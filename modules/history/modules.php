@@ -266,7 +266,7 @@ class Hm_Output_history_content  extends Hm_Output_Module {
         foreach ($data as $url => $row) {
             $from_class = 'from';
             if (!$row['from']) {
-                $row['from'] = sprintf('[%s]', $this->trans('No from'));
+                $row['from'] = $this->trans('[No From]');
                 $from_class = 'nofrom';
             }
             if (!$row['subject']) {

@@ -1538,7 +1538,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                 $custom = '<form id="imap_filter_form" method="GET">';
                 $custom .= '<input type="hidden" name="page" value="message_list" />';
                 $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
-                $custom .= '<input type="search" placeholder="'.$this->trans('search').
+                $custom .= '<input type="search" placeholder="'.$this->trans('Search').
                     '" class="imap_keyword" name="keyword" value="'.$this->html_safe($keyword).'" />';
                 $custom .= '<select name="sort" class="imap_sort">';
                 foreach ($sorts as $name => $val) {

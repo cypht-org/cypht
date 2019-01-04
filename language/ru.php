@@ -580,6 +580,7 @@ return array(
     'Not deleted' => false,
     'Results' => false,
     'Search Results' => false,
+    'feed item' => false
 ); 
 
 ?>
