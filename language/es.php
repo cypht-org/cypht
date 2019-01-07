@@ -578,7 +578,9 @@ return array(
     'Not deleted' => false,
     'Results' => false,
     'Search Results' => false,
-    'feed item' => false
+    'feed item' => false,
+    'Allow handling of mailto links' => false,
+    'Show folders' => false
 ); 
 
 ?>
