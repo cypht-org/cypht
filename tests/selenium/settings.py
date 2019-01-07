@@ -93,6 +93,9 @@ class SettingsTests(SettingsHelpers):
     def no_folder_icons_test(self):
         self.checkbox_test('general_setting', 'no_folder_icons', False)
 
+    def mailto_handler_test(self):
+        self.checkbox_test('general_setting', 'mailto_handler', False)
+
     def msg_list_icons_test(self):
         self.checkbox_test('general_setting', 'show_list_icons', False)
 

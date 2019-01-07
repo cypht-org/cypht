@@ -189,6 +189,22 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the the mailto handler setting in the general settings section.
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_mailto_handler_setting extends Hm_Handler_Module {
+    /**
+     * Can be one true or false
+     */
+    public function process() {
+        function mailto_handler_callback($val) {
+            return $val;
+        }
+        process_site_setting('mailto_handler', $this, 'mailto_handler_callback', false, true);
+    }
+}
+
+/**
  * Process input from the the list style setting in the general settings section.
  * @subpackage core/handler
  */
@@ -629,6 +645,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             }
         }
         $this->out('is_mobile', $this->request->mobile);
+        $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
     }
 }

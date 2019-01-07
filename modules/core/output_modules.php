@@ -513,6 +513,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
+            'var hm_mailto = function() { return '.($this->get('mailto_handler') ? '1' : '0').'; };'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
@@ -625,6 +626,23 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         }
         $res .= '</select></td></tr>';
         return $res;
+    }
+}
+
+/**
+ * @subpackage core/output
+ */
+class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('mailto_handler', $settings) && $settings['mailto_handler']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $checked = '';
+        }
+        return '<tr class="general_setting"><td><label for="mailto_handler">'.$this->trans('Allow handling of mailto links').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' value="1" id="mailto_handler" name="mailto_handler" /></td></tr>';
     }
 }
 

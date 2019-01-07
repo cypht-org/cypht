@@ -48,6 +48,7 @@ add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'afte
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_start_page_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_mailto_handler_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
@@ -57,7 +58,8 @@ add_output('settings', 'start_general_settings', true, 'core', 'start_settings_f
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'no_folder_icon_setting', true, 'core', 'timezone_setting', 'after');
-add_output('settings', 'list_style_setting', true, 'core', 'no_folder_icon_setting', 'after');
+add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_setting', 'after');
+add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
@@ -238,6 +240,7 @@ return array(
         'all_per_source' => FILTER_VALIDATE_INT,
         'all_since' => FILTER_SANITIZE_STRING,
         'no_folder_icons' => FILTER_VALIDATE_BOOLEAN,
+        'mailto_handler' => FILTER_VALIDATE_BOOLEAN,
         'list_style' => FILTER_SANITIZE_STRING,
         'timezone' => FILTER_SANITIZE_STRING,
         'disable_delete_prompt' => FILTER_VALIDATE_INT,
