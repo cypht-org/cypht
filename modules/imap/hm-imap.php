@@ -10,6 +10,7 @@ require_once('hm-imap-base.php');
 require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
+require_once('hm-jmap.php');
 
 /**
  * IMAP connection manager
@@ -22,7 +23,12 @@ class Hm_IMAP_List {
     public static $use_cache = true;
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_IMAP();
+        if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
+            self::$server_list[$id]['object'] = new Hm_JMAP();
+        }
+        else {
+            self::$server_list[$id]['object'] = new Hm_IMAP();
+        }
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
@@ -30,6 +36,7 @@ class Hm_IMAP_List {
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
+            'type'      => array_key_exists('type', $server) ? $server['type'] : 'imap',
             'username'  => $user,
             'password'  => $pass,
             'use_cache' => self::$use_cache
@@ -2090,6 +2097,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 'basename' => $folder['basename'],
                 'children' => $folder['has_kids'],
                 'noselect' => $folder['noselect'],
+                'id' => bin2hex($folder['basename']),
                 'name_parts' => $folder['name_parts'],
             );
         }

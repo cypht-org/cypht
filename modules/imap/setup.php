@@ -198,6 +198,7 @@ setup_base_ajax_page('ajax_imap_folder_expand', 'core');
 add_handler('ajax_imap_folder_expand', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_expand', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_folder_expand', 'imap_folder_expand',  true);
+add_handler('ajax_imap_folder_expand', 'save_imap_cache',  true);
 add_output('ajax_imap_folder_expand', 'filter_expanded_folder_data', true);
 
 /* select folder */
@@ -293,6 +294,7 @@ return array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
+        'folder_label' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(
@@ -321,7 +323,7 @@ return array(
         'folder' => FILTER_SANITIZE_STRING,
         'force_update' => FILTER_VALIDATE_BOOLEAN,
         'imap_folder_state' => FILTER_UNSAFE_RAW,
-        'imap_msg_uid' => FILTER_VALIDATE_INT,
+        'imap_msg_uid' => FILTER_SANITIZE_STRING,
         'imap_msg_part' => FILTER_SANITIZE_STRING,
         'imap_prefetch' => FILTER_VALIDATE_BOOLEAN,
         'hide_imap_server' => FILTER_VALIDATE_BOOLEAN,

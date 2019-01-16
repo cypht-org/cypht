@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/imap/hm-imap.php';
+require_once APP_PATH.'modules/imap/hm-jmap.php';
 
 /**
  * Check for attachments when forwarding a message
@@ -476,7 +477,14 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 if (!empty($details)) {
-                    $title = array('IMAP', $details['name'], hex2bin($parts[2]));
+                    if (array_key_exists('folder_label', $this->request->get)) {
+                        $folder = $this->request->get['folder_label'];
+                        $this->out('folder_label', $folder);
+                    }
+                    else {
+                        $folder = hex2bin($parts[2]);
+                    }
+                    $title = array('IMAP', $details['name'], $folder);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
@@ -576,7 +584,8 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             }
             $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], false);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
                 $this->out('imap_mailbox_page_path', $path);
                 list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
@@ -1166,6 +1175,16 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $max);
             }
         }
+        /* TODO: JMAP TEST */
+        /*Hm_IMAP_List::add(array(
+            'type' => 'jmap',
+            'name' => 'JMAP Test',
+            'server' => 'http://localhost',
+            'port' => 8080,
+            'user' => 'testuser',
+            'tls' => NULL,
+            'pass' => 'secret'
+        ), ($max + 1));*/
     }
 }
 
@@ -1394,7 +1413,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-
             if (imap_authed($imap)) {
                 $imap->read_only = $prefetch;
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
@@ -2379,11 +2397,15 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         else {
             $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
         }
+        $label_arg = '';
+        if (array_key_exists('type', $folder) && $folder['type'] == 'jmap') {
+            $label_arg = '&folder_label='.$output_mod->html_safe($folder['basename']);
+        }
         if (!$folder['noselect']) {
             $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-                '">'.$output_mod->html_safe($folder['basename']).'</a>';
+                $label_arg.'">'.$output_mod->html_safe($folder['basename']).'</a>';
         }
         else {
             $results .= $output_mod->html_safe($folder['basename']);
@@ -2496,6 +2518,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         if ($list_filter) {
             $url .= '&filter='.$output_module->html_safe($list_filter);
+        }
+        if (array_key_exists('folder_label', $msg)) {
+            $url .= '&folder_label='.$output_module->html_safe($msg['folder_label']);
         }
         if (!$show_icons) {
             $icon = false;
@@ -2778,7 +2803,7 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
             }
         }
         else {
-            if (count($vals) == 1 && isset($vals['subs'])) {
+            if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
                 $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
             }
         }
