@@ -54,6 +54,7 @@ class Hm_API_Curl {
         Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, 'hm3');
         Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
     }
 
     /**
