@@ -7,7 +7,7 @@
  */
 
 /**
- * Class for deailing with Oauth2
+ * Class for dealing with Oauth2
  */
 class Hm_Oauth2 {
 
