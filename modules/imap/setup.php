@@ -293,8 +293,7 @@ return array(
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
-        'imap_msg_part' => FILTER_SANITIZE_STRING,
-        'folder_label' => FILTER_SANITIZE_STRING
+        'imap_msg_part' => FILTER_SANITIZE_STRING
     ),
 
     'allowed_post' => array(

@@ -1137,6 +1137,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
         $updated = false;
         $new_servers = array();
         $max = 0;
+        $add_test_jmap = true;
         foreach ($servers as $index => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
@@ -1149,6 +1150,9 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             Hm_IMAP_List::add($server, $index);
             if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
+            }
+            if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
+                $add_test_jmap = false;
             }
         }
         $max++;
@@ -1175,16 +1179,17 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $max);
             }
         }
-        /* TODO: JMAP TEST */
-        /*Hm_IMAP_List::add(array(
-            'type' => 'jmap',
-            'name' => 'JMAP Test',
-            'server' => 'http://localhost',
-            'port' => 8080,
-            'user' => 'testuser',
-            'tls' => NULL,
-            'pass' => 'secret'
-        ), ($max + 1));*/
+        /*if ($add_test_jmap) {
+            Hm_IMAP_List::add(array(
+                'type' => 'jmap',
+                'name' => 'JMAP Test',
+                'server' => 'http://localhost',
+                'port' => 8080,
+                'user' => 'testuser',
+                'tls' => NULL,
+                'pass' => 'secret'
+            ), ($max + 1));
+        }*/
     }
 }
 
@@ -2397,15 +2402,11 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         else {
             $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
         }
-        $label_arg = '';
-        if (array_key_exists('type', $folder) && $folder['type'] == 'jmap') {
-            $label_arg = '&folder_label='.$output_mod->html_safe($folder['basename']);
-        }
         if (!$folder['noselect']) {
             $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-                $label_arg.'">'.$output_mod->html_safe($folder['basename']).'</a>';
+                '">'.$output_mod->html_safe($folder['basename']).'</a>';
         }
         else {
             $results .= $output_mod->html_safe($folder['basename']);
@@ -2518,9 +2519,6 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         if ($list_filter) {
             $url .= '&filter='.$output_module->html_safe($list_filter);
-        }
-        if (array_key_exists('folder_label', $msg)) {
-            $url .= '&folder_label='.$output_module->html_safe($msg['folder_label']);
         }
         if (!$show_icons) {
             $icon = false;
