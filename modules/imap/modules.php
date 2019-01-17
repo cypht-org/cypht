@@ -1137,7 +1137,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
         $updated = false;
         $new_servers = array();
         $max = 0;
-        $add_test_jmap = true;
         foreach ($servers as $index => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
@@ -1150,9 +1149,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             Hm_IMAP_List::add($server, $index);
             if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
-            }
-            if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
-                $add_test_jmap = false;
             }
         }
         $max++;
@@ -1179,17 +1175,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 $max);
             }
         }
-        /*if ($add_test_jmap) {
-            Hm_IMAP_List::add(array(
-                'type' => 'jmap',
-                'name' => 'JMAP Test',
-                'server' => 'http://localhost',
-                'port' => 8080,
-                'user' => 'testuser',
-                'tls' => NULL,
-                'pass' => 'secret'
-            ), ($max + 1));
-        }*/
     }
 }
 
