@@ -773,7 +773,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     }
                 }
                 if ($errs > 0) {
-                    Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['imap_action_type'], $server));
+                    Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['action_type'], $server));
                 }
                 if (count($status) > 0) {
                     $this->out('folder_state', $status);
@@ -2552,7 +2552,7 @@ if (!hm_exists('process_imap_message_ids')) {
 function process_imap_message_ids($ids) {
     $res = array();
     foreach (explode(',', $ids) as $id) {
-        if (preg_match("/imap_(\d+)_(\d+)_(\S+)$/", $id, $matches)) {
+        if (preg_match("/imap_(\S+)_(\S+)_(\S+)$/", $id, $matches)) {
             $server = $matches[1];
             $uid = $matches[2];
             $folder = $matches[3];
