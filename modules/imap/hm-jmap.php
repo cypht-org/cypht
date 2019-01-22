@@ -6,36 +6,6 @@
  * @subpackage imap
  */
 
-// jason [ ~/cypht ]$ egrep -o '\$imap->[a-z_]+' modules/*/modules.php | cut -f 2 -d '>' | sort | uniq -c | sort -n
-//      1 append_end
-//      1 append_feed
-//      1 append_start
-//      1 create_mailbox
-//      1 delete_mailbox
-//      1 get_folder_list_by_level
-//      1 get_mailbox_page
-//      1 get_mailbox_status
-//      1 get_message_headers
-//      1 get_namespaces
-//      1 read_only
-//      1 read_stream_line
-//      1 rename_mailbox
-//      1 start_message_stream
-//      1 struct_object
-//      2 get_message_structure
-//      2 get_special_use_mailboxes
-//      2 search_charset
-//      3 get_message_list
-//      3 selected_mailbox
-//      4 get_first_message_part
-//      4 get_message_content
-//      4 search
-//      6 search_bodystructure
-//      9 folder_state
-//      9 get_state
-//     14 message_action
-//     14 select_mailbox
-
 /**
  * public interface to JMAP commands
  * @subpackage imap/lib
@@ -47,6 +17,7 @@ class Hm_JMAP {
     private $api_url;
     private $account_id;
     private $headers;
+    private $delim = '.';
     private $state = 'disconnected';
     private $requests = array();
     private $responses = array();
@@ -58,6 +29,14 @@ class Hm_JMAP {
         'SUBJECT' => 'subject',
         'DATE' => 'sentAt'
     );
+    private $mod_map = array(
+        'READ' => array('$seen', true),
+        'UNREAD' => array('$seen', NULL),
+        'FLAG' => array('$flagged', true),
+        'UNFLAG' => array('$flagged', NULL),
+        'ANSWERED' => array('$answered', true),
+        'UNANSWERED' => array('$answered', NULL)
+    );
     private $default_caps = array(
         'urn:ietf:params:jmap:core',
         'urn:ietf:params:jmap:mail'
@@ -67,10 +46,114 @@ class Hm_JMAP {
     public $folder_state;
     public $use_cache = true;
 
+    /** 
+     * PUBLIC INTERFACE
+     */
+        
     public function __construct() {
         $this->api = new Hm_API_Curl();
     }
     
+    public function create_mailbox($mailbox) {
+    }
+
+    public function delete_mailbox($mailbox) {
+    }
+
+    public function start_message_stream($uid, $message_part) {
+    }
+
+    public function read_stream_line($size=1024) {
+    }
+
+    public function append_start($mailbox, $size, $seen=true) {
+    }
+
+    public function append_feed($string) {
+    }
+
+    public function append_end() {
+    }
+
+    public function get_mailbox_status($mailbox, $args=array('UNSEEN', 'UIDVALIDITY', 'UIDNEXT', 'MESSAGES', 'RECENT')) {
+    }
+
+    public function get_state() {
+        return $this->state;
+    }
+
+    public function show_debug() {
+        return array(
+            'commands' => $this->requests,
+            'responses' => $htis->responses
+        );
+    }
+
+    public function get_first_message_part($uid, $type, $subtype=false, $struct=false) {
+        if (!$subtype) {
+            $flds = array('type' => $type);
+        }
+        else {
+            $flds = array('type' => $type, 'subtype' => $subtype);
+        }
+        $matches = $this->search_bodystructure($struct, $flds, false);
+        if (empty($matches)) {
+            return array(false, false);
+        }
+
+        $subset = array_slice(array_keys($matches), 0, 1);
+        $msg_part_num = $subset[0];
+        $struct = array_slice($matches, 0, 1);
+
+        if (isset($struct[$msg_part_num])) {
+            $struct = $struct[$msg_part_num];
+        }
+        elseif (isset($struct[0])) {
+            $struct = $struct[0];
+        }
+        return array($msg_part_num, $this->get_message_content($uid, $msg_part_num, false, $struct));
+    }
+
+    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false) {
+        $mailbox_id = $this->folder_name_to_id($mailbox);
+        $filter = array('inMailbox' => $mailbox_id);
+        if ($keyword) {
+            $filter['hasKeyword'] = $keyword;
+        }
+        $methods = array(
+            array(
+                'Email/query',
+                array(
+                    'accountId' => $this->account_id,
+                    'filter' => $filter,
+                    'sort' => array(array(
+                        'property' => $this->sorts[$sort],
+                        'isAscending' => $rev ? false : true
+                    )),
+                    'position' => $offset,
+                    'limit' => $limit,
+                    'calculateTotal' => true
+                ),
+                'gmp' 
+            )
+        );
+        $res = $this->send_command($this->api_url, $methods);
+        $total = $this->search_response($res, array(0, 1, 'total'), 0);
+        $msgs = $this->get_message_list($this->search_response($res, array(0, 1, 'ids'), array()));
+        $this->setup_selected_mailbox($mailbox, $total);
+        return array($total, $msgs);
+    }
+
+    public function get_folder_list_by_level($level=false) {
+        if (!$level) {
+            $level = '';
+        }
+        if (count($this->folder_list) == 0) {
+            $this->folder_list = $this->parse_imap_folders($this->get_folder_list());
+        }
+        return $this->parse_folder_list_by_level($level);
+    }
+
     public function dump_cache() {
         return array(
             $this->session,
@@ -132,14 +215,16 @@ class Hm_JMAP {
     }
 
     public function get_namespaces() {
+        return array(array(
+            'class' => 'personal',
+            'prefix' => false,
+            'delim' => $this->delim
+        ));
     }
 
     public function select_mailbox($mailbox) {
         $this->setup_selected_mailbox($mailbox, 0);
         return true;
-    }
-
-    public function get_mailbox_status($mailbox, $args=array('UNSEEN', 'UIDVALIDITY', 'UIDNEXT', 'MESSAGES', 'RECENT')) {
     }
 
     public function get_message_list($uids) {
@@ -183,27 +268,6 @@ class Hm_JMAP {
         ));
         $res = $this->send_command($this->api_url, $methods);
         return $this->search_response($res, array(0, 1, 'list', 0, 'bodyValues', $message_part, 'value'));
-    }
-
-    private function process_imap_search_terms($terms) {
-        $converted_terms = array();
-        $map = array(
-            'SINCE' => 'after',
-            'SUBJECT' => 'subject',
-            'TO' => 'to',
-            'FROM' => 'from',
-            'BODY' => 'body',
-            'TEXT' => 'text'
-        );
-        foreach ($terms as $vals) {
-            if (array_key_exists($vals[0], $map)) {
-                if ($vals[0] == 'SINCE') {
-                    $vals[1] = gmdate("Y-m-d\TH:i:s\Z", strtotime($vals[1]));
-                }
-                $converted_terms[$map[$vals[0]]] = $vals[1];
-            }
-        }
-        return count($converted_terms) > 0 ? $converted_terms : false;
     }
 
     public function search($target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
@@ -251,28 +315,81 @@ class Hm_JMAP {
         return $this->normalize_headers($headers);
     }
 
-    public function start_message_stream($uid, $message_part) {
-    }
-
-    public function read_stream_line($size=1024) {
-    }
-
-    public function sort_by_fetch($sort, $reverse, $filter, $uid_str=false) {
-    }
-
-    public function delete_mailbox($mailbox) {
-    }
-
     public function rename_mailbox($mailbox, $new_mailbox) {
+        $id = $this->folder_name_to_id($mailbox);
+        $parent = explode($this->delim, $new_mailbox);
+        $name = array_pop($parent);
+        $parent = implode($this->delim, $parent);
+        if (!$parent) {
+            $parent = NULL;
+        }
+        else {
+            $parent = $this->folder_name_to_id($parent);
+        }
+        $methods = array(array(
+            'Mailbox/set',
+            array(
+                'accountId' => $this->account_id,
+                'update' => array($id => array('parentId' => $parent, 'name' => $name))
+            ),
+            'ma' 
+        ));
+        $res = $this->send_command($this->api_url, $methods);
+        $updated = $this->search_response($res, array(0, 1, 'updated')); 
+        /* TODO: Bust folder list cache */
+        //$this->folder_list = $this->parse_imap_folders($this->get_folder_list());
+        return count($updated) > 0;
     } 
 
-    public function create_mailbox($mailbox) {
+    public function message_action($action, $uids, $mailbox=false, $keyword=false) {
+        $methods = array();
+        $key =false;
+        if (array_key_exists($action, $this->mod_map)) {
+            $methods = $this->modify_msg_methods($action, $uids);
+            $key = 'updated';
+        }
+        elseif ($action == 'DELETE') {
+            $methods = $this->delete_msg_methods($uids);
+            $key = 'destroyed';
+        }
+        elseif (in_array($action, array('MOVE', 'COPY'), true)) {
+            $methods = $this->move_copy_methods($action, $uids, $mailbox);
+            $key = 'updated';
+        }
+        if (!$key) {
+            return false;
+        }
+        $res = $this->send_command($this->api_url, $methods);
+        $changed_uids = array_keys($this->search_response($res, array(0, 1, $key)));
+        return count($changed_uids) == count($uids);
     }
 
-    public function message_action($action, $uids, $mailbox=false, $keyword=false) {
-        /* TODO: Handle copy + move + delete */
-        $keywords = $this->convert_imap_keyword($action, $uids);
-        $methods = array(array(
+    public function search_bodystructure($struct, $search_flds, $all=true, $res=array()) {
+        $this->struct_object = new Hm_IMAP_Struct(array(), $this);
+        $res = $this->struct_object->recursive_search($struct, $search_flds, $all, $res);
+        return $res;
+    }
+
+    /**
+     * PRIVATE HELPER METHODS
+     */
+
+    private function move_copy_methods($action, $uids, $mailbox) {
+        /* TODO: this assumes a message can only be in ONE mailbox, other refs will be lost,
+            * we should switch to "patch to fix this */
+        if ($action == 'MOVE') {
+            $mailbox_ids = array('mailboxIds' => array($this->folder_name_to_id($mailbox) => true));
+        }
+        else {
+            $mailbox_ids = array('mailboxIds' => array(
+                $this->folder_name_to_id($this->selected_mailbox['detail']['name']) => true,
+                $this->folder_name_to_id($mailbox) => true));
+        }
+        $keywords = array();
+        foreach ($uids as $uid) {
+            $keywords[$uid] = $mailbox_ids;
+        }
+        return array(array(
             'Email/set',
             array(
                 'accountId' => $this->account_id,
@@ -280,35 +397,33 @@ class Hm_JMAP {
             ),
             'ma' 
         ));
-        $res = $this->send_command($this->api_url, $methods);
-        $updated_ids = array_keys($this->search_response($res, array(0, 1, 'updated')));
-        return count($updated_ids) == count($uids);
     }
 
-    public function append_start($mailbox, $size, $seen=true) {
-    }
-
-    public function append_feed($string) {
-    }
-
-    public function append_end() {
-    }
-
-    private function convert_imap_keyword($action, $uids) {
-        $res = array();
-        $map = array(
-            'READ' => array('$seen', true),
-            'UNREAD' => array('$seen', NULL),
-            'FLAG' => array('$flagged', true),
-            'UNFLAG' => array('$flagged', NULL),
-            'ANSWERED' => array('$answered', true),
-            'UNANSWERED' => array('$answered', NULL)
-        );
-        $jmap_keyword = $map[$action];
+    private function modify_msg_methods($action, $uids) {
+        $keywords = array();
+        $jmap_keyword = $this->mod_map[$action];
         foreach ($uids as $uid) {
-            $res[$uid] = array(sprintf('keywords/%s', $jmap_keyword[0]) => $jmap_keyword[1]);
+            $keywords[$uid] = array(sprintf('keywords/%s', $jmap_keyword[0]) => $jmap_keyword[1]);
         }
-        return $res;
+        return array(array(
+            'Email/set',
+            array(
+                'accountId' => $this->account_id,
+                'update' => $keywords
+            ),
+            'ma' 
+        ));
+    }
+
+    private function delete_msg_methods($uids) {
+        return array(array(
+            'Email/set',
+            array(
+                'accountId' => $this->account_id,
+                'destroy' => $uids
+            ),
+            'ma' 
+        ));
     }
 
     private function get_raw_bodystructure($uid) {
@@ -459,32 +574,12 @@ class Hm_JMAP {
         return $data;
     }
 
-    public function is_supported($extension) {
-    }
-
-    public function get_state() {
-        return $this->state;
-    }
-
-    public function show_debug() {
-        return array(
-            'commands' => $this->requests,
-            'responses' => $htis->responses
-        );
-    }
-
     private function setup_selected_mailbox($mailbox, $total) {
         $this->selected_mailbox = array('detail' => array(
             'selected' => 1,
             'name' => $mailbox,
             'exists' => $total
         ));
-    }
-
-    public function search_bodystructure($struct, $search_flds, $all=true, $res=array()) {
-        $this->struct_object = new Hm_IMAP_Struct(array(), $this);
-        $res = $this->struct_object->recursive_search($struct, $search_flds, $all, $res);
-        return $res;
     }
 
     private function parse_folder_list_by_level($level) {
@@ -499,7 +594,6 @@ class Hm_JMAP {
 
     private function parse_imap_folders($data) {
         $lookup = array();
-        $delim = '.';
         foreach ($data as $vals) {
             $vals['children'] = false;
             $lookup[$vals['id']] = $vals;
@@ -507,7 +601,7 @@ class Hm_JMAP {
         foreach ($data as $vals) {
             if ($vals['parentId']) {
                 $parents = $this->get_parent_recursive($vals, $lookup, $parents=array());
-                $level = implode($delim, $parents);
+                $level = implode($this->delim, $parents);
                 $parents[] = $vals['name'];
                 $lookup[$vals['parentId']]['children'] = true;
             }
@@ -518,19 +612,19 @@ class Hm_JMAP {
             $lookup[$vals['id']]['basename'] = $vals['name'];
             $lookup[$vals['id']]['level'] = $level;
             $lookup[$vals['id']]['name_parts'] = $parents;
-            $lookup[$vals['id']]['name'] = implode($delim, $parents);
+            $lookup[$vals['id']]['name'] = implode($this->delim, $parents);
         }
-        return $this->build_imap_folders($lookup, $delim);
+        return $this->build_imap_folders($lookup);
     }
 
-    private function build_imap_folders($data, $delim) {
+    private function build_imap_folders($data) {
         $result = array();
         foreach ($data as $vals) {
             if (strtolower($vals['name']) == 'inbox') {
                 $vals['name'] = 'INBOX';
             }
             $result[$vals['name']] = array(
-                    'delim' => $delim,
+                    'delim' => $this->delim,
                     'level' => $vals['level'],
                     'basename' => $vals['basename'],
                     'children' => $vals['children'],
@@ -563,69 +657,24 @@ class Hm_JMAP {
         return false;
     }
 
-    public function get_first_message_part($uid, $type, $subtype=false, $struct=false) {
-        if (!$subtype) {
-            $flds = array('type' => $type);
-        }
-        else {
-            $flds = array('type' => $type, 'subtype' => $subtype);
-        }
-        $matches = $this->search_bodystructure($struct, $flds, false);
-        if (!empty($matches)) {
-
-            $subset = array_slice(array_keys($matches), 0, 1);
-            $msg_part_num = $subset[0];
-            $struct = array_slice($matches, 0, 1);
-
-            if (isset($struct[$msg_part_num])) {
-                $struct = $struct[$msg_part_num];
-            }
-            elseif (isset($struct[0])) {
-                $struct = $struct[0];
-            }
-
-            return array($msg_part_num, $this->get_message_content($uid, $msg_part_num, false, $struct));
-        } 
-        return array(false, false);
-    }
-
-    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false) {
-        $mailbox_id = $this->folder_name_to_id($mailbox);
-        $filter = array('inMailbox' => $mailbox_id);
-        if ($keyword) {
-            $filter['hasKeyword'] = $keyword;
-        }
-        $methods = array(
-            array(
-                'Email/query',
-                array(
-                    'accountId' => $this->account_id,
-                    'filter' => $filter,
-                    'sort' => array(array(
-                        'property' => $this->sorts[$sort],
-                        'isAscending' => $rev ? false : true
-                    )),
-                    'position' => $offset,
-                    'limit' => $limit,
-                    'calculateTotal' => true
-                ),
-                'gmp' 
-            )
+    private function process_imap_search_terms($terms) {
+        $converted_terms = array();
+        $map = array(
+            'SINCE' => 'after',
+            'SUBJECT' => 'subject',
+            'TO' => 'to',
+            'FROM' => 'from',
+            'BODY' => 'body',
+            'TEXT' => 'text'
         );
-        $res = $this->send_command($this->api_url, $methods);
-        $total = $this->search_response($res, array(0, 1, 'total'), 0);
-        $msgs = $this->get_message_list($this->search_response($res, array(0, 1, 'ids'), array()));
-        $this->setup_selected_mailbox($mailbox, $total);
-        return array($total, $msgs);
-    }
-
-    public function get_folder_list_by_level($level=false) {
-        if (!$level) {
-            $level = '';
+        foreach ($terms as $vals) {
+            if (array_key_exists($vals[0], $map)) {
+                if ($vals[0] == 'SINCE') {
+                    $vals[1] = gmdate("Y-m-d\TH:i:s\Z", strtotime($vals[1]));
+                }
+                $converted_terms[$map[$vals[0]]] = $vals[1];
+            }
         }
-        if (count($this->folder_list) == 0) {
-            $this->folder_list = $this->parse_imap_folders($this->get_folder_list());
-        }
-        return $this->parse_folder_list_by_level($level);
+        return count($converted_terms) > 0 ? $converted_terms : false;
     }
 }
