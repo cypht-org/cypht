@@ -10,7 +10,7 @@
  * public interface to JMAP commands
  * @subpackage imap/lib
  */
-class Hm_JMAP extends Hm_JMAP_Email {
+class Hm_JMAP {
 
     private $api;
     private $session;
