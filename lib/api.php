@@ -12,7 +12,7 @@
 class Hm_API_Curl {
 
     public $last_status;
-    private $format = '';
+    public $format = '';
 
     /**
      * Init
@@ -55,6 +55,9 @@ class Hm_API_Curl {
         Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        if ($this->format == 'binary') {
+            Hm_Functions::c_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
+        }
     }
 
     /**
@@ -95,6 +98,9 @@ class Hm_API_Curl {
      */
     private function format_post_data($data) {
         $post = array();
+        if (!is_array($data)) {
+            return $data;
+        }
         foreach ($data as $name => $value) {
             $post[] = urlencode($name).'='.urlencode($value);
         }
