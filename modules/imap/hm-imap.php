@@ -939,7 +939,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
         }
         if ($struct === true) {
-            $full_struct = $this->get_message_structure( $uid );
+            $full_struct = $this->get_message_structure($uid);
             $part_struct = $this->search_bodystructure( $full_struct, array('imap_part_number' => $message_part));
             if (isset($part_struct[$message_part])) {
                 $struct = $part_struct[$message_part];
@@ -968,8 +968,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /**
      * use IMAP SEARCH or ESEARCH
-    /**
-     * search a field for a keyword
      * @param string $target message types to search. can be ALL, UNSEEN, ANSWERED, etc
      * @param mixed $uids an array of uids or a valid IMAP sequence set as a string (or false for ALL)
      * @param string $fld optional field to search
