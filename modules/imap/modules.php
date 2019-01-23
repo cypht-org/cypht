@@ -1463,7 +1463,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
-                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%d&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
                         $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
