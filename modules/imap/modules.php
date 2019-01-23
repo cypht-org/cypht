@@ -374,7 +374,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
             $folder = NULL;
             $msg_id = NULL;
 
-            if (array_key_exists('uid', $this->request->get) && is_numeric($this->request->get['uid'])) {
+            if (array_key_exists('uid', $this->request->get) && $this->request->get['uid']) {
                 $uid = $this->request->get['uid'];
             }
             if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\d+)_(.+)/", $this->request->get['list_path'], $matches)) {
@@ -390,7 +390,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                 if (imap_authed($imap)) {
                     if ($imap->select_mailbox($folder)) {
                         $msg_struct = $imap->get_message_structure($uid);
-                        $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $msg_id));
+                        $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $msg_id));
                         if (!empty($struct)) {
                             $part_struct = array_shift($struct);
                             $encoding = false;
@@ -3140,6 +3140,9 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
     }
     if (array_key_exists('description', $struct) && trim($struct['description'])) {
         return trim(str_replace(array("\n", ' '), '_', $struct['description'])).$extension;
+    }
+    if (array_key_exists('name', $struct) && trim($struct['name'])) {
+        return trim($struct['name']);
     }
     if ($no_default) {
         return '';
