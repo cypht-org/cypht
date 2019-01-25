@@ -118,9 +118,14 @@ var imap_setup_server_page = function() {
     $('.unhide_imap_connection').on('click', imap_unhide);
     $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
+
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');
     if (dsp === 'block' || dsp === 'none') {
         $('.imap_section').css('display', dsp);
+    }
+    var jdsp = Hm_Utils.get_from_local_storage('.jmap_section');
+    if (jdsp === 'block' || jdsp === 'none') {
+        $('.jmap_section').css('display', jdsp);
     }
 };
 

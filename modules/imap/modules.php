@@ -529,7 +529,6 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_path', $path);
                 return;
             }
-            $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
@@ -543,7 +542,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_path', $path);
             }
             else {
-                Hm_Msgs::add('ERRCould not authenticate to the selected IMAP server');
+                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server', $imap->server_type));
             }
         }
     }
@@ -968,6 +967,46 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
 }
 
 /**
+ * Add a new JMAP server
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
+    public function process() {
+        /**
+         * Used on the servers page to add a new JMAP server
+         */
+        if (isset($this->request->post['submit_jmap_server'])) {
+            list($success, $form) = $this->process_form(array('new_jmap_name', 'new_jmap_address'));
+            if (!$success) {
+                $this->out('old_form', $form);
+                Hm_Msgs::add('ERRYou must supply a name and a JMAP server URL');
+                return;
+            }
+            $hidden = false;
+            if (isset($this->request->post['new_jmap_hidden'])) {
+                $hidden = true;
+            }
+            $parsed = parse_url($form['new_jmap_address']);
+            if (array_key_exists('host', $parsed) && @get_headers($form['new_jmap_address'])) {
+
+                Hm_IMAP_List::add(array(
+                    'name' => $form['new_jmap_name'],
+                    'server' => $form['new_jmap_address'],
+                    'hide' => $hidden,
+                    'type' => 'jmap',
+                    'port' => false,
+                    'tls' => false));
+                Hm_Msgs::add('Added server!');
+                $this->session->record_unsaved('JMAP server added');
+            }
+            else {
+                Hm_Msgs::add('ERRCound not access supplied URL');
+            }
+        }
+    }
+}
+
+/**
  * Add a new IMAP server
  * @subpackage imap/handler
  */
@@ -1297,10 +1336,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             }
             if ($imap) {
                 if ($imap->get_state() == 'authenticated') {
-                    Hm_Msgs::add("Successfully authenticated to the IMAP server");
+                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server", $imap->server_type));
                 }
                 else {
-                    Hm_Msgs::add("ERRFailed to authenticate to the IMAP server");
+                    Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server", $imap->server_type));
                 }
             }
             else {
@@ -1766,7 +1805,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
 
-            $no_edit = false;
+            if (array_key_exists('type', $vals) && $vals['type'] == 'jmap') {
+                continue;
+            }
 
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
@@ -1792,8 +1833,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
-            $res .= 
-                '<form class="imap_connect" method="POST">'.
+            $res .= '<form class="imap_connect" method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
                 '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
@@ -1803,32 +1843,30 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
                 '" type="password" name="imap_pass"></span>';
 
-            if (!$no_edit) {
-                if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
-                }
-                else {
-                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
-                }
-                $hidden = false;
-                if (array_key_exists('hide', $vals) && $vals['hide']) {
-                    $hidden = true;
-                }
-                $res .= '<input type="submit" ';
-                if ($hidden) {
-                    $res .= 'style="display: none;" ';
-                }
-                $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
-                $res .= '<input type="submit" ';
-                if (!$hidden) {
-                    $res .= 'style="display: none;" ';
-                }
-                $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
-                $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
+            if (!isset($vals['user']) || !$vals['user']) {
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
             }
+            else {
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
+            }
+            $hidden = false;
+            if (array_key_exists('hide', $vals) && $vals['hide']) {
+                $hidden = true;
+            }
+            $res .= '<input type="submit" ';
+            if ($hidden) {
+                $res .= 'style="display: none;" ';
+            }
+            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
+            $res .= '<input type="submit" ';
+            if (!$hidden) {
+                $res .= 'style="display: none;" ';
+            }
+            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
+            $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             $res .= '</form></div>';
         }
         $res .= '<br class="clear_float" /></div></div>';
@@ -1848,7 +1886,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $count = count($this->get('imap_servers', array()));
+        $count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
@@ -1870,6 +1908,117 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
     }
 }
 
+/**
+ * Format the add IMAP server dialog for the servers page
+ * @subpackage imap/output
+ */
+class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
+    /**
+     * Build the HTML for the add server dialog
+     */
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap';}));
+        $count = sprintf($this->trans('%d configured'), $count);
+        return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST">'.
+            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<div class="subtitle">'.$this->trans('Add a JMAP Server').'</div><table>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_name">'.$this->trans('Account name').'</label>'.
+            '<input id="new_jmap_name" required type="text" name="new_jmap_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_address">'.$this->trans('Server URL').'</label>'.
+            '<input required type="url" id="new_jmap_address" name="new_jmap_address" class="txt_fld" placeholder="'.$this->trans('Server URL').'" value=""/></td></tr>'.
+            '<tr><td colspan="2"><input type="checkbox" id="new_jmap_hidden" name="new_jmap_hidden" class="" value="1">'.
+            '<label for="new_jmap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
+            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_jmap_server" /></td></tr>'.
+            '</table></form>';
+    }
+}
+
+/**
+ * Format configured JMAP servers for the servers page
+ * @subpackage imap/output
+ */
+class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
+    /**
+     * Build HTML for configured JMAP servers
+     */
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $res = '';
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+
+            if (!array_key_exists('type', $vals) || $vals['type'] != 'jmap') {
+                continue;
+            }
+            if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
+                $disabled = 'disabled="disabled"';
+                $user_pc = $vals['user'];
+                $pass_pc = $this->trans('[saved]');
+            }
+            elseif (array_key_exists('nopass', $vals)) {
+                if (array_key_exists('user', $vals)) {
+                    $user_pc = $vals['user'];
+                }
+                else {
+                    $user_pc = '';
+                }
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
+            }
+            else {
+                $user_pc = '';
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
+            }
+            $res .= '<div class="configured_server">';
+            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+            $res .= '<form class="imap_connect" method="POST">'.
+                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+                '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
+                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('JMAP username').'</label>'.
+                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').
+                '" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'"></span>'.
+                '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label>'.
+                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
+                '" type="password" name="imap_pass"></span>';
+
+            if (!isset($vals['user']) || !$vals['user']) {
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
+            }
+            else {
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
+            }
+            $hidden = false;
+            if (array_key_exists('hide', $vals) && $vals['hide']) {
+                $hidden = true;
+            }
+            $res .= '<input type="submit" ';
+            if ($hidden) {
+                $res .= 'style="display: none;" ';
+            }
+            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
+            $res .= '<input type="submit" ';
+            if (!$hidden) {
+                $res .= 'style="display: none;" ';
+            }
+            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
+            $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
+            $res .= '</form></div>';
+        }
+        $res .= '<br class="clear_float" /></div></div>';
+        return $res;
+    }
+}
 /**
  * Format the IMAP status output on the info page
  * @subpackage imap/output

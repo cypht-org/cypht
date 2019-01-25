@@ -65,6 +65,7 @@ class Hm_JMAP {
     public $folder_state = array();
     public $use_cache = true;
     public $read_only = false;
+    public $server_type = 'JMAP';
 
     /** 
      * PUBLIC INTERFACE
@@ -279,7 +280,7 @@ class Hm_JMAP {
     public function show_debug() {
         return array(
             'commands' => $this->requests,
-            'responses' => $htis->responses
+            'responses' => $this->responses
         );
     }
 
@@ -396,7 +397,6 @@ class Hm_JMAP {
             $cfg['username'],
             $cfg['password'],
             $cfg['server'],
-            $cfg['port']
         );
     }
 
@@ -413,22 +413,21 @@ class Hm_JMAP {
      * @param string $username user to login
      * @param string $password user password
      * @param string $url JMAP url
-     * @param integer $port JMAP port
      * @return boolean
      */
-    public function authenticate($username, $password, $url, $port) {
+    public function authenticate($username, $password, $url) {
         if (is_array($this->session)) {
             $res = $this->session;
         }
         else {
-            $auth_url = $this->prep_url($url, $port);
+            $auth_url = $this->prep_url($url);
             $res = $this->send_command($auth_url, array(), 'GET');
         }
         if (is_array($res) &&
             array_key_exists('apiUrl', $res) &&
             array_key_exists('accounts', $res)) {
 
-            $this->init_session($res, $url, $port);
+            $this->init_session($res, $url);
             return true;
         }
         return false;
@@ -835,30 +834,28 @@ class Hm_JMAP {
      * Start a JMAP session
      * @param array $data JMAP auth response
      * @param string $url url to access JMAP
-     * @param integer $port port to access JMAP
      * @return void
      */
-    private function init_session($data, $url, $port) {
+    private function init_session($data, $url) {
         $this->state = 'authenticated';
         $this->session = $data;
         $this->api_url = sprintf(
-            '%s:%s%s',
+            '%s%s',
             preg_replace("/\/$/", '', $url),
-            $port,
             $data['apiUrl']
         );
         $this->download_url = sprintf(
-            '%s:%s%s',
+            '%s%s',
             preg_replace("/\/$/", '', $url),
-            $port,
             $data['downloadUrl']
         );
         $this->upload_url = sprintf(
-            '%s:%s%s',
+            '%s%s',
             preg_replace("/\/$/", '', $url),
-            $port,
             $data['uploadUrl']
         );
+        /* TODO: get account listed as "primary" */
+        /* TODO: support > 1 account from a JMAP source */
         $this->account_id = array_keys($data['accounts'])[0];
         if (count($this->folder_list) == 0) {
             $this->reset_folders();
@@ -943,6 +940,9 @@ class Hm_JMAP {
                 $data = $data[$key];
             }
             else {
+                Hm_Debug::add('Failed to find key path in response');
+                Hm_Debug::add('key path: '.print_r($keypath, true));
+                Hm_Debug::add('data: '.print_r($data, true));
                 return $default;
             }
         }
@@ -995,15 +995,11 @@ class Hm_JMAP {
     /**
      * Prep a URL for JMAP discover
      * @param string $url JMAP url
-     * @param integer $port JMAP port
      * @return string
      */
-    private function prep_url($url, $port) {
+    private function prep_url($url) {
         $url = preg_replace("/\/$/", '', $url);
-        if ($port == 80 || $port == 443) {
-            return sprintf('%s/.well-known/jmap/', $url);
-        }
-        return sprintf('%s:%s/.well-known/jmap/', $url, $port);
+        return sprintf('%s/.well-known/jmap/', $url);
     }
 
     /**

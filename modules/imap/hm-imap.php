@@ -122,6 +122,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /* query the server for it's CAPABILITY response */
     public $no_caps = false;
 
+    /* server type */
+    public $server_type = 'IMAP';
+
     /* IMAP ID client information */
     public $app_name = 'Hm_IMAP';
     public $app_version = '3.0';

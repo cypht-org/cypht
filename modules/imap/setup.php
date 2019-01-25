@@ -19,9 +19,12 @@ add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'message_list_type', 'after');
-add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_imap_server', 'after');
+add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_imap_server', 'after');
+add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
 add_output('servers', 'add_imap_server_dialog', true, 'imap', 'server_content_start', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'add_imap_server_dialog', 'after');
+add_output('servers', 'add_jmap_server_dialog', true, 'imap', 'display_configured_imap_servers', 'after');
+add_output('servers', 'display_configured_jmap_servers', true, 'imap', 'add_jmap_server_dialog', 'after');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* settings page data */
@@ -315,6 +318,9 @@ return array(
         'imap_forget' => FILTER_SANITIZE_STRING,
         'imap_save' => FILTER_SANITIZE_STRING,
         'submit_imap_server' => FILTER_SANITIZE_STRING,
+        'submit_jmap_server' => FILTER_SANITIZE_STRING,
+        'new_jmap_address' => FILTER_SANITIZE_URL,
+        'new_jmap_name' => FILTER_SANITIZE_STRING,
         'new_imap_address' => FILTER_SANITIZE_STRING,
         'new_imap_hidden' => FILTER_VALIDATE_BOOLEAN,
         'new_imap_port' => FILTER_VALIDATE_INT,
