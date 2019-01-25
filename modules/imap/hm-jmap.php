@@ -882,7 +882,7 @@ class Hm_JMAP {
     }
 
     /**
-     * Combined parsed addresses
+     * Combine parsed addresses
      * @param array $addr JMAP address field
      * @return string
      */
@@ -908,7 +908,7 @@ class Hm_JMAP {
     }
 
     /**
-     * Send a "commmand" or a set of methods to JMAP
+     * Send a "command" or a set of methods to JMAP
      * @param string $url the JMAP url
      * @param array $methods the methods to run
      * @param string $method the HTTP method to use
