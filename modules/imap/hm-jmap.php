@@ -396,7 +396,7 @@ class Hm_JMAP {
         return $this->authenticate(
             $cfg['username'],
             $cfg['password'],
-            $cfg['server'],
+            $cfg['server']
         );
     }
 
