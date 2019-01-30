@@ -1401,7 +1401,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                 if (imap_authed($imap)) {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved('IMAP server saved');
+                    $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
                 }
                 else {
                     Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
@@ -1528,7 +1528,7 @@ class Hm_Handler_imap_hide extends Hm_Handler_Module {
             if ($success) {
                 Hm_IMAP_List::toggle_hidden($form['imap_server_id'], (bool) $this->request->post['hide_imap_server']);
                 Hm_Msgs::add('Hidden status updated');
-                $this->session->record_unsaved('IMAP server hidden status updated');
+                $this->session->record_unsaved(sprintf('%s server hidden status updated', imap_server_type($form['imap_server_id'])));
             }
         }
     }
@@ -1550,7 +1550,7 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
                 if ($res) {
                     $this->out('deleted_server_id', $form['imap_server_id']);
                     Hm_Msgs::add('Server deleted');
-                    $this->session->record_unsaved('IMAP server deleted');
+                    $this->session->record_unsaved(sprintf('%s server deleted', imap_server_type($form['imap_server_id'])));
                 }
             }
             else {
@@ -3339,4 +3339,17 @@ function process_sort_arg($sort) {
         $rev = $rev ? false : true;
     }
     return array($sort, $rev);
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('imap_server_type')) {
+function imap_server_type($id) {
+    $type = 'IMAP';
+    $details = Hm_IMAP_List::dump($id);
+    if (is_array($details) && array_key_exists('type', $details)) {
+        $type = strtoupper($details['type']);
+    }
+    return $type;
 }}

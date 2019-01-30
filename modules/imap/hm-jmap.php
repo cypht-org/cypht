@@ -18,6 +18,16 @@
  *
  */
 
+
+/**
+ * TODO:
+ * - support multiple accounts per JMAP connection.
+ * - Update move/copy for multiple mailboxId refs (patch)
+ * - mailbox state handling
+ * - pipeline where we can with back refs
+ * - disable download of multipart types
+ */
+
 /**
  * public interface to JMAP commands
  * @subpackage imap/lib
@@ -669,8 +679,6 @@ class Hm_JMAP {
      * @return array
      */
     private function move_copy_methods($action, $uids, $mailbox) {
-        /* TODO: this assumes a message can only be in ONE mailbox, other refs will be lost,
-                 we should switch to "patch" syntax to fix this */
         if ($action == 'MOVE') {
             $mailbox_ids = array('mailboxIds' => array($this->folder_name_to_id($mailbox) => true));
         }
@@ -854,10 +862,13 @@ class Hm_JMAP {
             preg_replace("/\/$/", '', $url),
             $data['uploadUrl']
         );
-        /* TODO: get account listed as "primary" */
-        /* TODO: support > 1 account from a JMAP source */
-        $this->account_id = array_keys($data['accounts'])[0];
-        if (count($this->folder_list) == 0) {
+        foreach ($data['accounts'] as $account) {
+            if (array_key_exists('isPrimary', $account) && $account['isPrimary']) {
+                $this->account_id = array_keys($data['accounts'])[0];
+                break;
+            }
+        }
+        if ($this->account_id && count($this->folder_list) == 0) {
             $this->reset_folders();
         }
     }
