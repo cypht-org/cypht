@@ -1,5 +1,45 @@
 'use strict';
 
+/* extend cash a bit for zepto expectations */
+$.isEmptyObject = function(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+};
+$.fn.sort = function(sort_function) {
+};
+$.fn.swipeLeft = function() {
+};
+$.fn.swipeRight = function() {
+};
+$.fn.swipeDown = function() {
+};
+$.fn.toggle = function() {
+    var display = this.css('display');
+    if (display == 'none') {
+        this.show();
+    }
+    else {
+        this.hide();
+    }
+};
+$.fn.hide = function() {
+    this.css('display', 'none');
+};
+$.fn.show = function() {
+    this.css('display', 'block');
+};
+$.inArray = function(item, list) {
+    for (var i in list) {
+        if (list[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};
+
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,
@@ -86,6 +126,30 @@ var Hm_Ajax_Request = function() { return {
     on_failure: false,
     start_time: 0,
 
+    xhr_fetch: function(config) {
+        var xhr = new XMLHttpRequest();
+        var data = '';
+        if (config.data) {
+            data = this.format_xhr_data(config.data);
+        }
+        xhr.open('POST', window.location.href)
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
+        xhr.send(data);
+        xhr.onload = function() {
+            config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
+            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
+        }
+    },
+
+    format_xhr_data: function(data) {
+        var res = []
+        for (var i in data) {
+            res.push(encodeURIComponent(data[i]['name']) + '=' + encodeURIComponent(data[i]['value']));
+        }
+        return res.join('&');
+    },
+
     make_request: function(args, callback, extra, request_name, on_failure) {
         var name;
         var arg;
@@ -111,29 +175,21 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        $.ajax({
-            type: "POST",
+        this.xhr_fetch({
             url: '',
             data: args,
-            context: this, 
-            success: this.done,
-            complete: this.always,
-            error: this.fail
+            callback: this
         });
 
         return false;
     },
 
-    done: function(res) {
+    done: function(res, xhr) {
         if (Hm_Ajax.aborted) {
             return;
         }
-        else if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
-            this.fail(res);
-            return;
-        }
-        else if (!res) {
-            this.fail(res);
+        else if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
+            this.fail(xhr);
             return;
         }
         else {
@@ -142,7 +198,7 @@ var Hm_Ajax_Request = function() { return {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
             if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                this.fail(res, true);
+                this.fail(xhr, true);
                 return;
             }
             if (Hm_Ajax.err_condition) {
@@ -208,12 +264,15 @@ var Hm_Notices = {
     hide_id: false,
 
     show: function(msgs) {
-        var msg_list = $.map(msgs, function(v) {
-            if (v.match(/^ERR/)) {
-                return '<span class="err">'+v.substring(3)+'</span>';
+        var msg_list = [];
+        for (var i in msgs) {
+            if (msgs[i].match(/^ERR/)) {
+                msg_list.push('<span class="err">'+msgs[i].substring(3)+'</span>');
             }
-            return v;
-        });
+            else {
+                msg_list.push(msgs[i]);
+            }
+        }
         $('.sys_messages').html(msg_list.join(', '));
         $('.sys_messages').show();
         $('.sys_messages').on('click', function() {
@@ -602,9 +661,9 @@ function Message_List() {
                 self.setup_combined_view(false);
             }
         }
-        $('.core_msg_control').click(function() { return self.message_action($(this).data('action')); });
-        $('.toggle_link').click(function() { return self.toggle_rows(); });
-        $('.refresh_link').click(function() { return self.load_sources(); });
+        $('.core_msg_control').on("click", function() { return self.message_action($(this).data('action')); });
+        $('.toggle_link').on("click", function() { return self.toggle_rows(); });
+        $('.refresh_link').on("click", function() { return self.load_sources(); });
     };
 
     this.add_sources = function(sources) {
@@ -829,8 +888,8 @@ function Message_List() {
     };
 
     this.set_checkbox_callback = function() {
-        $('input[type=checkbox]', $('.message_table')).unbind('click');
-        $('input[type=checkbox]', $('.message_table')).click(function(e) {
+        $('input[type=checkbox]', $('.message_table')).off('click');
+        $('input[type=checkbox]', $('.message_table')).on("click", function(e) {
             self.toggle_msg_controls();
         });
     };
@@ -941,7 +1000,7 @@ var Hm_Folders = {
             }
            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
         });
-        $.each(listitems, function(_, itm) { folder.append(itm); });
+        $.each(listitems, function(itm) { folder.append(itm); });
     },
     update_folder_list_display: function(res) {
         $('.folder_list').html(res.formatted_folder_list);
@@ -968,11 +1027,11 @@ var Hm_Folders = {
         return false;
     },
     folder_list_events: function() {
-        $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
-        $('.src_name').click(function() { return Hm_Utils.toggle_section($(this).data('source')); });
-        $('.update_message_list').click(function() { return Hm_Folders.update_folder_list(); });
-        $('.hide_folders').click(function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').click(function() { return Hm_Utils.confirm_logout(); });
+        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
+        $('.update_message_list').on("click", function() { return Hm_Folders.update_folder_list(); });
+        $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
+        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1032,7 +1091,7 @@ var Hm_Folders = {
         return false;
     },
     toggle_folders_event: function() {
-        $('.folder_toggle').click(function() { return Hm_Folders.open_folder_list(); });
+        $('.folder_toggle').on("click", function() { return Hm_Folders.open_folder_list(); });
     }
 };
 
@@ -1086,7 +1145,7 @@ var Hm_Utils = {
     },
     confirm_logout: function() {
         if ($('#unsaved_changes').val() === "0") {
-            $('#logout_without_saving').click();
+            $('#logout_without_saving').on("click", );
         }
         else {
             $('.confirm_logout').show();
@@ -1253,7 +1312,7 @@ var Hm_Utils = {
         }
     },
     cancel_logout_event: function() {
-        $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
+        $('.cancel_logout').on("click", function() { $('.confirm_logout').hide(); return false; });
     },
     json_encode: function(val) {
         try {
@@ -1263,11 +1322,14 @@ var Hm_Utils = {
             return false;
         }
     },
-    json_decode: function(val) {
+    json_decode: function(val, original) {
         try {
             return JSON.parse(val);
         }
         catch (e) {
+            if (original === true) {
+                return val;
+            }
             return false;
         }
     },
@@ -1385,10 +1447,10 @@ $(function() {
     /* setup settings and server pages */
     if (hm_page_name() == 'settings') {
         Hm_Utils.expand_core_settings();
-        $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
     else if (hm_page_name() == 'servers') {
-        $('.server_section').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.server_section').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
 
     /* check for folder reload */
@@ -1411,7 +1473,7 @@ $(function() {
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
         $('.content_cell').swipeDown(function(e) { e.preventDefault(); Hm_Message_List.load_sources(); });
-        $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
+        $('.source_link').on("click", function() { $('.list_sources').toggle(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');
             Hm_Folders.save_folder_list();
@@ -1419,17 +1481,17 @@ $(function() {
     }
     hl_save_link();
     if (hm_page_name() == 'search') {
-        $('.search_reset').click(Hm_Utils.reset_search_form);
+        $('.search_reset').on("click", Hm_Utils.reset_search_form);
     }
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
 
     if (hm_page_name() == 'home') {
-        $('.pw_update').click(function() { update_password($(this).data('id')); });
+        $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
     $('body').swipeRight(function() { Hm_Folders.open_folder_list(); });
     $('body').swipeLeft(function() { Hm_Folders.hide_folder_list(); });
-    $('.offline').click(function() { Hm_Utils.test_connection(); });
+    $('.offline').on("click", function() { Hm_Utils.test_connection(); });
 
 });

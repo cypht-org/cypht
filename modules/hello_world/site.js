@@ -30,7 +30,7 @@ var update_hello_world_display = function(res) {
  * If we are on the "hello_world" page, activate the click handler
  */
 if (hm_page_name() == 'hello_world') {
-    $('.hw_ajax_link').click(function() {
+    $('.hw_ajax_link').on("click", function() {
         hello_world_ajax_update();
     });
 }

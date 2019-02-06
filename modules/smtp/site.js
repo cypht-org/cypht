@@ -190,7 +190,7 @@ var upload_file = function(file) {
             }
             if (res.file_details) {
                 $('.uploaded_files').append(res.file_details);
-                $('.delete_attachment').click(function() { return delete_attachment($(this).data('id'), this); });
+                $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
             }
             Hm_Ajax.stop_loading_icon();
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
@@ -214,18 +214,18 @@ $(function() {
     if (hm_page_name() === 'compose') {
         var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
         Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
-        $('.draft_title').click(function() { $('.draft_list').toggle(); });
-        $('.toggle_recipients').click(function() { return toggle_recip_flds(); });
-        $('.smtp_reset').click(reset_smtp_form);
-        $('.delete_draft').click(function() { smtp_delete_draft($(this).data('id')); });
-        $('.smtp_save').click(function() { save_compose_state(false, true); });
-        $('.compose_attach_button').click(function() { $('.compose_attach_file').trigger('click'); });
-        $('.compose_attach_file').change(function() { upload_file(this.files[0]); });
-        $('.compose_form').on('submit', function() { $('.smtp_send').addClass('disabled_input'); $('.smtp_send').click(function() { return false; }); });
+        $('.draft_title').on("click", function() { $('.draft_list').toggle(); });
+        $('.toggle_recipients').on("click", function() { return toggle_recip_flds(); });
+        $('.smtp_reset').on("click", reset_smtp_form);
+        $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
+        $('.smtp_save').on("click", function() { save_compose_state(false, true); });
+        $('.compose_attach_button').on("click", function() { $('.compose_attach_file').trigger('click'); });
+        $('.compose_attach_file').on("change", function() { upload_file(this.files[0]); });
+        $('.compose_form').on('submit', function() { $('.smtp_send').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
         $('.compose_form').submit(function() { Hm_Ajax.show_loading_icon(); return true; });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
         }
-        $('.delete_attachment').click(function() { return delete_attachment($(this).data('id'), this); });
+        $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
     }
 });

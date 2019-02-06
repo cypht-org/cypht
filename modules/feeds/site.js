@@ -85,7 +85,7 @@ var set_combined_feeds_state = function() {
     var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');
     Hm_Utils.save_to_local_storage('formatted_feed_data', data.html());
-    $('input[type=checkbox]').click(function() {
+    $('input[type=checkbox]').on("click", function() {
         Hm_Message_List.toggle_msg_controls();
     });
     Hm_Message_List.update_title();
