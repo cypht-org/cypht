@@ -1,6 +1,20 @@
 'use strict';
 
-/* extend cash a bit for zepto expectations */
+/*
+ * TODO:
+ * - swipe support
+ * - clean up Hm_Ajax_Request if possible
+ */
+
+/* extend cash.js with some useful bits */
+$.inArray = function(item, list) {
+    for (var i in list) {
+        if (list[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};
 $.isEmptyObject = function(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -8,7 +22,17 @@ $.isEmptyObject = function(obj) {
     }
     return true;
 };
+$.fn.submit = function() { this[0].submit(); }
+$.fn.focus = function() { this[0].focus(); };
 $.fn.serializeArray = function() {
+    var parts;
+    var res = [];
+    var args = this.serialize().split('&');
+    for (var i in args) {
+        parts = args[i].split('=');
+        res.push({'name': parts[0], 'value': parts[1]});
+    }
+    return res;
 };
 $.fn.sort = function(sort_function) {
     var list = [];
@@ -23,14 +47,6 @@ $.fn.swipeLeft = function() {
 $.fn.swipeRight = function() {
 };
 $.fn.swipeDown = function() {
-};
-$.inArray = function(item, list) {
-    for (var i in list) {
-        if (list[i] === item) {
-            return i;
-        }
-    }
-    return -1;
 };
 
 /* ajax multiplexer */
@@ -168,12 +184,7 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        this.xhr_fetch({
-            url: '',
-            data: args,
-            callback: this
-        });
-
+        this.xhr_fetch({url: '', data: args, callback: this });
         return false;
     },
 
@@ -197,9 +208,6 @@ var Hm_Ajax_Request = function() { return {
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
                 Hm_Notices.hide(true);
-            }
-            if (res.date) {
-                $('.date').html(res.date);
             }
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
                 Hm_Notices.show(res.router_user_msgs);
@@ -250,7 +258,7 @@ var Hm_Ajax_Request = function() { return {
         }
         res = null;
     }
-}; };
+}};
 
 /* user notification manager */
 var Hm_Notices = {

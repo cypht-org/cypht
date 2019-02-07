@@ -221,8 +221,7 @@ $(function() {
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.compose_attach_button').on("click", function() { $('.compose_attach_file').trigger('click'); });
         $('.compose_attach_file').on("change", function() { upload_file(this.files[0]); });
-        $('.compose_form').on('submit', function() { $('.smtp_send').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
-        $('.compose_form').submit(function() { Hm_Ajax.show_loading_icon(); return true; });
+        $('.compose_form').on('submit', function() { Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
         }
