@@ -1,5 +1,76 @@
 'use strict';
 
+/* extend cash.js with some useful bits */
+$.inArray = function(item, list) {
+    for (var i in list) {
+        if (list[i] === item) {
+            return i;
+        }
+    }
+    return -1;
+};
+$.isEmptyObject = function(obj) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            return false;
+        }
+    }
+    return true;
+};
+$.fn.submit = function() { this[0].submit(); }
+$.fn.focus = function() { this[0].focus(); };
+$.fn.serializeArray = function() {
+    var parts;
+    var res = [];
+    var args = this.serialize().split('&');
+    for (var i in args) {
+        parts = args[i].split('=');
+        res.push({'name': parts[0], 'value': parts[1]});
+    }
+    return res;
+};
+$.fn.sort = function(sort_function) {
+    var list = [];
+    for (var i=0, len=this.length; i < len; i++) {
+        list.push(this[i]);
+    }
+    return $(list.sort(sort_function));
+};
+
+/* swipe event handler */
+var swipe_event = function(el, callback, direction) {
+    var  swipe_dir, start_x, start_y, dist_x, dist_y,
+        threshold = 150, restraint = 100, allowed_time = 500, elapsed_time,
+        dist, start_time, handleswipe = callback || function(swipe_dir){}
+
+    el.addEventListener('touchstart', function(e){
+        var touchobj = e.changedTouches[0];
+        swipe_dir = 'none';
+        dist = 0;
+        start_x = touchobj.pageX;
+        start_y = touchobj.pageY;
+        start_time = new Date().getTime();
+    }, false);
+
+    el.addEventListener('touchend', function(e){
+        var touchobj = e.changedTouches[0];
+        dist_x = touchobj.pageX - start_x;
+        dist_y = touchobj.pageY - start_y;
+        elapsed_time = new Date().getTime() - start_time;
+        if (elapsed_time <= allowed_time) {
+            if (Math.abs(dist_x) >= threshold && Math.abs(dist_y) <= restraint) {
+                swipe_dir = (dist_x < 0)? 'left' : 'right';
+            }
+            else if (Math.abs(dist_y) >= threshold && Math.abs(dist_x) <= restraint) {
+                swipe_dir = (dist_y < 0)? 'up' : 'down';
+            }
+        }
+        if (swipe_dir == direction) {
+            handleswipe();
+        }
+    }, false);
+};
+
 /* ajax multiplexer */
 var Hm_Ajax = {
     request_count: 0,
@@ -86,6 +157,30 @@ var Hm_Ajax_Request = function() { return {
     on_failure: false,
     start_time: 0,
 
+    xhr_fetch: function(config) {
+        var xhr = new XMLHttpRequest();
+        var data = '';
+        if (config.data) {
+            data = this.format_xhr_data(config.data);
+        }
+        xhr.open('POST', window.location.href)
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
+        xhr.send(data);
+        xhr.onload = function() {
+            config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
+            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
+        }
+    },
+
+    format_xhr_data: function(data) {
+        var res = []
+        for (var i in data) {
+            res.push(encodeURIComponent(data[i]['name']) + '=' + encodeURIComponent(data[i]['value']));
+        }
+        return res.join('&');
+    },
+
     make_request: function(args, callback, extra, request_name, on_failure) {
         var name;
         var arg;
@@ -111,29 +206,16 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        $.ajax({
-            type: "POST",
-            url: '',
-            data: args,
-            context: this, 
-            success: this.done,
-            complete: this.always,
-            error: this.fail
-        });
-
+        this.xhr_fetch({url: '', data: args, callback: this });
         return false;
     },
 
-    done: function(res) {
+    done: function(res, xhr) {
         if (Hm_Ajax.aborted) {
             return;
         }
-        else if (typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
-            this.fail(res);
-            return;
-        }
-        else if (!res) {
-            this.fail(res);
+        else if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
+            this.fail(xhr);
             return;
         }
         else {
@@ -142,15 +224,12 @@ var Hm_Ajax_Request = function() { return {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
             if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                this.fail(res, true);
+                this.fail(xhr, true);
                 return;
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
                 Hm_Notices.hide(true);
-            }
-            if (res.date) {
-                $('.date').html(res.date);
             }
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
                 Hm_Notices.show(res.router_user_msgs);
@@ -201,19 +280,22 @@ var Hm_Ajax_Request = function() { return {
         }
         res = null;
     }
-}; };
+}};
 
 /* user notification manager */
 var Hm_Notices = {
     hide_id: false,
 
     show: function(msgs) {
-        var msg_list = $.map(msgs, function(v) {
-            if (v.match(/^ERR/)) {
-                return '<span class="err">'+v.substring(3)+'</span>';
+        var msg_list = [];
+        for (var i in msgs) {
+            if (msgs[i].match(/^ERR/)) {
+                msg_list.push('<span class="err">'+msgs[i].substring(3)+'</span>');
             }
-            return v;
-        });
+            else {
+                msg_list.push(msgs[i]);
+            }
+        }
         $('.sys_messages').html(msg_list.join(', '));
         $('.sys_messages').show();
         $('.sys_messages').on('click', function() {
@@ -602,9 +684,9 @@ function Message_List() {
                 self.setup_combined_view(false);
             }
         }
-        $('.core_msg_control').click(function() { return self.message_action($(this).data('action')); });
-        $('.toggle_link').click(function() { return self.toggle_rows(); });
-        $('.refresh_link').click(function() { return self.load_sources(); });
+        $('.core_msg_control').on("click", function() { return self.message_action($(this).data('action')); });
+        $('.toggle_link').on("click", function() { return self.toggle_rows(); });
+        $('.refresh_link').on("click", function() { return self.load_sources(); });
     };
 
     this.add_sources = function(sources) {
@@ -829,8 +911,8 @@ function Message_List() {
     };
 
     this.set_checkbox_callback = function() {
-        $('input[type=checkbox]', $('.message_table')).unbind('click');
-        $('input[type=checkbox]', $('.message_table')).click(function(e) {
+        $('input[type=checkbox]', $('.message_table')).off('click');
+        $('input[type=checkbox]', $('.message_table')).on("click", function(e) {
             self.toggle_msg_controls();
         });
     };
@@ -932,7 +1014,7 @@ var Hm_Folders = {
         else {
             listitems = $('li', folder);
         }
-        listitems.sort(function(a, b) {
+        listitems = listitems.sort(function(a, b) {
             if (last_name && ($(a).attr('class') == last_name || $(b).attr('class') == last_name)) {
                 return false;
             }
@@ -968,11 +1050,11 @@ var Hm_Folders = {
         return false;
     },
     folder_list_events: function() {
-        $('.imap_folder_link').click(function() { return expand_imap_folders($(this).data('target')); });
-        $('.src_name').click(function() { return Hm_Utils.toggle_section($(this).data('source')); });
-        $('.update_message_list').click(function() { return Hm_Folders.update_folder_list(); });
-        $('.hide_folders').click(function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').click(function() { return Hm_Utils.confirm_logout(); });
+        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
+        $('.update_message_list').on("click", function() { return Hm_Folders.update_folder_list(); });
+        $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
+        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -985,11 +1067,7 @@ var Hm_Folders = {
         var path = hm_list_path();
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path.length) {
-            if (hm_list_parent()) {
-                $('a', $('.'+Hm_Utils.clean_selector(hm_list_parent()))).addClass('selected_menu');
-                $('.menu_'+Hm_Utils.clean_selector(hm_list_parent())).addClass('selected_menu');
-            }
-            else if (page == 'message_list' || page == 'message') {
+            if (page == 'message_list' || page == 'message') {
                 $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
@@ -1032,7 +1110,7 @@ var Hm_Folders = {
         return false;
     },
     toggle_folders_event: function() {
-        $('.folder_toggle').click(function() { return Hm_Folders.open_folder_list(); });
+        $('.folder_toggle').on("click", function() { return Hm_Folders.open_folder_list(); });
     }
 };
 
@@ -1085,8 +1163,8 @@ var Hm_Utils = {
         return false;
     },
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() === "0") {
-            $('#logout_without_saving').click();
+        if ($('#unsaved_changes').val() == 0) {
+            document.getElementById('logout_without_saving').click();
         }
         else {
             $('.confirm_logout').show();
@@ -1253,7 +1331,7 @@ var Hm_Utils = {
         }
     },
     cancel_logout_event: function() {
-        $('.cancel_logout').click(function() { $('.confirm_logout').hide(); return false; });
+        $('.cancel_logout').on("click", function() { $('.confirm_logout').hide(); return false; });
     },
     json_encode: function(val) {
         try {
@@ -1263,11 +1341,14 @@ var Hm_Utils = {
             return false;
         }
     },
-    json_decode: function(val) {
+    json_decode: function(val, original) {
         try {
             return JSON.parse(val);
         }
         catch (e) {
+            if (original === true) {
+                return val;
+            }
             return false;
         }
     },
@@ -1385,10 +1466,10 @@ $(function() {
     /* setup settings and server pages */
     if (hm_page_name() == 'settings') {
         Hm_Utils.expand_core_settings();
-        $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
     else if (hm_page_name() == 'servers') {
-        $('.server_section').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.server_section').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
 
     /* check for folder reload */
@@ -1410,8 +1491,7 @@ $(function() {
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
-        $('.content_cell').swipeDown(function(e) { e.preventDefault(); Hm_Message_List.load_sources(); });
-        $('.source_link').click(function() { $('.list_sources').toggle(); return false; });
+        $('.source_link').on("click", function() { $('.list_sources').toggle(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');
             Hm_Folders.save_folder_list();
@@ -1419,17 +1499,19 @@ $(function() {
     }
     hl_save_link();
     if (hm_page_name() == 'search') {
-        $('.search_reset').click(Hm_Utils.reset_search_form);
+        $('.search_reset').on("click", Hm_Utils.reset_search_form);
     }
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
 
     if (hm_page_name() == 'home') {
-        $('.pw_update').click(function() { update_password($(this).data('id')); });
+        $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
-    $('body').swipeRight(function() { Hm_Folders.open_folder_list(); });
-    $('body').swipeLeft(function() { Hm_Folders.hide_folder_list(); });
-    $('.offline').click(function() { Hm_Utils.test_connection(); });
+    if (hm_mobile()) {
+        swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
+        swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
+    }
+    $('.offline').on("click", function() { Hm_Utils.test_connection(); });
 
 });

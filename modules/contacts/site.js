@@ -135,10 +135,10 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
 };
 
 var setup_autocomplete_events = function(class_name, list_div, fld_val) {
-    $('.contact_suggestion').click(function(event) { return add_autocomplete(event, class_name, list_div); });
-    $(class_name).keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
-    $('.contact_suggestion').keydown(function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
-    $(document).click(function() { $(list_div).hide(); });
+    $('.contact_suggestion').on("click", function(event) { return add_autocomplete(event, class_name, list_div); });
+    $(class_name).on('keydown', function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
+    $('.contact_suggestion').on('keydown', function(event) { return autocomplete_keyboard_nav(event, list_div, class_name, fld_val); });
+    $(document).on("click", function() { $(list_div).hide(); });
 };
 
 var add_autocomplete = function(event, class_name, list_div, fld_val) {
@@ -160,24 +160,24 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
 };
 
 if (hm_page_name() == 'contacts') {
-    $('.delete_contact').click(function() {
+    $('.delete_contact').on("click", function() {
         delete_contact($(this).data('id'), $(this).data('source'));
         return false;
     });
-    $('.show_contact').click(function() {
+    $('.show_contact').on("click", function() {
         $('#'+$(this).data('id')).toggle();
         return false;
     });
-    $('.reset_contact').click(function() {
+    $('.reset_contact').on("click", function() {
         window.location.href = '?page=contacts';
     });
-    $('.server_title').click(function() {
+    $('.server_title').on("click", function() {
         $(this).next().toggle();
     });
 }
 else if (hm_page_name() == 'compose') {
-    $('.compose_to').keyup(function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
-    $('.compose_cc').keyup(function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
-    $('.compose_bcc').keyup(function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
+    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
+    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
+    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
     $('.compose_to').focus();
 }

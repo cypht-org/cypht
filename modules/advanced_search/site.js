@@ -15,7 +15,7 @@ var add_remove_terms = function(el) {
     not_chk.attr('id', 'adv_term_not'+count);
     $(el).prev().after(and_or.prop('outerHTML')+not_chk.prop('outerHTML')+term.prop('outerHTML')+close.prop('outerHTML'));
     $(el).hide();
-    $('#term_adv_remove'+count).click(function() {
+    $('#term_adv_remove'+count).on("click", function() {
         $('#adv_term'+count).remove();
         $('#adv_term_not'+count).remove();
         $('#term_and_or'+count).remove();
@@ -37,7 +37,7 @@ var add_remove_times = function(el) {
     close.attr('id', 'time_adv_remove'+count);
     and_or.attr('id', 'time_and_or'+count);
     $(el).prev().after(and_or.prop('outerHTML')+timeset.prop('outerHTML')+close.prop('outerHTML'));
-    $('#time_adv_remove'+count).click(function() {
+    $('#time_adv_remove'+count).on("click", function() {
         $('#adv_time'+count).remove();
         $('#time_and_or'+count).remove();
         $(this).remove();
@@ -60,7 +60,7 @@ var add_remove_targets = function(el) {
     and_or.attr('id', 'target_and_or'+count);
     $(el).prev().after(and_or.prop('outerHTML')+target.prop('outerHTML')+close.prop('outerHTML'));
     $(el).hide();
-    $('#target_adv_remove'+count).click(function() {
+    $('#target_adv_remove'+count).on("click", function() {
         $('#adv_target'+count).remove();
         $('#target_and_or'+count).remove();
         $(this).remove();
@@ -75,10 +75,10 @@ var expand_adv_folder = function(res) {
         folders.find('.manage_folders_li').remove();
         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.adv_folder_list')).append(folders);
         $('.imap_folder_link', list_container).addClass('adv_folder_link').removeClass('imap_folder_link');
-        $('.adv_folder_link', list_container).unbind('click');
-        $('.adv_folder_link', list_container).click(function() { return expand_adv_folder_list($(this).data('target')); });
-        $('a', list_container).not('.adv_folder_link').unbind('click');
-        $('a', list_container).not('.adv_folder_link').click(function() { adv_folder_select($(this).data('id')); return false; });
+        $('.adv_folder_link', list_container).off('click');
+        $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
+        $('a', list_container).not('.adv_folder_link').off('click');
+        $('a', list_container).not('.adv_folder_link').on("click", function() { adv_folder_select($(this).data('id')); return false; });
     }
 };
 
@@ -94,12 +94,12 @@ var adv_select_imap_folder = function(el) {
     list_container.show();
     folders.show();
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
-    $('.adv_folder_list').html(folders);
+    $('.adv_folder_list').html(folders.html());
 
-    $('.adv_folder_link', list_container).click(function() { return expand_adv_folder_list($(this).data('target')); });
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').unbind('click');
-    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').click(function() { adv_folder_select($(this).data('id')); return false; });
-    $('.close_adv_folders').click(function() {
+    $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').off('click');
+    $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').on("click", function() { adv_folder_select($(this).data('id')); return false; });
+    $('.close_adv_folders').on("click", function() {
         $('.adv_folder_list').html('');
         $('.adv_folder_list').hide();
         $(this).remove();
@@ -137,8 +137,8 @@ var add_source_to_list = function(id, label) {
     var row = '<div class="'+id+'">'+close.prop('outerHTML')+label;
     row += '<input type="hidden" value="'+id+'" /></div>';
     $('.adv_source_list').append(row);
-    $('.adv_remove_source').unbind('click');
-    $('.adv_remove_source').click(function() {
+    $('.adv_remove_source').off('click');
+    $('.adv_remove_source').on("click", function() {
         $('.'+$(this).data('target'), $('.adv_source_list')).remove();
     });
 };
@@ -381,8 +381,8 @@ var send_requests = function(requests) {
                 Hm_Message_List.update([detail.server_id+n], res.formatted_message_list, 'imap');
                 if (Hm_Utils.rows().length > 0) {
                     $('.adv_controls').show();
-                    $('.core_msg_control').unbind('click');
-                    $('.core_msg_control').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
+                    $('.core_msg_control').off('click');
+                    $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
                     Hm_Message_List.set_checkbox_callback();
                 }
                 Hm_Message_List.check_empty_list();
@@ -520,16 +520,16 @@ $(function() {
         globals.close_html += '.5-.719-.719%201.5-1.5-1.5-1.5.719-.719z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="R';
         globals.close_html += 'emove">';
 
-        $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-        $('.adv_folder_select').click(function() { adv_select_imap_folder(this); });
-        $('.new_time').click(function() { add_remove_times(this); });
-        $('.new_target').click(function() { add_remove_targets(this); });
-        $('.new_term').click(function() { add_remove_terms(this); });
-        $('.adv_expand_all').click(function() { adv_expand_sections(); });
-        $('.adv_collapse_all').click(function() { adv_collapse(); });
-        $('#adv_search').click(function() { process_advanced_search(); });
-        $('.toggle_link').click(function() { return Hm_Message_List.toggle_rows(); });
-        $('.adv_reset').click(function() { adv_reset_page(); });
+        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.adv_folder_select').on("click", function() { adv_select_imap_folder(this); });
+        $('.new_time').on("click", function() { add_remove_times(this); });
+        $('.new_target').on("click", function() { add_remove_targets(this); });
+        $('.new_term').on("click", function() { add_remove_terms(this); });
+        $('.adv_expand_all').on("click", function() { adv_expand_sections(); });
+        $('.adv_collapse_all').on("click", function() { adv_collapse(); });
+        $('#adv_search').on("click", function() { process_advanced_search(); });
+        $('.toggle_link').on("click", function() { return Hm_Message_List.toggle_rows(); });
+        $('.adv_reset').on("click", function() { adv_reset_page(); });
 
         apply_saved_search();
         var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
@@ -537,8 +537,8 @@ $(function() {
             adv_collapse(); 
             Hm_Utils.tbody().html(data);
             $('.adv_controls').show();
-            $('.core_msg_control').unbind('click');
-            $('.core_msg_control').click(function() { return Hm_Message_List.message_action($(this).data('action')); });
+            $('.core_msg_control').off('click');
+            $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
             Hm_Message_List.set_checkbox_callback();
         }
         Hm_Message_List.check_empty_list();

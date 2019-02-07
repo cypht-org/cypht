@@ -147,10 +147,10 @@ $(function() {
     document.getElementsByTagName('head')[0].appendChild(shortcut_script);
 
     if ($('.menu_shortcuts').length) {
-        $(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
+        //$(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }
     if (hm_page_name() == 'shortcuts') {
-        $('.reset_shortcut').click(function() {
+        $('.reset_shortcut').on("click", function() {
             window.location.href = '?page=shortcuts';
         });
     }

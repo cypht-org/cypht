@@ -70,9 +70,9 @@ var search_save_results = function(res) {
 };
 
 if (hm_page_name() == 'search') {
-    $('.save_search').click(save_search);
-    $('.update_search').click(update_search);
-    $('.delete_search').click(delete_search);
+    $('.save_search').on("click", save_search);
+    $('.update_search').on("click", update_search);
+    $('.delete_search').on("click", delete_search);
     if ($('.search_name').val().length) {
         Hm_Utils.save_to_local_storage('formatted_search_data', '');
     }

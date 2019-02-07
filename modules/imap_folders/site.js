@@ -9,10 +9,10 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
-    $('.'+link_class, folder_location).click(function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
-    $('a', folder_location).not('.'+link_class).not('.close').unbind('click');
-    $('a', folder_location).not('.'+link_class).not('.close').click(function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
-    $('.close', folder_location).click(function() {
+    $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
+    $('a', folder_location).not('.'+link_class).not('.close').off('click');
+    $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
+    $('.close', folder_location).on("click", function() {
         folders.remove();
         folder_location.hide();
         $('.'+target).html('');
@@ -40,10 +40,10 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                         folders.find('.manage_folders_li').remove();
                         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), folder_location).append(folders);
                         $('.imap_folder_link', folder_location).addClass(link_class).removeClass('imap_folder_link');
-                        $('.'+link_class, folder_location).unbind('click');
-                        $('.'+link_class, folder_location).click(function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
-                        $('a', folder_location).not('.'+link_class).not('.close').unbind('click');
-                        $('a', folder_location).not('.'+link_class).not('.close').click(function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
+                        $('.'+link_class, folder_location).off('click');
+                        $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
+                        $('a', folder_location).not('.'+link_class).not('.close').off('click');
+                        $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
                     }
                 }
             );
@@ -223,27 +223,27 @@ var folder_page_create = function() {
 
 $(function() {
     if (hm_page_name() == 'folders') {
-        $('#imap_server_folder').change(function() {
+        $('#imap_server_folder').on("change", function() {
             $(this).parent().submit();
         });
-        $('.settings_subtitle').click(function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
-    $('.select_parent_folder').click(function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
-    $('.select_rename_folder').click(function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
-    $('.select_delete_folder').click(function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
-    $('.select_trash_folder').click(function() { return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); });
-    $('.select_sent_folder').click(function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
-    $('.select_draft_folder').click(function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
-    $('.select_rename_parent_folder').click(function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
-    $('#create_folder').click(function() { folder_page_create(); return false; });
-    $('#delete_folder').click(function() { folder_page_delete(); return false; });
-    $('#rename_folder').click(function() { folder_page_rename(); return false; });
+    $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
+    $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
+    $('.select_delete_folder').on("click", function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
+    $('.select_trash_folder').on("click", function() { return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); });
+    $('.select_sent_folder').on("click", function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
+    $('.select_draft_folder').on("click", function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
+    $('.select_rename_parent_folder').on("click", function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
+    $('#create_folder').on("click", function() { folder_page_create(); return false; });
+    $('#delete_folder').on("click", function() { folder_page_delete(); return false; });
+    $('#rename_folder').on("click", function() { folder_page_rename(); return false; });
 
-    $('#set_trash_folder').click(function() { folder_page_assign_trash(); return false; });
-    $('#set_sent_folder').click(function() { folder_page_assign_sent(); return false; });
-    $('#set_draft_folder').click(function() { folder_page_assign_draft(); return false; });
+    $('#set_trash_folder').on("click", function() { folder_page_assign_trash(); return false; });
+    $('#set_sent_folder').on("click", function() { folder_page_assign_sent(); return false; });
+    $('#set_draft_folder').on("click", function() { folder_page_assign_draft(); return false; });
 
-    $('#clear_trash_folder').click(function() { clear_special_folder('trash'); return false; });
-    $('#clear_sent_folder').click(function() { clear_special_folder('sent'); return false; });
-    $('#clear_draft_folder').click(function() { clear_special_folder("draft"); return false; });
+    $('#clear_trash_folder').on("click", function() { clear_special_folder('trash'); return false; });
+    $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
+    $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
 });

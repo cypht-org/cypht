@@ -113,24 +113,24 @@ var msg_inline_close = function() {
 
 var update_imap_links = function(uid, details) {
     var path = details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
-    $('#unflag_msg').unbind('click');
-    $('#flag_msg').unbind('click');
-    $('#delete_message').unbind('click');
-    $('#delete_message').click(function() { return inline_msg_prep_imap_delete(path, uid, details); });
-    $('#flag_msg').click(function() { return imap_flag_message($(this).data('state'), uid, details); });
-    $('#unflag_msg').click(function() { return imap_flag_message($(this).data('state', uid, details)); });
+    $('#unflag_msg').off('click');
+    $('#flag_msg').off('click');
+    $('#delete_message').off('click');
+    $('#delete_message').on("click", function() { return inline_msg_prep_imap_delete(path, uid, details); });
+    $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state'), uid, details); });
+    $('#unflag_msg').on("click", function() { return imap_flag_message($(this).data('state', uid, details)); });
 };
 
 var capture_subject_click = function() {
     $('a', $('.subject')).off('click');
-    $('a', $('.subject')).click(function(e) {
+    $('a', $('.subject')).on("click", function(e) {
         var msg_details = get_inline_msg_details(this); 
         var uid = msg_details[0];
         var list_path = msg_details[1];
         var inline_msg_loaded_callback = function() {
             $('.header_subject th').append('<span class="close_inline_msg">X</span>');
-            $('.close_inline_msg').click(function() { msg_inline_close(); });
-            $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
+            $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
             update_imap_links(uid, details);
         };
 

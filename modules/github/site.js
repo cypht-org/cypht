@@ -105,14 +105,14 @@ if (hm_page_name() == 'servers') {
     if (dsp == 'block' || dsp == 'none') {
         $('.github_connect_section').css('display', dsp);
     }
-    $('#github_disconnect_form').submit(function(e) {
+    $('.github_disconnect').on("click", function(e) {
         if (!hm_delete_prompt()) {
             e.preventDefault();
             return false;
         }
         return true;
     });
-    $('.remove_repo').submit(function(e) {
+    $('.github_remove_repo').on("click", function(e) {
         if (!hm_delete_prompt()) {
             e.preventDefault();
             return false;

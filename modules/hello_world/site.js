@@ -2,7 +2,7 @@
 
 /**
  * This JS sets up an AJAX request and assigns it to a link on the hello_world page.
- * You have access to zepto functions when this code is loaded, so use the standard
+ * You have access to cash.js functions when this code is loaded, so use the standard
  * way to delay actions until page onload if you need to. Built in data sources like
  * hm_page_name() are defined before this is run so they are also available. When the
  * site build process is run this code will be combined with JS from other module sets,
@@ -30,7 +30,7 @@ var update_hello_world_display = function(res) {
  * If we are on the "hello_world" page, activate the click handler
  */
 if (hm_page_name() == 'hello_world') {
-    $('.hw_ajax_link').click(function() {
+    $('.hw_ajax_link').on("click", function() {
         hello_world_ajax_update();
     });
 }

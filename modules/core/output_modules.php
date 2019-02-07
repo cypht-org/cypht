@@ -448,12 +448,12 @@ class Hm_Output_header_css extends Hm_Output_Module {
 class Hm_Output_page_js extends Hm_Output_Module {
     /**
      * In debug mode adds each module js file to the page, otherwise uses the combined version.
-     * Includes the zepto library, and the forge lib if it's needed.
+     * Includes the cash.js library, and the forge lib if it's needed.
      */
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="third_party/zepto.min.js"></script>';
+            $js_lib = '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
             }

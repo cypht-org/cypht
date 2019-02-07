@@ -167,8 +167,8 @@ var pop3_message_view_finished = function() {
             Hm_Message_List.adjust_unread_total(-1);
         }
     }
-    $('.header_toggle').click(function() { return Hm_Utils.toggle_long_headers(); });
-    $('.msg_part_link').click(function() { return get_message_content($(this).data('messagePart')); });
+    $('.header_toggle').on("click", function() { return Hm_Utils.toggle_long_headers(); });
+    $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart')); });
 };
 
 var pop3_all_mail_content = function(id) {

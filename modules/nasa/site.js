@@ -42,6 +42,6 @@ var nasa_disconnect_result = function(res) {
 };
 
 if (hm_page_name() == 'servers') {
-    $('.nasa_api_connect').click(nasa_connect);
-    $('.nasa_api_disconnect').click(nasa_disconnect);
+    $('.nasa_api_connect').on("click", nasa_connect);
+    $('.nasa_api_disconnect').on("click", nasa_disconnect);
 }

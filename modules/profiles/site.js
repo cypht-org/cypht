@@ -1,7 +1,7 @@
 'use strict';
 
 if (hm_page_name() == 'compose') {
-    $('.compose_sign').click(function() {
+    $('.compose_sign').on("click", function() {
         var server_id = $('.compose_server').val();
         if (profile_signatures[server_id]) {
             var ta = $('.ke-content', $('iframe').contents());
@@ -37,6 +37,6 @@ var insert_sig = function(textarea, sig) {
 
 $(function() {
     if (hm_page_name() === 'profiles') {
-        $('.add_profile').click(function() { $('.edit_profile').show(); });
+        $('.add_profile').on("click", function() { $('.edit_profile').show(); });
     }
 });
