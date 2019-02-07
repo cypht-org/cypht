@@ -21,8 +21,8 @@ $.inArray = function(item, list) {
     return -1;
 };
 $.isEmptyObject = function(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key)) {
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) {
             return false;
         }
     }
