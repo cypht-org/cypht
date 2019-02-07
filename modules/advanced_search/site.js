@@ -94,7 +94,7 @@ var adv_select_imap_folder = function(el) {
     list_container.show();
     folders.show();
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
-    $('.adv_folder_list').html(folders);
+    $('.adv_folder_list').html(folders.html());
 
     $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
     $('a', list_container).not('.adv_folder_link').not('.close_adv_folders').off('click');
