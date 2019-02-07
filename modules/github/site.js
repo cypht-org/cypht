@@ -112,7 +112,7 @@ if (hm_page_name() == 'servers') {
         }
         return true;
     });
-    $('.remove_repo').submit(function(e) {
+    $('.github_remove_repo').on("click", function(e) {
         if (!hm_delete_prompt()) {
             e.preventDefault();
             return false;

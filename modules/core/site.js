@@ -3,10 +3,15 @@
 /*
  * TODO:
  * - swipe support
- * - clean up Hm_Ajax_Request if possible
  */
 
 /* extend cash.js with some useful bits */
+$.fn.swipeLeft = function(callback) {
+};
+$.fn.swipeRight = function(callback) {
+};
+$.fn.swipeDown = function(callback) {
+};
 $.inArray = function(item, list) {
     for (var i in list) {
         if (list[i] === item) {
@@ -17,8 +22,9 @@ $.inArray = function(item, list) {
 };
 $.isEmptyObject = function(obj) {
     for(var key in obj) {
-        if(obj.hasOwnProperty(key))
+        if(obj.hasOwnProperty(key)) {
             return false;
+        }
     }
     return true;
 };
@@ -36,17 +42,10 @@ $.fn.serializeArray = function() {
 };
 $.fn.sort = function(sort_function) {
     var list = [];
-    var len = this.length;
-    for (var i=0; i < len; i++) {
+    for (var i=0, len=this.length; i < len; i++) {
         list.push(this[i]);
     }
     return $(list.sort(sort_function));
-};
-$.fn.swipeLeft = function() {
-};
-$.fn.swipeRight = function() {
-};
-$.fn.swipeDown = function() {
 };
 
 /* ajax multiplexer */
@@ -1045,11 +1044,7 @@ var Hm_Folders = {
         var path = hm_list_path();
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path.length) {
-            if (hm_list_parent()) {
-                $('a', $('.'+Hm_Utils.clean_selector(hm_list_parent()))).addClass('selected_menu');
-                $('.menu_'+Hm_Utils.clean_selector(hm_list_parent())).addClass('selected_menu');
-            }
-            else if (page == 'message_list' || page == 'message') {
+            if (page == 'message_list' || page == 'message') {
                 $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
