@@ -1508,8 +1508,10 @@ $(function() {
     if (hm_page_name() == 'home') {
         $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
-    swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
-    swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
+    if (hm_mobile()) {
+        swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
+        swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
+    }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
 
 });
