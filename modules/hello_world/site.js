@@ -2,7 +2,7 @@
 
 /**
  * This JS sets up an AJAX request and assigns it to a link on the hello_world page.
- * You have access to zepto functions when this code is loaded, so use the standard
+ * You have access to cash.js functions when this code is loaded, so use the standard
  * way to delay actions until page onload if you need to. Built in data sources like
  * hm_page_name() are defined before this is run so they are also available. When the
  * site build process is run this code will be combined with JS from other module sets,

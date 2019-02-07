@@ -313,7 +313,7 @@ function output_page($source) { ?><!DOCTYPE html><html dir="ltr" class="ltr_page
         <head>
             <meta charset="utf-8" />
             <link href="../modules/core/site.css" media="all" rel="stylesheet" type="text/css" />
-            <script type="text/javascript" src="../third_party/zepto.min.js"></script>
+            <script type="text/javascript" src="../third_party/cash.min.js"></script>
             <script type="text/javascript">$(function() {
                 $('.settings_subtitle').click(function() { $(this).next().toggle(); });
                 $('select[name=session_type]').change(function() { console.log('here'); });
