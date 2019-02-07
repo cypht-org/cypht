@@ -8,28 +8,21 @@ $.isEmptyObject = function(obj) {
     }
     return true;
 };
+$.fn.serializeArray = function() {
+};
 $.fn.sort = function(sort_function) {
+    var list = [];
+    var len = this.length;
+    for (var i=0; i < len; i++) {
+        list.push(this[i]);
+    }
+    return $(list.sort(sort_function));
 };
 $.fn.swipeLeft = function() {
 };
 $.fn.swipeRight = function() {
 };
 $.fn.swipeDown = function() {
-};
-$.fn.toggle = function() {
-    var display = this.css('display');
-    if (display == 'none') {
-        this.show();
-    }
-    else {
-        this.hide();
-    }
-};
-$.fn.hide = function() {
-    this.css('display', 'none');
-};
-$.fn.show = function() {
-    this.css('display', 'block');
 };
 $.inArray = function(item, list) {
     for (var i in list) {
@@ -991,7 +984,7 @@ var Hm_Folders = {
         else {
             listitems = $('li', folder);
         }
-        listitems.sort(function(a, b) {
+        listitems = listitems.sort(function(a, b) {
             if (last_name && ($(a).attr('class') == last_name || $(b).attr('class') == last_name)) {
                 return false;
             }
@@ -1000,7 +993,7 @@ var Hm_Folders = {
             }
            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
         });
-        $.each(listitems, function(itm) { folder.append(itm); });
+        $.each(listitems, function(_, itm) { folder.append(itm); });
     },
     update_folder_list_display: function(res) {
         $('.folder_list').html(res.formatted_folder_list);
@@ -1144,8 +1137,8 @@ var Hm_Utils = {
         return false;
     },
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() === "0") {
-            $('#logout_without_saving').on("click", );
+        if ($('#unsaved_changes').val() == 0) {
+            document.getElementById('logout_without_saving').click();
         }
         else {
             $('.confirm_logout').show();
