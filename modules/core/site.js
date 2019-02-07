@@ -1,17 +1,6 @@
 'use strict';
 
-/*
- * TODO:
- * - swipe support
- */
-
 /* extend cash.js with some useful bits */
-$.fn.swipeLeft = function(callback) {
-};
-$.fn.swipeRight = function(callback) {
-};
-$.fn.swipeDown = function(callback) {
-};
 $.inArray = function(item, list) {
     for (var i in list) {
         if (list[i] === item) {
@@ -46,6 +35,40 @@ $.fn.sort = function(sort_function) {
         list.push(this[i]);
     }
     return $(list.sort(sort_function));
+};
+
+/* swipe event handler */
+var swipe_event = function(el, callback, direction) {
+    var  swipe_dir, start_x, start_y, dist_x, dist_y,
+        threshold = 150, restraint = 100, allowed_time = 500, elapsed_time,
+        dist, start_time, handleswipe = callback || function(swipe_dir){}
+
+    el.addEventListener('touchstart', function(e){
+        var touchobj = e.changedTouches[0];
+        swipe_dir = 'none';
+        dist = 0;
+        start_x = touchobj.pageX;
+        start_y = touchobj.pageY;
+        start_time = new Date().getTime();
+    }, false);
+
+    el.addEventListener('touchend', function(e){
+        var touchobj = e.changedTouches[0];
+        dist_x = touchobj.pageX - start_x;
+        dist_y = touchobj.pageY - start_y;
+        elapsed_time = new Date().getTime() - start_time;
+        if (elapsed_time <= allowed_time) {
+            if (Math.abs(dist_x) >= threshold && Math.abs(dist_y) <= restraint) {
+                swipe_dir = (dist_x < 0)? 'left' : 'right';
+            }
+            else if (Math.abs(dist_y) >= threshold && Math.abs(dist_x) <= restraint) {
+                swipe_dir = (dist_y < 0)? 'up' : 'down';
+            }
+        }
+        if (swipe_dir == direction) {
+            handleswipe();
+        }
+    }, false);
 };
 
 /* ajax multiplexer */
@@ -1468,7 +1491,6 @@ $(function() {
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
-        $('.content_cell').swipeDown(function(e) { e.preventDefault(); Hm_Message_List.load_sources(); });
         $('.source_link').on("click", function() { $('.list_sources').toggle(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');
@@ -1486,8 +1508,8 @@ $(function() {
     if (hm_page_name() == 'home') {
         $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
-    $('body').swipeRight(function() { Hm_Folders.open_folder_list(); });
-    $('body').swipeLeft(function() { Hm_Folders.hide_folder_list(); });
+    swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
+    swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
 
 });
