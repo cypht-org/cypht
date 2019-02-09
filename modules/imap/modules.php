@@ -1489,7 +1489,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
                     }
                     $save_reply_text = false;
-                    if (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text')) {
+                    if ($part == 0 || (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text'))) {
                         $save_reply_text = true;
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
@@ -1505,6 +1505,10 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
+                        if ($part == 0) {
+                            $msg_struct_current['type'] = 'text';
+                            $msg_struct_current['subtype'] = 'plain';
+                        }
                         $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
                             array('msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                     }
