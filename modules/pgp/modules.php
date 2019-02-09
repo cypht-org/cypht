@@ -90,7 +90,8 @@ class Hm_Handler_pgp_message_check extends Hm_Handler_Module {
             $pgp = true;
         }
         $part_struct = $this->get('msg_struct_current', array());
-        if ($part_struct['type'] == 'application' && $part_struct['subtype'] == 'pgp-encrypted') {
+        if (is_array($part_struct) && array_key_exists('type', $part_struct) &&
+            $part_struct['type'] == 'application' && $part_struct['subtype'] == 'pgp-encrypted') {
             $pgp = true;
         }
         $this->out('pgp_msg_part', $pgp);
