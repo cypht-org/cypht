@@ -91,7 +91,7 @@ class Hm_MIME_Msg {
             if (!trim($val)) {
                 continue;
             }
-            $headers .= sprintf("%s: %s\r\n", $name, $this->prep_fld($val, $name));
+            $headers .= sprintf("%s: %s\r\n", $name, rtrim($this->prep_fld($val, $name)));
         }
         if (!$this->final_msg) {
             if ($this->html) {
