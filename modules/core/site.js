@@ -124,8 +124,7 @@ var Hm_Ajax = {
     process_callback_hooks: function(name, res) {
         var hook;
         var func;
-        var i;
-        for (i in Hm_Ajax.callback_hooks) {
+        for (var i in Hm_Ajax.callback_hooks) {
             hook = Hm_Ajax.callback_hooks[i];
             if (hook[0] == name || hook[0] == '*') {
                 func = hook[1];
