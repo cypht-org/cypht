@@ -1,14 +1,13 @@
 #!/bin/bash
-rm -rf __pycache__/
+
 PYTHON=`which python`
-for suite in *
+rm -rf __pycache__/
+
+for suite in login.py folder_list.py pages.py profiles.py settings.py servers.py send.py inline_msg.py search.py
 do
-    pyc=`echo $suite | /bin/grep 'pyc$'`
-    if [ -z "$pyc" ] && [ "$suite" != "runner.py" ] && [ "$suite" != "base.py" ] && [ "$suite" != "runall.sh" ]; then
-        export TEST_SUITE="$suite"
-        "$PYTHON" -u ./$suite
-        if [ $? -ne 0 ]; then
-            exit 1
-        fi
+    export TEST_SUITE="$suite"
+    "$PYTHON" -u ./$suite
+    if [ $? -ne 0 ]; then
+        exit 1
     fi
 done
