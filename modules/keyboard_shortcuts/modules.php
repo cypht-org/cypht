@@ -193,7 +193,7 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
 class Hm_Output_keyboard_shortcut_data extends Hm_Output_Module {
     protected function output() {
         if ($this->get('shortcuts_enabled')) {
-            return '<script id="shortcuts" type="text/javascript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
+            return '<script type="text/javascript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
         }
     }
 }
@@ -294,8 +294,8 @@ if (!hm_exists('fromat_keyboard_action')) {
 function format_keyboard_action($action) {
     $actions = Array(
         'Keyboard_Shortcuts.unfocus' => 'unfocus',
+        'Hm_Folders.toggle_folder_list' => 'toggle',
         'ks_redirect' => 'redirect',
-        'Hm_Folders.toggle_folders' => 'folders',
         'ks_next_msg_list' => 'next',
         'ks_prev_msg_list' => 'prev',
         'ks_load_msg' => 'load',

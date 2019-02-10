@@ -142,7 +142,7 @@ var Keyboard_Shortcuts = {
 var Keyboard_Actions = {
     'unfocus': false,
     'redirect': ks_redirect,
-    'folders': Hm_Folders.toggle_folders,
+    'toggle': Hm_Folders.toggle_folder_list,
     'next': ks_next_msg_list,
     'prev': ks_prev_msg_list,
     'load': ks_load_msg,
@@ -154,7 +154,7 @@ var Keyboard_Actions = {
 
 $(function() {
 
-    if ($('.menu_shortcuts').length) {
+    if (typeof shortcuts != 'undefined') {
         $(document).not('input').on('keydown', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }
     if (hm_page_name() == 'shortcuts') {
