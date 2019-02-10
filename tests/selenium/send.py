@@ -1,7 +1,6 @@
 from base import WebTest, USER, PASS
 from creds import RECIP
 from runner import test_runner
-from selenium.common.exceptions import ElementNotVisibleException
 
 class SendTest(WebTest):
 

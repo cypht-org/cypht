@@ -193,7 +193,7 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
 class Hm_Output_keyboard_shortcut_data extends Hm_Output_Module {
     protected function output() {
         if ($this->get('shortcuts_enabled')) {
-            return '<script id="shortcuts" type="text/delayscript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
+            return '<script type="text/javascript">'.format_shortcuts($this->get('keyboard_shortcut_data')).'</script>';
         }
     }
 }
@@ -290,13 +290,33 @@ function shortcut_defaults($user_config=false) {
 /**
  * @subpackage keyboard_shortcuts/functions
  */
+if (!hm_exists('fromat_keyboard_action')) {
+function format_keyboard_action($action) {
+    $actions = Array(
+        'Keyboard_Shortcuts.unfocus' => 'unfocus',
+        'Hm_Folders.toggle_folder_list' => 'toggle',
+        'ks_redirect' => 'redirect',
+        'ks_next_msg_list' => 'next',
+        'ks_prev_msg_list' => 'prev',
+        'ks_load_msg' => 'load',
+        'ks_select_msg' => 'select',
+        'ks_select_all' => 'select_all',
+        'ks_click_button' => 'click',
+        'ks_follow_link' => 'link'
+    );
+    return $actions[$action];
+}}
+
+/**
+ * @subpackage keyboard_shortcuts/functions
+ */
 if (!hm_exists('format_shortcuts')) {
 function format_shortcuts($data) {
     $res = "var shortcuts = [\n";
     foreach ($data as $vals) {
         $c_chars = implode(',', array_map(function($v) { return "'".$v."'"; }, $vals['control_chars']));
-        $res .= sprintf("{'page': '%s', 'control_chars': [%s], 'char': %s, 'action': %s, 'target': '%s'},\n",
-            $vals['page'], $c_chars, $vals['char'], $vals['action'], $vals['target']);
+        $res .= sprintf("{'page': '%s', 'control_chars': [%s], 'char': %s, 'action': '%s', 'target': '%s'},\n",
+            $vals['page'], $c_chars, $vals['char'], format_keyboard_action($vals['action']), $vals['target']);
     }
     $res .= "];\n";
     return $res;

@@ -1,7 +1,6 @@
 from base import WebTest, USER, PASS
 from runner import test_runner
 from creds import IMAP_ID
-from selenium.common.exceptions import ElementNotVisibleException
 
 class ServersTest(WebTest):
 
