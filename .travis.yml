@@ -2,6 +2,11 @@ dist: trusty
 sudo: required
 language: php
 
+# only run on master
+branches:
+  only:
+  - master
+
 # php versions
 php:
     - '5.4'
