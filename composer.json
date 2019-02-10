@@ -25,6 +25,7 @@
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-curl": "*",
+        "ext-gd": "*",
         "ext-openssl": "*",
         "ext-PDO": "*",
         "ext-redis": "*",
