@@ -2,7 +2,6 @@
 
 from base import WebTest, USER, PASS
 from runner import test_runner
-from selenium.common.exceptions import ElementNotVisibleException
 
 class FolderListTests(WebTest):
 

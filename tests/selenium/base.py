@@ -93,6 +93,10 @@ class WebTest:
         print(" - finding element by id {0}".format(el_id))
         return self.driver.find_element_by_id(el_id)
 
+    def by_tag(self, name):
+        print(" - finding element by tag name {0}".format(name))
+        return self.driver.find_element_by_tag_name(name)
+
     def by_name(self, name):
         print(" - finding element by name {0}".format(name))
         return self.driver.find_element_by_name(name)

@@ -2,8 +2,6 @@
 
 from base import WebTest, USER, PASS
 from runner import test_runner
-from selenium.common.exceptions import ElementNotVisibleException
-from selenium.webdriver.support.ui import Select
 from settings import SettingsHelpers
 
 class InlineMsgTests(SettingsHelpers):
