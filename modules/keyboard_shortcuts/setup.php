@@ -19,7 +19,7 @@ add_handler('settings', 'process_enable_shortcut_setting', true, 'keyboard_short
 add_output('settings', 'enable_shortcut_setting', true, 'keyboard_shortcuts', 'start_general_settings', 'after');
 
 add_module_to_all_pages('handler', 'load_keyboard_shortcuts', true, 'keyboard_shortcuts', 'load_user_data', 'after');
-add_module_to_all_pages('output', 'keyboard_shortcut_data', true, 'keyboard_shortcuts', 'content_end', 'before');
+add_module_to_all_pages('output', 'keyboard_shortcut_data', true, 'keyboard_shortcuts', 'js_data', 'before');
 
 return array(
     'allowed_pages' => array(

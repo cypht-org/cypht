@@ -95,14 +95,14 @@ var Keyboard_Shortcuts = {
             }
             matched = Keyboard_Shortcuts.check_control_chars(combo['control_chars'], control_keys);
             if (matched) {
-                if (combo['action'] == Keyboard_Shortcuts.unfocus) {
+                if (combo['action'] == 'unfocus') {
                     Keyboard_Shortcuts.unfocus();
                     return false;
                 }
                 if (Keyboard_Shortcuts.in_input_tag(e)) {
                     return true;
                 }
-                combo['action'](combo['target']);
+                Keyboard_Actions[combo['action']](combo['target']);
                 return false;
             }
         }
@@ -139,15 +139,23 @@ var Keyboard_Shortcuts = {
     }
 };
 
+var Keyboard_Actions = {
+    'unfocus': false,
+    'redirect': ks_redirect,
+    'folders': Hm_Folders.toggle_folders,
+    'next': ks_next_msg_list,
+    'prev': ks_prev_msg_list,
+    'load': ks_load_msg,
+    'select': ks_select_msg,
+    'select_all': ks_select_all,
+    'click': ks_click_button,
+    'link': ks_follow_link
+};
+
 $(function() {
-    var shortcut_data = document.getElementById("shortcuts").innerHTML;
-    var shortcut_script = document.createElement('script')
-    shortcut_script.type = 'text/javascript';
-    shortcut_script.innerHTML = shortcut_data;
-    document.getElementsByTagName('head')[0].appendChild(shortcut_script);
 
     if ($('.menu_shortcuts').length) {
-        //$(document).not('input').keydown(function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
+        $(document).not('input').on('keydown', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }
     if (hm_page_name() == 'shortcuts') {
         $('.reset_shortcut').on("click", function() {
