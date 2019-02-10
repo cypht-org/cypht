@@ -32,7 +32,7 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
             $secret = base32_encode_str(create_secret($secret, $username, $len));
             $app_name = $this->config->get('app_name', 'Cypht');
             $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
-            $this->out('2fa_png_path', generate_qr_code($this->config, $username, $uri));
+            $this->out('2fa_png', generate_qr_code($this->config, $username, $uri));
             $this->out('2fa_backup_codes', backup_codes($this->user_config));
             $this->out('2fa_secret', $secret);
         }
@@ -120,9 +120,8 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $res .= ' checked="checked"';
         }
         $res .= '></td></tr>';
-        $path = $this->get('2fa_png_path');
-        if ($path && is_readable($path)) {
-            $png = file_get_contents($path);
+        $png = $this->get('2fa_png');
+        if ($png) {
             $qr_code = '<tr class="tfa_setting"><td></td><td>';
             if (!$enabled) {
                 $qr_code .= '<div class="err settings_wrap_text">'.
@@ -230,7 +229,7 @@ function get_2fa_key($config) {
  */
 if (!hm_exists('base32_encode_str')) {
 function base32_encode_str($str) {
-    require_once APP_PATH.'third_party/Base32.php';
+    require_once APP_PATH.'vendor/christian-riesen/base32/src/Base32.php';
     return Base32\Base32::encode($str);
 }}
 
@@ -240,9 +239,9 @@ function base32_encode_str($str) {
 if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
     $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
-    require_once APP_PATH.'third_party/phpqrcode.php';
-    QRcode::png($str, $qr_code);
-    return $qr_code;
+    require_once APP_PATH.'vendor/autoload.php';
+    $qrCode = new Endroid\QrCode\QrCode($str);
+    return $qrCode->writeString();
 }}
 
 /**
