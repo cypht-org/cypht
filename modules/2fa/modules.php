@@ -1,5 +1,7 @@
 <?php
 
+use CodeItNow\BarcodeBundle\Utils\QrCode;
+
 /**
  * 2FA modules
  * @package modules
@@ -131,13 +133,13 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img alt="" width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
+            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.$png.'" />';
             $qr_code .= '</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
         }
         else {
-            $qr_code .= '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code = '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
         }
         $res .= $qr_code;
         $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device').'<br /><br />';
@@ -240,8 +242,10 @@ if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
     $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
     require_once APP_PATH.'vendor/autoload.php';
-    $qrCode = new Endroid\QrCode\QrCode($str);
-    return $qrCode->writeString();
+    $qr_code = new QrCode();
+    $qr_code->setText($str);
+    $qr_code->setSize(200);
+    return $qr_code->generate();
 }}
 
 /**
