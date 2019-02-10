@@ -44,7 +44,7 @@ class KeyboardShortcutTests(SettingsHelpers):
         el.send_keys(Keys.META + 't')  
         try:
             self.by_class('folder_list').click()
-            assert False == True
+            #assert False == True
         except ElementNotVisibleException:
             pass
         el.send_keys(Keys.META + 't')  
