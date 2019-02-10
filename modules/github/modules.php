@@ -705,7 +705,11 @@ function github_connect_details($config) {
  */
 if (!hm_exists('build_github_subject')) {
 function build_github_subject($event, $output_mod) {
-    $pre = '['.trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type'])))).']';
+    $ref = '';
+    if (array_key_exists('payload', $event) && array_key_exists('ref', $event['payload'])) {
+        $ref = sprintf(' / %s', preg_replace("/^refs\/heads\//", '', $event['payload']['ref']));
+    }
+    $pre = '['.$output_mod->html_safe(trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type']))))).']';
     $post = '';
     $max = 100;
     switch (strtolower($event['type'])) {
@@ -717,10 +721,10 @@ function build_github_subject($event, $output_mod) {
             break;
         case 'pushevent':
             if (count($event['payload']['commits']) > 1) {
-                $post = sprintf($output_mod->trans('%d commits: '), count($event['payload']['commits']));
+                $post .= sprintf($output_mod->trans('%d commits: '), count($event['payload']['commits']));
             }
             else {
-                $post = sprintf($output_mod->trans('%d commit: '), count($event['payload']['commits']));
+                $post .= sprintf($output_mod->trans('%d commit: '), count($event['payload']['commits']));
             }
             $post .= substr($event['payload']['commits'][0]['message'], 0, $max);
             break;
@@ -748,6 +752,9 @@ function build_github_subject($event, $output_mod) {
             $post = substr($event['payload']['release']['name'], 0, $max);
         default:
             break;
+    }
+    if ($ref) {
+        $post .= $output_mod->html_safe($ref);
     }
     return $pre.' '.$post;
 }}
