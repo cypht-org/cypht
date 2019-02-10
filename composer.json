@@ -1,11 +1,35 @@
 {
+    "name": "jason-munro/cypht",
+    "type": "application",
+    "description": "Lightweight Open Source webmail written in PHP and JavaScript",
+    "keywords": ["php", "webmail", "webmail-client", "imap", "pop3", "smtp", "news-reader", "rss", "atom", "e-mail", "jmap"],
+    "homepage": "https://cypht.org",
+    "license": "GPLV2",
+    "authors":[
+        {
+            "name": "Jason Munro",
+            "email": "jason@cypht.org",
+            "homepage": "http://jasonmunro.net",
+            "role": "Project author and admin"
+        }
+    ],
     "require": {
+        "php": ">=5.4",
         "paragonie/random_compat": "9.99.99",
         "html2text/html2text": "4.2.1",
         "erusev/parsedown": "1.8.0-beta-5",
         "christian-riesen/base32": "1.3.2",
         "ezyang/htmlpurifier": "4.10.0",
-        "endroid/qr-code": "3.5.0"
+        "endroid/qr-code": "3.5.0",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-openssl": "*",
+        "ext-PDO": "*",
+        "ext-redis": "*",
+        "ext-memcached": "*",
+        "ext-gnupg": "*",
+        "ext-session": "*"
     },
     "config": {
     	"optimize-autoloader": true
