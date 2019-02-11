@@ -1,6 +1,7 @@
 apt-get install -y dovecot-imapd dovecot-lmtpd
 sleep 10
 stop dovecot
+usermod -a -G mail dovecot
 #echo "mail_location = maildir:/home/%u/Maildir" | tee --append /etc/dovecot/conf.d/10-mail.conf
 SSL_CERT=/etc/ssl/certs/dovecot.pem
 SSL_KEY=/etc/ssl/private/dovecot.pem
