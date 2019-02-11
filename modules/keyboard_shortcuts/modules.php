@@ -232,7 +232,7 @@ function format_shortcut_section($data, $type, $output_mod) {
             }
             $char = array_search($vals['char'], $codes);
             $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
-                '<td><a href="?page=shortcuts&edit_id=%s"><img alt="'.
+                '<td><a href="?page=shortcuts&edit_id=%s"><img width="16" height="16" alt="'.
                 $output_mod->trans('Update').'" class="kbd_config" src="%s" /><a></td></tr>',
                 $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
                 $output_mod->trans($vals['label']), $index, Hm_Image_Sources::$cog);
@@ -248,7 +248,7 @@ if (!hm_exists('shortcut_defaults')) {
 function shortcut_defaults($user_config=false) {
     $res = array(
         array('label' => 'Unfocus all input elements', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 27, 'action' => 'Keyboard_Shortcuts.unfocus', 'target' => 'false'),
-        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
+        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
         array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 85, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
         array('label' => 'Jump to the "Flagged" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 70, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=flagged'),
         array('label' => 'Jump to History', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 72, 'action' => 'ks_redirect', 'target' => '?page=history'),
