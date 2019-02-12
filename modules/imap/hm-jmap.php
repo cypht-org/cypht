@@ -26,6 +26,7 @@
  * - mailbox state handling
  * - pipeline where we can with back refs
  * - disable download of multipart types
+ * - recurse into nested multipart types for bodystruct
  */
 
 /**
