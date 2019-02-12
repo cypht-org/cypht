@@ -1493,6 +1493,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $save_reply_text = true;
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
+                    $this->out('list_headers', get_list_headers($msg_headers));
                     $this->out('msg_headers', $msg_headers);
                     $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
@@ -1757,6 +1758,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                 }
             }
+            if ($this->get('list_headers')) {
+                $txt .= format_list_headers($this);
+            }
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
@@ -1787,7 +1791,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
-            $txt .= '</th></tr></table>';
+            $txt .= '</th></tr>';
+            $txt .= '</table>';
 
             $this->out('msg_headers', $txt, false);
         }
@@ -3356,4 +3361,67 @@ function imap_server_type($id) {
         $type = strtoupper($details['type']);
     }
     return $type;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('get_list_headers')) {
+function get_list_headers($headers) {
+    $res = array();
+    $list_headers = array('list-archive', 'list-unsubscribe',
+        'list-subscribe', 'list-archive', 'list-post', 'list-help');
+    foreach (lc_headers($headers) as $name => $val) {
+        if (in_array($name, $list_headers, true)) {
+            $res[substr($name, 5)] = process_list_fld($val);
+        }
+    }
+    return $res;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('process_list_fld')) {
+function process_list_fld($fld) {
+    $res = array('links' => array(), 'email' => array(), 'values' => array());
+    foreach (explode(',', $fld) as $val) {
+        $val = trim(str_replace(array('<', '>'), '', $val));
+        if (preg_match("/^http/", $val)) {
+            $res['links'][] = $val;
+        }
+        elseif (preg_match("/^mailto/", $val)) {
+            $res['email'][] = substr($val, 7);
+        }
+        else {
+            $res['values'][] = $val;
+        }
+    }
+    return $res;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('format_list_headers')) {
+function format_list_headers($mod) {
+    $res = '<tr><th>'.$mod->trans('List').'</th><td>';
+    $sections = array();
+    foreach ($mod->get('list_headers') as $name => $vals) {
+        if (count($vals['email']) > 0 || count($vals['links']) > 0) {
+            $sources = array();
+            $section = ' '.$mod->html_safe($name).': ';
+            foreach ($vals['email'] as $v) {
+                $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
+                    '">'.$mod->trans('email').'</a>';
+            }
+            foreach ($vals['links'] as $v) {
+                $sources[] = '<a href="'.$mod->html_safe($v).'">'.$mod->trans('link').'</a>';
+            }
+            $section .= implode(', ', $sources);
+            $sections[] = $section;
+        }
+    }
+    $res .= implode(' | ', $sections).'</td></tr>';
+    return $res;
 }}
