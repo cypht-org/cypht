@@ -104,6 +104,7 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
             search_field_selection($this->get('search_fld', DEFAULT_SEARCH_FLD), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
             message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
+            combined_sort_dialog($this).
             ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
             ' <input type="button" class="search_reset" value="'.$this->trans('Reset').'" />';
     }
@@ -1625,6 +1626,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
+        if (!$this->get('is_mobile')) {
+            $res .= combined_sort_dialog($this);
+        }
         $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= list_sources($this->get('data_sources', array()), $this);

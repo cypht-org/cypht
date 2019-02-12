@@ -7,6 +7,8 @@ html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
 table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
+.message_list .combined_sort { font-size: 80%; margin-top: -2px; ; float: right; margin-right: 120px; }
+.search_content .combined_sort { display: none; }
 .offline { display: none; cursor: pointer; position: absolute; right: 0px; top: 0px; z-index: 101; color: white; background-color: red; padding: 18px; padding-right: 25px; padding-left: 25px; font-weight: bold; }
 .subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
 .subject { cursor: pointer; font-size: 110%; }
@@ -130,7 +132,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; }
 .server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
 .settings_subtitle, .server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; }
-.list_meta { float: right; margin-right: 120px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
+.list_meta { float: right; margin-right: 20px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
 .hide_folders { font-size: 0px; float: left; clear: none; margin-top: 10px; margin-left: 23px; }

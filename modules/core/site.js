@@ -472,17 +472,16 @@ function Message_List() {
     };
 
     this.sort = function(fld) {
-        var table = Hm_Utils.tbody();
-        var listitems = $('tr', table);
+        var listitems = Hm_Utils.rows();
         var aval;
         var bval;
-        listitems.sort(function(a, b) {
+        var sort_result = listitems.sort(function(a, b) {
             switch (Math.abs(fld)) {
                 case 1:
                 case 2:
                 case 3:
-                    aval = $($('td', a)[Math.abs(fld)]).text();
-                    bval = $($('td', b)[Math.abs(fld)]).text();
+                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
+                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
                     break;
                 case 4:
                 default:
@@ -492,23 +491,23 @@ function Message_List() {
             }
             if (fld == 4 || fld == -4 || !fld) {
                 if (fld == -4) {
-                    return aval > bval;
+                    return aval - bval;
                 }
-                return aval < bval;
+                return bval - aval;
             }
             else {
                 if (fld && fld < 0) {
                     return bval.toUpperCase().localeCompare(aval.toUpperCase());
                 }
-                else {
-                    return aval.toUpperCase().localeCompare(bval.toUpperCase());
-                }
+                return aval.toUpperCase().localeCompare(bval.toUpperCase());
             }
         });
-        $.each(listitems, function(_, itm) { table.append(itm); });
-        this.set_tab_index();
         this.sort_fld = fld;
-        /* TODO: save cache after sort */
+        Hm_Utils.tbody().html('');
+        for (var i = 0, len=sort_result.length; i < len; i++) {
+            Hm_Utils.tbody().append(sort_result[i]);
+        }
+        this.save_updated_list();
     };
 
     this.add_rows = function(msgs, msg_rows) {
@@ -536,16 +535,35 @@ function Message_List() {
     };
 
     this.insert_into_message_list = function(row, msg_rows) {
-        var timestr = $('.msg_timestamp', $(row)).val();
+        var sort_fld = this.sort_fld;
+        if (typeof sort_fld == 'undefined' || sort_fld == null) {
+            sort_fld = 4;
+        }
         var element = false;
-        var timestr2;
-        $('tr', msg_rows).each(function() {
-            timestr2 = $('.msg_timestamp', $(this)).val();
-            if ((timestr*1) >= (timestr2*1)) {
-                element = $(this);
-                return false;
-            }
-        });
+        if (sort_fld == 4 || sort_fld == -4) {
+            var timestr2;
+            var timestr = $('.msg_timestamp', $(row)).val();
+            $('tr', msg_rows).each(function() {
+                timestr2 = $('.msg_timestamp', $(this)).val();
+                if ((sort_fld == -4 && (timestr2*1) >= (timestr*1)) ||
+                    (sort_fld == 4 && (timestr*1) >= (timestr2*1))) {
+                    element = $(this);
+                    return false;
+                }
+            });
+        }
+        else {
+            var bval;
+            var aval = $($('td', $(row))[Math.abs(sort_fld)]).text().replace(/^\s+/g, '');
+            $('tr', msg_rows).each(function() {
+                bval = $($('td', $(this))[Math.abs(sort_fld)]).text().replace(/^\s+/g, '');
+                if ((sort_fld < 0 && aval.toUpperCase().localeCompare(bval.toUpperCase()) > 0) ||
+                   (sort_fld > 0 && bval.toUpperCase().localeCompare(aval.toUpperCase()) > 0)) {
+                    element = $(this);
+                    return false;
+                }
+            });
+        }
         if (element) {
             $(row, msg_rows).insertBefore(element);
         }
@@ -599,6 +617,7 @@ function Message_List() {
     this.save_updated_list = function() {
         if (this.page_caches.hasOwnProperty(hm_list_path())) {
             this.set_message_list_state(this.page_caches[hm_list_path()]);
+            Hm_Utils.save_to_local_storage('sort_'+hm_list_path(), this.sort_fld);
         }
     };
 
@@ -682,6 +701,11 @@ function Message_List() {
             else {
                 self.setup_combined_view(false);
             }
+        }
+        var sort_type = Hm_Utils.get_from_local_storage('sort_'+hm_list_path());
+        if (sort_type != null) {
+            this.sort_fld = sort_type;
+            $('.combined_sort').val(sort_type);
         }
         $('.core_msg_control').on("click", function() { return self.message_action($(this).data('action')); });
         $('.toggle_link').on("click", function() { return self.toggle_rows(); });
@@ -1490,6 +1514,7 @@ $(function() {
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
+        $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
         $('.source_link').on("click", function() { $('.list_sources').toggle(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');

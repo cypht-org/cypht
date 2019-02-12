@@ -95,6 +95,29 @@ function message_list_meta($input, $output_mod) {
 }}
 
 /**
+ * Build sort dialog for a combined list
+ * @subpackage core/functions
+ * @param object $output_mod Hm_Output_Module
+ * @return string
+ */
+if (!hm_exists('combined_sort_dialog')) {
+function combined_sort_dialog($mod) {
+    $sorts = array(
+        '4' => $mod->trans('Arrival'),
+        '2' => $mod->trans('From'),
+        '3' => $mod->trans('Subject'),
+    );
+
+    $res = '<select name="sort" class="combined_sort">';
+    foreach ($sorts as $name => $val) {
+        $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
+    }
+    $res .= '</select>';
+    return $res;
+}}
+
+/**
  * Build a human readable interval string
  * @subpackage core/functions
  * @param string $date_str date string parsable by strtotime()
