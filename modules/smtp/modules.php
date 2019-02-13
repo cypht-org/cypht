@@ -1150,7 +1150,7 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
         $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
     }
     if ($body_type == 2) {
-        require_once APP_PATH.'third_party/Parsedown.php';
+        require_once APP_PATH.'vendor/erusev/parsedown/Parsedown.php';
         $parsedown = new Parsedown();
         $body = $parsedown->text($body);
     }

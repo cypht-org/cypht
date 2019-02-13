@@ -1,0 +1,310 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "c4bc0768a37e6135e96e559a2c081e9c",
+    "packages": [
+        {
+            "name": "christian-riesen/base32",
+            "version": "1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ChristianRiesen/base32.git",
+                "reference": "80ff0e3b2124e61b4b39e2535709452f70bff367"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/80ff0e3b2124e61b4b39e2535709452f70bff367",
+                "reference": "80ff0e3b2124e61b4b39e2535709452f70bff367",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "php": ">=5.6",
+                "phpunit/phpunit": "^5.0",
+                "satooshi/php-coveralls": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Base32\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Christian Riesen",
+                    "email": "chris.riesen@gmail.com",
+                    "homepage": "http://christianriesen.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Base32 encoder/decoder according to RFC 4648",
+            "homepage": "https://github.com/ChristianRiesen/base32",
+            "keywords": [
+                "base32",
+                "decode",
+                "encode",
+                "rfc4648"
+            ],
+            "time": "2018-11-02T09:03:50+00:00"
+        },
+        {
+            "name": "codeitnowin/barcode",
+            "version": "3.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codeitnowin/barcode-generator.git",
+                "reference": "6325a15ae904ec401b947e1a3e868de1c2cc80b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codeitnowin/barcode-generator/zipball/6325a15ae904ec401b947e1a3e868de1c2cc80b0",
+                "reference": "6325a15ae904ec401b947e1a3e868de1c2cc80b0",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": ">=5.3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "CodeItNow\\": "CodeItNow/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Akhtar Khan",
+                    "email": "er.akhtarkhan@gmail.com"
+                }
+            ],
+            "description": "Barcode & Qr Code generator library by http://www.codeitnow.in. You can use it with Custom PHP application or any PHP Framework such as Laravel, Cakephp, Yii, Codeigneter etc.",
+            "homepage": "http://www.codeitnow.in",
+            "keywords": [
+                "Symfony2",
+                "barcode",
+                "cakephp",
+                "code",
+                "generator",
+                "laravel",
+                "qr",
+                "qrcode",
+                "symfony"
+            ],
+            "time": "2018-10-25T18:32:10+00:00"
+        },
+        {
+            "name": "erusev/parsedown",
+            "version": "1.8.0-beta-5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/erusev/parsedown.git",
+                "reference": "c26a2ee4bf8ba0270daab7da0353f2525ca6564a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/erusev/parsedown/zipball/c26a2ee4bf8ba0270daab7da0353f2525ca6564a",
+                "reference": "c26a2ee4bf8ba0270daab7da0353f2525ca6564a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Parsedown": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Emanuil Rusev",
+                    "email": "hello@erusev.com",
+                    "homepage": "http://erusev.com"
+                }
+            ],
+            "description": "Parser for Markdown.",
+            "homepage": "http://parsedown.org",
+            "keywords": [
+                "markdown",
+                "parser"
+            ],
+            "time": "2018-06-11T18:15:32+00:00"
+        },
+        {
+            "name": "ezyang/htmlpurifier",
+            "version": "v4.10.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/d85d39da4576a6934b72480be6978fb10c860021",
+                "reference": "d85d39da4576a6934b72480be6978fb10c860021",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "require-dev": {
+                "simpletest/simpletest": "^1.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "time": "2018-02-23T01:58:20+00:00"
+        },
+        {
+            "name": "html2text/html2text",
+            "version": "4.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mtibben/html2text.git",
+                "reference": "f7555eaf271beea4e1098274d3ff37fbb7b21ea7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mtibben/html2text/zipball/f7555eaf271beea4e1098274d3ff37fbb7b21ea7",
+                "reference": "f7555eaf271beea4e1098274d3ff37fbb7b21ea7",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance",
+                "symfony/polyfill-mbstring": "If you can't install ext-mbstring"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Html2Text\\": [
+                        "src/",
+                        "test/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Converts HTML to formatted plain text",
+            "time": "2018-08-13T12:05:08+00:00"
+        },
+        {
+            "name": "paragonie/random_compat",
+            "version": "v2.0.18",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paragonie/random_compat.git",
+                "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
+                "reference": "0a58ef6e3146256cc3dc7cc393927bcc7d1b72db",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "4.*|5.*"
+            },
+            "suggest": {
+                "ext-libsodium": "Provides a modern crypto API that can be used to generate random bytes."
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "lib/random.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Paragon Initiative Enterprises",
+                    "email": "security@paragonie.com",
+                    "homepage": "https://paragonie.com"
+                }
+            ],
+            "description": "PHP 5.x polyfill for random_bytes() and random_int() from PHP 7",
+            "keywords": [
+                "csprng",
+                "polyfill",
+                "pseudorandom",
+                "random"
+            ],
+            "time": "2019-01-03T20:59:08+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "erusev/parsedown": 10
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.4",
+        "ext-mbstring": "*",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "ext-openssl": "*",
+        "ext-session": "*"
+    },
+    "platform-dev": []
+}

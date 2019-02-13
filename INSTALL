@@ -3,7 +3,8 @@ Requirements
 
 Cypht requires at least PHP 5.4, with the OpenSSL and cURL extensions. You will
 also need PDO support if using any databases features. Testing is done on
-Debian and Ubuntu platforms with Nginx, Apache, standard PHP, and HHVM.
+Debian and Ubuntu platforms with Nginx, Apache, standard PHP, and HHVM. We also
+use Composer to manage our few PHP dependencies.
 
 
 1. Download and prepare the code
@@ -39,6 +40,9 @@ wget https://github.com/jasonmunro/cypht/archive/master.zip
 
 # unpack the archive
 unzip master.zip
+
+# run composer
+cd cypht-master && composer install && cd ..
 
 # create a vanilla ini file
 cp cypht-master/hm3.sample.ini cypht-master/hm3.ini

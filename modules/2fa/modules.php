@@ -1,5 +1,7 @@
 <?php
 
+use CodeItNow\BarcodeBundle\Utils\QrCode;
+
 /**
  * 2FA modules
  * @package modules
@@ -32,7 +34,7 @@ class Hm_Handler_process_enable_2fa extends Hm_Handler_Module {
             $secret = base32_encode_str(create_secret($secret, $username, $len));
             $app_name = $this->config->get('app_name', 'Cypht');
             $uri = sprintf('otpauth://totp/%s:%s?secret=%s&issuer=%s', $app_name, $username, $secret, $app_name);
-            $this->out('2fa_png_path', generate_qr_code($this->config, $username, $uri));
+            $this->out('2fa_png', generate_qr_code($this->config, $username, $uri));
             $this->out('2fa_backup_codes', backup_codes($this->user_config));
             $this->out('2fa_secret', $secret);
         }
@@ -120,9 +122,8 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $res .= ' checked="checked"';
         }
         $res .= '></td></tr>';
-        $path = $this->get('2fa_png_path');
-        if ($path && is_readable($path)) {
-            $png = file_get_contents($path);
+        $png = $this->get('2fa_png');
+        if ($png) {
             $qr_code = '<tr class="tfa_setting"><td></td><td>';
             if (!$enabled) {
                 $qr_code .= '<div class="err settings_wrap_text">'.
@@ -132,13 +133,13 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img alt="" width="128" height="128" src="data:image/png;base64,'.base64_encode($png).'" />';
+            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.$png.'" />';
             $qr_code .= '</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
         }
         else {
-            $qr_code .= '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code = '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
         }
         $res .= $qr_code;
         $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device').'<br /><br />';
@@ -230,7 +231,7 @@ function get_2fa_key($config) {
  */
 if (!hm_exists('base32_encode_str')) {
 function base32_encode_str($str) {
-    require_once APP_PATH.'third_party/Base32.php';
+    require_once APP_PATH.'vendor/christian-riesen/base32/src/Base32.php';
     return Base32\Base32::encode($str);
 }}
 
@@ -240,9 +241,11 @@ function base32_encode_str($str) {
 if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
     $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
-    require_once APP_PATH.'third_party/phpqrcode.php';
-    QRcode::png($str, $qr_code);
-    return $qr_code;
+    require_once APP_PATH.'vendor/autoload.php';
+    $qr_code = new QrCode();
+    $qr_code->setText($str);
+    $qr_code->setSize(200);
+    return $qr_code->generate();
 }}
 
 /**
