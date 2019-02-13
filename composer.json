@@ -25,13 +25,15 @@
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-curl": "*",
-        "ext-gd": "*",
         "ext-openssl": "*",
-        "ext-PDO": "*",
-        "ext-redis": "*",
-        "ext-memcached": "*",
-        "ext-gnupg": "*",
         "ext-session": "*"
+    },
+    "suggest": {
+        "ext-PDO": "To use database features, this needs to be installed",
+        "ext-redis": "To use Redis for caching, this needs to be installed",
+        "ext-gd": "To use 2fa, this needs to be installed for the QR code display",
+        "ext-memcached": "To use Memcached for caching, this needs to be installed",
+        "ext-gnupg": "To use the PGP module set, this needs to be installed"
     },
     "config": {
     	"optimize-autoloader": true

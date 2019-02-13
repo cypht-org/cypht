@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "72359623fec7c8830b9a792a6b0a21b9",
+    "content-hash": "29bdbfd5a1c6f1b44d4b53c9dfe33ea1",
     "packages": [
         {
             "name": "christian-riesen/base32",
@@ -300,10 +300,6 @@
         "ext-json": "*",
         "ext-curl": "*",
         "ext-openssl": "*",
-        "ext-pdo": "*",
-        "ext-redis": "*",
-        "ext-memcached": "*",
-        "ext-gnupg": "*",
         "ext-session": "*"
     },
     "platform-dev": []
