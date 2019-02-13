@@ -5,6 +5,12 @@
     "keywords": ["php", "webmail", "webmail-client", "imap", "pop3", "smtp", "news-reader", "rss", "atom", "e-mail", "jmap"],
     "homepage": "https://cypht.org",
     "license": "GPL-2.0-only",
+    "stability": "dev",
+    "support": {
+        "email": "jason@cypht.org",
+        "irc": "irc://irc.freenode.org/hastymail",
+        "issues": "https://github.com/jasonmunro/cypht/issues"
+    },
     "authors":[
         {
             "name": "Jason Munro",
