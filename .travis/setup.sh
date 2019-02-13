@@ -33,6 +33,7 @@ setup_ldap() {
 # Add a system user dovecot will use for authentication
 setup_user() {
     sudo useradd -m -d /home/testuser -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
+    sudo usermod -a -G mail testuser
 }
 
 # Install Dovecot

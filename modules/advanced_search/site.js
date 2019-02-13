@@ -530,6 +530,7 @@ $(function() {
         $('#adv_search').on("click", function() { process_advanced_search(); });
         $('.toggle_link').on("click", function() { return Hm_Message_List.toggle_rows(); });
         $('.adv_reset').on("click", function() { adv_reset_page(); });
+        $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
 
         apply_saved_search();
         var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
