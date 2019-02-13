@@ -726,6 +726,7 @@ function Message_List() {
                 self.clear_read_messages();
             }
             self.set_checkbox_callback();
+            $('.combined_sort').show();
         }
         if (hm_page_name() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
@@ -847,6 +848,7 @@ function Message_List() {
         }
         else {
             $('.empty_list').remove();
+            $('.combined_sort').show();
         }
         return count === 0;
     };

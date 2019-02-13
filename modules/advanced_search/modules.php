@@ -311,7 +311,7 @@ class Hm_Output_advanced_search_form_end extends Hm_Output_Module {
         return '</div><div class="content_title search_result_title"><img width="16" height="16" src="'.
             Hm_Image_Sources::$env_closed.'" alt="'.$this->trans('Results').
             '" class="adv_expand_all">'.$this->trans('Search Results').'</div>'.
-            '<div class="adv_controls">'.message_controls($this).'</div>'.
+            '<div class="adv_controls">'.message_controls($this).' '.combined_sort_dialog($this).'</div>'.
             '<div class="message_list">';
     }
 }

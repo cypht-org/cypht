@@ -105,7 +105,7 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
             message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
             combined_sort_dialog($this).
-            ' <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
+            ' | <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
             ' <input type="button" class="search_reset" value="'.$this->trans('Reset').'" />';
     }
 }
