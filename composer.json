@@ -1,6 +1,6 @@
 {
     "name": "jason-munro/cypht",
-    "type": "application",
+    "type": "project",
     "description": "Lightweight Open Source webmail written in PHP and JavaScript",
     "keywords": ["php", "webmail", "webmail-client", "imap", "pop3", "smtp", "news-reader", "rss", "atom", "e-mail", "jmap"],
     "homepage": "https://cypht.org",
