@@ -79,7 +79,7 @@ var Hm_Ajax = {
     aborted: false,
     err_condition: false,
     batch_callback: false,
-    icon_loading_id: 0,
+    icon_loading_id: false,
 
     get_ajax_hook_name: function(args) {
         var index;
@@ -94,11 +94,9 @@ var Hm_Ajax = {
     request: function(args, callback, extra, no_icon, batch_callback, on_failure) {
         var name = Hm_Ajax.get_ajax_hook_name(args);
         var ajax = new Hm_Ajax_Request();
-        if (Hm_Ajax.request_count === 0) {
-            if (!no_icon) {
-                Hm_Ajax.show_loading_icon();
-                $('body').addClass('wait');
-            }
+        if (!no_icon) {
+            Hm_Ajax.show_loading_icon();
+            $('body').addClass('wait');
         }
         Hm_Ajax.request_count++;
         if (batch_callback) {
@@ -108,8 +106,9 @@ var Hm_Ajax = {
     },
 
     show_loading_icon: function() {
-        if (Hm_Ajax.icon_loading_id) {
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+        if (Hm_Ajax.icon_loading_id !== false) {
+            return;
+            //Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
         }
         var hm_loading_pos = $('.loading_icon').width()/40;
         $('.loading_icon').show();
@@ -145,6 +144,7 @@ var Hm_Ajax = {
     stop_loading_icon : function(loading_id) {
         clearTimeout(loading_id);
         $('.loading_icon').hide();
+        Hm_Ajax.icon_loading_id = false;
     }
 };
 
