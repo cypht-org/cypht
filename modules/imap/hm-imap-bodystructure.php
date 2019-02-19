@@ -384,7 +384,7 @@ class Hm_IMAP_Struct {
      * @param array $res holds results during recursive iterations
      * @return array list of matching parts
      */
-    public function recursive_search($struct, $flds, $all, $res) {
+    public function recursive_search($struct, $flds, $all, $res, $parent=false) {
         foreach ($struct as $msg_id => $vals) {
             $matches = 0;
             if (isset($flds['imap_part_number'])) {
@@ -402,6 +402,9 @@ class Hm_IMAP_Struct {
                 if (isset($part['subs'])) {
                     $part['subs'] = count($part['subs']);
                 }
+                if (is_array($parent) && array_key_exists('envelope', $parent)) {
+                    $part['envelope'] = $parent['envelope'];
+                }
                 $res[preg_replace("/^0\.{1}/", '', $msg_id)] = $part;
                 if (!$all) {
                     return $res;
@@ -409,7 +412,7 @@ class Hm_IMAP_Struct {
                 
             }
             if (isset($vals['subs'])) {
-                $res = $this->recursive_search($vals['subs'], $flds, $all, $res);
+                $res = $this->recursive_search($vals['subs'], $flds, $all, $res, $vals);
             }
         }
         return $res;

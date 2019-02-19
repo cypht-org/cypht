@@ -14,8 +14,10 @@
 .msg_text { min-height: 600px; background-color: #fff; height: 100%; }
 .msg_text_inner { min-height: 300px; font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; }
 .msg_headers { max-width: 100%; border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; padding-top: 10px; }
-.msg_headers th { vertical-align: top; padding: 3px; padding-top: 5px; padding-left: 35px; font-weight: normal; text-align: left; white-space: nowrap; padding-right: 13px; }
-.msg_headers td { word-break: break-all; word-wrap: break-word; padding: 3px; padding-top: 5px; }
+.imap_envelope { max-width: 100%; color: #777; padding: 0px; padding-bottom: 20px; padding-top: 0px; margin-top: -10px; }
+.imap_envelope th, .msg_headers th { vertical-align: top; padding: 3px; padding-top: 5px; padding-left: 35px; font-weight: normal; text-align: left; white-space: nowrap; padding-right: 13px; }
+.imap_envelope th { padding-left: 0px; }
+.imap_envelope td, .msg_headers td { word-break: break-all; word-wrap: break-word; padding: 3px; padding-top: 5px; }
 .imap_update a { color: teal; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 10px; letter-spacing: 0px; }
 .close_link { float: right; padding-right: 20px; text-decoration: none; color: teal; font-size: 90%; margin-bottom: 10px;}
 .header_links { padding-top: 10px !important; }

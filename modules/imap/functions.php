@@ -976,6 +976,28 @@ function process_list_fld($fld) {
 /**
  * @subpackage imap/functions
  */
+if (!hm_exists('format_imap_envelope')) {
+function format_imap_envelope($env, $mod) {
+    $env = lc_headers($env);
+    $res = '<table class="imap_envelope"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    if (array_key_exists('subject', $env) && trim($env['subject'])) {
+        $res .= '<tr class="header_subject"><th colspan="2">'.$mod->html_safe($env['subject']).
+            '</th></tr>';
+    }
+
+    foreach ($env as $name => $val) {
+        if (in_array($name, array('date', 'from', 'to', 'message-id'), true)) {
+            $res .= '<tr><th>'.$mod->html_safe(ucfirst($name)).'</th>'.
+                '<td>'.$mod->html_safe($val).'</td></tr>';
+        }
+    }
+    $res .= '</table>';
+    return $res;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
 if (!hm_exists('format_list_headers')) {
 function format_list_headers($mod) {
     $res = '<tr><th>'.$mod->trans('List').'</th><td>';

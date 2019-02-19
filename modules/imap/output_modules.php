@@ -91,11 +91,12 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
             $struct = $this->get('msg_struct_current', array());
+            if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
+                $txt .= format_imap_envelope($struct['envelope'], $this);
+            }
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
-
                 $allowed = $this->get('header_allow_images');
                 $images = $this->get('imap_allow_images', false);
-
                 if ($allowed && stripos($this->get('msg_text'), 'img')) {
                     if (!$images) {
                         $id = $this->get('imap_msg_part');
