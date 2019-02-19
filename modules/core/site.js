@@ -163,13 +163,22 @@ var Hm_Ajax_Request = function() { return {
             data = this.format_xhr_data(config.data);
         }
         xhr.open('POST', window.location.href)
+        xhr.addEventListener('load', function() {
+            config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
+            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
+        });
+        xhr.addEventListener('error', function() {
+            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            config.callback.fail(xhr);
+        });
+        xhr.addEventListener('abort', function() {
+            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            config.callback.fail(xhr);
+
+        });
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
         xhr.send(data);
-        xhr.onload = function() {
-            config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
-            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
-        }
     },
 
     format_xhr_data: function(data) {
