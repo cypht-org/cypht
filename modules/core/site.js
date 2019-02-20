@@ -55,10 +55,10 @@ var swipe_event = function(el, callback, direction) {
         dist_y = touchobj.pageY - start_y;
         if ((new Date().getTime() - start_time) <= allowed_time) {
             if (Math.abs(dist_x) >= threshold && Math.abs(dist_y) <= restraint) {
-                callback((dist_x < 0) ? 'left' : 'right');
-            }
-            else if (Math.abs(dist_y) >= threshold && Math.abs(dist_x) <= restraint) {
-                callback((dist_y < 0) ? 'up' : 'down');
+                var dir = (dist_x < 0) ? 'left' : 'right';
+                if (dir == direction) {
+                    callback();
+                }
             }
         }
     }, false);
