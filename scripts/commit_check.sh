@@ -48,8 +48,9 @@ css_check() {
     echo; echo -e "$YELLOW CSS CHECK $END"; echo
     find . -name "*.css" \
         | while read fname;
-        do csslint --errors=errors "$fname";
-            if [[ $? != 0 ]]; then exit 1; fi;
+        do CHECK=`csslint --errors=errors "$fname"`
+            if [[ $? != 0 ]]; then echo "$CHECK"; exit 1; fi;
+            echo "$CHECK" | grep -v '^$';
         done
     err_condition
 }
