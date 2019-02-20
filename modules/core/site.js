@@ -120,6 +120,12 @@ var Hm_Ajax = {
         move_background_image();
     },
 
+    stop_loading_icon : function(loading_id) {
+        clearTimeout(loading_id);
+        $('.loading_icon').hide();
+        Hm_Ajax.icon_loading_id = false;
+    },
+
     process_callback_hooks: function(name, res) {
         var hook;
         var func;
@@ -139,12 +145,6 @@ var Hm_Ajax = {
 
     add_callback_hook: function(request_name, hook_function) {
         Hm_Ajax.callback_hooks.push([request_name, hook_function]);
-    },
-
-    stop_loading_icon : function(loading_id) {
-        clearTimeout(loading_id);
-        $('.loading_icon').hide();
-        Hm_Ajax.icon_loading_id = false;
     }
 };
 
@@ -281,6 +281,9 @@ var Hm_Ajax_Request = function() { return {
             if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
                 batch_count = --Hm_Ajax.batch_callbacks[this.batch_callback.toString()];
             }
+        }
+        else {
+            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
         }
         Hm_Message_List.set_checkbox_callback();
         if (batch_count === 0) {
