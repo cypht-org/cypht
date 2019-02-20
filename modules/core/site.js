@@ -44,7 +44,6 @@ var swipe_event = function(el, callback, direction) {
 
     el.addEventListener('touchstart', function(e) {
         var touchobj = e.changedTouches[0];
-        swipe_dir = 'none';
         start_x = touchobj.pageX;
         start_y = touchobj.pageY;
         start_time = new Date().getTime();
