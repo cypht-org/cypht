@@ -39,41 +39,35 @@ $.fn.sort = function(sort_function) {
 
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
-    var  swipe_dir, start_x, start_y, dist_x, dist_y,
-        threshold = 150, restraint = 100, allowed_time = 500, elapsed_time,
-        dist, start_time, handleswipe = callback || function(swipe_dir){}
+    var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
+        allowed_time = 500, start_time;
 
-    el.addEventListener('touchstart', function(e){
+    el.addEventListener('touchstart', function(e) {
         var touchobj = e.changedTouches[0];
         swipe_dir = 'none';
-        dist = 0;
         start_x = touchobj.pageX;
         start_y = touchobj.pageY;
         start_time = new Date().getTime();
     }, false);
 
-    el.addEventListener('touchend', function(e){
+    el.addEventListener('touchend', function(e) {
         var touchobj = e.changedTouches[0];
         dist_x = touchobj.pageX - start_x;
         dist_y = touchobj.pageY - start_y;
-        elapsed_time = new Date().getTime() - start_time;
-        if (elapsed_time <= allowed_time) {
+        if ((new Date().getTime() - start_time) <= allowed_time) {
             if (Math.abs(dist_x) >= threshold && Math.abs(dist_y) <= restraint) {
-                swipe_dir = (dist_x < 0)? 'left' : 'right';
+                callback((dist_x < 0) ? 'left' : 'right');
             }
             else if (Math.abs(dist_y) >= threshold && Math.abs(dist_x) <= restraint) {
-                swipe_dir = (dist_y < 0)? 'up' : 'down';
+                callback((dist_y < 0) ? 'up' : 'down');
             }
-        }
-        if (swipe_dir == direction) {
-            handleswipe();
         }
     }, false);
 };
 
 /* ajax multiplexer */
 var Hm_Ajax = {
-    request_count: 0,
+    batch_callbacks: {},
     callback_hooks: [],
     p_callbacks: [],
     aborted: false,
@@ -92,23 +86,29 @@ var Hm_Ajax = {
     },
 
     request: function(args, callback, extra, no_icon, batch_callback, on_failure) {
+        var bcb = false;
+        if (typeof batch_callback != 'undefined' && $.inArray(batch_callback, this.batch_callbacks) === -1) {
+            bcb = batch_callback.toString();
+            var detail = this.batch_callbacks[bcb];
+            if (typeof detail !== 'undefined') {
+                this.batch_callbacks[bcb] += 1;
+            }
+            else {
+                this.batch_callbacks[bcb] = 1;
+            }
+        }
         var name = Hm_Ajax.get_ajax_hook_name(args);
         var ajax = new Hm_Ajax_Request();
         if (!no_icon) {
             Hm_Ajax.show_loading_icon();
             $('body').addClass('wait');
         }
-        Hm_Ajax.request_count++;
-        if (batch_callback) {
-            Hm_Ajax.batch_callback = batch_callback;
-        }
-        return ajax.make_request(args, callback, extra, name, on_failure);
+        return ajax.make_request(args, callback, extra, name, on_failure, batch_callback);
     },
 
     show_loading_icon: function() {
         if (Hm_Ajax.icon_loading_id !== false) {
             return;
-            //Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
         }
         var hm_loading_pos = $('.loading_icon').width()/40;
         $('.loading_icon').show();
@@ -152,6 +152,7 @@ var Hm_Ajax = {
 var Hm_Ajax_Request = function() { return { 
     callback: false,
     name: false,
+    batch_callback: false,
     index: 0,
     on_failure: false,
     start_time: 0,
@@ -189,9 +190,10 @@ var Hm_Ajax_Request = function() { return {
         return res.join('&');
     },
 
-    make_request: function(args, callback, extra, request_name, on_failure) {
+    make_request: function(args, callback, extra, request_name, on_failure, batch_callback) {
         var name;
         var arg;
+        this.batch_callback = batch_callback;
         this.name = request_name;
         this.callback = callback;
         if (on_failure) {
@@ -214,7 +216,7 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        this.xhr_fetch({url: '', data: args, callback: this });
+        this.xhr_fetch({url: '', data: args, callback: this});
         return false;
     },
 
@@ -274,15 +276,18 @@ var Hm_Ajax_Request = function() { return {
     },
 
     always: function(res) {
-        Hm_Ajax.request_count--;
+        var batch_count = 1;
+        if (this.batch_callback) {
+            if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
+                batch_count = --Hm_Ajax.batch_callbacks[this.batch_callback.toString()];
+            }
+        }
         Hm_Message_List.set_checkbox_callback();
-        if (Hm_Ajax.request_count === 0) {
+        if (batch_count === 0) {
             Hm_Ajax.aborted = false;
             Hm_Ajax.p_callbacks = [];
-            if (Hm_Ajax.batch_callback) {
-                Hm_Ajax.batch_callback(res);
-                Hm_Ajax.batch_callback = false;
-            }
+            this.batch_callback(res);
+            this.batch_callback = false;
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             $('body').removeClass('wait');
         }
@@ -967,6 +972,7 @@ var Hm_Folders = {
     save_folder_list: function() {
         Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
     },
+
     load_unread_counts: function() {
         var res = Hm_Utils.json_decode(Hm_Utils.get_from_local_storage('unread_counts'));
         if (!res) {
@@ -976,6 +982,7 @@ var Hm_Folders = {
             Hm_Folders.unread_counts = res;
         }
     },
+
     update_unread_counts: function(folder) {
         if (folder) {
             $('.unread_'+folder).html('&#160;'+Hm_Folders.unread_counts[folder]+'&#160;');
@@ -996,6 +1003,7 @@ var Hm_Folders = {
         }
         Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));
     },
+
     open_folder_list: function() {
         $('.folder_list').show();
         $('.folder_toggle').toggle();
@@ -1008,6 +1016,7 @@ var Hm_Folders = {
         Hm_Utils.save_to_local_storage('hide_folder_list', '');
         return false;
     },
+
     toggle_folder_list: function() {
         if ($('.folder_list').css('display') == 'none') {
             Hm_Folders.open_folder_list();
@@ -1016,6 +1025,7 @@ var Hm_Folders = {
             Hm_Folders.hide_folder_list();
         }
     },
+
     hide_folder_list: function(forget) {
         $('.folder_list').hide();
         $('.folder_toggle').show();
@@ -1026,6 +1036,7 @@ var Hm_Folders = {
         }
         return false;
     },
+
     reload_folders: function(force, expand_after_update) {
         if (document.cookie.indexOf('hm_reload_folders=1') > -1 || force) {
             Hm_Folders.expand_after_update = expand_after_update;
@@ -1039,6 +1050,7 @@ var Hm_Folders = {
         }
         return false;
     },
+
     sort_list: function(class_name, exclude_name, last_name) {
         var folder = $('.'+class_name+' ul');
         var listitems;
@@ -1059,6 +1071,7 @@ var Hm_Folders = {
         });
         $.each(listitems, function(_, itm) { folder.append(itm); });
     },
+
     update_folder_list_display: function(res) {
         $('.folder_list').html(res.formatted_folder_list);
         Hm_Folders.sort_list('email_folders', 'menu_email');
@@ -1074,6 +1087,7 @@ var Hm_Folders = {
         Hm_Folders.listen_for_new_messages();
         hl_save_link();
     },
+
     update_folder_list: function() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_hm_folders'}],
@@ -1083,6 +1097,7 @@ var Hm_Folders = {
         );
         return false;
     },
+
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
         $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
@@ -1096,6 +1111,7 @@ var Hm_Folders = {
             Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}]);
         });
     },
+
     hl_selected_menu: function() {
         var page = hm_page_name();
         var path = hm_list_path();
@@ -1113,6 +1129,7 @@ var Hm_Folders = {
             $('.menu_'+page).addClass('selected_menu');
         }
     },
+
     listen_for_new_messages: function() {
         var target = $('.total_unread_count').get(0);
         if (!Hm_Folders.observer) {
@@ -1125,6 +1142,7 @@ var Hm_Folders = {
         }
         Hm_Folders.observer.observe(target, {attributes: true, childList: true, characterData: true});
     },
+
     load_from_local_storage: function() {
         var folder_list = Hm_Utils.get_from_local_storage('formatted_folder_list');
         if (folder_list) {
@@ -1143,6 +1161,7 @@ var Hm_Folders = {
         }
         return false;
     },
+
     toggle_folders_event: function() {
         $('.folder_toggle').on("click", function() { return Hm_Folders.open_folder_list(); });
     }
@@ -1166,12 +1185,14 @@ var Hm_Utils = {
         }
         return page_number;
     },
+
     get_from_global: function(name, def) {
         if (globals[name]) {
             return globals[name];
         }
         return def;
     },
+
     preserve_local_settings: function() {
         var i;
         var result = {};
@@ -1184,18 +1205,21 @@ var Hm_Utils = {
         }
         return result;
     },
+
     restore_local_settings: function(settings) {
         var i;
         for (i in settings) {
             Hm_Utils.save_to_local_storage(i, settings[i]);
         }
     },
+
     reset_search_form: function() {
         Hm_Utils.save_to_local_storage('formatted_search_data', '');
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],
             function(res) { window.location = '?page=search'; }, false, true);
         return false;
     },
+
     confirm_logout: function() {
         if ($('#unsaved_changes').val() == 0) {
             document.getElementById('logout_without_saving').click();
@@ -1205,6 +1229,7 @@ var Hm_Utils = {
         }
         return false;
     },
+
     get_path_type: function(path) {
         if (path.indexOf('_') != -1) {
             var path_parts = path.split('_');
@@ -1212,6 +1237,7 @@ var Hm_Utils = {
         }
         return false;
     },
+
     parse_folder_path: function(path, path_type) {
         if (!path_type) {
             path_type = Hm_Utils.get_path_type(path);
@@ -1261,6 +1287,7 @@ var Hm_Utils = {
         }
         return false;
     },
+
     toggle_section: function(class_name, force_on, force_off) {
         if ($(class_name).length) {
             if (force_off) {
@@ -1274,6 +1301,7 @@ var Hm_Utils = {
         }
         return false;
     },
+
     toggle_page_section: function(class_name) {
         if ($(class_name).length) {
             $(class_name).toggle();
@@ -1281,6 +1309,7 @@ var Hm_Utils = {
         }
         return false;
     },
+
     expand_core_settings: function() {
         var sections = Hm_Utils.get_core_settings();
         var key;
@@ -1294,6 +1323,7 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(key, dsp);
         }
     },
+
     get_core_settings: function() {
         var dsp;
         var results = {}
@@ -1314,6 +1344,7 @@ var Hm_Utils = {
         }
         return results;
     },
+
     get_from_local_storage: function(key) {
         var prefix = window.location.pathname;
         key = prefix+key;
@@ -1326,6 +1357,7 @@ var Hm_Utils = {
         }
         return res;
     },
+
     save_to_local_storage: function(key, val) {
         var prefix = window.location.pathname;
         key = prefix+key;
@@ -1344,17 +1376,21 @@ var Hm_Utils = {
         }
         return false;
     },
+
     clean_selector: function(str) {
         return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },
+
     toggle_long_headers: function() {
         $('.long_header').toggle();
         $('.header_toggle').toggle();
         return false;
     },
+
     set_unsaved_changes: function(state) {
         $('#unsaved_changes').val(state);
     },
+
     show_sys_messages: function() {
         if ($('.sys_messages').text().length) {
             $('.sys_messages').show();
@@ -1364,9 +1400,11 @@ var Hm_Utils = {
             });
         }
     },
+
     cancel_logout_event: function() {
         $('.cancel_logout').on("click", function() { $('.confirm_logout').hide(); return false; });
     },
+
     json_encode: function(val) {
         try {
             return JSON.stringify(val);
@@ -1375,6 +1413,7 @@ var Hm_Utils = {
             return false;
         }
     },
+
     json_decode: function(val, original) {
         try {
             return JSON.parse(val);
@@ -1386,15 +1425,19 @@ var Hm_Utils = {
             return false;
         }
     },
+
     rows: function() {
         return $('.message_table_body > tr').not('.inline_msg');
     },
+
     tbody: function() {
         return $('.message_table_body');
     },
+
     html_entities: function(str) {
         return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     },
+
     test_connection: function() {
         $('.offline').hide();
         Hm_Ajax.request(
