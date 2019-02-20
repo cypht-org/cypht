@@ -953,7 +953,7 @@ class Hm_JMAP {
             }
             else {
                 Hm_Debug::add('Failed to find key path in response');
-                Hm_Debug::add('key path: '.print_r($keypath, true));
+                Hm_Debug::add('key path: '.print_r($key_path, true));
                 Hm_Debug::add('data: '.print_r($data, true));
                 return $default;
             }
