@@ -397,6 +397,9 @@ class Hm_IMAP_Struct {
                     $matches++;
                 }
             }
+            if (array_key_exists('envelope', $vals)) {
+                $parent = $vals;
+            }
             if ($matches === count($flds)) {
                 $part = $vals;
                 if (isset($part['subs'])) {
@@ -412,7 +415,7 @@ class Hm_IMAP_Struct {
                 
             }
             if (isset($vals['subs'])) {
-                $res = $this->recursive_search($vals['subs'], $flds, $all, $res, $vals);
+                $res = $this->recursive_search($vals['subs'], $flds, $all, $res, $parent);
             }
         }
         return $res;
