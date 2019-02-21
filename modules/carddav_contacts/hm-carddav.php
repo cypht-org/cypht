@@ -73,6 +73,7 @@ class Hm_Carddav {
         foreach ($data['email'] as $email) {
             $res[] = array(
                 'source' => $this->src,
+                'type' => 'carddav',
                 'display_name' => $dn,
                 'phone_number' => $phone,
                 'email_address' => $email['value'],
