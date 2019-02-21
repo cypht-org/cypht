@@ -142,6 +142,7 @@ class Hm_Card_Parse {
                 $this->data[strtolower($prop['prop'])] = array($data);
             }
         }
+        $this->data['raw'] = $this->raw_card;
         $this->parse_values();
         $this->flatten_all();
         return count($this->data) > 0;
