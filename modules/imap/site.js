@@ -855,7 +855,7 @@ var imap_background_unread_content = function(id, folder) {
         {'name': 'imap_server_ids', 'value': id}],
         imap_background_unread_content_result,
         [],
-        true,
+        false,
         function() {
             var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
             Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
