@@ -78,6 +78,7 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
             if (array_key_exists('email_address', $res) && $res['email_address'] &&
                 array_key_exists('display_name', $res) && $res['display_name']) {
                 $res['source'] = $this->source;
+                $res['type'] = 'ldap';
                 $res['all_fields'] = $all;
                 $result[] = $res;
             }
