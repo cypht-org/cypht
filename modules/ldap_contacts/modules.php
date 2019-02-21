@@ -236,7 +236,7 @@ class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
         $sources = array();
         foreach ($ldap_config as $name => $vals) {
             if (is_array($vals) && array_key_exists('read_write', $vals) && $vals['read_write']) {
-                $this->append('contact_edit', $name);
+                $this->append('contact_edit', sprintf('ldap:%s', $name));
                 $sources[] = $name;
                 $edit = true;
             }
@@ -253,9 +253,11 @@ class Hm_Handler_load_ldap_contacts extends Hm_Handler_Module {
 class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
     public function process() {
         $ldap_config = $this->get('ldap_config');
-        if (array_key_exists('contact_source', $this->request->get)
-            &&array_key_exists($this->request->get['contact_source'], $ldap_config)
-            && array_key_exists('contact_id', $this->request->get)) {
+        if (array_key_exists('contact_source', $this->request->get) &&
+            array_key_exists('contact_type', $this->request->get) &&
+            $this->request->get['contact_type'] == 'ldap' &&
+            array_key_exists($this->request->get['contact_source'], $ldap_config) &&
+            array_key_exists('contact_id', $this->request->get)) {
 
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
@@ -444,24 +446,16 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             return;
         }
         $sources = $this->get('ldap_sources');
-        if (count($sources) == 1) {
-            $title = sprintf($this->trans('Add %s'), $this->html_safe($sources[0]));
-        }
-        else {
-            $title = $this->trans('Add LDAP');
-        }
+        $title = $this->trans('Add LDAP');
         $form_class='contact_form';
         $current = $this->get('current_ldap_contact');
         $current_source = false;
         if ($current) {
             $form_class = 'contact_update_form';
             $current_source = $current['source'];
-            $title = sprintf($this->trans('Update %s'), $this->html_safe($current_source));
+            $title = sprintf($this->trans('Update LDAP - %s'), $this->html_safe($current_source));
         }
-        if (count($sources) == 1) {
-            $source = '<input type="hidden" name="ldap_source" value="'.$this->html_safe($sources[0]).'" />';
-        }
-        elseif ($current_source) {
+        if ($current_source) {
             $source = '<input type="hidden" name="ldap_source" value="'.$this->html_safe($current_source).'" />';
         }
         else {
