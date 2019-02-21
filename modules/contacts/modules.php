@@ -159,7 +159,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);
         $res = '<table class="contact_list">';
-        $res .= '<tr><td colspan="5" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+        $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
         if ($contacts) {
@@ -170,18 +170,20 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 $res .= '<td><a data-id="contact_'.$this->html_safe($id).'_detail" '.
                     '" class="show_contact" title="'.$this->trans('Details').'">'.
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$person.'" /></a> '.
-                    '<span class="contact_src">'.($contact->value('source') ? $this->html_safe($contact->value('source')) : $this->trans('local')).'</span>'.
-                    '<td>'.$this->html_safe($contact->value('display_name')).'</td>'.
+                    '</d><td>'.$this->html_safe($contact->value('type')).'<td><span class="contact_src">'.
+                    ($contact->value('source') == 'local' ? '' : $this->html_safe($contact->value('source'))).'</span>'.
+                    '</td><td>'.$this->html_safe($contact->value('display_name')).'</td>'.
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
                     '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
                     $this->html_safe($contact->value('phone_number')).'</a></td>'.
                     '<td class="contact_controls">';
-                if (in_array($contact->value('source'), $editable, true)) {
+                if (in_array($contact->value('type').':'.$contact->value('source'), $editable, true)) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).
                         '" class="delete_contact" title="'.$this->trans('Delete').'"><img alt="'.$this->trans('Delete').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
                         '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.
-                        $this->html_safe($contact->value('source')).'&amp;contact_page='.$current_page.
+                        $this->html_safe($contact->value('source')).'&amp;contact_type='.
+                        $this->html_safe($contact->value('type')).'&amp;contact_page='.$current_page.
                         '" class="edit_contact" title="'.$this->trans('Edit').'"><img alt="'.$this->trans('Edit').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a>';
                 }
@@ -195,7 +197,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 $res .= build_contact_detail($this, $contact, $id).'</td>';
                 $res .= '</td></tr>';
             }
-            $res .= '<tr><td class="contact_pages" colspan="5">';
+            $res .= '<tr><td class="contact_pages" colspan="7">';
             if ($current_page > 1) {
                 $res .= '<a href="?page=contacts&contact_page='.($current_page-1).'">Previous</a>';
             }
@@ -250,7 +252,7 @@ function build_contact_detail($output_mod, $contact, $id) {
     }
     if ($all_fields) {
         foreach ($all_fields as $name => $val) {
-            if (in_array($name, array(0, 'objectclass', 'dn', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
+            if (in_array($name, array(0, 'raw', 'objectclass', 'dn', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
                 continue;
             }
             $res .= '<tr><th>'.$output_mod->trans(name_map($name)).'</th>';

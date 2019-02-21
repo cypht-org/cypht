@@ -1,5 +1,5 @@
 .add_contact_form input { margin: 5px; margin-left: 0px; }
-.add_contact_form { white-space: nowrap; padding-top: 10px; display: block; }
+.add_contact_form { padding-top: 10px; display: block; }
 .contact_list { margin-left: 35px; margin-right: 10px; margin-top: 20px; width: 50%; }
 .contact_list td { white-space: nowrap; padding-right: 20px; padding-bottom: 5px; vertical-align: -5px; padding-top: 5px; border-bottom: solid 1px #ddd; }
 .gmail_contacts { margin-top: 50px; }
@@ -16,7 +16,7 @@
 .no_contact_sources { text-align: center; color: #999; font-size: 110%; margin-top: 60px; }
 .add_contact { max-width: 300px; margin-bottom: 30px; margin-top: 10px; color: #666; margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
 .add_contact input, .add_contact select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
-.add_contact .server_title { cursor: pointer; }
+.add_contact .server_title { max-width: 300px; cursor: pointer; }
 .contact_form { margin-top: 10px; display: none; }
 .add_contact .menu_caret { opacity: .7; }
 .contact_update_form { margin-top: 10px; }

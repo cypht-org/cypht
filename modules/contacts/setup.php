@@ -57,6 +57,7 @@ return array(
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT,
         'contact_page' => FILTER_VALIDATE_INT,
+        'contact_type' => FILTER_SANITIZE_STRING,
         'contact_source' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
