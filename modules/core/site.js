@@ -170,10 +170,12 @@ var Hm_Ajax_Request = function() { return {
         xhr.addEventListener('error', function() {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             config.callback.fail(xhr);
+            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
         });
         xhr.addEventListener('abort', function() {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             config.callback.fail(xhr);
+            config.callback.always(Hm_Utils.json_decode(xhr.response, true));
 
         });
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -286,6 +288,7 @@ var Hm_Ajax_Request = function() { return {
         }
         Hm_Message_List.set_checkbox_callback();
         if (batch_count === 0) {
+            Hm_Ajax.batch_callbacks[this.batch_callback.toString()] = 0;
             Hm_Ajax.aborted = false;
             Hm_Ajax.p_callbacks = [];
             this.batch_callback(res);
