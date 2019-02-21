@@ -72,6 +72,7 @@ var Hm_Ajax = {
     aborted: false,
     err_condition: false,
     batch_callback: false,
+    active_reqs: 0,
     icon_loading_id: false,
 
     get_ajax_hook_name: function(args) {
@@ -88,12 +89,12 @@ var Hm_Ajax = {
         var bcb = false;
         if (typeof batch_callback != 'undefined' && $.inArray(batch_callback, this.batch_callbacks) === -1) {
             bcb = batch_callback.toString();
-            var detail = this.batch_callbacks[bcb];
+            var detail = Hm_Ajax.batch_callbacks[bcb];
             if (typeof detail !== 'undefined') {
-                this.batch_callbacks[bcb] += 1;
+                Hm_Ajax.batch_callbacks[bcb] += 1;
             }
             else {
-                this.batch_callbacks[bcb] = 1;
+                Hm_Ajax.batch_callbacks[bcb] = 1;
             }
         }
         var name = Hm_Ajax.get_ajax_hook_name(args);
@@ -102,6 +103,7 @@ var Hm_Ajax = {
             Hm_Ajax.show_loading_icon();
             $('body').addClass('wait');
         }
+        Hm_Ajax.active_reqs++;
         return ajax.make_request(args, callback, extra, name, on_failure, batch_callback);
     },
 
@@ -277,14 +279,12 @@ var Hm_Ajax_Request = function() { return {
     },
 
     always: function(res) {
+        Hm_Ajax.active_reqs--;
         var batch_count = 1;
         if (this.batch_callback) {
             if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
                 batch_count = --Hm_Ajax.batch_callbacks[this.batch_callback.toString()];
             }
-        }
-        else {
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
         }
         Hm_Message_List.set_checkbox_callback();
         if (batch_count === 0) {
@@ -293,6 +293,10 @@ var Hm_Ajax_Request = function() { return {
             Hm_Ajax.p_callbacks = [];
             this.batch_callback(res);
             this.batch_callback = false;
+            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            $('body').removeClass('wait');
+        }
+        if (Hm_Ajax.active_reqs == 0) {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             $('body').removeClass('wait');
         }
