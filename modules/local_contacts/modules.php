@@ -93,7 +93,9 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
 class Hm_Handler_load_edit_contact extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('contact_source', $this->request->get) && $this->request->get['contact_source'] == 'local'
-            && array_key_exists('contact_id', $this->request->get)) {
+            && array_key_exists('contact_type', $this->request->get) && $this->request->get['contact_type'] == 'local' &&
+            array_key_exists('contact_id', $this->request->get)) {
+
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
             if (is_object($contact)) {
@@ -112,11 +114,11 @@ class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
         $contact_list = $this->user_config->get('contacts', array());
-        $contact_list = array_map(function($v) { $v['source'] = 'local'; return $v; }, $contact_list);
+        $contact_list = array_map(function($v) { $v['type'] = 'local'; return $v; }, $contact_list);
         $contacts->import($contact_list);
         $this->append('contact_sources', 'local');
         $this->out('contact_store', $contacts, false);
-        $this->append('contact_edit', 'local');
+        $this->append('contact_edit', 'local:local');
     }
 }
 
