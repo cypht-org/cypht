@@ -54,6 +54,7 @@ function parse_contact_xml($xml, $source) {
         }
         $exists[] = $contact['email_address'];
         $contact['source'] = $source;
+        $contact['type'] = 'gmail';
         $results[] = $contact;
     }
     return $results;
