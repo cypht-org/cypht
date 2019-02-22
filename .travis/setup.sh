@@ -56,7 +56,7 @@ selenium_config() {
         mv .travis/creds.py-edge creds.py
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        mv .travis/creds.py-ie creds.py
+        mv .travis/creds.py-chrome creds.py
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         mv .travis/creds.py-chrome creds.py
