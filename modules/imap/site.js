@@ -568,7 +568,8 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
             Hm_Message_List.adjust_unread_total(-1);
         }
     }
-    $('.header_toggle').on("click", function() { return Hm_Utils.toggle_long_headers(); });
+    $('.all_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
+    $('.small_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
     $('.msg_part_link').on("click", function() {
         $('.header_subject')[0].scrollIntoView();
         $('.msg_text_inner').css('visibility', 'hidden');

@@ -208,8 +208,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
-                '<a href="#" class="hlink header_toggle">'.$this->trans('All headers').'</a>'.
-                '<a class="hlink header_toggle" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
+                '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
+                '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
                 ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>'.
                 ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>'.
                 ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';

@@ -1392,7 +1392,8 @@ var Hm_Utils = {
 
     toggle_long_headers: function() {
         $('.long_header').toggle();
-        $('.header_toggle').toggle();
+        $('.all_headers').toggle();
+        $('.small_headers').toggle();
         return false;
     },
 
