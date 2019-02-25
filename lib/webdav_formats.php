@@ -56,11 +56,60 @@ class Hm_Card_Parse {
     }
 
     /**
+     * Format as vcard
+     */
+    public function build_card() {
+        $new_card = array();
+        foreach ($this->data as $name => $val) {
+            if (method_exists($this, 'format_vcard_'.$name)) {
+                $res = $this->{'format_vcard_'.$name}();
+            }
+            else {
+                $res = $this->format_vcard_generic($name);
+            }
+            if (is_array($res) && $res) {
+                $new_card = array_merge($new_card, $res);
+            }
+            elseif ($res) {
+                $new_card[] = $res;
+            }
+        }
+        return implode("\n", $new_card);
+    }
+
+    /**
      * Return parsed data for an input
      * @return array
      */
     public function parsed_data() {
         return $this->data;
+    }
+
+    /**
+     * Get the value for a field
+     */
+    public function fld_val($name, $type=false, $default=false, $all=false) {
+        if (!array_key_exists($name, $this->data)) {
+            return $default;
+        }
+        $fld = $this->data[$name];
+        if ($all) {
+            return $fld;
+        }
+        foreach ($fld as $vals) {
+            if ($this->is_type($type, $vals)) {
+                if (array_key_exists('formatted', $vals)) {
+                    return $vals['formatted']['values'];
+                }
+                return $vals['values'];
+            }
+        }
+        if (array_key_exists('formatted', $fld[0])) {
+            return $fld[0]['formatted']['values'];
+        }
+        else {
+            return $fld[0]['values'];
+        }
     }
 
     /**
@@ -76,13 +125,31 @@ class Hm_Card_Parse {
     }
 
     /**
+     * Look for a sepcific type
+     */
+    private function is_type($type, $vals) {
+        if (!$type) {
+            return false;
+        }
+        if (!array_key_exists('type', $vals)) {
+            return false;
+        }
+        if (is_array($vals['type']) && in_array($type, $vals['type'])) {
+            return true;
+        }
+        elseif (strtolower($type) == strtolower($vals['type'])) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Normalize End-Of-Line chars
      * @param string $str string input
      * @return string
      */
     private function standard_eol($str) {
         return rtrim(str_replace(array( "\r\n", "\n\r", "\r"), "\n", $str));
-
     }
 
     /**
@@ -133,7 +200,7 @@ class Hm_Card_Parse {
                 continue;
             }
             $data = $prop['params'];
-            $data['value'] = $this->flatten(
+            $data['values'] = $this->flatten(
                 $this->process_value($vals[1], $prop['prop']));
             if (array_key_exists(strtolower($prop['prop']), $this->data)) {
                 $this->data[strtolower($prop['prop'])][] = $data;
@@ -144,7 +211,6 @@ class Hm_Card_Parse {
         }
         $this->data['raw'] = $this->raw_card;
         $this->parse_values();
-        $this->flatten_all();
         return count($this->data) > 0;
     }
 
@@ -219,33 +285,6 @@ class Hm_Card_Parse {
         }
         return $res;
     }
-    /**
-     * Unnest an array
-     */
-    private function unnest($vals) {
-        $res = array();
-        foreach ($vals as $val) {
-            foreach ($val as $v) {
-                $res[] = $v;
-            }
-        }
-        return $res;
-    }
-
-    /**
-     * Replace single element lists with scaler values
-     * @return void
-     */
-    private function flatten_all() {
-        foreach ($this->data as $prop => $vals) {
-            if ($prop == 'begin' || $prop == 'end') {
-                $this->data[$prop] = $this->unnest($vals);
-            }
-            else {
-                $this->data[$prop] = $this->flatten($this->flatten($vals));
-            }
-        }
-    }
 
     /**
      * Top level validation of input data
@@ -289,6 +328,66 @@ class Hm_Card_Parse {
             }
         }
     }
+
+    /**
+     * Catch-all for formatting vcard fields  that don't need specific formatting
+     * @param string $name the field name
+     * @return array
+     */
+    protected function format_vcard_generic($name) {
+        $res = array();
+        if (in_array($name, array('raw'), true)) {
+            return;
+        }
+        $vals = $this->fld_val($name, false, array(), true);
+        if (count($vals) == 0) {
+            $res;
+        }
+        foreach ($vals as $val) {
+            $name = substr($name, 0, 2) == 'x-' ? $name : strtoupper($name);
+            $params = array_merge(array($name), $this->build_vcard_params($val));
+            $res[] = sprintf("%s:%s", implode(';', $params), $val['values']);
+        }
+        return $res;
+    }
+
+    /**
+     * Build the vcard entry paramater string
+     * @param array field values
+     * @return array
+     */
+    protected function build_vcard_params($fld_val) {
+        $props = array();
+        foreach ($this->parameters as $param) {
+            if (array_key_exists(strtolower($param), $fld_val)) {
+                $props[] = sprintf('%s=%s', strtoupper($param),
+                    $this->combine($fld_val[strtolower($param)]));
+            }
+        }
+        return $props;
+    }
+
+    /**
+     * Combine an array value if needed, return formatted value
+     * @param mixed $val the value to combine
+     * @return string
+     */
+    protected function combine($val) {
+        if (is_array($val)) {
+            return implode(',', array_map(array($this, 'vcard_format'), $val));
+        }
+        return $this->vcard_format($val);
+    }
+
+    /**
+     * Clean a vcard value
+     * TODO: make escaping more robust
+     * @param string $val the value to format
+     * @return string
+     */
+    protected function vcard_format($val) {
+        return str_replace(array(',', "\n"), array('\,', '\n'), $val);
+    }
 }
 
 /**
@@ -299,9 +398,9 @@ class Hm_VCard extends Hm_Card_Parse {
     protected $raw_card = '';
     protected $data = array();
     protected $parameters = array(
-        'LANGUAGE', 'VALUE', 'PREF', 'ALTID',
-        'LABEL', 'PID', 'TYPE', 'MEDIATYPE',
-        'CALSCALE', 'SORT-AS', 'GEO', 'TZ'
+        'TYPE', 'PREF', 'LABEL', 'VALUE', 'LANGUAGE',
+        'MEDIATYPE', 'ALTID', 'PID', 'CALSCALE',
+        'SORT-AS', 'GEO', 'TZ'
     );
     protected $properties = array(
         'BEGIN', 'VERSION', 'END', 'FN', 'N',
@@ -315,10 +414,17 @@ class Hm_VCard extends Hm_Card_Parse {
         'FBURL', 'CALADRURI', 'CALURI'
     );
 
+    /* CONVERT VCARD INPUT */
+
+    /**
+     * Parse the name field
+     * @param array $vals name field values
+     * @return array
+     */
     protected function parse_n($vals) {
         foreach ($vals as $index => $name) {
-            $flds = $this->split_value($name['value'], ';', 5);
-            $vals[$index]['value'] = array(
+            $flds = $this->split_value($name['values'], ';', 5);
+            $vals[$index]['values'] = array(
                 'lastname' => $flds[0],
                 'firstname' => $flds[1],
                 'additional' => $flds[2],
@@ -329,10 +435,35 @@ class Hm_VCard extends Hm_Card_Parse {
         return $vals;
     }
 
+    /**
+     * Convert an address from vcard to an internal struct
+     * @param array $vals address values
+     * @return array
+     */
+    protected function format_addr($vals) {
+        $name = 'address';
+        if (array_key_exists('type', $vals)) {
+            $name = sprintf('%s_address', strtolower($vals['type']));
+        }
+        $vals = $vals['values'];
+        $street = $vals['street'];
+        if (!$street && $vals['po']) {
+            $steet = $vals['po'];
+        }
+        $value = sprintf('%s, %s, %s, %s, %s', $street, $vals['locality'], $vals['region'],
+            $vals['country'], $vals['postal_code']);
+        return array('name' => $name, 'values' => $value);
+    }
+
+    /**
+     * Parse an address field value
+     * @param array $vals address values
+     * @return array
+     */
     protected function parse_adr($vals) {
         foreach ($vals as $index => $addr) {
-            $flds = $this->split_value($addr['value'], ';', 7);
-            $vals[$index]['value'] = array(
+            $flds = $this->split_value($addr['values'], ';', 7);
+            $vals[$index]['values'] = array(
                 'po' => $flds[0],
                 'apartment' => $flds[1],
                 'street' => $flds[2],
@@ -346,19 +477,32 @@ class Hm_VCard extends Hm_Card_Parse {
         return $vals;
     }
 
-    protected function format_addr($vals) {
-        $name = 'address';
-        if (array_key_exists('type', $vals)) {
-            $name = sprintf('%s_address', strtolower($vals['type']));
+    /* CONVERT TO VCARD OUTPUT */
+
+    /**
+     * Format a name field for vcard output
+     * @return string
+     */
+    protected function format_vcard_n() {
+        $n = $this->fld_val('n');
+        return sprintf("N:%s;%s;%s;%s;%s", $n['lastname'], $n['firstname'],
+            $n['additional'], $n['prefixes'], $n['suffixes']);
+    }
+
+    /**
+     * Format addresses to vcard
+     * @return array
+     */
+    protected function format_vcard_adr() {
+        $res = array();
+        foreach ($this->fld_val('adr', array(), false, true) as $adr) {
+            $parts = $adr['values'];
+            $params = array_merge(array('ADR'), $this->build_vcard_params($adr));
+            $res[] = sprintf('%s:%s;%s;%s;%s;%s;%s;%s', implode(';', $params),
+                $parts['po'], $parts['apartment'], $parts['street'], $parts['locality'],
+                $parts['region'], $parts['postal_code'], $parts['country']);
         }
-        $vals = $vals['value'];
-        $street = $vals['street'];
-        if (!$street && $vals['po']) {
-            $steet = $vals['po'];
-        }
-        $value = sprintf('%s, %s, %s, %s, %s', $street, $vals['locality'], $vals['region'],
-            $vals['country'], $vals['postal_code']);
-        return array('name' => $name, 'value' => $value);
+        return $res;
     }
 }
 
@@ -412,12 +556,12 @@ class Hm_ICal extends Hm_Card_Parse {
 
     protected function parse_dt($vals) {
         foreach ($vals as $index => $dates) {
-            $dt = $vals[0]['value'];
+            $dt = $vals[0]['values'];
             if (substr($dt, -1, 1) == 'Z') {
                 $vals[0]['tzid'] = 'UTC';
                 $dt = substr($dt, 0, -1);
             }
-            $vals[$index]['value'] = date_parse_from_format('Ymd\THis', $dt);
+            $vals[$index]['values'] = date_parse_from_format('Ymd\THis', $dt);
         }
         return $vals;
     }
