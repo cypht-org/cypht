@@ -31,6 +31,9 @@ class Hm_Test_API_Curl extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('unit' => 'test'), $api->command('asdf', array(), array('foo' => 'bar')));
         Hm_Functions::$exec_res = NULL;
         $this->assertEquals(array(), $api->command('asdf', array(), array('foo' => 'bar')));
+        $api->format = 'binary';
+        Hm_Functions::$exec_res = 'foo';
+        $this->assertEquals('foo', $api->command('asdf', array(), 'bar'));
     }
     /**
      * @preserveGlobalState disabled

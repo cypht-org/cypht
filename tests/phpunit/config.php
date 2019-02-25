@@ -27,6 +27,7 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
     public function test_restore_servers() {
         $this->config->restore_servers(array(array(array('server' => 'foo'))));
         $this->assertEquals(2, count($this->config->dump()));
+        $this->config->restore_servers(array(array('foo')));
     }
     /**
      * @preserveGlobalState disabled

@@ -140,6 +140,7 @@ class Hm_Mock_Config {
     public $data = array(
         'user_settings_dir' => './data',
         'default_language' => 'es',
+        'default_setting_inline_message' => true
     );
     public function get($id, $default=false) {
         if (array_key_exists($id, $this->data)) {

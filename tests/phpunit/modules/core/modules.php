@@ -465,7 +465,7 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
     public function test_save_user_data() {
         $test = new Handler_Test('save_user_data', 'core');
         $res = $test->run();
-        $this->assertEquals(array('user_settings_dir' => './data', 'default_language' => 'es'), $res->session->get('user_data'));
+        $this->assertEquals(array('user_settings_dir' => './data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
     }
     /**
      * @preserveGlobalState disabled
