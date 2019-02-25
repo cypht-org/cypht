@@ -193,7 +193,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     Hm_Image_Sources::$doc.'" /></a>';
 
                 $res .= '</td></tr>';
-                $res .= '<tr><td id="contact_'.$this->html_safe($id).'_detail" class="contact_detail_row" colspan="5">';
+                $res .= '<tr><th></th><td id="contact_'.$this->html_safe($id).'_detail" class="contact_detail_row" colspan="6">';
                 $res .= build_contact_detail($this, $contact, $id).'</td>';
                 $res .= '</td></tr>';
             }
@@ -304,6 +304,8 @@ function name_map($val) {
         'org' => 'Company',
         'fn' => 'Full Name',
         'uid' => 'Uid',
+        'src_url' => 'URL',
+        'adr' => 'Address'
     );
     if (array_key_exists($val, $names)) {
         return $names[$val];
