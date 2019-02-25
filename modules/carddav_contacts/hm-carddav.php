@@ -49,7 +49,8 @@ class Hm_Carddav {
             Hm_Debug::add(sprintf('CARDDAV: Trying contacts url %s', $url));
             foreach ($this->xml_find($this->report($url), $this->addr_detail_path, true) as $addr) {
                 $parser->import($addr);
-                foreach ($this->convert_to_contact($parser->parsed_data()) as $contact) {
+                foreach ($this->convert_to_contact($parser) as $contact) {
+                    $contact['src_url'] = $url;
                     $res[] = $contact;
                 }
             }
@@ -58,43 +59,42 @@ class Hm_Carddav {
         $this->addresses = $res;
     }
 
-    private function convert_to_contact($data) {
+    private function convert_to_contact($parser) {
         $res = array();
-        if (!array_key_exists('email', $data) || count($data['email']) == 0) {
+        $emails = $parser->fld_val('email', false, array(), true);
+        if (count($emails) == 0) {
             return $res;
         }
 
-        $dn = '';
-        $phone = '';
-        $dn = array_key_exists('n', $data) ? sprintf('%s %s', $data['n']['firstname'], $data['n']['lastname']) : '';
-        $phone = array_key_exists('tel', $data) && count($data['tel']) > 0 ? $data['tel'][0]['value']: '';
-        $all_flds = $this->parse_extr_flds($data);
-
-        foreach ($data['email'] as $email) {
+        $dn = $parser->fld_val('dn');
+        if (!$dn) {
+            $dn = $parser->fld_val('n');
+            if (is_array($dn) && count($dn) > 0) {
+                $dn = sprintf('%s %s', $dn['firstname'], $dn['lastname']);
+            }
+        }
+        $phone = $parser->fld_val('tel');
+        $all_flds = $this->parse_extr_flds($parser);
+        foreach ($emails as $email) {
             $res[] = array(
                 'source' => $this->src,
                 'type' => 'carddav',
                 'display_name' => $dn,
                 'phone_number' => $phone,
-                'email_address' => $email['value'],
+                'email_address' => $email['values'],
                 'all_fields' => $all_flds
             );
         }
         return $res;
     }
 
-    private function parse_extr_flds($data) {
+    private function parse_extr_flds($parser) {
         $all_flds = array();
-        foreach ($data as $name => $vals) {
-            if (in_array($name, array('n', 'tel', 'email'))) {
+        foreach (array_keys($parser->parsed_data()) as $name) {
+            if (in_array($name, array('begin', 'end', 'n', 'tel', 'email', 'raw'))) {
                 continue;
             }
-            if (is_array($vals) && array_key_exists('formatted', $vals)) {
-                $all_flds[$vals['formatted']['name']] = $vals['formatted']['value'];
-            }
-            if (is_string($vals)) {
-                $all_flds[$name] = $vals;
-            }
+            $all_flds[$name] = $parser->fld_val($name);
         }
         return $all_flds;
     }
