@@ -1011,14 +1011,14 @@ function format_pop3_message_list($msg_list, $output_module, $style, $login_time
             $msg['server_name'] = 'Default';
         }
         $id = sprintf("pop3_%s_%s", $msg['server_id'], $msg_id);
-        $subject = display_value('subject', $msg);
+        $subject = display_value('subject', $msg, false, $output_module->trans('[No Subject]'));
         $from = display_value('from', $msg);
         $nofrom = '';
         if ($style == 'email' && !$from) {
             $nofrom = ' nofrom';
             $from = '[No From]';
         }
-        $date = display_value('date', $msg);
+        $date = display_value('date', $msg, false, $output_module->trans('[No Date]'));
         if ($date) {
             $date = translate_time_str($date, $output_module);
         }
