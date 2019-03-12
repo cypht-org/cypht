@@ -169,7 +169,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             );
             $msg_part = $this->get('imap_msg_part');
             $headers = $this->get('msg_headers', array());
-            if (!array_key_exists('subject', lc_headers($headers)) || !trim(lc_headers($headers))) {
+            if (!array_key_exists('subject', lc_headers($headers)) || !trim(lc_headers($headers)['subject'])) {
                 $headers['subject'] = $this->trans('[No Subject]');
             }
             $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
