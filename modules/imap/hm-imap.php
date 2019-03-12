@@ -1041,7 +1041,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         if ($only_auto_bcc) {
            $fld .= ' HEADER X-Auto-Bcc cypht';
         }
-        if ($exclude_auto_bcc) {
+        if (!strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
            $fld .= ' NOT HEADER X-Auto-Bcc cypht';
         }
         $esearch_enabled = false;
