@@ -324,14 +324,16 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                         $content = $item['summary'];
                         unset($item['summary']);
                     }
-                    $title = $item['title'];
+                    if (array_key_exists('title', $item)) {
+                        $title = $item['title'];
+                    }
                     $headers = $item;
                     unset($headers['title']);
                     $headers = array_merge(array('title' => $title), $headers);
                     break;
                 }
             }
-            if ($title) {
+            if ($content) {
                 feed_memcached_save($this, $feed_data, $feed_items);
                 Hm_Feed_Uid_Cache::read($form['feed_uid']);
                 $this->out('feed_message_content', $content);
@@ -644,6 +646,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 $item['guid'] = md5($item['title']);
             }
             if (isset($item['guid'])) {
+                if (!array_key_exists('title', $item) || !trim($item['title'])) {
+                    $item['title'] = $this->trans('[No Subject]');
+                }
                 $icon = 'rss';
                 $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
                 if (isset($item['dc:date'])) {
