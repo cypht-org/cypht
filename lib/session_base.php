@@ -394,6 +394,7 @@ class Hm_Session_Setup {
      * @return string
      */
     private function get_session_class() {
+        $custom_session_class = $this->config->get('session_class', 'Custom_Session');
         if ($this->session_type == 'DB') {
             $session_class = 'Hm_DB_Session';
         }
@@ -403,8 +404,8 @@ class Hm_Session_Setup {
         elseif ($this->session_type == 'REDIS') {
             $session_class = 'Hm_Redis_Session';
         }
-        elseif ($this->session_type == 'custom' && class_exists('Custom_Session')) {
-            $session_class = 'Custom_Session';
+        elseif ($this->session_type == 'custom' && class_exists($custom_session_class)) {
+            $session_class = $custom_session_class;
         }
         else {
             $session_class = 'Hm_PHP_Session';

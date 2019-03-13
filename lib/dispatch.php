@@ -156,6 +156,7 @@ class Hm_Dispatch {
     public $session;
     public $module_exec;
     public $page;
+    public $output;
 
     /**
      * Setup object needed to process a request
@@ -257,9 +258,10 @@ class Hm_Dispatch {
      */
     private function render_output() {
         $formatter = new $this->request->format($this->site_config);
-        $renderer = new Hm_Output_HTTP();
+        $class = $this->site_config->get('output_class', 'Hm_Output_HTTP');
+        $renderer = new $class;
         $content = $formatter->content($this->module_exec->output_response, $this->request->allowed_output);
-        $renderer->send_response($content, $this->module_exec->output_data);
+        $this->output = $renderer->send_response($content, $this->module_exec->output_data);
     }
 
     /**
