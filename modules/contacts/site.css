@@ -28,4 +28,9 @@
 .show_contact { margin-right: 15px; }
 .contact_detail th { font-weight: normal; text-align: left; padding-right: 20px; }
 .contact_fld { max-width: 300px; overflow-x: hidden; text-overflow: ellipsis; }
-@media screen and (max-device-width:480px) and (orientation : portrait) { .contact_list { margin-left: 0px; font-size: 125%; width: 100%; } .contact_controls img { width: 20px; height: 20px; } .contact_list_title, .add_contact { display: none; } .contact_fld { display: none; } .contact_src { display: none; } .add_contact_row { display: none; } }
+
+.mobile .contact_list { margin-left: 0px; font-size: 125%; width: 100%; }
+.mobile .contact_controls img { width: 20px; height: 20px; }
+.mobile .contact_list_title, .mobile .add_contact { display: none; }
+.mobile .contact_fld { display: none; } .contact_src { display: none; }
+.mobile .add_contact_row { display: none; }

@@ -20,4 +20,8 @@
 .nux_try_out { display: block; text-align: center; margin: auto; margin-top: 10px; }
 .nux_tz {  margin-top: 30px; }
 .nux_empty_combined_view { display: none; text-align: center; padding-top: 100px; color: #666; }
-@media screen and (max-device-width:480px) and (orientation : portrait) { .quick_add_section { padding-left: 0px; } .nux_dev_news, .nux_help, .nux_welcome {width: 90%; margin: 10px  auto; padding-left: 10px; padding-right: 5px; float: none; min-height: 200px; } .nux_dev_news { width: 90%; overflow: hidden; } .nux_welcome ul { padding-left: 10px; } }
+
+.mobile .quick_add_section { padding-left: 0px; }
+.mobile .nux_dev_news, .mobile .nux_help, .mobile .nux_welcome { max-width: 90%; width: 90%; margin: 10px  auto; padding-left: 10px; padding-right: 5px; float: none; min-height: 200px; }
+.mobile .nux_dev_news { width: 90%; overflow: hidden; }
+.mobile .nux_welcome ul { padding-left: 10px; }

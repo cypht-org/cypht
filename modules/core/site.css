@@ -193,101 +193,65 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
 
-@media screen and (max-device-width:1080px) and (orientation : portrait) {
-    .account_icon { width: 24px; height: 24px; vertical-align: -5px; }
-    .list_settings_link, .refresh_list { width: 38px; height: 38px; margin-top: -3px; }
-    .folder_toggle img { width: 36px; height: 42px; }
-    .folder_toggle{ top: 24px; left: 0px; }
-    .folders a { font-size: 125%; }
-    .folders li { padding-bottom: 5px; padding-top: 5px; }
-    .content_title { padding-left: 35px; }
-    .checkbox_cell { padding-left: 15px !important; }
-    .folder_list { min-width: 150px; }
-    .src_name, .content_title { font-size: 140%; padding-bottom: 15px; padding-top: 25px; max-height: 50px; }
-    body { font-size: 150%; }
-    .msg_text { font-size: 125%; }
-    .msg_text_inner { font-size: 140%; }
-    .list_meta { display: none; }
-    .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
-    .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
-    .msg_headers th { padding-left: 10px !important; }
-    .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
-    .unsaved_reminder { display: none; }
-}
-@media screen and (max-device-width:1080px) and (orientation : landscape) {
-    .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
-    .list_settings_link, .refresh_list { width: 24px; height: 24px; }
-    .folder_toggle img { width: 24px; height: 24px; }
-    .folder_toggle{ display: block; top: 16px; left: 0px; }
-    .folders a { font-size: 115%; }
-    .content_title { padding-left: 35px; }
-    .checkbox_cell { padding-left: 15px !important; }
-    .folder_list { display: none; width: 150px; }
-    .src_name, .content_title { font-size: 125%; max-height: 50px; }
-    .msg_text_inner { font-size: 140%; }
-    .msg_controls { position: absolute; background-color: #fff !important; }
-    .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
-    .header_subject th { max-width: 360px; white-space: normal !important; word-break: break-all; word-wrap: break-word; overflow: hidden !important; }
-    .msg_headers th { padding-left: 10px !important; }
-    .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
-    .unsaved_reminder { display: none; }
-}
-@media screen and (max-device-width:480px) and (orientation : portrait) {
-    .sys_messages { position: absolute; z-index: 1002; }
-    .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
-    .save_settings { margin-left: 0px !important; }
-    .save_settings_password { margin-right: 10px; }
-    body { font-size: 90%; min-width: 100%; }
-    .list_meta { display: block; }
-    .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
-    .mailbox_list_title { font-size: 80%; }
-    .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
-    .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
-    .content_cell { padding-top: 60px; display: block; width: 100%; }
-    .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 40px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; }
-    .folder_toggle { display: block; top: 19px; left: 5px; }
-    .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
-    .message_table { padding-left: 5px !important; }
-    .list_settings_link, .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
-    .refresh_list { margin-right: 5px; }
-    .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
-    .folder_toggle { position: fixed; z-index: 101; }
-    .update_message_list { margin-right: 20px; }
-    .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
-    .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -20px; height: 29px; font-size: 115%; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
-    .offline { height: 23px; padding-left: 38px; padding-right: 38px; }
-    .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
-    .msg_headers th { padding-left: 10px !important; }
-    .nlink, .plink, .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
-    .msg_text_inner { padding-left: 10px !important; font-size: 120%; padding: 10px !important; }
-    .list_meta { display: none; }
-    .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
-    .header_links, .nlink { white-space: normal !important; word-break: break-all; word-wrap: break-word; }
-    .search_form select, .search_form button, .search_form input { margin-left: 0px !important; margin: 0px; margin-top: 5px; }
-    .search_form label { display: none; }
-    .search_update { clear: both; }
-    .search_content .refresh_list { display: none; }
-    .search_content .content_title { max-height: 500px; }
-    .search_form select { width: 30px; }
-    .search_terms { width: 100px; }
-    .search_content { padding-top: 30px; }
-    .unsaved_reminder { display: none; }
-    .checkbox_cell { width: 35px; }
-    .checkbox_cell label { width: 30px; height: 30px; }
-    .github_para { white-space: normal !important; }
-    .login_form { margin-top: 60px; display: block; float: none; width: 100%; background-color: #fff; font-size: 130%; height: auto; }
-    #username, #password { width: 75%; }
-    .account_icon { width: 20px; height: 20px; }
-    .imap_filter { display: none; }
-    .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
-    .page_links { font-size: 150%; }
-    .page_links a img { width: 24px; height: 24px; }
-    .toggle_link { padding: 5px !important; line-height: auto !important; margin-left: 5px !important; }
-    .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
-    .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
-    .toggle_recipients { top: 8px !important; right: 0px !important; }
-    .prevnext, .news_cell .subject div img { width: 20px; height: 20px; }
-}
+/* mobile */
+.mobile { font-size: 90%; min-width: 100%; background: none; }
+.mobile .sys_messages { position: absolute; z-index: 1002; }
+.mobile .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
+.mobile .save_settings { margin-left: 0px !important; }
+.mobile .save_settings_password { margin-right: 10px; }
+.mobile .list_meta { display: block; }
+.mobile .checkbox_cell { padding-right: 0px !important; padding-left: 3px !important; }
+.mobile .mailbox_list_title { font-size: 95%; }
+.mobile .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
+.mobile .folder_list { padding: 0px !important; font-size: 130%; margin-right: 0px; display: none; width: 100%; }
+.mobile .folder_list li a { font-size: 110%; padding-top: 10px; }
+.mobile .folder_list li { padding-top: 5px; padding-bottom: 5px; }
+.mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
+.mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
+.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
+.mobile .folder_toggle { display: block; top: 19px; left: 8px; }
+.mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
+.mobile .message_table { padding-left: 5px !important; }
+.mobile .list_settings_link, .mobile .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
+.mobile .refresh_list { margin-right: 5px; }
+.mobile .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
+.mobile .folder_toggle { position: fixed; z-index: 101; }
+.mobile .update_message_list { margin-right: 20px; }
+.mobile .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
+.mobile .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -20px; height: 29px; font-size: 115%; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
+.mobile .offline { height: 23px; padding-left: 38px; padding-right: 38px; }
+.mobile .header_subject th { white-space: normal !important; word-break: break-all !important; word-wrap: break-word !important; }
+.mobile .msg_headers th { padding-left: 10px !important; }
+.mobile .nlink, .mobile .plink, .mobile .msg_headers td { white-space: normal; word-break: break-all; word-wrap: break-word; }
+.mobile .msg_text_inner { padding-left: 10px !important; font-size: 120%; padding: 10px !important; }
+.mobile .list_meta { display: none; }
+.mobile .user_settings table { white-space: normal; word-break: normal !important; table-layout: auto; }
+.mobile .header_links, .mobile .nlink { white-space: normal !important; word-break: break-all; word-wrap: break-word; }
+.mobile .search_form select, .mobile .search_form button, .mobile .search_form input { margin-left: 0px !important; margin: 0px; margin-top: 5px; }
+.mobile .search_form label { display: none; }
+.mobile .search_update { clear: both; }
+.mobile .search_content .refresh_list { display: none; }
+.mobile .search_content .content_title { max-height: 500px; }
+.mobile .search_form select { width: 30px; }
+.mobile .search_terms { max-width: 250px; }
+.mobile .search_content { padding-top: 30px; }
+.mobile .unsaved_reminder { display: none; }
+.mobile .checkbox_cell { width: 35px; }
+.mobile .checkbox_cell label { width: 30px; height: 30px; }
+.mobile .github_para { white-space: normal !important; }
+.mobile .login_form { margin-top: 60px; display: block; float: none; width: 100%; background-color: #fff; font-size: 130%; height: auto; }
+.mobile .account_icon { width: 20px; height: 20px; }
+.mobile .imap_filter { display: none; }
+.mobile .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
+.mobile .page_links { font-size: 150%; }
+.mobile .page_links a img { width: 24px; height: 24px; }
+.mobile .toggle_link { padding: 5px !important; line-height: auto !important; margin-left: 5px !important; }
+.mobile .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
+.mobile .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
+.mobile .toggle_recipients { top: 8px !important; right: 0px !important; }
+.mobile .prevnext, .mobile .news_cell .subject div img { width: 20px; height: 20px; }
+.mobile .long_session { float: left; clear: both; }
+
 @media print {
     .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
 }

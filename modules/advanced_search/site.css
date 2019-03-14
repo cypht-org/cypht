@@ -20,6 +20,4 @@
 .adv_search_link { margin-left: 20px; }
 .adv_terms { margin-left: 10px; }
 
-@media screen and (max-device-width:480px) and (orientation : portrait) {
-    .search_result_title { position: relative !important; z-index: 99 !important;}
-}
+.mobile .search_result_title { position: relative !important; z-index: 99 !important;}
