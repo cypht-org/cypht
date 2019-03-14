@@ -597,7 +597,6 @@ function Message_List() {
     };
 
     this.reset_checkboxes = function() {
-        $('input[type=checkbox]', $('.message_table')).each(function () { this.checked = false; });
         this.toggle_msg_controls();
         this.set_checkbox_callback();
     };
