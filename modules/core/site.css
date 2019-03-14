@@ -200,13 +200,16 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .save_settings { margin-left: 0px !important; }
 .mobile .save_settings_password { margin-right: 10px; }
 .mobile .list_meta { display: block; }
-.mobile .checkbox_cell { padding-right: 0px !important; padding-left: 0px !important; }
-.mobile .mailbox_list_title { font-size: 80%; }
+.mobile .checkbox_cell { padding-right: 0px !important; padding-left: 3px !important; }
+.mobile .mailbox_list_title { font-size: 95%; }
 .mobile .folder_cell { display: block; max-width: 96%; width: 96%; padding: 0px !important;}
-.mobile .folder_list { padding: 0px !important; font-size: 120%; margin-right: 0px; display: none; width: 100%; }
+.mobile .folder_list { padding: 0px !important; font-size: 130%; margin-right: 0px; display: none; width: 100%; }
+.mobile .folder_list li a { font-size: 110%; padding-top: 10px; }
+.mobile .folder_list li { padding-top: 5px; padding-bottom: 5px; }
+.mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
 .mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
-.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 40px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
-.mobile .folder_toggle { display: block; top: 19px; left: 5px; }
+.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
+.mobile .folder_toggle { display: block; top: 19px; left: 8px; }
 .mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
 .mobile .message_table { padding-left: 5px !important; }
 .mobile .list_settings_link, .mobile .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
@@ -227,10 +230,10 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .search_form select, .mobile .search_form button, .mobile .search_form input { margin-left: 0px !important; margin: 0px; margin-top: 5px; }
 .mobile .search_form label { display: none; }
 .mobile .search_update { clear: both; }
-.mobile .search_content , .mobile .refresh_list { display: none; }
-.mobile .search_content .mobile .content_title { max-height: 500px; }
+.mobile .search_content .refresh_list { display: none; }
+.mobile .search_content .content_title { max-height: 500px; }
 .mobile .search_form select { width: 30px; }
-.mobile .search_terms { width: 100px; }
+.mobile .search_terms { max-width: 250px; }*/
 .mobile .search_content { padding-top: 30px; }
 .mobile .unsaved_reminder { display: none; }
 .mobile .checkbox_cell { width: 35px; }
@@ -247,6 +250,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
 .mobile .toggle_recipients { top: 8px !important; right: 0px !important; }
 .mobile .prevnext, .mobile .news_cell .subject div img { width: 20px; height: 20px; }
+.mobile .long_session { float: left; clear: both; }
 
 @media print {
     .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
