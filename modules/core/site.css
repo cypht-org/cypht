@@ -233,7 +233,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .search_content .refresh_list { display: none; }
 .mobile .search_content .content_title { max-height: 500px; }
 .mobile .search_form select { width: 30px; }
-.mobile .search_terms { max-width: 250px; }*/
+.mobile .search_terms { max-width: 250px; }
 .mobile .search_content { padding-top: 30px; }
 .mobile .unsaved_reminder { display: none; }
 .mobile .checkbox_cell { width: 35px; }
