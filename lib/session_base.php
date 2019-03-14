@@ -455,7 +455,8 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function custom_auth() {
-        if ($this->auth_type == 'custom' && Hm_Functions::class_exists('Custom_Auth')) {
+        $custom_auth_class = $this->config->get('auth_class', 'Custom_Auth');
+        if ($this->auth_type == 'custom' && Hm_Functions::class_exists($custom_auth_class)) {
             return 'Custom_Auth';
         }
         return false;

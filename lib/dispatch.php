@@ -261,6 +261,8 @@ class Hm_Dispatch {
         $class = $this->site_config->get('output_class', 'Hm_Output_HTTP');
         $renderer = new $class;
         $content = $formatter->content($this->module_exec->output_response, $this->request->allowed_output);
+        /* TODO: might be a good idea to use a custom render class that can return
+         * the output on demand */
         $this->output = $renderer->send_response($content, $this->module_exec->output_data);
     }
 
