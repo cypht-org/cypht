@@ -6,6 +6,7 @@ GREEN="\e[00;32m"
 YELLOW="\e[00;33m"
 END="\e[00m"
 STARTTIME=`date +%s`
+SUITE=''
 
 # exit on error
 err_condition() {
@@ -58,9 +59,15 @@ css_check() {
 # run unit tests
 unit_test_check() {
     echo; echo -e "$YELLOW UNIT TEST CHECK $END"; echo
-    cd tests/phpunit && \
-        phpunit --debug -v --stop-on-error --stop-on-failure && \
-        cd "$CYPHT_DIR"
+    if [ -z "$SUITE" ]; then
+        cd tests/phpunit && \
+            phpunit --debug -v --stop-on-error --stop-on-failure 2>/dev/null && \
+            cd "$CYPHT_DIR"
+    else
+        cd tests/phpunit && \
+            phpunit --debug -v --stop-on-error --stop-on-failure --testsuite "$SUITE" 2>/dev/null && \
+            cd "$CYPHT_DIR"
+    fi
     err_condition
 }
 
@@ -151,6 +158,7 @@ if [ $# -eq 0 ]
             success
         ;;
         unit_test)
+            SUITE="$2"
             unit_test_check
             success
         ;;
