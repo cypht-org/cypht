@@ -62,12 +62,18 @@ class Hm_Request {
     /* HTTP request method */
     public $method = false;
 
+    /* force mobile ui */
+    private $always_mobile = false;
+
     /**
      * Process request details
      * @param array $filters list of input filters from module sets
      * @param object $config site config object
      */
     public function __construct($filters, $config) {
+        if ($config->get('always_mobile_ui', false)) {
+            $this->always_mobile = true;
+        }
         $this->filters = $filters;
         $this->filter_request_input();
         $this->get_other_request_details();
@@ -155,6 +161,10 @@ class Hm_Request {
      * @return void
      */
     private function is_mobile() {
+        if ($this->always_mobile) {
+            $this->mobile = true;
+            return;
+        }
         if (array_key_exists('HTTP_USER_AGENT', $this->server)) {
             if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos)/i", $this->server['HTTP_USER_AGENT'])) {
                 $this->mobile = true;
