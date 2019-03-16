@@ -4,6 +4,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
 
     public function setUp() {
         require 'bootstrap.php';
+        require 'helpers.php';
         define('CONFIG_FILE', APP_PATH.'hm3.rc');
         $this->config = new Hm_Mock_Config();
     }
@@ -26,7 +27,7 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
         ob_start();
         ob_start();
         $this->config->mods[] = 'site';
-        Hm_Functions::$exists = false;
+        Hm_Functions::$exists = true;
         $router = new Hm_Dispatch($this->config);
         $this->assertEquals('home', $router->page);
         ob_end_clean();

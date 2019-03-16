@@ -805,6 +805,7 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
     public function test_header_css_integrity() {
         define('CSS_HASH', 'foo');
         $test = new Output_Test('header_css', 'core');
+        $test->handler_response = array('router_module_list', array('core'));
         $res = $test->run();
         $this->assertEquals(array('<link href="site.css?v=asdf" integrity="foo" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
     }
@@ -1347,6 +1348,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test->handler_response = array('list_parent' => 'combined_inbox');
         $res = $test->run();
         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=combined_inbox">Everything</a></div><div class="msg_text">'), $res->output_response);
+        $test->handler_response = array('list_parent' => 'advanced_search');
+        $res = $test->run();
+        $this->assertEquals(array('<div class="content_title"><a href="?page=advanced_search&amp;list_path=advanced_search">Advanced Search</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'email');
         $res = $test->run();
         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=email">All Email</a></div><div class="msg_text">'), $res->output_response);
@@ -1390,6 +1394,9 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test->handler_response = array('message_list_fields' => array('foo', 'bar'));
         $res = $test->run();
         $this->assertEquals(array('<table class="message_table"><colgroup><col class="f"><col class="b"></colgroup><thead><tr><th class="o">o</th><th class="a">r</th></tr></thead><tbody class="message_table_body">'), $res->output_response);
+        $test->handler_response = array('message_list_fields' => array(array(false, true, false)));
+        $res = $test->run();
+        $this->assertEquals(array('<table class="message_table"><thead><tr><th></th></tr></thead><tbody class="message_table_body">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1458,7 +1465,7 @@ class Hm_Test_Core_Output_Modules_Debug extends PHPUnit_Framework_TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list' => array('core'));
         $res = $test->run();
-        $this->assertEquals(array('router_module_list' => array('core')), $res->output_response);
+        $this->assertEquals(array('<link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1471,7 +1478,7 @@ class Hm_Test_Core_Output_Modules_Debug extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

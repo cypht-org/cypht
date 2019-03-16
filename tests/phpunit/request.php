@@ -68,6 +68,23 @@ class Hm_Test_Request extends PHPUnit_Framework_TestCase {
         $req = new Hm_Request(filters(), $this->config);
         $this->assertTrue($req->tls);
     }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_request_force_mobile() {
+        $_SERVER['REQUEST_URI'] = 'test';
+        $_SERVER['HTTPS'] = 'on';
+        $_SERVER['HTTP_X_REQUESTED_WITH'] = 'xmlhttprequest';
+        $this->config->set('always_mobile_ui', true);
+        $_GET['foo'] = 'bar';
+        $_GET['blah'] = 'blah';
+        $req = new Hm_Request(filters(), $this->config);
+        $this->assertEquals('AJAX', $req->type);
+        $this->assertEquals('Hm_Format_JSON', $req->format);
+        $this->assertTrue($req->tls);
+        $this->assertTrue($req->mobile);
+    }
 }
 
 ?>

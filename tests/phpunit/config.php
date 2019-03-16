@@ -180,7 +180,15 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
      */
     public function test_site_load() {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
-        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar'), $config->dump());
+        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_get_user_defaults() {
+        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
+        $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
     public function tearDown() {
         unset($this->config);

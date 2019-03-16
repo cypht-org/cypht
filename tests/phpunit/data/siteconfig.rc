@@ -1,1 +1,1 @@
-a:1:{s:3:"foo";s:3:"bar";}
+a:2:{s:3:"foo";s:3:"bar";s:19:"default_setting_foo";s:3:"bar";}
