@@ -645,7 +645,6 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                 $this->out('redirect_url', '?'.$start_page);
             }
         }
-        $this->out('is_mobile', $this->request->mobile);
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
     }

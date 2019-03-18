@@ -456,7 +456,6 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
         $test->post = array('username' => 'foo', 'password' => 'bar');
         $res = $test->run();
         $this->assertFalse($res->handler_response['disable_delete_prompt']);
-        $this->assertFalse($res->handler_response['is_mobile']);
     }
     /**
      * @preserveGlobalState disabled
