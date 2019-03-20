@@ -48,6 +48,19 @@ class Hm_Card_Parse {
     }
 
     /**
+     * Load an already parsed card
+     * @param array $data parsed card data
+     * @return void
+     */
+    public function import_parsed($data) {
+        if (array_key_exists('raw', $data)) {
+            $this->raw_card = $data['raw'];
+            unset($data['raw']);
+        }
+        $this->data = $data;
+    }
+
+    /**
      * Return parsed data for an input
      * @return array
      */

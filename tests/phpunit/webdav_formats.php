@@ -42,7 +42,7 @@ class Hm_Test_Webdav_Formats extends PHPUnit_Framework_TestCase {
      */
     public function test_fld_val() {
         $parser = new Hm_VCard();
-$card = 'BEGIN:VCARD
+        $card = 'BEGIN:VCARD
 VERSION:4.0
 N:Gump;Forrest;;Mr.;
 FN:Forrest Gump
@@ -73,7 +73,7 @@ END:VCARD';
      */
     public function test_import_vcard_success() {
         $parser = new Hm_VCard();
-$card = 'BEGIN:VCARD
+        $card = 'BEGIN:VCARD
 VERSION:4.0
 N:Gump;Forrest;;Mr.;
 FN:Forrest Gump
@@ -98,9 +98,37 @@ END:VCARD';
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_parse_full_circle() {
+        $parser = new Hm_VCard();
+        $card = 'BEGIN:VCARD
+VERSION:4.0
+N:Gump;Forrest;;Mr.;
+FN:Forrest Gump
+ORG:Bubba Gump Shrimp Co.
+TITLE:Shrimp Man
+PHOTO;MEDIATYPE=image/gif:http://www.example.com/dir_photos/my_photo.gif
+TEL;TYPE=work,voice;VALUE=uri:tel:+1-111-555-1212
+TEL;TYPE=home,voice;VALUE=uri:tel:+1-404-555-1212
+ADR;TYPE=WORK;PREF=1;LABEL="100 Waters Edge\nBaytown\, LA 30314\nUnited States of America":;;100 Waters Edge;Baytown;LA;30314;United States of America
+ADR:;;100 Waters Edge;Baytown;LA;30314;United States of America
+ADR:1234;;;Baytown;LA;30314;United States of America
+ADR;TYPE=HOME;LABEL="42 Plantation St.\nBaytown\, LA 30314\nUnited States of America":;;42 Plantation St.;Baytown;LA;30314;United States of America
+EMAIL:forrestgump@example.com
+REV:20080424T195243Z
+x-qq:21588891
+END:VCARD';
+        $this->assertTrue($parser->import($card));
+        $parsed = $parser->parsed_data();
+        $parser->import_parsed($parsed);
+        $this->assertEquals($card, $parser->build_card());
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_build_vcard_success() {
         $parser = new Hm_VCard();
-$card = 'BEGIN:VCARD
+        $card = 'BEGIN:VCARD
 VERSION:4.0
 N:Gump;Forrest;;Mr.;
 FN:Forrest Gump
@@ -126,7 +154,7 @@ END:VCARD';
      */
     public function test_import_ical() {
         $parser = new Hm_ICal();
-$card = 'BEGIN:VCALENDAR
+        $card = 'BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//ABC Corporation//NONSGML My Product//EN
 BEGIN:VTODO
