@@ -14,7 +14,11 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('contact_source', 'contact_value'));
-        if ($success && $form['contact_source'] == 'local') {
+        if (!$success) {
+            return;
+        }
+        list($type, $source) = explode(':', $form['contact_source']);
+        if ($type == 'local' && $source == 'local') {
             $addresses = Hm_Address_Field::parse($form['contact_value']);
             if (!empty($addresses)) {
                 $contacts = $this->get('contact_store');
@@ -35,11 +39,12 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
 class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        list($success, $form) = $this->process_form(array('contact_source', 'contact_id'));
-        if ($success && $form['contact_source'] == 'local') {
+        list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
+        if ($success && $form['contact_type'] == 'local' && $form['contact_source'] == 'local') {
             if ($contacts->delete($form['contact_id'])) {
                 $this->user_config->set('contacts', $contacts->export());
                 $this->session->record_unsaved('Contact deleted');
+                $this->out('contact_deleted', 1);
                 Hm_Msgs::add('Contact Deleted');
             }
         }
@@ -165,6 +170,6 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
             'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.
-            $this->trans('Reset').'" /></div></form></div>';
+            $this->trans('Cancel').'" /></div></form></div>';
     }
 }
