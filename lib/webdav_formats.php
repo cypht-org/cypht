@@ -7,9 +7,133 @@
  */
 
 /**
+ * Trait with line parsing logic
+ */
+trait Hm_Card_Line_Parse {
+
+    /**
+     * Split a value skipping escaped characters
+     * @param string $line value to split
+     * @param string $delim value to split on
+     * @param integer $limit max number of splits (-1 for all)
+     * @return array
+     */
+    protected function split_value($line, $delim, $limit) {
+        $res = preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
+        return $res;
+    }
+
+    /**
+     * Normalize End-Of-Line chars
+     * @param string $str string input
+     * @return string
+     */
+    private function standard_eol($str) {
+        return rtrim(str_replace(array( "\r\n", "\n\r", "\r"), "\n", $str));
+    }
+
+    /**
+     * Unfold values that span > 1 line
+     * @param string $str string input
+     * @return string
+     */
+    private function unfold($str) {
+        return preg_replace("/\n\s{1}/m", '', $str);
+    }
+
+    /**
+     * Process the value portion of an input line
+     * @param string $value value to process
+     * @param string $type property type
+     * @return array
+     */
+    private function process_value($value, $type=false) {
+        $res = array();
+        foreach ($this->split_value($value, ',', -1) as $val) {
+            $res[] = str_replace(array('\n', '\,'), array("\n", ','), $val);
+        }
+        return $res;
+    }
+
+    /**
+     * Validate a property
+     * @param string $prop property name
+     * @return boolean
+     */
+    private function invalid_prop($prop) {
+        if (strtolower(substr($prop, 0, 2)) == 'x-') {
+            return false;
+        }
+        foreach ($this->properties as $name => $value) {
+            if (strtolower($prop) == strtolower($value)) {
+                return false;
+            }
+        }
+        Hm_Debug::add(sprintf("%s invalid prop found: %s", $this->format, $prop));
+        return true;
+    }
+
+    /**
+     * Validate a paramater
+     * @param string $param parameter to validate
+     * @return boolean
+     */
+    private function invalid_param($param) {
+        foreach ($this->parameters as $val) {
+            if (strtolower($param) == strtolower($val)) {
+                return false;
+            }
+        }
+        Hm_Debug::add(sprintf("%s invalid param found: %s",
+            $this->format, $param));
+        return true;
+    }
+
+    /**
+     * Parse a property value
+     * @param string $prop property to parse
+     * @return array
+     */
+    private function parse_prop($prop) {
+        $vals = $this->split_value($prop, ';', -1);
+        $res = array(
+            'prop' => $vals[0],
+            'params' => array()
+        );
+        if (count($vals) > 1) {
+            $res['params'] = $this->parse_prop_params($vals);
+        }
+        return $res;
+    }
+
+    /**
+     * Parse parameters in a property field
+     * @param array $vals list of parameters
+     * @return array
+     */
+    private function parse_prop_params($vals) {
+        $res = array();
+        array_shift($vals);
+        foreach ($vals as $val) {
+            $pair = $this->split_value($val, '=', 2);
+            if (count($pair) > 1) {
+                if ($this->invalid_param($pair[0])) {
+                    continue;
+                }
+                $res[strtolower($pair[0])] = $this->flatten(
+                    $this->process_value($pair[1]));
+            }
+        }
+        return $res;
+    }
+}
+
+/**
  * Class for parsing vCard/iCal data
  */
 class Hm_Card_Parse {
+
+    use Hm_Card_Line_Parse;
 
     /* input format version */
     protected $version = '';
@@ -126,18 +250,6 @@ class Hm_Card_Parse {
     }
 
     /**
-     * Split a value skipping escaped characters
-     * @param string $line value to split
-     * @param string $delim value to split on
-     * @param integer $limit max number of splits (-1 for all)
-     * @return array
-     */
-    protected function split_value($line, $delim, $limit) {
-        $res = preg_split("/\\\\.(*SKIP)(*FAIL)|$delim/s", $line, $limit);
-        return $res;
-    }
-
-    /**
      * Look for a sepcific type
      */
     private function is_type($type, $vals) {
@@ -157,24 +269,6 @@ class Hm_Card_Parse {
     }
 
     /**
-     * Normalize End-Of-Line chars
-     * @param string $str string input
-     * @return string
-     */
-    private function standard_eol($str) {
-        return rtrim(str_replace(array( "\r\n", "\n\r", "\r"), "\n", $str));
-    }
-
-    /**
-     * Unfold values that span > 1 line
-     * @param string $str string input
-     * @return string
-     */
-    private function unfold($str) {
-        return preg_replace("/\n\s{1}/m", '', $str);
-    }
-
-    /**
      * Flatten a list with 1 value to a scaler
      * @param array $arr list to flatten
      * @return array
@@ -187,26 +281,13 @@ class Hm_Card_Parse {
     }
 
     /**
-     * Process the value portion of an input line
-     * @param string $value value to process
-     * @param string $type property type
-     * @return array
-     */
-    private function process_value($value, $type=false) {
-        $res = array();
-        foreach ($this->split_value($value, ',', -1) as $val) {
-            $res[] = str_replace(array('\n', '\,'), array("\n", ','), $val);
-        }
-        return $res;
-    }
-
-    /**
      * Parse input file
      * @param array $lines lines of input to parse
      * @return boolean
      */
     private function parse($lines) {
         foreach ($lines as $line) {
+            $id = md5($line);
             $vals = $this->split_value($line, ':', 2);
             $prop = $this->parse_prop($vals[0]);
             if ($this->invalid_prop($prop['prop'])) {
@@ -215,6 +296,7 @@ class Hm_Card_Parse {
             $data = $prop['params'];
             $data['values'] = $this->flatten(
                 $this->process_value($vals[1], $prop['prop']));
+            $data['id'] = $id;
             if (array_key_exists(strtolower($prop['prop']), $this->data)) {
                 $this->data[strtolower($prop['prop'])][] = $data;
             }
@@ -225,78 +307,6 @@ class Hm_Card_Parse {
         $this->data['raw'] = $this->raw_card;
         $this->parse_values();
         return count($this->data) > 0;
-    }
-
-    /**
-     * Validate a property
-     * @param string $prop property name
-     * @return boolean
-     */
-    private function invalid_prop($prop) {
-        if (strtolower(substr($prop, 0, 2)) == 'x-') {
-            return false;
-        }
-        foreach ($this->properties as $name => $value) {
-            if (strtolower($prop) == strtolower($value)) {
-                return false;
-            }
-        }
-        Hm_Debug::add(sprintf("%s invalid prop found: %s", $this->format, $prop));
-        return true;
-    }
-
-    /**
-     * Validate a paramater
-     * @param string $param parameter to validate
-     * @return boolean
-     */
-    private function invalid_param($param) {
-        foreach ($this->parameters as $val) {
-            if (strtolower($param) == strtolower($val)) {
-                return false;
-            }
-        }
-        Hm_Debug::add(sprintf("%s invalid param found: %s",
-            $this->format, $param));
-        return true;
-    }
-
-    /**
-     * Parse a property value
-     * @param string $prop property to parse
-     * @return array
-     */
-    private function parse_prop($prop) {
-        $vals = $this->split_value($prop, ';', -1);
-        $res = array(
-            'prop' => $vals[0],
-            'params' => array()
-        );
-        if (count($vals) > 1) {
-            $res['params'] = $this->parse_prop_params($vals);
-        }
-        return $res;
-    }
-
-    /**
-     * Parse parameters in a property field
-     * @param array $vals list of parameters
-     * @return array
-     */
-    private function parse_prop_params($vals) {
-        $res = array();
-        array_shift($vals);
-        foreach ($vals as $val) {
-            $pair = $this->split_value($val, '=', 2);
-            if (count($pair) > 1) {
-                if ($this->invalid_param($pair[0])) {
-                    continue;
-                }
-                $res[strtolower($pair[0])] = $this->flatten(
-                    $this->process_value($pair[1]));
-            }
-        }
-        return $res;
     }
 
     /**
