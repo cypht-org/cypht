@@ -13,6 +13,33 @@ require APP_PATH.'modules/carddav_contacts/hm-carddav.php';
 /**
  * @subpackage carddav_contacts/handler
  */
+class Hm_Handler_process_add_carddav_contact extends Hm_Handler_Module {
+    public function process() {
+        $details = get_ini($this->config, 'carddav.ini', true);
+        list($success, $form) = $this->process_form(array('contact_source', 'carddav_email', 'carddav_name', 'add_contact'));
+        if (!$success || !array_key_exists($form['contact_source'], $details)) {
+            return;
+        }
+        $auths = $this->user_config->get('carddav_contacts_auth_setting', array());
+        $detail = $details[$form['contact_source']];
+        if (!array_key_exists($form['contact_source'], $auths)) {
+            return;
+        }
+        $auth = $auths[$form['contact_source']];
+        $pass = false;
+        if (array_key_exists('pass', $auth)) {
+            $pass = $auth['pass'];
+        }
+        $carddav = new Hm_Carddav($form['contact_source'], $detail['server'], $auth['user'], $pass);
+        if ($carddav->add_contact($form)) {
+            /* TODO: record unsaved, send user message */
+        }
+    }
+}
+
+/**
+ * @subpackage carddav_contacts/handler
+ */
 class Hm_Handler_process_edit_carddav_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
@@ -21,7 +48,21 @@ class Hm_Handler_process_edit_carddav_contact extends Hm_Handler_Module {
         if (!$success || !array_key_exists($form['contact_source'], $details)) {
             return;
         }
-        //$contact = $contacts->get($form['contact_id']);
+        $contact = $contacts->get($form['contact_id']);
+        $auths = $this->user_config->get('carddav_contacts_auth_setting', array());
+        $detail = $details[$form['contact_source']];
+        if (!array_key_exists($form['contact_source'], $auths)) {
+            return;
+        }
+        $auth = $auths[$form['contact_source']];
+        $pass = false;
+        if (array_key_exists('pass', $auth)) {
+            $pass = $auth['pass'];
+        }
+        $carddav = new Hm_Carddav($form['contact_source'], $detail['server'], $auth['user'], $pass);
+        if ($carddav->update_contact($contact, $form)) {
+            /* TODO: record unsaved, send user message */
+        }
     }
 }
 
@@ -69,6 +110,7 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
                 $pass = $auths[$name]['pass'];
             }
             $carddav = new Hm_Carddav($name, $vals['server'], $auths[$name]['user'], $pass);
+            $carddav->get_vcards();
             $contacts->import($carddav->addresses);
             $this->append('contact_sources', 'carddav');
         }
@@ -176,7 +218,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             return '';
         }
         $form_class = 'contact_form';
-        $button = '<input class="add_contact_submit" type="submit" name="add_carddav_contact" value="'.$this->trans('Add').'" />';
+        $button = '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
         $title = $this->trans('Add Carddav');
         $current = $this->get('current_carddav_contact', array());
         $current_source = false;
@@ -200,8 +242,8 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             $target = '<input type="hidden" name="contact_source" value="'.$this->html_safe($current_source).'" />';
         }
         else {
-            $target = '<label class="screen_reader" for="contact_source">'.$this->trans('Account').'</label><select id="carddav_target" '.
-                'name="carddav_target">';
+            $target = '<label class="screen_reader" for="contact_source">'.$this->trans('Account').'</label><select id="contact_source" '.
+                'name="contact_source">';
             foreach ($sources as $src => $details) {
                 $target .= '<option value="'.$this->html_safe($src).'">'.$this->html_safe($src).'</option>';
             }
@@ -215,8 +257,8 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             '<label class="screen_reader" for="carddav_email">'.$this->trans('E-mail Address').'</label>'.
             '<input required placeholder="'.$this->trans('E-mail Address').'" id="carddav_email" type="email" name="carddav_email" '.
             'value="'.$this->html_safe($email).'" /> *<br />'.
-            '<label class="screen_reader" for="carddav_name">'.$this->trans('Full Name').'</label>'.
-            '<input required placeholder="'.$this->trans('Full Name').'" id="carddav_name" type="text" name="carddav_name" '.
+            '<label class="screen_reader" for="carddav_name">'.$this->trans('Dsiplay Name').'</label>'.
+            '<input required placeholder="'.$this->trans('Dsiplay Name').'" id="carddav_name" type="text" name="carddav_name" '.
             'value="'.$this->html_safe($name).'" /> *<br />'.
             '<label class="screen_reader" for="carddav_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="carddav_phone" type="text" name="carddav_phone" '.

@@ -31,12 +31,12 @@ class Hm_Carddav {
         $this->pass = $pass;
         $this->url = $url;
         $this->api = new Hm_API_Curl('xml');
-        if ($this->discover()) {
-            $this->get_vcards();
-        }
     }
 
-    private function get_vcards() {
+    public function get_vcards() {
+        if (!$this->discover()) {
+            return;
+        }
         $res = array();
         $parser = new Hm_VCard();
         $count = 0;
@@ -59,6 +59,23 @@ class Hm_Carddav {
         $this->addresses = $res;
     }
 
+    public function add_contact($form) {
+        /* TODO: format as vcard, add to carddav server */
+    }
+
+    public function update_contact($contact, $form) {
+        $new_card = $this->convert_to_card($contact, $form);
+        /* TODO: update on carddav server */
+    }
+
+    private function convert_to_card($contact, $form) {
+        $parser = new Hm_VCard();
+        $parsed = $contact->value('carddav_parsed');
+        /* TODO: update $parsed */
+        $parser->import_parsed($parsed);
+        return $parser->build_card();
+    }
+
     private function convert_to_contact($parser) {
         $res = array();
         $emails = $parser->fld_val('email', false, array(), true);
@@ -67,11 +84,9 @@ class Hm_Carddav {
         }
 
         $dn = $parser->fld_val('dn');
-        if (!$dn) {
-            $dn = $parser->fld_val('n');
-            if (is_array($dn) && count($dn) > 0) {
-                $dn = sprintf('%s %s', $dn['firstname'], $dn['lastname']);
-            }
+        $n = $parser->fld_val('n');
+        if (is_array($n) && count($n) > 0) {
+            $n = sprintf('%s %s', $n['firstname'], $n['lastname']);
         }
         $phone = $parser->fld_val('tel');
         $all_flds = $this->parse_extr_flds($parser);
@@ -80,8 +95,10 @@ class Hm_Carddav {
                 'source' => $this->src,
                 'type' => 'carddav',
                 'display_name' => $dn,
+                'name' => $n,
                 'phone_number' => $phone,
                 'email_address' => $email['values'],
+                'carddav_parsed' => $parser->parsed_data(),
                 'all_fields' => $all_flds
             );
         }

@@ -8,6 +8,7 @@ output_source('carddav_contacts');
 add_handler('contacts', 'load_carddav_contacts', true, 'carddav_contacts', 'load_contacts', 'after');
 add_handler('contacts', 'load_edit_carddav_contact', true, 'carddav_contacts', 'load_carddav_contacts', 'after');
 add_handler('contacts', 'process_edit_carddav_contact', true, 'carddav_contacts', 'load_edit_carddav_contact', 'after');
+add_handler('contacts', 'process_add_carddav_contact', true, 'carddav_contacts', 'load_edit_carddav_contact', 'after');
 add_handler('ajax_autocomplete_contact', 'load_carddav_contacts', true, 'carddav_contacts', 'load_contacts', 'after');
 add_handler('ajax_imap_message_content', 'load_carddav_contacts', true, 'carddav_contacts', 'load_contacts', 'after');
 add_handler('compose', 'load_carddav_contacts', true, 'carddav_contacts', 'load_contacts', 'after');
