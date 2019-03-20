@@ -130,7 +130,7 @@ var autocomplete_keyboard_nav = function(event, list_div, class_name, fld_val) {
     else if (event.keyCode == 9) {
         $(list_div).html('');
         $(list_div).hide();
-        $(class_name).focusout();
+        $(class_name).trigger('focusout');
         return true;
     }
     if (in_list) {
