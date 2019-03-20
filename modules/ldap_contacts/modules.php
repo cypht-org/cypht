@@ -17,9 +17,13 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
     public function process() {
         $ldap_config = $this->get('ldap_config');
         list($success, $form) = $this->process_form(array('contact_source', 'contact_value'));
-        if ($success && array_key_exists($form['contact_source'], $ldap_config)) {
+        if (!$success) {
+            return;
+        }
+        list($type, $source) = explode(':', $form['contact_source']);
+        if ($type == 'ldap' && array_key_exists($source, $ldap_config)) {
             $addresses = Hm_Address_Field::parse($form['contact_value']);
-            $config = $ldap_config[$form['contact_source']];
+            $config = $ldap_config[$source];
             if (count($config) == 0) {
                 Hm_Msgs::add('ERRUnable to add contact');
                 return;
@@ -43,7 +47,6 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                         }
                         if ($ldap->add($atts, $dn)) {
                             Hm_Msgs::add('Contact Added');
-                            $this->session->record_unsaved('Contact Added');
                         }
                         else {
                             Hm_Msgs::add('ERRUnable to add contact');
@@ -63,8 +66,8 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
         $contacts = $this->get('contact_store');
         $ldap_config = ldap_config($this->config);
         $sources = array_keys($ldap_config);
-        list($success, $form) = $this->process_form(array('contact_source', 'contact_id'));
-        if ($success && in_array($form['contact_source'], $sources, true)) {
+        list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
+        if ($success && $form['contact_type'] == 'ldap' && in_array($form['contact_source'], $sources, true)) {
             $config = $ldap_config[$form['contact_source']];
             $contact = $contacts->get($form['contact_id']);
             if (!$contact) {
@@ -73,9 +76,13 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
             $ldap = new Hm_LDAP_Contacts($config);
             if ($ldap->connect()) {
                 $flds = $contact->value('all_fields');
-                $ldap->delete($flds['dn']);
-                $this->session->record_unsaved('Contact Deleted');
-                Hm_Msgs::add('Contact Deleted');
+                if ($ldap->delete($flds['dn'])) {
+                    Hm_Msgs::add('Contact Deleted');
+                    $this->out('contact_deleted', 1);
+                }
+                else {
+                    Hm_Msgs::add('ERRCould not delete contact');
+                }
             }
             else {
                 Hm_Msgs::add('ERRCould not delete contact');
@@ -186,7 +193,6 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
         $ldap = new Hm_LDAP_Contacts($config);
         if ($ldap->connect()) {
             if ($ldap->add($entry, $dn)) {
-                $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
             else {
@@ -403,7 +409,7 @@ class Hm_Output_ldap_form_submit extends Hm_Output_Module {
             $name = 'update_ldap_contact';
         }
         return '<input name="'.$name.'" type="submit" value="'.$this->trans($label).'" />'.
-            '<input type="button" class="reset_contact" value="'.$this->trans('Reset').'" />';
+            '<input type="button" class="reset_contact" value="'.$this->trans('Cancel').'" />';
     }
 }
 
