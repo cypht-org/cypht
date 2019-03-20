@@ -247,6 +247,12 @@ function build_contact_detail($output_mod, $contact, $id) {
             $all_fields = $val;
             continue;
         }
+        if ($name == 'carddav_parsed') {
+            continue;
+        }
+        if (!trim($val)) {
+            continue;
+        }
         $res .= '<tr><th>'.$output_mod->trans(name_map($name)).'</th>';
         $res .= '<td class="'.$output_mod->html_safe($name).'">'.$output_mod->html_safe($val).'</td></tr>';
     }

@@ -14,12 +14,13 @@
 #cc_contacts, #bcc_contacts, #to_contacts { z-index: 1; display: none; left: 34px; margin-top: -5px; position: absolute; background-color: #fff; border: solid 1px #ddd; padding: 10px; border-radius: 3px 3px 3px 3px; border-top: none; }
 .contact_pages { text-align: center; border-bottom: none !important; }
 .no_contact_sources { text-align: center; color: #999; font-size: 110%; margin-top: 60px; }
-.add_contact { max-width: 300px; margin-bottom: 30px; margin-top: 10px; color: #666; margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
+.add_contact { margin-bottom: 30px; margin-top: 10px; color: #666; margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 300px; }
 .add_contact input, .add_contact select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
-.add_contact .server_title { max-width: 300px; cursor: pointer; }
+.add_contact .server_title { cursor: pointer; }
 .contact_form { margin-top: 10px; display: none; }
 .add_contact .menu_caret { opacity: .7; }
 .contact_update_form { margin-top: 10px; }
+.contact_update_form, .contact_form { white-space: nowrap; }
 .contact_detail { margin: 20px; margin-bottom: 30px; }
 .contact_detail_row table { width: auto; }
 .contact_detail td { border: none; }
