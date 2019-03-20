@@ -24,6 +24,11 @@ class Hm_Carddav {
     private $addressbook_path = '//response/propstat/prop/addressbook-home-set/href';
     private $addr_list_path = '//response/href';
     private $addr_detail_path = '//response/propstat/prop/address-data';
+    private $card_flds = array(
+        'carddav_email' => 'email',
+        'carddav_phone' => 'tel',
+        'carddav_fn' => 'fn'
+    );
 
     public function __construct($src, $url, $user, $pass) {
         $this->user = $user;
@@ -60,20 +65,87 @@ class Hm_Carddav {
     }
 
     public function add_contact($form) {
-        /* TODO: format as vcard, add to carddav server */
+        if (!$this->discover()) {
+            return false;
+        }
+        $filename = sha1(time().json_encode($form));
+        $uid = sha1($filename);
+        $card = array('BEGIN:VCARD', 'VERSION:3', sprintf('UID:%s', $uid));
+        foreach ($this->card_flds as $name => $cname) {
+            if (array_key_exists($name, $form) && trim($form[$name])) {
+                $card[] = sprintf('%s:%s', strtoupper($cname), $form[$name]);
+            }
+        }
+        $card[] = 'END:VCARD';
+        $url = sprintf('%s%s.vcf', $this->address_url, $filename);
+        $card = implode("\n", $card);
+        return $this->update_server_contact($url, $card);
+    }
+
+    public function delete_contact($contact) {
+        return $this->delete_server_contact($contact->value('src_url'));
     }
 
     public function update_contact($contact, $form) {
-        $new_card = $this->convert_to_card($contact, $form);
-        /* TODO: update on carddav server */
+        $parsed = $contact->value('carddav_parsed');
+        $parsed = $this->update_or_add('carddav_email', $form, $parsed);
+        $parsed = $this->update_or_add('carddav_fn', $form, $parsed);
+        $parsed = $this->update_or_add('carddav_phone', $form, $parsed);
+        $new_card = $this->convert_to_card($parsed);
+        return $this->update_server_contact($contact->value('src_url'), $new_card);
     }
 
-    private function convert_to_card($contact, $form) {
+    private function find_by_id($type, $form, $data) {
+        if (!array_key_exists($type, $form) || !trim($form[$type])) {
+            return false;
+        }
+        $id = $form[$type];
+        foreach ($data as $name => $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            foreach ($entry as $index => $vals) {
+                if (array_key_exists('id', $vals) && $id == $vals['id']) {
+                    return array($name, $index);
+                }
+            }
+        }
+        return false;
+    }
+
+    private function update_or_add($type, $form, $parsed) {
+        $path = $this->find_by_id($type.'_id', $form, $parsed);
+        if ($path === false && trim($form[$type])) {
+            $start = array_splice($parsed, 0, 2);
+            $start[$this->card_flds[$type]] = array(array('values' => $form[$type]));
+            $parsed = array_merge($start, $parsed);
+        }
+        elseif (trim($form[$type])) {
+            $parsed[$path[0]][$path[1]]['values'] = $form[$type];
+        }
+        return $parsed;
+    }
+
+    private function convert_to_card($parsed) {
         $parser = new Hm_VCard();
-        $parsed = $contact->value('carddav_parsed');
-        /* TODO: update $parsed */
         $parser->import_parsed($parsed);
         return $parser->build_card();
+    }
+
+    private function get_phone($parser) {
+        $res = $parser->fld_val('tel', false, false, true);
+        if ($res === false) {
+            return array('', '');
+        }
+        return array($res[0]['values'], $res[0]['id']);
+    }
+
+    private function get_display_name($parser) {
+        $res = $parser->fld_val('fn', false, false, true);
+        if ($res === false) {
+            return array('', '');
+        }
+        return array($res[0]['values'], $res[0]['id']);
     }
 
     private function convert_to_contact($parser) {
@@ -83,21 +155,20 @@ class Hm_Carddav {
             return $res;
         }
 
-        $dn = $parser->fld_val('dn');
-        $n = $parser->fld_val('n');
-        if (is_array($n) && count($n) > 0) {
-            $n = sprintf('%s %s', $n['firstname'], $n['lastname']);
-        }
-        $phone = $parser->fld_val('tel');
+        list($fn, $fn_id) = $this->get_display_name($parser);
+        list($phone, $phone_id) = $this->get_phone($parser);
+
         $all_flds = $this->parse_extr_flds($parser);
         foreach ($emails as $email) {
             $res[] = array(
                 'source' => $this->src,
                 'type' => 'carddav',
-                'display_name' => $dn,
-                'name' => $n,
+                'fn' => $fn,
+                'carddav_fn_id' => $fn_id,
                 'phone_number' => $phone,
                 'email_address' => $email['values'],
+                'carddav_phone_id' => $phone_id,
+                'carddav_email_id' => $email['id'],
                 'carddav_parsed' => $parser->parsed_data(),
                 'all_fields' => $all_flds
             );
@@ -108,7 +179,7 @@ class Hm_Carddav {
     private function parse_extr_flds($parser) {
         $all_flds = array();
         foreach (array_keys($parser->parsed_data()) as $name) {
-            if (in_array($name, array('begin', 'end', 'n', 'tel', 'email', 'raw'))) {
+            if (in_array($name, array('begin', 'end', 'n', 'fn', 'tel', 'email', 'raw'))) {
                 continue;
             }
             $all_flds[$name] = $parser->fld_val($name);
@@ -215,5 +286,17 @@ class Hm_Carddav {
             '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
         Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml));
         return $this->api->command($url, $this->auth_headers(), array(), $req_xml, 'REPORT');
+    }
+
+    private function delete_server_contact($url) {
+        $headers = $this->auth_headers();
+        $this->api->command($url, $headers, array(), '', 'DELETE');
+        return $this->api->last_status == 200;
+    }
+    private function update_server_contact($url, $card) {
+        $headers = $this->auth_headers();
+        $headers[] = 'Content-Type: text/vcard; charset=utf-8';
+        $this->api->command($url, $headers, array(), $card, 'PUT');
+        return $this->api->last_status == 200 || $this->api->last_status == 201;
     }
 }
