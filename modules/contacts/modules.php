@@ -166,19 +166,23 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             $total = count($contacts->dump());
             $contacts->sort('email_address');
             foreach ($contacts->page($current_page, $per_page) as $id => $contact) {
+                $name = $contact->value('display_name');
+                if (!trim($name)) {
+                    $name = $contact->value('fn');
+                }
                 $res .= '<tr class="contact_row_'.$this->html_safe($id).'">';
                 $res .= '<td><a data-id="contact_'.$this->html_safe($id).'_detail" '.
                     '" class="show_contact" title="'.$this->trans('Details').'">'.
                     '<img alt="'.$this->trans('Send To').'" width="16" height="16" src="'.Hm_Image_Sources::$person.'" /></a> '.
                     '</d><td>'.$this->html_safe($contact->value('type')).'<td><span class="contact_src">'.
                     ($contact->value('source') == 'local' ? '' : $this->html_safe($contact->value('source'))).'</span>'.
-                    '</td><td>'.$this->html_safe($contact->value('display_name')).'</td>'.
+                    '</td><td>'.$this->html_safe($name).'</td>'.
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
                     '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
                     $this->html_safe($contact->value('phone_number')).'</a></td>'.
                     '<td class="contact_controls">';
                 if (in_array($contact->value('type').':'.$contact->value('source'), $editable, true)) {
-                    $res .= '<a data-id="'.$this->html_safe($id).'" data-source="'.$this->html_safe($contact->value('source')).
+                    $res .= '<a data-id="'.$this->html_safe($id).'" data-type="'.$this->html_safe($contact->value('type')).'" data-source="'.$this->html_safe($contact->value('source')).
                         '" class="delete_contact" title="'.$this->trans('Delete').'"><img alt="'.$this->trans('Delete').
                         '" width="16" height="16" src="'.Hm_Image_Sources::$circle_x.'" /></a>'.
                         '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.
@@ -247,7 +251,7 @@ function build_contact_detail($output_mod, $contact, $id) {
             $all_fields = $val;
             continue;
         }
-        if ($name == 'carddav_parsed') {
+        if (substr($name, 0, 8) == 'carddav_') {
             continue;
         }
         if (!trim($val)) {
@@ -257,6 +261,7 @@ function build_contact_detail($output_mod, $contact, $id) {
         $res .= '<td class="'.$output_mod->html_safe($name).'">'.$output_mod->html_safe($val).'</td></tr>';
     }
     if ($all_fields) {
+        ksort($all_fields);
         foreach ($all_fields as $name => $val) {
             if (in_array($name, array(0, 'raw', 'objectclass', 'dn', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
                 continue;
@@ -306,6 +311,9 @@ function name_map($val) {
         'home_address' => 'Home Address',
         'work_address' => 'Work Address',
         'nickname' => 'Nickname',
+        'pager' => 'Pager',
+        'homephone' => 'Home Phone',
+        'type' => 'Type',
         'url' => 'Website',
         'org' => 'Company',
         'fn' => 'Full Name',

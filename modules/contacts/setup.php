@@ -52,7 +52,8 @@ return array(
         'contact_value' => FILTER_SANITIZE_STRING,
         'edit_contact' => FILTER_SANITIZE_STRING,
         'add_contact' => FILTER_SANITIZE_STRING,
-        'contact_source' => FILTER_SANITIZE_STRING
+        'contact_source' => FILTER_SANITIZE_STRING,
+        'contact_type' => FILTER_SANITIZE_STRING
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT,
@@ -61,6 +62,7 @@ return array(
         'contact_source' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
+        'contact_deleted' => array(FILTER_VALIDATE_INT, false),
         'contact_suggestions' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY)
     ),
 );
