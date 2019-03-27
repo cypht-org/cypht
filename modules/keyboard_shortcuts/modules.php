@@ -248,7 +248,7 @@ if (!hm_exists('shortcut_defaults')) {
 function shortcut_defaults($user_config=false) {
     $res = array(
         array('label' => 'Unfocus all input elements', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 27, 'action' => 'Keyboard_Shortcuts.unfocus', 'target' => 'false'),
-        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
+        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
         array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 85, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
         array('label' => 'Jump to the "Flagged" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 70, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=flagged'),
         array('label' => 'Jump to History', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 72, 'action' => 'ks_redirect', 'target' => '?page=history'),
