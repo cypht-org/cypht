@@ -305,6 +305,22 @@ abstract class Hm_Session {
     }
 
     /**
+     * @param Hm_Request $request request object
+     * @return string
+     */
+    private function cookie_path($request) {
+        $path = $this->site_config->get('cookie_path', false);
+        if (!$path) {
+            $path = $request->path;
+        }
+        if ($path == 'none') {
+            $path = '';
+        }
+        return $path;
+    }
+
+
+    /**
      * Set a cookie, secure if possible
      * @param object $request request details
      * @param string $name cookie name
@@ -332,7 +348,7 @@ abstract class Hm_Session {
             $html_only = false;
         }
         if ($name != 'hm_reload_folders' && !$path && isset($request->path)) {
-            $path = $request->path;
+            $path = $this->cookie_path($request);
         }
         if (!$domain) {
             $domain = $this->cookie_domain($request);
