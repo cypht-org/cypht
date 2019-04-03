@@ -295,11 +295,11 @@ abstract class Hm_Session {
      */
     private function cookie_domain($request) {
         $domain = $this->site_config->get('cookie_domain', false);
+        if ($domain == 'none') {
+            return '';
+        }
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
             $domain = $request->server['HTTP_HOST'];
-        }
-        if ($domain == 'none') {
-            $domain = '';
         }
         return $domain;
     }
@@ -310,11 +310,11 @@ abstract class Hm_Session {
      */
     private function cookie_path($request) {
         $path = $this->site_config->get('cookie_path', false);
-        if (!$path) {
-            $path = $request->path;
-        }
         if ($path == 'none') {
             $path = '';
+        }
+        if (!$path) {
+            $path = $request->path;
         }
         return $path;
     }
