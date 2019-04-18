@@ -882,22 +882,22 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $smtp_profiles = profiles_by_smtp_id($profiles, $id);
-            if ($selected_id !== false && $id == $selected_id) {
+            foreach (profiles_by_smtp_id($profiles, $id) as $index => $profile) {
+                if ($profile['default']) {
+                    $default = $id.'.'.($index + 1);
+                }
+                if ((string) $selected_id === sprintf('%s.%s', $id, ($index + 1))) {
+                    $selected = $id.'.'.($index + 1);
+                }
+                elseif ($recip && trim($recip) == $profile['address']) {
+                    $selected = $id.'.'.($index + 1);
+                }
+            }
+            if (!$selected && $selected_id !== false && $id == $selected_id) {
                 $selected = $id;
             }
-            elseif ($recip && trim($recip) == trim($vals['user'])) {
-                $selected = $id.'.1';
-            }
-            else {
-                foreach ($smtp_profiles as $index => $profile) {
-                    if ($profile['default']) {
-                        $default = $id.'.'.($index + 1);
-                    }
-                    if ((string) $selected_id === sprintf('%s.%s', $id, ($index + 1))) {
-                        $selected = $id.'.'.($index + 1);
-                    }
-                }
+            elseif (!$selected && $recip && trim($recip) == trim($vals['user'])) {
+                $selected = $id;
             }
         }
         if ($selected === false && $default !== false) {
@@ -1056,6 +1056,14 @@ function get_primary_recipient($profiles, $headers, $smtp_servers) {
             }
         }
     }
+    foreach ($addresses as $address) {
+        foreach ($smtp_servers as $id => $vals) {
+            if ($vals['user'] == $address) {
+                return $address;
+            }
+        }
+    }
+
     return false;
 }}
 
@@ -1152,6 +1160,7 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
     if ($body_type == 2) {
         require_once APP_PATH.'vendor/erusev/parsedown/Parsedown.php';
         $parsedown = new Parsedown();
+        $parsedown->setSafeMode(true);
         $body = $parsedown->text($body);
     }
     return array($body, $cc, $bcc, $in_reply_to, $draft);
