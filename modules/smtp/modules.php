@@ -1335,9 +1335,6 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $smtp_tls = $config->get('default_smtp_tls', true);
     $servers = $user_config->get('smtp_servers', array());
     foreach ($servers as $index => $server) {
-        if ($server['server'] == $smtp_server && $server['tls'] == $smtp_tls && $server['port'] == $smtp_port) {
-            continue;
-        }
         Hm_SMTP_List::add($server, $index);
     }
     $attributes = array(
