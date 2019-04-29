@@ -306,6 +306,8 @@ class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Hm_User_Config_File', get_class(load_user_config_object($mock_config)));
         $mock_config->set('user_config_type', 'DB');
         $this->assertEquals('Hm_User_Config_DB', get_class(load_user_config_object($mock_config)));
+        $mock_config->set('user_config_type', 'custom:Hm_Mock_Config');
+        $this->assertEquals('Hm_Mock_Config', get_class(load_user_config_object($mock_config)));
     }
     /**
      * @preserveGlobalState disabled
