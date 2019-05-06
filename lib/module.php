@@ -198,7 +198,7 @@ trait Hm_Handler_Validate {
         if (!in_array(strtolower($request->method), array('get', 'post'), true)) {
             if ($session->loaded) {
                 $session->destroy($request);
-                Hm_Debug::add('LOGGED OUT: mismatched origins');
+                Hm_Debug::add(sprintf('LOGGED OUT: invalid method %s', $request->method));
             }
             return false;
         }
