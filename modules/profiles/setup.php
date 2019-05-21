@@ -18,7 +18,7 @@ add_output('profiles', 'profile_content', true, 'profiles', 'profile_edit_form',
 add_output('ajax_hm_folders', 'profile_page_link', true, 'profiles', 'settings_menu_end', 'before');
 add_output('compose', 'compose_signature_button', true, 'profiles', 'compose_form_end', 'before');
 add_output('compose', 'compose_signature_values', true, 'profiles', 'compose_form_start', 'before');
-add_handler('compose', 'compose_profile_data', true, 'profiles', 'load_user_data', 'after');
+add_handler('compose', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
 
 return array(
     'allowed_pages' => array(
