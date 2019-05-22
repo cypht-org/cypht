@@ -487,6 +487,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $this->out('save_sent_server', $imap_server);
             $this->out('save_sent_msg', $mime);
         }
+        else {
+            Hm_Debug::add(sprintf('Unable to save sent message, no IMAP server found for SMTP server: %s', $smtp_details['server']));
+        }
 
         /* clean up */
         $this->out('msg_sent', true);

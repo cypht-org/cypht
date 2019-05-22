@@ -232,6 +232,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $msg = rtrim($msg)."\r\n";
         $cache = Hm_IMAP_List::get_cache($this->cache, $imap_id);
         $imap = Hm_IMAP_List::connect($imap_id, $cache);
+        $imap_details = Hm_IMAP_List::dump($imap_id);
         $sent_folder = false;
         if (imap_authed($imap)) {
             $specials = $this->user_config->get('special_imap_folders', array());
@@ -250,10 +251,16 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                 }
                 $sent_folder = $auto_sent['sent'];
             }
-            if ($imap->append_start($sent_folder, strlen($msg), true)) {
-                $imap->append_feed($msg."\r\n");
-                if (!$imap->append_end()) {
-                    Hm_Msgs::add('ERRAn error occurred saving the sent message');
+            if (!$sent_folder) {
+                Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
+            }
+            if ($sent_folder) {
+                Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
+                if ($imap->append_start($sent_folder, strlen($msg), true)) {
+                    $imap->append_feed($msg."\r\n");
+                    if (!$imap->append_end()) {
+                        Hm_Msgs::add('ERRAn error occurred saving the sent message');
+                    }
                 }
             }
         }
