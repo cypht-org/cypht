@@ -231,7 +231,7 @@ function get_2fa_key($config) {
  */
 if (!hm_exists('base32_encode_str')) {
 function base32_encode_str($str) {
-    require_once APP_PATH.'vendor/christian-riesen/base32/src/Base32.php';
+    require_once VENDOR_PATH.'christian-riesen/base32/src/Base32.php';
     return Base32\Base32::encode($str);
 }}
 
@@ -241,7 +241,7 @@ function base32_encode_str($str) {
 if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
     $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
-    require_once APP_PATH.'vendor/autoload.php';
+    require_once VENDOR_PATH.'autoload.php';
     $qr_code = new QrCode();
     $qr_code->setText($str);
     $qr_code->setSize(200);

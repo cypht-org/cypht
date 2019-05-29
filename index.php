@@ -13,6 +13,7 @@
  * SITE_ID    random site id used for page keys
  */
 define('APP_PATH', '');
+define('VENDOR_PATH', APP_PATH.'vendor/');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
 define('SITE_ID', '');

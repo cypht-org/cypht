@@ -35,7 +35,7 @@ require APP_PATH.'lib/webdav_formats.php';
 
 /* load random bytes polyfill if needed */
 if (!function_exists('random_bytes')) {
-    require APP_PATH.'vendor/paragonie/random_compat/lib/random.php';
+    require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
 }
 
 /* check for and load the correct libsodium interface */
