@@ -10,6 +10,7 @@ if (!defined('DEBUG_MODE')) {
 
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
+define('VENDOR_PATH', APP_PATH.'vendor/');
 
 /* random id */
 define('SITE_ID', 'randomid');

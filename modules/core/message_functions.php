@@ -16,7 +16,7 @@
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
-    require_once APP_PATH.'vendor/autoload.php';
+    require_once VENDOR_PATH.'autoload.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$images) {
@@ -35,7 +35,7 @@ function format_msg_html($str, $images=false) {
  */
 if (!hm_exists('convert_html_to_text')) {
 function convert_html_to_text($html) {
-    require_once APP_PATH.'vendor/html2text/html2text/src/Html2Text.php';
+    require_once VENDOR_PATH.'html2text/html2text/src/Html2Text.php';
     $html = new \Html2Text\Html2Text($html, array('do_links' => 'table', 'width' => 0));
     return $html->getText();
 }}
