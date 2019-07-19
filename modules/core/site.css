@@ -253,5 +253,5 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .long_session { float: left; clear: both; }
 
 @media print {
-    .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
+    .sys_messages, .next, .prev, .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
 }
