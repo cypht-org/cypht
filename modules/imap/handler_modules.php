@@ -696,39 +696,30 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
-        // Hm_Msgs::add($form);
 
         if ($success) {
-            $archive_result = false;
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            $archive_folder = false;
-            $specials = $this->user_config->get('special_imap_folders', array());
-            
-            
-            if (array_key_exists($form['imap_server_id'], $specials)) {
-                if (array_key_exists('all', $specials[$form['imap_server_id']])) {
-                    if ($specials[$form['imap_server_id']]['all']) {
-                        $archive_folder = $specials[$form['imap_server_id']]['all'];
-                    }
-                }
-            }
+            $archive_folder = "Archive";
+
             if (imap_authed($imap)) {
-                Hm_Msgs::add($imap);
-                if ($imap->select_mailbox(hex2bin($form['folder']))) {
-                    $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
-                    if ($archive_folder && $archive_folder != hex2bin($form['folder'])) {
-                        if ($imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
-                            $archive_result = true;
+                if(count($imap->get_mailbox_status($archive_folder)) == 0) {
+                    if ($new_folder && $imap->create_mailbox($new_folder)) {
+                        if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                            $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder);
+                            Hm_Msgs::add("Message archived");
                         }
+                    } else {
+                        Hm_Msgs::add('ERRAn error occurred archiving the message');
+                    }
+                } else {
+                    if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                        $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder);
+                        Hm_Msgs::add("Message archived");
                     }
                 }
             }
-            if (!$archive_result) {
-                Hm_Msgs::add('ERRAn error occurred trying to archive this message');
-                $this->out('imap_archive_error', true);
-            }
-            
+
             $msgs = Hm_Msgs::get();
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
@@ -1619,4 +1610,3 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
         }
     }
 }
-
