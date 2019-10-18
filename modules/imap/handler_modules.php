@@ -703,19 +703,40 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             $archive_folder = "Archive";
 
             if (imap_authed($imap)) {
+                $new_folder = $archive_folder . '/' . hex2bin($form['folder']);
+
                 if(count($imap->get_mailbox_status($archive_folder)) == 0) {
-                    if ($new_folder && $imap->create_mailbox($new_folder)) {
-                        if ($imap->select_mailbox(hex2bin($form['folder']))) {
-                            $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder);
-                            Hm_Msgs::add("Message archived");
+                    if($imap->create_mailbox($archive_folder)) {
+                        if ($imap->create_mailbox($new_folder)) {
+                            if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                                $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder);
+                                Hm_Msgs::add("Message archived");
+                            } else {
+                                Hm_Msgs::add('ERRAn error occurred archiving the message');
+                            }
+                        } else {
+                            Hm_Msgs::add('ERRAn error occurred archiving the message');
                         }
                     } else {
                         Hm_Msgs::add('ERRAn error occurred archiving the message');
                     }
                 } else {
-                    if ($imap->select_mailbox(hex2bin($form['folder']))) {
-                        $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder);
-                        Hm_Msgs::add("Message archived");
+                    if(count($imap->get_mailbox_status($new_folder)) == 0 ){
+                        if ($imap->create_mailbox($new_folder)) {
+                            if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                                $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder);
+                                Hm_Msgs::add("Message archived");
+                            } else {
+                                Hm_Msgs::add('ERRAn error occurred archiving the message');
+                            }
+                        } else {
+                            Hm_Msgs::add('ERRAn error occurred archiving the message');
+                        }
+                    } else {
+                        if ($imap->select_mailbox(hex2bin($form['folder']))) {
+                            $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder);
+                            Hm_Msgs::add("Message archived");
+                        }
                     }
                 }
             }
