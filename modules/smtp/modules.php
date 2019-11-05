@@ -104,16 +104,24 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
             return;
         }
         if (!is_readable($file['tmp_name'])) {
+            if($file['error'] == 1) {
+                $upload_max_filesize = ini_get('upload_max_filesize');
+                Hm_Msgs::add('ERRYour upload failed because you reached the limit of ' . $upload_max_filesize . '.');    
+                return;
+            }
             Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
             return;
         }
+
         $content = file_get_contents($file['tmp_name']);
         if (!$content) {
             Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
             return;
         }
+
         if (!attach_file($content, $file, $filepath, $draft_id, $this)) {
             Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
+            return;
         }
     }
 }
