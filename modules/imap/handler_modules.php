@@ -700,7 +700,20 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         if ($success) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            $archive_folder = "Archive";
+            $archive_folder = false;
+
+            $specials = $this->user_config->get('special_imap_folders', array());
+            if (array_key_exists($form['imap_server_id'], $specials)) {
+                if (array_key_exists('archive', $specials[$form['imap_server_id']])) {
+                    if ($specials[$form['imap_server_id']]['archive']) {
+                        $archive_folder = $specials[$form['imap_server_id']]['archive'];
+                    }
+                }
+            }
+
+            if(!$archive_folder) {
+                $archive_folder = "Archive";
+            }
 
             if (imap_authed($imap)) {
                 $new_folder = $archive_folder . '/' . hex2bin($form['folder']);
