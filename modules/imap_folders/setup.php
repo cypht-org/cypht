@@ -32,20 +32,20 @@ add_handler('compose', 'special_folders', true, 'imap_folders', 'load_user_data'
 setup_base_ajax_page('ajax_imap_folders_delete', 'core');
 add_handler('ajax_imap_folders_delete', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_folders_delete', 'process_folder_delete', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_imap_folders_delete', 'save_imap_cache',  true, 'imap', 'process_folder_delete', 'after');
-add_handler('ajax_imap_folders_delete', 'close_session_early', true, 'core', 'save_imap_cache', 'after');
+add_handler('ajax_imap_folders_delete', 'imap_bust_cache', true, 'imap', 'process_folder_delete', 'after');
+add_handler('ajax_imap_folders_delete', 'close_session_early', true, 'core', 'imap_bust_cache', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_rename', 'core');
 add_handler('ajax_imap_folders_rename', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_folders_rename', 'process_folder_rename', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_imap_folders_rename', 'save_imap_cache',  true, 'imap', 'process_folder_rename', 'after');
-add_handler('ajax_imap_folders_rename', 'close_session_early', true, 'core', 'save_imap_cache', 'after');
+add_handler('ajax_imap_folders_rename', 'imap_bust_cache',  true, 'imap', 'process_folder_rename', 'after');
+add_handler('ajax_imap_folders_rename', 'close_session_early', true, 'core', 'imap_bust_cache', 'after');
 
 setup_base_ajax_page('ajax_imap_folders_create', 'core');
 add_handler('ajax_imap_folders_create', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_folders_create', 'process_folder_create', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_imap_folders_create', 'save_imap_cache',  true, 'imap', 'process_folder_create', 'after');
-add_handler('ajax_imap_folders_create', 'close_session_early', true, 'core', 'save_imap_cache', 'after');
+add_handler('ajax_imap_folders_create', 'imap_bust_cache', true, 'imap', 'process_folder_create', 'after');
+add_handler('ajax_imap_folders_create', 'close_session_early', true, 'core', 'imap_bust_cache', 'after');
 
 setup_base_ajax_page('ajax_imap_clear_special_folder', 'core');
 add_handler('ajax_imap_clear_special_folder', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
