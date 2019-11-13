@@ -716,8 +716,9 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             }
 
             if (imap_authed($imap)) {
-                $new_folder = $archive_folder . '/' . hex2bin($form['folder']);
-
+                $delimiter = $imap->get_namespaces()[0]['delim'];
+                $new_folder = $archive_folder . $delimiter . hex2bin($form['folder']);
+                
                 if(count($imap->get_mailbox_status($archive_folder)) == 0) {
                     if($imap->create_mailbox($archive_folder)) {
                         if ($imap->create_mailbox($new_folder)) {
