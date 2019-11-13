@@ -233,6 +233,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
+            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             $txt .= '<div class="move_to_location"></div></div>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';

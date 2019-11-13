@@ -580,6 +580,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     $('#delete_message').on("click", function() { return imap_delete_message(); });
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
+    $('#archive_message').on("click", function(e) { return imap_archive_message();});
 };
 
 var get_local_message_content = function(msg_uid, path) {
@@ -930,3 +931,43 @@ $(function() {
     Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
 });
+
+
+var imap_archive_message = function(state, supplied_uid, supplied_detail) {
+    var uid = hm_msg_uid();
+    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    if (supplied_uid) {
+        uid = supplied_uid;
+    }
+    if (supplied_detail) {
+        detail = supplied_detail;
+    }
+    if (detail && uid) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_archive_message'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            function(res) {
+                if (!res.imap_archive_error) {
+                    if (Hm_Utils.get_from_global('msg_uid', false)) {
+                        return;
+                    }
+                    var nlink = $('.nlink');
+                    if (nlink.length) {
+                        window.location.href = nlink.attr('href');
+                    }
+                    else {
+                        if (!hm_list_parent()) {
+                            window.location.href = "?page=message_list&list_path="+hm_list_path();
+                        }
+                        else {
+                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                        }
+                    }
+                }
+            }
+        );
+    }
+    return false;
+};

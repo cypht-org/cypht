@@ -190,6 +190,16 @@ add_handler('ajax_imap_delete_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_delete_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_delete_message', 'imap_delete_message',  true);
 
+/* archive message callback */
+setup_base_ajax_page('ajax_imap_archive_message', 'core');
+add_handler('ajax_imap_archive_message', 'message_list_type', true, 'core');
+add_handler('ajax_imap_archive_message', 'imap_message_list_type', true);
+add_handler('ajax_imap_archive_message', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
+
+
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_message_action', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
@@ -270,6 +280,7 @@ return array(
         'ajax_imap_save_folder_state',
         'ajax_imap_message_action',
         'ajax_imap_delete_message',
+        'ajax_imap_archive_message',
         'ajax_imap_flag_message',
         'ajax_imap_update_combined_source',
         'ajax_imap_mark_as_read',
