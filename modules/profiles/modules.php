@@ -205,7 +205,8 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_signature_button extends Hm_Output_Module {
     protected function output() {
-        return '<input class="compose_sign" type="button" value="'.$this->trans('Sign').'" />';
+        return '<input type="hidden" value="'.$this->trans('You need at least one configured profile to sign messages').'" id="sign_msg" />'.
+            '<input class="compose_sign" type="button" value="'.$this->trans('Sign').'" />';
     }
 }
 
