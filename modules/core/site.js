@@ -393,6 +393,7 @@ function Message_List() {
     this.deleted = [];
     this.background = false;
     this.completed_count = 0;
+    this.last_click = '';
     this.callbacks = [];
     this.sort_fld = 4;
     this.past_total = 0;
@@ -957,9 +958,48 @@ function Message_List() {
         }
     };
 
+    this.select_range = function(a, b) {
+        var start = false;
+        var end = false;
+        $('input[type=checkbox]', $('.message_table')).filter(function() {
+            if (end) {
+                return;
+            }
+            if (!start && ($(this).prop('id') == a || $(this).prop('id') == b)) {
+                start = true;
+                return;
+            }
+            if (start && ($(this).prop('id') == b || $(this).prop('id') == a)) {
+                end = true;
+                return;
+            }
+            if (start && !end) {
+                this.checked = true;
+            }
+        });
+    };
+
+    this.process_shift_click = function(el) {
+        var id = $(el).prop('id');
+        self.select_range(id, self.last_click);
+    };
+
     this.set_checkbox_callback = function() {
+        $('.checkbox_label').off('mousedown');
+        $('.checkbox_label').on('mousedown', function (e) {
+            if (e.ctrlKey || e.shiftKey) {
+                e.preventDefault();
+                document.getSelection().removeAllRanges();
+            }
+        });
         $('input[type=checkbox]', $('.message_table')).off('click');
         $('input[type=checkbox]', $('.message_table')).on("click", function(e) {
+            if (e.shiftKey) {
+                if (self.last_click) {
+                    self.process_shift_click(this);
+                }
+            }
+            self.last_click = $(this).prop('id');
             self.toggle_msg_controls();
         });
     };
