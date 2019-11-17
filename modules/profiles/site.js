@@ -12,6 +12,8 @@ if (hm_page_name() == 'compose') {
                 ta = $('#compose_body');
                 insert_sig(ta[0], profile_signatures[server_id]);
             }
+        } else {
+            Hm_Notices.show(['ERRYou need at least one configured profile to sign messages']);
         }
     });
 }
