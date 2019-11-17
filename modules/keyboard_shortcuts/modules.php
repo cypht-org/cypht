@@ -248,13 +248,13 @@ if (!hm_exists('shortcut_defaults')) {
 function shortcut_defaults($user_config=false) {
     $res = array(
         array('label' => 'Unfocus all input elements', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 27, 'action' => 'Keyboard_Shortcuts.unfocus', 'target' => 'false'),
-        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
-        array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 85, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
-        array('label' => 'Jump to the "Flagged" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 70, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=flagged'),
-        array('label' => 'Jump to History', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 72, 'action' => 'ks_redirect', 'target' => '?page=history'),
-        array('label' => 'Jump to Contacts', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 67, 'action' => 'ks_redirect', 'target' => '?page=contacts'),
-        array('label' => 'Jump to the Compose page', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 83, 'action' => 'ks_redirect', 'target' => '?page=compose'),
-        array('label' => 'Toggle the folder list', 'group' => 'general', 'page' => '*', 'control_chars' => array('meta'), 'char' => 84, 'action' => 'Hm_Folders.toggle_folder_list', 'target' => false),
+        array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
+        array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 85, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
+        array('label' => 'Jump to the "Flagged" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 70, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=flagged'),
+        array('label' => 'Jump to History', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 72, 'action' => 'ks_redirect', 'target' => '?page=history'),
+        array('label' => 'Jump to Contacts', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 67, 'action' => 'ks_redirect', 'target' => '?page=contacts'),
+        array('label' => 'Jump to the Compose page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 83, 'action' => 'ks_redirect', 'target' => '?page=compose'),
+        array('label' => 'Toggle the folder list', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 89, 'action' => 'Hm_Folders.toggle_folder_list', 'target' => false),
 
         array('label' => 'Focus the next message in the list', 'group' => 'message_list', 'page' => 'message_list', 'control_chars' => array(), 'char' => 78, 'action' => 'ks_next_msg_list', 'target' => false),
         array('label' => 'Focus the previous message in the list', 'group' => 'message_list', 'page' => 'message_list', 'control_chars' => array(), 'char' => 80, 'action' => 'ks_prev_msg_list', 'target' => false),
