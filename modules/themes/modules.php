@@ -20,7 +20,7 @@ class Hm_Handler_load_theme  extends Hm_Handler_Module {
         if ($theme == 'hn') {
             $this->user_config->set('list_style', 'news_style');
         }
-        if ($theme == 'dark') {
+        if ($theme == 'tdark' || $theme == 'dark') {
             hm_theme_icons();
         }
         if ($theme == 'terminal') {
@@ -110,6 +110,7 @@ function hm_themes() {
         'default' => 'White Bread (Default)',
         'blue' => 'Boring Blues',
         'dark' => 'Dark But Not Too Dark',
+        'tdark' => 'Too Dark',
         'gray' => 'More Gray Than White Bread',
         'green' => 'Poison Mist',
         'tan' => 'A Bunch Of Browns',

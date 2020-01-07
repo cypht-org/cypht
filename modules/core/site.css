@@ -192,6 +192,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
+.prev th, .next th { white-space: normal !important; }
 
 /* mobile */
 .mobile { font-size: 90%; min-width: 100%; background: none; }
