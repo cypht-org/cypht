@@ -11,14 +11,14 @@
  * @subpackage smtp/lib
  */
 class Hm_MIME_Msg {
-    private $bcc = '';
-    private $headers = array('X-Mailer' => 'Cypht', 'MIME-Version' => '1.0');
-    private $boundary = '';
-    private $attachments = array();
-    private $body = '';
-    private $text_body = '';
-    private $html = false;
-    private $final_msg = '';
+    protected $bcc = '';
+    protected $headers = array('X-Mailer' => 'Cypht', 'MIME-Version' => '1.0');
+    protected $boundary = '';
+    protected $attachments = array();
+    protected $body = '';
+    protected $text_body = '';
+    protected $html = false;
+    protected $final_msg = '';
 
     /* build mime message data */
     function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='') {
