@@ -741,7 +741,7 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
     public function test_header_start() {
         $test = new Output_Test('header_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<!DOCTYPE html><html dir="ltr" class="ltr_page" lang=en><head><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-status-bar-style" content="black" /><meta name="theme-color" content="#888888" /><meta charset="utf-8" />'), $res->output_response);
+        $this->assertEquals(array('<!DOCTYPE html><html dir="ltr" class="ltr_page" lang=en><head><meta name="referrer" content="no-referrer" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-status-bar-style" content="black" /><meta name="theme-color" content="#888888" /><meta charset="utf-8" />'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
