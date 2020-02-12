@@ -93,6 +93,8 @@ add_output('search', 'search_form_end', true, 'core', 'search_form_content', 'af
 add_output('search', 'message_list_start', true, 'core', 'search_form_end', 'after');
 add_output('search', 'search_results_table_end', true, 'core', 'message_list_start', 'after');
 add_output('search', 'search_content_end', true, 'core', 'search_results_table_end', 'after');
+add_output('search', 'search_move_copy_controls', true, 'core', 'search_content_start', 'before');
+
 
 /* reset search form */
 setup_base_ajax_page('ajax_reset_search', 'core');
