@@ -122,7 +122,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .list_controls a { padding-right: 5px; }
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
-.folder_toggle { font-size: 0px; position: absolute; top: 20px; left: 7px; display: none; }
+.folder_toggle { font-size: 0px; float: left; margin: 15px; margin-top: 19px; display: none; }
 .folder_toggle img { opacity: .5; }
 .next_img { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAM9JREFUOI2dkkEOgjAQRR8uFA9DiJfSa8AZxMjCsxjjISB4Etm0LlrIZBgr8SezaOb/3z/TwhIHoAVewBhrAK5AafBn7IEb4BPlonluiZ+KrCF7D21i3Zwy8HGkeWYr7i8DB5Qb4GSQ1yADjhC2/U8CD/QZ4Zm2X27QBhrjRhzqKJrKMpyqlo1BRKoMoUYl+B2E55BzpUwqxT1D+J5uhYkWO6CYmi3LDVcJsQca6Z4TvqdlYonvwE5HzGMSPY6O3VhiiRK4AD3wjtURFlZo8geE63UUiXP5tgAAAABJRU5ErkJggg==') top left no-repeat; }
 .prev_img { background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAMBJREFUOI2lkkEOgkAMRR8sdDyMId6QO4iBhVeRGA8h0YXxGLAZXEwxk1LIGH/SBbT/zXRamOsANMATGCQeQA0URv1XO+AMjCvhBe4s880wlBL6/1VDrJPLKG9B6rjnNfMSxCNv0iSYlyAnCK+dYrYgHYQxpZo1pM8EsDGKMvU9GjVDDrx/OFnrlQPtH4ALhFF45qPUsrZyPyX1KFMAVZx0hPVMBbTAVhc4uYnVTnztyjLHKggb1gG9xB04xj1P+gCAqG/EiKgzLwAAAABJRU5ErkJggg==') top left no-repeat; }
@@ -210,13 +210,13 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
 .mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
 .mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
-.mobile .folder_toggle { display: block; top: 19px; left: 8px; }
 .mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
+.mobile .folder_toggle { display: block; top: 0px; left: -3px; }
+.mobile .folder_toggle img { width: 24px; height: 32px; margin-top: -7px; }
+.mobile .folder_toggle { position: fixed; z-index: 101; }
 .mobile .message_table { padding-left: 5px !important; }
 .mobile .list_settings_link, .mobile .refresh_list { width: 24px; height: 24px; vertical-align: -13px; }
 .mobile .refresh_list { margin-right: 5px; }
-.mobile .folder_toggle img { width: 30px; height: 36px; margin-top: -7px; }
-.mobile .folder_toggle { position: fixed; z-index: 101; }
 .mobile .update_message_list { margin-right: 20px; }
 .mobile .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
 .mobile .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -20px; height: 29px; font-size: 115%; padding-left: 10px; padding-top: 9px; top: 10px; left: 70px !important; }
