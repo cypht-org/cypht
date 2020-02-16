@@ -35,6 +35,8 @@ Features: [https://cypht.org/features.html](https://cypht.org/features.html)
 
 License: [https://cypht.org/license.html](https://cypht.org/license.html)
 
+Community chat room: [https://gitter.im/cypht-org/community](https://gitter.im/cypht-org/community)
+
 For developers, get via Composer: [https://packagist.org/packages/jason-munro/cypht](https://packagist.org/packages/jason-munro/cypht)
 
 Contact: [jason@cypht.org](mailto:jason@cypht.org)
