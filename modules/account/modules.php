@@ -32,6 +32,7 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
         $user_config = load_user_config_object($this->config);
         if ($this->session->change_pass($user, $form['new_pass1'])) {
             Hm_Msgs::add("Password changed");
+            return;
         }
         Hm_Msgs::add("ERRAn error Occurred");
         $user_config->load($user, $form['old_pass']);
