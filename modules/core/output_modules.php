@@ -1659,4 +1659,20 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
     }
 }
 
-
+/**
+ * Add move/copy dialog to the search page
+ * @subpackage imap/output
+ */
+class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
+    protected function output() {
+        $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+        $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
+        $res .= '<div class="move_to_location"></div>';
+        $res .= '<input type="hidden" class="move_to_type" value="" />';
+        $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
+        $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
+        $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+        // $res = "<strong>COPY/MOVE</strong>";
+        $this->concat('msg_controls_extra', $res);
+    }
+}
