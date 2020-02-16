@@ -322,13 +322,17 @@ class Hm_Output_header_start extends Hm_Output_Module {
             $dir = $this->dir;
         }
         $class = $dir."_page";
-        return '<!DOCTYPE html><html dir="'.$this->html_safe($dir).'" class="'.
+        $res = '<!DOCTYPE html><html dir="'.$this->html_safe($dir).'" class="'.
             $this->html_safe($class).'" lang='.$this->html_safe($lang).'><head>'.
-            '<meta name="referrer" content="no-referrer" />'.
             '<meta name="apple-mobile-web-app-capable" content="yes" />'.
             '<meta name="mobile-web-app-capable" content="yes" />'.
             '<meta name="apple-mobile-web-app-status-bar-style" content="black" />'.
             '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />';
+
+        if ($this->get('router_login_state')) {
+            $res .= '<meta name="referrer" content="no-referrer" />';
+        }
+        return $res;
     }
 }
 
