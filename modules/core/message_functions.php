@@ -105,7 +105,7 @@ function reply_to_address($headers, $type) {
     $msg_to = '';
     $msg_cc = '';
     $headers = lc_headers($headers);
-	$delivered_to = $headers['delivered-to'];
+    $delivered_to = $headers['delivered-to'];
     if ($type == 'forward') {
         return $msg_to;
     }
