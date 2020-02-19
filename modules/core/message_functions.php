@@ -105,12 +105,13 @@ function reply_to_address($headers, $type) {
     $msg_to = '';
     $msg_cc = '';
     $headers = lc_headers($headers);
+	$delivered_to = $headers['delivered-to'];
     if ($type == 'forward') {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
         if (array_key_exists($fld, $headers)) { 
-            list($parsed, $msg_to) = format_reply_address($headers[$fld], array());
+            list($parsed, $msg_to) = format_reply_address($headers[$fld], array(), $delivered_to);
             if ($msg_to) {
                 break;
             }
@@ -118,11 +119,11 @@ function reply_to_address($headers, $type) {
     }
     if ($type == 'reply_all') {
         if (array_key_exists('cc', $headers)) {
-            list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
+            list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed, $delivered_to);
             $parsed += $cc_parsed;
         }
         if (array_key_exists('to', $headers)) {
-            list($parsed, $recips) = format_reply_address($headers['to'], $parsed);
+            list($parsed, $recips) = format_reply_address($headers['to'], $parsed, $delivered_to);
             if ($recips) {
                 if ($msg_cc) {
                     $msg_cc .= ', '.$recips;
@@ -143,7 +144,7 @@ function reply_to_address($headers, $type) {
  * @return string
  */
 if (!hm_exists('format_reply_address')) {
-function format_reply_address($fld, $excluded) {
+function format_reply_address($fld, $excluded, $delivered_to) {
     $addr = process_address_fld($fld);
     $res = array();
     foreach ($addr as $v) {
@@ -155,7 +156,9 @@ function format_reply_address($fld, $excluded) {
             }
         }
         if (!$skip) {
-            $res[] = $v;
+			if ($v['email'] != $delivered_to) {
+				$res[] = $v;
+			}
         }
     }
     if ($res) {
