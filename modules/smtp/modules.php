@@ -412,14 +412,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if (!array_key_exists('smtp_send', $this->request->post)) {
             return;
         }
-
         /* missing field */
         list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
         }
-
         /* defaults */
         $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
         $to = $form['compose_to'];
@@ -431,7 +429,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
-
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
@@ -459,6 +456,17 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             repopulate_compose_form($draft, $this);
             return;
+        }
+
+        /* warn user when sent folder is undefined */
+        $specials = $this->user_config->get('special_imap_folders', array());
+        if(array_key_exists($smtp_id, $specials) || empty($specials)){
+            if(!array_key_exists('sent', $specials[$smtp_id]) || empty($specials[$smtp_id]['sent'])) {
+                // Hm_Debug::add(sprintf('Unable to sent message, no Sent folder have been defined for SMTP server: %s', $smtp_details['server']));
+                Hm_Msgs::add('ERRUnable to send message: Please configure your folder to save sent messages (Sent Folder)');
+                repopulate_compose_form($draft, $this);
+                return;
+            }
         }
 
         /* build message */
