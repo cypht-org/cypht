@@ -180,4 +180,16 @@ Nux_Quick_Services::add('inbox', array(
     )
 ));
 
-
+Nux_Quick_Services::add('gandi', array(
+    'server' => 'mail.gandi.net',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Gandi',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'mail.gandi.net',
+        'port' => 465,
+        'tls' => true
+    )
+));
