@@ -216,10 +216,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
 			$to = explode(', ',$headers['To']);
 			$to_size = sizeof($to);
-            $cc = false;
-            if (array_key_exists('cc', lc_headers($headers))) {
-                $cc = true;
-            }
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
