@@ -156,9 +156,9 @@ function format_reply_address($fld, $excluded, $delivered_to) {
             }
         }
         if (!$skip) {
-			if ($v['email'] != $delivered_to) {
-				$res[] = $v;
-			}
+            if ($v['email'] != $delivered_to) {
+                $res[] = $v;
+            }
         }
     }
     if ($res) {
