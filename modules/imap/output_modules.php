@@ -209,13 +209,12 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= format_list_headers($this);
             }
 
-			$cc = false;
-			if (array_key_exists('cc', lc_headers($headers))) {
-				$cc = true;
-			}
-
-			$to = explode(', ',$headers['To']);
-			$to_size = sizeof($to);
+            $cc = false;
+            if (array_key_exists('cc', lc_headers($headers))) {
+                $cc = true;
+            } 
+            $to = explode(', ', $headers['To']);
+            $to_size = sizeof($to);
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
@@ -223,10 +222,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
                 ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
-				if ($cc || $to_size > 1) {
-					$txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
-				}
-			$txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
+                if ($cc || $to_size > 1) {
+                    $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                }
+            $txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
             }
