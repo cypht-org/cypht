@@ -20,6 +20,7 @@ define('DEBUG_MODE', false);
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('WEB_ROOT', '');
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';

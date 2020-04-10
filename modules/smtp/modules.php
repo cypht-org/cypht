@@ -652,8 +652,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $res = '';
         if ($html == 1) {
-            $res .= '<script type="text/javascript" src="modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
-                '<link href="modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
+            $res .= '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
+                '<link href="'.WEB_ROOT.'modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
                 '<script type="text/javascript">KindEditor.ready(function(K) { K.create("#compose_body", {items:'.
                 "['formatblock', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'bold',".
                 "'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'pagebreak', 'link', 'unlink',".
@@ -661,7 +661,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 "'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', '|',".
                 "'undo', 'redo', 'preview', 'print', '|', 'selectall', 'cut', 'copy', 'paste',".
                 "'plainpaste', 'wordpaste', '|', 'source', 'fullscreen']".
-                ",basePath: 'modules/smtp/assets/kindeditor/'".
+                ",basePath: '".WEB_ROOT."modules/smtp/assets/kindeditor/'".
                 '})});;</script>';
         }
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
@@ -681,9 +681,9 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
             $this->html_safe($body).'</textarea>';
         if ($html == 2) {
-            $res .= '<link href="modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
-                '<script type="text/javascript" src="modules/smtp/assets/markdown/editor.js"></script>'.
-                '<script type="text/javascript" src="modules/smtp/assets/markdown/marked.js"></script>'.
+            $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
+                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
+                '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/marked.js"></script>'.
                 '<script type="text/javascript">var editor = new Editor(); editor.render();</script>';
         }
         $res .= '<table class="uploaded_files">';

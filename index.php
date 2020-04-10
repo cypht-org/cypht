@@ -14,6 +14,7 @@
  */
 define('APP_PATH', '');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('WEB_ROOT', '');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
 define('SITE_ID', '');
