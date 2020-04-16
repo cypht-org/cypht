@@ -18,6 +18,11 @@ php:
   #- '7.3'
     - '7.4'
 
+# start dbs
+services:
+    - mysql
+    - postgresql
+
 # run the phpunit tests, then the selenium tests
 script: sh .travis/run.sh
 
