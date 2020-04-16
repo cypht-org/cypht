@@ -290,21 +290,9 @@ setup_all_tests() {
 
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
-    mysql5.5)
-        setup_all_tests
-    ;;
-    mysql5.4)
-        setup_all_tests
-    ;;
-    sqlite5.6)
-        setup_all_tests
-    ;;
-    postgresql7.1)
-        setup_all_tests
-    ;;
-    postgresql7.2)
-        setup_all_tests
-    ;;
+    #<database><phpversion>)
+        #setup_all_tests
+    #;;
     *)
         setup_unit_tests
     ;;
