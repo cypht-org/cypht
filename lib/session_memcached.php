@@ -26,7 +26,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
      * @param object $request request details
      * @return void
      */
-    public function start($request) {
+    public function start($request, $existing_session=False) {
         $this->db_start($request);
     }
 
