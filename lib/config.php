@@ -339,7 +339,6 @@ class Hm_User_Config_DB extends Hm_Config {
         }
         else {
             $this->decrypt_failed = true;
-            $this->encrypted_str = $data['settings'];
             return false;
         }
     }
