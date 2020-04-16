@@ -371,7 +371,7 @@ class Hm_POP3 extends Hm_POP3_Base {
         $msg_headers = array();
         $current_header = false;
         foreach ($lines as $line) {
-            if (($line{0} == "\t" || $line{0} == " ") && $current_header) {
+            if (($line[0] == "\t" || $line[0] == " ") && $current_header) {
                 $msg_headers[$current_header] .= decode_fld($line);
             }
             else {

@@ -126,23 +126,23 @@ class Hm_IMAP_Base {
             $chunk = '';
 
             /* if we hit a newline exit the loop */
-            if ($line{$i} == "\r" || $line{$i} == "\n") {
+            if ($line[$i] == "\r" || $line[$i] == "\n") {
                 $line_cont = false;
                 break;
             }
 
             /* skip spaces */
-            if ($line{$i} == ' ') {
+            if ($line[$i] == ' ') {
                 continue;
             }
 
             /* capture special chars as "atoms" */
-            elseif ($line{$i} == '*' || $line{$i} == '[' || $line{$i} == ']' || $line{$i} == '(' || $line{$i} == ')') {
-                $chunk = $line{$i};
+            elseif ($line[$i] == '*' || $line[$i] == '[' || $line[$i] == ']' || $line[$i] == '(' || $line[$i] == ')') {
+                $chunk = $line[$i];
             }
         
             /* regex match a quoted string */
-            elseif ($line{$i} == '"') {
+            elseif ($line[$i] == '"') {
                 if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", substr($line, $i), $matches)) {
                     $chunk = substr($matches[1], 1, -1);
                 }
@@ -150,7 +150,7 @@ class Hm_IMAP_Base {
             }
 
             /* IMAP literal */
-            elseif ($line{$i} == '{') {
+            elseif ($line[$i] == '{') {
                 $end = strpos($line, '}');
                 if ($end !== false) {
                     $literal_size  = substr($line, ($i + 1), ($end - $i - 1));

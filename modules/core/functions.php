@@ -209,7 +209,7 @@ if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
     /* check for a dot, max allowed length and standard ASCII characters */
     if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
-        $val{0} == '-' || $val{(strlen($val) - 1)} == '-') {
+        $val[0] == '-' || $val[(strlen($val) - 1)] == '-') {
         return false;
     }
     return true;
@@ -224,7 +224,7 @@ function validate_domain_full($val) {
 if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
     /* check length, "." rules, and for characters > ASCII 127 */
-    if (strlen($val) > 64 || $val{0} == '.' || $val{(strlen($val) -1)} == '.' || strstr($val, '..') ||
+    if (strlen($val) > 64 || $val[0] == '.' || $val[(strlen($val) -1)] == '.' || strstr($val, '..') ||
         preg_match('/[^\x00-\x7F]/',$val)) {
         return false;
     }
@@ -552,6 +552,9 @@ if (!hm_exists('profiles_by_smtp_id')) {
 function profiles_by_smtp_id($profiles, $id) {
     $res = array();
     foreach ($profiles as $vals) {
+        if (!is_array($vals)) {
+            continue;
+        }
         if ($vals['smtp_id'] == $id) {
             $res[] = $vals;
         }

@@ -219,7 +219,7 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_profiles_by_server_id() {
-        $this->assertEquals(array(0), profiles_by_smtp_id(array('smtp_id' => 0), 0));
+        $this->assertEquals(array(), profiles_by_smtp_id(array('smtp_id' => 0), 0));
     }
 }
 class Hm_Test_Core_Functions_Debug extends PHPUnit_Framework_TestCase {
