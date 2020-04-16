@@ -195,7 +195,7 @@ class Hm_Address_Field {
     }
 
     private static function is_quote($string, $i, $quote) {
-        if (in_array($string{$i}, array('"', "'"), true)) {
+        if (in_array($string[$i], array('"', "'"), true)) {
             if (!self::embeded_quote($string, $i)) {
                 $quote = $quote ? false : true;
             }
@@ -211,16 +211,16 @@ class Hm_Address_Field {
             if (self::delimiter_found($string, $i, $quote)) {
                 break;
             }
-            $result .= $string{$i};
+            $result .= $string[$i];
         }
         return array(strrev(trim(trim($result),'"\'')), $i);
     }
 
     private static function embeded_quote($string, $i) {
-        return $i > 0 && $string{$i -1} == '\\';
+        return $i > 0 && $string[$i -1] == '\\';
     }
 
     private static function delimiter_found($string, $i, $quote) {
-        return !$quote && in_array($string{$i}, array(',', ';'), true);
+        return !$quote && in_array($string[$i], array(',', ';'), true);
     }
 }
