@@ -251,12 +251,9 @@ function process_address_fld($fld) {
         }
         if (!$email) {
             foreach ($vals as $i => $v) {
-                $v = trim($v, '<>\'"');
-                if (is_email_address($v)) {
-                    $email = trim($v, '<>\'"');
-                    $email_pos = $i;
-                    break;
-                }
+                $email = trim($v, '<>\'"');
+                $email_pos = $i;
+                break;
             }
         }
         if ($email) {
@@ -269,7 +266,14 @@ function process_address_fld($fld) {
                     $parts['comment'] = $v;
                 }
                 else {
-                    $label[] = $v;
+                    $v = trim($v);
+                    if (is_email_address($v)) {
+                        $email = trim($v, '<>\'"');
+                        $parts['email'] = $email;
+                    } else {
+                        $label[] = $v;
+                    }
+                    
                 }
             }
             $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $label));
