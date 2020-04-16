@@ -222,7 +222,7 @@ install_coveralls() {
 
 # install libsodium
 install_sodium() {
-    if [ "$TRAVIS_PHP_VERSION" != "7.2" ]; then
+    if [ "$TRAVIS_PHP_VERSION" != "7.2" ] && [ "$TRAVIS_PHP_VERSION" != "7.3" ] && [ "$TRAVIS_PHP_VERSION" != "7.4" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
         sudo apt-get install libsodium-dev -y
         pecl channel-update pecl.php.net
