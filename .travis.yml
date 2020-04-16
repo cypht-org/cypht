@@ -1,4 +1,4 @@
-dist: trusty
+#dist: trusty
 sudo: required
 language: php
 
