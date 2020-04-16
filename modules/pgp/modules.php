@@ -107,7 +107,7 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
             return;
         }
         $pub_keys = $this->get('pgp_public_keys', array());
-        $res = '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>';
+        $res = '<script type="text/javascript" src="'.WEB_ROOT.'modules/pgp/assets/openpgp.min.js"></script>';
         $res .= '<div class="pgp_section">';
 
         $res .= '<span class="pgp_sign"><label for="pgp_sign">'.$this->trans('PGP Sign as').'</label>';
@@ -132,7 +132,7 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
 class Hm_Output_pgp_settings_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="pgp_settings"><div class="content_title">'.$this->trans('PGP Settings').'</div>';
-        $res .= '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>';
+        $res .= '<script type="text/javascript" src="'.WEB_ROOT.'modules/pgp/assets/openpgp.min.js"></script>';
         return $res;
     }
 }
@@ -199,7 +199,7 @@ class Hm_Output_pgp_settings_end extends Hm_Output_Module {
  */
 class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
     protected function output() {
-        return '<script type="text/javascript" src="modules/pgp/assets/openpgp.min.js"></script>'.
+        return '<script type="text/javascript" src="'.WEB_ROOT.'modules/pgp/assets/openpgp.min.js"></script>'.
         '<div class="pgp_msg_controls"><select class="pgp_private_keys"></select> <input type="button" class="pgp_btn" value="Decrypt" /></div>'.prompt_for_passhrase($this);
     }
 }

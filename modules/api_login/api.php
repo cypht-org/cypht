@@ -8,6 +8,8 @@
 /* Constants */
 define('DEBUG_MODE', false);
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
+define('VENDOR_PATH', APP_PATH.'vendor/');
+define('WEB_ROOT', '');
 define('CONFIG_FILE', APP_PATH.'hm3.rc');
 
 /* Init the framework */
