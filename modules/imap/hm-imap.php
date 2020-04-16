@@ -1145,7 +1145,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                                 if (preg_match("/^from /i", $line)) {
                                     continue;
                                 }
-                                if (isset($headers[$i]) && trim($line) && ($line{0} == "\t" || $line{0} == ' ')) {
+                                if (isset($headers[$i]) && trim($line) && ($line[0] == "\t" || $line[0] == ' ')) {
                                     $headers[$i][1] .= str_replace("\t", " ", $line);
                                 }
                                 elseif ($split) {
@@ -1552,7 +1552,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $status = $this->check_response($res);
             }
             if ($status) {
-                $this->bust_cache( $this->selected_mailbox['name'] );
+                if (is_array($this->selected_mailbox)) {
+                    $this->bust_cache($this->selected_mailbox['name']);
+                }
                 if ($mailbox) {
                     $this->bust_cache($mailbox);
                 }

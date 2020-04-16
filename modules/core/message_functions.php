@@ -186,40 +186,40 @@ function split_address_fld($str) {
     $substr = '';
 
     while ($pos < $end) {
-        if (!$in_quotes && ($str{$pos} == '(' || $str{$pos} == '"' || $str{$pos} == "'")) {
-            $substr = $str{$pos};
+        if (!$in_quotes && ($str[$pos] == '(' || $str[$pos] == '"' || $str[$pos] == "'")) {
+            $substr = $str[$pos];
             if ($substr == '(') {
                 $in_quotes = ')';
             }
             else {
-                $in_quotes = $str{$pos};
+                $in_quotes = $str[$pos];
             }
         }
-        elseif ($in_quotes && $str{$pos} == $in_quotes) {
-            $substr .= $str{$pos};
+        elseif ($in_quotes && $str[$pos] == $in_quotes) {
+            $substr .= $str[$pos];
             $in_quotes = false;
         }
         elseif ($in_quotes) {
-            $substr .= $str{$pos};
+            $substr .= $str[$pos];
         }
-        elseif (!$in_quotes && ($str{$pos} == ' ' || $str{$pos} == '<')) {
+        elseif (!$in_quotes && ($str[$pos] == ' ' || $str[$pos] == '<')) {
             if ($substr) {
                 $output[$index][] = $substr;
             }
-            if ($str{$pos} == '<') {
-                $substr = $str{$pos};
+            if ($str[$pos] == '<') {
+                $substr = $str[$pos];
             }
             else {
                 $substr = '';
             }
         }
-        elseif (!$in_quotes && ($str{$pos} == ',' || $str{$pos} == ';')) {
+        elseif (!$in_quotes && ($str[$pos] == ',' || $str[$pos] == ';')) {
             $output[$index][] = $substr;
             $substr = '';
             $index++;
         }
         else {
-            $substr .= $str{$pos};
+            $substr .= $str[$pos];
         }
         $pos++;
     }
@@ -265,7 +265,7 @@ function process_address_fld($fld) {
                 if ($i == $email_pos) {
                     continue;
                 }
-                if ($v && $v{0} == '(') {
+                if ($v && $v[0] == '(') {
                     $parts['comment'] = $v;
                 }
                 else {
@@ -495,7 +495,7 @@ function decode_fld($string) {
             $fld = substr($v, 2, -2);
             $charset = strtolower(substr($fld, 0, strpos($fld, '?')));
             $fld = substr($fld, (strlen($charset) + 1));
-            $encoding = $fld{0};
+            $encoding = $fld[0];
             $fld = substr($fld, (strpos($fld, '?') + 1));
             if (strtoupper($encoding) == 'B') {
                 $fld = mb_convert_encoding(base64_decode($fld), 'UTF-8', $charset);
