@@ -20,13 +20,16 @@ setup_memcached() {
     echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 }
 
-# PHP 7+ needs to have the LDAP extension manually enabled
-setup_ldap() {
+# PHP tweaks based on versions
+ssetup_php() {
     if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
         sudo apt-get install php7.0-ldap
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
         sudo apt-get install php7.1-ldap
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
+        sudo apt-get install php7.4-gd
     fi
 }
 
@@ -234,7 +237,7 @@ install_sodium() {
 # setup just what is needed for the phpunit unit tests
 setup_unit_tests() {
     update_repos
-    setup_ldap
+    setup_php
     setup_memcached
     setup_cypht
     install_phpunit
@@ -246,7 +249,7 @@ setup_unit_tests() {
 # setup just what is needed for the selenium UI tests
 setup_ui_tests() {
     update_repos
-    setup_ldap
+    setup_php
     setup_memcached
     setup_cypht
     install_sodium
@@ -260,7 +263,7 @@ setup_ui_tests() {
 # setup both UI and unit tests
 setup_all_tests() {
     update_repos
-    setup_ldap
+    setup_php
     setup_memcached
     setup_user
     install_dovecot
