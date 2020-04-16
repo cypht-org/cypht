@@ -105,6 +105,7 @@ function reply_to_address($headers, $type) {
     $msg_to = '';
     $msg_cc = '';
     $headers = lc_headers($headers);
+    $parsed = array();
     if ($type == 'forward') {
         return $msg_to;
     }
@@ -144,7 +145,7 @@ function reply_to_address($headers, $type) {
  */
 if (!hm_exists('format_reply_address')) {
 function format_reply_address($fld, $excluded) {
-    $addr = process_address_fld($fld);
+    $addr = process_address_fld(trim($fld));
     $res = array();
     foreach ($addr as $v) {
         $skip = false;
