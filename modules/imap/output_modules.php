@@ -531,7 +531,7 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
  */
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('is_mobile') && $this->get('move_copy_controls', false)) {
+        if ($this->get('move_copy_controls', false)) {
             $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location"></div>';
