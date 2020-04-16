@@ -8,6 +8,7 @@
 
 # Add repos
 update_repos() {
+    sudo apt-get install software-properties-common
     sudo add-apt-repository ppa:ondrej/php -y
     sudo apt-get -qq update
 }
@@ -15,6 +16,15 @@ update_repos() {
 # Enable memcached extension
 setup_memcached() {
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
+        sudo apt-get install -y php-memcached
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
+        sudo apt-get install -y php-memcached
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
+        sudo apt-get install -y php-memcached
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
         sudo apt-get install -y php-memcached
     fi
     echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
