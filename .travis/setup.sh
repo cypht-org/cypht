@@ -61,6 +61,12 @@ selenium_config() {
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
+        mv .travis/creds.py-chrome creds.py
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
+        mv .travis/creds.py-chrome creds.py
+    fi
 }
 
 # Configure Cypht
@@ -98,6 +104,12 @@ install_phpunit() {
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
+        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
+        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
         wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
     fi
     chmod +x phpunit
@@ -138,6 +150,12 @@ install_apache() {
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
 
