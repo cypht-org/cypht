@@ -21,7 +21,7 @@ setup_memcached() {
 }
 
 # PHP tweaks based on versions
-ssetup_php() {
+setup_php() {
     if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
         sudo apt-get install php7.0-ldap
     fi
