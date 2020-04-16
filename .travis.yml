@@ -1,4 +1,4 @@
-#dist: bionic
+dist: bionic
 sudo: required
 language: php
 
