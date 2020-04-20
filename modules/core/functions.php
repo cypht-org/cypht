@@ -55,6 +55,7 @@ function interface_langs() {
         'de' => 'German',
         'es' => 'Spanish',
         'fr' => 'French',
+        'et' => 'Estonian',
         'it' => 'Italian',
         'ru' => 'Russian',
         'ro' => 'Romanian',
