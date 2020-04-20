@@ -2,8 +2,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* Hello from Herurg from Russia with LOVE! ;) */
-
 return array(
     'interface_lang' => 'az',
     'interface_direction' => 'ltr',
