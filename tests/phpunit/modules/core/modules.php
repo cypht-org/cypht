@@ -1104,7 +1104,7 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-br">Brazilian Portuguese</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

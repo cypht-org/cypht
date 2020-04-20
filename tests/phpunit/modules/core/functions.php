@@ -11,7 +11,7 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_interface_langs() {
-        $this->assertEquals(12, count(interface_langs()));
+        $this->assertEquals(13, count(interface_langs()));
     }
     /**
      * @preserveGlobalState disabled
