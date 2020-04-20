@@ -62,7 +62,7 @@ function interface_langs() {
         'nl' => 'Dutch',
         'ja' => 'Japanese',
         'hu' => 'Hungarian',
-        'pt-br' => 'Brazilian Portuguese',
+        'pt-BR' => 'Brazilian Portuguese',
         'az' => 'Azerbaijani',
     );
 }}
