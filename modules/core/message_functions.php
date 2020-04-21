@@ -35,9 +35,8 @@ function format_msg_html($str, $images=false) {
  */
 if (!hm_exists('convert_html_to_text')) {
 function convert_html_to_text($html) {
-    require_once VENDOR_PATH.'html2text/html2text/src/Html2Text.php';
-    $html = new \Html2Text\Html2Text($html, array('do_links' => 'table', 'width' => 0));
-    return $html->getText();
+    $html = new HTMLToText($html);
+    return $html->text;
 }}
 
 /**
@@ -509,3 +508,42 @@ function decode_fld($string) {
     }
     return trim($string);
 }}
+
+/**
+ * @subpackage core/class
+ */
+class HTMLToText {
+
+    public $text = '';
+    private $current = false;
+    private $blocks = array('table', 'li', 'div', 'h1', 'h2', 'br', 'h3', 'h4', 'h5', 'p', 'tr');
+    private $skips = array('head', 'script', 'style');
+
+    function __construct($html) {
+        $doc = new DOMDocument();
+        @$doc->loadHTML($html);
+        if (trim($html) && $doc->hasChildNodes()) {
+            $this->parse_nodes($doc->childNodes);
+        }
+        $this->text = trim(strip_tags(html_entity_decode(preg_replace("/\n{2,}/m",
+            "\n\n", $this->text), ENT_QUOTES, "UTF-8")));
+    }
+
+    function block($tag) {
+        in_array($tag, $this->blocks) && $this->current != $tag ? $this->text .= "\n" : false;
+        $this->current = $tag;
+    }
+
+    function parse_nodes($nodes) {
+        $trims = chr(160).chr(194)." \t\n\r\0\x0B";
+        foreach ($nodes as $node) {
+            if (!in_array($node->nodeName, $this->skips)) {
+                $this->block($node->nodeName);
+                if ($node->nodeName == '#text' && trim($node->textContent, $trims)) {
+                    $this->text .= trim($node->textContent, $trims)." ";
+                }
+                $node->hasChildNodes() ? $this->parse_nodes($node->childNodes) : false;
+            }
+        }
+    }
+}
