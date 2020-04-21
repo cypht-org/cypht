@@ -846,7 +846,8 @@ function get_imap_mime_extension($type, $subtype) {
 if (!hm_exists('get_imap_part_name')) {
 function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
     $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
-    if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) && array_key_exists('attachment', $struct['file_attributes'])) {
+    if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) &&
+        array_key_exists('attachment', $struct['file_attributes']) && is_array($struct['file_attributes']['attachment'])) {
         for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
             if (strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['file_attributes']['attachment'])) {
