@@ -105,18 +105,22 @@ function reply_to_address($headers, $type) {
     $msg_cc = '';
     $headers = lc_headers($headers);
     $parsed = array();
+    $delivered_address = array('email' => $headers['delivered-to'], 
+        'comment' => '', 'label' => '');
+
     if ($type == 'forward') {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
         if (array_key_exists($fld, $headers)) { 
-            list($parsed, $msg_to) = format_reply_address($headers[$fld], array());
+            list($parsed, $msg_to) = format_reply_address($headers[$fld], $parsed);
             if ($msg_to) {
                 break;
             }
         }
     }
     if ($type == 'reply_all') {
+        $parsed[] = $delivered_address;
         if (array_key_exists('cc', $headers)) {
             list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
             $parsed += $cc_parsed;
