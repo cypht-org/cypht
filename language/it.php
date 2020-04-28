@@ -524,7 +524,7 @@ return array(
     'Inline' => false,
     'Right' => false,
     'Messages per page for IMAP folder views' => false,
-    'Arrival' => false,
+    'Arrival Date' => false,
     'Add a feed' => false,
     'Apply' => false,
     'Azerbaijani' => false,
