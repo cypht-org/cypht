@@ -121,6 +121,12 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             $msg['server_name'] = $server_details['name'];
             $msg_list[] = $msg;
         }
+        usort($msg_list, function($a, $b) {
+            if (!array_key_exists('internal_date', $a) || (!array_key_exists('internal_date', $b))) {
+                return 0;
+            }
+            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
+        });
         return array_slice($msg_list, 0, $limit);
     }
 
