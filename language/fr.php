@@ -53,7 +53,7 @@ return array(
     'Source' => 'Source',
     'From' => 'De',
     'Subject' => 'Objet',
-    'Sent Date' => 'Date d\'envoie',
+    'Sent Date' => 'Date d\'envoi',
     'IMAP Servers' => 'Serveurs IMAP',
     'Add an IMAP Server' => 'Ajouter un serveur IMAP',
     'Account name' => 'Nom du compte',
