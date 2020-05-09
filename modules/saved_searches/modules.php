@@ -134,6 +134,21 @@ class Hm_Output_update_search_icon extends Hm_Output_Module {
     }
 }
 
+
+/**
+ * @subpackage savedsearches/output
+ */
+class Hm_Output_update_search_label_icon extends Hm_Output_Module {
+    protected function output() {
+        $style = '';
+        if (!$this->get('search_name')) {
+            $style = 'style="display: none;"';
+        }
+        return '<a href="" '.$style.' class="update_search_label" title="'.$this->trans('Update saved search label').'"><img width="20" height="20" alt="'.
+            $this->trans('Update saved search label').'" src="'.Hm_Image_Sources::$edit.'" /></a>';
+    }
+}
+
 /**
  * @subpackage savedsearches/output
  */

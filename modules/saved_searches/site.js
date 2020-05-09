@@ -78,5 +78,6 @@ if (hm_page_name() == 'search') {
     }
     else if ($('.search_terms').val().length) {
         $('.save_search').show();
+        $('.update_search_label').show()
     }
 }

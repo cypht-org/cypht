@@ -10,7 +10,7 @@ add_handler('ajax_save_search', 'load_user_data', true, 'core');
 add_handler('ajax_save_search', 'save_search', true, 'core');
 add_handler('ajax_save_search', 'language', true);
 add_handler('ajax_save_search', 'date', true, 'core');
-add_handler('ajax_save_search', 'http_headers', true, 'core');
+add_handler('jnyeyoonipzbdpjs', 'http_headers', true, 'core');
 add_output('ajax_save_search', 'filter_saved_search_result', true);
 
 add_handler('ajax_update_search', 'login', false, 'core');
@@ -35,9 +35,12 @@ add_output('ajax_hm_folders', 'search_folders',  true, 'saved_searches', 'folder
 
 add_handler('search', 'save_searches_data', true, 'saved_searches', 'load_user_data', 'after');
 add_output('search', 'save_search_icon', true, 'saved_searches', 'search_results_table_end', 'after');
+add_output('search', 'update_search_label_icon', true, 'saved_searches', 'search_form_content', 'before');
 add_output('search', 'search_name_fld', true, 'saved_searches', 'search_form_content', 'after');
 add_output('search', 'delete_search_icon', true, 'saved_searches', 'search_form_end', 'after');
 add_output('search', 'update_search_icon', true, 'saved_searches', 'search_form_end', 'after');
+
+
 
 return array(
     'allowed_pages' => array(
