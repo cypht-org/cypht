@@ -256,3 +256,8 @@ div.unseen, .unseen .subject { font-weight: 700; }
 @media print {
     .sys_messages, .next, .prev, .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
 }
+
+
+.update_search_label_field { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
+/*.list_src { color: #666; margin-bottom: 10px; }*/
+.update_saved_search_title { color: #666; font-size: 110%; padding: 5px; margin-bottom: 10px; }

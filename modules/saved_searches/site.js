@@ -73,6 +73,7 @@ if (hm_page_name() == 'search') {
     $('.save_search').on("click", save_search);
     $('.update_search').on("click", update_search);
     $('.delete_search').on("click", delete_search);
+    $('.update_search_label').on("click", function() { $('.update_search_label_field').toggle(); return false; });
     if ($('.search_name').val().length) {
         Hm_Utils.save_to_local_storage('formatted_search_data', '');
     }
