@@ -26,6 +26,9 @@ class Hm_Request {
     /* sanitized $_SERVER variables */
     public $server = array(); 
 
+    /* $_ENV variables (fallback for missing $_SERVER vals) */
+    private $env = array();
+
     /* request type. either AJAX or HTTP */
     public $type = '';
 
@@ -95,6 +98,7 @@ class Hm_Request {
     private function filter_request_input() {
         if (array_key_exists('allowed_server', $this->filters)) {
             $this->server = $this->filter_input(INPUT_SERVER, $this->filters['allowed_server']);
+            $this->env = $this->filter_input(INPUT_ENV, $this->filters['allowed_server']);
         }
         if (array_key_exists('allowed_post', $this->filters)) {
             $this->post = $this->filter_input(INPUT_POST, $this->filters['allowed_post']);
@@ -121,6 +125,10 @@ class Hm_Request {
         }
         if (array_key_exists('REQUEST_METHOD', $this->server)) {
             $this->method = $this->server['REQUEST_METHOD'];
+        }
+        elseif (array_key_exists('REQUEST_METHOD', $this->env)) {
+            $this->method = $this->env['REQUEST_METHOD'];
+            $this->server = $this->env;
         }
         $this->get_request_type();
         $this->is_tls();
