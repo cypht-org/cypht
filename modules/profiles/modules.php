@@ -116,7 +116,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         $data = $this->get('profiles');
         $profile = array(
-            'name' => $form['profile_name'],
+            'name' => html_entity_decode($form['profile_name'], ENT_QUOTES),
             'sig' => $sig,
             'smtp_id' => $form['profile_smtp'],
             'replyto' => $form['profile_replyto'],

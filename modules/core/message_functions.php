@@ -196,7 +196,12 @@ function split_address_fld($str) {
 
     while ($pos < $end) {
         if (!$in_quotes && ($str[$pos] == '(' || $str[$pos] == '"' || $str[$pos] == "'")) {
-            $substr = $str[$pos];
+            if (strlen($substr) > 0) {
+                $substr .= $str[$pos];
+            }
+            else {
+                $substr = $str[$pos];
+            }
             if ($substr == '(') {
                 $in_quotes = ')';
             }
@@ -281,7 +286,7 @@ function process_address_fld($fld) {
                     $label[] = $v;
                 }
             }
-            $parts['label'] = str_replace(array('"', "'"), '', implode(' ', $label));
+            $parts['label'] = trim(implode(' ', $label), '\'"');
             $res[] = $parts;
         }
     }

@@ -154,7 +154,7 @@ class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
             array (
                 'email' => 'blah@tests.com',
                 'comment' => '(comment here)',
-                'label' => 'stuff foo',
+                'label' => 'stuff" foo',
             ),
             array(
                 'email' => 'foo@blah.com',
