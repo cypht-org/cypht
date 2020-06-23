@@ -329,11 +329,9 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
         $res .= '<div class="folder_row">';
         $res .= '<div class="sp_description">'.$this->trans('If set, archived messages for this account will be moved to this folder').'</div>';
         $res .= '</div><div class="folder_row"><a href="#" class="select_archive_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_archive"></span>';
-        $res .= '<a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></div>';
-        $res .= '<ul class="folders archive_folder_select"><li class="archive_title">';
-        $res .= '</li></ul>';
+        $res .= $this->trans('Select Folder').'</a>: <span class="selected_archive"></span></div>';
+        $res .= '<ul class="folders archive_folder_select"><li class="archive_title"><a href="#" class="close">';
+        $res .= $this->trans('Cancel').'</a></li></ul>';
         $res .= '<input type="hidden" value="" id="archive_source" />';
         $res .= ' <input type="button" id="set_archive_folder" value="'.$this->trans('Update').'" /> ';
         $res .= ' <input type="button" id="clear_archive_folder" value="'.$this->trans('Remove').'" /><br /><br />';
