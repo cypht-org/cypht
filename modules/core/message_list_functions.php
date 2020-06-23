@@ -407,15 +407,15 @@ if (!hm_exists('update_search_label_field')) {
 function update_search_label_field($search_term, $output_mod) {
     $res = '<div class="update_search_label_field">';
     $res .= '<div class="update_saved_search_title">'.$output_mod->html_safe('Update saved search label') .'</div>';
-    $res .= '<form method="get">
+    $res .= '<div">
     <input type="hidden" name="page" value="search">
     <input type="hidden" name="search_terms" value="'. $search_term .'">
     <label class="screen_reader" for="search_terms_label">Search Terms</label>
     <input required="" placeholder="New search terms label" id="search_terms_label" type="search" class="search_terms_label" name="search_terms_label">
     <div>
-        <input type="submit" class="search_label_update" value="Update">
+        <input type="button" class="search_label_update" value="Update">
     </div>
-    </form>';
+    </div>';
     $res .= '</div>';
     return $res;
 }}
