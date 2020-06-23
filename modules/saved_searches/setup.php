@@ -31,7 +31,7 @@ add_output('ajax_delete_search', 'filter_saved_search_result', true);
 
 add_handler('ajax_update_save_search_label', 'login', false, 'core');
 add_handler('ajax_update_save_search_label', 'load_user_data', true, 'core');
-add_handler('ajax_update_save_search_label', 'delete_search', true, 'core');
+add_handler('ajax_update_save_search_label', 'update_save_search_label', true, 'core');
 add_handler('ajax_update_save_search_label', 'language', true);
 add_handler('ajax_update_save_search_label', 'date', true, 'core');
 add_handler('ajax_update_save_search_label', 'http_headers', true, 'core');
@@ -54,7 +54,8 @@ return array(
     'allowed_pages' => array(
         'ajax_save_search',
         'ajax_update_search',
-        'ajax_delete_search'
+        'ajax_delete_search',
+        'ajax_update_save_search_label',
     ),
     'allowed_get' => array(
         'search_name' => FILTER_SANITIZE_STRING
@@ -63,7 +64,8 @@ return array(
         'search_name' => FILTER_SANITIZE_STRING,
         'search_terms' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
-        'search_since' => FILTER_SANITIZE_STRING
+        'search_since' => FILTER_SANITIZE_STRING,
+        'search_terms_label' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'saved_search_result' => array(FILTER_VALIDATE_INT, false)

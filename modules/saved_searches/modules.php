@@ -76,6 +76,26 @@ class Hm_Handler_delete_search extends Hm_Handler_Module {
     }
 }
 
+
+ /**
+ * @subpackage savedsearches/handler
+ */
+class Hm_Handler_update_save_search_label extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('search_name', 'search_terms_label'));
+        if ($success) {
+            $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
+            if ($searches->rename($form['search_name'], $form['search_terms_label'])) {
+                $this->session->record_unsaved('Update a saved search label');
+                $this->user_config->set('saved_searches', $searches->dump());
+                $this->session->set('user_data', $this->user_config->dump());
+                $this->out('update_save_search_label', true);
+                Hm_Msgs::add('Saved search label updated');
+            }
+        }
+    }
+}
+
  /**
  * @subpackage savedsearches/handler
  */
@@ -113,7 +133,7 @@ class Hm_Output_search_name_fld extends Hm_Output_Module {
  */
 class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('saved_search') || $this->get('updated_search') || $this->get('deleted_search')) {
+        if ($this->get('saved_search') || $this->get('updated_search') || $this->get('deleted_search') || $this->get('update_save_search_label')) {
             $this->out('saved_search_result', 1);
         }
         else {
@@ -260,6 +280,14 @@ class Hm_Saved_Searches {
         }
         $this->searches = $new_searches;
         return count($new_searches) !== count($old_searches);
+    }
+    public function rename($old_name, $new_name) {
+        if(array_key_exists($old_name, $this->searches)) {
+            $this->searches[$new_name] = $this->searches[$old_name];
+            unset($this->searches[$old_name]);
+            return true;
+        }
+        return false;
     }
 }
 

@@ -48,13 +48,13 @@ var save_search = function(event) {
 
 
 var update_save_search_label = function(event) {
-    console.log("search label update");
     event.preventDefault();
     if($('.search_label_update').val().length) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_update_save_search_label'},
-            {'name': 'search_terms_label', 'value': $('.search_terms_label').val()}]
-            search_save_results
+            {'name': 'search_terms_label', 'value': $('.search_terms_label').val()},
+            {'name': 'search_name', 'value': $('.search_terms').val()}],
+            update_save_search_label_results
         );
     }
     return false;
