@@ -85,7 +85,7 @@ var search_save_results = function(res) {
 
 var update_save_search_label_results = function(res) {
     if(res.saved_search_result) {
-        $('.update_save_search_label_results').toggle();
+        $('.update_search_label_field').toggle();
         $('.search_terms_label').val("");
         Hm_Folders.reload_folders(true, '.search_folders');
     }
