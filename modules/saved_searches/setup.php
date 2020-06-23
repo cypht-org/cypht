@@ -29,6 +29,14 @@ add_handler('ajax_delete_search', 'date', true, 'core');
 add_handler('ajax_delete_search', 'http_headers', true, 'core');
 add_output('ajax_delete_search', 'filter_saved_search_result', true);
 
+add_handler('ajax_update_save_search_label', 'login', false, 'core');
+add_handler('ajax_update_save_search_label', 'load_user_data', true, 'core');
+add_handler('ajax_update_save_search_label', 'delete_search', true, 'core');
+add_handler('ajax_update_save_search_label', 'language', true);
+add_handler('ajax_update_save_search_label', 'date', true, 'core');
+add_handler('ajax_update_save_search_label', 'http_headers', true, 'core');
+add_output('ajax_update_save_search_label', 'filter_saved_search_result', true);
+
 
 add_handler('ajax_hm_folders', 'saved_search_folder_data',  true, 'saved_searches', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'search_folders',  true, 'saved_searches', 'folder_list_content_start', 'before');
