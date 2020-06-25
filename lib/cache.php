@@ -231,6 +231,7 @@ class Hm_Redis {
         $this->port = $config->get('redis_port', false);
         $this->enabled = $config->get('enable_redis', false);
         $this->db_index = $config->get('redis_index', 0);
+        $this->socket = $config->get('redis_socket', '');
         $this->supported = Hm_Functions::class_exists('Redis');
         $this->config = $config;
     }
@@ -241,7 +242,13 @@ class Hm_Redis {
     private function connect() {
         $this->cache_con = Hm_Functions::redis();
         try {
-            if ($this->cache_con->connect($this->server, $this->port)) {
+            if ($this->socket) {
+                $con = $this->cache_con->connect($this->socket);
+            }
+            else {
+                $con = $this->cache_con->connect($this->server, $this->port);
+            }
+            if ($con) {
                 $this->auth();
                 $this->cache_con->select($this->db_index);
                 return true;
