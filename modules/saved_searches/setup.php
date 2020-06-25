@@ -10,7 +10,7 @@ add_handler('ajax_save_search', 'load_user_data', true, 'core');
 add_handler('ajax_save_search', 'save_search', true, 'core');
 add_handler('ajax_save_search', 'language', true);
 add_handler('ajax_save_search', 'date', true, 'core');
-add_handler('jnyeyoonipzbdpjs', 'http_headers', true, 'core');
+add_handler('ajax_save_search', 'http_headers', true, 'core');
 add_output('ajax_save_search', 'filter_saved_search_result', true);
 
 add_handler('ajax_update_search', 'login', false, 'core');
