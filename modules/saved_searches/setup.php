@@ -65,9 +65,11 @@ return array(
         'search_terms' => FILTER_SANITIZE_STRING,
         'search_fld' => FILTER_SANITIZE_STRING,
         'search_since' => FILTER_SANITIZE_STRING,
-        'search_terms_label' => FILTER_SANITIZE_STRING
+        'search_terms_label' => FILTER_SANITIZE_STRING,
+        'old_search_terms_label' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
-        'saved_search_result' => array(FILTER_VALIDATE_INT, false)
+        'saved_search_result' => array(FILTER_VALIDATE_INT, false),
+        'new_saved_search_label' => array(FILTER_SANITIZE_STRING, false),
     ),
 );

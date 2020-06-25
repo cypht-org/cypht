@@ -82,13 +82,14 @@ class Hm_Handler_delete_search extends Hm_Handler_Module {
  */
 class Hm_Handler_update_save_search_label extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('search_name', 'search_terms_label'));
+        list($success, $form) = $this->process_form(array('search_name', 'search_terms_label', 'old_search_terms_label'));
         if ($success) {
             $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
-            if ($searches->rename($form['search_name'], $form['search_terms_label'])) {
+            if ($searches->rename($form['old_search_terms_label'], $form['search_terms_label'])) {
                 $this->session->record_unsaved('Update a saved search label');
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
+                $this->out('new_saved_search_label', $form['search_terms_label']);
                 $this->out('update_save_search_label', true);
                 Hm_Msgs::add('Saved search label updated');
             }

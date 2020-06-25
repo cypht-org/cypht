@@ -410,7 +410,9 @@ function update_search_label_field($search_term, $output_mod) {
     $res .= '<div">
     <input type="hidden" name="page" value="search">
     <input type="hidden" name="search_terms" value="'. $search_term .'">
-    <label class="screen_reader" for="search_terms_label">Search Terms</label>
+    <label class="screen_reader" for="search_terms_label">Current Search Label</label>
+    <input required="" disabled id="old_search_terms_label" type="search" value="' . $search_term . '" class="old_search_terms_label" name="old_search_terms_label">
+    <label class="screen_reader" for="search_terms_label">New Search Terms</label>
     <input required="" placeholder="New search terms label" id="search_terms_label" type="search" class="search_terms_label" name="search_terms_label">
     <div>
         <input type="button" class="search_label_update" value="Update">

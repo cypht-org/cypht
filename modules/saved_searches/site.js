@@ -53,6 +53,7 @@ var update_save_search_label = function(event) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_update_save_search_label'},
             {'name': 'search_terms_label', 'value': $('.search_terms_label').val()},
+            {'name': 'old_search_terms_label', 'value': $('.old_search_terms_label').val()},
             {'name': 'search_name', 'value': $('.search_terms').val()}],
             update_save_search_label_results
         );
@@ -87,6 +88,7 @@ var update_save_search_label_results = function(res) {
     if(res.saved_search_result) {
         $('.update_search_label_field').toggle();
         $('.search_terms_label').val("");
+        $('.old_search_terms_label').val(res.new_saved_search_label);
         Hm_Folders.reload_folders(true, '.search_folders');
     }
 }
