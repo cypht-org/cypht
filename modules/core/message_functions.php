@@ -181,119 +181,6 @@ function format_reply_address($fld, $excluded) {
 }}
 
 /**
- * Split an E-mail address header in to a list
- * @param string $str value to split
- * @return array
- */
-if (!hm_exists('split_address_fld')) {
-function split_address_fld($str) {
-    $output = array();
-    $in_quotes = false;
-    $pos = 0;
-    $index = 0;
-    $end = strlen($str);
-    $substr = '';
-
-    while ($pos < $end) {
-        if (!$in_quotes && ($str[$pos] == '(' || $str[$pos] == '"' || $str[$pos] == "'")) {
-            if (strlen($substr) > 0) {
-                $substr .= $str[$pos];
-            }
-            else {
-                $substr = $str[$pos];
-            }
-            if ($substr == '(') {
-                $in_quotes = ')';
-            }
-            else {
-                $in_quotes = $str[$pos];
-            }
-        }
-        elseif ($in_quotes && $str[$pos] == $in_quotes) {
-            $substr .= $str[$pos];
-            $in_quotes = false;
-        }
-        elseif ($in_quotes) {
-            $substr .= $str[$pos];
-        }
-        elseif (!$in_quotes && ($str[$pos] == ' ' || $str[$pos] == '<')) {
-            if ($substr) {
-                $output[$index][] = $substr;
-            }
-            if ($str[$pos] == '<') {
-                $substr = $str[$pos];
-            }
-            else {
-                $substr = '';
-            }
-        }
-        elseif (!$in_quotes && ($str[$pos] == ',' || $str[$pos] == ';')) {
-            $output[$index][] = $substr;
-            $substr = '';
-            $index++;
-        }
-        else {
-            $substr .= $str[$pos];
-        }
-        $pos++;
-    }
-    $output[$index][] = $substr;
-    return $output;
-}}
-
-/**
- * Break up an address field into something usable
- * @param string $fld address field to parse
- * @return array
- */
-if (!hm_exists('process_address_fld')) {
-function process_address_fld($fld) {
-    $res = array();
-    $data = split_address_fld($fld);
-
-    foreach ($data as $vals) {
-        $email = false;
-        $email_pos = false;
-        $label = array();
-        $parts = array('email' => '', 'comment' => '', 'label' => '');
-        foreach ($vals as $i => $v) {
-            if (is_email_address($v)) {
-                $email = trim($v, '<>\'"');
-                $email_pos = $i;
-                break;
-            }
-        }
-        if (!$email) {
-            foreach ($vals as $i => $v) {
-                $v = trim($v, '<>\'"');
-                if (is_email_address($v)) {
-                    $email = trim($v, '<>\'"');
-                    $email_pos = $i;
-                    break;
-                }
-            }
-        }
-        if ($email) {
-            $parts['email'] = $email;
-            foreach ($vals as $i => $v) {
-                if ($i == $email_pos) {
-                    continue;
-                }
-                if ($v && $v[0] == '(') {
-                    $parts['comment'] = $v;
-                }
-                else {
-                    $label[] = $v;
-                }
-            }
-            $parts['label'] = trim(implode(' ', $label), '\'"');
-            $res[] = $parts;
-        }
-    }
-    return $res;
-}}
-
-/**
  * Get reply to subject
  * @subpackage core/functions
  * @param array $headers message headers
@@ -561,3 +448,98 @@ class HTMLToText {
         }
     }
 }
+
+/**
+ * trim a potential E-mail value
+ * @param $val string E-mail value
+ * @return string trimmed value
+ */
+if (!hm_exists('addr_split')) {
+function trim_email($val) {
+    $seps = array(',', ';');
+    $misc = array('"', "'", '>', '<');
+    return trim($val, implode(array_merge($misc, $seps)));
+}}
+
+/**
+ * Split an address field
+ * @param $str string field value
+ * @param $seps array break chars
+ * @return array results
+ */
+if (!hm_exists('addr_split')) {
+function addr_split($str, $seps = array(',', ';')) {
+    $str = preg_replace('/(\s){2,}/', ' ', $str);
+    $max = strlen($str);
+    $word = '';
+    $words = array();
+    $capture = false;
+    $capture_chars = array('"' => '"', '(' => ')', '<' => '>');
+    for ($i=0;$i<$max;$i++) {
+        if ($capture && $capture_chars[$capture] == $str[$i]) {
+            $capture = false;
+        }
+        elseif (!$capture && in_array($str[$i], array_keys($capture_chars))) {
+            $capture = $str[$i];
+        }
+        
+        if (!$capture && in_array($str[$i], $seps)) {
+            $words[] = trim($word);
+            $word = '';
+        }
+        else {
+            $word .= $str[$i];
+        }
+    }
+    $words[] = trim($word);
+    return $words;
+}}
+
+/**
+ * Parse an address field
+ * @param $str string field value
+ * @return array results
+ */
+if (!hm_exists('addr_parse')) {
+function addr_parse($str) {
+    $label = array();
+    $email = '';
+    $comment = array();
+    foreach (addr_split($str, array(' ')) as $token) {
+        if (is_email_address(trim_email($token))) {
+            $email = trim_email($token);
+        }
+        else {
+            $label[] = $token;
+        }
+    }
+    $label = implode(' ', $label);
+    if (preg_match('/\([^)]+\)/', $label, $matches)) {
+        foreach ($matches as $match) {
+            $comment[] = $match;
+            $label = str_replace($match, '', $label);
+        }
+        $comment = implode(',', $comment);
+    }
+    else {
+        $comment = '';
+    }
+    return array('email' => $email, 'label' => trim($label, ' \'"'), 'comment' => $comment);
+}}
+
+/**
+ * Parse an address field
+ * @param $fld string field value
+ * @return array results
+ */
+if (!hm_exists('process_address_fld')) {
+function process_address_fld($fld) {
+    $res = array();
+    foreach (addr_split($fld) as $str) {
+        $addr = addr_parse($str);
+        if ($addr['email']) {
+            $res[] = $addr;
+        }
+    }
+    return $res;
+}}
