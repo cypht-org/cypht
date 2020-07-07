@@ -176,7 +176,6 @@ var Hm_Ajax_Request = function() { return {
         });
         xhr.addEventListener('abort', function() {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
-            config.callback.fail(xhr);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
 
         });
