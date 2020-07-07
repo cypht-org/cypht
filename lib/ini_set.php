@@ -21,6 +21,9 @@ ini_set('session.use_strict_mode', 1);
 
 /* limit session cookie to HTTP only */
 ini_set('session.cookie_httponly', 1);
+if ((float) substr(phpversion(), 0, 3) >= 7.3) {
+    ini_set('session.cookie_samesite', 'Strict');
+}
 
 /* HTTPS required for session cookie */
 if (!$config->get('disable_tls', false)) {
@@ -62,6 +65,6 @@ foreach (array('app_data_dir', 'user_settings_dir', 'attachment_dir') as $dir) {
         $base .= PATH_SEPARATOR.$config->get($dir, false);
     }
 }
-if (!defined('HHVM_VERSION') && !$disabled) {
+if (!$disabled) {
     ini_set('open_basedir', $base);
 }
