@@ -246,7 +246,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
 .mobile .page_links { font-size: 150%; }
 .mobile .page_links a img { width: 24px; height: 24px; }
-.mobile .toggle_link { padding: 5px !important; line-height: auto !important; margin-left: 5px !important; }
+.mobile .toggle_link { padding: 5px !important; line-height: normal !important; margin-left: 5px !important; }
 .mobile .toggle_link img { vertical-align: -3px !important; width: 16px; height: 16px; }
 .mobile .compose_form { padding: 0px !important; padding-left: 5px !important; width: 92% !important; }
 .mobile .toggle_recipients { top: 8px !important; right: 0px !important; }
