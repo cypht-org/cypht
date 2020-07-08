@@ -535,11 +535,21 @@ function addr_parse($str) {
 if (!hm_exists('process_address_fld')) {
 function process_address_fld($fld) {
     $res = array();
+    $count = 0;
+    $pre = false;
     foreach (addr_split($fld) as $str) {
         $addr = addr_parse($str);
         if ($addr['email']) {
-            $res[] = $addr;
+            if ($pre) {
+                $addr['label'] = $pre.' '.$addr['label'];
+                $pre = false;
+            }
+            $res[$count] = $addr;
         }
+        elseif ($addr['label']) {
+            $pre = $addr['label'];
+        }
+        $count++;
     }
     return $res;
 }}
