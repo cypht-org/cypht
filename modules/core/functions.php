@@ -517,6 +517,18 @@ function start_page_opts() {
 }}
 
 /**
+ * List of valid default sort order options
+ * @return array
+ */
+if (!hm_exists('default_sort_order_opts')) {
+function default_sort_order_opts() {
+    return array(
+        'arrival' => 'Arrival Date',
+        'date' => 'Sent Date',
+    );
+}}
+
+/**
  * See if a host + username is already in a server list
  * @param class $list class to check
  * @param int $id server id to get hostname from

@@ -202,8 +202,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $from = '[No From]';
             $nofrom = ' nofrom';
         }
-        $timestamp = strtotime($msg['internal_date']);
-        $date = translate_time_str(human_readable_interval($msg['internal_date']), $output_module);
+        if ($list_sort == 'date') {
+            $date_field = 'date';
+        } else {
+            $date_field = 'internal_date';
+        }
+        $timestamp = strtotime($msg[$date_field]);
+        $date = translate_time_str(human_readable_interval($msg[$date_field]), $output_module);
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';
@@ -908,9 +913,10 @@ function imap_authed($imap) {
  * @subpackage imap/functions
  */
 if (!hm_exists('process_sort_arg')) {
-function process_sort_arg($sort) {
+function process_sort_arg($sort, $default = 'arrival') {
     if (!$sort) {
-        return array('ARRIVAL', true);
+        $default = strtoupper($default);
+        return array($default, true);
     }
     $rev = false;
     if (substr($sort, 0, 1) == '-') {

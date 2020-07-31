@@ -26,8 +26,14 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                 'unflagged' => $this->trans('Unflagged'), 'answered' => $this->trans('Answered'),
                 'unanswered' => $this->trans('Unanswered'));
 
-            $sorts = array('arrival' => $this->trans('Arrival Date'), 'from' => $this->trans('From'),
-                'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'date' => $this->trans('Sent Date'));
+            $default_sort_order = $this->get('default_sort_order');
+            if ($default_sort_order == 'arrival') {
+                $sorts = array('arrival' => $this->trans('Arrival Date'), 'from' => $this->trans('From'),
+                    'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'date' => $this->trans('Sent Date'));
+            } else {
+                $sorts = array('date' => $this->trans('Sent Date'), 'from' => $this->trans('From'),
+                    'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'arrival' => $this->trans('Arrival Date'));
+            }
 
             if (!$this->get('is_mobile', false)) {
                 $custom = '<form id="imap_filter_form" method="GET">';
