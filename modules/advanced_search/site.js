@@ -384,6 +384,9 @@ var send_requests = function(requests) {
                     $('.core_msg_control').off('click');
                     $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
                     Hm_Message_List.set_checkbox_callback();
+                    if (typeof check_select_for_imap !== 'undefined') {
+                        check_select_for_imap();
+                    }
                 }
                 Hm_Message_List.check_empty_list();
             },
@@ -541,6 +544,9 @@ $(function() {
             $('.core_msg_control').off('click');
             $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
             Hm_Message_List.set_checkbox_callback();
+            if (typeof check_select_for_imap !== 'undefined') {
+                check_select_for_imap();
+            }
         }
         Hm_Message_List.check_empty_list();
     }
