@@ -165,8 +165,9 @@ class Hm_Output_update_search_label_icon extends Hm_Output_Module {
         if (!$this->get('search_name')) {
             $style = 'style="display: none;"';
         }
-        return '<a href="" '.$style.' class="update_search_label" title="'.$this->trans('Update saved search label').'"><img width="20" height="20" alt="'.
+        $res = '<a href="" class="update_search_label" title="'.$this->trans('Update saved search label').'"><img '.$style.' width="20" height="20" alt="'.
             $this->trans('Update saved search label').'" src="'.Hm_Image_Sources::$edit.'" /></a>' . update_search_label_field($this->get('search_name'), $this);
+        return $res;
     }
 }
 
