@@ -102,8 +102,9 @@ function message_list_meta($input, $output_mod) {
  */
 if (!hm_exists('combined_sort_dialog')) {
 function combined_sort_dialog($mod) {
+    $dt_sort = $mod->get('default_sort_order', 'arrival');
     $sorts = array(
-        '4' => $mod->trans('Arrival'),
+        '4' => $dt_sort == 'arrival' ? $mod->trans('Arrival Date') : $mod->trans('Sent Date'),
         '2' => $mod->trans('From'),
         '3' => $mod->trans('Subject'),
     );

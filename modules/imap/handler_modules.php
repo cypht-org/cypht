@@ -449,7 +449,7 @@ class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
      * retrieve default sort order of messages
      */
     public function process() {
-        $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', false));
+        $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', 'arrival'));
     }
 }
 
@@ -583,7 +583,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $filter = strtoupper($this->get('list_filter'));
         }
         $keyword = $this->get('list_keyword', '');
-        list($sort, $rev) = process_sort_arg($this->get('list_sort'), $this->user_config->get('default_sort_order_setting', false));
+        list($sort, $rev) = process_sort_arg($this->get('list_sort'), $this->user_config->get('default_sort_order_setting', 'arrival'));
         $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
         $msgs = array();
