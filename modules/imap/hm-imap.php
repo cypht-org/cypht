@@ -67,6 +67,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
     /* config */
 
+    /* Enable EIMS workarounds */
+    private $eims_tweaks = false;
+
     /* maximum characters to read in from a request */
     public $max_read = false;
 
@@ -128,8 +131,8 @@ class Hm_IMAP extends Hm_IMAP_Cache {
     /* IMAP ID client information */
     public $app_name = 'Hm_IMAP';
     public $app_version = '3.0';
-    public $app_vendor = 'Hastymail Development Group';
-    public $app_support_url = 'http://hastymail.org/contact_us/';
+    public $app_vendor = 'Cypht Development Group';
+    public $app_support_url = 'https://cypht.org/#contact';
 
     /* connect error info */
     public $con_error_msg = '';
@@ -502,6 +505,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
                 if ($folder != 'INBOX' && $folder != $namespace && stristr($flags, 'noselect')) { 
                     $no_select = true;
+                }
+                /* EIMS work-around */
+                if ($this->eims_tweaks && !stristr($flags, 'noinferiors') && stristr($flags, 'noselect')) {
+                    $has_kids = true;
                 }
 
                 /* store the results in the big folder list struct */
