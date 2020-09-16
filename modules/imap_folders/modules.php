@@ -92,8 +92,8 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
         if ($success) {
             $parent = false;
             $parent_str = false;
-            if (array_key_exists('parent', $this->request->post)) {
-                $parent_str = $this->request->post['parent'];
+            if (array_key_exists('parent', $this->request->post) && trim($this->request->post['parent'])) {
+                $parent_str = decode_folder_str($this->request->post['parent']);
             }
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
