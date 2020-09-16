@@ -146,9 +146,10 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .configured_server { float: left; margin-left: 25px; width: 230px; }
 .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
-.list_sources { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
-.list_src { color: #666; margin-bottom: 10px; }
-.src_title { color: #666; font-size: 110%; padding: 5px; margin-bottom: 10px; }
+.list_sources, .update_search_label_field { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
+.list_src, .old_search_terms_label, .search_terms_label { color: #666; margin-bottom: 10px; }
+.old_search_terms_label, .search_terms_label { display: block; width: 100%; }
+.src_title, .update_saved_search_title { color: #666; font-size: 110%; padding: 5px; margin-bottom: 10px; }
 .del_src_link { padding: 3px; color: #666; margin-right: 5px; }
 .search_form { font-size: 80%; color: #999; display: inline; padding-left: 15px; }
 .search_form input, .search_form select { margin-right: 3px; margin-left: 3px; }

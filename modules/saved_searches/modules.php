@@ -76,6 +76,27 @@ class Hm_Handler_delete_search extends Hm_Handler_Module {
     }
 }
 
+
+ /**
+ * @subpackage savedsearches/handler
+ */
+class Hm_Handler_update_save_search_label extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('search_name', 'search_terms_label', 'old_search_terms_label'));
+        if ($success) {
+            $searches = new Hm_Saved_Searches($this->user_config->get('saved_searches', array()));
+            if ($searches->rename($form['old_search_terms_label'], $form['search_terms_label'])) {
+                $this->session->record_unsaved('Update a saved search label');
+                $this->user_config->set('saved_searches', $searches->dump());
+                $this->session->set('user_data', $this->user_config->dump());
+                $this->out('new_saved_search_label', $form['search_terms_label']);
+                $this->out('update_save_search_label', true);
+                Hm_Msgs::add('Saved search label updated');
+            }
+        }
+    }
+}
+
  /**
  * @subpackage savedsearches/handler
  */
@@ -113,7 +134,7 @@ class Hm_Output_search_name_fld extends Hm_Output_Module {
  */
 class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
     protected function output() {
-        if ($this->get('saved_search') || $this->get('updated_search') || $this->get('deleted_search')) {
+        if ($this->get('saved_search') || $this->get('updated_search') || $this->get('deleted_search') || $this->get('update_save_search_label')) {
             $this->out('saved_search_result', 1);
         }
         else {
@@ -131,6 +152,21 @@ class Hm_Output_update_search_icon extends Hm_Output_Module {
             return '<a href="" class="update_search" title="'.$this->trans('Update saved search').'"><img width="20" height="20" alt="'.
                 $this->trans('Update search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
         }
+    }
+}
+
+
+/**
+ * @subpackage savedsearches/output
+ */
+class Hm_Output_update_search_label_icon extends Hm_Output_Module {
+    protected function output() {
+        $style = '';
+        if (!$this->get('search_name')) {
+            $style = 'style="display: none;"';
+        }
+        return '<a href="" '.$style.' class="update_search_label" title="'.$this->trans('Update saved search label').'"><img width="20" height="20" alt="'.
+            $this->trans('Update saved search label').'" src="'.Hm_Image_Sources::$edit.'" /></a>' . update_search_label_field($this->get('search_name'), $this);
     }
 }
 
@@ -245,6 +281,14 @@ class Hm_Saved_Searches {
         }
         $this->searches = $new_searches;
         return count($new_searches) !== count($old_searches);
+    }
+    public function rename($old_name, $new_name) {
+        if(array_key_exists($old_name, $this->searches)) {
+            $this->searches[$new_name] = $this->searches[$old_name];
+            unset($this->searches[$old_name]);
+            return true;
+        }
+        return false;
     }
 }
 

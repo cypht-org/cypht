@@ -46,6 +46,21 @@ var save_search = function(event) {
     return false;
 };
 
+
+var update_save_search_label = function(event) {
+    event.preventDefault();
+    if($('.search_label_update').val().length) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_update_save_search_label'},
+            {'name': 'search_terms_label', 'value': $('.search_terms_label').val()},
+            {'name': 'old_search_terms_label', 'value': $('.old_search_terms_label').val()},
+            {'name': 'search_name', 'value': $('.search_terms').val()}],
+            update_save_search_label_results
+        );
+    }
+    return false;
+}
+
 var search_delete_results = function(res) {
     if (res.saved_search_result) {
         Hm_Folders.reload_folders(true, '.search_folders');
@@ -69,14 +84,26 @@ var search_save_results = function(res) {
     }
 };
 
+var update_save_search_label_results = function(res) {
+    if(res.saved_search_result) {
+        $('.update_search_label_field').toggle();
+        $('.search_terms_label').val("");
+        $('.old_search_terms_label').val(res.new_saved_search_label);
+        Hm_Folders.reload_folders(true, '.search_folders');
+    }
+}
+
 if (hm_page_name() == 'search') {
     $('.save_search').on("click", save_search);
     $('.update_search').on("click", update_search);
     $('.delete_search').on("click", delete_search);
+    $('.update_search_label').on("click", function() { $('.update_search_label_field').toggle(); return false; });
+    $('.search_label_update').on("click", update_save_search_label);
     if ($('.search_name').val().length) {
         Hm_Utils.save_to_local_storage('formatted_search_data', '');
     }
     else if ($('.search_terms').val().length) {
         $('.save_search').show();
+        $('.update_search_label').show()
     }
 }
