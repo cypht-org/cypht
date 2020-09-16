@@ -1105,13 +1105,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             return array();
         }
         if ($message_part == 1 || !$message_part) {
-            $command = "UID FETCH $uid (FLAGS BODY[HEADER])\r\n";
+            $command = "UID FETCH $uid (FLAGS INTERNALDATE BODY[HEADER])\r\n";
         }
         else {
             if (!$this->is_clean($message_part, 'msg_part')) {
                 return array();
             }
-            $command = "UID FETCH $uid (FLAGS BODY[$message_part.HEADER])\r\n";
+            $command = "UID FETCH $uid (FLAGS INTERNALDATE BODY[$message_part.HEADER])\r\n";
         }
         $cache_command = $command.(string)$raw;
         $cache = $this->check_cache($cache_command);
@@ -1123,6 +1123,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         $status = $this->check_response($result, true);
         $headers = array();
         $flags = array();
+        $internal_date = '';
         if ($status) {
             foreach ($result as $vals) {
                 if ($vals[0] != '*') {
@@ -1130,7 +1131,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
                 $search = true;
                 $flag_search = false;
-                foreach ($vals as $v) {
+                for ($j = 0; $j < count($vals); $j++) {
+                    $v = $vals[$j];
+                    if (stristr(strtoupper($v), 'INTERNALDATE')) {
+                        $internal_date = $vals[$j+1];
+                        $j++;
+                        continue;
+                    }
                     if ($flag_search) {
                         if ($v == ')') {
                             $flag_search = false;
@@ -1174,6 +1181,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             if (!empty($flags)) {
                 $headers[] = array('Flags', implode(' ', $flags));
+            }
+            if (!empty($internal_date)) {
+                $headers[] = array('Arrival Date', $internal_date);
             }
         }
         $results = array();

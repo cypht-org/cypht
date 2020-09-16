@@ -441,6 +441,19 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
 }
 
 /**
+ * Check the default sort order
+ * @subpackage core/handler
+ */
+class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
+    /***
+     * retrieve default sort order of messages
+     */
+    public function process() {
+        $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', false));
+    }
+}
+
+/**
  * Process the list_path input argument
  * @subpackage imap/handler
  */
@@ -479,6 +492,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
                         $this->out('list_sort', $this->request->get['sort']);
                     }
+                } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
+                    $this->out('list_sort', $default_sort_order);
                 }
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
@@ -568,7 +583,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $filter = strtoupper($this->get('list_filter'));
         }
         $keyword = $this->get('list_keyword', '');
-        list($sort, $rev) = process_sort_arg($this->get('list_sort'));
+        list($sort, $rev) = process_sort_arg($this->get('list_sort'), $this->user_config->get('default_sort_order_setting', false));
         $limit = $this->user_config->get('imap_per_page_setting', DEFAULT_PER_SOURCE);
         $offset = 0;
         $msgs = array();

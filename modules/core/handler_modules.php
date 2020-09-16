@@ -243,6 +243,25 @@ class Hm_Handler_process_start_page_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the the default sort order setting in the general settings section.
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_default_sort_order_setting extends Hm_Handler_Module {
+    /**
+     * Can be one of the values in start_page_opts()
+     */
+    public function process() {
+        function default_sort_order_callback($val) {
+            if (in_array($val, array_keys(default_sort_order_opts()), true)) {
+                return $val;
+            }
+            return false;
+        }
+        process_site_setting('default_sort_order', $this, 'default_sort_order_callback');
+    }
+}
+
+/**
  * Process "hide folder list icons" setting 
  * @subpackage core/handler
  */

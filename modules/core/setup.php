@@ -48,6 +48,7 @@ add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'afte
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_start_page_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_default_sort_order_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_mailto_handler_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
@@ -64,7 +65,8 @@ add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setti
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
 add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'start_page_setting', true, 'core', 'no_password_setting', 'after');
-add_output('settings', 'start_unread_settings', true, 'core', 'start_page_setting', 'after');
+add_output('settings', 'default_sort_order_setting', true, 'core', 'start_page_setting', 'after');
+add_output('settings', 'start_unread_settings', true, 'core', 'default_sort_order_setting', 'after');
 add_output('settings', 'unread_since_setting', true, 'core', 'start_unread_settings', 'after');
 add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_setting', 'after');
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
@@ -256,6 +258,7 @@ return array(
         'message_list_since' => FILTER_SANITIZE_STRING,
         'no_password_save' => FILTER_VALIDATE_BOOLEAN,
         'start_page' => FILTER_SANITIZE_STRING,
+        'default_sort_order' => FILTER_SANITIZE_STRING,
         'stay_logged_in' => FILTER_VALIDATE_BOOLEAN
     )
 );

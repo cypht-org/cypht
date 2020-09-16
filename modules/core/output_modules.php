@@ -606,6 +606,39 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
 }
 
 /**
+ * Outputs the default sort order option on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
+    /**
+     * Can be any of the main combined pages
+     */
+    protected function output() {
+        $options = default_sort_order_opts();
+        $settings = $this->get('user_settings', array());
+
+        if (array_key_exists('default_sort_order', $settings)) {
+            $default_sort_order = $settings['default_sort_order'];
+        }
+        else {
+            $default_sort_order = null;
+        }
+        $res = '<tr class="general_setting"><td><label for="default_sort_order">'.
+            $this->trans('Default message sort order').'</label></td>'.
+            '<td><select id="start_page" name="default_sort_order">';
+        foreach ($options as $val => $label) {
+            $res .= '<option ';
+            if ($default_sort_order == $val) {
+                $res .= 'selected="selected" ';
+            }
+            $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
+        }
+        $res .= '</select></td></tr>';
+        return $res;
+    }
+}
+
+/**
  * Outputs the list style option on the settings page
  * @subpackage core/output
  */
