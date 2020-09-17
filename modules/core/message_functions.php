@@ -422,12 +422,11 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        @$doc->loadHTML($html);
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }
-        $this->text = trim(strip_tags(html_entity_decode(preg_replace("/\n{2,}/m",
-            "\n\n", $this->text), ENT_QUOTES, "UTF-8")));
+        $this->text = trim(strip_tags(html_entity_decode(preg_replace("/\n{2,}/m", "\n\n", $this->text), ENT_QUOTES, "UTF-8")));
     }
 
     function block($tag) {
@@ -436,7 +435,7 @@ class HTMLToText {
     }
 
     function parse_nodes($nodes) {
-        $trims = chr(160).chr(194)." \t\n\r\0\x0B";
+        $trims = " \t\n\r\0\x0B";
         foreach ($nodes as $node) {
             if (!in_array($node->nodeName, $this->skips)) {
                 $this->block($node->nodeName);
