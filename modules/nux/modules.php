@@ -29,7 +29,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         $curl_result = Hm_Functions::c_exec($ch);
         if (trim($curl_result)) {
             foreach (explode("\n", $curl_result) as $line) {
-                if (preg_match("/^([a-z0-9]{40})\|([a-z0-9]{7})\|([^\|]+)\|([^\|]+)\|([^\|]+)$/", $line, $matches)) {
+                if (preg_match("/^([a-z0-9]{40})\|([a-z0-9]{8})\|([^\|]+)\|([^\|]+)\|([^\|]+)$/", $line, $matches)) {
                     $res[] = array(
                         'hash' => $matches[1],
                         'shash' => $matches[2],
