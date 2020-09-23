@@ -37,7 +37,7 @@ License: [https://cypht.org/license.html](https://cypht.org/license.html)
 
 Community chat room: [https://gitter.im/cypht-org/community](https://gitter.im/cypht-org/community)
 
-For developers, get via Composer: [https://packagist.org/packages/jason-munro/cypht](https://packagist.org/packages/jason-munro/cypht)
+For developers, get via Composer: [https://packagist.org/packages/jason-munro/cypht](https://packagist.org/packages/jason-munro/cypht) (use dev-master until a stable release is available)
 
 Docker: [https://hub.docker.com/r/sailfrog/cypht-docker](https://hub.docker.com/r/sailfrog/cypht-docker)
 
