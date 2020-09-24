@@ -487,14 +487,6 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
-                if (array_key_exists('sort', $this->request->get)) {
-                    if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
-                        'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
-                        $this->out('list_sort', $this->request->get['sort']);
-                    }
-                } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
-                    $this->out('list_sort', $default_sort_order);
-                }
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
@@ -514,6 +506,14 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('Sent'));
                 $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE));
                 $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SINCE));
+            }
+            if (array_key_exists('sort', $this->request->get)) {
+                if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
+                    'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
+                    $this->out('list_sort', $this->request->get['sort']);
+                }
+            } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
+                $this->out('list_sort', $default_sort_order);
             }
         }
     }
