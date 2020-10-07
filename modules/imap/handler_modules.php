@@ -819,7 +819,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag'))) {
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive'))) {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
@@ -827,6 +827,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $specials = $this->user_config->get('special_imap_folders', array());
                 foreach ($ids as $server => $folders) {
                     $trash_folder = false;
+                    $archive_folder = false;
                     if ($form['action_type'] == 'delete') {
                         if (array_key_exists($server, $specials)) {
                             if (array_key_exists('trash', $specials[$server])) {
@@ -834,6 +835,21 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     $trash_folder = $specials[$server]['trash'];
                                 }
                             }
+                        }
+                    }
+                    if ($form['action_type'] == 'archive') {
+                        if (array_key_exists($server, $specials)) {
+                            if (array_key_exists('archive', $specials[$server])) {
+                                if ($specials[$server]['archive']) {
+                                    $archive_folder = $specials[$server]['archive'];
+                                } else {
+                                    $archive_folder = "Archive";
+                                }
+                            } else {
+                                $archive_folder = "Archive";
+                            }
+                        } else {
+                            $archive_folder = "Archive";
                         }
                     }
                     $cache = Hm_IMAP_List::get_cache($this->cache, $server);
@@ -848,7 +864,12 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                         $errs++;
                                     }
                                 }
-                                else {
+                                elseif ($form['action_type' == 'archive' && $archive_folder && $archive_folder] != hex2bin($folder)) {
+                                    $new_folder = prep_folder_name($imap, hex2bin($folder), false, $archive_folder);
+                                    if (!$imap->message_action('MOVE', $uids, $new_folder)) {
+                                        $errs++;
+                                    }
+                                } else {
                                     if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
                                         $errs++;
                                     }
