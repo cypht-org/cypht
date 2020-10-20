@@ -218,7 +218,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (array_key_exists('cc', lc_headers($headers))) {
                 $reply_all = true;
             }
-            $addr = split_address_fld($headers['To']);
+            $addr = addr_split($headers['To']);
             $size = count($addr);
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
