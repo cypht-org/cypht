@@ -174,7 +174,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .home_password_dialogs .pw_input { width: 120px; }
 .nux_title { font-size: 120%; margin-bottom: 20px; }
 .total_unread_count, .unread_count { background-color: #ccc; font-size: 90%; margin-left: 10px; padding: 0px; padding-bottom: 1px; border-radius: 4px 4px 4px 4px; vertical-align: 2px; font-weight: bold; color: #fff; }
-.debug_title { color: teal; padding-left: 20px; }
+.debug_title { color: teal; position: fixed; background-color: #f5f5f5; bottom: 0px; right: 0px; padding: 20px; padding-left: 20px; }
 .long_session { float: left; }
 .long_session input { padding: 0px; float: none; }
 

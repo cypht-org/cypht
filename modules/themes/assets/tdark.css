@@ -34,3 +34,4 @@ textarea { font-size: 100%; }
 .list_controls { background: none !important; }
 .editor-toolbar a { color: #fff !important; }
 .sys_messages { filter: drop-shadow(4px 4px 4px #121212); }
+.debug_title {background-color: #111;}

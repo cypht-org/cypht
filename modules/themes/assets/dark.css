@@ -33,3 +33,4 @@ textarea { font-size: 100%; }
 .list_controls { background: none !important; }
 .editor-toolbar a { color: #fff !important; }
 .reply_quote {font-family: monospace !important; }
+.debug_title {background-color: #111;}

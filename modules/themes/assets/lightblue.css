@@ -5,3 +5,4 @@ select, option, input, textarea, .ke-container * { background-color: #e6ebf2 !im
 .message_table td { border-bottom: none; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: #666 !important; }
 .list_controls { background: none !important; }
+.debug_title {background-color: #ddd !important;}

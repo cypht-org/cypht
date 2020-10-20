@@ -1,4 +1,4 @@
-html * { font-family: Verdana, Geneva, sans-serif; font-size: 12pt; color: #828282 !important; border-color: #f6f6ef !important; background-color: transparent !important; }
+html * { font-family: Verdana, Geneva, sans-serif; font-size: 12pt; border-color: #f6f6ef !important; background-color: transparent !important; }
 main, div { border-radius: 0px 0px 0px 0px }
 body, .folder_cell { padding-top: 10px; background: none !important; background-color: transparent !important; }
 html { background-color: #fff; }
@@ -41,3 +41,4 @@ nav { padding-top: 0px !important; }
 @media screen and (max-device-width:480px) and (orientation : portrait) {
     .content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; }
 }
+.debug_title {background-color: #ddd !important;}

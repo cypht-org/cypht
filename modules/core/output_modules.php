@@ -1127,7 +1127,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
         if (DEBUG_MODE) {
             $res .= ' <span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
-                '" class="debug_title">['.$this->trans('Debug').']</span>';
+                '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
         $res .= '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
         '</div><div class="main"><ul class="folders">';

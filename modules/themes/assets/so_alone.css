@@ -48,10 +48,11 @@ input[type=button],input[type=submit] {
 	color: #D5D9E1;
 	border-radius: 3px !important;
 }
-textarea, select {
+input, textarea, select {
 	border:1px solid;
 	border-color: #1E222A;
 	background-color: #21262E;
+    font-size: 15px !important;
 	color: #555C69;
 	border-radius: 3px !important;
 }
@@ -409,3 +410,5 @@ textarea { font-size: 100%; }
 .compose_form, .compose_page {
 	background-color: #3c4453;
 }
+.sys_messages {filter: none;}
+.imap_keyword {background-color: #E0E3EC !important; padding: 4px;}
