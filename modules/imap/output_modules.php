@@ -214,13 +214,25 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
+            $reply_all = false;
+            if (array_key_exists('cc', lc_headers($headers))) {
+                $reply_all = true;
+            }
+            $addr = split_address_fld($headers['To']);
+            $size = count($addr);
+
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
-                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>'.
-                ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>'.
+                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                if ($reply_all || $size > 1) {
+                    $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                }
+                else {
+                    $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
+                }
                 ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
