@@ -523,7 +523,7 @@ function addr_parse($str) {
     else {
         $comment = '';
     }
-    return array('email' => $email, 'label' => trim($label, ' \'"'), 'comment' => $comment);
+    return array('email' => $email, 'label' => preg_replace('/[\pZ\pC]+/u', ' ', trim($label, ' \'"')), 'comment' => $comment);
 }}
 
 /**
