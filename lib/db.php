@@ -33,6 +33,7 @@ class Hm_DB {
             'db_pass' => $site_config->get('db_pass', false),
             'db_socket' => $site_config->get('db_socket', false),
             'db_conn_type' => $site_config->get('db_connection_type', 'host'),
+            'db_port' => $site_config->get('db_port', ''),
         );
         foreach (self::$required_config as $v) {
             if (!self::$config[$v]) {
@@ -48,6 +49,7 @@ class Hm_DB {
     static private function db_key() {
         return md5(self::$config['db_driver'].
             self::$config['db_host'].
+            self::$config['db_port'].
             self::$config['db_name'].
             self::$config['db_user'].
             self::$config['db_pass'].
@@ -68,7 +70,11 @@ class Hm_DB {
             return sprintf('%s:unix_socket=%s;dbname=%s', self::$config['db_driver'], self::$config['db_socket'], self::$config['db_name']);
         }
         else {
-            return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+            if (empty(self::$config['db_port'])){
+                return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
+            } else {
+                return sprintf('%s:host=%s;port=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_port'], self::$config['db_name']);
+            }
         }
     }
 
