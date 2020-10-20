@@ -336,6 +336,7 @@ var imap_combined_inbox_content = function(id, folder) {
 var cache_imap_page = function() {
     var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     var data = Hm_Message_List.filter_list();
+    data.find('input[type=checkbox]').removeAttr('checked');
     Hm_Utils.save_to_local_storage(key, data.html());
     Hm_Utils.save_to_local_storage(key+'_page_links', $('.page_links').html());
 }
@@ -407,7 +408,6 @@ var display_imap_mailbox = function(res) {
     $('.page_links').html(res.page_links);
     $('input[type=checkbox]').on("click", function(e) {
         Hm_Message_List.toggle_msg_controls();
-        Hm_Message_List.check_select_range(e);
     });
     cache_imap_page();
 };

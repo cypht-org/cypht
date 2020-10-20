@@ -945,6 +945,7 @@ function Message_List() {
     this.set_message_list_state = function(list_type) {
         var data = this.filter_list();
         data.find('*[style]').attr('style', '');
+        data.find('input[type=checkbox]').removeAttr('checked');
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = self.check_empty_list();
         if (!empty) {
@@ -960,45 +961,51 @@ function Message_List() {
     this.select_range = function(a, b) {
         var start = false;
         var end = false;
-        $('input[type=checkbox]', $('.message_table')).filter(function() {
+        $('input[type=checkbox]', $('.message_table')).each(function() {
             if (end) {
-                return;
+                return false;
             }
             if (!start && ($(this).prop('id') == a || $(this).prop('id') == b)) {
+                this.checked = true;
                 start = true;
-                return;
-            }
-            if (start && ($(this).prop('id') == b || $(this).prop('id') == a)) {
-                end = true;
-                return;
+                return true;
             }
             if (start && !end) {
                 this.checked = true;
+            }
+            if (start && ($(this).prop('id') == b || $(this).prop('id') == a)) {
+                end = true;
+                return true;
             }
         });
     };
 
     this.process_shift_click = function(el) {
-        var id = $(el).prop('id');
+        var id = el.prop('id');
+        if (id == self.last_click) {
+            return;
+        }
         self.select_range(id, self.last_click);
     };
 
     this.set_checkbox_callback = function() {
+        $('.checkbox_label').off('click');
         $('.checkbox_label').off('mousedown');
         $('.checkbox_label').on('mousedown', function (e) {
-            if (e.ctrlKey || e.shiftKey) {
-                e.preventDefault();
+            if (e.shiftKey) {
                 document.getSelection().removeAllRanges();
             }
         });
-        $('input[type=checkbox]', $('.message_table')).off('click');
-        $('input[type=checkbox]', $('.message_table')).on("click", function(e) {
+        $('.checkbox_label').on('click', function (e) {
             if (e.shiftKey) {
+                var el = $(this).prev();
                 if (self.last_click) {
-                    self.process_shift_click(this);
+                    self.process_shift_click(el);
                 }
+                $('#'+el.prop('id')).attr('checked', 'checked');
+                e.preventDefault();
             }
-            self.last_click = $(this).prop('id');
+            self.last_click = $(this).prev().prop('id');
             self.toggle_msg_controls();
         });
     };
