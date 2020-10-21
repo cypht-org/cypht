@@ -842,14 +842,8 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                             if (array_key_exists('archive', $specials[$server])) {
                                 if ($specials[$server]['archive']) {
                                     $archive_folder = $specials[$server]['archive'];
-                                } else {
-                                    $archive_folder = "Archive";
                                 }
-                            } else {
-                                $archive_folder = "Archive";
                             }
-                        } else {
-                            $archive_folder = "Archive";
                         }
                     }
                     $cache = Hm_IMAP_List::get_cache($this->cache, $server);
