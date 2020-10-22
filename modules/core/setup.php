@@ -82,12 +82,14 @@ add_output('settings', 'end_settings_form', true, 'core', 'content_section_end',
 
 /* message list page */
 setup_base_page('message_list');
+add_handler('message_list', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
 add_output('message_list', 'message_list_heading', true, 'core', 'content_section_start', 'after');
 add_output('message_list', 'message_list_start', true, 'core', 'message_list_heading', 'after');
 add_output('message_list', 'message_list_end', true, 'core', 'message_list_start', 'after');
 
 /* search page */
 setup_base_page('search');
+add_handler('search', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
 add_output('search', 'search_content_start', true, 'core', 'content_section_start', 'after');
 add_output('search', 'search_form_start', true, 'core', 'search_content_start', 'after');
 add_output('search', 'search_form_content', true, 'core', 'search_form_start', 'after');
@@ -98,6 +100,7 @@ add_output('search', 'search_content_end', true, 'core', 'search_results_table_e
 add_output('search', 'search_move_copy_controls', true, 'core', 'search_content_start', 'before');
 
 /* advanced search page */
+add_handler('advanced_search', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
 add_output('advanced_search', 'search_move_copy_controls', true, 'core', 'advanced_search_content_start', 'before');
 
 /* reset search form */
