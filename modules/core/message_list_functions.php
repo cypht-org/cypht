@@ -322,7 +322,9 @@ function message_controls($output_mod) {
         '<a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
         '<a class="msg_flag core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
         '<a class="msg_unflag core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>';
+        '<a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
+        '<a class="msg_archive core_msg_control" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
     }
