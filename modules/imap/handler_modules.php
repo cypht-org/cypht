@@ -441,19 +441,6 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
 }
 
 /**
- * Check the default sort order
- * @subpackage core/handler
- */
-class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
-    /***
-     * retrieve default sort order of messages
-     */
-    public function process() {
-        $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', 'arrival'));
-    }
-}
-
-/**
  * Process the list_path input argument
  * @subpackage imap/handler
  */
