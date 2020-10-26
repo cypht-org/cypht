@@ -1006,6 +1006,9 @@ function Message_List() {
                 e.preventDefault();
             }
             self.last_click = $(this).prev().prop('id');
+        });
+        $('input[type=checkbox]', $('.message_table')).off('input');
+        $('input[type=checkbox]', $('.message_table')).on('input', function(e) {
             self.toggle_msg_controls();
         });
     };
