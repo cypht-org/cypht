@@ -618,7 +618,7 @@ function Message_List() {
         if (action_type == 'unflag' && hm_list_path() == 'flagged') {
             remove = true;
         }
-        else if (action_type == 'delete') {
+        else if (action_type == 'delete' || action_type == 'archive') {
             remove = true;
         }
         if (remove) {

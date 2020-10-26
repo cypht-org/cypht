@@ -845,8 +845,8 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                         $errs++;
                                     }
                                 }
-                                elseif ($form['action_type' == 'archive' && $archive_folder && $archive_folder] != hex2bin($folder)) {
-                                    $new_folder = prep_folder_name($imap, hex2bin($folder), false, $archive_folder);
+                                elseif ($form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
+                                    $new_folder = prep_folder_name($imap, $archive_folder, false);
                                     if (!$imap->message_action('MOVE', $uids, $new_folder)) {
                                         $errs++;
                                     }
