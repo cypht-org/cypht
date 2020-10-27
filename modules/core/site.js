@@ -820,13 +820,18 @@ function Message_List() {
                         self.save_updated_list();
                         self.toggle_msg_controls();
                     }
+                    else {
+                        if (res.hasOwnProperty('move_count')) {
+                            selected = Object.values(res.move_count);
+                        }
+                        self.update_after_action(action_type, selected);
+                    }
                 },
                 [],
                 false,
                 false,
                 true
             );
-            self.update_after_action(action_type, selected);
         }
         return false;
     };

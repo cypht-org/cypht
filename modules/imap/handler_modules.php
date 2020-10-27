@@ -187,7 +187,6 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 else {
                     Hm_Msgs::add('Messages copied');
                 }
-                $this->session->set('imap_cache', array());
             }
             elseif (count($moved) > 0) {
                 if ($form['imap_move_action'] == 'move') {
@@ -196,7 +195,6 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 else {
                     Hm_Msgs::add('Some messages copied (only IMAP message types can be copied)');
                 }
-                $this->session->set('imap_cache', array());
             }
             elseif (count($moved) == 0) {
                 Hm_Msgs::add('ERRUnable to move/copy selected messages');
@@ -705,6 +703,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
         $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
         $archive_folder = false;
+        $errors = 0;
 
         $specials = $this->user_config->get('special_imap_folders', array());
         if (array_key_exists($form['imap_server_id'], $specials)) {
@@ -714,46 +713,32 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                 }
             }
         }
-
-        if(!$archive_folder) {
-            $archive_folder = "Archive";
+        if (!$archive_folder) {
+            Hm_Msgs::add('No archive folder configured for this IMAP server');
+            $errors++;
         }
 
-        if (imap_authed($imap)) {
-            $new_folder = prep_folder_name($imap, hex2bin($form['folder']), false, $archive_folder);
+        if (!$errors && imap_authed($imap)) {
             $archive_exists = count($imap->get_mailbox_status($archive_folder));
-            $folder_exists = count($imap->get_mailbox_status($new_folder));
-            $error = false;
-
-            /* if archive folders don't exist try to create them */
-            if (!$archive_exists && !$imap->create_mailbox($archive_folder)) {
-                $error = true;
-            }
-            if (!$error && !$folder_exists && !$imap->create_mailbox($new_folder)) {
-                $error = true;
+            if (!$archive_exists) {
+                Hm_Msgs::add('Configured archive folder for this IMAP server does not exist');
+                $errors++;
             }
 
             /* select source folder */
-            if (!$error && !$imap->select_mailbox(hex2bin($form['folder']))) {
-                $error = true;
+            if ($errors || !$imap->select_mailbox(hex2bin($form['folder']))) {
+                Hm_Msgs::add('ERRAn error occurred archiving the message');
+                $errors++;
             }
 
             /* try to move the message */
-            if (!$error && $imap->message_action('MOVE', array($form['imap_msg_uid']), $new_folder)) {
+            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
                 Hm_Msgs::add("Message archived");
-
-                /* bust imap cache if we created a new folder */
-                if (!$archive_exists || !$folder_exists) {
-                    $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    $this->cache->del('imap'.$form['imap_server_id']);
-                    $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_'.bin2hex($archive_folder));
-                }
             }
             else {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
             }
         }
-
         $msgs = Hm_Msgs::get();
         Hm_Msgs::flush();
         $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
@@ -810,6 +795,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
+                $moved = array();
                 $status = array();
                 $specials = $this->user_config->get('special_imap_folders', array());
                 foreach ($ids as $server => $folders) {
@@ -844,13 +830,23 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     if (!$imap->message_action('MOVE', $uids, $trash_folder)) {
                                         $errs++;
                                     }
+                                    else {
+                                        foreach ($uids as $uid) {
+                                            $moved[] = sprintf("imap_%d_%s_%s", $server, $uid, $folder);
+                                        }
+                                    }
                                 }
                                 elseif ($form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
-                                    $new_folder = prep_folder_name($imap, $archive_folder, false);
-                                    if (!$imap->message_action('MOVE', $uids, $new_folder)) {
+                                    if (!$imap->message_action('MOVE', $uids, $archive_folder)) {
                                         $errs++;
                                     }
-                                } else {
+                                    else {
+                                        foreach ($uids as $uid) {
+                                            $moved[] = sprintf("imap_%d_%s_%s", $server, $uid, $folder);
+                                        }
+                                    }
+                                }
+                                else {
                                     if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
                                         $errs++;
                                     }
@@ -868,6 +864,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 if ($errs > 0) {
                     Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['action_type'], $server));
                 }
+                $this->out('move_count', $moved);
                 if (count($status) > 0) {
                     $this->out('folder_state', $status);
                 }
