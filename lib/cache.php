@@ -273,6 +273,17 @@ class Hm_Redis {
             $this->cache_con->auth($this->config->get('redis_pass'));
         }
     }
+    
+    /**
+     * @param string $key cache key to delete
+     */
+    public function del($key) {
+        if (!$this->is_active()) {
+            return false;
+        }
+        return $this->cache_con->del($key);
+    }
+
 
     /**
      * @return boolean
