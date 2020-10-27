@@ -73,7 +73,7 @@ class Hm_Mock_Memcached_No {
     }
 }
 class Hm_Mock_Memcached {
-    private $data = array();
+    protected $data = array();
     public static $set_failure = false;
     const RES_NOTFOUND = 1;
     const OPT_BINARY_PROTOCOL = false;
@@ -126,6 +126,13 @@ class Hm_Mock_Redis extends Hm_Mock_Memcached {
     }
     function close() {
         return true;
+    }
+    function del($key) {
+        if (array_key_exists($key, $this->data)) {
+            unset($this->data[$key]);
+            return true;
+        }
+        return false;
     }
 }
 if (!class_exists('Memcached')) {
