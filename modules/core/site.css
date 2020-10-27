@@ -31,7 +31,7 @@ td { vertical-align: top; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
 .mailbox_list_title { display: inline; }
-.sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 100; }
+.sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
