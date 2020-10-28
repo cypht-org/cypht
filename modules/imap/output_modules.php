@@ -189,6 +189,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
+                        elseif ($fld == 'date') {
+                            $value = sprintf('%s (%s)', strftime('%c %Z', strtotime($value)), human_readable_interval($value));
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                        }
                         else {
                             if (strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');
