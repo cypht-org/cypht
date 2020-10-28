@@ -810,6 +810,7 @@ function Message_List() {
             }
         });
         if (selected.length > 0) {
+            var updated = false;
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
                 {'name': 'action_type', 'value': action_type},
@@ -825,6 +826,7 @@ function Message_List() {
                             selected = Object.values(res.move_count);
                         }
                         self.update_after_action(action_type, selected);
+                        updated = true;
                     }
                 },
                 [],
@@ -832,6 +834,9 @@ function Message_List() {
                 false,
                 true
             );
+        }
+        if (!updated) {
+            self.update_after_action(action_type, selected);
         }
         return false;
     };
