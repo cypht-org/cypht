@@ -41,6 +41,10 @@ var inline_msg_prep_imap_delete = function(path, uid, details) {
     return imap_delete_message(false, uid, details);
 };
 
+var inline_imap_unread_message = function(uid, details) {
+    return imap_unread_message(uid, details);
+};
+
 var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
     details['uid'] = uid;
     var path = '.'+details['type']+'_'+details['server_id']+'_'+uid+'_'+details['folder'];
@@ -116,9 +120,11 @@ var update_imap_links = function(uid, details) {
     $('#unflag_msg').off('click');
     $('#flag_msg').off('click');
     $('#delete_message').off('click');
+    $('#unread_message').off('click');
     $('#delete_message').on("click", function() { return inline_msg_prep_imap_delete(path, uid, details); });
     $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state'), uid, details); });
     $('#unflag_msg').on("click", function() { return imap_flag_message($(this).data('state', uid, details)); });
+    $('#unread_message').on("click", function() { return inline_imap_unread_message(uid, details);});
 };
 
 var capture_subject_click = function() {
@@ -171,6 +177,7 @@ $(function() {
             Hm_Ajax.add_callback_hook('*', capture_subject_click);
             Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
             Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
+            Hm_Ajax.add_callback_hook('ajax_imap_unread',msg_inline_close);
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
             }
