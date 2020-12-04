@@ -815,7 +815,14 @@ var imap_perform_move_copy = function(dest_id, context) {
                             window.location.href = nlink.attr('href');
                         }
                         else {
-                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            if(hm_page_name() == 'search'){
+                                window.location.reload();
+                            }
+                            else if(hm_page_name() == 'advanced_search'){
+                                process_advanced_search();
+                            }else{
+                                window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            }
                         }
                     }
                 }
