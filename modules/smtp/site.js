@@ -235,6 +235,5 @@ $(function() {
         if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
             replace_cursor_positon ($('textarea[name="compose_body"]'));
         }
-        
     }  
 });
