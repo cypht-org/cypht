@@ -210,18 +210,6 @@ var delete_attachment = function(file, link) {
     return false;
 };
 
-var get_url_parameter = function (sParam){
-    var sPageURL = window.location.search.substring(1);
-    var sURLVariables = sPageURL.split('&');
-    for (var i = 0; i < sURLVariables.length; i++){
-        var sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] == sParam)
-        {
-            return sParameterName[1];
-        }
-    }
-}
-
 var replace_cursor_positon = function (txtElement) { 
     txtElement.val('\r\n\r\n\r\n'+txtElement.val());
     txtElement.prop('selectionEnd',0);
@@ -244,7 +232,7 @@ $(function() {
             toggle_recip_flds();
         }
         $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
-        if (get_url_parameter('reply') === '1'){
+        if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
             replace_cursor_positon ($('textarea[name="compose_body"]'));
         }
         
