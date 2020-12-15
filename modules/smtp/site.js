@@ -210,6 +210,12 @@ var delete_attachment = function(file, link) {
     return false;
 };
 
+var replace_cursor_positon = function (txtElement) { 
+    txtElement.val('\r\n\r\n\r\n'+txtElement.val());
+    txtElement.prop('selectionEnd',0);
+    txtElement.focus(); 
+}
+
 $(function() {
     if (hm_page_name() === 'compose') {
         var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
@@ -226,5 +232,8 @@ $(function() {
             toggle_recip_flds();
         }
         $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
-    }
+        if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
+            replace_cursor_positon ($('textarea[name="compose_body"]'));
+        }
+    }  
 });
