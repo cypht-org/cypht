@@ -228,6 +228,7 @@ add_output('ajax_imap_folder_display', 'filter_folder_page', true);
 
 /* search results */
 setup_base_ajax_page('ajax_imap_search', 'core');
+add_handler('ajax_imap_search', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
 add_handler('ajax_imap_search', 'message_list_type', true, 'core');
 add_handler('ajax_imap_search', 'imap_message_list_type', true);
 add_handler('ajax_imap_search', 'load_imap_servers_from_config',  true);
@@ -237,6 +238,7 @@ add_handler('ajax_imap_search', 'imap_search',  true);
 add_output('ajax_imap_search', 'filter_imap_search', true);
 
 /* advanced search results */
+add_handler('ajax_adv_search', 'default_sort_order_setting', true, 'core', 'load_user_data', 'after');
 add_handler('ajax_adv_search', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_adv_search', 'imap_oauth2_token_check', true, 'imap', 'load_imap_servers_from_config', 'after');
 
