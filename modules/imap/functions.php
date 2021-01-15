@@ -173,7 +173,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     }
     $show_icons = $output_module->get('msg_list_icons');
     $list_page = $output_module->get('list_page', 0);
-    $list_sort = $output_module->get('list_sort');
+    $list_sort = $output_module->get('list_sort', $output_module->get('default_sort_order'));
     $list_filter = $output_module->get('list_filter');
     foreach($msg_list as $msg) {
         $row_class = 'email';
