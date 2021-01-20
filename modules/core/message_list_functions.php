@@ -126,6 +126,9 @@ function combined_sort_dialog($mod) {
  */
 if (!hm_exists('human_readable_interval')) {
 function human_readable_interval($date_str) {
+    if (!$date_str) {
+        return 'Unknown';
+    }
     $precision     = 2;
     $interval_time = array();
     $date          = strtotime($date_str);

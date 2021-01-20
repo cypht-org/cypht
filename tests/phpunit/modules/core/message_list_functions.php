@@ -36,11 +36,13 @@ class Hm_Test_Core_Message_List_Functions extends PHPUnit_Framework_TestCase {
      * @runInSeparateProcess
      */
     public function test_human_readable_interval() {
-        $this->assertEquals(1, preg_match("/\d+ years, \d+ (hour|hours|day|days|week|weeks|month|months)/", human_readable_interval(0)));
+        $date = date('D M d, Y G:i:s', strtotime('yesterday'));
+        $this->assertEquals(1, preg_match("/\d+ day, \d+ (hour|hours|day|days|week|weeks|month|months)/", human_readable_interval($date)));
         $date = date("D M d, Y G:i:s");
         $this->assertEquals('Just now', human_readable_interval($date));
         $date = date("D M d, 3000 G:i:s");
         $this->assertEquals('From the future!', human_readable_interval($date));
+        $this->assertEquals('Unknown', human_readable_interval(''));
     }
     /**
      * @preserveGlobalState disabled
