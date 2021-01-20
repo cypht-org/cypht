@@ -1191,7 +1191,15 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if (!$raw) {
                 $vals[1] = $this->decode_fld($vals[1]);
             }
-            $results[$vals[0]] = $vals[1];
+            if (array_key_exists($vals[0], $results)) {
+                if (!is_array($results[$vals[0]])) {
+                    $results[$vals[0]] = array($results[$vals[0]]);
+                }
+                $results[$vals[0]][] = $vals[1];
+            }
+            else {
+                $results[$vals[0]] = $vals[1];
+            }
         }
         if ($status) {
             return $this->cache_return_val($results, $cache_command);

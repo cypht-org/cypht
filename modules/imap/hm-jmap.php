@@ -619,7 +619,15 @@ class Hm_JMAP {
         $res = array();
         if (is_array($headers)) {
             foreach ($headers as $vals) {
-                $res[$vals['name']] = $vals['value'];
+                if (array_key_exists($vals['name'], $res)) {
+                    if (!is_array($res[$vals['name']])) {
+                        $res[$vals['name']] = array($res[$vals['name']]);
+                    }
+                    $res[$vals['name']][] = $vals['value'];
+                }
+                else {
+                    $res[$vals['name']] = $vals['value'];
+                }
             }
         }
         return $res;

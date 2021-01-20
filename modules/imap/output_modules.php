@@ -212,7 +212,14 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             foreach ($headers as $name => $value) {
                 if (!in_array(strtolower($name), $small_headers)) {
-                    $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    if (is_array($value)) {
+                        foreach ($value as $line) {
+                            $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($line).'</td></tr>';
+                        }
+                    }
+                    else {
+                        $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    }
                 }
             }
             if ($this->get('list_headers')) {
