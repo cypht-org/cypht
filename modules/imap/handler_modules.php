@@ -1602,7 +1602,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                             $msg_struct_current['subtype'] = 'plain';
                         }
                         $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
-                            array('msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
+                            array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                     }
                 }
             }

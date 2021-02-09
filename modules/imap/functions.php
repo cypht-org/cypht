@@ -892,10 +892,19 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
  */
 if (!hm_exists('clear_existing_reply_details')) {
 function clear_existing_reply_details($session) {
+    $msgs = array();
+    $max = 20;
     foreach ($session->dump() as $name => $val) {
         if (substr($name, 0, 19) == 'reply_details_imap_') {
-            $session->del($name);
+            $msgs[$name] = $val['ts'];
         }
+    }
+    arsort($msgs, SORT_NUMERIC);
+    if (count($msgs) <= $max) {
+        return ;
+    }
+    foreach (array_slice($msgs, $max) as $name) {
+        $session->del($name);
     }
 }}
 
