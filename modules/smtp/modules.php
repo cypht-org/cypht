@@ -194,7 +194,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
         }
         $draft = array();
-        $draft_id = count($this->session->get('compose_drafts', array()));
+        $draft_id = next_draft_key($this->session);
         $reply_type = false;
         if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
             $reply_type = 'reply';
@@ -204,6 +204,10 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         }
         elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
             $reply_type = 'forward';
+            $draft_id = $this->get('compose_draft_id', -1);
+            if ($draft_id >= 0) {
+                $draft = get_draft($draft_id, $this->session);
+            }
         }
         elseif (array_key_exists('draft_id', $this->request->get)) {
             $draft = get_draft($this->request->get['draft_id'], $this->session);
@@ -578,11 +582,10 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
             Hm_Image_Sources::$doc.'" title="'.$this->trans('Drafts').'" alt="'.$this->trans('Drafts').'" />';
         $res .= '<div class="draft_list">';
         foreach ($drafts as $id => $draft) {
-            if (trim($draft['draft_subject'])) {
-                $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
-                    $this->html_safe($id).'">'.$this->html_safe($draft['draft_subject']).'</a> '.
-                    '<img class="delete_draft" width="16" height="16" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
-            }
+            $subject = trim($draft['draft_subject']) ? trim($draft['draft_subject']) : 'Draft '.($id+1);
+            $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
+                $this->html_safe($id).'">'.$this->html_safe($subject).'</a> '.
+                '<img class="delete_draft" width="16" height="16" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
         }
         $res .= '</div>';
         return $res;
@@ -1097,17 +1100,11 @@ function delete_draft($id, $session) {
  */
 if (!hm_exists('save_draft')) {
 function save_draft($atts, $id, $session) {
-    if (!trim($atts['draft_subject'])) {
-        return false;
-    }
     $drafts = $session->get('compose_drafts', array());
-    if ($id !== false) {
-        $drafts[$id] = $atts;
+    if ($id === false) {
+        $id = next_draft_key($session);
     }
-    else {
-        $drafts[] = $atts;
-        $id = count($drafts) - 1;
-    }
+    $drafts[$id] = $atts;
     $session->set('compose_drafts', $drafts);
     return $id;
 }}
@@ -1136,10 +1133,28 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
         $file['filename'] = $filepath.'/'.$filename;
         $file['basename'] = $filename;
         save_uploaded_file($draft_id, $file, $mod->session);
+        if (!get_draft($draft_id, $mod->session)) {
+            save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
+                'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
+                'draft_in_reply_to' => ''), $draft_id, $mod->session);
+        }
         $mod->out('upload_file_details', $file);
         return true;
     }
     return false;
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('next_draft_key')) {
+function next_draft_key($session) {
+    $drafts = $session->get('compose_drafts', array());
+    if (count($drafts)) {
+        return max(array_keys($drafts))+1;
+    } else {
+        return 0;
+    }
 }}
 
 /**
