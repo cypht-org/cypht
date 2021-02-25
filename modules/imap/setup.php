@@ -297,18 +297,18 @@ return array(
         'imap_connect_time' => array(FILTER_SANITIZE_STRING, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_status_display' => array(FILTER_UNSAFE_RAW, false),
-        'imap_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_status_server_id' => array(FILTER_SANITIZE_STRING, false),
         'imap_expanded_folder_path' => array(FILTER_SANITIZE_STRING, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_SANITIZE_STRING, false),
-        'imap_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_server_id' => array(FILTER_SANITIZE_STRING, false),
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_STRING, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_get' => array(
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_STRING,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_msg_part' => FILTER_SANITIZE_STRING
     ),
@@ -316,7 +316,7 @@ return array(
     'allowed_post' => array(
         'server_port' => FILTER_VALIDATE_INT,
         'server' => FILTER_SANITIZE_STRING,
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_STRING,
         'imap_server_ids' => FILTER_SANITIZE_STRING,
         'imap_user' => FILTER_SANITIZE_STRING,
         'imap_pass' => FILTER_UNSAFE_RAW,

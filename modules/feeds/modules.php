@@ -23,13 +23,13 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
             }
-            elseif (preg_match("/^feeds_\d+$/", $path)) {
+            elseif (preg_match("/^feeds_\w+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
-                $details = Hm_Feed_List::dump(intval($parts[1]));
+                $details = Hm_Feed_List::dump($parts[1]);
                 if (!empty($details)) {
                     $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
@@ -148,7 +148,7 @@ class Hm_Handler_feed_message_action extends Hm_Handler_Module {
         if ($success) {
             $id_list = explode(',', $form['message_ids']);
             foreach ($id_list as $msg_id) {
-                if (preg_match("/^feeds_(\d)+_.+$/", $msg_id)) {
+                if (preg_match("/^feeds_(\w)+_.+$/", $msg_id)) {
                     $parts = explode('_', $msg_id, 3);
                     $guid = $parts[2];
                     switch($form['action_type']) {
@@ -475,7 +475,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 $callback = 'feeds_combined_content';
                 break;
             default:
-                if (preg_match("/^feeds_(\d+)$/", $path, $matches)) {
+                if (preg_match("/^feeds_(\w+)$/", $path, $matches)) {
                     $server_id = $matches[1];
                     $callback = 'load_feed_list';
                 }
