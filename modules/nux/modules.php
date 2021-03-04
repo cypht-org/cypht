@@ -23,21 +23,22 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         }
         $ch = Hm_Functions::c_init();
         $res = array();
-        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://cypht.org/git.txt');
+        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits');
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+        Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
         $curl_result = Hm_Functions::c_exec($ch);
         if (trim($curl_result)) {
-            foreach (explode("\n", $curl_result) as $line) {
-                if (preg_match("/^([a-z0-9]{40})\|([a-z0-9]{8})\|([^\|]+)\|([^\|]+)\|([^\|]+)$/", $line, $matches)) {
-                    $res[] = array(
-                        'hash' => $matches[1],
-                        'shash' => $matches[2],
-                        'name' => $matches[3],
-                        'age' => date('D, M d', strtotime($matches[4])),
-                        'note' => $matches[5]
-                    );
-                }
+            $json_commits = json_decode($curl_result);
+            foreach($json_commits as $c) {
+                $msg = trim($c->commit->message);
+                $res[] = array(
+                   'hash' => $c->sha,
+                   'shash' => substr($c->sha, 0, 8),
+                   'name' => $c->commit->author->name,
+                   'age' => date('D, M d', strtotime($c->commit->author->date)),
+                   'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                );
             }
         }
         $this->cache->set('nux_dev_news', $res);
@@ -287,9 +288,10 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
         $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/jasonmunro/hm3/commit/%s">%s</a>'.
-                '</td><td class="msg_date">%s</td><td>%s</td></tr>',
+                '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
                 $this->html_safe($vals['hash']),
                 $this->html_safe($vals['shash']),
+                $this->html_safe($vals['name']),
                 $this->html_safe($vals['age']),
                 $this->html_safe($vals['note'])
             );
