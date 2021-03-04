@@ -31,12 +31,13 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         if (trim($curl_result)) {
             $json_commits = json_decode($curl_result);
             foreach($json_commits as $c) {
+                $msg = trim($c->commit->message);
                 $res[] = array(
                    'hash' => $c->sha,
                    'shash' => substr($c->sha, 0, 8),
                    'name' => $c->commit->author->name,
                    'age' => date('D, M d', strtotime($c->commit->author->date)),
-                   'note' => (strlen(trim($c->commit->message)) > 80 ? substr(trim($c->commit->message), 0, 80) . "..." : trim($c->commit->message))
+                   'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
                 );
             }
         }
