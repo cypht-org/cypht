@@ -50,11 +50,12 @@ class Hm_Handler_process_nasa_connection extends Hm_Handler_Module {
 class Hm_Handler_fetch_apod_content extends Hm_Handler_Module {
     public function process() {
         $key = $this->user_config->get('nasa_api_key', '');
-        $date = date('Y-m-d');
+        // Today needs to be the day at NASA HQ
+        $date = dateInESTTZ();
         if ($key) {
             if (array_key_exists('apod_date', $this->request->get)) {
                 $apod_date = $this->request->get['apod_date'];
-                if (preg_match("/^\d{4}-\d{2}-\d{2}$/", $apod_date)) 
+                if (preg_match("/^\d{4}-\d{2}-\d{2}$/", $apod_date))
                     $date = $apod_date;
             }
             $api = new Hm_API_Curl();
@@ -87,7 +88,7 @@ class Hm_Output_apod_content extends Hm_Output_Module {
         $res = '<div class="content_title">'.$this->trans('Astronomy Picture of the Day');
         $res .= apod_date_form($date, $this);
         $res .= '</div>';
-        if (!$data || $data == array() || array_key_exists('error', $data)) {
+        if (!$data || $data == array() || array_key_exists('error', $data) || array_key_exists('code', $data)) {
             $res .= '<div class="apod_error">';
             if (is_array($data) && array_key_exists('error', $data) && array_key_exists('message', $data['error'])) {
                 $res .= $this->html_safe($data['error']['message']);
@@ -169,15 +170,32 @@ class Hm_Output_nasa_folders extends Hm_Output_Module {
 if (!hm_exists('apod_date_form')) {
 function apod_date_form($date, $output_mod) {
     $next = '';
-    if (strtotime(date('Y-m-d')) > strtotime($date)) {
-        $next = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', strtotime('+1 days', strtotime($date))));
+    // There are no APOD's for June 17, 18 and 19 in 1995 - the only dates
+    // since the first picture on June 16 1995, so these are excluded for
+    // prev and next days.
+    if (strtotime(dateInESTTZ()) > strtotime($date)) {
+        if (date('Y-m-d', strtotime($date)) == "1995-06-16")
+            $nextday = strtotime("1995-06-20");
+        else
+            $nextday = strtotime('+1 days', strtotime($date));
+        $next = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', $nextday));
     }
-    $prev = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', strtotime('-1 days', strtotime($date))));
+    if (strtotime($date) > strtotime("1995-06-16")) {
+        if (date("Y-m-d", strtotime($date)) == "1995-06-20")
+            $prevday = strtotime("1995-06-16");
+        else
+            $prevday = strtotime('-1 days', strtotime($date));
+        $prev = sprintf('?page=nasa_apod&amp;apod_date=%s', date('Y-m-d', $prevday));
+    }
     $res = '<form class="apod_date" method="get">';
-    $res .= '<a href="'.$prev.'">'.$output_mod->trans('Previous').'</a>';
-    $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" />';
+    // Previous can be empty if the first picture of June 16 1995 has been reached
+    if ($prev) {
+        $res .= '<a href="'.$prev.'">'.$output_mod->trans('Previous').'</a>';
+    }
+    $res .= '<input name="apod_date" class="apod_date_fld" type="date" value="'.$date.'" min="1995-06-16" max="'.dateInESTTZ().'"/>';
     $res .= '<input type="hidden" name="page" value="nasa_apod" />';
     $res .= '<input type="submit" value="'.$output_mod->trans('Update').'" />';
+    // Next can be empty if the day hasn't ticked over at NASA HQ yet
     if ($next) {
         $res .= '<a href="'.$next.'">'.$output_mod->trans('Next').'</a>';
     }
@@ -185,3 +203,12 @@ function apod_date_form($date, $output_mod) {
     return $res;
 }}
 
+function dateInESTTZ() {
+    // Create a "today" at NASA's HQ (in EST/EDT timezone)
+    $tz = "America/New_York";
+    $timestamp = time();
+    $dt = new DateTime("now", new DateTimeZone($tz));
+    $dt->setTimeStamp($timestamp);
+    $date = $dt->format('Y-m-d');
+    return $date;
+}
