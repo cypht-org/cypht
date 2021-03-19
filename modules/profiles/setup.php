@@ -28,7 +28,7 @@ return array(
         'profile_name' => FILTER_SANITIZE_STRING,
         'profile_id' => FILTER_VALIDATE_INT,
         'profile_replyto' => FILTER_SANITIZE_STRING,
-        'profile_smtp' => FILTER_VALIDATE_INT,
+        'profile_smtp' => FILTER_SANITIZE_STRING,
         'profile_imap' => FILTER_SANITIZE_STRING,
         'profile_default' => FILTER_VALIDATE_INT,
         'profile_address' => FILTER_SANITIZE_STRING,
