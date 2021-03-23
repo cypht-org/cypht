@@ -127,7 +127,7 @@ return array(
         'compose_in_reply_to' => FILTER_UNSAFE_RAW,
         'compose_cc' => FILTER_UNSAFE_RAW,
         'compose_bcc' => FILTER_UNSAFE_RAW,
-        'compose_smtp_id' => FILTER_VALIDATE_FLOAT,
+        'compose_smtp_id' => FILTER_SANITIZE_STRING,
         'draft_id' => FILTER_VALIDATE_INT,
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_UNSAFE_RAW,
