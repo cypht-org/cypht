@@ -13,7 +13,7 @@ case "$BUILD" in
     postgresql7.4)
         phpunit_tests && selenium_tests
     ;;
-    )
+    *)
         phpunit_tests
     ;;
 esac
