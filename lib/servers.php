@@ -76,7 +76,7 @@ trait Hm_Server_Connect {
      * @param mixed $cache cached connection data
      * @return bool true on success
      */
-    public abstract function service_connect($id, $server, $user, $pass, $cache);
+    public abstract static function service_connect($id, $server, $user, $pass, $cache);
 
     /**
      * Try to disconnect cleanly
