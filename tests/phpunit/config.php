@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_User_Config_File
  */
-class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
+class Hm_Test_User_Config_File extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
@@ -149,7 +151,7 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
         $this->assertEquals('UTC', date_default_timezone_get());
         $this->assertEquals('foo', $this->config->get('bar'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }
@@ -157,9 +159,9 @@ class Hm_Test_User_Config_File extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Site_Config_File
  */
-class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
+class Hm_Test_Site_Config_File extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
@@ -190,7 +192,7 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
         $config = new Hm_Site_Config_File('./data/siteconfig.rc');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }
@@ -198,9 +200,9 @@ class Hm_Test_Site_Config_File extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_User_Config_DB
  */
-class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
+class Hm_Test_User_Config_DB extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
@@ -215,12 +217,9 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $user_config = new Hm_User_Config_DB($site_config);
         $this->assertTrue($user_config->connect());
     }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_db_load() {
-        /*$site_config = new Hm_Mock_Config();
+    
+    /*public function test_db_load() {
+        $site_config = new Hm_Mock_Config();
         setup_db($site_config);
         $user_config = new Hm_User_Config_DB($site_config);
         $this->assertEquals(array('version' => VERSION), $user_config->dump());
@@ -236,8 +235,9 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $site_config->set('single_server_mode', true);
         $user_config = new Hm_User_Config_DB($site_config);
         $user_config->load('testuser', 'testkey');
-        $this->assertTrue(array_key_exists('version', $user_config->dump()));*/
-    }
+        $this->assertTrue(array_key_exists('version', $user_config->dump()));
+    }*/
+    
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -280,17 +280,18 @@ class Hm_Test_User_Config_DB extends PHPUnit_Framework_TestCase {
         $site_config->set('auth_type', 'IMAP');
         $site_config->set('single_server_mode', true);
         $user_config = new Hm_User_Config_DB($site_config);
+        $user_config->load('foo', 'foo');
         $user_config->set('foo',  'bar');
         $this->assertEquals('bar', $user_config->get('foo'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }
 
-class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
+class Hm_Test_User_Config_Functions extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
@@ -321,7 +322,7 @@ class Hm_Test_User_Config_Functions extends PHPUnit_Framework_TestCase {
         $this->assertFalse(crypt_state($site_config));
     }
 
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }

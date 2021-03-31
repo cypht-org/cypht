@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Auth extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
         setup_db($this->config);
@@ -142,7 +144,7 @@ class Hm_Test_Auth extends PHPUnit_Framework_TestCase {
         $auth = new Hm_Auth_DB($this->config);
         $this->assertEquals(2, $auth->create('unittestuser', 'unittestpass'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }

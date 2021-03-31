@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Dispatch extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
         define('CONFIG_FILE', APP_PATH.'hm3.rc');
@@ -135,9 +137,9 @@ class Hm_Test_Dispatch extends PHPUnit_Framework_TestCase {
     }
 }
 
-class Hm_Test_Debug_Page_Redirect extends PHPUnit_Framework_TestCase {
+class Hm_Test_Debug_Page_Redirect extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         define('CONFIG_FILE', APP_PATH.'hm3.rc');

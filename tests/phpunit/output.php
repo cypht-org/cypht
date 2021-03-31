@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_Output_HTTP
  */
-class Hm_Test_Output extends PHPUnit_Framework_TestCase {
+class Hm_Test_Output extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->http = new Hm_Output_HTTP();
     }
@@ -27,7 +29,7 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
         ob_end_clean();
         $this->assertEquals('test', $output);
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->http);
     }
 }
@@ -35,9 +37,9 @@ class Hm_Test_Output extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Msgs
  */
-class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
+class Hm_Test_Msgs extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**
@@ -100,9 +102,9 @@ class Hm_Test_Msgs extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Debug
  */
-class Hm_Test_Debug extends PHPUnit_Framework_TestCase {
+class Hm_Test_Debug extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**
@@ -122,8 +124,8 @@ class Hm_Test_Debug extends PHPUnit_Framework_TestCase {
 /**
  * tests for elog
  */
-class Hm_Test_Elog extends PHPUnit_Framework_TestCase {
-    public function setUp() {
+class Hm_Test_Elog extends TestCase {
+    public function setUp(): void {
         define( 'DEBUG_MODE', true);
         require 'bootstrap.php';
     }

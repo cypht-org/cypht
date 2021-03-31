@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for the Hm_Request class
  */
-class Hm_Test_Request extends PHPUnit_Framework_TestCase {
+class Hm_Test_Request extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         define('CONFIG_FILE', APP_PATH.'hm3.rc');
         $this->config = new Hm_Mock_Config();

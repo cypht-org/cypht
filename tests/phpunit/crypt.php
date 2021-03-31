@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_Crypt
  */
-class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
+class Hm_Test_Crypt extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**
@@ -53,9 +55,9 @@ class Hm_Test_Crypt extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Crypt
  */
-class Hm_Test_Crypt_Base extends PHPUnit_Framework_TestCase {
+class Hm_Test_Crypt_Base extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         define('LIBSODIUM', false);
         require 'bootstrap.php';
     }
@@ -161,9 +163,9 @@ class Hm_Test_Crypt_Base extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Request_Key
  */
-class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
+class Hm_Test_Request_Key extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $session = new Hm_Mock_Session();
         $request = new Hm_Mock_Request('AJAX');
@@ -196,7 +198,7 @@ class Hm_Test_Request_Key extends PHPUnit_Framework_TestCase {
     public function test_key_validate() {
         $this->assertTrue(Hm_Request_Key::validate('fakefingerprint'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
     }
 }
 

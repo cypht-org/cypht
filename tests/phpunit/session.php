@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_PHP_Session
  */
-class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
+class Hm_Test_PHP_Session extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
@@ -269,9 +271,9 @@ class Hm_Test_PHP_Session extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Redis_Session
  */
-class Hm_Test_Redis_Session extends PHPUnit_Framework_TestCase {
+class Hm_Test_Redis_Session extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
@@ -294,9 +296,9 @@ class Hm_Test_Redis_Session extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Memcached_Session
  */
-class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
+class Hm_Test_Memcached_Session extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
@@ -396,9 +398,9 @@ class Hm_Test_Memcached_Session extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_DB_Session
  */
-class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
+class Hm_Test_DB_Session extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
@@ -548,14 +550,14 @@ class Hm_Test_DB_Session extends PHPUnit_Framework_TestCase {
         $session->destroy($request);
 
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }
 
-class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
+class Hm_Test_Session_Functions extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php'; 
         $this->config = new Hm_Mock_Config();
         require APP_PATH.'modules/site/lib.php';
@@ -603,7 +605,7 @@ class Hm_Test_Session_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals('Hm_PHP_Session', get_class(($setup->setup_session())));
 
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }

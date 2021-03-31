@@ -1,12 +1,14 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 
 /**
  * tests for Hm_Format_JSON and Hm_Format_HTML5
  */
-class Hm_Test_Format extends PHPUnit_Framework_TestCase {
+class Hm_Test_Format extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->json = new Hm_Format_JSON($config);
@@ -36,12 +38,12 @@ class Hm_Test_Format extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array(), $this->json->filter_all_output(array('date' => array()), array('date' => array(FILTER_SANITIZE_STRING, false))));
         $this->assertEquals(array('test_array' => array('test')), $this->json->filter_all_output(array('test_array' => array('test')), array('test_array' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY))));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         Hm_Output_Modules::del('test', 'blah');
     }
 }
-class Hm_Test_Transform extends PHPUnit_Framework_TestCase {
-    public function setUp() {
+class Hm_Test_Transform extends TestCase {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**

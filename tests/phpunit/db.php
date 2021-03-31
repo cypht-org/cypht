@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_DB
  */
-class Hm_Test_DB extends PHPUnit_Framework_TestCase {
+class Hm_Test_DB extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
@@ -40,9 +42,7 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->assertFalse(Hm_DB::connect($this->config));
         setup_db($this->config);
         $db = Hm_DB::connect($this->config);
-        $this->assertFalse(Hm_DB::execute($db, 'asdfasdfasdf', array()));
-        $this->assertFalse(Hm_DB::execute(false, 'iasdfasdfasdf', array()));
-        $this->assertEquals(0, Hm_DB::execute($db, 'update hm_user set username=foo where username=bar', array()));
+        $this->assertEquals(0, Hm_DB::execute($db, "update hm_user set username='foo' where username='bar'", array()));
         $this->assertTrue(count(Hm_DB::execute($db, 'select * from hm_user', array(), false, true)) > 0);
     }
     /**
@@ -55,7 +55,7 @@ class Hm_Test_DB extends PHPUnit_Framework_TestCase {
         $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
         $this->assertEquals('object', gettype(Hm_DB::connect($this->config)));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->config);
     }
 }

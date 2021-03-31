@@ -32,12 +32,6 @@ setup_memcached() {
 
 # PHP tweaks based on versions
 setup_php() {
-    if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
-        sudo apt-get install php7.0-ldap
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        sudo apt-get install php7.1-ldap
-    fi
     if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
         sudo apt-get install php7.4-gd
     fi
@@ -56,29 +50,14 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
-    if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then
-        mv .travis/creds.py-chrome creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
-        mv .travis/creds.py-safari creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
-        mv .travis/creds.py-ff creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
-        mv .travis/creds.py-edge creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        mv .travis/creds.py-chrome creds.py
-    fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
-        mv .travis/creds.py-chrome creds.py
+        mv .travis/creds.py-ff creds.py
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
-        mv .travis/creds.py-chrome creds.py
+        mv .travis/creds.py-edge creds.py
     fi
 }
 
@@ -101,29 +80,17 @@ setup_cypht() {
 
 # Install a version of phpunit that is compatible with the version of PHP that is installed
 install_phpunit() {
-    if [ "$TRAVIS_PHP_VERSION" = "5.4" ]; then
-        wget https://phar.phpunit.de/phpunit-4.8.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.5" ]; then
-        wget https://phar.phpunit.de/phpunit-4.8.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "5.6" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
-    fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
-        wget https://phar.phpunit.de/phpunit-5.7.phar -O phpunit
+        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
+        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
     fi
     chmod +x phpunit
     sudo mv phpunit /usr/local/bin/phpunit
@@ -156,12 +123,6 @@ install_apache() {
     sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
     sudo a2enmod rewrite actions fastcgi alias
     echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-    if [ "$TRAVIS_PHP_VERSION" = "7.0" ]; then
-        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.1" ]; then
-        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
-    fi
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
@@ -169,6 +130,9 @@ install_apache() {
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
 
@@ -221,9 +185,6 @@ setup_db() {
         mysql -u root -e "insert into hm_user values('unittestuser', 'sha512:86000:xfEgf7NIUQ2XkeU5tnIcA+HsN8pUllMVdzpJxCSwmbsZAE8Hze3Zs+MeIqepwocYteJ92vhq7pjOfrVThg/p1voELkDdPenU8i2PgG9UTI0IJTGhMN7rsUILgT6XlMAKLp/u2OD13sukUFcQNTdZNFqMsuTVTYw/Me2tAnFwgO4=:rfyUhYsWBCknx6EmbeswN0fy0hAC0N3puXzwWyDRquA=');" test
         mysql -u root -e "insert into hm_user_settings values('testuser', 'sFpVPU/hPvmfeiEKUBs4w1EizmbW/Ze2BALZf6kdJrIU3KVZrsqIhKaWTNNFRm3p51ssRAH2mpbxBMhsdpOAqIZMXFHjLttRu9t5WZWOkN7qwEh2LRq6imbkMkfqXg//K294QDLyWjE0Lsc/HSGqnguBF0YUVLVmWmdeqq7/OrXUo4HNbU88i4s2gkukKobJA2hjcOEq/rLOXr3t4LnLlcISnUbt4ptalSbeRrOnx4ehZV8hweQf1E+ID7s/a+8HHx1Qo713JDzReoLEKUsxRQ==');" test
     fi
-     if [ "$TRAVIS_PHP_VERSION" = "7.1" ] && [ "$DB" = "mysql" ]; then
-         cp -vf .travis/phpunit.xml tests/phpunit/phpunit.xml
-     fi
 }
 
 # install coveralls
@@ -252,7 +213,7 @@ setup_unit_tests() {
     setup_cypht
     install_phpunit
     install_coveralls
-    install_sodium
+    #install_sodium
     bootstrap_unit_tests
 }
 
@@ -262,7 +223,7 @@ setup_ui_tests() {
     setup_php
     setup_memcached
     setup_cypht
-    install_sodium
+    #install_sodium
     setup_user
     install_dovecot
     selenium_config
@@ -282,7 +243,7 @@ setup_all_tests() {
     install_phpunit
     install_coveralls
     install_selenium
-    install_sodium
+    #install_sodium
     install_apache
     install_postfix
     bootstrap_unit_tests

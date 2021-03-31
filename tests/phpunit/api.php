@@ -1,9 +1,10 @@
 <?php
 
+use PHPunit\Framework\TestCase;
 
-class Hm_Test_API_Curl extends PHPUnit_Framework_TestCase {
+class Hm_Test_API_Curl extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**
