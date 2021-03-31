@@ -41,13 +41,16 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
-    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
+        mv .travis/creds.py-chrome creds.py
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
         mv .travis/creds.py-ff creds.py
     fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
+    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
         mv .travis/creds.py-edge creds.py
     fi
 }
