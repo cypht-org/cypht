@@ -81,15 +81,8 @@ setup_cypht() {
 # Install a version of phpunit that is compatible with the version of PHP that is installed
 install_phpunit() {
     if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
-        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
-        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
-        wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
+        wget https://phar.phpunit.de/phpunit-8.phar -O phpunit
+    else
         wget https://phar.phpunit.de/phpunit-9.phar -O phpunit
     fi
     chmod +x phpunit
