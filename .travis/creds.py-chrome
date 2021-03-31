@@ -7,8 +7,8 @@ RECIP='testuser@localhost.localdomain'
 IMAP_ID='2'
 DESIRED_CAP = None
 SITE_URL = 'http://cypht-test.org/'
-USER = 'testuser'
-PASS = 'testuser'
+USER = 'unittestuser'
+PASS = 'unittestpass'
 
 config = {
     'user': os.environ['BROWSERSTACK_USER'],
