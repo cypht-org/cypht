@@ -411,7 +411,6 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
  */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {
-
         /* not sending */
         if (!array_key_exists('smtp_send', $this->request->post)) {
             return;
@@ -508,6 +507,19 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         Hm_Msgs::add("Message Sent");
         delete_draft($form['draft_id'], $this->session);
         delete_uploaded_files($this->session, $form['draft_id']);
+    }
+}
+
+/**
+ * Determine if composer_from is set
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_from_replace extends Hm_Handler_Module {
+    public function process()
+    {
+        if (array_key_exists('compose_from', $this->request->get)) {
+            $this->out('compose_from', $this->request->get['compose_from']);
+        }
     }
 }
 
@@ -611,6 +623,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $html = $this->get('smtp_compose_type', 0);
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
+        $from = $this->get('compose_from');
+
         if (!$msg_path) {
             $msg_path = $this->get('compose_msg_path', '');
         }
@@ -693,6 +707,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         foreach ($files as $file) {
             $res .= format_attachment_row($file, $this);
         }
+
+        // If compose_from GET parameter is set, force $recip replacement.
+        // This ensures any module can force the selected dropdown SMTP server
+        if ($from) {
+            $recip = $from;
+        }
+
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $smtp_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>'.
@@ -910,7 +931,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             if (!$selected && $selected_id !== false && $id == $selected_id) {
                 $selected = $id;
             }
-            elseif (!$selected && $recip && trim($recip) == trim($vals['user'])) {
+            if (!$selected && $recip && trim($recip) == trim($vals['user'])) {
                 $selected = $id;
             }
         }
