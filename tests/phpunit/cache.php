@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for Hm_Uid_Cache
  */
-class Hm_Test_Uid_Cache extends PHPUnit_Framework_TestCase {
+class Hm_Test_Uid_Cache extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         Test_Uid_Cache::load(array(array('foo', 'bar'),array()));
     }
@@ -54,7 +56,7 @@ class Hm_Test_Uid_Cache extends PHPUnit_Framework_TestCase {
         Test_Uid_Cache::read('baz');
         $this->assertTrue(Test_Uid_Cache::is_read('baz'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         Test_Uid_Cache::load(array(),array());
     }
 }
@@ -62,9 +64,9 @@ class Hm_Test_Uid_Cache extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Memcached
  */
-class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
+class Hm_Test_Hm_Memcache extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
@@ -170,9 +172,9 @@ class Hm_Test_Hm_Memcache extends PHPUnit_Framework_TestCase {
 /**
  * tests for Hm_Redis
  */
-class Hm_Test_Hm_Redis extends PHPUnit_Framework_TestCase {
+class Hm_Test_Hm_Redis extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
@@ -272,9 +274,9 @@ class Hm_Test_Hm_Redis extends PHPUnit_Framework_TestCase {
 /**
  * tests for generica cache
  */
-class Hm_Test_Hm_Cache extends PHPUnit_Framework_TestCase {
+class Hm_Test_Hm_Cache extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
@@ -342,14 +344,12 @@ class Hm_Test_Hm_Cache extends PHPUnit_Framework_TestCase {
         $cache = new Hm_Cache($this->config, $session);
         $this->assertTrue($cache->set('foo', 'bar'));
         $this->assertEquals('bar', $cache->get('foo'));
-        $this->assertEquals('baz', $cache->get('bar', 'baz'));
         $this->config->set('enable_redis', true);
         $this->config->set('redis_server', 'asdf');
         $this->config->set('redis_port', 10);
         $cache = new Hm_Cache($this->config, $session);
         $this->assertTrue($cache->set('foo', 'bar'));
         $this->assertEquals('bar', $cache->get('foo'));
-        $this->assertEquals('baz', $cache->get('bar', 'baz'));
     }
     /**
      * @preserveGlobalState disabled

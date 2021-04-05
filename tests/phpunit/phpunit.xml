@@ -1,79 +1,75 @@
-<phpunit strict="false" colors="true">
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage includeUncoveredFiles="false" processUncoveredFiles="false">
+    <include>
+      <directory suffix=".php">../../lib</directory>
+      <directory suffix=".php">../../modules/core/</directory>
+    </include>
+    <exclude>
+      <file>../../lib/framework.php</file>
+      <file>../../lib/sodium_compat.php</file>
+    </exclude>
+  </coverage>
+  <testsuites>
     <testsuite name="session">
-        <file>./session.php</file>
+      <file>./session.php</file>
     </testsuite>
     <testsuite name="cache">
-        <file>./cache.php</file>
+      <file>./cache.php</file>
     </testsuite>
     <testsuite name="crypt">
-        <file>./crypt.php</file>
+      <file>./crypt.php</file>
     </testsuite>
     <testsuite name="config">
-        <file>./config.php</file>
+      <file>./config.php</file>
     </testsuite>
     <testsuite name="db">
-        <file>./db.php</file>
+      <file>./db.php</file>
     </testsuite>
     <testsuite name="format">
-        <file>./format.php</file>
+      <file>./format.php</file>
     </testsuite>
     <testsuite name="auth">
-        <file>./auth.php</file>
+      <file>./auth.php</file>
     </testsuite>
     <testsuite name="oauth2">
-        <file>./oauth2.php</file>
+      <file>./oauth2.php</file>
     </testsuite>
     <testsuite name="module">
-        <file>./module.php</file>
+      <file>./module.php</file>
     </testsuite>
     <testsuite name="modules">
-        <file>./modules.php</file>
+      <file>./modules.php</file>
     </testsuite>
     <testsuite name="dispatch">
-        <file>./dispatch.php</file>
+      <file>./dispatch.php</file>
     </testsuite>
     <testsuite name="output">
-        <file>./output.php</file>
+      <file>./output.php</file>
     </testsuite>
     <testsuite name="request">
-        <file>./request.php</file>
+      <file>./request.php</file>
     </testsuite>
     <testsuite name="servers">
-        <file>./servers.php</file>
+      <file>./servers.php</file>
     </testsuite>
     <testsuite name="webdav_formats">
-        <file>./webdav_formats.php</file>
+      <file>./webdav_formats.php</file>
     </testsuite>
     <testsuite name="api">
-        <file>./api.php</file>
+      <file>./api.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
-        <file>./modules/imap/hm-imap.php</file>
-    </testsuite>-->
+            <file>./modules/imap/hm-imap.php</file>
+        </testsuite>-->
     <testsuite name="modules_core">
-        <file>./modules/core/functions.php</file>
-        <file>./modules/core/message_functions.php</file>
-        <file>./modules/core/message_list_functions.php</file>
-        <file>./modules/core/modules.php</file>
+      <file>./modules/core/functions.php</file>
+      <file>./modules/core/message_functions.php</file>
+      <file>./modules/core/message_list_functions.php</file>
+      <file>./modules/core/modules.php</file>
     </testsuite>
-    <filter>
-        <whitelist addUncoveredFilesFromWhitelist="false" processUncoveredFilesFromWhitelist="false">
-            <directory suffix=".php">../../lib</directory>
-            <exclude>
-                <file>../../lib/framework.php</file>
-            </exclude>
-            <exclude>
-                <file>../../lib/sodium_compat.php</file>
-            </exclude>
-            <directory suffix=".php">../../modules/core/</directory>
-            <!--<directory suffix=".php">../../modules/imap/hm-imap-base.php</directory>
-            <directory suffix=".php">../../modules/imap/hm-imap-cache.php</directory>
-            <directory suffix=".php">../../modules/imap/hm-imap-parser.php</directory>
-            <directory suffix=".php">../../modules/imap/hm-imap-bodystructure.php</directory>
-            <directory suffix=".php">../../modules/imap/hm-imap.php</directory>-->
-        </whitelist>
-    </filter>
-    <!--<logging>
+  </testsuites>
+  <!--<logging>
         <log type="coverage-html" target="../../../cypht-docs/test_coverage/" charset="UTF-8" highlight="false" lowUpperBound="75" highLowerBound="99"/>
         <log type="coverage-clover" target="clover.xml"/>
     </logging>-->

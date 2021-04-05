@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for the Hm_Module_Output trait
  */
-class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
+class Hm_Test_Modules_Output extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
@@ -96,9 +98,9 @@ class Hm_Test_Modules_Output extends PHPUnit_Framework_TestCase {
 /**
  * tests for the Hm_Handler_Module class
  */
-class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
+class Hm_Test_Handler_Module extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
@@ -187,9 +189,9 @@ class Hm_Test_Handler_Module extends PHPUnit_Framework_TestCase {
 /**
  * DEBUG_MODE tests for the Hm_Handler_Module class
  */
-class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
+class Hm_Test_Handler_Module_Debug extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         $this->parent = build_parent_mock();
@@ -208,9 +210,9 @@ class Hm_Test_Handler_Module_Debug extends PHPUnit_Framework_TestCase {
 /**
  * tests for the Hm_Output_Module class
  */
-class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
+class Hm_Test_Output_Module extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->output_mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
     }
@@ -240,7 +242,7 @@ class Hm_Test_Output_Module extends PHPUnit_Framework_TestCase {
         $this->assertEquals('nohtml', $this->output_mod->html_safe('nohtml'));
         $this->assertEquals('&lt;script&gt;', $this->output_mod->html_safe('<script>', true));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->output_mod);
     }
 }

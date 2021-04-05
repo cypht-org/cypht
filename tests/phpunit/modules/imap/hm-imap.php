@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Hm_IMAP extends TestCase {
+
+    public function setUp(): void {
         define('IMAP_TEST', true);
         require 'bootstrap.php';
         require APP_PATH.'modules/imap/hm-imap.php';
@@ -535,7 +537,7 @@ class Hm_Test_Hm_IMAP extends PHPUnit_Framework_TestCase {
         $this->connect();
         $this->assertEquals(array(1, '0123456789'), $this->imap->get_first_message_part(1731, 'text', 'plain'));
     }
-    public function tearDown() {
+    public function tearDown(): void {
         $this->disconnect();
     }
 }

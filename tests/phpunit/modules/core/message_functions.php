@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Core_Message_Functions extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Core_Message_Functions extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }

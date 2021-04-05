@@ -28,6 +28,7 @@ config_check() {
 php_check() {
     echo; echo -e "$YELLOW PHP CHECK $END"; echo
     find . -name "*.php" -print \
+        | grep -v .autoload-legacy.php \
         | xargs -L 1  php -l
     err_condition
 }
@@ -38,7 +39,7 @@ js_check() {
     find . -name "*.js" \
         | while read fname;
         do echo $fname;
-            acorn --silent "$fname"; if [[ $? != 0 ]];
+            acorn --ecma2020 --silent "$fname"; if [[ $? != 0 ]];
         then exit 1; fi;
         done
     err_condition

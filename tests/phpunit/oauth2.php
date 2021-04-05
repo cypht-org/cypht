@@ -1,9 +1,11 @@
 <?php
 
+use PHPunit\Framework\TestCase;
 
-class Hm_Test_Oauth2 extends PHPUnit_Framework_TestCase {
 
-    public function setUp() {
+class Hm_Test_Oauth2 extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         $this->oauth2 = new Hm_Oauth2('client_id', 'secret', 'uri');
     }
@@ -31,7 +33,7 @@ class Hm_Test_Oauth2 extends PHPUnit_Framework_TestCase {
         $res = $this->oauth2->request_token('url', 'auth_code');
         $this->assertEquals(array('unit' => 'test'), $res);
     }
-    public function tearDown() {
+    public function tearDown(): void {
         unset($this->oauth2);
     }
 }

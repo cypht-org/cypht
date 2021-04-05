@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for the Hm_Modules trait
  */
-class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
+class Hm_Test_Modules extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         Hm_Test_Module_List::add('test', 'date', false, false, 'after', true, 'core');
     }
@@ -131,9 +133,9 @@ class Hm_Test_Modules extends PHPUnit_Framework_TestCase {
 /**
  * tests for the module runner
  */
-class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
+class Hm_Test_Module_Exec extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->module_exec = new Hm_Module_Exec($config);
@@ -290,9 +292,9 @@ class Hm_Test_Module_Exec extends PHPUnit_Framework_TestCase {
     }
 }
 
-class Hm_Test_Module_Exec_Debug extends PHPUnit_Framework_TestCase {
+class Hm_Test_Module_Exec_Debug extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         $config = new Hm_Mock_Config();
@@ -320,9 +322,9 @@ class Hm_Test_Module_Exec_Debug extends PHPUnit_Framework_TestCase {
 /**
  * tests for the functional interface to modules
  */
-class Hm_Test_Module_Functions extends PHPUnit_Framework_TestCase {
+class Hm_Test_Module_Functions extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**

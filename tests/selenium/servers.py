@@ -72,5 +72,5 @@ if __name__ == '__main__':
         'smtp_add',
         'smtp_del',
         'imap_add',
-        'imap_confirm'
+        #'imap_confirm'
     ])

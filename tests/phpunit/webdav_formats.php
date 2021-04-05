@@ -1,9 +1,10 @@
 <?php
 
+use PHPunit\Framework\TestCase;
 
-class Hm_Test_Webdav_Formats extends PHPUnit_Framework_TestCase {
+class Hm_Test_Webdav_Formats extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
     }
     /**

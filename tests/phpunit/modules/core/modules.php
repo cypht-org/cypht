@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Core_Handler_Modules extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
         require APP_PATH.'modules/core/modules.php';
@@ -562,9 +564,9 @@ class Hm_Test_Core_Handler_Modules extends PHPUnit_Framework_TestCase {
  * TODO: add assertions to all tests
  */
 
-class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
+class Hm_Test_Core_Output_Modules extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
         require APP_PATH.'modules/core/modules.php';
@@ -1449,8 +1451,8 @@ class Hm_Test_Core_Output_Modules extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array('</tbody></table><div class="page_links"></div></div>'), $res->output_response);
     }
 }
-class Hm_Test_Core_Output_Modules_Debug extends PHPUnit_Framework_TestCase {
-    public function setUp() {
+class Hm_Test_Core_Output_Modules_Debug extends TestCase {
+    public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         require 'helpers.php';

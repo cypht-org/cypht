@@ -1,11 +1,13 @@
 <?php
 
+use PHPunit\Framework\TestCase;
+
 /**
  * tests for the Hm_Server_List trait
  */
-class Hm_Test_Server_List extends PHPUnit_Framework_TestCase {
+class Hm_Test_Server_List extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         require 'bootstrap.php';
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 0);
         Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1), 3);

@@ -727,8 +727,8 @@ var imap_background_unread_content_result = function(res) {
 };
 
 var check_select_for_imap = function() {
-    $('input[type=checkbox]').off('change'); 
-    $('input[type=checkbox]').on("change", function(e) { search_selected_for_imap(); });
+    $('body').off('change', 'input[type=checkbox]');
+    $('body').on('change', 'input[type=checkbox]', function(e) { search_selected_for_imap(); });
 };
 
 var search_selected_for_imap = function() {

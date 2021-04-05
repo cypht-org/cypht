@@ -1,8 +1,10 @@
 <?php
 
-class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
+use PHPunit\Framework\TestCase;
 
-    public function setUp() {
+class Hm_Test_Core_Functions extends TestCase {
+
+    public function setUp(): void {
         require 'bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
@@ -222,9 +224,9 @@ class Hm_Test_Core_Functions extends PHPUnit_Framework_TestCase {
         $this->assertEquals(array(), profiles_by_smtp_id(array('smtp_id' => 0), 0));
     }
 }
-class Hm_Test_Core_Functions_Debug extends PHPUnit_Framework_TestCase {
+class Hm_Test_Core_Functions_Debug extends TestCase {
 
-    public function setUp() {
+    public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
