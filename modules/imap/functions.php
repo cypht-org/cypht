@@ -1023,6 +1023,7 @@ function format_list_headers($mod) {
             $section = ' '.$mod->html_safe($name).': ';
             foreach ($vals['email'] as $v) {
                 $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
+                    '&compose_from='.$mod->get('msg_headers')['Delivered-To'].
                     '">'.$mod->trans('email').'</a>';
             }
             foreach ($vals['links'] as $v) {

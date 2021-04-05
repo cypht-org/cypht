@@ -7,6 +7,7 @@ output_source('smtp');
 
 add_module_to_all_pages('handler', 'smtp_default_server', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_reply_to_details', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'smtp_from_replace', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
@@ -97,6 +98,7 @@ return array(
         'draft_id' => FILTER_VALIDATE_INT,
         'compose_to' => FILTER_SANITIZE_STRING,
         'mailto_uri' => FILTER_SANITIZE_STRING,
+        'compose_from' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),
