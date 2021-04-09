@@ -166,6 +166,18 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             delete_draft($draft_id, $this->session);
         }
         else {
+            if ($this->module_is_supported('imap')) {
+                if (save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+                        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+                        'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
+                        $this, $this->cache)) {
+                    Hm_Msgs::add('Draft saved');
+                } elseif ($draft_notice) {
+                    Hm_Msgs::add('ERRYou must enter a subject to save a draft');
+                }
+                return;
+            }
+
             if (save_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                 'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                 'draft_in_reply_to' => $inreplyto), $draft_id, $this->session) !== false) {
@@ -1146,6 +1158,61 @@ function save_draft($atts, $id, $session) {
     $drafts[$id] = $atts;
     $session->set('compose_drafts', $drafts);
     return $id;
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('find_imap_by_smtp')) {
+function find_imap_by_smtp($imap_profiles, $smtp_profile)
+{
+    foreach ($imap_profiles as $id => $profile) {
+        if ($smtp_profile['user'] == $profile['user']) {
+            return array_merge(['id' => $id], $profile);
+        }
+        if (explode('@', $smtp_profile['user'])[0]
+            == explode('@', $profile['user'])[0]) {
+            return array_merge(['id' => $id], $profile);
+        }
+        if ($smtp_profile['user'] == $profile['name']) {
+            return array_merge(['id' => $id], $profile);
+        }
+    }
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('save_imap_draft')) {
+function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
+    $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
+        $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
+
+    $specials = $mod->user_config->get('special_imap_folders');
+
+    if (array_key_exists($imap_profile['id'], $specials) &&
+        $specials[$imap_profile['id']]['draft']) {
+        $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
+        $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
+        $draft_folder = $imap->select_mailbox($specials[$imap_profile['id']]['draft']);
+
+        $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
+            $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
+            0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
+
+        $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
+        $msg = str_replace("\n", "\r\n", $msg);
+        $msg = rtrim($msg)."\r\n";
+
+        if ($imap->append_start($specials[$imap_profile['id']]['draft'], strlen($msg), true)) {
+            $imap->append_feed($msg."\r\n");
+            if (!$imap->append_end()) {
+                Hm_Msgs::add('ERRAn error occurred saving the sent message');
+            }
+        }
+        return 1;
+    }
+    return save_draft($atts, $id, $session);
 }}
 
 /**
