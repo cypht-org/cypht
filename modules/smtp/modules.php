@@ -717,16 +717,16 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             foreach ($profiles as $id => $profile) {
                 if ($profile['user'] == $from) {
                     $smtp_id = $id;
-                    break;
                 }
                 // Profile users without the domain
                 if ($profile['user'] == explode('@', $from)[0]) {
                     $smtp_id = $id;
-                    break;
                 }
                 // Some users might use the profile name as the full email
                 if ($profile['name'] == $from) {
                     $smtp_id = $id;
+                }
+                if ($smtp_id) {
                     break;
                 }
             }
