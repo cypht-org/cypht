@@ -1207,7 +1207,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         if ($imap->append_start($specials[$imap_profile['id']]['draft'], strlen($msg), true)) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
-                Hm_Msgs::add('ERRAn error occurred saving the sent message');
+                Hm_Msgs::add('ERRAn error occurred saving the draft message');
             }
         }
         return 1;
