@@ -134,7 +134,7 @@ return array(
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_UNSAFE_RAW,
         'draft_to' => FILTER_UNSAFE_RAW,
-        'draft_smtp' => FILTER_VALIDATE_FLOAT,
+        'draft_smtp' => FILTER_SANITIZE_STRING,
         'draft_cc' => FILTER_UNSAFE_RAW,
         'draft_bcc' => FILTER_UNSAFE_RAW,
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
