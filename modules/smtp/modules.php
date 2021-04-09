@@ -708,10 +708,28 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= format_attachment_row($file, $this);
         }
 
-        // If compose_from GET parameter is set, force $recip replacement.
-        // This ensures any module can force the selected dropdown SMTP server
+        // If compose_from GET parameter is set, search for the correct smtp_id
+        // within the SMTP profiles.
+        //
+        // Added latency reduction 'break' for big smtp profile lists
         if ($from) {
-            $recip = $from;
+            $profiles = $this->module_output()['smtp_servers'];
+            foreach ($profiles as $id => $profile) {
+                if ($profile['user'] == $from) {
+                    $smtp_id = $id;
+                    break;
+                }
+                // Profile users without the domain
+                if ($profile['user'] == explode('@', $from)[0]) {
+                    $smtp_id = $id;
+                    break;
+                }
+                // Some users might use the profile name as the full email
+                if ($profile['name'] == $from) {
+                    $smtp_id = $id;
+                    break;
+                }
+            }
         }
 
         $res .= '</table>'.
