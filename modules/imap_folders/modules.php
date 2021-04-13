@@ -217,7 +217,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
         $res .= '<option value="">'.$this->trans('Select an IMAP server').'</option>';
         foreach ($this->get('imap_servers', array()) as $id => $server) {
             $res .= '<option ';
-            if ($server_id === $id) {
+            if ($server_id == $id) {
                 $res .= 'selected="selected" ';
             }
             $res .= 'value="'.$this->html_safe($id).'">';
