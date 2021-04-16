@@ -296,6 +296,10 @@ function icon_callback($vals, $style, $output_mod) {
         $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />' : ' F';
         $title[] = $output_mod->trans('Flagged');
     }
+    if (in_array('draft', $vals[0])) {
+        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Draft').'" />' : ' D';
+        $title[] = $output_mod->trans('Draft');
+    }
     if (in_array('answered', $vals[0])) {
         $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />' : ' A';
         $title[] = $output_mod->trans('Answered');

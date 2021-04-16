@@ -34,6 +34,50 @@ class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
+    public function process() {
+        if (!$this->module_is_supported('imap')) {
+            Hm_Msgs::add('ERRIMAP module unavailable.');
+            return;
+        }
+        if (array_key_exists('imap_draft', $this->request->get)
+            && array_key_exists('list_path', $this->request->get)
+            && array_key_exists('uid', $this->request->get)) {
+            $path = explode('_', $this->request->get['list_path']);
+
+            $imap = Hm_IMAP_List::connect($path[1]);
+            if ($imap->select_mailbox(hex2bin($path[2]))) {
+                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
+                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
+                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+
+                $imap_draft = array(
+                    'From' => $msg_header['From'],
+                    'To' => $msg_header['To'],
+                    'Subject' => $msg_header['Subject'],
+                    'Message-Id' => $msg_header['Message-Id'],
+                    'Content-Type' => $msg_header['Content-Type'],
+                    'Body' => $msg_text
+                );
+
+                if (array_key_exists('Cc', $msg_header)) {
+                    $imap_draft['Cc'] = $msg_header['Cc'];
+                }
+
+                if ($imap_draft) {
+                    $this->out('draft_id', $this->request->get['uid']);
+                    $this->out('imap_draft', $imap_draft);
+                }
+                return;
+            }
+            Hm_Msgs::add('ERRCould not load the IMAP mailbox.');
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
@@ -631,6 +675,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $draft = $this->get('compose_draft', array());
         $reply = $this->get('reply_details', array());
+        $imap_draft = $this->get('imap_draft', array());
         $reply_type = $this->get('reply_type', '');
         $html = $this->get('smtp_compose_type', 0);
         $msg_path = $this->get('list_path', '');
@@ -645,6 +690,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $smtp_id = false;
         $draft_id = $this->get('compose_draft_id', 0);
+
         if (!empty($reply)) {
             list($to, $cc, $subject, $body, $in_reply_to) = format_reply_fields(
                 $reply['msg_text'], $reply['msg_headers'], $reply['msg_struct'], $html, $this, $reply_type);
@@ -652,7 +698,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $recip = get_primary_recipient($this->get('compose_profiles', array()), $reply['msg_headers'],
                 $this->get('smtp_servers', array()));
         }
-        elseif (!empty($draft)) {
+
+        if (!empty($draft)) {
             if (array_key_exists('draft_to', $draft)) {
                 $to = $draft['draft_to'];
             }
@@ -675,6 +722,23 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 $bcc = $draft['draft_bcc'];
             }
         }
+
+        if ($imap_draft) {
+            if (array_key_exists('Body', $imap_draft)) {
+                $body= $imap_draft['Body'];
+            }
+            if (array_key_exists('To', $imap_draft)) {
+                $to= $imap_draft['To'];
+            }
+            if (array_key_exists('Subject', $imap_draft)) {
+                $subject= $imap_draft['Subject'];
+            }
+            if (array_key_exists('Cc', $imap_draft)) {
+                $cc= $imap_draft['Cc'];
+            }
+            $draft_id = $msg_uid;
+        }
+
         $send_disabled = '';
         if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
@@ -1204,12 +1268,18 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg)."\r\n";
 
-        if ($imap->append_start($specials[$imap_profile['id']]['draft'], strlen($msg), true)) {
+        if ($imap->append_start($specials[$imap_profile['id']]['draft'], strlen($msg), false, true)) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
                 Hm_Msgs::add('ERRAn error occurred saving the draft message');
             }
         }
+
+        // Remove old version from the mailbox
+        if ($id) {
+            $imap->message_action('DELETE', array($id));
+        }
+
         return 1;
     }
     return save_draft($atts, $id, $session);
