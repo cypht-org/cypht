@@ -150,7 +150,7 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
         if (!is_readable($file['tmp_name'])) {
             if($file['error'] == 1) {
                 $upload_max_filesize = ini_get('upload_max_filesize');
-                Hm_Msgs::add('ERRYour upload failed because you reached the limit of ' . $upload_max_filesize . '.');    
+                Hm_Msgs::add('ERRYour upload failed because you reached the limit of ' . $upload_max_filesize . '.');
                 return;
             }
             Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
@@ -211,11 +211,13 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         }
         else {
             if ($this->module_is_supported('imap')) {
-                if (save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+                $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                         'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                         'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
-                        $this, $this->cache)) {
+                        $this, $this->cache);
+                if ($new_draft_id) {
                     Hm_Msgs::add('Draft saved');
+                    $this->out('draft_id', $new_draft_id);
                 } elseif ($draft_notice) {
                     Hm_Msgs::add('ERRYou must enter a subject to save a draft');
                 }
@@ -950,7 +952,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             $res .= '<div class="configured_server">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-            $res .= 
+            $res .=
                 '<form class="smtp_connect" method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
@@ -1272,15 +1274,26 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
                 Hm_Msgs::add('ERRAn error occurred saving the draft message');
+                return 0;
             }
         }
 
+        $mailbox_page = $imap->get_mailbox_page($specials[$imap_profile['id']]['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
+
         // Remove old version from the mailbox
         if ($id) {
-            $imap->message_action('DELETE', array($id));
+          $imap->message_action('DELETE', array($id));
         }
 
-        return 1;
+        foreach ($mailbox_page[1] as $mail) {
+            $msg_header = $imap->get_message_headers($mail['uid']);
+            if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id'])
+            {
+                return $mail['uid'];
+            }
+        }
+
+        return 0;
     }
     return save_draft($atts, $id, $session);
 }}

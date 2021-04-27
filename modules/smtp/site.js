@@ -127,6 +127,9 @@ var save_compose_state = function(no_files, notice) {
         function(res) {
             $('.smtp_send').prop('disabled', false);
             $('.smtp_send').removeClass('disabled_input');
+            if (res.draft_id) {
+                $('.compose_draft_id').val(res.draft_id);
+            }
             if (res.draft_subject) {
                 $('.draft_list .draft_'+draft_id+' a').text(res.draft_subject);
             }
@@ -180,7 +183,7 @@ var upload_file = function(file) {
     xhr.open('POST', '', true);
     xhr.setRequestHeader('X-Requested-With', 'xmlhttprequest');
     xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4){ 
+        if (xhr.readyState == 4){
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(xhr.responseText);
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
@@ -210,10 +213,10 @@ var delete_attachment = function(file, link) {
     return false;
 };
 
-var replace_cursor_positon = function (txtElement) { 
+var replace_cursor_positon = function (txtElement) {
     txtElement.val('\r\n\r\n\r\n'+txtElement.val());
     txtElement.prop('selectionEnd',0);
-    txtElement.focus(); 
+    txtElement.focus();
 }
 
 $(function() {
@@ -240,5 +243,5 @@ $(function() {
                 save_compose_state();
             }, 100);
         }
-    }  
+    }
 });
