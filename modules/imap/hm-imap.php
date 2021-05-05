@@ -897,7 +897,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * get content for a message part
      * @param int $uid a single IMAP message UID
      * @param string $message_part the IMAP message part number
-     * @param bool $raw flag to enabled fetching the entire message as text
      * @param int $max maximum read length to allow.
      * @param mixed $struct a message part structure array for decoding and
      *                      charset conversion. bool true for auto discovery
@@ -1595,7 +1594,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param bool $seen flag to mark the message seen
      * $return bool true on success
      */
-    public function append_start($mailbox, $size, $seen=true) {
+    public function append_start($mailbox, $size, $seen=true, $draft=false) {
         if (!$this->is_clean($mailbox, 'mailbox') || !$this->is_clean($size, 'uid')) {
             return false;
         }
@@ -1604,6 +1603,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         }
         else {
             $command = 'APPEND "'.$this->utf7_encode($mailbox).'" () {'.$size."}\r\n";
+        }
+        if ($draft) {
+            $command = 'APPEND "'.$this->utf7_encode($mailbox).'" (\Draft) {'.$size."}\r\n";
         }
         $this->send_command($command);
         $result = $this->fgets();
