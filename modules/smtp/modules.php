@@ -437,7 +437,7 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
                         if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']));
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
                             $servers = Hm_SMTP_List::dump(false, true);
                             $this->user_config->set('smtp_servers', $servers);
                             $this->session->set('user_data', $this->user_config->dump());
@@ -1421,7 +1421,7 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
             if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id));
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $smtp_id));
                 $servers = Hm_SMTP_List::dump(false, true);
                 $mod->user_config->set('smtp_servers', $servers);
                 $mod->session->set('user_data', $mod->user_config->dump());
@@ -1479,9 +1479,9 @@ if (!hm_exists('server_from_compose_smtp_id')) {
 function server_from_compose_smtp_id($id) {
     $pos = strpos($id, '.');
     if ($pos === false) {
-        return $id;
+        return intval($id);
     }
-    return substr($id, 0, $pos);
+    return intval(substr($id, 0, $pos));
 }}
 
 /**
