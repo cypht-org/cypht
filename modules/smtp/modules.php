@@ -251,6 +251,25 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if (count($servers) == 0 && $this->page == 'compose') {
             Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
         }
+        else if (count($servers) > 0 && $this->page == 'compose') {
+            if (array_key_exists('profile_status', $this->request->post)) {
+                $profile_value = $this->request->post['profile_status'];
+                list($selected_smtp_id, $profile_id) = explode(".", $profile_value);
+                /* warn user when sent folder is undefined */
+                $specials = $this->user_config->get('special_imap_folders', array());
+                // if profile do not exist
+                if ($profile_id != '') {
+                    if(array_key_exists($selected_smtp_id, $specials) || empty($specials)){
+                        if(!array_key_exists('sent', $specials[$selected_smtp_id]) || empty($specials[$selected_smtp_id]['sent'])) {
+                            Hm_Msgs::add('Please configure your folder to save sent messages (Sent Folder)');
+                        }
+                    }
+                }
+                else {
+                    Hm_Msgs::add('ERRPlease create a profile for saving sent messages option');
+                }
+            }
+        }
         $draft = array();
         $draft_id = next_draft_key($this->session);
         $reply_type = false;

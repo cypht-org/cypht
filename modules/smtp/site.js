@@ -171,6 +171,20 @@ var reset_smtp_form = function() {
     save_compose_state(true);
 };
 
+var get_smtp_profile = function(profile_value) {
+    if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
+        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option']);
+    }
+    else {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_profiles_status'},
+            {'name': 'profile_value', 'value': profile_value}],
+            function(res) { 
+            }
+        );
+    }
+}
+
 var upload_file = function(file) {
     var res = '';
     var form = new FormData();
@@ -243,5 +257,11 @@ $(function() {
                 save_compose_state();
             }, 100);
         }
-    }
+        $( document ).ready(function() {
+            get_smtp_profile($('.compose_server').val());
+            $('.compose_server').on('change', function() {
+                get_smtp_profile(this.value);
+            });
+        });
+    }  
 });
