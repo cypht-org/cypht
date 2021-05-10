@@ -76,9 +76,10 @@ add_handler('ajax_smtp_delete_attachment', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'date', true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'http_headers', true, 'core');
 
+add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'login', false, 'core');
 add_handler('ajax_profiles_status', 'load_user_data',  true, 'core');
-add_handler('compose', 'ajax_profiles_status', true, 'smtp', 'load_smtp_servers_from_config', 'after');
+add_handler('ajax_profiles_status', 'profile_status', true);
 
 setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
 add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
