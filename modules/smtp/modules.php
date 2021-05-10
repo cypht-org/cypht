@@ -1251,6 +1251,11 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile)
  */
 if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
+    // Check if it is a profile
+    if (strstr($atts['draft_smtp'], '.')) {
+        $atts['draft_smtp'] = reset(explode('.', $atts['draft_smtp']));
+    }
+
     $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
         $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
 
