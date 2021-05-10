@@ -488,6 +488,11 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
  */
 class Hm_Handler_profile_status extends Hm_Handler_Module {
     public function process() {
+        // If IMAP module is not supported
+        if (!$this->module_is_supported('imap')) {
+            return;
+        }
+
         $profiles = $this->user_config->get('profiles');
         $servers = $this->user_config->get('smtp_servers', array());
         $profile_value = $this->request->post['profile_value'];
