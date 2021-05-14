@@ -50,14 +50,14 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 $msg_struct = $imap->get_message_structure($this->request->get['uid']);
                 list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
                 $msg_header = $imap->get_message_headers($this->request->get['uid']);
-
                 $imap_draft = array(
                     'From' => $msg_header['From'],
                     'To' => $msg_header['To'],
                     'Subject' => $msg_header['Subject'],
                     'Message-Id' => $msg_header['Message-Id'],
                     'Content-Type' => $msg_header['Content-Type'],
-                    'Body' => $msg_text
+                    'Body' => $msg_text,
+                    'Reply-To' => $msg_header['Reply-To']
                 );
 
                 if (array_key_exists('Cc', $msg_header)) {
@@ -701,6 +701,11 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 $this->get('smtp_servers', array()));
         }
 
+        if(!empty($imap_draft)) {
+            $recip = get_primary_recipient($this->get('compose_profiles', array()), $imap_draft,
+                $this->get('smtp_servers', array()));
+        }
+
         if (!empty($draft)) {
             if (array_key_exists('draft_to', $draft)) {
                 $to = $draft['draft_to'];
@@ -1168,7 +1173,7 @@ function format_attachment_row($file, $output_mod) {
 if (!hm_exists('get_primary_recipient')) {
 function get_primary_recipient($profiles, $headers, $smtp_servers) {
     $addresses = array();
-    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc');
+    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc', 'reply-to');
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
