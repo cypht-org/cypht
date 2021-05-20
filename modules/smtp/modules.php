@@ -1288,6 +1288,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         // Remove old version from the mailbox
         if ($id) {
           $imap->message_action('DELETE', array($id));
+          $imap->message_action('EXPUNGE', array($id));
         }
 
         foreach ($mailbox_page[1] as $mail) {
