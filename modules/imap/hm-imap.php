@@ -1520,6 +1520,9 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 case 'READ':
                     $command = "UID STORE $uid_string +FLAGS (\Seen)\r\n";
                     break;
+                case 'ARCHIVE':
+                    $command = "UID STORE $uid_string +FLAGS (\Archive)\r\n";
+                    break;    
                 case 'FLAG':
                     $command = "UID STORE $uid_string +FLAGS (\Flagged)\r\n";
                     break;

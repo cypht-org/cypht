@@ -109,6 +109,7 @@ return array(
         'draft_id' => array(FILTER_VALIDATE_INT, false)
     ),
     'allowed_post' => array(
+        'post_archive' => FILTER_VALIDATE_INT,
         'attachment_id' => FILTER_SANITIZE_STRING,
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_SANITIZE_STRING,

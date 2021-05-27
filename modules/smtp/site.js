@@ -92,6 +92,11 @@ var smtp_delete_draft = function(id) {
     );
 };
 
+var send_archive = function() {
+    $('.compose_post_archive').val(1);
+    document.getElementsByClassName("smtp_send")[0].click();
+}
+
 var save_compose_state = function(no_files, notice) {
     var no_icon = true;
     if (notice) {
@@ -228,9 +233,10 @@ $(function() {
         $('.smtp_reset').on("click", reset_smtp_form);
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
+        $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
         $('.compose_attach_button').on("click", function() { $('.compose_attach_file').trigger('click'); });
         $('.compose_attach_file').on("change", function() { upload_file(this.files[0]); $('.compose_attach_file').val(''); });
-        $('.compose_form').on('submit', function() { Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
+        $('.compose_form').on('submit', function() { Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); $('.smtp_send_archive').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
         }
