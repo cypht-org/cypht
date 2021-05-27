@@ -245,9 +245,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $icon = false;
         }
 
-        if (in_array('draft', $flags)) {
-            $url = '?page=compose&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&uid='.$msg['uid'].'&imap_draft=1';
-        }
+        //if (in_array('draft', $flags)) {
+        //    $url = '?page=compose&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&uid='.$msg['uid'].'&imap_draft=1';
+        //}
 
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
