@@ -474,10 +474,10 @@ class Hm_Handler_pop3_connect extends Hm_Handler_Module {
                 $pop3 = Hm_POP3_List::connect($form['pop3_server_id'], false);
             }
             if ($pop3 && $pop3->state == 'authed') {
-                Hm_Msgs::add("Successfully authenticated to the POP3 server");
+                Hm_Msgs::add("Successfully authenticated to the POP3 server : " . $form['pop3_user']);
             }
             else {
-                Hm_Msgs::add("ERRFailed to authenticate to the POP3 server");
+                Hm_Msgs::add("ERRFailed to authenticate to the POP3 server : " . $form['pop3_user']);
             }
         }
     }
@@ -636,7 +636,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_pop3_name', 'new_pop3_address', 'new_pop3_port'));
             if (!$success) {
                 $this->out('old_form', $form);
-                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
+                Hm_Msgs::add('ERRYou must supply a name, a server and a port ' . $form['pop3_user']);
             }
             else {
                 $tls = false;
@@ -653,7 +653,7 @@ class Hm_Handler_process_add_pop3_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('POP3 server added');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCound not add server: %s, %s', $errstr, $form['pop3_user']));
                 }
             }
         }
