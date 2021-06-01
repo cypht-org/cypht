@@ -242,7 +242,8 @@ setup_all_tests() {
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
     postgresql7.4)
-        setup_all_tests
+        #setup_all_tests
+        setup_unit_tests
     ;;
     *)
         setup_unit_tests
