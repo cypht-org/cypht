@@ -547,7 +547,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_path', $path);
             }
             else {
-                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server', $imap->server_type));
+                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server ()', $imap->server_type));
             }
         }
     }
@@ -1428,10 +1428,10 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             }
             if ($imap) {
                 if ($imap->get_state() == 'authenticated') {
-                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server", $imap->server_type));
+                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $imap->server_type, $form['imap_user']));
                 }
                 else {
-                    Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server", $imap->server_type));
+                    Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server : %s", $imap->server_type, $form['imap_user']));
                 }
             }
             else {
@@ -1496,7 +1496,7 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
                     $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
                 }
                 else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? " . $form['imap_user']);
                     Hm_IMAP_List::forget_credentials($form['imap_server_id']);
                 }
             }
