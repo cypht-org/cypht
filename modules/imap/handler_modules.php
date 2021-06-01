@@ -380,7 +380,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
             if (array_key_exists('uid', $this->request->get) && $this->request->get['uid']) {
                 $uid = $this->request->get['uid'];
             }
-            if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\w+)_(.+)/", $this->request->get['list_path'], $matches)) {
+            if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\d+)_(.+)/", $this->request->get['list_path'], $matches)) {
                 $server_id = $matches[1];
                 $folder = hex2bin($matches[2]);
             }
@@ -450,12 +450,12 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            if (preg_match("/^imap_\w+_.+$/", $path)) {
+            if (preg_match("/^imap_\d+_.+$/", $path)) {
                 $this->out('list_meta', false, false);
                 $this->out('list_path', $path, false);
                 $this->out('move_copy_controls', true);
                 $parts = explode('_', $path, 3);
-                $details = Hm_IMAP_List::dump($parts[1]);
+                $details = Hm_IMAP_List::dump(intval($parts[1]));
                 $custom_link = 'add';
                 foreach (imap_data_sources(false, $this->user_config->get('custom_imap_sources', array())) as $vals) {
                     if ($vals['id'] == $parts[1] && $vals['folder'] == $parts[2]) {
@@ -521,7 +521,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             if (isset($this->request->post['folder'])) {
                 $folder = $this->request->post['folder'];
             }
-            $path = sprintf("imap_%s_%s", $form['imap_server_id'], $folder);
+            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $folder);
             $page_cache = $this->cache->get('imap_folders_'.$path);
             if (array_key_exists('imap_prefetch', $this->request->post)) {
                 $prefetched = $this->session->get('imap_prefetched_ids', array());
@@ -586,7 +586,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $list_page = 1;
                 }
             }
-            $path = sprintf("imap_%s_%s", $form['imap_server_id'], $form['folder']);
+            $path = sprintf("imap_%d_%s", $form['imap_server_id'], $form['folder']);
             $details = Hm_IMAP_List::dump($form['imap_server_id']);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
@@ -833,7 +833,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                     else {
                                         foreach ($uids as $uid) {
-                                            $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
+                                            $moved[] = sprintf("imap_%d_%s_%s", $server, $uid, $folder);
                                         }
                                     }
                                 }
@@ -843,7 +843,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                     else {
                                         foreach ($uids as $uid) {
-                                            $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
+                                            $moved[] = sprintf("imap_%d_%s_%s", $server, $uid, $folder);
                                         }
                                     }
                                 }
@@ -1329,7 +1329,7 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
                 $results = imap_refresh_oauth2_token($server, $this->config);
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
-                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $server_id));
+                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $server_id));
                         $updated++;
                     }
                 }
@@ -1595,14 +1595,14 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
-                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
                         if ($part == 0) {
                             $msg_struct_current['type'] = 'text';
                             $msg_struct_current['subtype'] = 'plain';
                         }
-                        $this->session->set(sprintf('reply_details_imap_%s_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
+                        $this->session->set(sprintf('reply_details_imap_%d_%s_%s', $form['imap_server_id'], $form['folder'], $form['imap_msg_uid']),
                             array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                     }
                 }

@@ -175,7 +175,7 @@ return array(
         'formatted_message_list' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'just_saved_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
         'just_forgot_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'deleted_server_id' => array(FILTER_SANITIZE_STRING, false),
+        'deleted_server_id' => array(FILTER_VALIDATE_INT, false),
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),

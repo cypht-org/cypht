@@ -10,7 +10,7 @@ var imap_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (typeof res.deleted_server_id !== 'undefined') {
+            if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);

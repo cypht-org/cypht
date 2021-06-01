@@ -168,7 +168,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=imap_%s_%s&amp;uid=%d',
+            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_server_id')),
                 $this->html_safe($this->get('msg_folder')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -607,7 +607,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
                 }
