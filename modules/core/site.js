@@ -426,7 +426,6 @@ function Message_List() {
         }
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             this.run_callbacks(completed);
-            Hm_Ajax.aborted = true;
             return 0;
         }
         if (msgs[0] === "") {
