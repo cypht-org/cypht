@@ -468,14 +468,14 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
-    public function process() {
+    public function process() {       
         /* not sending */
         if (!array_key_exists('smtp_send', $this->request->post)) {
             return;
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id'));
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
@@ -558,6 +558,26 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
         else {
             Hm_Debug::add(sprintf('Unable to save sent message, no IMAP server found for SMTP server: %s', $smtp_details['server']));
+        }
+
+        // Archive replied message
+        if ($form['post_archive']) {
+            $msg_path = explode('_', $this->request->post['compose_msg_path']);
+            $msg_uid = $this->request->post['compose_msg_uid'];
+            
+            $imap = Hm_IMAP_List::connect($msg_path[1]);
+            if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
+                $specials = $this->user_config->get('special_imap_folders', array());
+                if (array_key_exists($msg_path[1], $specials)) {
+                    if (array_key_exists('archive', $specials[$msg_path[1]])) {
+                        if ($specials[$msg_path[1]]['archive']) {
+                            $archive_folder = $specials[$msg_path[1]]['archive'];
+                            $imap->message_action('ARCHIVE', array($msg_uid));
+                            $imap->message_action('MOVE', array($msg_uid), $archive_folder);
+                        }
+                    }
+                }
+            }
         }
 
         /* clean up */
@@ -766,6 +786,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
+            '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
             '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
             '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
@@ -817,8 +838,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $smtp_id).
-            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>'.
-            '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
+            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
+
+        if ($this->get('list_path')) {
+            $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
+        }    
+
+        $res .= '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
             '" name="compose_attach_button" type="button" />';
