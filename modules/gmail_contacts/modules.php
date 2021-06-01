@@ -75,7 +75,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
             $results = imap_refresh_oauth2_token($server, $config);
             if (!empty($results)) {
                 if (Hm_IMAP_List::update_oauth2_token($id, $results[1], $results[0])) {
-                    Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $id));
+                    Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $id));
                     $server = Hm_IMAP_List::dump($id, true);
                 }
             }

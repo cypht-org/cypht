@@ -170,7 +170,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=imap_%s_%s&amp;uid=%d',
+            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_server_id')),
                 $this->html_safe($this->get('msg_folder')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -238,8 +238,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
-                '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>'.
-                ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
+            if (!isset($headers['Flags']) || !stristr($headers['Flags'], 'draft')) {
+                $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($reply_all || $size > 1) {
                     $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 }
@@ -247,6 +248,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
                 }
                 $txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
+            }
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
             }
@@ -261,11 +263,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= ' | <a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
+
             $txt .= ' | <a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a>';
             $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+
+            if (isset($headers['Flags']) && stristr($headers['Flags'], 'draft')) {
+                $txt .= ' | <a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
+            }
             $txt .= '<div class="move_to_location"></div></div>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
@@ -609,7 +616,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
+                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
                 }
@@ -724,6 +731,7 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
+            $this->out('page_links', 'There is no pagination is this view, please visit the individual mail boxes.');
         }
         else {
             $this->out('formatted_message_list', array());

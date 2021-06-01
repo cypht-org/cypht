@@ -113,15 +113,15 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">+</a>';
+            $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
         }
         else {
             $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
         }
         if (!$folder['noselect']) {
-            $results .= '<a data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
+            $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
                 '" href="?page=message_list&amp;list_path='.
-                urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).
+                urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
                 '">'.$output_mod->html_safe($folder['basename']).'</a>';
         }
         else {
@@ -179,7 +179,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $row_class = 'email';
         $icon = 'env_open';
         if (!$parent_list) {
-            $parent_value = sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']);
+            $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
         }
         else {
             $parent_value = $parent_list;
@@ -221,7 +221,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
             $icon = 'sent';
         }
-        foreach (array('attachment', 'deleted', 'flagged', 'answered') as $flag) {
+        foreach (array('attachment', 'deleted', 'flagged', 'answered', 'draft') as $flag) {
             if (stristr($msg['flags'], $flag)) {
                 $flags[] = $flag;
             }
@@ -231,7 +231,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
-        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
         if ($list_page) {
             $url .= '&list_page='.$output_module->html_safe($list_page);
         }
@@ -244,6 +244,11 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if (!$show_icons) {
             $icon = false;
         }
+
+        //if (in_array('draft', $flags)) {
+        //    $url = '?page=compose&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&uid='.$msg['uid'].'&imap_draft=1';
+        //}
+
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
@@ -608,6 +613,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     $sent_results = array();
     $status = array();
     foreach($ids as $index => $id) {
+        $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($hm_cache, $id);
         $imap = Hm_IMAP_List::connect($id, $cache);
         if (imap_authed($imap)) {
@@ -1052,6 +1058,7 @@ function format_list_headers($mod) {
             $section = ' '.$mod->html_safe($name).': ';
             foreach ($vals['email'] as $v) {
                 $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
+                    '&compose_from='.$mod->get('msg_headers')['Delivered-To'].
                     '">'.$mod->trans('email').'</a>';
             }
             foreach ($vals['links'] as $v) {

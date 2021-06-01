@@ -41,4 +41,6 @@ For developers, get via Composer: [https://packagist.org/packages/jason-munro/cy
 
 Docker: [https://hub.docker.com/r/sailfrog/cypht-docker](https://hub.docker.com/r/sailfrog/cypht-docker)
 
+LinkedIn group: [https://www.linkedin.com/groups/13804559/](https://www.linkedin.com/groups/13804559/)
+
 Contact: [jason@cypht.org](mailto:jason@cypht.org)

@@ -10,7 +10,7 @@ var imap_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (typeof res.deleted_server_id !== 'undefined') {
+            if (res.deleted_server_id > -1 ) {
                 form.parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -298,6 +298,8 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
                 add_auto_folder(res.auto_sent_folder);
             }
             Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+            $('.page_links').html(res.page_links);
+            cache_imap_page();
         },
         [],
         false,
@@ -412,6 +414,16 @@ var select_imap_folder = function(path, callback) {
         );
     }
     return false;
+};
+
+var setup_imap_message_list_content_page = function() {
+    var cache_details = fetch_cached_imap_page();
+    if (cache_details[0]) {
+        $('.message_table tbody').html(cache_details[0]);
+    }
+    if (cache_details[1]) {
+        $('.page_links').html(cache_details[1]);
+    }
 };
 
 var setup_imap_folder_page = function() {
@@ -959,6 +971,9 @@ if (hm_list_path() == 'sent') {
 $(function() {
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
         setup_imap_folder_page();
+    }
+    else if (hm_page_name() === 'message_list' && hm_list_path() === 'combined_inbox') {
+        setup_imap_message_list_content_page();
     }
     else if (hm_page_name() === 'message' && hm_list_path().substr(0, 4) === 'imap') {
         imap_setup_message_view_page();

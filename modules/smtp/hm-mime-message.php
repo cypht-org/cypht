@@ -50,6 +50,11 @@ class Hm_MIME_Msg {
         $this->body = $body;
     }
 
+    /* return headers array */
+    function get_headers() {
+      return $this->headers;
+    }
+
     /* add attachments */
     function add_attachments($files) {
         $this->attachments = $files;
@@ -267,4 +272,3 @@ class Hm_MIME_Msg {
         return str_replace('.', '=2E', quoted_printable_encode($string));
     }
 }
-

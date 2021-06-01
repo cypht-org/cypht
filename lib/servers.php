@@ -183,12 +183,12 @@ trait Hm_Server_List {
     public static function add($atts, $id=false) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        if ($id === false) {
-            do {
-                $id = uniqid();
-            } while (isset(self::$server_list[$id]));
+        if ($id !== false) {
+            self::$server_list[$id] = $atts;
         }
-        self::$server_list[$id] = $atts;
+        else {
+            self::$server_list[] = $atts;
+        }
     }
 
     /**

@@ -93,7 +93,7 @@ class Hm_Handler_github_message_action extends Hm_Handler_Module {
             $id_list = explode(',', $form['message_ids']);
             Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
             foreach ($id_list as $msg_id) {
-                if (preg_match("/^github_(\w)+_(\d)+$/", $msg_id)) {
+                if (preg_match("/^github_(\d)+_(\d)+$/", $msg_id)) {
                     $parts = explode('_', $msg_id, 3);
                     $guid = $parts[2];
                     switch($form['action_type']) {

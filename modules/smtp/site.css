@@ -5,6 +5,7 @@
 .toggle_recipients { background-color: #fff; position: absolute; padding-left: 5px; right: 9px; top: 28px; font-size: 120%; }
 .compose_body { width: 100%; min-height: 300px; padding: 5px; margin: 5px; }
 .smtp_send { cursor: pointer; color: #666; font-size: 125%; padding: 10px; margin-top: 10px; }
+.smtp_send_archive { cursor: pointer; color: #666; font-size: 125%; padding: 10px; margin-top: 10px; margin-left: 10px; }
 .smtp_section { display: none; }
 .smtp_server_setup .content_title { cursor: pointer; }
 .compose_server, .compose_server option { width: 100%; padding: 5px; margin: 5px; }

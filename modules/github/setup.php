@@ -67,7 +67,7 @@ return array(
     ),
     'allowed_output' => array(
         'github_msg_text' => array(FILTER_UNSAFE_RAW, false),
-        'github_server_id' => array(FILTER_SANITIZE_STRING, false),
+        'github_server_id' => array(FILTER_VALIDATE_INT, false),
         'github_status_display' => array(FILTER_UNSAFE_RAW, false),
         'github_status_repo' => array(FILTER_SANITIZE_STRING, false),
     ),
