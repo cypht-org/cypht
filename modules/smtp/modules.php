@@ -817,21 +817,29 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         //
         // Added latency reduction 'break' for big smtp profile lists
         if ($from) {
-            $profiles = $this->module_output()['smtp_servers'];
-            foreach ($profiles as $id => $profile) {
-                if ($profile['user'] == $from) {
+            $smtp_servers = $this->module_output()['smtp_servers'];
+            foreach ($smtp_servers as $id => $server) {
+                if ($server['user'] == $from) {
                     $smtp_id = $id;
                 }
                 // Profile users without the domain
-                if ($profile['user'] == explode('@', $from)[0]) {
+                if ($server['user'] == explode('@', $from)[0]) {
                     $smtp_id = $id;
                 }
                 // Some users might use the profile name as the full email
-                if ($profile['name'] == $from) {
+                if ($server['name'] == $from) {
                     $smtp_id = $id;
                 }
                 if ($smtp_id) {
                     break;
+                }
+            }
+
+            // Check if SMTP_ID is related to a Profile
+            $profiles = profiles_by_smtp_id($this->module_output()['profiles'], $smtp_id);
+            foreach ($profiles as $id => $profile) {
+                if ($profile['address'] == $from) {
+                    $smtp_id = $smtp_id.'.'.($id + 1);
                 }
             }
         }
