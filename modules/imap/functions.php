@@ -536,6 +536,35 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
 }}
 
 /**
+ * Format the attached images section
+ * @subpackage imap/functions
+ * @param array $struct message structure
+ * @param object $output_mod Hm_Output_Module
+ * @param string $dl_link base arguments for a download link
+ * @return string
+ */
+if (!hm_exists('format_attached_image_section')) {
+function format_attached_image_section($struct, $output_mod, $dl_link) {
+    $res = '';
+    $isThereAnyImg = false;
+    foreach ($struct as $id => $vals) {
+        if ($vals['type'] === 'image') {
+            $res .= '<div><img class="attached_image" src="?'.$dl_link.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" ></div>';
+            $isThereAnyImg = true;
+        }
+        if (isset($vals['subs'])) {
+            $res .= format_attached_image_section($vals['subs'], $output_mod, $dl_link);
+        }
+    }
+
+    if ($isThereAnyImg) {
+        $res = '<div class="attached_image_box">' . $res . '</div>';
+    }
+
+    return $res;
+}}
+
+/**
  * Filter out message parts that are not attachments
  * @param array message structure
  * @return bool

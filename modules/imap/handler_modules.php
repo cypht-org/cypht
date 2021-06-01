@@ -362,6 +362,80 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
 }
 
 /**
+ * Stream a message from IMAP to the browser and show it
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_show_message extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('imap_show_message', $this->request->get) && $this->request->get['imap_show_message']) {
+
+            $server_id = NULL;
+            $uid = NULL;
+            $folder = NULL;
+            $msg_id = NULL;
+
+            if (array_key_exists('uid', $this->request->get) && $this->request->get['uid']) {
+                $uid = $this->request->get['uid'];
+            }
+            if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\w+)_(.+)/", $this->request->get['list_path'], $matches)) {
+                $server_id = $matches[1];
+                $folder = hex2bin($matches[2]);
+            }
+            if (array_key_exists('imap_msg_part', $this->request->get) && preg_match("/^[0-9\.]+$/", $this->request->get['imap_msg_part'])) {
+                $msg_id = preg_replace("/^0.{1}/", '', $this->request->get['imap_msg_part']);
+            }
+            if ($server_id !== NULL && $uid !== NULL && $folder !== NULL && $msg_id !== NULL) {
+                $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
+                $imap = Hm_IMAP_List::connect($server_id, $cache);
+                if (imap_authed($imap)) {
+                    if ($imap->select_mailbox($folder)) {
+                        $msg_struct = $imap->get_message_structure($uid);
+                        $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $msg_id));
+                        if (!empty($struct)) {
+                            $part_struct = array_shift($struct);
+                            $encoding = false;
+                            if (array_key_exists('encoding', $part_struct)) {
+                                $encoding = trim(strtolower($part_struct['encoding']));
+                            }
+                            $stream_size = $imap->start_message_stream($uid, $msg_id);
+                            if ($stream_size > 0) {
+                                $charset = '';
+                                if (array_key_exists('attributes', $part_struct)) {
+                                    if (is_array($part_struct['attributes']) && array_key_exists('charset', $part_struct['attributes'])) {
+                                        $charset = '; charset='.$part_struct['attributes']['charset'];
+                                    }
+                                }
+                                header('Content-Type: '.$part_struct['type'].'/'.$part_struct['subtype'].$charset);
+                                header('Content-Transfer-Encoding: binary');
+                                ob_end_clean();
+                                $output_line = '';
+                                while($line = $imap->read_stream_line()) {
+                                    if ($encoding == 'quoted-printable') {
+                                        $line = quoted_printable_decode($line);
+                                    }
+                                    elseif ($encoding == 'base64') {
+                                        $line = base64_decode($line);
+                                    }
+                                    echo $output_line;
+                                    $output_line = $line;
+
+                                }
+                                if ($part_struct['type'] == 'text') {
+                                    $output_line = preg_replace("/\)(\r\n)$/m", '$1', $output_line);
+                                }
+                                echo $output_line;
+                                Hm_Functions::cease();
+                            }
+                        }
+                    }
+                }
+            }
+            Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+        }
+    }
+}
+
+/**
  * Stream a message from IMAP to the browser
  * @subpackage imap/handler
  */
@@ -1595,7 +1669,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
-                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%d_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
                         if ($part == 0) {
