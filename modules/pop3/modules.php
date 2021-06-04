@@ -591,12 +591,14 @@ class Hm_Handler_load_pop3_servers_from_config extends Hm_Handler_Module {
         $servers = $this->user_config->get('pop3_servers', array());
         $added = false;
         $max = 0;
-        foreach ($servers as $index => $server) {
+        $index = 0;
+        foreach ($servers as $server) {
             Hm_POP3_List::add( $server, $index );
             if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
             $max = $index;
+            $index++;
         }
         $max++;
         if (!$added) {

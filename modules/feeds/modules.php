@@ -411,8 +411,10 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     public function process() {
         $feeds = $this->user_config->get('feeds', array());
+        $index = 0;
         foreach ($feeds as $index => $feed) {
             Hm_Feed_List::add($feed, $index);
+            $index++;
         }
         Hm_Feed_Uid_Cache::load($this->cache->get('feed_read_uids', array(), true));
     }

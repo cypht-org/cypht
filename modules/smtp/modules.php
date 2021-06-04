@@ -245,8 +245,10 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         $servers = $this->user_config->get('smtp_servers', array());
-        foreach ($servers as $index => $server) {
+        $index = 0;
+        foreach ($servers as $server) {
             Hm_SMTP_List::add( $server, $index );
+            $index++;
         }
         if (count($servers) == 0 && $this->page == 'compose') {
             Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
