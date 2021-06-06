@@ -208,33 +208,23 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
             delete_draft($draft_id, $this->session);
+            return;
         }
-        else {
-            if ($this->module_is_supported('imap')) {
-                $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-                        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-                        'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
-                        $this, $this->cache);
-                if ($new_draft_id) {
-                    Hm_Msgs::add('Draft saved');
-                    $this->out('draft_id', $new_draft_id);
-                } elseif ($draft_notice) {
-                    Hm_Msgs::add('ERRYou must enter a subject to save a draft');
-                }
-                return;
-            }
-
-            if (save_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-                'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-                'draft_in_reply_to' => $inreplyto), $draft_id, $this->session) !== false) {
+        if ($this->module_is_supported('imap')) {
+            $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+                    'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+                    'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
+                    $this, $this->cache);
+            if ($new_draft_id) {
                 if ($draft_notice) {
                     Hm_Msgs::add('Draft saved');
-                    $this->out('draft_subject', $subject);
                 }
+                $this->out('draft_id', $new_draft_id);
             }
             elseif ($draft_notice) {
                 Hm_Msgs::add('ERRYou must enter a subject to save a draft');
             }
+            return;
         }
     }
 }

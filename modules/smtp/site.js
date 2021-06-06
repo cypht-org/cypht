@@ -115,6 +115,10 @@ var save_compose_state = function(no_files, notice) {
     }
     globals.draft_state = body+subject+to+smtp+cc+bcc;
 
+    if (!body && !subject && !to && !cc && !bcc) {
+        return;
+    }
+
     $('.smtp_send').prop('disabled', true);
     $('.smtp_send').addClass('disabled_input');
     Hm_Ajax.request(
