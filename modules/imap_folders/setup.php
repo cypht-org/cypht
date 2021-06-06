@@ -11,6 +11,8 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('imap_folders');
 output_source('imap_folders');
 
+add_module_to_all_pages('handler', 'fix_folder_assignments', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+
 setup_base_page('folders', 'core');
 add_handler('folders', 'folders_server_id', true, 'imap_folders', 'load_user_data', 'after');
 add_handler('folders', 'special_folders', true, 'imap_folders', 'folders_server_id', 'after');

@@ -23,6 +23,9 @@ abstract class Hm_Config {
     /* if decryption fails, save the encrypted payload */
     public $encrypted_str;
 
+    /* flag to save config after page handling */
+    public $save_on_login = false;
+    
     /**
      * This method must be overriden by classes extending this one
      * @param string $source source or identifier to determine the source

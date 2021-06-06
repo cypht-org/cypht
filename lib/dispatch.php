@@ -216,6 +216,9 @@ class Hm_Dispatch {
         /* clean up any network connections */
         $this->close_connections();
 
+        /* check for update settings on login */
+        $this->save_settings_on_login();
+
         /* check to see if a handler module told us to redirect the browser */
         $this->check_for_redirect($this->request, $this->module_exec, $this->session);
 
@@ -228,6 +231,18 @@ class Hm_Dispatch {
 
         /* output content to the browser */
         $this->render_output();
+    }
+    
+    /**
+     * Check for a flag to save settings on login
+     */
+    private function save_settings_on_login() {
+        if (!$this->session->loaded) {
+            return;
+        }
+        if ($this->module_exec->user_config->save_on_login) {
+            $this->module_exec->user_config->save($this->request->post['username'], $this->request->post['password']);
+        }
     }
 
     /**

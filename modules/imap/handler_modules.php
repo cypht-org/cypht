@@ -234,13 +234,9 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $imap_details = Hm_IMAP_List::dump($imap_id);
         $sent_folder = false;
         if (imap_authed($imap)) {
-            $specials = $this->user_config->get('special_imap_folders', array());
-            if (array_key_exists($imap_id, $specials)) {
-                if (array_key_exists('sent', $specials[$imap_id])) {
-                    if ($specials[$imap_id]['sent']) {
-                        $sent_folder = $specials[$imap_id]['sent'];
-                    }
-                }
+            $specials = get_special_folders($this, $imap_id);
+            if (array_key_exists('sent', $specials) && $specials['sent']) {
+                $sent_folder = $specials['sent'];
             }
 
             if (!$sent_folder) {
@@ -721,13 +717,9 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             $trash_folder = false;
-            $specials = $this->user_config->get('special_imap_folders', array());
-            if (array_key_exists($form['imap_server_id'], $specials)) {
-                if (array_key_exists('trash', $specials[$form['imap_server_id']])) {
-                    if ($specials[$form['imap_server_id']]['trash']) {
-                        $trash_folder = $specials[$form['imap_server_id']]['trash'];
-                    }
-                }
+            $specials = get_special_folders($this, $form['imap_server_id']);
+            if (array_key_exists('trash', $specials) && $specials['trash']) {
+                $trash_folder = $specials['trash'];
             }
             if (imap_authed($imap)) {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
@@ -780,13 +772,9 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         $archive_folder = false;
         $errors = 0;
 
-        $specials = $this->user_config->get('special_imap_folders', array());
-        if (array_key_exists($form['imap_server_id'], $specials)) {
-            if (array_key_exists('archive', $specials[$form['imap_server_id']])) {
-                if ($specials[$form['imap_server_id']]['archive']) {
-                    $archive_folder = $specials[$form['imap_server_id']]['archive'];
-                }
-            }
+        $specials = get_special_folders($this, $form['imap_server_id']);
+        if (array_key_exists('archive', $specials) && $specials['archive']) {
+            $archive_folder = $specials['archive'];
         }
         if (!$archive_folder) {
             Hm_Msgs::add('No archive folder configured for this IMAP server');
@@ -872,17 +860,13 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $msgs = 0;
                 $moved = array();
                 $status = array();
-                $specials = $this->user_config->get('special_imap_folders', array());
                 foreach ($ids as $server => $folders) {
+                    $specials = get_special_folders($this, $server);
                     $trash_folder = false;
                     $archive_folder = false;
                     if ($form['action_type'] == 'delete') {
-                        if (array_key_exists($server, $specials)) {
-                            if (array_key_exists('trash', $specials[$server])) {
-                                if ($specials[$server]['trash']) {
-                                    $trash_folder = $specials[$server]['trash'];
-                                }
-                            }
+                        if (array_key_exists('trash', $specials) && $specials['trash']) {
+                            $trash_folder = $specials['trash'];
                         }
                     }
                     if ($form['action_type'] == 'archive') {
@@ -1311,8 +1295,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $this->out('move_copy_controls', true);
             }
             if ($path == 'sent') {
-                foreach (imap_sent_sources($callback, $this->user_config->get('special_imap_folders', array()),
-                    $this->user_config->get('smtp_auto_bcc_setting', false)) as $vals) {
+                foreach (imap_sent_sources($callback, $this) as $vals) {
                     $this->append('data_sources', $vals);
                 }
             }

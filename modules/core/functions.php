@@ -574,3 +574,27 @@ function profiles_by_smtp_id($profiles, $id) {
     }
     return $res;
 }}
+
+/**
+ * @subpackage cores/functions
+ */
+function get_special_folders($mod, $id) {
+    $server = Hm_IMAP_List::dump($id);
+    if (!$server) {
+        return array();
+    }
+    $specials = $mod->user_config->get('special_imap_folders', array());
+    foreach ($specials as $vals) {
+        if (array_key_exists('imap_user', $vals) &&
+            array_key_exists('imap_server', $vals) &&
+            $server['server'] == $vals['imap_server'] &&
+            $server['user'] == $vals['imap_user']) {
+            
+            return $vals;
+        }
+    }
+    if (array_key_exists($id, $specials)) {
+        return $specials[$id];
+    }
+    return array();
+}

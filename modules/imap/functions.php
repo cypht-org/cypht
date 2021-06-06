@@ -17,14 +17,16 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @return array
  */
 if (!hm_exists('imap_sent_sources')) {
-function imap_sent_sources($callback, $configured, $inbox) {
+function imap_sent_sources($callback, $mod) {
+    $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
             continue;
         }
-        if (array_key_exists($index, $configured) && array_key_exists('sent', $configured[$index]) && $configured[$index]['sent']) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex($configured[$index]['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        $folders = get_special_folders($mod, $index);
+        if (array_key_exists('sent', $folders) && $folders['sent']) {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);

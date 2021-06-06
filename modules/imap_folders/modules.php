@@ -11,6 +11,45 @@ if (!defined('DEBUG_MODE')) { die(); }
 /**
  * @subpackage imap_folders/handler
  */
+class Hm_Handler_fix_folder_assignments extends Hm_Handler_Module {
+    public function process() {
+        /* only run on login */
+        if (!$this->session->loaded) {
+            return;
+        }
+        /* check for already fixed settings */
+        $specials = $this->user_config->get('special_imap_folders', array());
+        if (count($specials) == 0 || array_key_exists('imap_server', reset($specials))) {
+            return;
+        }
+        $updated = array();
+        $count = 0;
+
+        /* update special folders with imap details */
+        foreach ($specials as $index => $vals) {
+            if (!array_key_exists('imap_server', $vals)) {
+                $count++;
+                $server = Hm_IMAP_List::dump($index);
+                if (!is_array($server) || !array_key_exists('server', $server)) {
+                    continue;
+                }
+                $vals['imap_user'] = $server['user'];
+                $vals['imap_server'] = $server['server'];
+                $updated[$index] = $vals;
+            }
+        }
+
+        /* save permanently if we updated anything */
+        if ($count) {
+            $this->user_config->set('special_imap_folders', $updated);
+            $this->user_config->save_on_login = true;
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
 class Hm_Handler_add_folder_manage_link extends Hm_Handler_Module {
     public function process() {
         $server = false;

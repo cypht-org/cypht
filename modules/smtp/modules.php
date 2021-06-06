@@ -50,6 +50,9 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 $msg_struct = $imap->get_message_structure($this->request->get['uid']);
                 list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
                 $msg_header = $imap->get_message_headers($this->request->get['uid']);
+                if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
+                    return;
+                }
                 $imap_draft = array(
                     'From' => $msg_header['From'],
                     'To' => $msg_header['To'],
@@ -222,7 +225,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
                 $this->out('draft_id', $new_draft_id);
             }
             elseif ($draft_notice) {
-                Hm_Msgs::add('ERRYou must enter a subject to save a draft');
+                Hm_Msgs::add('ERRUnable to save draft');
             }
             return;
         }
@@ -559,15 +562,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             
             $imap = Hm_IMAP_List::connect($msg_path[1]);
             if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
-                $specials = $this->user_config->get('special_imap_folders', array());
-                if (array_key_exists($msg_path[1], $specials)) {
-                    if (array_key_exists('archive', $specials[$msg_path[1]])) {
-                        if ($specials[$msg_path[1]]['archive']) {
-                            $archive_folder = $specials[$msg_path[1]]['archive'];
-                            $imap->message_action('ARCHIVE', array($msg_uid));
-                            $imap->message_action('MOVE', array($msg_uid), $archive_folder);
-                        }
-                    }
+                $specials = get_special_folders($this, $msg_path[1]);
+                if (array_key_exists('archive', $specials) && $specials['archive']) {
+                    $archive_folder = $specials['archive'];
+                    $imap->message_action('ARCHIVE', array($msg_uid));
+                    $imap->message_action('MOVE', array($msg_uid), $archive_folder);
                 }
             }
         }
@@ -1290,13 +1289,12 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
         $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
 
-    $specials = $mod->user_config->get('special_imap_folders');
+    $specials = get_special_folders($mod, $imap_profile['id']);
 
-    if (array_key_exists($imap_profile['id'], $specials) &&
-        $specials[$imap_profile['id']]['draft']) {
+    if (array_key_exists('draft', $specials) && $specials['draft']) {
         $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
         $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
-        $draft_folder = $imap->select_mailbox($specials[$imap_profile['id']]['draft']);
+        $draft_folder = $imap->select_mailbox($specials['draft']);
 
         $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
@@ -1306,7 +1304,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg)."\r\n";
 
-        if ($imap->append_start($specials[$imap_profile['id']]['draft'], strlen($msg), false, true)) {
+        if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
                 Hm_Msgs::add('ERRAn error occurred saving the draft message');
@@ -1314,7 +1312,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
             }
         }
 
-        $mailbox_page = $imap->get_mailbox_page($specials[$imap_profile['id']]['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
+        $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
 
         // Remove old version from the mailbox
         if ($id) {
