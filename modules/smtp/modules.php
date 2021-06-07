@@ -218,7 +218,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                     'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
                     $this, $this->cache);
-            if ($new_draft_id) {
+            if ($new_draft_id >= 0) {
                 if ($draft_notice) {
                     Hm_Msgs::add('Draft saved');
                 }
@@ -1288,14 +1288,13 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
 
     $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
         $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
-
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (array_key_exists('draft', $specials) && $specials['draft']) {
         $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
         $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
         $draft_folder = $imap->select_mailbox($specials['draft']);
-
+        
         $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
             0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
@@ -1308,7 +1307,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
                 Hm_Msgs::add('ERRAn error occurred saving the draft message');
-                return 0;
+                return 1;
             }
         }
 
@@ -1327,9 +1326,9 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
                 return $mail['uid'];
             }
         }
-
-        return 0;
+        return 1;
     }
+        
     return save_draft($atts, $id, $session);
 }}
 
