@@ -214,10 +214,12 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';
-            $row_class .= ' unseen';
             if ($icon != 'sent') {
                 $icon = 'env_closed';
             }
+        }
+        else {
+            $row_class .= ' seen';
         }
         if (trim($msg['x_auto_bcc']) === 'cypht') {
             $from = preg_replace("/(\<.+\>)/U", '', $msg['to']);
@@ -230,6 +232,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         $source = $msg['server_name'];
         $row_class .= ' '.str_replace(' ', '_', $source);
+        $row_class .= ' '.implode(' ', $flags);
         if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
