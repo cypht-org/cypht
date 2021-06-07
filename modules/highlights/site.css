@@ -1,0 +1,9 @@
+.add_hl_form {padding-left: 30px; padding-top: 10px; max-width: 340px;}
+.add_hl_form td {padding: 10px;}
+.submit_row {padding-top: 20px;}
+.github_source, .imap_source, .feeds_source {max-width: 300px; min-width: 120px;}
+.imap_row, .github_row, .feeds_row {display: none;}
+.hl_rules {padding-left: 30px; padding-top: 20px; padding-bottom: 20px;}
+.hl_rules td {padding: 3px; padding-top: 7px; padding-bottom: 0px;}
+.hl_rules th {font-weight: normal; border-bottom: solid 1px #eee; text-align: left;}
+.rule_del {border: none; width: 16px; height: 16px; opacity: .5}
