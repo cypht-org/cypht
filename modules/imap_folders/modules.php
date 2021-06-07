@@ -249,11 +249,15 @@ class Hm_Handler_imap_folder_check extends Hm_Handler_Module {
  */
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
-        $server_id = $this->get('folder_server');
+        $server_id = $this->get('folder_server', -1);
         $res = '<div class="folders_page"><form method="get">';
         $res .= '<input type="hidden" name="page" value="folders" />';
         $res .= '<select id="imap_server_folder" name="imap_server_id">';
-        $res .= '<option value="">'.$this->trans('Select an IMAP server').'</option>';
+        $res .= '<option ';
+        if ($server_id == -1) {
+            $res .= 'selected="selected" ';
+        }
+        $res .= 'value="">'.$this->trans('Select an IMAP server').'</option>';
         foreach ($this->get('imap_servers', array()) as $id => $server) {
             $res .= '<option ';
             if ($server_id == $id) {
