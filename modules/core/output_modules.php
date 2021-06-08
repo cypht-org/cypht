@@ -207,7 +207,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="screen_reader" for="password">'.$this->trans('Password').'</label>'.
                 '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                $stay_logged_in.' <input type="submit" id="login" value="'.$this->trans('Login').'" />';
+                $stay_logged_in.' <input style="cursor:pointer;" type="submit" id="login" value="'.$this->trans('Login').'" />';
         }
         else {
             $settings = $this->get('changed_settings', array());
