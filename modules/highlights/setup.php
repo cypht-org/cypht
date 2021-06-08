@@ -34,7 +34,5 @@ return array(
         'hl_imap_sources' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
         'hl_github_sources' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
         'hl_feeds_sources' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
-
-
     )
 );
