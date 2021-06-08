@@ -147,6 +147,10 @@ class Hm_Output_highlight_css extends Hm_Output_Module {
                     $css[] = sprintf('.message_table %s td a {color: %s !important;}',
                         $id, $rule['color'], ($rule['important'] ? '!important' : ''));
                 }
+                else {
+                    $css[] = sprintf('.message_table %s td div {background-color: %s !important;}',
+                        $id, $rule['color'], ($rule['important'] ? '!important' : ''));
+                }
             }
         }
         $res = '<style type="text/css">'.implode(' ', $css).'</style>';
