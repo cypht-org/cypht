@@ -7,6 +7,7 @@ output_source('smtp');
 
 add_module_to_all_pages('handler', 'smtp_default_server', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_reply_to_details', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'load_smtp_is_imap_draft', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'smtp_from_replace', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
@@ -50,6 +51,7 @@ add_handler('ajax_smtp_debug', 'date', true, 'core');
 add_handler('ajax_smtp_debug', 'http_headers', true, 'core');
 
 /* save draft ajax request */
+add_handler('ajax_smtp_save_draft', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_smtp_save_draft', 'login', false, 'core');
 add_handler('ajax_smtp_save_draft', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
@@ -74,9 +76,10 @@ add_handler('ajax_smtp_delete_attachment', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'date', true, 'core');
 add_handler('ajax_smtp_delete_attachment', 'http_headers', true, 'core');
 
+add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'login', false, 'core');
 add_handler('ajax_profiles_status', 'load_user_data',  true, 'core');
-add_handler('compose', 'ajax_profiles_status', true, 'smtp', 'load_smtp_servers_from_config', 'after');
+add_handler('ajax_profiles_status', 'profile_status', true);
 
 setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
 add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
@@ -97,6 +100,7 @@ return array(
         'ajax_profiles_status'
     ),
     'allowed_get' => array(
+        'imap_draft' => FILTER_VALIDATE_INT,
         'reply' => FILTER_VALIDATE_INT,
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
@@ -141,7 +145,7 @@ return array(
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_UNSAFE_RAW,
         'draft_to' => FILTER_UNSAFE_RAW,
-        'draft_smtp' => FILTER_VALIDATE_FLOAT,
+        'draft_smtp' => FILTER_SANITIZE_STRING,
         'draft_cc' => FILTER_UNSAFE_RAW,
         'draft_bcc' => FILTER_UNSAFE_RAW,
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
