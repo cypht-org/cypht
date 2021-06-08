@@ -112,8 +112,19 @@ class Hm_Output_highlight_css extends Hm_Output_Module {
                         $ids = get_imap_ids($rule['sources']);
                     }
                     if ($rule['types']) {
-                        foreach ($rule['types'] as $type) {
-                            $ids[] = '.'.$type;
+                        if (!$ids) {
+                            foreach ($rule['types'] as $type) {
+                                $ids[] = '.'.$type;
+                            }
+                        }
+                        else {
+                            $updated = array();
+                            foreach ($ids as $id) {
+                                foreach ($rule['types'] as $type) {
+                                    $updated[] = $id.'.'.$type;
+                                }
+                            }
+                            $ids = $updated;
                         }
                     }
                     if (!$ids) {
