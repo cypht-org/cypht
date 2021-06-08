@@ -6,7 +6,6 @@ class Hm_Mock_Session {
     public $auth_state = true;
     public $cookie_set = false;
     public $data = array();
-    public $auth_failed = true;
     public function get($id, $default=false) {
         if ($id == 'saved_pages') {
             return array('foo' => array('bar', false));
