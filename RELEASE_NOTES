@@ -1,3 +1,18 @@
-This is a placeholder for the release notes that will be updated each time we
-create a release. New development goes on in this branch, so be aware things
-may break!
+Cypht 1.3.0
+-----------
+
+It has been 3 YEARS since we last offered a stable release and the
+list of changes is gigantic. The detailed commit list is in the
+CHANGES file. This release is stable, but not perfect. There are
+known issues documented at Github. It is however light years ahead
+of the last stable release and even with known issues far more
+stable and superior in just about every way.
+
+Many thanks to everyone supporting the project in any way they can.
+Special thanks to the Tiki WIki team for all the incredible help
+they have provided (https://tiki.org/). This will be the first of
+a more regular release schedule, at least more regular than every
+3 years!
+
+Jason Munro
+jason@cypht.org

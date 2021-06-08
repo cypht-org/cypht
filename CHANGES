@@ -1,0 +1,562 @@
+4fec6547 make sure we always indicate a failed login issue #487                           (2021-06-08) <Jason Munro>
+6342fd00 fix highlight rules that include both E-mail types and sources                   (2021-06-08) <Jason Munro>
+5a747b55 fix typo in imap specific highlight rules                                        (2021-06-08) <Jason Munro>
+2b3e9be3 force color display in highlight rules list                                      (2021-06-08) <Jason Munro>
+265919ca highlight fix for background color + themes                                      (2021-06-08) <Jason Munro>
+d830f006 too dark theme tweak                                                             (2021-06-08) <Jason Munro>
+30d787c6 fix unit test I just broke                                                       (2021-06-07) <Jason Munro>
+db8fb96a fix cursor to indicate a button on the login page, issue #486                    (2021-06-07) <Jason Munro>
+85b082b4 add missing rule type arg                                                        (2021-06-07) <Jason Munro>
+974509b6 noop to trigger github webhooks                                                  (2021-06-07) <Jason Munro>
+9c5ca8f4 attempt to add gitter webhook to travis                                          (2021-06-07) <Jason Munro>
+68018cc6 initial commit for a highlighting module set for message lists                   (2021-06-07) <Jason Munro>
+b6cbdb47 add more flags as classes to imap message listings                               (2021-06-07) <Jason Munro>
+1ce72f87 add another icon (pencil)                                                        (2021-06-07) <Jason Munro>
+d4bfa658 Merge pull request #490 from henrique-borba/draft-fix                            (2021-06-07) <Jason Munro>
+b44c88a1 fix imap folder page default sever selection                                     (2021-06-07) <Jason Munro>
+0f49e286 Fix the draft implementation after 454                                           (2021-06-07) <Henrique Borba>
+78e24fa9 fix for issue #349 after reverting PR #454                                       (2021-06-06) <Jason Munro>
+ba20c9cd some tweaks on the new IMAP drafts feature                                       (2021-06-06) <Jason Munro>
+f3f56cc8 work arounds for changed server indexing                                         (2021-06-04) <Jason Munro>
+1c252b0a load integer indexes even if saved with unique ids                               (2021-06-04) <Jason Munro>
+a3d835fb disable selenium tests in travis ci                                              (2021-06-01) <Jason Munro>
+09f162a3 disable selenium in travis ci for now                                            (2021-06-01) <Jason Munro>
+6e4df68e Merge pull request #482 from azibom/show-images-inline-like-roundcube-and-gmail  (2021-06-01) <Jason Munro>
+d1e7f2e6 Merge branch 'master' into show-images-inline-like-roundcube-and-gmail           (2021-06-01) <Jason Munro>
+eed8e97c Merge pull request #484 from WikiSuite/fix-error-message                         (2021-06-01) <Jason Munro>
+653fc94e Merge pull request #481 from henrique-borba/removed-ajax-abort-checkbox          (2021-06-01) <Jason Munro>
+551e1203 Merge pull request #479 from henrique-borba/default-list-sender-profile-fix      (2021-06-01) <Jason Munro>
+9fade315 Merge pull request #478 from henrique-borba/draft-edit-change                    (2021-06-01) <Jason Munro>
+b050f227 Merge pull request #477 from henrique-borba/send-and-archive-button              (2021-06-01) <Jason Munro>
+c1fcc664 Merge pull request #473 from jasonmunro/revert-454-feature/server-list-by-uniqid (2021-06-01) <Jason Munro>
+0b988e2c Make the error message clearer and more explicit                                 (2021-05-30) <Eric Ampire>
+9d18dd7e add the show attached images feature style                                       (2021-05-28) <cshabanic>
+0b4211e8 add the show attached images feature                                             (2021-05-28) <cshabanic>
+eed979b6 Add LinkedIn group                                                               (2021-05-27) <Marc Laporte>
+0d51dff6 Remove Hm_Ajax.abort when checkboxes are checked                                 (2021-05-27) <Henrique Borba>
+ed84a395 Fix the default sender for list links when sender is a profile                   (2021-05-27) <Henrique Borba>
+886519f5 Edit draft link in IMAP message                                                  (2021-05-27) <Henrique Borba>
+c67deda9 Send and archive button when replying emails                                     (2021-05-27) <Henrique Borba>
+47e2b607 Removing pop3 in the keywords as it's deprecated                                 (2021-05-22) <Marc Laporte>
+4d632ed9 Merge pull request #475 from henrique-borba/fix-draft-default-smtp               (2021-05-20) <Jason Munro>
+d3ed0994 Merge pull request #476 from henrique-borba/expunge-drafts                       (2021-05-20) <Jason Munro>
+27b5f2fc Expunge older drafts                                                             (2021-05-14) <Henrique Borba>
+87305bfa Fixed default SMTP server when editing a Draft                                   (2021-05-14) <Henrique Borba>
+7ae6f1dd Merge pull request #474 from henrique-borba/drafts-hotfix                        (2021-05-10) <Jason Munro>
+f7aa3a05 Fixed IMAP drafts not being saved when the selected SMTP server is a profile     (2021-05-10) <Henrique Borba>
+4e45bd4a Revert "use uniqid instead of php array indexing for server list"                (2021-05-07) <Jason Munro>
+0db91c56 Merge pull request #464 from henrique-borba/master                               (2021-05-05) <Jason Munro>
+c5ef783a Draft editing implementation                                                     (2021-04-27) <Henrique Borba>
+34e4fe11 Draft compose and labels                                                         (2021-04-16) <Henrique Borba>
+34f6d01b Merge pull request #3 from jasonmunro/master                                     (2021-04-16) <Henrique Borba>
+f5c3585c fix for missing imap folder select dialog issue #465                             (2021-04-13) <Jason Munro>
+cee45de7 Fixed error messsage text in save_imap_draft when append_end return false        (2021-04-09) <Henrique Borba>
+e2cce196 Base implementation for IMAP drafts                                              (2021-04-09) <Henrique Borba>
+b74ca250 Implemented the draft settings back to imap_folders                              (2021-04-09) <Henrique Borba>
+81bf9fd1 draft_smtp must be filtered as string and not float                              (2021-04-09) <Henrique Borba>
+6b55ae0f Removed excess breaks for better code readability                                (2021-04-09) <Henrique Borba>
+83d04000 Hotfix for the default email in the SMTP list when using the mailing list opti.. (2021-04-09) <Henrique Borba>
+a05df777 Merge pull request #2 from jasonmunro/master                                     (2021-04-09) <Henrique Borba>
+1accf48e Merge pull request #463 from henrique-borba/master                               (2021-04-05) <Jason Munro>
+9c15b69a Merge pull request #462 from azibom/no-page-2-for-messages-in-combined-view      (2021-04-05) <Jason Munro>
+1100b5af Fix the wrong email in the SMTP list when using the mailing list options         (2021-04-05) <Henrique Borba>
+0e89a2cd Merge pull request #1 from jasonmunro/master                                     (2021-04-05) <Henrique Borba>
+528f98eb add a default text to the combined inbox page                                    (2021-04-04) <cshabanic>
+0493cb42 Merge pull request #461 from kroky/bugfix/checkbox-move                          (2021-04-01) <Jason Munro>
+60c938a5 still trying to get selenium working                                             (2021-04-01) <Jason Munro>
+c4b84064 typo fix in selenium runner                                                      (2021-03-31) <Jason Munro>
+1d52c92b disable profile test for now                                                     (2021-03-31) <Jason Munro>
+a00d77dc more travis + selinium tweaking                                                  (2021-03-31) <Jason Munro>
+65b5bed4 another attempt at travis + selenium                                             (2021-03-31) <Jason Munro>
+2387064e disable selenium in travis for now (!!)                                          (2021-03-31) <Jason Munro>
+3824352e try to get at least 1 instance to run selenium in travis                         (2021-03-31) <Jason Munro>
+bfe743c3 fix typo                                                                         (2021-03-31) <Jason Munro>
+cf75a724 more travis tweaks                                                               (2021-03-31) <Jason Munro>
+813b2e00 disable test failing in travis for now                                           (2021-03-31) <Jason Munro>
+bcde2f64 more travis ci tweaks                                                            (2021-03-31) <Jason Munro>
+b6db0cc2 more work to get travis + PHP 8 working                                          (2021-03-31) <Jason Munro>
+17c441ce travis tweaks for updates unit tests. Enable selenium tests (!!)                 (2021-03-31) <Jason Munro>
+fd41b3bc update unit tests for phpunit 9. Limit travis to PHP 7.2 +                       (2021-03-31) <Jason Munro>
+538db1c3 disable test until I figure out a functiona css selector                         (2021-03-31) <Jason Munro>
+c4e26385 tweaks for changes in underlying testing tools                                   (2021-03-31) <Jason Munro>
+52370031 changes to make everything work with PHP 8+                                      (2021-03-31) <Jason Munro>
+f829bc01 fix copy/move folder list when checking a message from the list before all sou.. (2021-03-25) <Victor Emanouilov>
+f59c9452 fix sending (bug introduced with PR 454)                                         (2021-03-23) <Jason Munro>
+b0a7f86d fix add profile (broken smtp id white list entry from PR 454)                    (2021-03-19) <Jason Munro>
+15de538e fix unit tests                                                                   (2021-03-09) <Jason Munro>
+7dde8c62 Merge pull request #457 from kmpoppe/update-nasa-module                          (2021-03-09) <Jason Munro>
+0eef1364 fix change password causing settings to get lost                                 (2021-03-09) <Jason Munro>
+9e2bfc41 Making NASA APOD questions date safe                                             (2021-03-05) <Kai Michael Poppe>
+b1d0b928 Merge pull request #456 from kmpoppe/patch-1                                     (2021-03-04) <Jason Munro>
+71158cf0 Shortening commit message for asthetics                                          (2021-03-04) <Kai Michael Poppe>
+8bf54d42 Development News (Commit history)                                                (2021-03-03) <Kai Michael Poppe>
+f58c1920 Add Gitter link                                                                  (2021-02-25) <Marc Laporte>
+a15dc039 fix typo                                                                         (2021-02-25) <Marc Laporte>
+6ed4d3a2 Merge pull request #455 from kmpoppe/ie11-compatibility                          (2021-02-25) <Jason Munro>
+339d8a23 Site.js in Core Module compatibility for IE11                                    (2021-02-25) <Kai Michael Poppe>
+04a52ffc Merge pull request #454 from kroky/feature/server-list-by-uniqid                 (2021-02-25) <Jason Munro>
+4765e8ef use uniqid instead of php array indexing for server list (imap, jmap, smtp, po.. (2021-02-23) <Victor Emanouilov>
+f335220b Merge pull request #453 from kroky/bugfix/drafts                                 (2021-02-15) <Jason Munro>
+04759c1b attempt to fix draft versions, missing attachments when sending emails and oth.. (2021-02-15) <Victor Emanouilov>
+2a9060a1 fix sometimes blank reply to details when > 1 tab/window is open                 (2021-02-08) <Jason Munro>
+1abd5b12 check for bad date input                                                         (2021-01-20) <Jason Munro>
+47f5c703 support multiple message headers with the same name                              (2021-01-20) <Jason Munro>
+8f39829f Merge pull request #449 from kroky/bugfix/sort-date-in-search                    (2021-01-15) <Jason Munro>
+4c107c6a use default sort order for search/advanced search pages                          (2021-01-04) <Victor Emanouilov>
+8cba7736 Merge pull request #445 from mnsuccess/cursor_action                             (2020-12-14) <Jason Munro>
+72a165f1 Improve code :Allow Cursor to be placed according to action                      (2020-12-07) <mnsuccess>
+e35a0dc0 improve code : Allow Cursor to be placed according to action                     (2020-12-07) <mnsuccess>
+9363fc98 Merge pull request #446 from mnsuccess/unread_action                             (2020-12-04) <Jason Munro>
+21ed5e71 Merge pull request #447 from mnsuccess/copy_move_action                          (2020-12-04) <Jason Munro>
+bd79cb64 make copy/move buttons work everywhere :All Mails, simple search and advanced .. (2020-11-19) <mnsuccess>
+dc6a9f7a [NEW]  add mark as unread on the inline message                                  (2020-11-17) <mnsuccess>
+a76fa518 [FIX] allow cursor to be placed according to action                              (2020-11-10) <mnsuccess>
+f5296071 Fix a typo                                                                       (2020-11-02) <Marc Laporte>
+57adcefc js fix for updating a list of an action                                          (2020-10-28) <Jason Munro>
+aa249e7d convert date to user's tz + add "time ago" value issue #444                      (2020-10-28) <Jason Munro>
+aa33d978 change html report location                                                      (2020-10-27) <Jason Munro>
+592b85da archive message fixes issue #439                                                 (2020-10-27) <Jason Munro>
+acd69faf style tweak                                                                      (2020-10-27) <Jason Munro>
+51ac822c mock update for redis change                                                     (2020-10-27) <Jason Munro>
+badb18bd replace deprecated redis delete command with del                                 (2020-10-27) <Jason Munro>
+268ec8a5 fix archive feature                                                              (2020-10-26) <Jason Munro>
+5f3e682e fix toggle message control behavior after recent js changes                      (2020-10-26) <Jason Munro>
+10f2a5ed unit test fixes                                                                  (2020-10-23) <Jason Munro>
+914ae6ee A multitude of tiny changes to help text                                         (2020-10-22) <Marc Laporte>
+8a082cde Merge pull request #443 from kroky/bugfix/send-date-sort                         (2020-10-22) <Jason Munro>
+04705489 Merge pull request #441 from yvesdaxmaz/add_archive_to_all_mail                  (2020-10-22) <Jason Munro>
+d443189a fix default sort order label (Arrival vs Sent Date) throughout the codebase - .. (2020-10-22) <Victor Emanouilov>
+d1468f2f skipped archive message without archived folder set                              (2020-10-21) <Yves Kipondo>
+fc5b23cf add mistakenly left out forward link on message view                             (2020-10-21) <Jason Munro>
+db605630 unit test update                                                                 (2020-10-20) <Jason Munro>
+eb5a7ce0 move debug title to the lower right                                              (2020-10-20) <Jason Munro>
+13007904 slightly improved address label cleanup                                          (2020-10-20) <Jason Munro>
+30f559e9 fix function name that changed                                                   (2020-10-20) <Jason Munro>
+15a63936 Merge pull request #390 from adrienmaloba/check-multiples-recipients             (2020-10-20) <Jason Munro>
+52fb74d3 Merge pull request #434 from kroky/bugfix/date-sort                              (2020-10-20) <Jason Munro>
+dfa8a56e slight clean up of db port support, added default to hm3.sample.ini              (2020-10-20) <Jason Munro>
+a16408f0 Merge pull request #442 from KosuDS/master                                       (2020-10-20) <Jason Munro>
+aa15919a Merge branch 'master' of github.com:jasonmunro/cypht into master                 (2020-10-20) <Jason Munro>
+556fed43 fix for shift click + firefox, remove unused method from imap js                 (2020-10-20) <Jason Munro>
+7bc59338 cyph/lib/db/php - added support for the database port                            (2020-10-20) <Karol Skorupski>
+83bf778b cash js version bump                                                             (2020-10-13) <Jason Munro>
+7535093b Add archive message handler on message_list page                                 (2020-10-07) <Yves Kipondo>
+ae4a0c85 mend                                                                             (2020-10-07) <--replace-all>
+8f9160eb Add archive button in messages heading list                                      (2020-10-07) <--replace-all>
+c72a9b3f Disable REPLY-ALL link instead of remove it                                      (2020-10-05) <Adrien Maloba>
+542de993 expose default sort order even on combined message views, so imap message list.. (2020-09-24) <Victor Emanouilov>
+1f46f5cf dev-master has so many fixes                                                     (2020-09-23) <Marc Laporte>
+ae6bf16e Adding link to the official Docker image                                         (2020-09-19) <Marc Laporte>
+31a8bc48 add opera mini to the user agent check for mobile devices                        (2020-09-18) <Jason Munro>
+85b5b1e0 fix dev news section on the home page                                            (2020-09-17) <Jason Munro>
+10764b7d minor font family fix for the dark theme                                         (2020-09-16) <Jason Munro>
+4e98917d fix for utf8 mangling from html to text issue #429                               (2020-09-16) <Jason Munro>
+ed035eea follow up fixes to edit saved search name PR merge                               (2020-09-16) <Jason Munro>
+886f54f2 Merge pull request #409 from yvesdaxmaz/update_saved_search_label                (2020-09-16) <Jason Munro>
+3920c50b unit test updates for UI changes                                                 (2020-09-16) <Jason Munro>
+0964b662 couple fixes for the latest merged PR (default sort of arrival or date)          (2020-09-16) <Jason Munro>
+2e3174fb Merge pull request #418 from kroky/feature/default-sort-date                     (2020-09-16) <Jason Munro>
+f26f9c0e start EIMS workarounds issue #430                                                (2020-09-16) <Jason Munro>
+ad8b3993 redirect to the default start page when accessing / rather than home             (2020-09-16) <Jason Munro>
+4720f94a fix bug creating subfolders of existing folders                                  (2020-09-16) <Jason Munro>
+26905f30 Merge pull request #422 from kroky/bugfix/advanced-search-move-copy              (2020-09-16) <Jason Munro>
+ce25efa6 Merge pull request #408 from lyabs243/cypht-folder                               (2020-09-16) <Jason Munro>
+fbe3cf85 make copy/move buttons work in advanced search - fix mising event handlers       (2020-08-13) <Victor Emanouilov>
+0c7a095e Merge branch 'master' of github.com:jasonmunro/cypht into master                 (2020-07-31) <Jason Munro>
+0e3d63f6 fix login issue on non-standard port issue #414                                  (2020-07-31) <Jason Munro>
+ee98884b add default sort order for imap folders - arrival or sent date; show arrival d.. (2020-07-31) <Victor Emanouilov>
+3d75a557 Merge pull request #417 from xorti/loose-dependencies-version-constraints        (2020-07-29) <Jason Munro>
+26312227 Loose composer dependencies contraints to support newer versions                 (2020-07-29) <Jorge Sá Pereira>
+90d00b13 more work on address parsing                                                     (2020-07-08) <Jason Munro>
+9b2745b4 small css fix                                                                    (2020-07-08) <Jason Munro>
+836e2e20 test update                                                                      (2020-07-07) <Jason Munro>
+61c80a93 testing some new and improved (hopefully) address parsing                        (2020-07-07) <Jason Munro>
+bdb37d62 don't flash "offline" in firefox when an ajax request is aborted due to naviga.. (2020-07-07) <Jason Munro>
+d0bbf574 support cookie samesite for PHP >= 7.3                                           (2020-07-07) <Jason Munro>
+60532962 fix dark theme shadow on sys messages                                            (2020-07-06) <Jason Munro>
+e2421bad rename jnyeyoonipzbdpjs request handler to ajax_save_search                      (2020-06-25) <Yves Kipondo>
+cc859ea4 add old saved search label in form as disabled input field                       (2020-06-25) <Yves Kipondo>
+2d1d2205 allow redis connect using a unix socket issue #410                               (2020-06-25) <Jason Munro>
+9895677c hide the update_search_label_field after updated saved search label              (2020-06-23) <Yves Kipondo>
+0d9a3b49 define update_save_search_label Handler class                                    (2020-06-23) <Yves Kipondo>
+0357162b add ajax_update_save_search_label request handler                                (2020-06-23) <Yves Kipondo>
+f065fcd7 attach click event listener on search_label_update button                        (2020-06-23) <Yves Kipondo>
+36f9c0c2 add edit saved search label form                                                 (2020-05-12) <Yves Kipondo>
+95045be8 add edit saved search icon                                                       (2020-05-09) <Yves Kipondo>
+66f7359b Adapt "archive folder" css so that it conforms to the other sections of the "f.. (2020-06-23) <lyabs243>
+fd9f9575 Fix indentation to comply with Cypht's standards                                 (2020-06-22) <lyabs243>
+706574f9 update js compression example in ini file                                        (2020-06-19) <Jason Munro>
+b42a7660 address parsing fixes, profile display name fix for single quotes                (2020-06-19) <Jason Munro>
+0ab31845 testing a fix for issue #405                                                     (2020-06-18) <Jason Munro>
+d43dfabc Fix theme issue when selecting a folder                                          (2020-06-18) <lyabs243>
+e1560204 Fix a typo                                                                       (2020-05-05) <Marc Laporte>
+bd659cad Merge pull request #393 from yvesdaxmaz/arrival_data_sent_date                   (2020-05-05) <Jason Munro>
+c43d3b87 fix slice offset issue #394                                                      (2020-05-05) <Jason Munro>
+f597f0d6 fix translation references of Arrival and Date to respectively Arrival Date an.. (2020-04-28) <Yves Kipondo>
+77841503 replace arrival by arrival date and date by sent date                            (2020-04-28) <Yves Kipondo>
+be092b11 don't fail on reply all if delivered-to is not set for some reason               (2020-04-24) <Jason Munro>
+65c03491 Merge pull request #389 from adrienmaloba/exclude-delivered-to-address-from      (2020-04-24) <Jason Munro>
+ce0af650 Remove REPLY-ALL link when there is only one recipient                           (2020-04-23) <Adrien Maloba>
+83568427 make sure to exclude delivered to address from reply-all option                  (2020-04-22) <Adrien Maloba>
+43d833fb LGPL switch over with hopefully temp html2text replacement issue #333            (2020-04-21) <Jason Munro>
+69d6546b IMAP message parsing warning fix                                                 (2020-04-21) <Jason Munro>
+59c3d2eb unit test updates for recent commits                                             (2020-04-20) <Jason Munro>
+843e2aba fix a bug disabling Portuguese                                                   (2020-04-20) <Jason Munro>
+1fbb84b1 add Estonian language support and make a small css tweak                         (2020-04-20) <Jason Munro>
+fb414f47 Merge pull request #388 from azizibr/patch-1                                     (2020-04-20) <Jason Munro>
+dfdd6015 Update az.php                                                                    (2020-04-20) <Aziz Ibrahimov>
+beea64a8 disable selenium test in travis (sadface)                                        (2020-04-16) <Jason Munro>
+4ee23ac5 typo fix                                                                         (2020-04-16) <Jason Munro>
+626f4649 enable a single travis PHP 7.4 instance to run selenium tests                    (2020-04-16) <Jason Munro>
+93a5bad1 update apache package for travis                                                 (2020-04-16) <Jason Munro>
+a2d85a53 don't try to run UI tests when unconfigured                                      (2020-04-16) <Jason Munro>
+415b5272 disable selenium tests for now                                                   (2020-04-16) <Jason Munro>
+8fe0d01c open up the travis flood gates on PHP 7 versions                                 (2020-04-16) <Jason Munro>
+eeb49489 maybe figured out the last bit for travis + php7.4                               (2020-04-16) <Jason Munro>
+764a3adc trying to fix mysql + php 7.3 + travis CI                                        (2020-04-16) <Jason Munro>
+669130a9 getting close!                                                                   (2020-04-15) <Jason Munro>
+ab7a58d5  refuse to give up until this works (PHP7.4 + Travis CI)                         (2020-04-15) <Jason Munro>
+3fa40d31 moar travis + PHP 7.4                                                            (2020-04-15) <Jason Munro>
+117f8523 getting closer to travis ci + php 7.4                                            (2020-04-15) <Jason Munro>
+ca58bd30 another OS change attempt                                                        (2020-04-15) <Jason Munro>
+c777c879 try a new OS version for PHP 7.4                                                 (2020-04-15) <Jason Munro>
+80b4368e typo fix                                                                         (2020-04-15) <Jason Munro>
+5e3ccc00 imore work on PHP 7.4 + travis CI                                                (2020-04-15) <Jason Munro>
+cf4875b2 first of likely many fixes for travis + PHP > 7.2                                (2020-04-15) <Jason Munro>
+a2f5bfe3 Merge branch 'master' of github.com:jasonmunro/cypht                             (2020-04-15) <Jason Munro>
+f024bc03 now that travis is fixed, lets break it again! :)                                (2020-04-15) <Jason Munro>
+2538b227 Merge pull request #381 from yvesdaxmaz/add_mail_provider                        (2020-04-15) <Jason Munro>
+f296257d travis is having issues, so limiting the build matrix for now                    (2020-04-15) <Jason Munro>
+2b3a87f7 make sure newlines are message with address parsing [skip ci]                    (2020-04-15) <Jason Munro>
+2f1d5846 disable imap tests for now                                                       (2020-04-15) <Jason Munro>
+a0421e23 revert PR that breaks address parsing                                            (2020-04-15) <Jason Munro>
+f9533c4f disable troublesome unit test temporarily                                        (2020-04-15) <Jason Munro>
+1ee33ed0 fix method signature to match base class                                         (2020-04-15) <Jason Munro>
+8c6b4cf2 merge php7.4 fixes                                                               (2020-04-15) <Jason Munro>
+858608ff Merge pull request #383 from adrienmaloba/prevent-last-recipient-from-disappea.. (2020-04-15) <Jason Munro>
+e626c0d3 Merge pull request #386 from yvesdaxmaz/message_selection_controls               (2020-04-15) <Jason Munro>
+e4511902 Merge branch 'kroky-feature/webroot'                                             (2020-04-15) <Jason Munro>
+c1c98126 fix deprecated string indexing                                                   (2020-04-15) <Jason Munro>
+3e90eaa2 php 7.4 compat changes                                                           (2020-04-15) <Jason Munro>
+c07f442f disable a faling test, fix another                                               (2020-04-15) <Jason Munro>
+1adcf07d enable imap tests while working on php 7.4 support                               (2020-04-15) <Jason Munro>
+eccc1c54 fix invalid assignment                                                           (2020-04-15) <Jason Munro>
+05dfc9cd make actions copy and move available on mobile devices                           (2020-04-15) <Yves Kipondo>
+c54d8c72 add WEB_ROOT constant to allow theme and static asset files loaded from a diff.. (2020-04-10) <Victor Emanouilov>
+9e487c72 prevent last recipient from disappearing                                         (2020-04-04) <Adrien Maloba>
+69621d75 Add gandi.net as email provider                                                  (2020-03-14) <Yves Kipondo>
+1769ba9b layout tweak for the folder list toggle icon                                     (2020-02-16) <Jason Munro>
+60652eef error message fix for password update                                            (2020-02-16) <Jason Munro>
+9234d567 Merge pull request #374 from yvesdaxmaz/search_copy_move                         (2020-02-16) <Jason Munro>
+c125613d only set noreferrer when logged in                                               (2020-02-16) <Jason Munro>
+c084ce5c Merge pull request #373 from t-m-w/master                                        (2020-02-16) <Jason Munro>
+554bab89 Merge pull request #365 from yvesdaxmaz/file_attachment_error                    (2020-02-16) <Jason Munro>
+05627405 Promoting our chat room                                                          (2020-02-16) <Marc Laporte>
+7b1fe49c Add copy and move button to advanced search result apge                          (2020-02-12) <Yves Kipondo>
+979de7da Add copy and move button to simple search result page                            (2020-02-12) <Yves Kipondo>
+05725c19 Promoting our Packagist.org URL                                                  (2020-02-11) <Marc Laporte>
+adc5c548 [Privacy] Don't send referrer information when clicking links                    (2020-02-10) <t-m-w>
+58f9c65c disable keyboard shortcut tests as they are failing in travis                    (2020-01-06) <Jason Munro>
+94c5b847 css tweaks and a new theme                                                       (2020-01-06) <Jason Munro>
+e32958ae Merge branch 'file_attachment_error' of github.com:yvesdaxmaz/cypht into file_.. (2019-11-20) <Yves Kipondo>
+bc30c11c add maximun allowed size when attaching big big file                             (2019-11-05) <Yves Kipondo>
+c3fd36ad change default shortcuts, enable selenium tests issue #331                       (2019-11-17) <Jason Munro>
+89935e24 move string to PHP for sign warning so it can be translated                      (2019-11-17) <Jason Munro>
+19d3dd41 Merge pull request #358 from yvesdaxmaz/signing_alert                            (2019-11-17) <Jason Munro>
+02ec977a readme update                                                                    (2019-11-17) <Jason Munro>
+e1952b2d support shift+click to select multiple items in a list issue #362                (2019-11-17) <Jason Munro>
+c5dc2b96 follow up work on the new archive message feature issue #228                     (2019-11-13) <Jason Munro>
+935d142f Merge pull request #357 from yvesdaxmaz/add_archive                              (2019-11-13) <Jason Munro>
+5d7514ec use specific imap delimiter when generate archive mailbox name                   (2019-11-13) <Yves Kipondo>
+e08e04fb fix overly aggresive caching when managing folders issue #363                    (2019-11-13) <Jason Munro>
+f4c1da3b allow user to set archive folder                                                 (2019-11-08) <Yves Kipondo>
+16cdc7cb add set archive folder select handler                                            (2019-11-07) <Yves Kipondo>
+649beadc add archive dialog output in imap_folder module                                  (2019-11-07) <Yves Kipondo>
+10becfd0 add maximun allowed size when attaching big big file                             (2019-11-05) <Yves Kipondo>
+61b2d75f show alert when trying to sign message without existing profile                  (2019-10-23) <Yves Kipondo>
+469632df move archived message to it respective mailbox                                   (2019-10-18) <Yves Kipondo>
+ff04d17e update archive_message handler to move message to archive folder                 (2019-10-17) <Yves Kipondo>
+86b74d36 Add ajax_imap_archive_message handler                                            (2019-10-09) <Yves Kipondo>
+eee77c03 remove some unneeded bits when printing a message view                           (2019-07-19) <Jason Munro>
+c39ccc30 add vendor path to cli scripts                                                   (2019-06-05) <Jason Munro>
+b841ee41 add vendor path definition to config gen                                         (2019-06-05) <Jason Munro>
+5c4a4c76 Merge pull request #347 from kroky/feature/vendor-path                           (2019-06-05) <Jason Munro>
+3c4cfde1 add missing VENDOR_PATH constant to tests                                        (2019-05-30) <Victor Emanouilov>
+e84ad7b7 use separate constant for VENDOR_PATH to allow customizing of the vendor direc.. (2019-05-29) <Victor Emanouilov>
+d75452cf add some debugging around saving sent messages                                   (2019-05-22) <Jason Munro>
+cd4663f4 Merge pull request #346 from kroky/bugfix/profile-load-precedence                (2019-05-21) <Jason Munro>
+35d33dd7 fix compose page handler module precedence - profiles that depend on smtp serv.. (2019-05-21) <Victor Emanouilov>
+e15e7c9e Fix for not saving sent copy when imap id is 0 issue #345                        (2019-05-15) <Jason Munro>
+968e755a fix incorrect debug statement                                                    (2019-05-06) <Jason Munro>
+a271b96a Merge pull request #342 from kroky/feature/custom-user-config                    (2019-04-30) <Jason Munro>
+ecb43810 allow usage of custom class for implemeting user configuration persistence       (2019-04-29) <Victor Emanouilov>
+8f763819 remove obsolete logic filtering out too many SMTP servers issue #340             (2019-04-22) <Jason Munro>
+3a908422 fix for issue #338, not setting outbound smtp server on reply                    (2019-04-18) <Jason Munro>
+c71b7684 small refactor for cookie domain/path - expand a unit test                       (2019-04-03) <Jason Munro>
+e7d7a417 Merge pull request #335 from kroky/feature/cookie-path                           (2019-04-03) <Jason Munro>
+e64797a5 add example for cookie path setting                                              (2019-04-03) <Victor Emanouilov>
+aa835fa8 add cookie_path configuration parameter                                          (2019-04-02) <Victor Emanouilov>
+14007786 revert accidentally changed default shortcut                                     (2019-03-27) <Jason Munro>
+ab755d71 new user message style issue #325                                                (2019-03-21) <Jason Munro>
+e66ba753 add mobile web app capable meta tags issue #330                                  (2019-03-21) <Jason Munro>
+99949ff4 fix javascript errors with auto-complete from zepto to crash change              (2019-03-20) <Jason Munro>
+02d01923 fix re-attaching files with the same filename issue #323                         (2019-03-20) <Jason Munro>
+2b0da4ae preliminary support for add/update/delete of carddav contacts                    (2019-03-20) <Jason Munro>
+b1509163 break some code up, add field level ids to parsed vcard output                   (2019-03-20) <Jason Munro>
+4b7acc22 local contacts fixes                                                             (2019-03-20) <Jason Munro>
+2eb4bd3b LDAP contacts module set fixes                                                   (2019-03-20) <Jason Munro>
+355fb16a misc fixes around contacts in general                                            (2019-03-20) <Jason Munro>
+914d675b work on carddav contact edit/add                                                 (2019-03-19) <Jason Munro>
+0d276b01 import method for parsed vcard data                                              (2019-03-19) <Jason Munro>
+4c9cce89 some contact css tweaks                                                          (2019-03-19) <Jason Munro>
+5c7d467b remove unneeded is_mobile assignment                                             (2019-03-18) <Jason Munro>
+ea1056aa misc test updates                                                                (2019-03-16) <Jason Munro>
+b2baee66 tweaks around debug include assets for better testing                            (2019-03-16) <Jason Munro>
+388378cd small commit checker improvements                                                (2019-03-16) <Jason Munro>
+92047041 add an option to always use the mobile UI                                        (2019-03-16) <Jason Munro>
+47132203 update github ini issue #328                                                     (2019-03-15) <Jason Munro>
+d23605b9 don't reset checkbox state after a message action                                (2019-03-14) <Jason Munro>
+ff66fdbe Merge pull request #327 from jasonmunro/remove-mobile-media-queries              (2019-03-14) <Jason Munro>
+d5cd5369 fix left over char left in css file                                              (2019-03-14) <Jason Munro>
+0946163e more css tweaks                                                                  (2019-03-14) <Jason Munro>
+4d0e0e46 small follow up to PR #326                                                       (2019-03-14) <Jason Munro>
+7210feeb Merge pull request #326 from kroky/feature/easier-integration                    (2019-03-14) <Jason Munro>
+f078a23e testing out a new way to deliver the mobile UI                                   (2019-03-13) <Jason Munro>
+807797cb allow easier integration into 3rd party systems - specify session class and ab.. (2019-03-13) <Victor Emanouilov>
+9e8ef26e work around for broken Yahoo IMAP search issue #324                              (2019-03-12) <Jason Munro>
+183fba94 fix warning on subject check for the IMAP message view                           (2019-03-12) <Jason Munro>
+008de4a5 better handling of RSS/ATOM content that is missing core attributes              (2019-03-12) <Jason Munro>
+508a1ce4 add missing desktop notifications to sample ini file                             (2019-03-12) <Jason Munro>
+65d30063 add default subject for imap message view (issue #322)                           (2019-03-04) <Jason Munro>
+986da4a2 better handling of missing fields in pop3 message lists                          (2019-03-04) <Jason Munro>
+4deb42e9 fix all/small headers links on the message view page                             (2019-02-25) <Jason Munro>
+7b5daaf9 phpunit test updates                                                             (2019-02-24) <Jason Munro>
+d1438531 misc small contacts detail view improvements                                     (2019-02-24) <Jason Munro>
+85014366 updates for new webdav formats interface                                         (2019-02-24) <Jason Munro>
+68b64804 work on card editing                                                             (2019-02-24) <Jason Munro>
+ae3b82c7 disable IE in browserstack until I figure out what is going wrong                (2019-02-22) <Jason Munro>
+f20484dc Merge pull request #321 from Razvan0925/patch-1                                  (2019-02-22) <Jason Munro>
+b22a22b9 Fix problems adding imap, smtp and probably more                                 (2019-02-22) <Luca Razvan>
+07718df9 work in progress on edit/add/delete carddav contacts                             (2019-02-21) <Jason Munro>
+97adc7f7 general contacts improvements                                                    (2019-02-21) <Jason Munro>
+6f6b5b2d some cleanup and type + source support for ldap contacts                         (2019-02-21) <Jason Munro>
+8eaf584c use source and type when checking for a contact edit/add                         (2019-02-21) <Jason Munro>
+904b211d add type field to carddav contacts store                                         (2019-02-21) <Jason Munro>
+da949dff add type field to ldap contacts store                                            (2019-02-21) <Jason Munro>
+4973ba7e add type field to gmail contacts store                                           (2019-02-21) <Jason Munro>
+2b9c7d56 include raw card detail in carddav output (for now)                              (2019-02-21) <Jason Munro>
+efd8e41d more work on core ajax related bits                                              (2019-02-21) <Jason Munro>
+2bbd8bbb disable loading icon on background updates                                       (2019-02-21) <Jason Munro>
+e22994cb more ajax related fixes                                                          (2019-02-20) <Jason Munro>
+f2ad5550 fix mobile swipe event handling                                                  (2019-02-20) <Jason Munro>
+480542f4 remove unused var                                                                (2019-02-20) <Jason Munro>
+3ed77688 fix for showing inline headers on a digest message view                          (2019-02-20) <Jason Munro>
+227e4820 cleaner csslint output                                                           (2019-02-20) <Jason Munro>
+6eed3ae8 fix for loading icon changes                                                     (2019-02-20) <Jason Munro>
+ec184297 misc fixes and clean ups for the core module set js                              (2019-02-19) <Jason Munro>
+0e4d237d variable name fix in jmap error reporting                                        (2019-02-19) <Jason Munro>
+6afa70c6 show digest envelope inline if possible when viewing a message part              (2019-02-19) <Jason Munro>
+44f03b34 tweaking some loading icon logic                                                 (2019-02-19) <Jason Munro>
+f0bdae0d better ajax failure handling after the zepto/cash switch                         (2019-02-19) <Jason Munro>
+cdc05f1e composer json update                                                             (2019-02-13) <Jason Munro>
+38196262 application value update                                                         (2019-02-13) <Jason Munro>
+e5de4bdf license correction                                                               (2019-02-13) <Jason Munro>
+558ca5e8 Merge pull request #319 from jasonmunro/composer-issue-311                       (2019-02-13) <Jason Munro>
+3e44cef1 composer update for random compat version                                        (2019-02-13) <Jason Munro>
+db8f0d1c add composer to travis config                                                    (2019-02-13) <Jason Munro>
+beb1572f composer updates for optional deps                                               (2019-02-13) <Jason Munro>
+e361e65c down merge master                                                                (2019-02-13) <Jason Munro>
+68b83efc test updates for combined sort option                                            (2019-02-12) <Jason Munro>
+d170c6b8 add client side sorting to search and advanced search                            (2019-02-12) <Jason Munro>
+554aa712 test updates for combined sort                                                   (2019-02-12) <Jason Munro>
+3b4cb69f client side sorting for combined views (not search yet) issue #189               (2019-02-12) <Jason Munro>
+06fda14d break up the too large imap modules file                                         (2019-02-12) <Jason Munro>
+86647fa7 add a todo                                                                       (2019-02-12) <Jason Munro>
+9aec876c simple mailing list controls for the message view issue #169                     (2019-02-12) <Jason Munro>
+70a3d129 disable shortcut tests for now                                                   (2019-02-11) <Jason Munro>
+e67fdcf9 fix keyboard shortcut edit icons sizes                                           (2019-02-11) <Jason Munro>
+ee314020 another attempt at fixing travis                                                 (2019-02-10) <Jason Munro>
+fc037a84 attempt to fix travis failures                                                   (2019-02-10) <Jason Munro>
+407811f3 comment out an assertion until I figure out why it's failing                     (2019-02-10) <Jason Munro>
+412e9552 INSTALL update for composer                                                      (2019-02-10) <Jason Munro>
+ca360009 down merge master                                                                (2019-02-10) <Jason Munro>
+d4e2aa7f clean up, and add some keyboard shortcut tests                                   (2019-02-10) <Jason Munro>
+4f0f22fb more keyboard shortcut fixes                                                     (2019-02-10) <Jason Munro>
+c45d9d29 fix keyboard shortcuts module set javascript issue #318                          (2019-02-10) <Jason Munro>
+9f1bf6ab add an install file                                                              (2019-02-10) <Jason Munro>
+11c27ca9 include branch info in subject where applicable                                  (2019-02-10) <Jason Munro>
+8e8443ed add another php extension                                                        (2019-02-10) <Jason Munro>
+6eba0485 change the qr code lib to something with less requirements                       (2019-02-10) <Jason Munro>
+2a428553 more composer config tweaks                                                      (2019-02-09) <Jason Munro>
+ef23321a composer config updates                                                          (2019-02-09) <Jason Munro>
+0694d158 limit travis builds to the master branch for now                                 (2019-02-10) <Jason Munro>
+ff2518c2 composer config and updated gitignore. Don't build on travis yet                 (2019-02-10) <Jason Munro>
+a7a694c3 change include paths for composer installed libs                                 (2019-02-10) <Jason Munro>
+985a8154 remove libs now included with composer                                           (2019-02-10) <Jason Munro>
+2f9f16b6 fix reply to body when viewing a raw mode message issue #314                     (2019-02-09) <Jason Munro>
+5de9f9bb potential warning fix                                                            (2019-02-09) <Jason Munro>
+1471ac10 fix potentially bad outbound headers                                             (2019-02-09) <Jason Munro>
+a76e1986 test improvements, add inline msg view test issue #316                           (2019-02-09) <Jason Munro>
+52984c27 fix inline view issue #316                                                       (2019-02-09) <Jason Munro>
+4938d478 small non functional change                                                      (2019-02-09) <Jason Munro>
+19dd3b83 Merge pull request #313 from jasonmunro/replace-zepto-with-cash                  (2019-02-07) <Jason Munro>
+d12ccbdf only enable swiping on mobile                                                    (2019-02-07) <Jason Munro>
+6048eca0 swipe support for mobile                                                         (2019-02-07) <Jason Munro>
+6068fdda more work on using cash js instead of zepto                                      (2019-02-07) <Jason Munro>
+0dcfa410 format fix                                                                       (2019-02-07) <Jason Munro>
+bc9232a1 more fixes for cash replacing zepto                                              (2019-02-07) <Jason Munro>
+f01406b3 more cashjs updates                                                              (2019-02-07) <Jason Munro>
+b94bf271 more work on using cash instead of zepto                                         (2019-02-06) <Jason Munro>
+2b26c777 more work on using cash to replace zepto                                         (2019-02-06) <Jason Munro>
+b83e0b17 testing to see if we can use cash instead of zepto                               (2019-02-06) <Jason Munro>
+5fb2bb75 more JMAP tweaks and updates                                                     (2019-01-30) <Jason Munro>
+c24021c1 comment clean up [ci skip]                                                       (2019-01-24) <Jason Munro>
+f0173d41 clean up after removing port from jmap lib                                       (2019-01-24) <Jason Munro>
+0453cf3c Add JMAP server management issue #180                                            (2019-01-24) <Jason Munro>
+5009bdd1 big update for JMAP.                                                             (2019-01-23) <Jason Munro>
+dda9a95e enable some more IMAP caching                                                    (2019-01-23) <Jason Munro>
+4c5d2874 fix sprintf cast as IMAP message part ids are not numbers                        (2019-01-23) <Jason Munro>
+186c9ff4 WS and comment fix                                                               (2019-01-23) <Jason Munro>
+fe0061d6 fix test reference                                                               (2019-01-23) <Jason Munro>
+1411f5a4 more JMAP work, issue #180                                                       (2019-01-23) <Jason Munro>
+297c9a57 small tweaks, better JMAP support                                                (2019-01-23) <Jason Munro>
+6e9affa8 make the api layer a bit more flexible                                           (2019-01-23) <Jason Munro>
+9d9bc0ff more JMAP: move/copy/delete and rename mailbox work. code clean up               (2019-01-22) <Jason Munro>
+2c8ddba3 more JMAP integration work                                                       (2019-01-17) <Jason Munro>
+33f78f6f uid check fix and error message fix                                              (2019-01-17) <Jason Munro>
+a592c1ae remove jmap test code (don't need this anymore)                                  (2019-01-16) <Jason Munro>
+2ad1b1b7 rework jmap folder handling, remove work arounds                                 (2019-01-16) <Jason Munro>
+c192d01e Merge pull request #312 from marclaporte/patch-1                                 (2019-01-16) <Jason Munro>
+1db49a8c Fix a typo                                                                       (2019-01-16) <Marc Laporte>
+5e4ffb2e follow redirects in the api wrapper                                              (2019-01-16) <Jason Munro>
+af0b4168 WIP for JMAP support (issue #180)                                                (2019-01-16) <Jason Munro>
+9e8d8f6e only prompt for mailto link handling if the user allows it                       (2019-01-07) <Jason Munro>
+56750ed7 i18n update                                                                      (2019-01-07) <Jason Munro>
+639590d0 test a workaround for firefox on browserstack due to a recent change             (2019-01-04) <Jason Munro>
+c794ed6b i18n clean up                                                                    (2019-01-04) <Jason Munro>
+1c420362 unit test fixes                                                                  (2018-12-21) <Jason Munro>
+b2fe6328 testing some performance and accessability changes                               (2018-12-20) <Jason Munro>
+8b725440 add advanced search module set to default ini file issue #245                    (2018-12-12) <Jason Munro>
+605bba54 tweak to offline vs server error checking on ajax callbacks                      (2018-12-03) <Jason Munro>
+9aa7cec4 Merge branch 'master' of github.com:jasonmunro/cypht                             (2018-12-01) <Jason Munro>
+6ece08fc make message html flitering a little nicer issue #308                            (2018-12-01) <Jason Munro>
+69ada333 update ignore list                                                               (2018-12-01) <Jason Munro>
+c625cf44 loader for easier manual CLI tests                                               (2018-12-01) <Jason Munro>
+a3fd3d35 fix in folder imap search                                                        (2018-11-30) <Jason Munro>
+d2822d85 add a timer to the commit check                                                  (2018-11-29) <Jason Munro>
+427e52de remove todos and fix newly added time range values                               (2018-11-29) <Jason Munro>
+bbd96758 add negative search term support (woot) issue #307                               (2018-11-29) <Jason Munro>
+7d41e00b unit test tweak for imap search interface change                                 (2018-11-29) <Jason Munro>
+a0cca5ea fix imap search to allow multiple search terms                                   (2018-11-29) <Jason Munro>
+0249a933 add per source limit to advanced search, default of 100                          (2018-11-29) <Jason Munro>
+e5351c5e fix imap folder list caching                                                     (2018-11-29) <Jason Munro>
+a13c4db6 fix bug in carddav credential saving, change warning to debug level              (2018-11-29) <Jason Munro>
+f99ef934 fix bug that wiped out ldap addressbooks password on save                        (2018-11-29) <Jason Munro>
+7dcb4571 clean up the VT100 theme a bit                                                   (2018-11-29) <Jason Munro>
+b17173af advanced search fixes                                                            (2018-11-28) <Jason Munro>
+c3c0792d add simple keyword search to imap message list views                             (2018-11-27) <Jason Munro>
+98f79fec dont' force font family in themes, issue #305                                    (2018-11-27) <Jason Munro>
+2f9d0ce4 better coverage for webdav format unit tests                                     (2018-11-27) <Jason Munro>
+5fd908ea potential warning fix for address parsing                                        (2018-11-27) <Jason Munro>
+d2efb82e misc carddav fixes                                                               (2018-11-27) <Jason Munro>
+4aeeea3e mock out new hm_functions method for tests                                       (2018-11-27) <Jason Munro>
+36e4abbe formatting change that plays nice with PHPUnit coverage                          (2018-11-27) <Jason Munro>
+98efe5e1 add support for the last HTTP status code for the API layer                      (2018-11-27) <Jason Munro>
+ef2104e7 unit test fix                                                                    (2018-11-21) <Jason Munro>
+0a718e49 i18n string update                                                               (2018-11-20) <Jason Munro>
+7c8abd12 small 2fa formatting clean up                                                    (2018-11-20) <Jason Munro>
+ba4cc9c7 don't use a class that triggers an ad blocker (!)                                (2018-11-20) <Jason Munro>
+ef4f550a remove duplicate id                                                              (2018-11-20) <Jason Munro>
+d2bde518 wrap up some options to save vertical space                                      (2018-11-21) <Jason Munro>
+4fd63a5d i18n string updates                                                              (2018-11-21) <Jason Munro>
+6587cf7a more advanced search work                                                        (2018-11-21) <Jason Munro>
+6099da47 remove advanced search module setup                                              (2018-11-21) <Jason Munro>
+8fc16e4b fix charset check                                                                (2018-11-21) <Jason Munro>
+d34719c0 add another server error vs offline check                                        (2018-11-20) <Jason Munro>
+4db11af1 more work on advanced search - getting very close to MVP!                        (2018-11-20) <Jason Munro>
+66800f00 more work on advanced search                                                     (2018-11-19) <Jason Munro>
+ca1b4df0 add advanced search module assignments to imap module set                        (2018-11-19) <Jason Munro>
+b4f4cd28 limit message list checkbox logic to inside the message list                     (2018-11-19) <Jason Munro>
+df23745a white list BODY keyword for searching                                            (2018-11-19) <Jason Munro>
+7d1dddda add support for multiple search targets                                          (2018-11-19) <Jason Munro>
+7cc78cb2 enable more verbose phpunit output in commit check                               (2018-11-19) <Jason Munro>
+98ae3ee7 work in progress for advanced search                                             (2018-11-19) <Jason Munro>
+1a886f26 add some additional PHP support warnings to config gen                           (2018-11-15) <Jason Munro>
+8c811f05 fix for horizontal scroll bars due to really long E-mail headers vals            (2018-11-15) <Jason Munro>
+b63d02a3 begone fould namespaces! testing a fix for issue #120                            (2018-11-15) <Jason Munro>
+483812c4 remove unneeded file (again)                                                     (2018-11-13) <Jason Munro>
+b372f890 commit check script update                                                       (2018-11-13) <Jason Munro>
+7df54c45 remove unneeded test file                                                        (2018-11-13) <Jason Munro>
+1a29d186 color tweak on ui test output                                                    (2018-11-13) <Jason Munro>
+7e94a74d ignore list update                                                               (2018-11-13) <Jason Munro>
+f80c9e73 minor cleanup to the commit check script                                         (2018-11-13) <Jason Munro>
+13ed07ab add success output to individual checks [skip ci]                                (2018-11-13) <Jason Munro>
+c62d1924 add some helper scripts I have been using to the repo                            (2018-11-13) <Jason Munro>
+9f98f32e css fixes to themes                                                              (2018-11-13) <Jason Munro>
+4539c2da ignore list update                                                               (2018-11-13) <Jason Munro>
+ec56abff remove empty css files                                                           (2018-11-13) <Jason Munro>
+929e79b7 better handling of server errors vs network errors from JS                       (2018-11-12) <Jason Munro>
+c7fc6be1 simplify some reply and from formatting logic for easier testing                 (2018-11-12) <Jason Munro>
+48b3e7fd selenium test update to make it easier to run locally and on travis              (2018-11-12) <Jason Munro>
+ffee8a0d add carddav debugging, remove test user/pass                                     (2018-11-12) <Jason Munro>
+52a7e907 fix pop3 module set breakage from cache changes                                  (2018-11-12) <Jason Munro>
+e35a13cd i18n update for latests non-translated strings                                   (2018-11-09) <Jason Munro>
+66637a83 wrap up initial read-only carddav contacts support                               (2018-11-09) <Jason Munro>
+2f2a8a06 small css tweak [skip ci]                                                        (2018-11-09) <Jason Munro>
+db4e50c7 unit test update                                                                 (2018-11-08) <Jason Munro>
+904cfdff webdav format tweaks                                                             (2018-11-08) <Jason Munro>
+5107f33a include carddav ini in config script                                             (2018-11-08) <Jason Munro>
+758c36c2 work on webdav format parsing                                                    (2018-11-08) <Jason Munro>
+bfd11843 work on read-only carddav contact support                                        (2018-11-08) <Jason Munro>
+d645e16f dont' reduce opacity of image attachments issue #302                             (2018-11-08) <Jason Munro>
+79606ff9 fix imap folders module set for recent cache changes issue #301                  (2018-11-08) <Jason Munro>
+b94d3ede mobile layout fix for long rss feed from value                                   (2018-11-07) <Jason Munro>
+cea10216 comment fix [skip ci]                                                            (2018-11-07) <Jason Munro>
+c1d1c39c updated unit test for core module set change                                     (2018-11-07) <Jason Munro>
+e881fbc0 testing some updates for better offline handling issue #298                      (2018-11-07) <Jason Munro>
+858081dc ini file comment updates [skip ci]                                               (2018-11-07) <Jason Munro>
+d43cde2b unit test updates                                                                (2018-11-07) <Jason Munro>
+b1b51614 add Redis session support                                                        (2018-11-07) <Jason Munro>
+a5c39d51 small refactor                                                                   (2018-11-07) <Jason Munro>
+ff5806f2 version bump                                                                     (2018-11-07) <Jason Munro>
+ab3f4d1c ini file updates for new caching and session options                             (2018-11-07) <Jason Munro>
+0a76e27d more cache layer fixes                                                           (2018-11-07) <Jason Munro>
+f4223015 store uid read/unread status in the session for feeds and github                 (2018-11-07) <Jason Munro>
+444a4f30 minor non-functional changes                                                     (2018-11-07) <Jason Munro>
+62c24e79 force connect method on classes using this trait [skip travis]                   (2018-11-06) <Jason Munro>
+f807ea24 comment updates [skip travis]                                                    (2018-11-06) <Jason Munro>
+de88c0bc comment and non-functional lib updates [skip travis]                             (2018-11-06) <Jason Munro>
+1c01e81f comment updates [skip ci]                                                        (2018-11-06) <Jason Munro>
+a4f85e28 more cache layer tweaking                                                        (2018-11-06) <Jason Munro>
+3037cc8c minor clean ups to the new cache layer                                           (2018-11-06) <Jason Munro>
+18cdd52c major cache overhaul (woot)!                                                     (2018-11-06) <Jason Munro>
+a6fa453d folder list section sorting fix                                                  (2018-11-06) <Jason Munro>
+52c54419 small clean up to the sample ini file                                            (2018-11-05) <Jason Munro>
+e0701cf4 fix for inline message view delete issue #299                                    (2018-11-05) <Jason Munro>
+9553a3c4 Merge pull request #300 from ulfgebhardt/pr-github-templates                     (2018-11-05) <Jason Munro>
+b04d53f6 fixed link in github template                                                    (2018-11-03) <Ulf Gebhardt>
+c4325d89 github templates                                                                 (2018-11-03) <Ulf Gebhardt>
+a2fc44fa fix broken core module unit test                                                 (2018-11-01) <Jason Munro>
+98d52501 slight UI improvement when loading different IMAP message parts                  (2018-10-30) <Jason Munro>
+c21a8595 improve coverage for webdav format tests                                         (2018-10-30) <Jason Munro>
+49069c66 don't redirect on ajax failure. this helps with issue #298                       (2018-10-30) <Jason Munro>
+2f06317e fix for move/copy with inline message view issue #296                            (2018-10-26) <Jason Munro>
+5d841ae7 add an auto-create profile option for issue #293                                 (2018-10-24) <Jason Munro>
+41c2efa0 another fix for issue #292, this allows empty user/pass settings                 (2018-10-18) <Jason Munro>
+1f03bba3 fix for ldap contacts not using user supplied creds issue #292                   (2018-10-18) <Jason Munro>
+0e96ba17 update travis config to not install libsodium for PHP 7.2                        (2018-10-17) <Jason Munro>
+792f9c08 fix github source names in combined view source list                             (2018-10-17) <Jason Munro>
+6508d53e fix outbound reply-to when no profile is enabled issue #291                      (2018-10-12) <Jason Munro>
+117eac72 version bump                                                                     (2018-10-12) <Jason Munro>
+b0267ddf fix typo in core module setup file                                               (2018-10-12) <Jason Munro>
+77fae13e improve module overrides so order in the ini file does not matter                (2018-10-12) <Jason Munro>
+8d464a3f version bump                                                                     (2018-10-11) <Jason Munro>
+be92fe27 allow a couple pgp module functions to be overridden                             (2018-10-11) <Jason Munro>
+06a1fec1 remove some debugs                                                               (2018-10-11) <Jason Munro>
+d1267089 comment update                                                                   (2018-10-11) <Jason Munro>
+731dd8c6 fix for issue #291                                                               (2018-10-11) <Jason Munro>
+04e4a630 update pgp module readme                                                         (2018-10-11) <Jason Munro>
+ac72e9a2 third party lib updates                                                          (2018-10-11) <Jason Munro>
+8af230bf initial checkin of WIP CardDav contact support                                   (2018-10-11) <Jason Munro>
+f10cfaa2 update travis coverage report for new library file                               (2018-10-10) <Jason Munro>
+dad0d58f disable add to calendar link that does not work yet                              (2018-10-11) <Jason Munro>
