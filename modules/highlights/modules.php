@@ -296,7 +296,7 @@ class Hm_Output_highlight_link extends Hm_Output_Module {
 /*
  * @subpackage highlights/functions
  */
-function hl_base_rule($form) {
+function hl_base_rule($form, $type) {
     if (array_key_exists('hl_important', $form) && $form['hl_important']) {
         $important = true;
     }
@@ -305,7 +305,7 @@ function hl_base_rule($form) {
     }
     return array(
         'important' => $important,
-        'type' => 'imap',
+        'type' => $type,
         'color' => $form['hl_color'],
         'target' => $form['hl_target'],
         'sources' => array(),
@@ -317,7 +317,7 @@ function hl_base_rule($form) {
  * @subpackage highlights/functions
  */
 function hl_imap_rule($form) {
-    $rule = hl_base_rule($form);
+    $rule = hl_base_rule($form, 'imap');
     if (array_key_exists('hl_imap_sources', $form)) {
         foreach ($form['hl_imap_sources'] as $id) {
             $server = Hm_IMAP_List::dump($id);
@@ -337,7 +337,7 @@ function hl_imap_rule($form) {
  * @subpackage highlights/functions
  */
 function hl_feeds_rule($form) {
-    $rule = hl_base_rule($form);
+    $rule = hl_base_rule($form, 'feeds');
     if (array_key_exists('hl_feeds_sources', $form)) {
         foreach ($form['hl_feeds_sources'] as $id) {
             $server = Hm_Feed_List::dump($id);
@@ -354,7 +354,7 @@ function hl_feeds_rule($form) {
  * @subpackage highlights/functions
  */
 function hl_github_rule($form, $mod) {
-    $rule = hl_base_rule($form);
+    $rule = hl_base_rule($form, 'github');
     if (array_key_exists('hl_github_sources', $form)) {
         $repos = $mod->user_config->get('github_repos', array());
         foreach ($form['hl_github_sources'] as $id) {
