@@ -379,7 +379,7 @@ function get_imap_ids($sources) {
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         foreach ($sources as $src) {
             if ($src['user'] == $vals['user'] && $src['server'] == $vals['server']) {
-                $ids[] = sprintf('[class=^="imap_%s_"]', $index);
+                $ids[] = sprintf('[class^="imap_%s_"]', $index);
             }
         }
     }
