@@ -215,7 +215,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
                 $res .= '<tr>'.
                     '<td>'.$this->html_safe($rule['type']).'</td>'.
                     '<td>'.$this->html_safe($rule['target']).'</td>'.
-                    '<td style="color: '.$this->html_safe($rule['color']).';">'.$this->html_safe($rule['color']).'</td>'.
+                    '<td style="color: '.$this->html_safe($rule['color']).' !important;">'.$this->html_safe($rule['color']).'</td>'.
                     '<td>'.$this->html_safe($src).'</td>'.
                     '<td>'.$this->html_safe($types).'</td>'.
                     '<td>'.$this->html_safe($rule['important'] ? 'true' : 'false').'</td>'.
