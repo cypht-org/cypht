@@ -35,6 +35,9 @@ class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
+    public function unangle($str) {
+        return trim(preg_replace("/(^| )</", ' ', preg_replace("/>($| )/", ' ', $str)));
+    }
     public function process() {
         if (!$this->module_is_supported('imap')) {
             Hm_Msgs::add('ERRIMAP module unavailable.');
@@ -55,7 +58,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 }
                 $imap_draft = array(
                     'From' => $msg_header['From'],
-                    'To' => $msg_header['To'],
+                    'To' => $this->unangle($msg_header['To']),
                     'Subject' => $msg_header['Subject'],
                     'Message-Id' => $msg_header['Message-Id'],
                     'Content-Type' => $msg_header['Content-Type'],
@@ -64,7 +67,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 );
 
                 if (array_key_exists('Cc', $msg_header)) {
-                    $imap_draft['Cc'] = $msg_header['Cc'];
+                    $imap_draft['Cc'] = $this->unangle($msg_header['Cc']);
                 }
 
                 if ($imap_draft) {
