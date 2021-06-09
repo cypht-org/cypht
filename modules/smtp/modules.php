@@ -1260,9 +1260,9 @@ function save_draft($atts, $id, $session) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('find_imap_by_smtp')) {
-function find_imap_by_smtp($imap_profiles, $smtp_profile)
-{
-    foreach ($imap_profiles as $id => $profile) {
+function find_imap_by_smtp($imap_profiles, $smtp_profile) {
+    $id = 0;
+    foreach ($imap_profiles as $profile) {
         if ($smtp_profile['user'] == $profile['user']) {
             return array_merge(['id' => $id], $profile);
         }
@@ -1273,6 +1273,7 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile)
         if ($smtp_profile['user'] == $profile['name']) {
             return array_merge(['id' => $id], $profile);
         }
+        $id++;
     }
 }}
 
@@ -1283,7 +1284,8 @@ if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     // Check if it is a profile
     if (strstr($atts['draft_smtp'], '.')) {
-        $atts['draft_smtp'] = reset(explode('.', $atts['draft_smtp']));
+        $draft_split = explode('.', $atts['draft_smtp']);
+        $atts['draft_smtp'] = reset($draft_split);
     }
 
     $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
@@ -1307,7 +1309,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
                 Hm_Msgs::add('ERRAn error occurred saving the draft message');
-                return 1;
+                return -1;
             }
         }
 
@@ -1321,15 +1323,12 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
 
         foreach ($mailbox_page[1] as $mail) {
             $msg_header = $imap->get_message_headers($mail['uid']);
-            if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id'])
-            {
+            if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
                 return $mail['uid'];
             }
         }
-        return 1;
     }
-        
-    return save_draft($atts, $id, $session);
+    return -1;
 }}
 
 /**
