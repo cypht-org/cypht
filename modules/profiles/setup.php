@@ -20,6 +20,8 @@ add_output('compose', 'compose_signature_button', true, 'profiles', 'compose_for
 add_output('compose', 'compose_signature_values', true, 'profiles', 'compose_form_start', 'before');
 add_handler('compose', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
 
+add_handler('ajax_smtp_save_draft', 'compose_profile_data', true, 'profiles', 'load_smtp_servers_from_config', 'after');
+
 return array(
     'allowed_pages' => array(
         'profiles'

@@ -1285,14 +1285,25 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile) {
  */
 if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
-    // Check if it is a profile
-    if (strstr($atts['draft_smtp'], '.')) {
-        $draft_split = explode('.', $atts['draft_smtp']);
-        $atts['draft_smtp'] = reset($draft_split);
+    $imap_profile = false;
+    $profiles = $mod->get('compose_profiles', array());
+    $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
+    if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
+        $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
-
-    $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
-        $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
+    if (!$imap_profile) {
+        if (strstr($atts['draft_smtp'], '.')) {
+            $draft_split = explode('.', $atts['draft_smtp']);
+            $atts['draft_smtp'] = reset($draft_split);
+        }
+        $imap_profile = find_imap_by_smtp(
+            $mod->user_config->get('imap_servers'),
+            $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
+        );
+    }
+    if (!$imap_profile) {
+        return -1;
+    }
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (array_key_exists('draft', $specials) && $specials['draft']) {
