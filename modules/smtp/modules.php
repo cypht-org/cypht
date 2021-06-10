@@ -746,16 +746,19 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         if ($imap_draft) {
             if (array_key_exists('Body', $imap_draft)) {
-                $body= $imap_draft['Body'];
+                $body = $imap_draft['Body'];
             }
             if (array_key_exists('To', $imap_draft)) {
-                $to= $imap_draft['To'];
+                $to = $imap_draft['To'];
             }
             if (array_key_exists('Subject', $imap_draft)) {
-                $subject= $imap_draft['Subject'];
+                $subject = $imap_draft['Subject'];
             }
             if (array_key_exists('Cc', $imap_draft)) {
-                $cc= $imap_draft['Cc'];
+                $cc = $imap_draft['Cc'];
+            }
+            if (array_key_exists('From', $imap_draft)) {
+                $from = $imap_draft['From'];
             }
             $draft_id = $msg_uid;
         }
@@ -805,41 +808,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         foreach ($files as $file) {
             $res .= format_attachment_row($file, $this);
         }
-
-        // If compose_from GET parameter is set, search for the correct smtp_id
-        // within the SMTP profiles.
-        //
-        // Added latency reduction 'break' for big smtp profile lists
-        if ($from) {
-            $smtp_servers = $this->module_output()['smtp_servers'];
-            foreach ($smtp_servers as $id => $server) {
-                if ($server['user'] == $from) {
-                    $smtp_id = $id;
-                }
-                // Profile users without the domain
-                if ($server['user'] == explode('@', $from)[0]) {
-                    $smtp_id = $id;
-                }
-                // Some users might use the profile name as the full email
-                if ($server['name'] == $from) {
-                    $smtp_id = $id;
-                }
-                if ($smtp_id) {
-                    break;
-                }
-            }
-
-            // Check if SMTP_ID is related to a Profile
-            $profiles = profiles_by_smtp_id($this->module_output()['profiles'], $smtp_id);
-            foreach ($profiles as $id => $profile) {
-                if ($profile['address'] == $from) {
-                    $smtp_id = $smtp_id.'.'.($id + 1);
-                }
-            }
-        }
-
         $res .= '</table>'.
-            smtp_server_dropdown($this->module_output(), $this, $recip, $smtp_id).
+            smtp_server_dropdown($this->module_output(), $this, $recip).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
 
         if ($this->get('list_path')) {
@@ -1287,9 +1257,13 @@ if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     Hm_Debug::add(sprintf("DRAFTS: save_imap_draft atts: %s", print_r($atts, true)));
     $imap_profile = false;
+    $from = false;
+    $name = '';
     $profiles = $mod->get('compose_profiles', array());
     $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
+        $from = $profile['replyto'];
+        $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
     if (!$imap_profile) {
@@ -1302,6 +1276,9 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
             $mod->user_config->get('imap_servers'),
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
         );
+        if ($imap_profile) {
+            $from = $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'];
+        }
     }
     if (!$imap_profile) {
         Hm_Debug::add("DRAFTS: still no profile exiting");
@@ -1317,9 +1294,18 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
     $draft_folder = $imap->select_mailbox($specials['draft']);
     
-    $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
-        $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
-        0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
+    $mime = new Hm_MIME_Msg(
+        $atts['draft_to'],
+        $atts['draft_subject'],
+        $atts['draft_body'],
+        $from,
+        false,
+        $atts['draft_cc'],
+        $atts['draft_bcc'],
+        '',
+        $name,
+        $atts['draft_in_reply_to']
+    );
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
