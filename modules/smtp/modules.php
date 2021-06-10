@@ -1285,6 +1285,7 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile) {
  */
 if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
+    Hm_Debug::add(sprintf("DRAFTS: save_imap_draft atts: %s", print_r($atts, true)));
     $imap_profile = false;
     $profiles = $mod->get('compose_profiles', array());
     $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
@@ -1292,6 +1293,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
     if (!$imap_profile) {
+        Hm_Debug::add("DRAFTS: did not find imap profile");
         if (strstr($atts['draft_smtp'], '.')) {
             $draft_split = explode('.', $atts['draft_smtp']);
             $atts['draft_smtp'] = reset($draft_split);
@@ -1302,44 +1304,47 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         );
     }
     if (!$imap_profile) {
+        Hm_Debug::add("DRAFTS: still no profile exiting");
         return -1;
     }
     $specials = get_special_folders($mod, $imap_profile['id']);
 
-    if (array_key_exists('draft', $specials) && $specials['draft']) {
-        $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
-        $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
-        $draft_folder = $imap->select_mailbox($specials['draft']);
-        
-        $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
-            $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
-            0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
+    if (!array_key_exists('draft', $specials) || !$specials['draft']) {
+        Hm_Debug::add(sprintf("DRAFTS: no special folders found for imap id %s", $imap_profile['id']));
+        return -1;
+    }
+    $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
+    $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
+    $draft_folder = $imap->select_mailbox($specials['draft']);
+    
+    $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
+        $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
+        0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
 
-        $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
-        $msg = str_replace("\n", "\r\n", $msg);
-        $msg = rtrim($msg)."\r\n";
+    $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
+    $msg = str_replace("\n", "\r\n", $msg);
+    $msg = rtrim($msg)."\r\n";
 
-        if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
-            $imap->append_feed($msg."\r\n");
-            if (!$imap->append_end()) {
-                Hm_Msgs::add('ERRAn error occurred saving the draft message');
-                return -1;
-            }
+    if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
+        $imap->append_feed($msg."\r\n");
+        if (!$imap->append_end()) {
+            Hm_Msgs::add('ERRAn error occurred saving the draft message');
+            return -1;
         }
+    }
 
-        $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
+    $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
 
-        // Remove old version from the mailbox
-        if ($id) {
-          $imap->message_action('DELETE', array($id));
-          $imap->message_action('EXPUNGE', array($id));
-        }
+    // Remove old version from the mailbox
+    if ($id) {
+      $imap->message_action('DELETE', array($id));
+      $imap->message_action('EXPUNGE', array($id));
+    }
 
-        foreach ($mailbox_page[1] as $mail) {
-            $msg_header = $imap->get_message_headers($mail['uid']);
-            if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
-                return $mail['uid'];
-            }
+    foreach ($mailbox_page[1] as $mail) {
+        $msg_header = $imap->get_message_headers($mail['uid']);
+        if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
+            return $mail['uid'];
         }
     }
     return -1;
