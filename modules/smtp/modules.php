@@ -1255,7 +1255,6 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile) {
  */
 if (!hm_exists('save_imap_draft')) {
 function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
-    Hm_Debug::add(sprintf("DRAFTS: save_imap_draft atts: %s", print_r($atts, true)));
     $imap_profile = false;
     $from = false;
     $name = '';
@@ -1267,7 +1266,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
     if (!$imap_profile) {
-        Hm_Debug::add("DRAFTS: did not find imap profile");
         if (strstr($atts['draft_smtp'], '.')) {
             $draft_split = explode('.', $atts['draft_smtp']);
             $atts['draft_smtp'] = reset($draft_split);
@@ -1281,13 +1279,11 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         }
     }
     if (!$imap_profile) {
-        Hm_Debug::add("DRAFTS: still no profile exiting");
         return -1;
     }
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (!array_key_exists('draft', $specials) || !$specials['draft']) {
-        Hm_Debug::add(sprintf("DRAFTS: no special folders found for imap id %s", $imap_profile['id']));
         return -1;
     }
     $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
