@@ -1,3 +1,21 @@
+release-v1.3.0-rc2
+------------------
+b62f8b78 remove draft saving debug                                                        (2021-06-11) <Jason Munro>
+f4116582 more work on drafts - fix missing from address                                   (2021-06-10) <Jason Munro>
+7cf9ec65 add debugging around saving drafts                                               (2021-06-10) <Jason Munro>
+3052ef76 more work on drafts                                                              (2021-06-10) <Jason Munro>
+591f824c remove angle brackets from resumed draft E-mail addresses                        (2021-06-09) <Jason Munro>
+8c08d635 show rule color in list as background or text based on target                    (2021-06-09) <Jason Munro>
+09346ffb couple fixes around new drafts                                                   (2021-06-09) <Jason Munro>
+02ddf0d1 test update for css change when not logged in                                    (2021-06-08) <Jason Munro>
+340d698c only output minimal css when not logged in                                       (2021-06-08) <Jason Munro>
+e01a7ad5 fix unit tests after adding a new lang                                           (2021-06-08) <Jason Munro>
+fcfa580a new Indonesian language thanks to gemelli and naomi16i                           (2021-06-08) <Jason Munro>
+cb5843eb release notes + change log for 1.3.0                                             (2021-06-08) <Jason Munro>
+1b66d3e7 IMAP support check for profile_status method                                     (2021-05-10) <Henrique Borba>
+
+release-v1.3.0-rc1
+------------------
 4fec6547 make sure we always indicate a failed login issue #487                           (2021-06-08) <Jason Munro>
 6342fd00 fix highlight rules that include both E-mail types and sources                   (2021-06-08) <Jason Munro>
 5a747b55 fix typo in imap specific highlight rules                                        (2021-06-08) <Jason Munro>
