@@ -77,7 +77,12 @@ class Hm_Handler_highlight_process_form extends Hm_Handler_Module {
                 $form[$fld] = $this->request->post[$fld];
             }
         }
-        if ($form['hl_source_type'] == 'feeds' &&
+        if ($form['hl_source_type'] == 'github' &&
+            array_key_exists('hl_github_unseen', $this->request->post) &&
+            $this->request->post['hl_github_unseen']) {
+            $form['hl_imap_flags'] = array('unseen');
+        }
+        elseif ($form['hl_source_type'] == 'feeds' &&
             array_key_exists('hl_feeds_unseen', $this->request->post) &&
             $this->request->post['hl_feeds_unseen']) {
             $form['hl_imap_flags'] = array('unseen');
@@ -109,65 +114,27 @@ class Hm_Output_highlight_css extends Hm_Output_Module {
         $css = array();
         $repos = $this->get('github_repos', array());
         $rules = $this->get('highlight_rules', array());
+        $defaults = array('imap' => '.email', 'feeds' => '.feeds', 'github' => '.github');
         foreach ($rules as $rule) {
-            switch($rule['type']) {
-                case 'imap':
-                    $ids = array();
-                    if ($rule['sources']) {
-                        $ids = get_imap_ids($rule['sources']);
+            $ids = get_rule_ids($rule['sources'], $rule['type'], $repos);
+            if (!$ids) {
+                $ids = array($defaults[$rule['type']]);
+            }
+            if ($rule['types']) {
+                if (!$ids) {
+                    foreach ($rule['types'] as $type) {
+                        $ids[] = '.'.$type;
                     }
-                    if ($rule['types']) {
-                        if (!$ids) {
-                            foreach ($rule['types'] as $type) {
-                                $ids[] = '.'.$type;
-                            }
-                        }
-                        else {
-                            $updated = array();
-                            foreach ($ids as $id) {
-                                foreach ($rule['types'] as $type) {
-                                    $updated[] = $id.'.'.$type;
-                                }
-                            }
-                            $ids = $updated;
+                }
+                else {
+                    $updated = array();
+                    foreach ($ids as $id) {
+                        foreach ($rule['types'] as $type) {
+                            $updated[] = $id.'.'.$type;
                         }
                     }
-                    if (!$ids) {
-                        $ids = array('.email');
-                    }
-                    break;
-                case 'feeds':
-                    if ($rule['sources']) {
-                        $ids = get_feed_ids($rule['sources']);
-                    }
-                    if ($rule['types']) {
-                        if (!$ids) {
-                            foreach ($rule['types'] as $type) {
-                                $ids[] = '.'.$type;
-                            }
-                        }
-                        else {
-                            $updated = array();
-                            foreach ($ids as $id) {
-                                foreach ($rule['types'] as $type) {
-                                    $updated[] = $id.'.'.$type;
-                                }
-                            }
-                            $ids = $updated;
-                        }
-                    }
-                    if (!$ids) {
-                        $ids = array('.feeds');
-                    }
-                    break;
-                case 'github':
-                    if ($rule['sources']) {
-                        $ids = get_github_ids($rule['sources'], $repos);
-                    }
-                    else {
-                        $ids = array('.github');
-                    }
-                    break;
+                    $ids = $updated;
+                }
             }
             foreach ($ids as $id) {
                 $css[] = sprintf('.message_table %s td {%s: %s !important;}',
@@ -298,6 +265,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
                 $res .= '<option value="'.$this->html_safe($repo).'">'.$this->trans($repo).'</option>';
             }
             $res .= '</select></td></tr>';
+            $res .= '<tr class="github_row"><td>'.$this->trans('Unseen').'</td><td><input name="hl_github_unseen" type="checkbox" value="true" /></td></tr>';
         }
         $res .= '<tr><td>'.$this->trans('Highlight target').'</td>';
         $res .= '<td><select name="hl_target">';
@@ -362,7 +330,8 @@ function hl_imap_rule($form) {
             if (!$server) {
                 continue;
             }
-            $rule['sources'][] = array('name' => $server['name'], 'user' => $server['user'], 'server' => $server['server']);
+            $rule['sources'][] = array('name' => $server['name'],
+                'user' => $server['user'], 'server' => $server['server']);
         }
     }
     if (array_key_exists('hl_imap_flags', $form)) {
@@ -382,7 +351,8 @@ function hl_feeds_rule($form) {
             if (!$server) {
                 continue;
             }
-            $rule['sources'][] = array('server' => $server['server'], 'name' => $server['name']);
+            $rule['sources'][] = array('server' => $server['server'],
+                'name' => $server['name']);
         }
     }
     if (array_key_exists('hl_imap_flags', $form)) {
@@ -406,8 +376,30 @@ function hl_github_rule($form, $mod) {
             }
         }
     }
+    if (array_key_exists('hl_imap_flags', $form)) {
+        $rule['types'] = $form['hl_imap_flags'];
+    }
     return $rule;
 }
+
+/*
+ * @subpackage highlights/functions
+ */
+function get_rule_ids($sources, $type, $repos) {
+    if ($type == 'imap') {
+        return get_imap_ids($sources);
+    }
+    elseif ($type == 'feeds') {
+        return get_feed_ids($sources);
+    }
+    elseif ($type == 'github') {
+        return get_github_ids($sources, $repos);
+    }
+    else {
+        return array();
+    }
+}
+
 /*
  * @subpackage highlights/functions
  */
