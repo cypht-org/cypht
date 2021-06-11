@@ -31,6 +31,7 @@ return array(
         'hl_source_type' => FILTER_SANITIZE_STRING,
         'hl_important' => FILTER_VALIDATE_BOOLEAN,
         'hl_feeds_unseen' => FILTER_VALIDATE_BOOLEAN,
+        'hl_github_unseen' => FILTER_VALIDATE_BOOLEAN,
         'hl_imap_flags' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
         'hl_imap_sources' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
         'hl_github_sources' =>  array('filter' => FILTER_SANITIZE_STRING, 'flags' => FILTER_REQUIRE_ARRAY),
