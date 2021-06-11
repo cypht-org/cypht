@@ -77,6 +77,11 @@ class Hm_Handler_highlight_process_form extends Hm_Handler_Module {
                 $form[$fld] = $this->request->post[$fld];
             }
         }
+        if ($form['hl_source_type'] == 'feeds' &&
+            array_key_exists('hl_feeds_unseen', $this->request->post) &&
+            $this->request->post['hl_feeds_unseen']) {
+            $form['hl_imap_flags'] = array('unseen');
+        }
         switch ($form['hl_source_type']) {
             case 'imap':
                 $new_rule = hl_imap_rule($form);
@@ -135,7 +140,23 @@ class Hm_Output_highlight_css extends Hm_Output_Module {
                     if ($rule['sources']) {
                         $ids = get_feed_ids($rule['sources']);
                     }
-                    else {
+                    if ($rule['types']) {
+                        if (!$ids) {
+                            foreach ($rule['types'] as $type) {
+                                $ids[] = '.'.$type;
+                            }
+                        }
+                        else {
+                            $updated = array();
+                            foreach ($ids as $id) {
+                                foreach ($rule['types'] as $type) {
+                                    $updated[] = $id.'.'.$type;
+                                }
+                            }
+                            $ids = $updated;
+                        }
+                    }
+                    if (!$ids) {
                         $ids = array('.feeds');
                     }
                     break;
@@ -268,6 +289,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
                 $res .= '<option value="'.$this->html_safe($index).'">'.$this->trans($vals['name']).'</option>';
             }
             $res .= '</select></td></tr>';
+            $res .= '<tr class="feeds_row"><td>'.$this->trans('Unseen').'</td><td><input name="hl_feeds_unseen" type="checkbox" value="true" /></td></tr>';
         }
         if ($sources['github']) {
             $res .= '<tr class="github_row"><td>'.$this->trans('Repos').
@@ -362,6 +384,9 @@ function hl_feeds_rule($form) {
             }
             $rule['sources'][] = array('server' => $server['server'], 'name' => $server['name']);
         }
+    }
+    if (array_key_exists('hl_imap_flags', $form)) {
+        $rule['types'] = $form['hl_imap_flags'];
     }
     return $rule;
 }
