@@ -682,7 +682,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
             if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {
-                Hm_Dispatch::page_redirect('?'.$start_page);
+                $this->out('redirect_url', '?'.$start_page);
             }
         }
     }
