@@ -94,6 +94,12 @@ trait Hm_Dispatch_Redirect {
         if ($this->post_redirect($request, $session, $mod_exec)) {
             return 'redirect';
         }
+        elseif (array_key_exists('redirect_url', $mod_exec->handler_response) &&
+            $mod_exec->handler_response['redirect_url']) {
+            $session->end();
+            $this->redirect_to_url($mod_exec);
+            return 'redirect';
+        }
         elseif ($this->unpack_messages($request, $session)) {
             return 'msg_forward';
         }
