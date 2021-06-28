@@ -192,7 +192,8 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 '-10000px;top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;'.
                 'padding-top:60px;height:300px;border-radius:0px 0px 20px 0px;margin:0px;background-color:#f5f5f5;'.
                 'width:300px;padding-left:20px;}.login_form input{clear:both;float:left;padding:4px;margin-left:20px;'.
-                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}</style>';
+                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session'.
+                '{float:left;}.long_session input{padding:0px;float:none;}</style>';
 
         return $css.'<form class="login_form" method="POST">';
         }
