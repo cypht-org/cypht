@@ -86,13 +86,18 @@ add_handler('ajax_hm_folders', 'smtp_auto_bcc_check',  true, 'smtp', 'load_imap_
 add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'logout_menu_item', 'before');
 
 add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+
+add_handler('ajax_profiles_status', 'login', false, 'core');
+add_handler('ajax_profiles_status', 'load_user_data', true, 'core');
+add_handler('ajax_profiles_status', 'profile_status', true);
 return array(
     'allowed_pages' => array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
         'ajax_smtp_attach_file',
         'ajax_smtp_delete_attachment',
-        'ajax_smtp_delete_draft'
+        'ajax_smtp_delete_draft',
+        'ajax_profiles_status'
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -107,7 +112,8 @@ return array(
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),
         'draft_subject' => array(FILTER_SANITIZE_STRING, false),
-        'draft_id' => array(FILTER_VALIDATE_INT, false)
+        'draft_id' => array(FILTER_VALIDATE_INT, false),
+        'profile_value' => array(FILTER_SANITIZE_STRING, false)
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
@@ -145,6 +151,7 @@ return array(
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
+        'profile_value' => FILTER_SANITIZE_STRING
     )
 );
 
