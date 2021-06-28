@@ -462,6 +462,53 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_profile_status extends Hm_Handler_Module {
+    public function process() {
+        $profiles = $this->user_config->get('profiles');
+        $servers = $this->user_config->get('smtp_servers', array());
+        $profile_value = $this->request->post['profile_value'];
+        $imap_servers = $this->user_config->get('imap_servers',array());
+        $specials = $this->user_config->get('special_imap_folders', array());
+
+        // If profile do not exist
+        if (!strstr($profile_value, '.')) {
+            if (count(Hm_Msgs::get()) == 0) {
+                Hm_Msgs::add('ERRPlease create a profile for saving sent messages option');
+            }
+            return;
+        } 
+
+        list($selected_smtp_id, $profile_id) = explode(".", $profile_value);
+        $profile = profiles_by_smtp_id($profiles, $selected_smtp_id)[0];
+
+        // Select the IMAP account from the profile info
+        foreach ($imap_servers as $id => $srv) {
+            if ($srv['user'] == $profile['user'] && $srv['server'] == $profile['server']) {
+                $imap_server_id = $id;
+            }
+        }
+
+        // If IMAP server can't be found just ignore the
+        // sent folder warning
+        if (!isset($imap_server_id)) {
+            return;
+        }
+
+        if (count($servers) > 0) {
+            if( !array_key_exists($imap_server_id, $specials) ||
+                !array_key_exists('sent', $specials[$imap_server_id]) || 
+                empty($specials[$imap_server_id]['sent'])) {
+                    if (count(Hm_Msgs::get()) == 0) {
+                        Hm_Msgs::add('ERRPlease configure your folder to save sent messages (Sent Folder)');
+                    }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {       
         /* not sending */
