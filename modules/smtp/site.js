@@ -12,7 +12,7 @@ var get_smtp_profile = function(profile_value) {
             }
         );
     }
-}
+};
 
 var smtp_test_action = function(event) {
     event.preventDefault();
@@ -267,13 +267,11 @@ $(function() {
                 save_compose_state();
             }, 100);
         }
-        $( document ).ready(function() {
-            if (document.getElementsByClassName("sys_messages")[0].textContent != 'Message Sent') {
-                get_smtp_profile(this.value);
-            }
-            $('.compose_server').on('change', function() {
-                get_smtp_profile(this.value);
-            });
+        if ($('.sys_messages').text() != 'Message Sent') {
+            get_smtp_profile($('.compose_server').val());
+        }
+        $('.compose_server').on('change', function() {
+            get_smtp_profile($('.compose_server').val());
         });
     }
 });
