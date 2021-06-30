@@ -175,9 +175,9 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
             Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
             return;
         }
-        if (!attach_file(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+        if (!attach_file($content, $file, $filepath, $draft_id, $this, $this->module_is_supported('imap'), array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
         'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-        'draft_in_reply_to' => ''),$content, $file, $filepath, $draft_id, $this, $this->module_is_supported('imap'))) {
+        'draft_in_reply_to' => ''))) {
             Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
             return;
         }
@@ -1387,7 +1387,7 @@ function get_draft($id, $session) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('attach_file')) {
-function attach_file($atts, $content, $file, $filepath, $draft_id, $mod, $imap_draft=false) {    
+function attach_file($content, $file, $filepath, $draft_id, $mod, $imap_draft=false, $atts=array()) {    
     $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
     $filename = hash('sha512', $content);
     $filepath = rtrim($filepath, '/');
