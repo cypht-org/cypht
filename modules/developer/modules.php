@@ -160,13 +160,13 @@ class Hm_Output_config_map extends Hm_Output_Module {
         $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
         foreach ($mods as $name => $vals) {
             $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
-            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/class-Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
             $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
                 $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
-                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/class-Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
             }
         }
     }
@@ -179,13 +179,13 @@ class Hm_Output_config_map extends Hm_Output_Module {
         $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
         foreach ($mods as $name => $vals) {
             $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
-            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/class-Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
             $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
                 $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
-                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/class-Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
+                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html"><img src="'.Hm_Image_Sources::$code.'" /></a></td></tr>';
             }
         }
     }

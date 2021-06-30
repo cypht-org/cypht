@@ -6,13 +6,13 @@ img { opacity: .4 !important; }
 .msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #aaa !important; }
 a:hover { color: #fff !important; }
-#password, option, .selected_part, .toggle_recipients, textarea, select, input, .toggle_link { color: #aaa !important; background-color: #222 !important; }
+#password, option, .selected_part, .toggle_recipients, textarea, select, input, .toggle_link { color: #aaa !important; background-color: #000 !important; }
 textarea { font-size: 100%; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
-.move_to_location, .move_to_title, li, ul, #to_contacts, #cc_contacts, #bcc_contacts, .msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content, div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background: none !important; background-color: #121212 !important; }
+.move_to_location, .move_to_title, li, ul, #to_contacts, #cc_contacts, #bcc_contacts, .msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content, div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background: none !important; background-color: #0a0a0a !important; }
 .today { background-color: #222 !important; }
 .ke-content body * { background-color: #000 !important; }
-.src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #121212, #000) !important; }
+.src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #060606, #000) !important; }
 .debug, .subtitle { color: #999 !important; }
 .subject, .subject a { font-weight: normal !important; color: #999 !important; }
 .empty_list { color: #666 !important; }

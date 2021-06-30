@@ -69,8 +69,4 @@
       <file>./modules/core/modules.php</file>
     </testsuite>
   </testsuites>
-  <!--<logging>
-        <log type="coverage-html" target="../../../cypht-docs/test_coverage/" charset="UTF-8" highlight="false" lowUpperBound="75" highLowerBound="99"/>
-        <log type="coverage-clover" target="clover.xml"/>
-    </logging>-->
 </phpunit>

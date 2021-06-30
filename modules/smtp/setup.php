@@ -52,6 +52,7 @@ add_handler('ajax_smtp_debug', 'http_headers', true, 'core');
 
 /* save draft ajax request */
 add_handler('ajax_smtp_save_draft', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_smtp_save_draft', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_smtp_save_draft', 'login', false, 'core');
 add_handler('ajax_smtp_save_draft', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
@@ -87,9 +88,10 @@ add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'logout_menu_ite
 
 add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 
-add_handler('ajax_profiles_status', 'login', false, 'core');
-add_handler('ajax_profiles_status', 'load_user_data', true, 'core');
-add_handler('ajax_profiles_status', 'profile_status', true);
+setup_base_ajax_page('ajax_profiles_status', 'core');
+add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_profiles_status', 'profile_status', true, 'smtp', 'load_imap_servers_from_config', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_smtp_debug',

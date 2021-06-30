@@ -56,6 +56,7 @@ function interface_langs() {
         'es' => 'Spanish',
         'fr' => 'French',
         'et' => 'Estonian',
+        'id' => 'Indonesian',
         'it' => 'Italian',
         'ru' => 'Russian',
         'ro' => 'Romanian',
@@ -418,7 +419,7 @@ function setup_base_page($name, $source=false) {
     add_handler($name, 'http_headers', true, $source);
 
     add_output($name, 'header_start', false, $source);
-    add_output($name, 'header_css', false, $source);
+    add_output($name, 'header_css', true, $source);
     add_output($name, 'header_content', false, $source);
     add_output($name, 'js_data', true, $source);
     add_output($name, 'js_search_data', true, $source);

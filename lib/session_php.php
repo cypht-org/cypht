@@ -164,9 +164,6 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
     /* data store connection used by classes that extend this */
     public $conn;
 
-    /* used to indicate failed auth */
-    public $auth_failed = false;
-
     /* flag to indicate an existing session */
     protected $existing = false;
 
@@ -201,9 +198,6 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->authed($request, $fingerprint);
-            }
-            else {
-                $this->auth_failed = true;
             }
         }
         elseif (array_key_exists($this->cname, $request->cookie)) {
