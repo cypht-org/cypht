@@ -465,6 +465,31 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_profile_status extends Hm_Handler_Module {
+    public function process() {
+        $profiles = $this->user_config->get('profiles');
+        $profile_value = $this->request->post['profile_value'];
+        
+        if (!strstr($profile_value, '.')) {
+            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            return;
+        } 
+        $profile = profile_from_compose_smtp_id($profiles, $profile_value);
+        if (!$profile) {
+            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            return;
+        }
+        $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
+        $specials = get_special_folders($this, $imap_profile['id']);
+        if (!array_key_exists('sent', $specials) || !$specials['sent']) {
+            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account)');
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {       
         /* not sending */
