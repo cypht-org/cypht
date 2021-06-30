@@ -136,6 +136,13 @@ class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
+        $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
+        $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
+        $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
+        $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
+        $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
+
         if (!array_key_exists('upload_file', $this->request->files)) {
             return;
         }
@@ -165,8 +172,9 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
             Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
             return;
         }
-
-        if (!attach_file($content, $file, $filepath, $draft_id, $this)) {
+        if (!attach_file(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+        'draft_in_reply_to' => ''),$content, $file, $filepath, $draft_id, $this, $this->module_is_supported('imap'))) {
             Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
             return;
         }
@@ -213,6 +221,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             delete_draft($draft_id, $this->session);
             return;
         }
+        
         if ($this->module_is_supported('imap')) {
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
@@ -1332,11 +1341,12 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     if (strstr($atts['draft_smtp'], '.')) {
         $atts['draft_smtp'] = reset(explode('.', $atts['draft_smtp']));
     }
-
+    
     $imap_profile = find_imap_by_smtp($mod->user_config->get('imap_servers'),
         $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]);
     $specials = get_special_folders($mod, $imap_profile['id']);
-
+    $uploaded_files = get_uploaded_files($id, $session);
+    
     if (array_key_exists('draft', $specials) && $specials['draft']) {
         $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
         $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
@@ -1345,11 +1355,14 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $mime = new Hm_MIME_Msg($atts['draft_to'], $atts['draft_subject'], $atts['draft_body'],
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'],
             0, $atts['draft_cc'], $atts['draft_bcc'], $atts['draft_bcc'], $atts['draft_in_reply_to']);
+        
+        $mime->add_attachments($uploaded_files);
+        $mime->process_attachments();
 
         $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg)."\r\n";
-
+        
         if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
             $imap->append_feed($msg."\r\n");
             if (!$imap->append_end()) {
@@ -1357,7 +1370,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
                 return 1;
             }
         }
-
+        
         $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
 
         // Remove old version from the mailbox
@@ -1375,7 +1388,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         }
         return 1;
     }
-        
+    
     return save_draft($atts, $id, $session);
 }}
 
@@ -1395,7 +1408,7 @@ function get_draft($id, $session) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('attach_file')) {
-function attach_file($content, $file, $filepath, $draft_id, $mod) {
+function attach_file($atts, $content, $file, $filepath, $draft_id, $mod, $imap_draft=false) {    
     $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
     $filename = hash('sha512', $content);
     $filepath = rtrim($filepath, '/');
@@ -1404,9 +1417,17 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
         $file['basename'] = $filename;
         save_uploaded_file($draft_id, $file, $mod->session);
         if (!get_draft($draft_id, $mod->session)) {
-            save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
-                'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
-                'draft_in_reply_to' => ''), $draft_id, $mod->session);
+            if ($imap_draft) {
+                $new_draft_id = save_imap_draft($atts, $draft_id, $mod->session, $mod, $mod->cache);
+                if ($new_draft_id >= 0) {
+                    $mod->out('draft_id', $new_draft_id);
+                }
+            }
+            else if (!$imap_draft) {
+                save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
+                    'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
+                    'draft_in_reply_to' => ''), $draft_id, $mod->session);
+            }
         }
         $mod->out('upload_file_details', $file);
         return true;

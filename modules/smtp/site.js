@@ -203,6 +203,12 @@ var upload_file = function(file) {
     form.append('hm_ajax_hook', 'ajax_smtp_attach_file');
     form.append('hm_page_key', $('#hm_page_key').val());
     form.append('draft_id', $('.compose_draft_id').val());
+    form.append('draft_smtp', $('.compose_server').val());
+    form.append('draft_subject', $('.compose_subject').val());
+    form.append('draft_body', $('#compose_body').val());
+    form.append('draft_to', $('.compose_to').val());
+    form.append('draft_cc', $('.compose_cc').val());
+    form.append('draft_bcc', $('.compose_bcc').val());
     xhr.open('POST', '', true);
     xhr.setRequestHeader('X-Requested-With', 'xmlhttprequest');
     xhr.onreadystatechange = function() {
@@ -219,6 +225,9 @@ var upload_file = function(file) {
                 $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
             }
             Hm_Ajax.stop_loading_icon();
+            if (res.draft_id) {
+                $('.compose_draft_id').val(res.draft_id);
+            }
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
                 Hm_Notices.show(res.router_user_msgs);
             }
