@@ -1578,6 +1578,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('msg_text_uid', $form['imap_msg_uid']);
             $this->out('msg_server_id', $form['imap_server_id']);
             $this->out('msg_folder', $form['folder']);
+            $this->out('msg_list_path', 'imap_'.$form['imap_server_id'].'_'.$form['folder']);
             $part = false;
             $prefetch = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {

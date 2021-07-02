@@ -170,9 +170,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
-                $this->html_safe($this->get('msg_server_id')),
-                $this->html_safe($this->get('msg_folder')),
+            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
+                $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
             );
             $msg_part = $this->get('imap_msg_part');
