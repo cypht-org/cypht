@@ -1,3 +1,7 @@
+release-v1.3.0
+--------------
+8a143fcc small style fix for mobile login page                                            (2021-07-07) <Jason Munro>
+
 release-v1.3.0-rc2
 ------------------
 b62f8b78 remove draft saving debug                                                        (2021-06-11) <Jason Munro>
