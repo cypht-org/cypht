@@ -51,6 +51,7 @@ td { vertical-align: top; }
 .user_settings table { table-layout: fixed; width: 100%; }
 .user_settings table td { height: 34px; vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 10px; color: #666; }
 .settings_table .save_settings { cursor: pointer; color: #666; font-size: 125%; padding: 10px !important; float: left !important; }
+.settings_table .reset_factory_button { cursor: pointer; color: #666; font-size: 110%; padding: 10px !important; float: left !important; }
 .disabled_link { color: #bbb; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
 .disabled_input, input:disabled { color: #aaa !important; background-color: #ddd; }
@@ -88,6 +89,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .end_float { clear: both; }
 .list_toggle { padding-right: 9px; margin-left: 15px; vertical-align: -2px; }
 .submit_cell { padding-top: 30px !important; }
+.reset_factory_cell { padding-bottom: 5px !important; }
 .password_notice { float: left; margin-left: 10px; font-size: .9em; color: #666; padding-top: 5px; }
 .checkbox_cell label { display: block; width: 16px; height: 16px; background-color: #eee; border: solid 1px #ddd; }
 .checkbox_cell input[type="checkbox"] { display: none; }
