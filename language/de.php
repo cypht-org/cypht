@@ -134,6 +134,7 @@ return array(
     'Invalid username or password' => 'Benutzername oder Passwort ungültig',
     'Update' => 'Aktualisieren',
     'Save' => 'Speichern',
+    'Factory Reset' => 'Werkseinstellungen zurückgesetzt',
     'Sources' => 'Quellen',
     'Configure' => 'Konfigurieren',
     'Refresh' => 'Erneuern',

@@ -136,6 +136,7 @@ return array(
     'Invalid username or password' => 'Ошибка в имени пользователя или пароле',
     'Update' => 'Обновить',
     'Save' => 'Сохранить',
+    'Factory Reset' => 'Сброс к заводским настройкам',
     'Sources' => 'Исходники',
     'Configure' => 'Настроить',
     'Refresh' => 'Обновить',
