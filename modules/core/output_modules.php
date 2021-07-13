@@ -1087,20 +1087,6 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
 }
 
 /**
- * Button to reset settings to default
- * @subpackage core/output
- */
-class Hm_Output_factory_reset_button extends Hm_Output_Module {
-    /**
-     * Creates a button for factory reset
-     */
-    protected function output() {
-        return '<tr><td class="submit_cell" colspan="2">'.
-            '<form method="post"><input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Factory Reset').'" /></form>';
-    }
-}
-
-/**
  * Ends the settings table
  * @subpackage core/output
  */
@@ -1111,7 +1097,9 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output() {
         return '<tr><td class="submit_cell" colspan="2">'.
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
-            '</td></tr></table></form></div>';
+            '</td></tr></table></form>'.
+            '<form method="post"><input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Factory Reset').'" /></form>'.
+            '</div>';
     }
 }
 

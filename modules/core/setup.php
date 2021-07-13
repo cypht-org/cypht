@@ -57,7 +57,6 @@ add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_setting
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
-add_output('settings', 'factory_reset_button', true, 'core', 'end_settings_form', 'before');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'no_folder_icon_setting', true, 'core', 'timezone_setting', 'after');
@@ -230,6 +229,7 @@ return array(
 
     'allowed_post' => array(
         'payload' => FILTER_SANITIZE_STRING,
+        'reset_factory' => FILTER_SANITIZE_STRING,
         'hm_page_key' => FILTER_SANITIZE_STRING,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
