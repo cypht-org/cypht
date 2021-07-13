@@ -141,6 +141,7 @@ return array(
     'Invalid username or password' => 'Nama pengguna atau kata sandi tidak valid',
     'Update' => 'Perbarui',
     'Save' => 'Simpan',
+    'Factory Reset' => 'Atur ulang pabrik factory',
     'Sources' => 'Sumber',
     'Configure' => 'Konfigurasi',
     'Refresh' => 'Segarkan',

@@ -134,6 +134,7 @@ return array(
     'Invalid username or password' => 'Érvénytelen felhasználó név vagy jelszó',
     'Update' => 'Frissítés',
     'Save' => 'Mentés',
+    'Factory Reset' => 'Gyári beállítások visszaállítása',
     'Sources' => 'Források',
     'Configure' => 'Beállítás',
     'Refresh' => 'Frissítés',

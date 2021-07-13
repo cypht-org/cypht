@@ -1085,6 +1085,21 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
             '<td><input type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" value="1" /></td></tr>';
     }
 }
+
+/**
+ * Button to reset settings to default
+ * @subpackage core/output
+ */
+class Hm_Output_factory_reset_button extends Hm_Output_Module {
+    /**
+     * Creates a button for factory reset
+     */
+    protected function output() {
+        return '<tr><td class="submit_cell" colspan="2">'.
+            '<form method="post"><input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Factory Reset').'" /></form>';
+    }
+}
+
 /**
  * Ends the settings table
  * @subpackage core/output

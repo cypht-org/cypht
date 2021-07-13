@@ -134,6 +134,7 @@ return array(
     'Invalid username or password' => 'ユーザー名かパスワードに誤りがあります',
     'Update' => '更新',
     'Save' => '保存',
+    'Factory Reset' => '工場出荷時のリセット',
     'Sources' => 'サービス',
     'Configure' => '設定',
     'Refresh' => '再読み込み',
