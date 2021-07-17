@@ -1661,3 +1661,57 @@ $(function() {
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
 
 });
+
+/*
+   check if language is rtl, it checks some elements based on the page and 
+   if those contain non-Arabic letters, the ltr class will be added and it
+   will fix the direction and font.
+*/
+function fixLtrInRtl() {
+    if (((document.documentElement.className).indexOf("rtl_page")) == -1) {
+        return
+    }
+
+    function isTextEnglish(text) {
+        if (text === "") {
+            return false
+        }
+        var RTL = ['ا', 'ب', 'پ', 'ت', 'س', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'و', 'ه', 'ی'];
+        for (var char of RTL) {
+            if (text.indexOf(char) > -1) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    function getElements() {
+        var location = window.location.search;
+        if (location.startsWith("?page=message&")) {
+            return [...document.getElementsByClassName("msg_text_inner")[0].getElementsByTagName('*'), ...document.getElementsByClassName("header_subject")[0].getElementsByTagName("*")];
+        }
+        if (location.startsWith("?page=message_list&") || location.startsWith("?page=history")) {
+            return [...document.getElementsByTagName('*')];
+        }
+        return []
+    }
+
+    setTimeout(function(){
+        var elements = getElements() 
+        for (var index = 0; index < elements.length; index++) {
+            if (isTextEnglish(elements[index].textContent)) {
+                if ((elements[index].className).indexOf("ltr") > -1) {
+                    continue
+                }
+                elements[index].className = elements[index].className + ' ltr';
+            };
+        }
+    }, 0)
+}
+
+/* runs fixLtrInRtl function when page loads completely */
+window.addEventListener('load', function () {
+    setTimeout(function () {
+        fixLtrInRtl()
+    }, 0);
+})
