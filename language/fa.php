@@ -13,6 +13,7 @@ return array(
     "Main"=>"اصلی",
     "Username"=>"نام کاربری",
     "Password"=>"کلمه عبور",
+    "Date"=>"تاریخ",
     "Notices"=>"اعلامیه ها",
     "IMAP Server"=>"سرور IMAP",
     "Message highlighting"=>"هایلایت کردن پیام",
