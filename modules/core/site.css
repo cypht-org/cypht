@@ -202,6 +202,8 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .smtp_save, .rtl_page .smtp_reset, .rtl_page .compose_attach_button, .rtl_page .compose_sign{ float: left; }
 .rtl_page .smtp_send { direction: rtl !important; }
+.rtl_page .sys_messages { left: 20px; right: auto; }
+.rtl_page .total_unread_count { margin-right: 10px; margin-left: 0px; }
 .rtl_page .debug_title { right: auto; left: 0; }
 .rtl_page * { font-family: "Behdad"; direction: rtl; }
 .ltr {font-family: auto; direction: ltr;}
