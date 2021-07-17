@@ -96,6 +96,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
         $style = 'news';
     }
     $res = format_imap_message_list($msgs, $mod, $type, $style);
+    $res[min(array_keys($res))][0] .= '<script> fixLtrInRtl() </script>';
     $mod->out('formatted_message_list', $res);
 }}
 
