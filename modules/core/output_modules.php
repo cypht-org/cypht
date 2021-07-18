@@ -463,6 +463,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
             }
             $res .= 'media="all" rel="stylesheet" type="text/css" />';
         }
+        $res .= '<style type="text/css">@font-face { font-family: "Behdad";
+            src: url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),
+            url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>';
         return $res;
     }
 }

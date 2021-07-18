@@ -2,11 +2,6 @@ a { text-decoration: none; color: teal; }
 form { display: inline; padding: 0px; margin: 0px; }
 a:hover { color: #000 !important; }
 p { margin: 0px; padding: 0px; }
-@font-face {
-    font-family: "Behdad";
-    src: url("/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),
-         url("/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");
-}
 br { clear: both; }
 html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
