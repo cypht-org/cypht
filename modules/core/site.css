@@ -200,6 +200,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .sys_messages { left: 20px; right: auto; }
 .rtl_page .total_unread_count { margin-right: 10px; margin-left: 0px; }
 .rtl_page .debug_title { right: auto; left: 0; }
+.rtl_page .combined_sort { margin-right: 15px; margin-left: 105px;}
 .rtl_page * { font-family: "Behdad"; direction: rtl; }
 .ltr {font-family: auto; direction: ltr;}
 .prev th, .next th { white-space: normal !important; }
