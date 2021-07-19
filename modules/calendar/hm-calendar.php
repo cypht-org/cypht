@@ -50,7 +50,7 @@ class Hm_Cal_Output {
         if ($this->month != (int) date('n', strtotime($day))) {
             $res .= 'offmonth ';
         }
-        $res .= '">'.date('d', strtotime($day));
+        $res .= '">'.$this->output_mod->translate_number(date('d', (strtotime($day))));
         $res .= $this->output_event($day);
         $res .= '</td>';
         return $res;
@@ -161,7 +161,7 @@ class Hm_Cal_Output {
         $year = date('Y', strtotime($this->year.'-'.$this->month));
         $month = date('F', strtotime($this->year.'-'.$this->month));
         $title = sprintf('%s, %%s', $month);
-        $title = sprintf($this->output_mod->trans($title), $year);
+        $title = sprintf($this->output_mod->trans($title), $this->output_mod->translate_number($year));
         return '<div class="month_label">'.$prev.' '.$title.' '.$next.'</div>';
     }
 

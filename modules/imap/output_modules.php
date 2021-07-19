@@ -125,7 +125,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 }
             }
         }
-        $txt .= '</div>';
+        $txt .= '</div> <script>fixLtrInRtl()</script>';
         $this->out('msg_text', $txt);
     }
 }
