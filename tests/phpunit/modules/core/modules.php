@@ -797,7 +797,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_header_css() {
         $test = new Output_Test('header_css', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<link href="site.css?v=asdf" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
+        $this->assertEquals(array('<link href="site.css?v=asdf" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -808,7 +808,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list', array('core'));
         $res = $test->run();
-        $this->assertEquals(array('<link href="site.css?v=asdf" integrity="foo" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
+        $this->assertEquals(array('<link href="site.css?v=asdf" integrity="foo" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -846,10 +846,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };</script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };</script>'), $res->output_response);
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };</script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };</script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1106,7 +1106,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1139,10 +1139,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_end_settings_form() {
         $test = new Output_Test('end_settings_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="post"><input class="reset_factory_button" type="submit" name="reset_factory" value="Factory Reset" /></form></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button" type="submit" name="reset_factory" value="Factory Reset" /></form></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="post"><input class="reset_factory_button" type="submit" name="reset_factory" value="Factory Reset" /></form></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button" type="submit" name="reset_factory" value="Factory Reset" /></form></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1466,7 +1466,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list' => array('core'));
         $res = $test->run();
-        $this->assertEquals(array('<link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" />'), $res->output_response);
+        $this->assertEquals(array('<link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

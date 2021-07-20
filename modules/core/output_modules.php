@@ -463,9 +463,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
             }
             $res .= 'media="all" rel="stylesheet" type="text/css" />';
         }
-        $res .= '<style type="text/css">@font-face { font-family: "Behdad";
-            src: url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),
-            url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>';
+        $res .= '<style type="text/css">@font-face {font-family:"Behdad";'.
+            'src:url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),'.
+            'url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>';
         return $res;
     }
 }
@@ -1692,7 +1692,9 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-
+        if (!$this->get('is_mobile') && substr($this->get('list_path'), 0, 5) != 'imap_') {
+            $res .= combined_sort_dialog($this);
+        }
         $res .= list_controls($refresh_link, $config_link, $source_link);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= list_sources($this->get('data_sources', array()), $this);

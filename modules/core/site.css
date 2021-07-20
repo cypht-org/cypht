@@ -83,7 +83,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
 .src_name { white-space: nowrap; overflow: hidden; max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .main_menu { padding-top: 20px; }
-.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px; display: flex; flex-flow: row wrap; max-height: 35rem;}
+.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px;}
 .header_subject .content_title { color: #555; }
 .header_subject th { white-space: normal !important; }
 .end_float { clear: both; }
@@ -220,7 +220,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .folder_list li { padding-top: 5px; padding-bottom: 5px; }
 .mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
 .mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
-.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
+.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; display: flex; flex-flow: row wrap; max-height: 35rem;}
 .mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
 .mobile .folder_toggle { display: block; top: 0px; left: -3px; }
 .mobile .folder_toggle img { width: 24px; height: 32px; margin-top: -7px; }
