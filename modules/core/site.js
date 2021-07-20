@@ -1659,7 +1659,8 @@ $(function() {
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
     }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
-
+    
+    fixLtrInRtl()
 });
 
 /*
@@ -1668,7 +1669,7 @@ $(function() {
    will fix the direction and font.
 */
 function fixLtrInRtl() {
-    if (((document.documentElement.className).indexOf("rtl_page")) == -1) {
+    if (hm_language_direction() != "rtl") {
         return
     }
 
@@ -1686,12 +1687,12 @@ function fixLtrInRtl() {
     };
 
     function getElements() {
-        var location = window.location.search;
-        if (location.startsWith("?page=message&")) {
-            return [...document.getElementsByClassName("msg_text_inner")[0].getElementsByTagName('*'), ...document.getElementsByClassName("header_subject")[0].getElementsByTagName("*")];
+        var pageName = hm_page_name();
+        if (pageName == "message") {
+            return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
         }
-        if (location.startsWith("?page=message_list&") || location.startsWith("?page=history")) {
-            return [...document.getElementsByTagName('*')];
+        if (pageName == "message_list" || pageName == "?page=history") {
+            return [...$('*')];
         }
         return []
     }
@@ -1708,10 +1709,3 @@ function fixLtrInRtl() {
         }
     }, 0)
 }
-
-/* runs fixLtrInRtl function when page loads completely */
-window.addEventListener('load', function () {
-    setTimeout(function () {
-        fixLtrInRtl()
-    }, 0);
-})
