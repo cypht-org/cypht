@@ -114,7 +114,7 @@ function reply_to_address($headers, $type) {
     if ($type == 'forward') {
         return $msg_to;
     }
-    if (count($headers["return-path"]) == 1) {
+    if (array_key_exists("return-path", $headers) && count($headers["return-path"]) == 1) {
         $msg_to = $headers["to"];
     }
     else {
