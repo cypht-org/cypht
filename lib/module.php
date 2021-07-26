@@ -490,6 +490,24 @@ abstract class Hm_Output_Module {
         return str_replace('\n', '<br />', strip_tags($string));
     }
 
+
+    /**
+     * Return a translated string of numbers if possible and if language is farsi
+     * @param string $string the string to be translated which has to be numbers
+     * @return string translated string
+     */
+    public function translate_number($number) {
+        if (!is_numeric($number) || !in_array($this->lang, array("fa"))) {
+            return $number;
+        }
+        $number_splitted = str_split($number);
+        $translated_number = "";
+        foreach ($number_splitted as $number_splitted) {
+            $translated_number .= $this->trans($number_splitted);
+        }
+        return $translated_number;
+    }
+
     /**
      * Build output by calling module specific output functions
      * @param string $format output type, either HTML5 or AJAX

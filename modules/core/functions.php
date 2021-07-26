@@ -54,6 +54,7 @@ function interface_langs() {
         'en' => 'English',
         'de' => 'German',
         'es' => 'Spanish',
+        'fa' => 'Farsi',
         'fr' => 'French',
         'et' => 'Estonian',
         'id' => 'Indonesian',

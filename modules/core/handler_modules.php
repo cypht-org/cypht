@@ -530,6 +530,26 @@ class Hm_Handler_save_user_settings extends Hm_Handler_Module {
 }
 
 /**
+ * Do reset factory from the settings page to the session
+ * @subpackage core/handler
+ */
+class Hm_Handler_reset_factory extends Hm_Handler_Module {
+    /**
+     * reset user config to the default
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('reset_factory'));
+        if (!$success) {
+            return;
+        }
+        $this->user_config->reset_factory();
+        Hm_Msgs::add('Settings restored to default');
+        $this->session->record_unsaved('Site settings restored to default');
+        $this->out('reload_folders', true, false);
+    }
+}
+
+/**
  * Setup a default title
  * @subpackage core/handler
  */

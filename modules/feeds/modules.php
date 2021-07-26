@@ -698,6 +698,9 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $icon = 'rss_alt';
                     $flags = array('unseen');
+                    if (strpos($row_style, 'unseen') === false) {
+                        $row_style .= ' unseen';
+                    }
                 }
                 $nofrom = '';
                 if (isset($item['author'])) {

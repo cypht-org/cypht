@@ -84,7 +84,7 @@ sudo mkdir /var/lib/hm3/attachments
 sudo mkdir /var/lib/hm3/users
 sudo mkdir /var/lib/hm3/app_data
 
-chown -R www-data /var/lib/hm3/
+sudo chown -R www-data /var/lib/hm3/
       
 The /var/lib/hm3/users directory is only required if you are using the
 file-system and not a database to store user settings (user_config_type = file

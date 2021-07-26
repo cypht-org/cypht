@@ -135,6 +135,7 @@ return array(
     'Invalid username or password' => 'İstifadəçi adı və ya parolda səhv',
     'Update' => 'Yeniləmək',
     'Save' => 'Saxlamaq',
+    'Factory Reset' => 'Zavod reset',
     'Sources' => 'Mənbələr',
     'Configure' => 'Qurmaq',
     'Refresh' => 'Yeniləmək',

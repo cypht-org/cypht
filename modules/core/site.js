@@ -1615,6 +1615,7 @@ $(function() {
     else if (hm_page_name() == 'servers') {
         $('.server_section').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
+    $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
     /* check for folder reload */
     var reloaded = Hm_Folders.reload_folders();
@@ -1658,5 +1659,53 @@ $(function() {
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
     }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
-
+    
+    fixLtrInRtl()
 });
+
+/*
+   check if language is rtl, it checks some elements based on the page and 
+   if those contain non-Arabic letters, the ltr class will be added and it
+   will fix the direction and font.
+*/
+function fixLtrInRtl() {
+    if (hm_language_direction() != "rtl") {
+        return
+    }
+
+    function isTextEnglish(text) {
+        if (text === "") {
+            return false
+        }
+        var RTL = ['ا', 'ب', 'پ', 'ت', 'س', 'ج', 'چ', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'ژ', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ک', 'گ', 'ل', 'م', 'ن', 'و', 'ه', 'ی'];
+        for (var char of RTL) {
+            if (text.indexOf(char) > -1) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    function getElements() {
+        var pageName = hm_page_name();
+        if (pageName == "message") {
+            return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
+        }
+        if (pageName == "message_list" || pageName == "?page=history") {
+            return [...$('*')];
+        }
+        return []
+    }
+
+    setTimeout(function(){
+        var elements = getElements() 
+        for (var index = 0; index < elements.length; index++) {
+            if (isTextEnglish(elements[index].textContent)) {
+                if ((elements[index].className).indexOf("ltr") > -1) {
+                    continue
+                }
+                elements[index].className = elements[index].className + ' ltr';
+            };
+        }
+    }, 0)
+}

@@ -51,13 +51,14 @@ td { vertical-align: top; }
 .user_settings table { table-layout: fixed; width: 100%; }
 .user_settings table td { height: 34px; vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 10px; color: #666; }
 .settings_table .save_settings { cursor: pointer; color: #666; font-size: 125%; padding: 10px !important; float: left !important; }
+.reset_factory_button { cursor: pointer; color: #666; font-size: 100%; padding: 10px !important; float: right !important; margin-right: 20px;}
 .disabled_link { color: #bbb; }
 .save_settings_password { float: left; margin-left: 0px; padding: 4px; }
 .disabled_input, input:disabled { color: #aaa !important; background-color: #ddd; }
 input, option, select { font-size: 100%; padding: 3px; }
 textarea, select, input { border: solid 1px #ddd; background-color: #fff; color: #333; border-radius: 3px; }
 .login_form { float: left; font-size: 90%; padding-top: 60px; height: 300px; border-radius: 0px 0px 10px 0px; margin: 0px; background-color: #f5f5f5; width: 300px; padding-left: 20px; }
-.screen_reader { position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden; }
+.screen_reader { position:absolute; top:auto; width:1px; height:1px; overflow:hidden; }
 .login_form input { clear: both; float: left; padding: 4px; margin-left: 20px; margin-top: 10px; margin-bottom: 10px; }
 #username, #password { width: 200px; }
 .err { color: red !important; }
@@ -82,7 +83,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
 .src_name { white-space: nowrap; overflow: hidden; max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .main_menu { padding-top: 20px; }
-.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px; }
+.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px;}
 .header_subject .content_title { color: #555; }
 .header_subject th { white-space: normal !important; }
 .end_float { clear: both; }
@@ -189,10 +190,19 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .save_settings, .rtl_page .password_notice { float: right !important; }
 .rtl_page .save_settings_password { float: right; margin-left: 0px; padding: 4px; }
 .rtl_page .debug { float: left !important; }
+.rtl_page .reset_factory_button { float: left !important; margin-left: 50px !important; }
 .rtl_page .list_meta { margin-left: 120px; float: left; }
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
+.rtl_page .smtp_save, .rtl_page .smtp_reset, .rtl_page .compose_attach_button, .rtl_page .compose_sign{ float: left; }
+.rtl_page .smtp_send { direction: rtl !important; }
+.rtl_page .sys_messages { left: 20px; right: auto; }
+.rtl_page .total_unread_count { margin-right: 10px; margin-left: 0px; }
+.rtl_page .debug_title { right: auto; left: 0; }
+.rtl_page .combined_sort { margin-right: 15px; margin-left: 105px;}
+.rtl_page * { font-family: "Behdad"; direction: rtl; }
+.ltr {font-family: auto; direction: ltr;}
 .prev th, .next th { white-space: normal !important; }
 
 /* mobile */
@@ -210,7 +220,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .folder_list li { padding-top: 5px; padding-bottom: 5px; }
 .mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
 .mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
-.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; }
+.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; display: flex; flex-flow: row wrap; max-height: 35rem;}
 .mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
 .mobile .folder_toggle { display: block; top: 0px; left: -3px; }
 .mobile .folder_toggle img { width: 24px; height: 32px; margin-top: -7px; }

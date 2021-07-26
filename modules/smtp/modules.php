@@ -139,6 +139,13 @@ class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
  */
 class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
     public function process() {
+        $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
+        $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
+        $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+        $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
+        $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
+        $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
+
         if (!array_key_exists('upload_file', $this->request->files)) {
             return;
         }
@@ -168,8 +175,9 @@ class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
             Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
             return;
         }
-
-        if (!attach_file($content, $file, $filepath, $draft_id, $this)) {
+        if (!attach_file($content, $file, $filepath, $draft_id, $this, $this->module_is_supported('imap'), array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+        'draft_in_reply_to' => ''))) {
             Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
             return;
         }
@@ -216,6 +224,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             delete_draft($draft_id, $this->session);
             return;
         }
+        
         if ($this->module_is_supported('imap')) {
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
@@ -458,6 +467,31 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
             else {
                 Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_profile_status extends Hm_Handler_Module {
+    public function process() {
+        $profiles = $this->user_config->get('profiles');
+        $profile_value = $this->request->post['profile_value'];
+        
+        if (!strstr($profile_value, '.')) {
+            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            return;
+        } 
+        $profile = profile_from_compose_smtp_id($profiles, $profile_value);
+        if (!$profile) {
+            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            return;
+        }
+        $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
+        $specials = get_special_folders($this, $imap_profile['id']);
+        if (!array_key_exists('sent', $specials) || !$specials['sent']) {
+            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account)');
         }
     }
 }
@@ -1260,11 +1294,13 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     $name = '';
     $profiles = $mod->get('compose_profiles', array());
     $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
+    $uploaded_files = get_uploaded_files($id, $session);
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
         $from = $profile['replyto'];
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
+
     if (!$imap_profile) {
         if (strstr($atts['draft_smtp'], '.')) {
             $draft_split = explode('.', $atts['draft_smtp']);
@@ -1281,6 +1317,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     if (!$imap_profile) {
         return -1;
     }
+
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (!array_key_exists('draft', $specials) || !$specials['draft']) {
@@ -1302,6 +1339,8 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $name,
         $atts['draft_in_reply_to']
     );
+    $mime->add_attachments($uploaded_files);
+    $mime->process_attachments();
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
@@ -1348,7 +1387,7 @@ function get_draft($id, $session) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('attach_file')) {
-function attach_file($content, $file, $filepath, $draft_id, $mod) {
+function attach_file($content, $file, $filepath, $draft_id, $mod, $imap_draft=false, $atts=array()) {    
     $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
     $filename = hash('sha512', $content);
     $filepath = rtrim($filepath, '/');
@@ -1357,9 +1396,17 @@ function attach_file($content, $file, $filepath, $draft_id, $mod) {
         $file['basename'] = $filename;
         save_uploaded_file($draft_id, $file, $mod->session);
         if (!get_draft($draft_id, $mod->session)) {
-            save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
-                'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
-                'draft_in_reply_to' => ''), $draft_id, $mod->session);
+            if ($imap_draft) {
+                $new_draft_id = save_imap_draft($atts, $draft_id, $mod->session, $mod, $mod->cache);
+                if ($new_draft_id >= 0) {
+                    $mod->out('draft_id', $new_draft_id);
+                }
+            }
+            else if (!$imap_draft) {
+                save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
+                    'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
+                    'draft_in_reply_to' => ''), $draft_id, $mod->session);
+            }
         }
         $mod->out('upload_file_details', $file);
         return true;

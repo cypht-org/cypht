@@ -35,37 +35,36 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                     'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'arrival' => $this->trans('Arrival Date'));
             }
 
-            if (!$this->get('is_mobile', false)) {
-                $custom = '<form id="imap_filter_form" method="GET">';
-                $custom .= '<input type="hidden" name="page" value="message_list" />';
-                $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
-                $custom .= '<input type="search" placeholder="'.$this->trans('Search').
-                    '" class="imap_keyword" name="keyword" value="'.$this->html_safe($keyword).'" />';
-                $custom .= '<select name="sort" class="imap_sort">';
-                foreach ($sorts as $name => $val) {
-                    $custom .= '<option ';
-                    if ($name == $sort) {
-                        $custom .= 'selected="selected" ';
-                    }
-                    $custom .= 'value="'.$name.'">'.$val.' &darr;</option>';
-                    $custom .= '<option ';
-                    if ('-'.$name == $sort) {
-                        $custom .= 'selected="selected" ';
-                    }
-                    $custom .= 'value="-'.$name.'">'.$val.' &uarr;</option>';
+            $custom = '<form id="imap_filter_form" method="GET">';
+            $custom .= '<input type="hidden" name="page" value="message_list" />';
+            $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
+            $custom .= '<input type="search" placeholder="'.$this->trans('Search').
+                '" class="imap_keyword" name="keyword" value="'.$this->html_safe($keyword).'" />';
+            $custom .= '<select name="sort" class="imap_sort">';
+            foreach ($sorts as $name => $val) {
+                $custom .= '<option ';
+                if ($name == $sort) {
+                    $custom .= 'selected="selected" ';
                 }
-                $custom .= '</select>';
-
-                $custom .= '<select name="filter" class="imap_filter">';
-                foreach ($opts as $name => $val) {
-                    $custom .= '<option ';
-                    if ($name == $filter) {
-                        $custom .= 'selected="selected" ';
-                    }
-                    $custom .= 'value="'.$name.'">'.$val.'</option>';
+                $custom .= 'value="'.$name.'">'.$val.' &darr;</option>';
+                $custom .= '<option ';
+                if ('-'.$name == $sort) {
+                    $custom .= 'selected="selected" ';
                 }
-                $custom .= '</select></form>';
+                $custom .= 'value="-'.$name.'">'.$val.' &uarr;</option>';
             }
+            $custom .= '</select>';
+
+            $custom .= '<select name="filter" class="imap_filter">';
+            foreach ($opts as $name => $val) {
+                $custom .= '<option ';
+                if ($name == $filter) {
+                    $custom .= 'selected="selected" ';
+                }
+                $custom .= 'value="'.$name.'">'.$val.'</option>';
+            }
+            $custom .= '</select></form>';
+
             if ($this->get('custom_list_controls_type') == 'remove') {
                 $custom .= '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
@@ -126,7 +125,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 }
             }
         }
-        $txt .= '</div>';
+        $txt .= '</div> <script>fixLtrInRtl()</script>';
         $this->out('msg_text', $txt);
     }
 }
@@ -170,9 +169,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=imap_%d_%s&amp;uid=%d',
-                $this->html_safe($this->get('msg_server_id')),
-                $this->html_safe($this->get('msg_folder')),
+            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
+                $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
             );
             $msg_part = $this->get('imap_msg_part');

@@ -51,6 +51,7 @@ add_handler('settings', 'process_start_page_setting', true, 'core', 'date', 'aft
 add_handler('settings', 'process_default_sort_order_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_mailto_handler_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after');
+add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 
@@ -228,6 +229,7 @@ return array(
 
     'allowed_post' => array(
         'payload' => FILTER_SANITIZE_STRING,
+        'reset_factory' => FILTER_SANITIZE_STRING,
         'hm_page_key' => FILTER_SANITIZE_STRING,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,

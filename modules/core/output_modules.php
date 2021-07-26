@@ -188,11 +188,12 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 'background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,'.
                 '#fff);font-size:1em;height:100%;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
                 'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid '.
-                '1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute;left:'.
-                '-10000px;top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;'.
+                '1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute'.
+                ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;'.
                 'padding-top:60px;height:300px;border-radius:0px 0px 20px 0px;margin:0px;background-color:#f5f5f5;'.
                 'width:300px;padding-left:20px;}.login_form input{clear:both;float:left;padding:4px;margin-left:20px;'.
-                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}</style>';
+                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session'.
+                '{float:left;}.long_session input{padding:0px;float:none;}.mobile .long_session{float:left;clear:both;}</style>';
 
         return $css.'<form class="login_form" method="POST">';
         }
@@ -462,6 +463,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
             }
             $res .= 'media="all" rel="stylesheet" type="text/css" />';
         }
+        $res .= '<style type="text/css">@font-face {font-family:"Behdad";'.
+            'src:url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),'.
+            'url("'.WEB_ROOT.'modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>';
         return $res;
     }
 }
@@ -540,6 +544,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
             'var hm_mailto = function() { return '.($this->get('mailto_handler') ? '1' : '0').'; };'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
+            'var hm_language_direction = function() { return "'.$this->html_safe($this->dir).'"; };'.
             'var hm_list_path = function() { return "'.$this->html_safe($this->get('list_path', '')).'"; };'.
             'var hm_list_parent = function() { return "'.$this->html_safe($this->get('list_parent', '')).'"; };'.
             'var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", "'.$this->html_safe($this->get('uid', '')).'"); };'.
@@ -1084,6 +1089,7 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
             '<td><input type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" value="1" /></td></tr>';
     }
 }
+
 /**
  * Ends the settings table
  * @subpackage core/output
@@ -1095,7 +1101,10 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
     protected function output() {
         return '<tr><td class="submit_cell" colspan="2">'.
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
-            '</td></tr></table></form></div>';
+            '</td></tr></table></form>'.
+            '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Factory Reset').'" /></form>'.
+            '</div>';
     }
 }
 
@@ -1683,7 +1692,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-        if (!$this->get('is_mobile')) {
+        if (!$this->get('is_mobile') && substr($this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
         $res .= list_controls($refresh_link, $config_link, $source_link);

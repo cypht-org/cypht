@@ -137,6 +137,7 @@ return array(
     'Invalid username or password' => 'Vale kasutajanimi või salasõna',
     'Update' => 'Uuenda',
     'Save' => 'Salvesta',
+    'Factory Reset' => 'Tehaseseadete taastamine',
     'Sources' => 'Allikad',
     'Configure' => 'Seadista',
     'Refresh' => 'Värskenda',

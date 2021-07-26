@@ -76,6 +76,20 @@ abstract class Hm_Config {
     }
 
     /**
+     * Reset config to default values
+     * @return void
+     */
+    public function reset_factory() {
+        $this->config = array(
+            "version"=>$this->config["version"], 
+            "feeds"=>$this->config["feeds"], 
+            "pop3_servers"=>$this->config["pop3_servers"], 
+            "imap_servers"=>$this->config["imap_servers"], 
+            "smtp_servers"=>$this->config["smtp_servers"]
+        );
+    }
+
+    /**
      * Return a config value if it exists
      * @param string $name config value name
      * @param false|string $default value to return if the name is not found
@@ -283,6 +297,23 @@ class Hm_User_Config_File extends Hm_Config {
             $this->save($this->username, false);
         }
     }
+
+    /**
+     * Reset config to default values
+     * @return void
+     */
+    public function reset_factory() {
+        $this->config = array(
+            "version"=>$this->config["version"], 
+            "feeds"=>$this->config["feeds"], 
+            "pop3_servers"=>$this->config["pop3_servers"], 
+            "imap_servers"=>$this->config["imap_servers"], 
+            "smtp_servers"=>$this->config["smtp_servers"]
+        );
+        if (!$this->crypt) {
+            $this->save($this->username, false);
+        }
+    }
 }
 
 /**
@@ -417,6 +448,23 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function set($name, $value) {
         $this->config[$name] = $value;
+        if (!$this->crypt) {
+            $this->save($this->username, false);
+        }
+    }
+
+    /**
+     * Reset config to default values
+     * @return void
+     */
+    public function reset_factory() {
+        $this->config = array(
+            "version"=>$this->config["version"], 
+            "feeds"=>$this->config["feeds"], 
+            "pop3_servers"=>$this->config["pop3_servers"], 
+            "imap_servers"=>$this->config["imap_servers"], 
+            "smtp_servers"=>$this->config["smtp_servers"]
+        );
         if (!$this->crypt) {
             $this->save($this->username, false);
         }
