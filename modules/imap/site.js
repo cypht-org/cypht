@@ -297,7 +297,9 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
             if (res.auto_sent_folder) {
                 add_auto_folder(res.auto_sent_folder);
             }
+
             Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+            
             $('.page_links').html(res.page_links);
             cache_imap_page();
         },
@@ -337,6 +339,7 @@ var imap_search_page_content = function(id, folder) {
 };
 
 var update_imap_combined_source = function(path, state, event) {
+    clear_imap_page_combined_inbox();
     event.preventDefault();
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_update_combined_source'},
@@ -392,12 +395,17 @@ var clear_imap_page_cache = function() {
     Hm_Utils.save_to_local_storage(key+'_page_links', '');
 }
 
+var clear_imap_page_combined_inbox = function() {
+    var key = 'imap_1_combined_inbox';
+    Hm_Utils.save_to_local_storage(key, '');
+    Hm_Utils.save_to_local_storage(key+'_page_links', '');
+}
+
 var fetch_cached_imap_page = function() {
     var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     var page = Hm_Utils.get_from_local_storage(key);
     var links = Hm_Utils.get_from_local_storage(key+'_page_links');
     return [ page, links ];
-
 }
 
 var select_imap_folder = function(path, callback) {
@@ -417,6 +425,7 @@ var select_imap_folder = function(path, callback) {
 };
 
 var setup_imap_message_list_content_page = function() {
+    $('.message_table_body').html('');
     var cache_details = fetch_cached_imap_page();
     if (cache_details[0]) {
         $('.message_table tbody').html(cache_details[0]);
@@ -687,6 +696,7 @@ var imap_prefetch_message_content = function(uid, server_id, folder) {
 var imap_prefetch_msgs = function() {
     var detail;
     var key;
+    
     $(Hm_Utils.get_from_local_storage('formatted_unread_data')).each(function() {
         if ($(this).attr('class').match(/^imap/)) {
             detail = Hm_Utils.parse_folder_path($(this).attr('class'), 'imap');
