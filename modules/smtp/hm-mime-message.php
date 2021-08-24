@@ -50,6 +50,10 @@ class Hm_MIME_Msg {
         $this->body = $body;
     }
 
+    function set_autocrypt_header($public_key = NULL) {
+        $this->headers['Autocrypt'] = 'addr='.str_replace(['<', '>'], '', $this->headers['From']).'; prefer-encrypt=mutual; keydata='.base64_encode($public_key);
+    }
+
     /* return headers array */
     function get_headers() {
       return $this->headers;

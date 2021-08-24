@@ -78,6 +78,7 @@ var Hm_Pgp = {
         return openpgp.encrypt(options).then(function(ciphertext) {
             var encrypted = ciphertext.data;
             $('#compose_body').val(encrypted);
+            $('#autocrypt_pgp_key').val(keytext);
             Hm_Pgp.show_result();
             return true;
         });
@@ -98,9 +99,12 @@ var Hm_Pgp = {
             var decrypted = await key.decrypt(pass);
         }
         catch (e) {
-            Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
-            Hm_Pgp.show_result();
-            return;
+            console.log(e.toString());
+            if (e.toString() != 'Error: Key packet is already decrypted.') {
+                Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
+                Hm_Pgp.show_result();
+                return;
+            }
         }
         return openpgp.decrypt({message: msg, privateKeys: [key]}).then(function(plaintext) {
             var plain = plaintext.data;
@@ -180,6 +184,7 @@ var Hm_Pgp = {
         if (!encrypt) {
             encrypt = false;
         }
+        
         if (encrypt && sign) {
             await Hm_Pgp.get_passphrase(Hm_Pgp.encrypt_text, encrypt, sign);
         }
@@ -259,6 +264,28 @@ var Hm_Pgp = {
 
     check_pgp_msg: async function(res) {
         var keylist = await Hm_Pgp.private_key_options();
+
+        $("#import_public_key_form").on('submit', function (event) {
+            event.preventDefault();
+            console.log("foi");
+
+            var form = new FormData();
+            var xhr = new XMLHttpRequest;
+            form.append('public_key', $('#public_key_header_field').val());
+            form.append('hm_ajax_hook', 'ajax_public_key_import_string');
+            form.append('hm_page_key', $('#hm_page_key').val());
+            form.append('public_key_email', $('#key_import_email').val());
+            xhr.open('POST', '/?page=pgp#ajax_public_key_import_string', true);
+            xhr.setRequestHeader('X-Requested-With', 'xmlhttprequest');
+            xhr.onreadystatechange = function() {
+                Hm_Ajax.show_loading_icon();
+                if (xhr.readyState == 4){
+                    res = Hm_Utils.json_decode(xhr.responseText);
+                }
+                Hm_Ajax.stop_loading_icon();
+            }
+            xhr.send(form);
+        });
 
         if (keylist && res.pgp_msg_part) {
             $('.pgp_private_keys').html(keylist);

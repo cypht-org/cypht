@@ -276,9 +276,23 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
-            $txt .= '</th></tr>';
-            $txt .= '</table>';
+            $txt .= '</th></tr>';       
 
+
+            $headers = $this->get('msg_headers', array());
+            if (array_key_exists('Autocrypt', $headers)) {
+                $exploded_autocrypt_header = explode('keydata=', $headers['Autocrypt']);
+                $exploded_autocrypt_email_header = explode('addr=', $headers['Autocrypt']);
+                if (count($exploded_autocrypt_header) >= 1) {
+                    $pgp_key = end($exploded_autocrypt_header);
+                    $key_email = reset(explode(';', end($exploded_autocrypt_email_header)));
+                    $txt .= '<tr class="autocrypt_key_header_import_warning"><td colspan="2"><div>The sender sent their public key in the message header ';
+                    $txt .= '<form id="import_public_key_form" method="POST" action="?page=pgp#public_keys"><input type="hidden" id="key_import_email" value="'.$key_email.'" /><input id="hm_page_key" type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" /><input type="hidden" id="public_key_header_field" value="'.$pgp_key.'" name="public_key"><button type="submit" id="import_public_button">Import</button></form>';
+                    $txt .= '</div></td></tr>';
+                }                
+            }     
+
+            $txt .= '</table>';
             $this->out('msg_headers', $txt, false);
         }
     }

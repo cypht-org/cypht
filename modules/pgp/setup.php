@@ -18,11 +18,14 @@ add_output('message', 'pgp_msg_controls', true, 'pgp', 'message_start', 'before'
 add_handler('ajax_imap_message_content', 'pgp_message_check',  true, 'pgp', 'imap_message_content', 'after');
 add_output('ajax_hm_folders', 'pgp_settings_link', true, 'pgp', 'settings_menu_end', 'before');
 
+add_handler('ajax_public_key_import_string', 'login', false, 'core');
+add_handler('ajax_public_key_import_string', 'ajax_public_key_import_string', true);
+
 add_handler('compose', 'pgp_compose_data', true, 'pgp', 'load_user_data', 'after');
 add_output('compose', 'pgp_compose_controls', true, 'pgp', 'compose_form_end', 'after');
 
 return array(
-    'allowed_pages' => array('pgp'),
+    'allowed_pages' => array('pgp', 'ajax_public_key_import_string'),
     'allowed_output' => array(
         'pgp_msg_part' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),

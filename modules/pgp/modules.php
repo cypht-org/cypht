@@ -18,6 +18,39 @@ class Hm_Handler_load_pgp_data extends Hm_Handler_Module {
     }
 }
 
+
+/**
+ * @subpackage pgp/handler
+ */
+class Hm_Handler_ajax_public_key_import_string extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('public_key', 'public_key_email'));
+
+        $gpg = new gnupg();
+        $data = base64_decode($form['public_key']);
+
+        $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
+        putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+
+        $info = $gpg->import($data);
+        if (is_array($info) && array_key_exists('fingerprint', $info)) {
+            $fingerprint = $info['fingerprint'];
+        }
+
+        if (!$info) {
+            Hm_Msgs::add('ERRUnable to import public key');
+            return;
+        }
+
+        $keys = $this->user_config->get('pgp_public_keys', array());
+        $keys[] = array('fingerprint' => $fingerprint, 'key' => base64_decode($form['public_key']), 'email' => $form['public_key_email']);
+        $this->session->set('pgp_public_keys', $keys, true);
+        $this->session->record_unsaved('Public key imported');
+        Hm_Msgs::add('Public key imported');
+    }
+}
+
+
 /**
  * @subpackage pgp/handler
  */
@@ -239,8 +272,10 @@ function validate_public_key($file_location) {
         Hm_Debug::add('Uploaded public key not readable');
         return false;
     }
+    
     $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
     putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+
     $gpg = new gnupg();
     $info = $gpg->import($data);
     if (is_array($info) && array_key_exists('fingerprint', $info)) {

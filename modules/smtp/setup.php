@@ -153,7 +153,9 @@ return array(
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
-        'profile_value' => FILTER_SANITIZE_STRING
+        'profile_value' => FILTER_SANITIZE_STRING,
+        'autocrypt_send_public_key' => FILTER_SANITIZE_STRING,
+        'autocrypt_pgp_key' => FILTER_SANITIZE_STRING
     )
 );
 
