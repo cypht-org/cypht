@@ -72,9 +72,6 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         if (data_source_available($modules, 'smtp')) {
             $smtp_servers = count(Hm_SMTP_List::dump(false));
         }
-        if (data_source_available($modules, 'smtp')) {
-            $smtp_servers = count(Hm_SMTP_List::dump(false));
-        }
         if (data_source_available($modules, 'profiles')) {
             $profiles = new Hm_Profiles($this);
             $profiles = count($profiles->list_all());
