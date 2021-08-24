@@ -57,6 +57,7 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $pop3_servers = NULL;
         $smtp_servers = NULL;
         $feed_servers = NULL;
+        $profiles = NULL;
 
         $modules = $this->config->get_modules();
 
