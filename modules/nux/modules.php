@@ -10,6 +10,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/nux/services.php';
+require APP_PATH.'modules/profiles/hm-profiles.php';
 
 /**
  * @subpackage nux/handler
@@ -56,6 +57,7 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $pop3_servers = NULL;
         $smtp_servers = NULL;
         $feed_servers = NULL;
+        $profiles = NULL;
 
         $modules = $this->config->get_modules();
 
@@ -71,12 +73,17 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         if (data_source_available($modules, 'smtp')) {
             $smtp_servers = count(Hm_SMTP_List::dump(false));
         }
+        if (data_source_available($modules, 'profiles')) {
+            $profiles = new Hm_Profiles($this);
+            $profiles = count($profiles->list_all());
+        }
 
         $this->out('nux_server_setup', array(
             'imap' => $imap_servers,
             'pop3' => $pop3_servers,
             'feeds' => $feed_servers,
-            'smtp' => $smtp_servers
+            'smtp' => $smtp_servers,
+            'profiles' => $profiles
         ));
         $this->out('tzone', $this->user_config->get('timezone_setting'));
     }
@@ -322,18 +329,34 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         }
         $server_data = $this->get('nux_server_setup', array());
         $tz = $this->get('tzone');
-        $protos = array('imap', 'pop3', 'smtp', 'feeds');
+        $protos = array('imap', 'pop3', 'smtp', 'feeds', 'profiles');
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
         $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');
         $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div><ul>';
+        
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
             if ($proto == 'feeds') {
                 $proto_dsp = 'RSS/ATOM';
             }
             $res .= '<li class="nux_'.$proto.'">';
+
+            // Check if user have profiles configured
+            if ($proto == 'profiles') {
+                if ($server_data[$proto] === 0) {
+                    $res .= sprintf($this->trans('You don\'t have any profile(s)'));
+                    $res .= sprintf(' <a href="?page=profiles">%s</a>', $proto, $this->trans('Add'));
+                }
+                if ($server_data[$proto] > 0) {
+                    $res .= sprintf($this->trans('You have %s profile(s)'), $server_data[$proto]);
+                    $res .= sprintf(' <a href="?page=profiles">%s</a>', $this->trans('Manage'));
+                }
+                $res .= '</li>';
+                continue;
+            }
+
             if ($server_data[$proto] === NULL) {
                 $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto_dsp));
             }
