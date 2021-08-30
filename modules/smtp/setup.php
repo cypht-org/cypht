@@ -62,6 +62,7 @@ add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 
 /* attach file */
 add_handler('ajax_smtp_attach_file', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_smtp_attach_file', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_smtp_attach_file', 'login', false, 'core');
 add_handler('ajax_smtp_attach_file', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_attach_file', 'smtp_attach_file',  true);
