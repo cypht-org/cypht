@@ -9,8 +9,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require APP_PATH.'modules/nux/services.php';
-require APP_PATH.'modules/profiles/hm-profiles.php';
+require_once APP_PATH.'modules/nux/services.php';
+require_once APP_PATH.'modules/profiles/hm-profiles.php';
 
 /**
  * @subpackage nux/handler
