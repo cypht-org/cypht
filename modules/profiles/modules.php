@@ -256,7 +256,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         $res = '';
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
-            $res .= '<table class="profile_details"><tr>'.
+            $res .= '<table class="profile_details" style="display: block;overflow-x: auto;white-space: nowrap;"><tr>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
                 '<th class="profile_fld">'.$this->trans('IMAP Server').'</th>'.
                 '<th class="profile_fld">'.$this->trans('Username').'</th>'.
