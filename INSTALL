@@ -43,8 +43,12 @@ wget https://github.com/jasonmunro/cypht/archive/master.zip
 # unpack the archive
 unzip master.zip
 
-# run composer
-cd cypht-master && composer install && cd ..
+# run composer if it's there
+if [ -x /usr/bin/composer ]; then
+    cd cypht-master && composer install && cd ..
+else
+    echo "You may need to install php's composer."
+fi
 
 # create a vanilla ini file
 cp cypht-master/hm3.sample.ini cypht-master/hm3.ini
