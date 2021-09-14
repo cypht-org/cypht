@@ -749,7 +749,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         $res = array();
         if ($this->get('imap_mailbox_page')) {
             $details = $this->get('imap_folder_detail');
-            $type = $details['name'] == 'Sent' ? 'sent' : false;
+            $type = stripos($details['name'], 'Sent') !== false ? 'sent' : false;
             prepare_imap_message_list($this->get('imap_mailbox_page'), $this, $type);
             if ($details['offset'] == 0) {
                 $page_num = 1;
