@@ -47,7 +47,6 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
             && array_key_exists('list_path', $this->request->get)
             && array_key_exists('uid', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-
             $imap = Hm_IMAP_List::connect($path[1]);
             if ($imap->select_mailbox(hex2bin($path[2]))) {
                 $msg_struct = $imap->get_message_structure($this->request->get['uid']);
@@ -56,6 +55,27 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
+                
+                $attached_files = [];
+                $this->session->set('uploaded_files', array());
+                if (array_key_exists('subs', $msg_struct[0])) {
+                    foreach ($msg_struct[0]['subs'] as $ind => $sub) {
+                        if ($ind != '0.1') {
+                            $new_attachment['basename'] = $sub['attributes']['name'];
+                            $new_attachment['name'] = $sub['attributes']['name'];
+                            $new_attachment['size'] = $sub['size'];
+                            $new_attachment['type'] = $sub['type'];
+                            $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$sub['attributes']['name'];
+                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            file_put_contents($file_path, $content);
+                            $new_attachment['tmp_name'] = $file_path;
+                            $new_attachment['filename'] = $file_path;
+                            $attached_files[$this->request->get['uid']][] = $new_attachment;
+                        }
+                    }
+                }
+                $this->session->set('uploaded_files', $attached_files);
+
                 $imap_draft = array(
                     'From' => $msg_header['From'],
                     'To' => $this->unangle($msg_header['To']),
@@ -120,10 +140,23 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('attachment_id', $this->request->post)) {
+            $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
+            $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
+            $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+            $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
+            $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
+            $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
+    
+            $draft_id = $this->request->post['draft_id'];
             $id = $this->request->post['attachment_id'];
             $filename = false;
             $remaining_files = array();
             $res = delete_uploaded_files($this->session, false, $id);
+
+            $atts = array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+            'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+            'draft_in_reply_to' => '');
+
             if ($res) {
                 Hm_Msgs::add('Attachment deleted');
             }
@@ -1338,12 +1371,12 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     );
     
     $mime->add_attachments($uploaded_files);
-    $mime->process_attachments();
+    $res = $mime->process_attachments();
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
-
+    
     if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
         $imap->append_feed($msg."\r\n");
         if (!$imap->append_end()) {
