@@ -559,6 +559,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* add attachments */
         $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
+        if ($form['draft_id'] > 0) {
+            $mime->add_attachments(get_uploaded_files(0, $this->session));
+        }
 
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
@@ -613,6 +616,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         Hm_Msgs::add("Message Sent");
         delete_draft($form['draft_id'], $this->session);
         delete_uploaded_files($this->session, $form['draft_id']);
+        if ($form['draft_id'] > 0) {
+            delete_uploaded_files($this->session, 0);
+        }
     }
 }
 
