@@ -47,7 +47,6 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
             && array_key_exists('list_path', $this->request->get)
             && array_key_exists('uid', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-
             $imap = Hm_IMAP_List::connect($path[1]);
             if ($imap->select_mailbox(hex2bin($path[2]))) {
                 $msg_struct = $imap->get_message_structure($this->request->get['uid']);
@@ -56,6 +55,30 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
+                
+                # Attahcment Download
+                # Draft attachments must be redownloaded and added to the file cache to prevent 
+                # attachments from being deleted when editing a previously saved draft.
+                $attached_files = [];
+                $this->session->set('uploaded_files', array());
+                if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
+                    foreach ($msg_struct[0]['subs'] as $ind => $sub) {
+                        if ($ind != '0.1') {
+                            $new_attachment['basename'] = $sub['description'];
+                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['size'] = $sub['size'];
+                            $new_attachment['type'] = $sub['type'];
+                            $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
+                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            file_put_contents($file_path, $content);
+                            $new_attachment['tmp_name'] = $file_path;
+                            $new_attachment['filename'] = $file_path;
+                            $attached_files[$this->request->get['uid']][] = $new_attachment;
+                        }
+                    }
+                }
+                $this->session->set('uploaded_files', $attached_files);
+
                 $imap_draft = array(
                     'From' => $msg_header['From'],
                     'To' => $this->unangle($msg_header['To']),
@@ -120,10 +143,23 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('attachment_id', $this->request->post)) {
+            $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
+            $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
+            $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
+            $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
+            $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
+            $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
+    
+            $draft_id = $this->request->post['draft_id'];
             $id = $this->request->post['attachment_id'];
             $filename = false;
             $remaining_files = array();
             $res = delete_uploaded_files($this->session, false, $id);
+
+            $atts = array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+            'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+            'draft_in_reply_to' => '');
+
             if ($res) {
                 Hm_Msgs::add('Attachment deleted');
             }
@@ -278,11 +314,20 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $draft = get_draft($this->request->get['draft_id'], $this->session);
             $draft_id = $this->request->get['draft_id'];
         }
+        elseif (array_key_exists('draft_id', $this->request->post)) {
+            $draft = get_draft($this->request->post['draft_id'], $this->session);
+            $draft_id = $this->request->post['draft_id'];
+        }
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
+        if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
+            $draft_id = $this->request->get['uid'];
+        }
+
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
+        
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
@@ -737,7 +782,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
-
+        
         if (!$msg_path) {
             $msg_path = $this->get('compose_msg_path', '');
         }
@@ -802,7 +847,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
             $draft_id = $msg_uid;
         }
-
+        
         $send_disabled = '';
         if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
@@ -845,6 +890,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<script type="text/javascript">var editor = new Editor(); editor.render();</script>';
         }
         $res .= '<table class="uploaded_files">';
+        
         foreach ($files as $file) {
             $res .= format_attachment_row($file, $this);
         }
@@ -1169,6 +1215,7 @@ function get_uploaded_files($id, $session) {
     if (array_key_exists($id, $files)) {
         return $files[$id];
     }
+
     return array();
 }}
 
@@ -1258,20 +1305,6 @@ function delete_draft($id, $session) {
 /**
  * @subpackage smtp/functions
  */
-if (!hm_exists('save_draft')) {
-function save_draft($atts, $id, $session) {
-    $drafts = $session->get('compose_drafts', array());
-    if ($id === false) {
-        $id = next_draft_key($session);
-    }
-    $drafts[$id] = $atts;
-    $session->set('compose_drafts', $drafts);
-    return $id;
-}}
-
-/**
- * @subpackage smtp/functions
- */
 if (!hm_exists('find_imap_by_smtp')) {
 function find_imap_by_smtp($imap_profiles, $smtp_profile) {
     $id = 0;
@@ -1327,6 +1360,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (!array_key_exists('draft', $specials) || !$specials['draft']) {
+        Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
     }
     $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
@@ -1345,13 +1379,14 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
         $name,
         $atts['draft_in_reply_to']
     );
+    
     $mime->add_attachments($uploaded_files);
-    $mime->process_attachments();
+    $res = $mime->process_attachments();
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
-
+    
     if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
         $imap->append_feed($msg."\r\n");
         if (!$imap->append_end()) {
@@ -1404,14 +1439,10 @@ function attach_file($content, $file, $filepath, $draft_id, $mod, $imap_draft=fa
         if (!get_draft($draft_id, $mod->session)) {
             if ($imap_draft) {
                 $new_draft_id = save_imap_draft($atts, $draft_id, $mod->session, $mod, $mod->cache);
+                save_uploaded_file($new_draft_id, $file, $mod->session);
                 if ($new_draft_id >= 0) {
                     $mod->out('draft_id', $new_draft_id);
                 }
-            }
-            else if (!$imap_draft) {
-                save_draft(array('draft_smtp' => '', 'draft_to' => '', 'draft_body' => '',
-                    'draft_subject' => '', 'draft_cc' => '', 'draft_bcc' => '',
-                    'draft_in_reply_to' => ''), $draft_id, $mod->session);
             }
         }
         $mod->out('upload_file_details', $file);

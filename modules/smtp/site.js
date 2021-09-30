@@ -238,8 +238,16 @@ var upload_file = function(file) {
 
 var delete_attachment = function(file, link) {
     Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_attachment'},
-        {'name': 'attachment_id', 'value': file}],
+    [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_attachment'},
+     {'name': 'attachment_id', 'value': file}, 
+     {'name': 'draft_id', 'value': $('.compose_draft_id').val()},
+     {'name': 'draft_smtp', 'value': $('.compose_server').val()}, 
+     {'name': 'draft_subject', 'value': $('.compose_subject').val()}, 
+     {'name': 'draft_body', 'value': $('#compose_body').val()}, 
+     {'name': 'draft_to', 'value': $('.compose_to').val()}, 
+     {'name': 'draft_cc', 'value': $('.compose_cc').val()}, 
+     {'name': 'draft_bcc', 'value': $('.compose_bcc').val()}, 
+    ],
         function(res) { $(link).parent().parent().remove(); }
     );
     return false;
