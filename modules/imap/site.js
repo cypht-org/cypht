@@ -655,6 +655,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
     $('#unread_message').on("click", function() { return inline_imap_unread_message(msg_uid, detail);});
+    fixLtrInRtl();
 };
 
 var get_local_message_content = function(msg_uid, path) {

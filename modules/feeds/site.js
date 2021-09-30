@@ -165,6 +165,7 @@ var display_feed_item_content = function(res) {
             Hm_Message_List.adjust_unread_total(-1);
         }
     }
+    fixLtrInRtl();
 };
 
 var load_feed_list = function(id) {

@@ -505,7 +505,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                         array('subject_callback', $subject, $url, $flags, $icon),
                         array('safe_output_callback', 'source', $repo_name),
                         array('safe_output_callback', 'from', $from),
-                        array('date_callback', human_readable_interval($date), $ts),
+                        array('date_callback', translate_time_str(human_readable_interval($date), $this), $ts),
                     ),
                     $id,
                     $style,
@@ -519,7 +519,7 @@ class Hm_Output_filter_github_data extends Hm_Output_Module {
                         array('safe_output_callback', 'source', $repo_name, $icon),
                         array('safe_output_callback', 'from', $from),
                         array('subject_callback', $subject, $url, $flags),
-                        array('date_callback', human_readable_interval($date), $ts),
+                        array('date_callback', translate_time_str(human_readable_interval($date), $this), $ts),
                         array('icon_callback', $flags)
                     ),
                     $id,

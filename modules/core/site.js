@@ -415,6 +415,7 @@ function Message_List() {
                 try { func(); } catch(e) { console.log(e); }
             }
         }
+        fixLtrInRtl();
     };
 
     this.update = function(ids, msgs, type, cache) {
