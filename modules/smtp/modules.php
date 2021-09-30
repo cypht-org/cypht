@@ -56,7 +56,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                     return;
                 }
                 
-                # Attahcment Download
+                # Attachment Download
                 # Draft attachments must be redownloaded and added to the file cache to prevent 
                 # attachments from being deleted when editing a previously saved draft.
                 $attached_files = [];
