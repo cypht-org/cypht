@@ -536,7 +536,7 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
         $specials = get_special_folders($this, $imap_profile['id']);
         if (!array_key_exists('sent', $specials) || !$specials['sent']) {
-            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account)');
+            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account');
         }
     }
 }
