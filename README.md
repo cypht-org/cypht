@@ -39,6 +39,8 @@ Community chat room: [https://gitter.im/cypht-org/community](https://gitter.im/c
 
 For developers, get via Composer: [https://packagist.org/packages/jason-munro/cypht](https://packagist.org/packages/jason-munro/cypht)
 
+Auto-generated code documentation: [https://cypht.org/docs/code_docs/index.html](https://cypht.org/docs/code_docs/index.html)
+
 Docker: [https://hub.docker.com/r/sailfrog/cypht-docker](https://hub.docker.com/r/sailfrog/cypht-docker)
 
 LinkedIn group: [https://www.linkedin.com/groups/13804559/](https://www.linkedin.com/groups/13804559/)
