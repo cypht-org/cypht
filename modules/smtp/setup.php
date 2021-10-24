@@ -60,24 +60,19 @@ add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
 add_handler('ajax_smtp_save_draft', 'date', true, 'core');
 add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 
-/* attach file */
-add_handler('ajax_smtp_attach_file', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_smtp_attach_file', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_smtp_attach_file', 'login', false, 'core');
-add_handler('ajax_smtp_attach_file', 'load_user_data',  true, 'core');
-add_handler('ajax_smtp_attach_file', 'smtp_attach_file',  true);
-add_handler('ajax_smtp_attach_file', 'save_user_data',  true, 'core');
-add_handler('ajax_smtp_attach_file', 'date', true, 'core');
-add_handler('ajax_smtp_attach_file', 'http_headers', true, 'core');
-add_output('ajax_smtp_attach_file', 'filter_upload_file_details', true);
+/* resumable test chunk */
+add_handler('ajax_get_test_chunk', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_get_test_chunk', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_get_test_chunk', 'login', false, 'core');
+add_handler('ajax_get_test_chunk', 'load_user_data',  true, 'core');
+add_handler('ajax_get_test_chunk', 'get_test_chunk',  true);
 
-/* delete attached file */
-add_handler('ajax_smtp_delete_attachment', 'login', false, 'core');
-add_handler('ajax_smtp_delete_attachment', 'load_user_data',  true, 'core');
-add_handler('ajax_smtp_delete_attachment', 'smtp_delete_attached_file',  true);
-add_handler('ajax_smtp_delete_attachment', 'save_user_data',  true, 'core');
-add_handler('ajax_smtp_delete_attachment', 'date', true, 'core');
-add_handler('ajax_smtp_delete_attachment', 'http_headers', true, 'core');
+/* resumable upload chunk */
+add_handler('ajax_upload_chunk', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_upload_chunk', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_upload_chunk', 'login', false, 'core');
+add_handler('ajax_upload_chunk', 'load_user_data',  true, 'core');
+add_handler('ajax_upload_chunk', 'upload_chunk',  true);
 
 setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
 add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
@@ -97,10 +92,10 @@ return array(
     'allowed_pages' => array(
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
-        'ajax_smtp_attach_file',
-        'ajax_smtp_delete_attachment',
         'ajax_smtp_delete_draft',
-        'ajax_profiles_status'
+        'ajax_profiles_status',
+        'ajax_get_test_chunk',
+        'ajax_upload_chunk'
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -108,9 +103,19 @@ return array(
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
         'draft_id' => FILTER_VALIDATE_INT,
+        'hm_ajax_hook' => FILTER_SANITIZE_STRING,
         'compose_to' => FILTER_SANITIZE_STRING,
         'mailto_uri' => FILTER_SANITIZE_STRING,
-        'compose_from' => FILTER_SANITIZE_STRING
+        'compose_from' => FILTER_SANITIZE_STRING,
+        'resumableChunkNumber' => FILTER_VALIDATE_INT,
+        'resumableTotalChunks' => FILTER_VALIDATE_INT,
+        'resumableChunkSize' => FILTER_VALIDATE_INT,
+        'resumableCurrentChunkSize' => FILTER_VALIDATE_INT,
+        'resumableTotalSize' => FILTER_VALIDATE_INT,
+        'resumableType' => FILTER_SANITIZE_STRING,
+        'resumableIdentifier' => FILTER_SANITIZE_STRING,
+        'resumableFilename' => FILTER_SANITIZE_STRING,
+        'resumableRelativePath' => FILTER_SANITIZE_STRING,
     ),
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),
@@ -154,7 +159,8 @@ return array(
         'draft_in_reply_to' => FILTER_UNSAFE_RAW,
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
-        'profile_value' => FILTER_SANITIZE_STRING
+        'profile_value' => FILTER_SANITIZE_STRING,
+        'uploaded_files' => FILTER_SANITIZE_STRING
     )
 );
 

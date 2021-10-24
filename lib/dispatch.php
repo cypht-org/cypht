@@ -307,6 +307,14 @@ class Hm_Dispatch {
      * @return boolean
      */
     public function validate_ajax_request($request, $filters) {
+        if (array_key_exists('hm_ajax_hook', $request->get)) {
+            if (in_array($request->get['hm_ajax_hook'], $this->get_pages($filters), true)) {
+                return true;
+            }
+            else {
+                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+            }
+        }
         if (array_key_exists('hm_ajax_hook', $request->post)) {
             if (in_array($request->post['hm_ajax_hook'], $this->get_pages($filters), true)) {
                 return true;
@@ -327,6 +335,10 @@ class Hm_Dispatch {
     public function get_page($filters, $request) {
         $this->page = 'notfound';
         if ($request->type == 'AJAX' && $this->validate_ajax_request($request, $filters)) {
+            if (array_key_exists('hm_ajax_hook', $request->get)) {
+                $this->page = $request->get['hm_ajax_hook'];
+                return;
+            }
             $this->page = $request->post['hm_ajax_hook'];
         }
         elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {

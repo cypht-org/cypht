@@ -116,6 +116,7 @@ var save_compose_state = function(no_files, notice) {
     if (notice) {
         no_icon = false;
     }
+    var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
     var body = $('.compose_body').val();
     var subject = $('.compose_subject').val();
     var to = $('.compose_to').val();
@@ -123,11 +124,12 @@ var save_compose_state = function(no_files, notice) {
     var cc = $('.compose_cc').val();
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
+    
     var draft_id = $('.compose_draft_id').val();
-    if (globals.draft_state == body+subject+to+smtp+cc+bcc) {
+    if (globals.draft_state == body+subject+to+smtp+cc+bcc+uploaded_files) {
         return;
     }
-    globals.draft_state = body+subject+to+smtp+cc+bcc;
+    globals.draft_state = body+subject+to+smtp+cc+bcc+uploaded_files;
 
     if (!body && !subject && !to && !cc && !bcc) {
         return;
@@ -146,7 +148,8 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_notice', 'value': notice},
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
-        {'name': 'draft_to', 'value': to}],
+        {'name': 'draft_to', 'value': to},
+        {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
             $('.smtp_send').prop('disabled', false);
             $('.smtp_send').removeClass('disabled_input');
@@ -194,73 +197,84 @@ var reset_smtp_form = function() {
     save_compose_state(true);
 };
 
-var upload_file = function(file) {
-    var res = '';
-    var form = new FormData();
-    var xhr = new XMLHttpRequest;
-    Hm_Ajax.show_loading_icon();
-    form.append('upload_file', file);
-    form.append('hm_ajax_hook', 'ajax_smtp_attach_file');
-    form.append('hm_page_key', $('#hm_page_key').val());
-    form.append('draft_id', $('.compose_draft_id').val());
-    form.append('draft_smtp', $('.compose_server').val());
-    form.append('draft_subject', $('.compose_subject').val());
-    form.append('draft_body', $('#compose_body').val());
-    form.append('draft_to', $('.compose_to').val());
-    form.append('draft_cc', $('.compose_cc').val());
-    form.append('draft_bcc', $('.compose_bcc').val());
-    xhr.open('POST', '', true);
-    xhr.setRequestHeader('X-Requested-With', 'xmlhttprequest');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState == 4){
-            if (hm_encrypt_ajax_requests()) {
-                res = Hm_Utils.json_decode(xhr.responseText);
-                res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
-            }
-            else {
-                res = Hm_Utils.json_decode(xhr.responseText);
-            }
-            if (res.file_details) {
-                $('.uploaded_files').append(res.file_details);
-                $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
-            }
-            Hm_Ajax.stop_loading_icon();
-            if (res.draft_id) {
-                $('.compose_draft_id').val(res.draft_id);
-            }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
-                Hm_Notices.show(res.router_user_msgs);
-            }
-        }
-    }
-    xhr.send(form);
-};
-
-var delete_attachment = function(file, link) {
-    Hm_Ajax.request(
-    [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_attachment'},
-     {'name': 'attachment_id', 'value': file}, 
-     {'name': 'draft_id', 'value': $('.compose_draft_id').val()},
-     {'name': 'draft_smtp', 'value': $('.compose_server').val()}, 
-     {'name': 'draft_subject', 'value': $('.compose_subject').val()}, 
-     {'name': 'draft_body', 'value': $('#compose_body').val()}, 
-     {'name': 'draft_to', 'value': $('.compose_to').val()}, 
-     {'name': 'draft_cc', 'value': $('.compose_cc').val()}, 
-     {'name': 'draft_bcc', 'value': $('.compose_bcc').val()}, 
-    ],
-        function(res) { $(link).parent().parent().remove(); }
-    );
-    return false;
-};
-
 var replace_cursor_positon = function (txtElement) {
     txtElement.val('\r\n\r\n\r\n'+txtElement.val());
     txtElement.prop('selectionEnd',0);
     txtElement.focus();
 }
 
-$(function() {
+var init_resumable_upload = function () {
+    var r = new Resumable({
+        target:'?page=compose&hm_ajax_hook=ajax_upload_chunk',
+        testTarget:'?page=compose&hm_ajax_hook=ajax_get_test_chunk',
+        testMethod: 'POST',
+        headers: {
+            'X-Requested-with': 'xmlhttprequest'
+        }
+    });
+    r.assignBrowse(document.getElementsByClassName('compose_attach_button'));
+    r.on('fileAdded', function(file, event){
+        console.log(file);
+        $('.uploaded_files').append('<tr id="tr-'+file.uniqueIdentifier+'"><td>'
+                +file.fileName+'</td><td>'+file.file.type+' ' + (Math.round((file.file.size/1024) * 100)/100) + 'KB '
+                +'</td><td><a class="remove_attachment" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
+                +'<div class="meter" style="width:100%"><span id="progress-'
+                +file.uniqueIdentifier+'" style="width:0%;"><span class="progress" id="progress-bar-'
+                +file.uniqueIdentifier+'"></span></span></div></td></tr>');
+        r.upload()
+        $('.pause_upload').on('click', function (e) {
+            e.preventDefault();
+            r.pause();
+        });
+        $('.resume_upload').on('click', function(e) {
+            e.preventDefault();
+            $('.remove_attachment').css('display', 'none');
+            $('.pause_upload').css('display', '');
+            $('.resume_upload').css('display', 'none');
+            r.upload();
+        });
+        $('.remove_attachment').on('click', function(e) {
+            e.preventDefault();
+            var fileUniqueId = $(this).attr('id').replace('remove-', '');
+            file = r.getFromUniqueIdentifier(fileUniqueId);
+            r.removeFile(file);
+            $(this).parent().parent().next('tr').remove();
+            $(this).parent().parent().remove();
+        });
+    });
+    r.on('fileProgress', function(file) {
+        var progress = Math.floor(file.progress() * 100);
+        $('#progress-' + file.uniqueIdentifier).css('width', progress+'%');
+    });
+    r.on('fileSuccess', function(file) {
+        $('.remove_attachment').css('display', '');
+        $('.pause_upload').css('display', 'none');
+        $('.resume_upload').css('display', 'none');
+        $('#tr-'+file.uniqueIdentifier).append('<td style="display:none"><input name="uploaded_files[]" type="text" value="'+file.fileName+'" /></td>');
+        $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'green');
+    });
+    r.on('fileError', function(file, message) {
+        $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'red');
+    });
+    r.on('pause', function() {
+        $('.remove_attachment').css('display', 'none');
+        $('.pause_upload').css('display', 'none');
+        $('.resume_upload').css('display', '');
+    });
+    $('.remove_attachment').on('click', function(e) {
+        e.preventDefault();
+        var fileUniqueId = $(this).attr('id').replace('remove-', '');
+        file = r.getFromUniqueIdentifier(fileUniqueId);
+        r.removeFile(file);
+        $(this).parent().parent().next('tr').remove();
+        $(this).parent().parent().remove();
+    });
+}
+
+$(function() {    
     if (hm_page_name() === 'compose') {
+        init_resumable_upload()
+
         var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
         Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
         $('.draft_title').on("click", function() { $('.draft_list').toggle(); });
@@ -269,13 +283,10 @@ $(function() {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_attach_button').on("click", function() { $('.compose_attach_file').trigger('click'); });
-        $('.compose_attach_file').on("change", function() { upload_file(this.files[0]); $('.compose_attach_file').val(''); });
         $('.compose_form').on('submit', function() { Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); $('.smtp_send_archive').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
         }
-        $('.delete_attachment').on("click", function() { return delete_attachment($(this).data('id'), this); });
         if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
             replace_cursor_positon ($('textarea[name="compose_body"]'));
         }
