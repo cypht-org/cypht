@@ -267,3 +267,30 @@ div.unseen, .unseen .subject { font-weight: 700; }
 @media print {
     .sys_messages, .next, .prev, .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
 }
+
+/* tooltip */
+[data-title]:hover:after {
+    opacity: 1;
+    transition: all 0.1s ease 0.5s;
+    visibility: visible;
+}
+[data-title]:after {
+    content: attr(data-title);
+    background-color: #000;
+    color: #fff;
+    font-size: 80%;
+    width: auto !important;
+    position: fixed !important;
+    padding: 5px 5px;
+    border-radius: 4px;
+    margin-top: 10px;
+    white-space: nowrap;
+    box-shadow: 1px 1px 3px #222222;
+    opacity: 0;
+    z-index: 10 !important;
+    visibility: hidden;
+}
+[data-title] {
+    position: relative;
+    z-index: 10 !important;
+}
