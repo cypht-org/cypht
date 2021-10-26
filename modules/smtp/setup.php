@@ -168,7 +168,8 @@ return array(
         'draft_notice' => FILTER_VALIDATE_BOOLEAN,
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
         'profile_value' => FILTER_SANITIZE_STRING,
-        'uploaded_files' => FILTER_SANITIZE_STRING
+        'uploaded_files' => FILTER_SANITIZE_STRING,
+        'send_uploaded_files' => FILTER_SANITIZE_STRING
     )
 );
 

@@ -214,7 +214,6 @@ var init_resumable_upload = function () {
     });
     r.assignBrowse(document.getElementsByClassName('compose_attach_button'));
     r.on('fileAdded', function(file, event){
-        console.log(file);
         $('.uploaded_files').append('<tr id="tr-'+file.uniqueIdentifier+'"><td>'
                 +file.fileName+'</td><td>'+file.file.type+' ' + (Math.round((file.file.size/1024) * 100)/100) + 'KB '
                 +'</td><td><a class="remove_attachment" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
@@ -297,7 +296,13 @@ $(function() {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_form').on('submit', function() { Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); $('.smtp_send_archive').addClass('disabled_input'); $('.smtp_send').on("click", function() { return false; }); });
+        $('.compose_form').on('submit', function() { 
+            var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
+            $('#send_uploaded_files').val(uploaded_files);
+            Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); 
+            $('.smtp_send_archive').addClass('disabled_input'); 
+            $('.smtp_send').on("click", function() { return false; }); 
+        });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
         }

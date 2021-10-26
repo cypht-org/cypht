@@ -554,6 +554,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
+        
+        /* parse attachments */
+        $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
+        foreach($uploaded_files as $key => $file) {
+            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+        }
+        $uploaded_files = get_uploaded_files_from_array(
+            $uploaded_files
+        );
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
@@ -588,11 +597,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to);
 
         /* add attachments */
-        $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
-        if ($form['draft_id'] > 0) {
-            $mime->add_attachments(get_uploaded_files(0, $this->session));
-        }
-
+        $mime->add_attachments($uploaded_files);
+        $res = $mime->process_attachments();
+        
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
@@ -947,7 +954,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }    
 
-        $res .= '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
+        $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" /><input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
             '" name="compose_attach_button" type="button" />';
@@ -1300,7 +1307,7 @@ function format_attachment_row($file, $output_mod) {
 if (!hm_exists('get_primary_recipient')) {
 function get_primary_recipient($profiles, $headers, $smtp_servers) {
     $addresses = array();
-    $flds = array('from', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc', 'reply-to');
+    $flds = array('from', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
@@ -1443,10 +1450,11 @@ if (!hm_exists('get_uploaded_files_from_array')) {
 function get_uploaded_files_from_array($uploaded_files) {
     $parsed_files = [];
     foreach($uploaded_files as $file) {
+        $parsed_path = explode('/', $file);
         $parsed_files[] = [
             'filename' => $file,
             'type' => '',
-            'name' => end(explode('/', $file))
+            'name' => end($parsed_path)
         ];
     }
     return $parsed_files;
