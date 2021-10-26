@@ -823,6 +823,24 @@ class Hm_Output_imap_unflag_on_send_controls extends Hm_Output_Module {
         }
     }
 }
+
+/**
+ * Option to enable/disable flagging a message as read when opened (defaults to true)
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_unread_on_open extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('unread_on_open', $settings) && $settings['unread_on_open']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="unread_on_open">'.
+            $this->trans('Don\'t flag a message as read on open').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" value="1" /></td></tr>';
+    }
+}
+
 /**
  * Option to enable/disable simple message structure on the message view
  * @subpackage imap/output
