@@ -237,7 +237,9 @@ var init_resumable_upload = function () {
             e.preventDefault();
             var fileUniqueId = $(this).attr('id').replace('remove-', '');
             file = r.getFromUniqueIdentifier(fileUniqueId);
-            r.removeFile(file);
+            if (file) {
+                r.removeFile(file);
+            }
             $(this).parent().parent().next('tr').remove();
             $(this).parent().parent().remove();
         });
@@ -264,14 +266,26 @@ var init_resumable_upload = function () {
     $('.remove_attachment').on('click', function(e) {
         e.preventDefault();
         var fileUniqueId = $(this).attr('id').replace('remove-', '');
-        file = r.getFromUniqueIdentifier(fileUniqueId);
-        r.removeFile(file);
         $(this).parent().parent().next('tr').remove();
         $(this).parent().parent().remove();
+        file = r.getFromUniqueIdentifier(fileUniqueId);
+        r.removeFile(file);
     });
 }
 
 $(function() {    
+    if (hm_page_name() === 'settings') {
+        $('#clear_chunks_button').on('click', function(e) {
+            e.preventDefault();
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_clear_attachment_chunks'}],
+                function(res) {
+                    
+                },
+                []
+            );
+        });
+    }
     if (hm_page_name() === 'compose') {
         init_resumable_upload()
 

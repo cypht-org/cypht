@@ -35,6 +35,9 @@ add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_setting
 add_handler('settings', 'process_auto_bcc', true, 'smtp', 'save_user_settings', 'before');
 add_output('settings', 'compose_type_setting', true, 'smtp', 'start_general_settings', 'after');
 add_output('settings', 'auto_bcc_setting', true, 'smtp', 'compose_type_setting', 'after');
+add_handler('settings', 'attachment_dir', true, 'smtp', 'save_user_settings', 'after');
+add_output('settings', 'attachment_setting', true, 'smtp', 'compose_type_setting', 'after');
+
 
 /* ajax server setup callback data */
 add_handler('ajax_smtp_debug', 'login', false, 'core');
@@ -56,7 +59,6 @@ add_handler('ajax_smtp_save_draft', 'load_smtp_servers_from_config', true, 'imap
 add_handler('ajax_smtp_save_draft', 'login', false, 'core');
 add_handler('ajax_smtp_save_draft', 'load_user_data',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'smtp_save_draft',  true);
-//add_handler('ajax_smtp_save_draft', 'close_session_early',  true, 'core');
 add_handler('ajax_smtp_save_draft', 'date', true, 'core');
 add_handler('ajax_smtp_save_draft', 'http_headers', true, 'core');
 
@@ -88,8 +90,14 @@ setup_base_ajax_page('ajax_profiles_status', 'core');
 add_handler('ajax_profiles_status', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_profiles_status', 'profile_status', true, 'smtp', 'load_imap_servers_from_config', 'after');
 
+/* resumable clear chunks */
+add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
+add_handler('ajax_clear_attachment_chunks', 'load_user_data',  true, 'core');
+add_handler('ajax_clear_attachment_chunks', 'clear_attachment_chunks',  true);
+
 return array(
     'allowed_pages' => array(
+        'ajax_clear_attachment_chunks',
         'ajax_smtp_debug',
         'ajax_smtp_save_draft',
         'ajax_smtp_delete_draft',

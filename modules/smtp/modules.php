@@ -178,7 +178,18 @@ class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
  */
 class Hm_Handler_upload_chunk extends Hm_Handler_Module {
     public function process() {
+        $imap_profile = find_imap_by_smtp(
+            $this->user_config->get('imap_servers'),
+            $this->user_config->get('smtp_servers')[$this->request->get['draft_smtp']]
+        );
+        $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
+        
+        // create the attachment folder for the profile to avoid
+        if (!is_dir($filepath.'/'.$from)) {
+            mkdir($filepath.'/'.$from, 0777, true);
+        }
+
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
             if ($file['error'] != 0) {
                 Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
@@ -186,7 +197,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
             }
     
             if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
-                $temp_dir = $filepath.'/chunks-'.$this->request->get['resumableIdentifier'];
+                $temp_dir = $filepath.'/'.$from.'/chunks-'.$this->request->get['resumableIdentifier'];
             }
             $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
         
@@ -664,6 +675,66 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', 0));
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_attachment_dir extends Hm_Handler_Module {
+    public function process() {
+        $this->out('attachment_dir', $this->config->get('attachment_dir'));
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
+    public function process() {
+        $attachment_dir = $this->config->get('attachment_dir');
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($attachment_dir));
+        foreach ($rii as $file) {
+            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
+                continue;
+            }
+            if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
+                rrmdir($file->getPath());
+            }
+        }
+        Hm_Msgs::add('Attachment chunks cleaned');
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/output
+ */
+class Hm_Output_attachment_setting extends Hm_Output_Module {
+    protected function output() {
+        $size_in_kbs = 0;
+        $num_chunks = 0;
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
+        $files = array(); 
+        
+        foreach ($rii as $file) {
+            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
+                continue;
+            }
+            if ($file->isDir()){ 
+                continue;
+            }
+            if (strstr($file->getPathname(), 'part')) {
+                $num_chunks++;
+                $size_in_kbs += filesize($file->getPathname());
+                $files[] = $file->getPathname(); 
+            }
+        }
+        if ($size_in_kbs > 0) {
+            $size_in_kbs = round(($size_in_kbs / 1024), 2);
+        }
+        return '<tr class="general_setting"><td><label>'.
+            $this->trans('Attachment Chunks').'</label></td>'.
+            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" >Clear Chunks</button></td></tr>';
     }
 }
 
@@ -1213,18 +1284,14 @@ function save_uploaded_file($id, $atts, $session) {
  */
 if (!hm_exists('format_attachment_row')) {
 function format_attachment_row($file, $output_mod) {
-    return '<tr><td>'.
-        '<img src="'.Hm_Image_Sources::$paperclip.'" alt="" width="16" height="16" />'.
-        '</td><td>'.$output_mod->html_safe($file['name']).
-        '</td><td>'.$output_mod->html_safe($file['type']).'</td><td>'.
-        $output_mod->html_safe(round($file['size']/1024, 2)).'KB</td>'.
-        '<td>'.
-        '<a title="'.$output_mod->trans('Delete').'" href="#" data-id="'.$output_mod->html_safe($file['basename']).
-        '" class="remove_attachment"><img src="'.Hm_Image_Sources::$circle_x.'" alt="X" width="16" height="16" />'.
-        '</a>'.
-        '</td>'.
-        '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
-        '</tr>';
+    $unique_identifier = str_replace(' ', '_', $output_mod->html_safe($file['name']));
+    return '<tr id="tr-'.$unique_identifier.'"><td>'.
+            $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
+            '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
+            '</td><td><a class="remove_attachment" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
+            '<div class="meter" style="width:100%"><span id="progress-'.
+            $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
+            $unique_identifier.'"></span></span></div></td></tr>';
 }}
 
 /**
@@ -1233,7 +1300,7 @@ function format_attachment_row($file, $output_mod) {
 if (!hm_exists('get_primary_recipient')) {
 function get_primary_recipient($profiles, $headers, $smtp_servers) {
     $addresses = array();
-    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc', 'reply-to');
+    $flds = array('from', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc', 'reply-to');
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
@@ -1259,7 +1326,6 @@ function get_primary_recipient($profiles, $headers, $smtp_servers) {
             }
         }
     }
-
     return false;
 }}
 
@@ -1406,10 +1472,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     }
 
     if (!$imap_profile) {
-        if (strstr($atts['draft_smtp'], '.')) {
-            $draft_split = explode('.', $atts['draft_smtp']);
-            $atts['draft_smtp'] = reset($draft_split);
-        }
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
