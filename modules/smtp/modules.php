@@ -178,10 +178,15 @@ class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
  */
 class Hm_Handler_upload_chunk extends Hm_Handler_Module {
     public function process() {
-        $imap_profile = find_imap_by_smtp(
-            $this->user_config->get('imap_servers'),
-            $this->user_config->get('smtp_servers')[$this->request->get['draft_smtp']]
-        );
+        $profiles = $this->get('compose_profiles', array());
+        
+        $profile = profile_from_compose_smtp_id($profiles, $this->request->get['draft_smtp']);
+        if (!$profile) {
+            $imap_profile = find_imap_by_smtp(
+                $this->user_config->get('imap_servers'),
+                $this->user_config->get('smtp_servers')[$this->request->get['draft_smtp']]
+            );
+        }
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
         
@@ -854,7 +859,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         if(!empty($imap_draft)) {
             $recip = get_primary_recipient($this->get('compose_profiles', array()), $imap_draft,
-                $this->get('smtp_servers', array()));
+                $this->get('smtp_servers', array(), True));
         }
 
         if (!empty($draft)) {
@@ -1305,9 +1310,12 @@ function format_attachment_row($file, $output_mod) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('get_primary_recipient')) {
-function get_primary_recipient($profiles, $headers, $smtp_servers) {
+function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=False) {
     $addresses = array();
-    $flds = array('from', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    if ($is_draft) {
+        $flds = array('from','delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    }
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {

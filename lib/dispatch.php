@@ -337,9 +337,9 @@ class Hm_Dispatch {
         if ($request->type == 'AJAX' && $this->validate_ajax_request($request, $filters)) {
             if (array_key_exists('hm_ajax_hook', $request->get)) {
                 $this->page = $request->get['hm_ajax_hook'];
-                return;
+            } else {
+                $this->page = $request->post['hm_ajax_hook'];
             }
-            $this->page = $request->post['hm_ajax_hook'];
         }
         elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {
             $this->page = $request->get['page'];

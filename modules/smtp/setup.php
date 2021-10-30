@@ -70,8 +70,8 @@ add_handler('ajax_get_test_chunk', 'load_user_data',  true, 'core');
 add_handler('ajax_get_test_chunk', 'get_test_chunk',  true);
 
 /* resumable upload chunk */
-add_handler('ajax_upload_chunk', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_upload_chunk', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_upload_chunk', 'load_imap_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('ajax_upload_chunk', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('ajax_upload_chunk', 'login', false, 'core');
 add_handler('ajax_upload_chunk', 'load_user_data',  true, 'core');
 add_handler('ajax_upload_chunk', 'upload_chunk',  true);

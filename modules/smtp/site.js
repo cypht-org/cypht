@@ -205,8 +205,8 @@ var replace_cursor_positon = function (txtElement) {
 
 var init_resumable_upload = function () {
     var r = new Resumable({
-        target:'?page=compose&hm_ajax_hook=ajax_upload_chunk',
-        testTarget:'?page=compose&hm_ajax_hook=ajax_get_test_chunk',
+        target:'?page=compose&hm_ajax_hook=ajax_upload_chunk&draft_smtp=' + $(".compose_server").val(),
+        testTarget:'?page=compose&hm_ajax_hook=ajax_get_test_chunk&draft_smtp=' + $(".compose_server").val(),
         testMethod: 'POST',
         headers: {
             'X-Requested-with': 'xmlhttprequest'
