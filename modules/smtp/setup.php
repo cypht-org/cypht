@@ -74,6 +74,7 @@ add_handler('ajax_upload_chunk', 'load_imap_servers_from_config', true, 'smtp', 
 add_handler('ajax_upload_chunk', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('ajax_upload_chunk', 'login', false, 'core');
 add_handler('ajax_upload_chunk', 'load_user_data',  true, 'core');
+add_handler('ajax_upload_chunk', 'compose_profile_data',  true, 'profiles');
 add_handler('ajax_upload_chunk', 'upload_chunk',  true);
 
 setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
@@ -124,6 +125,7 @@ return array(
         'resumableIdentifier' => FILTER_SANITIZE_STRING,
         'resumableFilename' => FILTER_SANITIZE_STRING,
         'resumableRelativePath' => FILTER_SANITIZE_STRING,
+        'draft_smtp' => FILTER_SANITIZE_STRING
     ),
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),

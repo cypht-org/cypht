@@ -178,15 +178,6 @@ class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
  */
 class Hm_Handler_upload_chunk extends Hm_Handler_Module {
     public function process() {
-        $profiles = $this->get('compose_profiles', array());
-        
-        $profile = profile_from_compose_smtp_id($profiles, $this->request->get['draft_smtp']);
-        if (!$profile) {
-            $imap_profile = find_imap_by_smtp(
-                $this->user_config->get('imap_servers'),
-                $this->user_config->get('smtp_servers')[$this->request->get['draft_smtp']]
-            );
-        }
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
         
