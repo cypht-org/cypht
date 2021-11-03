@@ -104,6 +104,22 @@ class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process "unread_on_open" setting for the message view page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_unread_on_open extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function unread_on_open_callback($val) {
+            return $val;
+        }
+        process_site_setting('unread_on_open', $this, 'unread_on_open_callback', false, true);
+    }
+}
+
+/**
  * Process "simple message parts" setting for the message view page in the settings page
  * @subpackage imap/handler
  */
@@ -617,7 +633,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_path', $path);
             }
             else {
-                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, get_failed_email($imap->show_debug())));
+                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
             }
         }
     }
@@ -1595,7 +1611,12 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
-                $imap->read_only = $prefetch;
+                if ($this->user_config->get('unread_on_open_setting', false)) {
+                    $imap->read_only = true;
+                }
+                else {
+                    $imap->read_only = $prefetch;
+                }
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
                     $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                     $msg_struct = $imap->get_message_structure($form['imap_msg_uid']);
