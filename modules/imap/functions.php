@@ -968,6 +968,23 @@ function imap_authed($imap) {
 
 /**
  * @subpackage imap/functions
+ * @param $debug_msg
+ * @return string
+ */
+if (!hm_exists('get_failed_email')) {
+function get_failed_email($debug_msg) {
+    $email = '';
+    preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $debug_msg, $matches);
+    if(count($matches[0]) < 1){
+        $email = '';
+    }else{
+        $email = $matches[0][0];
+    }
+    return $email;
+}}
+
+/**
+ * @subpackage imap/functions
  */
 if (!hm_exists('process_sort_arg')) {
 function process_sort_arg($sort, $default = 'arrival') {
