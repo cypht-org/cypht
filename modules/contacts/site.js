@@ -1,5 +1,10 @@
 'use strict';
 
+function contact_phone_verify(){
+    var contact_phone=document.getElementById("contact_phone");
+    contact_phone.value=contact_phone.value.replace(/\D/g,'');
+}
+
 var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;

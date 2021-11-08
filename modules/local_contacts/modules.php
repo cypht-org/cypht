@@ -168,7 +168,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             '<input required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" '.
             'value="'.$this->html_safe($name).'" /> *<br />'.
             '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
-            '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
+            '<input onkeyup="contact_phone_verify()" onchange="contact_phone_verify()" placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="tel" name="contact_phone" '.
             'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.
             $this->trans('Cancel').'" /></div></form></div>';
     }
