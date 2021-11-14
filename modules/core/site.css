@@ -7,7 +7,7 @@ html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
 table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
-.adv_controls .combined_sort, .message_list .combined_sort { font-size: 80%; margin-top: -2px; ; float: right; margin-right: 120px; }
+.adv_controls .combined_sort, .message_list .combined_sort { font-size: 80%; margin-top: -2px; ; float: right; margin-right: 225px; }
 .adv_controls .combined_sort { margin-right: 20px; }
 .search_content .combined_sort { display: none; }
 .offline { display: none; cursor: pointer; position: absolute; right: 0px; top: 0px; z-index: 101; color: white; background-color: red; padding: 18px; padding-right: 25px; padding-left: 25px; font-weight: bold; }
@@ -255,6 +255,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .account_icon { width: 20px; height: 20px; }
 .mobile .imap_filter { display: none; }
 .mobile .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
+.mobile .list_controls img { margin-top: 10px }
 .mobile .page_links { font-size: 150%; }
 .mobile .page_links a img { width: 24px; height: 24px; }
 .mobile .toggle_link { padding: 5px !important; line-height: normal !important; margin-left: 5px !important; }
@@ -266,4 +267,15 @@ div.unseen, .unseen .subject { font-weight: 700; }
 
 @media print {
     .sys_messages, .next, .prev, .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
+}
+
+#list_controls_menu {
+    position: absolute;
+    width: 50px; 
+    right: 10px;
+    display: none;
+    padding-left: 14px;
+    padding-bottom: 5px;
+    background: linear-gradient(180deg, #fff, #fff, #f7f2ef);
+    border-radius: 0 0 4px 4px;
 }

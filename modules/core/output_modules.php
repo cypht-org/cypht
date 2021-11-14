@@ -1661,7 +1661,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      * Title, list controls, and message controls
      */
     protected function output() {
-
+        $terms = $this->get('search_terms', '');
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');
             $source_link = '';
@@ -1680,12 +1680,17 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+            $search_field = '<form method="GET">
+            <input type="hidden" name="page" value="message_list" />
+            <input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
+            <input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
             $config_link = '';
             $source_link = '';
             $refresh_link = '';
+            $search_field = '';
         }
         $res = '';
         $res .= '<div class="message_list '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title">';
@@ -1695,7 +1700,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         if (!$this->get('is_mobile') && substr($this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
-        $res .= list_controls($refresh_link, $config_link, $source_link);
+        $res .= list_controls($refresh_link, $config_link, $source_link, $search_field);
 	    $res .= message_list_meta($this->module_output(), $this);
         $res .= list_sources($this->get('data_sources', array()), $this);
         $res .= '</div>';
