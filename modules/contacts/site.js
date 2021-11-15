@@ -1,5 +1,17 @@
 'use strict';
 
+var verification_number=false;
+function contact_phone_verify(){
+    if(!verification_number){
+        var contact_phone=document.getElementById("contact_phone");
+        const regex = new RegExp('^\\d+$');
+        if(!regex.test(contact_phone.value)){
+            alert("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!");
+            verification_number=true;
+        }
+    }
+}
+
 var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;
