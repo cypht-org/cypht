@@ -1,5 +1,21 @@
 'use strict';
 
+var verification_number=false;
+function contact_phone_verify(){
+    if(!verification_number){
+        var contact_phone=document.getElementById("contact_phone");
+        const regex_number = new RegExp('^\\d+$');
+        const allowed_characters = ['+','-','(',')'];
+        for (let chain_counter = 0; chain_counter < contact_phone.value.length; chain_counter++) {
+            if(!(regex_number.test(contact_phone.value[chain_counter])) && !(allowed_characters.indexOf(contact_phone.value[chain_counter]) > -1)){
+                alert("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!");
+                verification_number=true;
+                break;
+            }
+        }
+    }
+}
+
 var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;
