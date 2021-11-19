@@ -440,6 +440,8 @@ function credentials_form($details, $mod) {
     $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
     $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
     $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
+    $res .= $details['id'] === 'gmail' ? ' ' .sprintf($mod->trans('Make sure your %s less secure app access %s '.'and your App password are enabled. For more details about the '.'configuration of IMAP, POP and SMTP click %s here %s'),
+    '<a href="https://myaccount.google.com/lesssecureapps" target="_blank">', '</a>', '<a href="https://developers.google.com/gmail/imap/imap-smtp" target="_blank">', '</a>') : '';
     $res .= '<br /><br /><label class="screen_reader" for="nux_email">';
     $res .= $mod->trans('E-mail Address').'</label><input type="email" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
     $res .= '<br /><label class="screen_reader" for="nux_password">'.$mod->trans('E-mail Password').'</label>';

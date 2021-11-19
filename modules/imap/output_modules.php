@@ -330,7 +330,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<form class="imap_connect" method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
+                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.is_gmail_server($this, $this->html_safe($vals['server']), 'imap.gmail.com', $disabled). 
                 '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').
                 '" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'"></span>'.
                 '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label>'.
