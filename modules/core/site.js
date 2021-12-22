@@ -1,5 +1,71 @@
 'use strict';
 
+document.addEventListener('keydown', checkKeyDown);
+document.addEventListener('keyup', checkKeyUp);
+var ctrlPressed = false;
+var shiftPressed = false;
+var last_select = false;
+var indice_last_select = false;
+
+/* deactivation of links to emails */
+function checkKeyDown (event) {
+    if(((event.code == "ControlLeft" || event.code == "ControlRight") || (event.code == "ShiftLeft" || event.code == "ShiftRight"))){
+        var elements=document.getElementsByClassName("subject");
+        if(elements){
+            for(let counter_element = 1; counter_element < elements.length; counter_element++){
+                elements[counter_element].getElementsByTagName("A")[0].setAttribute("style","pointer-events: none");
+            }
+        }
+        if(event.code == "ControlLeft" || event.code == "ControlRight"){
+            ctrlPressed = true;
+        }else if(event.code == "ShiftLeft" || event.code == "ShiftRight"){
+            shiftPressed = true;
+        }
+    }
+
+}
+
+/* activation of links to emails */
+function checkKeyUp (event) {
+    if(((event.code == "ControlLeft" || event.code == "ControlRight") || (event.code == "ShiftLeft" || event.code == "ShiftRight"))){
+        var elements=document.getElementsByClassName("subject");
+        if(elements && ((ctrlPressed && !shiftPressed) || (!ctrlPressed && shiftPressed))){
+            for(let counter_element = 1; counter_element < elements.length; counter_element++){
+                elements[counter_element].getElementsByTagName("A")[0].setAttribute("style","pointer-events: auto");
+            }
+        }
+        if(event.code == "ControlLeft" || event.code == "ControlRight"){
+            ctrlPressed = false;
+        }else if(event.code == "ShiftLeft" || event.code == "ShiftRight"){
+            shiftPressed = false;
+        }
+    }
+}
+
+/* click on the whole entry */
+function set_row_mail_callback(elements) {
+    var element = elements.getElementsByClassName("checkbox_label")[0];
+    if(ctrlPressed){
+        element.click();
+    }
+    else if(shiftPressed){
+        if(last_select){
+            var checkbox_cell = document.getElementsByClassName('checkbox_cell');
+            var nodes_cells = Array.prototype.slice.call(checkbox_cell);
+            var indice_last_select = nodes_cells.indexOf(last_select.parentNode);
+            var indice_current_select = nodes_cells.indexOf(element.parentNode);
+            var start = indice_current_select >= indice_last_select ? indice_last_select : indice_current_select;
+            var end = indice_current_select < indice_last_select ? indice_last_select : indice_current_select;
+            for(let counter_element = start; counter_element <= end; counter_element++){
+                checkbox_cell[counter_element].firstChild.checked=true;
+            }
+        }else if(element.parentNode.firstChild.checked == false){
+            element.click();
+        }
+    }
+    last_select = element;
+}
+
 /* extend cash.js with some useful bits */
 $.inArray = function(item, list) {
     for (var i in list) {

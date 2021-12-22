@@ -178,7 +178,7 @@ function human_readable_interval($date_str) {
  */
 if (!hm_exists('message_list_row')) {
 function message_list_row($values, $id, $style, $output_mod, $row_class='') {
-    $res = '<tr class="'.$output_mod->html_safe($id);
+    $res = '<tr onclick="set_row_mail_callback(this)" class="'.$output_mod->html_safe($id);
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
     }
