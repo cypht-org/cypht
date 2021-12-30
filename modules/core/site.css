@@ -144,6 +144,7 @@ textarea, select, input { border: solid 1px #ddd; background-color: #fff; color:
 .email_setting, .all_setting, .unread_setting, .flagged_setting, .general_setting { display: none; }
 .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; }
 .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
+.mail_entry { cursor: move; }
 .configured_server { float: left; margin-left: 25px; width: 230px; }
 .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
 .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }

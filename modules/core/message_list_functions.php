@@ -182,6 +182,7 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
     }
+    $res .= " mail_entry";
     $res .= '">';
     if ($style == 'news') {
         $res .= '<td class="news_cell checkbox_cell">';

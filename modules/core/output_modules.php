@@ -501,6 +501,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
             if ($core) {
                 $res = '<script type="text/javascript" src="'.sprintf("%ssite.js", $core).'"></script>'.$res;
+                $res = '<script type="text/javascript" src="'.sprintf("%sSortable.js", $core).'"></script>'.$res;
             }
             return $js_lib.$res;
         }
@@ -1607,7 +1608,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $res .= '<thead><tr>'.implode('', $header_flds).'</tr></thead>';
             }
         }
-        $res .= '<tbody class="message_table_body">';
+        $res .= '<tbody class="message_table_body" id="sortablelist">';
         return $res;
     }
 }
