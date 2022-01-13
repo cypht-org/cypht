@@ -702,7 +702,9 @@ class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
                 continue;
             }
             if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
-                rrmdir($file->getPath());
+                if (strstr($file->getPathname(), 'part')) {
+                    rrmdir($file->getPath());
+                }
             }
         }
         Hm_Msgs::add('Attachment chunks cleaned');
