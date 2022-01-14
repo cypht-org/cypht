@@ -180,7 +180,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
     public function process() {
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
-        
+
         // create the attachment folder for the profile to avoid
         if (!is_dir($filepath.'/'.$from)) {
             mkdir($filepath.'/'.$from, 0777, true);
@@ -554,7 +554,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* parse attachments */
         $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
         foreach($uploaded_files as $key => $file) {
-            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$smtp_id.'/'.$file;
         }
         $uploaded_files = get_uploaded_files_from_array(
             $uploaded_files
@@ -595,7 +595,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* add attachments */
         $mime->add_attachments($uploaded_files);
         $res = $mime->process_attachments();
-        
+
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
