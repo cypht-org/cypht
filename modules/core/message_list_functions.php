@@ -215,7 +215,7 @@ function safe_output_callback($vals, $style, $output_mod) {
         if ($vals[2]){
             $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
         }
-        if (array_key_exists('3', $vals) &&  isset($vals[3])){
+        if (count($vals) > 3) {
             $title = $output_mod->html_safe($vals[3]);
         } else {
             $title = $output_mod->html_safe($vals[1]);
