@@ -702,7 +702,7 @@ class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
                 continue;
             }
             if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
-                if (strstr($file->getPathname(), 'part')) {
+                if (strpos($file->getPath(), 'chunks-') !== False) {
                     rrmdir($file->getPath());
                 }
             }
@@ -728,7 +728,7 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
             if ($file->isDir()){ 
                 continue;
             }
-            if (strstr($file->getPathname(), 'part')) {
+            if (strpos($file->getPathname(), '.part') !== False) {
                 $num_chunks++;
                 $size_in_kbs += filesize($file->getPathname());
                 $files[] = $file->getPathname(); 
