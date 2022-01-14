@@ -1022,6 +1022,7 @@ function get_list_headers($headers) {
 if (!hm_exists('process_list_fld')) {
 function process_list_fld($fld) {
     $res = array('links' => array(), 'email' => array(), 'values' => array());
+    $fld = is_array($fld) ? implode(" ", $fld) : $fld;
     foreach (explode(',', $fld) as $val) {
         $val = trim(str_replace(array('<', '>'), '', $val));
         if (preg_match("/^http/", $val)) {
