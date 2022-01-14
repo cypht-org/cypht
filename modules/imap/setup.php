@@ -33,6 +33,7 @@ add_handler('settings', 'process_sent_source_max_setting', true, 'imap', 'date',
 add_handler('settings', 'process_text_only_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_msg_part_icons', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_simple_msg_parts', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
@@ -41,6 +42,7 @@ add_output('settings', 'sent_source_max_setting', true, 'imap', 'sent_since_sett
 add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 'after');
 add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'msg_list_icons_setting', 'after');
 add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_setting', 'after');
+add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_simple_msg_parts', 'after');
 
 /* compose page data */
@@ -325,6 +327,7 @@ return array(
         'text_only' => FILTER_VALIDATE_BOOLEAN,
         'msg_part_icons' => FILTER_VALIDATE_BOOLEAN,
         'simple_msg_parts' => FILTER_VALIDATE_BOOLEAN,
+        'unread_on_open' => FILTER_VALIDATE_BOOLEAN,
         'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_STRING,
         'imap_connect' => FILTER_SANITIZE_STRING,
