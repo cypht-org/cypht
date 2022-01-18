@@ -239,12 +239,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
             if (!isset($headers['Flags']) || !stristr($headers['Flags'], 'draft')) {
                 $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
-                if ($reply_all || $size > 1) {
-                    $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
-                }
-                else {
-                    $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
-                }
+                $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 $txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
             }
             if ($msg_part === '0') {
