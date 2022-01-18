@@ -36,7 +36,7 @@ td { vertical-align: top; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
 .message_table > thead > tr > th { display: none; }
-.message_table > tbody > tr > td { padding: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 3px; color: #333; border-bottom: solid 1px #ede8e6; }
+.message_table > tbody > tr > td { cursor: pointer; padding: 5px; padding-left: 10px; padding-top: 5px; padding-bottom: 3px; color: #333; border-bottom: solid 1px #ede8e6; }
 .message_table { table-layout: fixed; width: 100%; padding: 20px; padding-top: 15px; padding-bottom: 40px; padding-left: 20px; }
 .message_table > tbody > tr > th:hover { color: #000; }
 .logout_form { white-space: nowrap; padding: 0px; margin: 0px; }
