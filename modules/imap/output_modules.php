@@ -225,10 +225,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            $reply_all = false;
-            if (array_key_exists('cc', lc_headers($headers))) {
-                $reply_all = true;
-            }
             $addr = addr_split($headers['To']);
             $size = count($addr);
 
