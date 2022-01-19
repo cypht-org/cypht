@@ -1476,10 +1476,10 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('page_js', 'core');
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('foo', 'core'));
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
