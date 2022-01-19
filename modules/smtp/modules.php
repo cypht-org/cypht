@@ -181,9 +181,11 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
         $from = $this->request->get['draft_smtp'];
         $filepath = $this->config->get('attachment_dir');
 
+        $userpath = md5($this->session->get('username', false));
+
         // create the attachment folder for the profile to avoid
-        if (!is_dir($filepath.'/'.$from)) {
-            mkdir($filepath.'/'.$from, 0777, true);
+        if (!is_dir($filepath.'/'.$userpath)) {
+            mkdir($filepath.'/'.$userpath, 0777, true);
         }
 
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
@@ -193,7 +195,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
             }
     
             if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
-                $temp_dir = $filepath.'/'.$from.'/chunks-'.$this->request->get['resumableIdentifier'];
+                $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$this->request->get['resumableIdentifier'];
             }
             $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
         
@@ -522,6 +524,80 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     }
 }
 
+if (!hm_exists('get_mime_type')) {
+    function get_mime_type($filename)
+    {
+        $idx = explode('.', $filename);
+        $count_explode = count($idx);
+        $idx = strtolower($idx[$count_explode - 1]);
+
+        $mimet = array(
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'php' => 'text/html',
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'swf' => 'application/x-shockwave-flash',
+            'flv' => 'video/x-flv',
+
+            // images
+            'png' => 'image/png',
+            'jpe' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/vnd.microsoft.icon',
+            'tiff' => 'image/tiff',
+            'tif' => 'image/tiff',
+            'svg' => 'image/svg+xml',
+            'svgz' => 'image/svg+xml',
+
+            // archives
+            'zip' => 'application/zip',
+            'rar' => 'application/x-rar-compressed',
+            'exe' => 'application/x-msdownload',
+            'msi' => 'application/x-msdownload',
+            'cab' => 'application/vnd.ms-cab-compressed',
+
+            // audio/video
+            'mp3' => 'audio/mpeg',
+            'qt' => 'video/quicktime',
+            'mov' => 'video/quicktime',
+
+            // adobe
+            'pdf' => 'application/pdf',
+            'psd' => 'image/vnd.adobe.photoshop',
+            'ai' => 'application/postscript',
+            'eps' => 'application/postscript',
+            'ps' => 'application/postscript',
+
+            // ms office
+            'doc' => 'application/msword',
+            'rtf' => 'application/rtf',
+            'xls' => 'application/vnd.ms-excel',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'docx' => 'application/msword',
+            'xlsx' => 'application/vnd.ms-excel',
+            'pptx' => 'application/vnd.ms-powerpoint',
+
+
+            // open office
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        );
+
+        if (isset($mimet[$idx])) {
+            return $mimet[$idx];
+        } else {
+            return 'application/octet-stream';
+        }
+    }
+}
+
 /**
  * @subpackage smtp/handler
  */
@@ -554,8 +630,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* parse attachments */
         $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
         foreach($uploaded_files as $key => $file) {
-            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$smtp_id.'/'.$file;
+            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
         }
+
         $uploaded_files = get_uploaded_files_from_array(
             $uploaded_files
         );
@@ -1410,6 +1487,7 @@ if (!hm_exists('rrmdir')) {
 if (!hm_exists('createFileFromChunks')) {
     function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
         // count all the parts of this file
+        // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
         $total_files_on_server_size = 0;
         $temp_total = 0;
         foreach(scandir($temp_dir) as $file) {
@@ -1454,7 +1532,7 @@ function get_uploaded_files_from_array($uploaded_files) {
         $parsed_path = explode('/', $file);
         $parsed_files[] = [
             'filename' => $file,
-            'type' => '',
+            'type' => get_mime_type($file),
             'name' => end($parsed_path)
         ];
     }

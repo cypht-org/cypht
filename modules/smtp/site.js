@@ -253,6 +253,7 @@ var init_resumable_upload = function () {
         $('.resume_upload').css('display', 'none');
         $('#tr-'+file.uniqueIdentifier).append('<td style="display:none"><input name="uploaded_files[]" type="text" value="'+file.fileName+'" /></td>');
         $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'green');
+        $('#progress-' + file.uniqueIdentifier).parent().css('opacity', '0');
     });
     r.on('fileError', function(file, message) {
         $('#progress-bar-' + file.uniqueIdentifier).css('background-color', 'red');
