@@ -483,6 +483,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
         if (DEBUG_MODE) {
             $res = '';
             $js_lib = '<script type="text/javascript" src="third_party/cash.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
             }

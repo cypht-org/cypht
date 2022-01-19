@@ -140,89 +140,6 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
-class Hm_Handler_smtp_delete_attached_file extends Hm_Handler_Module {
-    public function process() {
-        if (array_key_exists('attachment_id', $this->request->post)) {
-            $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
-            $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
-            $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
-            $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
-            $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
-            $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
-    
-            $draft_id = $this->request->post['draft_id'];
-            $id = $this->request->post['attachment_id'];
-            $filename = false;
-            $remaining_files = array();
-            $res = delete_uploaded_files($this->session, false, $id);
-
-            $atts = array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-            'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-            'draft_in_reply_to' => '');
-
-            if ($res) {
-                Hm_Msgs::add('Attachment deleted');
-            }
-            else {
-                Hm_Msgs::add('ERRAn error occurred trying to delete the attachment');
-            }
-        }
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
-class Hm_Handler_smtp_attach_file extends Hm_Handler_Module {
-    public function process() {
-        $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
-        $body = array_key_exists('draft_body', $this->request->post) ? $this->request->post['draft_body'] : '';
-        $subject = array_key_exists('draft_subject', $this->request->post) ? $this->request->post['draft_subject'] : '';
-        $smtp = array_key_exists('draft_smtp', $this->request->post) ? $this->request->post['draft_smtp'] : '';
-        $cc = array_key_exists('draft_cc', $this->request->post) ? $this->request->post['draft_cc'] : '';
-        $bcc = array_key_exists('draft_bcc', $this->request->post) ? $this->request->post['draft_bcc'] : '';
-
-        if (!array_key_exists('upload_file', $this->request->files)) {
-            return;
-        }
-        if (!array_key_exists('draft_id', $this->request->post)) {
-            return;
-        }
-        $file = $this->request->files['upload_file'];
-        $draft_id = $this->request->post['draft_id'];
-        $filepath = $this->config->get('attachment_dir');
-
-        if (!$filepath) {
-            Hm_Msgs::add('ERRNo directory configured for uploaded files.');
-            return;
-        }
-        if (!is_readable($file['tmp_name'])) {
-            if($file['error'] == 1) {
-                $upload_max_filesize = ini_get('upload_max_filesize');
-                Hm_Msgs::add('ERRYour upload failed because you reached the limit of ' . $upload_max_filesize . '.');
-                return;
-            }
-            Hm_Msgs::add('ERRAn error occurred saving the uploaded file.');
-            return;
-        }
-
-        $content = file_get_contents($file['tmp_name']);
-        if (!$content) {
-            Hm_Msgs::add('ERRAn error occurred reading the uploaded file.');
-            return;
-        }
-        if (!attach_file($content, $file, $filepath, $draft_id, $this, $this->module_is_supported('imap'), array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-        'draft_in_reply_to' => ''))) {
-            Hm_Msgs::add('ERRAn error occurred attaching the uploaded file.');
-            return;
-        }
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
 class Hm_Handler_process_delete_draft extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('draft_id'));
@@ -243,6 +160,67 @@ class Hm_Handler_process_delete_draft extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
+    public function process() {
+        $filepath = $this->config->get('attachment_dir');
+        $filepath = $filepath.'/chunks-'.$this->request->get['resumableIdentifier'];
+        $chunk_file = $filepath.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
+        if (file_exists($chunk_file)) {
+            header("HTTP/1.0 200 Ok");
+        } else {
+            header("HTTP/1.0 404 Not Found");
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_upload_chunk extends Hm_Handler_Module {
+    public function process() {
+        $from = $this->request->get['draft_smtp'];
+        $filepath = $this->config->get('attachment_dir');
+
+        $userpath = md5($this->session->get('username', false));
+
+        // create the attachment folder for the profile to avoid
+        if (!is_dir($filepath.'/'.$userpath)) {
+            mkdir($filepath.'/'.$userpath, 0777, true);
+        }
+
+        if (!empty($this->request->files)) foreach ($this->request->files as $file) {
+            if ($file['error'] != 0) {
+                Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
+                continue;
+            }
+    
+            if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
+                $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$this->request->get['resumableIdentifier'];
+            }
+            $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
+        
+            // create the temporary directory
+            if (!is_dir($temp_dir)) {
+                mkdir($temp_dir, 0777, true);
+            }
+        
+            // move the temporary file
+            if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
+                Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename']);
+            } else {
+                // check if all the parts present, and create the final destination file
+                $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
+                                $this->request->get['resumableChunkSize'], 
+                                $this->request->get['resumableTotalSize'],
+                                $this->request->get['resumableTotalChunks']);    
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
     public function process() {
         $to = array_key_exists('draft_to', $this->request->post) ? $this->request->post['draft_to'] : '';
@@ -254,6 +232,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $inreplyto = array_key_exists('draft_in_reply_to', $this->request->post) ? $this->request->post['draft_in_reply_to'] : '';
         $draft_id = array_key_exists('draft_id', $this->request->post) ? $this->request->post['draft_id'] : false;
         $draft_notice = array_key_exists('draft_notice', $this->request->post) ? $this->request->post['draft_notice'] : false;
+        $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
@@ -262,10 +241,14 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         }
         
         if ($this->module_is_supported('imap')) {
+            $uploaded_files = explode(',', $uploaded_files);
+            foreach($uploaded_files as $key => $file) {
+                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+            }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
                     'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
-                    $this, $this->cache);
+                    $this, $this->cache, $uploaded_files);
             if ($new_draft_id >= 0) {
                 if ($draft_notice) {
                     Hm_Msgs::add('Draft saved');
@@ -541,6 +524,80 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     }
 }
 
+if (!hm_exists('get_mime_type')) {
+    function get_mime_type($filename)
+    {
+        $idx = explode('.', $filename);
+        $count_explode = count($idx);
+        $idx = strtolower($idx[$count_explode - 1]);
+
+        $mimet = array(
+            'txt' => 'text/plain',
+            'htm' => 'text/html',
+            'html' => 'text/html',
+            'php' => 'text/html',
+            'css' => 'text/css',
+            'js' => 'application/javascript',
+            'json' => 'application/json',
+            'xml' => 'application/xml',
+            'swf' => 'application/x-shockwave-flash',
+            'flv' => 'video/x-flv',
+
+            // images
+            'png' => 'image/png',
+            'jpe' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'jpg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'bmp' => 'image/bmp',
+            'ico' => 'image/vnd.microsoft.icon',
+            'tiff' => 'image/tiff',
+            'tif' => 'image/tiff',
+            'svg' => 'image/svg+xml',
+            'svgz' => 'image/svg+xml',
+
+            // archives
+            'zip' => 'application/zip',
+            'rar' => 'application/x-rar-compressed',
+            'exe' => 'application/x-msdownload',
+            'msi' => 'application/x-msdownload',
+            'cab' => 'application/vnd.ms-cab-compressed',
+
+            // audio/video
+            'mp3' => 'audio/mpeg',
+            'qt' => 'video/quicktime',
+            'mov' => 'video/quicktime',
+
+            // adobe
+            'pdf' => 'application/pdf',
+            'psd' => 'image/vnd.adobe.photoshop',
+            'ai' => 'application/postscript',
+            'eps' => 'application/postscript',
+            'ps' => 'application/postscript',
+
+            // ms office
+            'doc' => 'application/msword',
+            'rtf' => 'application/rtf',
+            'xls' => 'application/vnd.ms-excel',
+            'ppt' => 'application/vnd.ms-powerpoint',
+            'docx' => 'application/msword',
+            'xlsx' => 'application/vnd.ms-excel',
+            'pptx' => 'application/vnd.ms-powerpoint',
+
+
+            // open office
+            'odt' => 'application/vnd.oasis.opendocument.text',
+            'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+        );
+
+        if (isset($mimet[$idx])) {
+            return $mimet[$idx];
+        } else {
+            return 'application/octet-stream';
+        }
+    }
+}
+
 /**
  * @subpackage smtp/handler
  */
@@ -568,6 +625,16 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_body' => '',
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
+        );
+        
+        /* parse attachments */
+        $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
+        foreach($uploaded_files as $key => $file) {
+            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+        }
+
+        $uploaded_files = get_uploaded_files_from_array(
+            $uploaded_files
         );
 
         /* msg details */
@@ -603,10 +670,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to);
 
         /* add attachments */
-        $mime->add_attachments(get_uploaded_files($form['draft_id'], $this->session));
-        if ($form['draft_id'] > 0) {
-            $mime->add_attachments(get_uploaded_files(0, $this->session));
-        }
+        $mime->add_attachments($uploaded_files);
+        $res = $mime->process_attachments();
 
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
@@ -690,6 +755,68 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', 0));
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_attachment_dir extends Hm_Handler_Module {
+    public function process() {
+        $this->out('attachment_dir', $this->config->get('attachment_dir'));
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
+    public function process() {
+        $attachment_dir = $this->config->get('attachment_dir');
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($attachment_dir));
+        foreach ($rii as $file) {
+            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
+                continue;
+            }
+            if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
+                if (strpos($file->getPath(), 'chunks-') !== False) {
+                    rrmdir($file->getPath());
+                }
+            }
+        }
+        Hm_Msgs::add('Attachment chunks cleaned');
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/output
+ */
+class Hm_Output_attachment_setting extends Hm_Output_Module {
+    protected function output() {
+        $size_in_kbs = 0;
+        $num_chunks = 0;
+        $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
+        $files = array(); 
+        
+        foreach ($rii as $file) {
+            if ($file->getFilename() == '.' || $file->getFilename() == '..') {
+                continue;
+            }
+            if ($file->isDir()){ 
+                continue;
+            }
+            if (strpos($file->getPathname(), '.part') !== False) {
+                $num_chunks++;
+                $size_in_kbs += filesize($file->getPathname());
+                $files[] = $file->getPathname(); 
+            }
+        }
+        if ($size_in_kbs > 0) {
+            $size_in_kbs = round(($size_in_kbs / 1024), 2);
+        }
+        return '<tr class="general_setting"><td><label>'.
+            $this->trans('Attachment Chunks').'</label></td>'.
+            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" >Clear Chunks</button></td></tr>';
     }
 }
 
@@ -802,7 +929,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         if(!empty($imap_draft)) {
             $recip = get_primary_recipient($this->get('compose_profiles', array()), $imap_draft,
-                $this->get('smtp_servers', array()));
+                $this->get('smtp_servers', array(), True));
         }
 
         if (!empty($draft)) {
@@ -902,7 +1029,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }    
 
-        $res .= '<input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
+        $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" /><input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
             '" name="compose_attach_button" type="button" />';
@@ -1239,26 +1366,26 @@ function save_uploaded_file($id, $atts, $session) {
  */
 if (!hm_exists('format_attachment_row')) {
 function format_attachment_row($file, $output_mod) {
-    return '<tr><td>'.
-        '<img src="'.Hm_Image_Sources::$paperclip.'" alt="" width="16" height="16" />'.
-        '</td><td>'.$output_mod->html_safe($file['name']).
-        '</td><td>'.$output_mod->html_safe($file['type']).'</td><td>'.
-        $output_mod->html_safe(round($file['size']/1024, 2)).'KB</td>'.
-        '<td>'.
-        '<a title="'.$output_mod->trans('Delete').'" href="#" data-id="'.$output_mod->html_safe($file['basename']).
-        '" class="delete_attachment"><img src="'.Hm_Image_Sources::$circle_x.'" alt="X" width="16" height="16" />'.
-        '</a>'.
-        '</td>'.
-        '</tr>';
+    $unique_identifier = str_replace(' ', '_', $output_mod->html_safe($file['name']));
+    return '<tr id="tr-'.$unique_identifier.'"><td>'.
+            $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
+            '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
+            '</td><td><a class="remove_attachment" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
+            '<div class="meter" style="width:100%"><span id="progress-'.
+            $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
+            $unique_identifier.'"></span></span></div></td></tr>';
 }}
 
 /**
  * @subpackage smtp/functions
  */
 if (!hm_exists('get_primary_recipient')) {
-function get_primary_recipient($profiles, $headers, $smtp_servers) {
+function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=False) {
     $addresses = array();
-    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'to', 'cc', 'reply-to');
+    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    if ($is_draft) {
+        $flds = array('from','delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    }
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
@@ -1284,7 +1411,6 @@ function get_primary_recipient($profiles, $headers, $smtp_servers) {
             }
         }
     }
-
     return false;
 }}
 
@@ -1323,17 +1449,109 @@ function find_imap_by_smtp($imap_profiles, $smtp_profile) {
     }
 }}
 
+
+/**
+ * Delete a directory RECURSIVELY
+ * @param string $dir - directory path
+ * @link http://php.net/manual/en/function.rmdir.php
+ */
+if (!hm_exists('rrmdir')) {
+    function rrmdir($dir) {
+        if (is_dir($dir)) {
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    if (filetype($dir . "/" . $object) == "dir") {
+                        rrmdir($dir . "/" . $object); 
+                    } else {
+                        unlink($dir . "/" . $object);
+                    }
+                }
+            }
+            reset($objects);
+            rmdir($dir);
+        }
+    }
+}
+
+/**
+ *
+ * Check if all the parts exist, and 
+ * gather all the parts of the file together
+ * @param string $temp_dir - the temporary directory holding all the parts of the file
+ * @param string $fileName - the original file name
+ * @param string $chunkSize - each chunk size (in bytes)
+ * @param string $totalSize - original file size (in bytes)
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('createFileFromChunks')) {
+    function createFileFromChunks($temp_dir, $fileName, $chunkSize, $totalSize,$total_files) {
+        // count all the parts of this file
+        // $fileName = Hm_Crypt::ciphertext($fileName, Hm_Request_Key::generate());
+        $total_files_on_server_size = 0;
+        $temp_total = 0;
+        foreach(scandir($temp_dir) as $file) {
+            $temp_total = $total_files_on_server_size;
+            $tempfilesize = filesize($temp_dir.'/'.$file);
+            $total_files_on_server_size = $temp_total + $tempfilesize;
+        }
+        // check that all the parts are present
+        // If the Size of all the chunks on the server is equal to the size of the file uploaded.
+        if ($total_files_on_server_size >= $totalSize) {
+        // create the final destination file 
+            if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
+                for ($i=1; $i<=$total_files; $i++) {
+                    fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
+                }
+                fclose($fp);
+                $hashed_content = Hm_Crypt::ciphertext(file_get_contents($temp_dir.'/../'.$fileName), Hm_Request_Key::generate());
+                file_put_contents($temp_dir.'/../'.$fileName, $hashed_content);
+            } else {
+                return false;
+            }
+
+            // rename the temporary directory (to avoid access from other 
+            // concurrent chunks uploads) and than delete it
+            if (rename($temp_dir, $temp_dir.'_UNUSED')) {
+                rrmdir($temp_dir.'_UNUSED');
+            } else {
+                rrmdir($temp_dir);
+            }
+        }
+        return true;
+    }
+}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('get_uploaded_files_from_array')) {
+function get_uploaded_files_from_array($uploaded_files) {
+    $parsed_files = [];
+    foreach($uploaded_files as $file) {
+        $parsed_path = explode('/', $file);
+        $parsed_files[] = [
+            'filename' => $file,
+            'type' => get_mime_type($file),
+            'name' => end($parsed_path)
+        ];
+    }
+    return $parsed_files;
+}
+}
+
 /**
  * @subpackage smtp/functions
  */
 if (!hm_exists('save_imap_draft')) {
-function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
+function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files) {
     $imap_profile = false;
     $from = false;
     $name = '';
     $profiles = $mod->get('compose_profiles', array());
     $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
-    $uploaded_files = get_uploaded_files($id, $session);
+    $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
         $from = $profile['replyto'];
         $name = $profile['name'];
@@ -1341,10 +1559,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     }
 
     if (!$imap_profile) {
-        if (strstr($atts['draft_smtp'], '.')) {
-            $draft_split = explode('.', $atts['draft_smtp']);
-            $atts['draft_smtp'] = reset($draft_split);
-        }
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
@@ -1382,7 +1596,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache) {
     
     $mime->add_attachments($uploaded_files);
     $res = $mime->process_attachments();
-
+    
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
@@ -1420,33 +1634,6 @@ function get_draft($id, $session) {
     $drafts = $session->get('compose_drafts', array());
     if (array_key_exists($id, $drafts)) {
         return $drafts[$id];
-    }
-    return false;
-}}
-
-/**
- * @subpackage smtp/functions
- */
-if (!hm_exists('attach_file')) {
-function attach_file($content, $file, $filepath, $draft_id, $mod, $imap_draft=false, $atts=array()) {    
-    $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
-    $filename = hash('sha512', $content);
-    $filepath = rtrim($filepath, '/');
-    if (@file_put_contents($filepath.'/'.$filename, $content)) {
-        $file['filename'] = $filepath.'/'.$filename;
-        $file['basename'] = $filename;
-        save_uploaded_file($draft_id, $file, $mod->session);
-        if (!get_draft($draft_id, $mod->session)) {
-            if ($imap_draft) {
-                $new_draft_id = save_imap_draft($atts, $draft_id, $mod->session, $mod, $mod->cache);
-                save_uploaded_file($new_draft_id, $file, $mod->session);
-                if ($new_draft_id >= 0) {
-                    $mod->out('draft_id', $new_draft_id);
-                }
-            }
-        }
-        $mod->out('upload_file_details', $file);
-        return true;
     }
     return false;
 }}
