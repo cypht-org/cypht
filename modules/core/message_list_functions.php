@@ -210,13 +210,21 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
 if (!hm_exists('safe_output_callback')) {
 function safe_output_callback($vals, $style, $output_mod) {
     $img = '';
-    if (count($vals) == 3 && $vals[2]) {
-        $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+    $title = '';
+    if (count($vals) > 2) {
+        if ($vals[2]){
+            $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+        }
+        if (count($vals) > 3) {
+            $title = $output_mod->html_safe($vals[3]);
+        } else {
+            $title = $output_mod->html_safe($vals[1]);
+        }
     }
     if ($style == 'news') {
-        return sprintf('<div class="%s" title="%s">%s%s</div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="%s" data-title="%s">%s%s</div>', $output_mod->html_safe($vals[0]), $title, $img, $output_mod->html_safe($vals[1]));
     }
-    return sprintf('<td class="%s" title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]), $img, $output_mod->html_safe($vals[1]));
+    return sprintf('<td class="%s" data-title="%s">%s%s</td>', $output_mod->html_safe($vals[0]), $title, $img, $output_mod->html_safe($vals[1]));
 }}
 
 /**

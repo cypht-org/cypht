@@ -31,7 +31,8 @@
         "ext-json": "*",
         "ext-curl": "*",
         "ext-openssl": "*",
-        "ext-session": "*"
+        "ext-session": "*",
+        "ext-fileinfo": "*"
     },
     "suggest": {
         "ext-PDO": "To use database features, this needs to be installed",

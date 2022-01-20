@@ -22,7 +22,20 @@ class Hm_Profiles {
     public function load($hmod) {
         $this->load_new($hmod);
         if (count($this->data) == 0) {
-            $this->load_legacy($hmod);
+            if (PHP_VERSION_ID < 70000) {
+                try {
+                    $this->load_legacy($hmod);
+                } catch (Exception $e) {
+                    $this->data = array();
+                }
+            }
+            if (PHP_VERSION_ID >= 70000) {
+                try {
+                    $this->load_legacy($hmod);
+                } catch (Throwable $e) {
+                    $this->data = array();
+                }
+            }
         }
         if (count($this->data) == 0) {
             $this->create_default($hmod);
