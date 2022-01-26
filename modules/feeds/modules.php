@@ -320,6 +320,10 @@ class Hm_Handler_feed_item_content extends Hm_Handler_Module {
                         $content = $item['description'];
                         unset($item['description']);
                     }
+                    elseif (isset($item['content'])) {
+                        $content = $item['content'];
+                        unset($item['content']);
+                    }
                     elseif (isset($item['summary'])) {
                         $content = $item['summary'];
                         unset($item['summary']);

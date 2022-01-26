@@ -269,7 +269,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('icon_callback', $flags),
                     array('subject_callback', $subject, $url, $flags, $icon),
                     array('safe_output_callback', 'source', $source),
-                    array('safe_output_callback', 'from'.$nofrom, $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('date_callback', $date, $timestamp),
                 ),
                 $id,
@@ -282,7 +282,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $source, $icon),
-                    array('safe_output_callback', 'from'.$nofrom, $from),
+                    array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags),
                     array('date_callback', $date, $timestamp),
                     array('icon_callback', $flags)
@@ -1022,6 +1022,7 @@ function get_list_headers($headers) {
 if (!hm_exists('process_list_fld')) {
 function process_list_fld($fld) {
     $res = array('links' => array(), 'email' => array(), 'values' => array());
+    $fld = is_array($fld) ? implode(" ", $fld) : $fld;
     foreach (explode(',', $fld) as $val) {
         $val = trim(str_replace(array('<', '>'), '', $val));
         if (preg_match("/^http/", $val)) {

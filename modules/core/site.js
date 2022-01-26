@@ -285,7 +285,7 @@ var Hm_Ajax_Request = function() { return {
                 batch_count = --Hm_Ajax.batch_callbacks[this.batch_callback.toString()];
             }
         }
-        Hm_Message_List.set_checkbox_callback();
+        Hm_Message_List.set_row_events();
         if (batch_count === 0) {
             Hm_Ajax.batch_callbacks[this.batch_callback.toString()] = 0;
             Hm_Ajax.aborted = false;
@@ -598,7 +598,7 @@ function Message_List() {
 
     this.reset_checkboxes = function() {
         this.toggle_msg_controls();
-        this.set_checkbox_callback();
+        this.set_row_events();
     };
 
     this.toggle_msg_controls = function() {
@@ -747,7 +747,7 @@ function Message_List() {
             if (cache_name == 'formatted_unread_data') {
                 self.clear_read_messages();
             }
-            self.set_checkbox_callback();
+            self.set_row_events();
             $('.combined_sort').show();
         }
         if (hm_page_name() == 'search' && hm_run_search() == "0") {
@@ -959,7 +959,7 @@ function Message_List() {
         Hm_Utils.save_to_local_storage(list_type, data.html());
         var empty = self.check_empty_list();
         if (!empty) {
-            self.set_checkbox_callback();
+            self.set_row_events();
         }
         $('.total').text(Hm_Utils.rows().length);
         self.update_title();
@@ -976,12 +976,12 @@ function Message_List() {
                 return false;
             }
             if (!start && ($(this).prop('id') == a || $(this).prop('id') == b)) {
-                this.checked = true;
+                this.checked = 'checked';
                 start = true;
                 return true;
             }
             if (start && !end) {
-                this.checked = true;
+                this.checked = 'checked';
             }
             if (start && ($(this).prop('id') == b || $(this).prop('id') == a)) {
                 end = true;
@@ -998,30 +998,52 @@ function Message_List() {
         self.select_range(id, self.last_click);
     };
 
-    this.set_checkbox_callback = function() {
-        $('.checkbox_label').off('click');
-        $('.checkbox_label').off('mousedown');
-        $('.checkbox_label').on('mousedown', function (e) {
-            if (e.shiftKey) {
-                document.getSelection().removeAllRanges();
+    this.set_row_events = function() {
+        Hm_Utils.rows().off('click');
+        Hm_Utils.rows().on('click', function(e) { self.process_row_click(e); });
+    }
+
+    this.process_row_click = function(e) {
+        document.getSelection().removeAllRanges();
+        var target = $(e.target);
+        var class_name = target[0].className;
+        var shift = e.shiftKey;
+        var ctrl = e.ctrlKey;
+        if (class_name == 'checkbox_label' || class_name == 'checkbox_cell') {
+            ctrl = true
+        }
+        while (target[0].tagName != 'TR') { target = target.parent(); }
+        var el = $('input[type=checkbox]', target);
+        if (!shift && !ctrl) {
+            window.location = $('.subject a', target).prop('href');
+            return false;
+        }
+        else {
+            self.select_on_row_click(shift, ctrl, el, target);
+        }
+        self.toggle_msg_controls();
+        e.preventDefault();
+        return false;
+    }
+
+    this.select_on_row_click = function(shift, ctrl, el, target) {
+        if (shift) {
+            if (self.last_click) {
+                self.process_shift_click(el);
             }
-        });
-        $('.checkbox_label').on('click', function (e) {
-            if (e.shiftKey) {
-                var el = $(this).prev();
-                if (self.last_click) {
-                    self.process_shift_click(el);
-                }
-                $('#'+el.prop('id')).attr('checked', 'checked');
-                e.preventDefault();
+            $('#'+el.prop('id')).prop('checked', 'checked');
+            self.last_click = el.prop('id');
+        }
+        else if (ctrl) {
+            if (el.prop('checked')) {
+                $('#'+el.prop('id')).prop('checked', false);
             }
-            self.last_click = $(this).prev().prop('id');
-        });
-        $('input[type=checkbox]', $('.message_table')).off('input');
-        $('input[type=checkbox]', $('.message_table')).on('input', function(e) {
-            self.toggle_msg_controls();
-        });
-    };
+            else {
+                $('#'+el.prop('id')).prop('checked', 'checked');
+                self.last_click = el.prop('id');
+            }
+        }
+    }
 
     this.set_all_mail_state = function() { self.set_message_list_state('formatted_all_mail'); };
     this.set_combined_inbox_state = function() { self.set_message_list_state('formatted_combined_inbox'); };
