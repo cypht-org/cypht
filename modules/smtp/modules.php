@@ -242,8 +242,9 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         
         if ($this->module_is_supported('imap')) {
             $uploaded_files = explode(',', $uploaded_files);
+            $userpath = md5($this->session->get('username', false));
             foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+                $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
             }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
