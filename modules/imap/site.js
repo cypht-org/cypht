@@ -318,6 +318,9 @@ var add_auto_folder = function(folder) {
 };
 
 var imap_sent_content = function(id, folder) {
+    if (hm_search_terms()){
+        return imap_message_list_content(id, folder, 'ajax_imap_search', Hm_Message_List.set_search_state);
+    }
     return imap_message_list_content(id, folder, 'ajax_imap_sent', cache_sent_data);
 };
 
@@ -328,6 +331,9 @@ var cache_sent_data = function() {
 };
 
 var imap_all_mail_content = function(id, folder) {
+    if (hm_search_terms()){
+        return imap_message_list_content(id, folder, 'ajax_imap_search', Hm_Message_List.set_search_state);
+    }
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_all_mail_state);
 };
 
@@ -370,14 +376,23 @@ var add_imap_combined_source = function(event) {
 };
 
 var imap_combined_unread_content = function(id, folder) {
+    if (hm_search_terms()){
+        return imap_message_list_content(id, folder, 'ajax_imap_search', Hm_Message_List.set_search_state);
+    }
     return imap_message_list_content(id, folder, 'ajax_imap_unread', Hm_Message_List.set_unread_state);
 };
 
 var imap_combined_flagged_content = function(id, folder) {
+    if (hm_search_terms()){
+        return imap_message_list_content(id, folder, 'ajax_imap_search', Hm_Message_List.set_search_state);
+    }
     return imap_message_list_content(id, folder, 'ajax_imap_flagged', Hm_Message_List.set_flagged_state);
 };
 
 var imap_combined_inbox_content = function(id, folder) {
+    if (hm_search_terms()){
+        return imap_message_list_content(id, folder, 'ajax_imap_search', Hm_Message_List.set_search_state);
+    }
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
 };
 
