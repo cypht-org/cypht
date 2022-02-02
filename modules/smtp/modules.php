@@ -242,8 +242,9 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         
         if ($this->module_is_supported('imap')) {
             $uploaded_files = explode(',', $uploaded_files);
+            $userpath = md5($this->session->get('username', false));
             foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+                $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
             }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
@@ -1371,7 +1372,7 @@ function format_attachment_row($file, $output_mod) {
             $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
             '</td><td><a class="remove_attachment" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
-            '<div class="meter" style="width:100%"><span id="progress-'.
+            '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
             $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
             $unique_identifier.'"></span></span></div></td></tr>';
 }}
