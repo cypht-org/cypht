@@ -1662,6 +1662,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
      * Title, list controls, and message controls
      */
     protected function output() {
+        $search_field = '';
         $terms = $this->get('search_terms', '');
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');

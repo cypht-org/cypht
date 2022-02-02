@@ -134,7 +134,11 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_list_controls() {
-        $this->assertEquals('<div class="list_controls">foobazbar</div>', list_controls('foo', 'bar', 'baz'));
+        $this->assertEquals('<div class="list_controls no_mobile">foobazbar</div>
+    <div class="list_controls on_mobile">
+        <img alt="" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAYAAABw4pVUAAAABmJLR0QA/wD/AP+gvaeTAAACKUlEQVR4nO3bS2oUQQCH8U/JERTNQ1DwLmoYFG9hPIlbF2LEnUcQ9Tbqwsc2hqwk0XExDj5Ak35U9b8r3w9qk0VRRZGe7un5QJIkSeO7MPUCetoB7gEL4Dpw7effPwDvgVfAS+DjJKs7Ry4Dj4FjYHnK+Aa8ADYnWek5sAAOOf0g/h6HwO4E623aQ+CE7oexHifAXvVVN+o2ww7j90vYovLam7NFv8vUv8YX4GrVHTTmOeMdxno8rbqDhuxwtrupruMY2K64j04uTr2A/7gPbBSYd4PVM0yk5AO5U3Du2Nvg5AO5OdO5m3XE+J8f63FUcR+dJP+HLAvO/b3g3IMkH8jngnN/Kjj3IMkH8namcw+SfCBvCs79uuDczSr5YLhVcR9N2Wf8A3lSdQeN2WT1heBYh3EAXKm6gwbdwq/f4+wx/AXVg+qrbtwu/S5fB6xecqmAS8Aj4Ctnu5t6xsxeSM31Z0DbwF1Wnwk3+PNnQO/49TOgkk/7kiRJktSEuT4Y2oeEsA8JYh8SxD4kiH1IEPuQMPYhQexDwtiHhLEPCWMfEsY+JMyy4Nz2IT3Yh4SxDwljHxLGPiSQfUgY+5BA9iGB7EMC2YcEsg8JZR8iSZIkSSOZ64OhfUgI+5Ag9iFB7EOC2IcEsQ8JYx8SxD4kjH1IGPuQMPYhYexDwiwLzm0f0oN9SBj7kDD2IWHsQwLZh4SxDwlkHxLIPiSQfUgg+5BQ9iGSJEnq4AcUOGe0TZbwqAAAAABJRU5ErkJggg==" width="20" height="20" onclick="listControlsMenu()"/>
+        <div id="list_controls_menu" classs="list_controls_menu">foobazbar</div>
+    </div>', list_controls('foo', 'bar', 'baz'));
     }
     /**
      * @preserveGlobalState disabled
