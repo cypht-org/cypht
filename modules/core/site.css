@@ -261,7 +261,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .login_form { margin-top: 60px; display: block; float: none; width: 100%; background-color: #fff; font-size: 130%; height: auto; }
 .mobile .account_icon { width: 20px; height: 20px; }
 .mobile .imap_filter { display: none; }
-.mobile .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; height: 48px; padding-left: 5px; padding-right: 5px; }
+.mobile .list_controls { color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); height: 48px; padding-left: 5px; padding-right: 5px; }
 .mobile .list_controls img { margin-top: 10px }
 .mobile .page_links { font-size: 150%; }
 .mobile .page_links a img { width: 24px; height: 24px; }
@@ -306,10 +306,9 @@ div.unseen, .unseen .subject { font-weight: 700; }
 #list_controls_menu {
     position: absolute;
     width: 50px; 
-    right: 10px;
+    right: 0px;
     display: none;
     padding-left: 14px;
     padding-bottom: 5px;
-    background: linear-gradient(180deg, #fff, #fff, #f7f2ef);
-    border-radius: 0 0 4px 4px;
+    background-color: #fff;
 }
