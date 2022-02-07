@@ -21,7 +21,7 @@ ini_set('session.use_strict_mode', 1);
 
 /* limit session cookie to HTTP only */
 ini_set('session.cookie_httponly', 1);
-if ((float) substr(phpversion(), 0, 3) >= 7.3) {
+if (version_compare(PHP_VERSION, 7.3, '>=')) {
     ini_set('session.cookie_samesite', 'Strict');
 }
 
@@ -40,7 +40,7 @@ ini_set('session.use_trans_sid', 0);
 ini_set('session.cache_limiter', 'nocache');
 
 /* session hash mechanism */
-if ((float) substr(phpversion(), 0, 3) === 5.6) {
+if (version_compare(PHP_VERSION, 5.6, '==')) {
     ini_set('session.hash_function', 1);
 }
 else {

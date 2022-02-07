@@ -140,7 +140,7 @@ class Hm_Request {
      * @return void
      */
     private function empty_super_globals() {
-        if ((float) substr(phpversion(), 0, 3) >= 8.1) {
+        if (version_compare(PHP_VERSION, '8.1', '>=')) {
             return;
         }
         $_POST = array();
