@@ -19,7 +19,7 @@ err_condition() {
 
 # check for super global usage by modules
 global_check() {
-    GLOBALS=$(find modules/ -name "*.php" | xargs grep -Er '(_ENV|_FILES_POST|_GET|GLOABALS|_COOKIE|_SERVER)')
+    GLOBALS=$(find modules/ -name "*.php" | xargs grep -Er '(_ENV|_FILES|_POST|_GET|GLOABALS|_COOKIE|_SERVER)')
     if [ -n "$GLOBALS" ]; then
         echo 'SUPER GLOBAL FOUND';
         echo "$GLOBALS"
@@ -189,6 +189,9 @@ if [ $# -eq 0 ]
         ;;
         all)
             run_all
+        ;;
+        *)
+            echo "command not found"
         ;;
     esac
 fi
