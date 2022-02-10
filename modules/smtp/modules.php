@@ -1017,12 +1017,33 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<script type="text/javascript">var editor = new Editor(); editor.render();</script>';
         }
         $res .= '<table class="uploaded_files">';
-        
+
         foreach ($files as $file) {
             $res .= format_attachment_row($file, $this);
         }
+
+        /* select the correct account to unsubscribe from mailing lists */
+        $selected_id = false;
+        if (empty($recip) && !empty($from)) {
+            /* This solves the problem when a profile is not associated with the email */
+            $server_found = false;
+            foreach ($this->module_output()['smtp_profiles'] as $id => $server) {
+                if ($server['address'] == $from) {
+                    $server_found = true;
+                }
+            }
+            if (!$server_found) {
+                foreach ($this->module_output()['smtp_servers'] as $id => $server) {
+                    if ($server['user'] == $from) {
+                        $selected_id = $id;
+                    }
+                }
+                $recip = null;
+            }
+        }
+
         $res .= '</table>'.
-            smtp_server_dropdown($this->module_output(), $this, $recip).
+            smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
 
         if ($this->get('list_path')) {
