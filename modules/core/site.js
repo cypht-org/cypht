@@ -1133,7 +1133,7 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            document.cookie = 'hm_reload_folders=0;max-age=0';
+            document.cookie = 'hm_reload_folders=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             Hm_Utils.expand_core_settings();
             return true;
         }
