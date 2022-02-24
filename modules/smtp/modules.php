@@ -706,7 +706,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         Hm_Msgs::add("Message Sent");
 
         /* if it is a draft, remove it */
-        if ($this->module_is_supported('imap')) {
+        if ($this->module_is_supported('imap') && $imap_server) {
             $imap_server = find_imap_by_smtp(
                 $this->user_config->get('imap_servers'),
                 $this->user_config->get('smtp_servers')[$smtp_id]
