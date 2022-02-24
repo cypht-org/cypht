@@ -185,8 +185,12 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
             $headers['Content-Type'] = 'application/json';
         }
         $this->out('http_headers', $headers, false);
-        if (array_key_exists('hm_reload_folders', $this->request->cookie) && $this->request->cookie['hm_reload_folders'] == 2) {
-            $this->session->delete_cookie($request, 'hm_reload_folders');
+        if ($this->session->get('hm_reload_folders', false)) {
+            $this->session->set('hm_reload_folders', $this->session->get('hm_reload_folders') + 1);
+        }
+        if ($this->session->get('hm_reload_folders', false) > 3) {
+            $this->session->delete_cookie($this->request, 'hm_reload_folders');
+            $this->session->del('hm_reload_folders');
         }
     }
 }
@@ -847,6 +851,7 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
     public function process() {
         if ($this->get('reload_folders', false)) {
             $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
+            $this->session->set('hm_reload_folders', 1);
         }
     }
 }

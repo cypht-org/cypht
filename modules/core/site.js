@@ -1133,7 +1133,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            document.cookie = 'hm_reload_folders=2';
             Hm_Utils.expand_core_settings();
             return true;
         }

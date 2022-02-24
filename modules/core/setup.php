@@ -185,7 +185,6 @@ return array(
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_SANITIZE_STRING,
-        'hm_reload_folders' => FILTER_VALIDATE_INT,
         'hm_id' => FILTER_SANITIZE_STRING,
         'hm_session' => FILTER_SANITIZE_STRING,
         'hm_msgs'    => FILTER_SANITIZE_STRING
