@@ -150,7 +150,10 @@ class Hm_Request {
         $_FILES = array();
         $_REQUEST = array();
         $_ENV = array();
-        $GLOBALS = array();
+        
+        foreach (array_keys($GLOBALS) as $key) {
+            unset($GLOBALS[$key]);
+        }
     }
 
     /**
