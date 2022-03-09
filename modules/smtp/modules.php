@@ -906,6 +906,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
     protected function output() {
         $selected = 2;
         $settings = $this->get('user_settings', array());
+        $reset = '';
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
@@ -922,7 +923,10 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if ($selected == 2) {
             $res .= 'selected="selected" ';
         }
-        $res .= 'value="2">'.$this->trans('Markdown').'</option></select></td></tr>';
+        if ($selected != 0) {
+            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+        }
+        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
     }
 }
@@ -938,10 +942,12 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
             $auto = $settings['smtp_auto_bcc'];
         }
         $res = '<tr class="general_setting"><td>'.$this->trans('Always BCC sending address').'</td><td><input value="1" type="checkbox" name="smtp_auto_bcc"';
+        $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        $res .= '></td></tr>';
+        $res .= '>'.$reset.'</td></tr>';
         return $res;
     }
 }

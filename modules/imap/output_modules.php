@@ -831,12 +831,14 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
     protected function output() {
         $checked = '';
         $settings = $this->get('user_settings', array());
+        $reset = '';
         if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -862,12 +864,16 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
         $per_page = 20;
+        $reset = '';
         if (array_key_exists('imap_per_page', $settings)) {
             $per_page = $settings['imap_per_page'];
         }
+        if ($per_page != 20) {
+            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+        }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
             $this->trans('Messages per page for IMAP folder views').'</label></td><td><input type="text" id="imap_per_page" '.
-            'name="imap_per_page" value="'.$this->html_safe($per_page).'" /></td></tr>';
+            'name="imap_per_page" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -879,12 +885,14 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
     protected function output() {
         $checked = '';
         $settings = $this->get('user_settings', array());
+        $reset = '';
         if (array_key_exists('msg_part_icons', $settings) && $settings['msg_part_icons']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -896,12 +904,14 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
     protected function output() {
         $checked = '';
         $settings = $this->get('user_settings', array());
+        $reset = '';
         if (array_key_exists('text_only', $settings) && $settings['text_only']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -913,12 +923,16 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
     protected function output() {
         $sources = DEFAULT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
+        $reset = '';
         if (array_key_exists('sent_per_source', $settings)) {
             $sources = $settings['sent_per_source'];
         }
+        if ($sources != 20) {
+            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+        }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" /></td></tr>';
+            '<td><input type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 

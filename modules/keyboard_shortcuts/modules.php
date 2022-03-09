@@ -99,14 +99,16 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_keyboard_shortcuts', $settings) && $settings['enable_keyboard_shortcuts']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         else {
             $checked = '';
+            $reset='';
         }
         return '<tr class="general_setting"><td><label for="enable_keyboard_shortcuts">'.
             $this->trans('Enable keyboard shortcuts').'</label></td>'.
             '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" /></td></tr>';
+            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" />'.$reset.'</td></tr>';
     }
 }
 
