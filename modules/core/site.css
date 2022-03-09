@@ -264,45 +264,10 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .prevnext, .mobile .news_cell .subject div img { width: 20px; height: 20px; }
 .mobile .long_session { float: left; clear: both; }
 .reset_default_value_checkbox, .reset_default_value_select, .reset_default_value_input { vertical-align: bottom; transform: scaleX(-1); width: 18px; height: 18px; }
-
-.tooltip_restore {
-  position: relative;  /*les .tooltip_restore deviennent référents*/
-}
-
-/* on génère un élément :after lors du survol et du focus :*/
-
-.tooltip_restore:hover:after,
-.tooltip_restore:focus:after {
-  content: attr(restore_aria_label);  /* on affiche restore_aria_label */
-  position: absolute;
-  top: -2.4em;
-  left: 50%;
-  transform: translateX(-50%); /* on centre horizontalement  */
-  z-index: 1; /* pour s'afficher au dessus des éléments en position relative */
-  white-space: nowrap;  /* on interdit le retour à la ligne*/
-  padding: 5px 14px;
-  background: #777;
-  color: #fff;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-/* on génère un second élément en :before pour la flèche */
-
-[restore_aria_label]:hover:before,
-[restore_aria_label]:focus:before {
-  content: "▼";
-  position: absolute;
-  top: -1em;
-  left: 50%;
-  transform: translateX(-50%); /* on centre horizontalement  */
-  color: #777;
-}
-
-/* pas de contour durant le :focus */
-[restore_aria_label]:focus {
-  outline: none;
-}
+.tooltip_restore { position: relative; }
+.tooltip_restore:hover:after, .tooltip_restore:focus:after { content: attr(restore_aria_label); position: absolute; top: -2.4em; left: 50%; transform: translateX(-50%); z-index: 1; white-space: nowrap; padding: 5px 14px; background: #777; color: #fff; border-radius: 4px; font-size: 1rem; }
+[restore_aria_label]:hover:before, [restore_aria_label]:focus:before { content: "▼"; position: absolute; top: -1em; left: 50%; transform: translateX(-50%); color: #777; }
+[restore_aria_label]:focus { outline: none; }
 
 @media print {
     .sys_messages, .next, .prev, .folder_list, .msg_parts, .header_links, .content_title, .add_contact_row, .unsaved_icon, .add_vcal { display: none !important; }
