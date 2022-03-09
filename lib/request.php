@@ -152,7 +152,9 @@ class Hm_Request {
         $_ENV = array();
         
         foreach (array_keys($GLOBALS) as $key) {
-            unset($GLOBALS[$key]);
+            if (isset($GLOBALS)) {
+                unset($GLOBALS[$key]);
+            }
         }
     }
 
