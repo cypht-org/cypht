@@ -58,18 +58,18 @@ return array(
         'ajax_update_save_search_label',
     ),
     'allowed_get' => array(
-        'search_name' => FILTER_SANITIZE_STRING
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_post' => array(
-        'search_name' => FILTER_SANITIZE_STRING,
-        'search_terms' => FILTER_SANITIZE_STRING,
-        'search_fld' => FILTER_SANITIZE_STRING,
-        'search_since' => FILTER_SANITIZE_STRING,
-        'search_terms_label' => FILTER_SANITIZE_STRING,
-        'old_search_terms_label' => FILTER_SANITIZE_STRING
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_terms' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_fld' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_terms_label' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'old_search_terms_label' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_output' => array(
         'saved_search_result' => array(FILTER_VALIDATE_INT, false),
-        'new_saved_search_label' => array(FILTER_SANITIZE_STRING, false),
+        'new_saved_search_label' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
     ),
 );

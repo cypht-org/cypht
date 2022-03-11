@@ -54,11 +54,11 @@ return array(
         'ajax_wp_notice_display',
     ),
     'allowed_post' => array(
-        'wp_disconnect' => FILTER_SANITIZE_STRING,
+        'wp_disconnect' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'unread_exclude_wordpress' => FILTER_VALIDATE_INT,
-        'wp_uid' => FILTER_SANITIZE_STRING,
+        'wp_uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'wordpress_limit' => FILTER_VALIDATE_INT,
-        'wordpress_since' => FILTER_SANITIZE_STRING,
+        'wordpress_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),

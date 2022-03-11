@@ -309,7 +309,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         if (!empty($msgs)) {
             $res .= implode(',', array_map(function($v) {
                 if (preg_match("/ERR/", $v)) {
-                    return sprintf('<span class="err">%s</span>', $this->trans(substr($v, 3)));
+                    return sprintf('<span class="err">%s</span>', $this->trans(substr((string) $v, 3)));
                 }
                 else {
                     return $this->trans($v);
@@ -414,7 +414,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
         elseif ($this->exists('mailbox_list_title')) {
             $title .= ' '.implode('-', $this->get('mailbox_list_title', array()));
         }
-        if (!trim($title) && $this->exists('router_page_name')) {
+        if (!trim((string) $title) && $this->exists('router_page_name')) {
             $title = '';
             if ($this->get('list_path') == 'message_list') {
                 $title .= ' '.ucwords(str_replace('_', ' ', $this->get('list_path')));
@@ -426,7 +426,7 @@ class Hm_Output_header_content extends Hm_Output_Module {
                 $title .= ' '.ucwords(str_replace('_', ' ', $this->get('router_page_name')));
             }
         }
-        return '<title>'.$this->trans(trim($title)).'</title>'.
+        return '<title>'.$this->trans(trim((string) $title)).'</title>'.
             '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">'.
             '<link rel="icon" class="tab_icon" type="image/png" href="data:image/png;base64,iVBORw0KGgo'.
             'AAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAFVJR'.
@@ -1677,15 +1677,15 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $path = $this->get('list_path');
             }
-            if (substr($path, 0, 4) == 'pop3') {
+            if (substr((string) $path, 0, 4) == 'pop3') {
                 $path = 'pop3';
             }
             $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
-            $search_field = '<form method="GET">
-            <input type="hidden" name="page" value="message_list" />
-            <input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
-            <input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
+            //$search_field = '<form method="GET">
+            //<input type="hidden" name="page" value="message_list" />
+            //<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
+            //<input required type="search" placeholder="'.$this->trans('Search').'" id="search_terms" class="imap_keyword" name="search_terms" value="'.$this->html_safe($terms).'"/></form>';
 
         }
         else {
@@ -1699,7 +1699,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-        if (!$this->get('is_mobile') && substr($this->get('list_path'), 0, 5) != 'imap_') {
+        if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
         $res .= list_controls($refresh_link, $config_link, $source_link, $search_field);

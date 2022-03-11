@@ -245,7 +245,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         $domain = $this->site_config->get('cookie_domain', false);
         if (!$domain && array_key_exists('HTTP_HOST', $request->server)) {
             $host = parse_url($request->server['HTTP_HOST'],  PHP_URL_HOST);
-            if (trim($host)) {
+            if (trim((string) $host)) {
                 $domain = $host;
             }
             else {

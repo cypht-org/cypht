@@ -31,7 +31,7 @@ return array(
     ),
     'allowed_post' => array(
         'enable_keyboard_shortcuts' => FILTER_VALIDATE_INT,
-        'shortcut_meta' => array('filter' => FILTER_SANITIZE_STRING, 'flags'  => FILTER_FORCE_ARRAY),
+        'shortcut_meta' => array('filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags'  => FILTER_FORCE_ARRAY),
         'shortcut_key' => FILTER_VALIDATE_INT,
         'shortcut_id' => FILTER_VALIDATE_INT,
     )
