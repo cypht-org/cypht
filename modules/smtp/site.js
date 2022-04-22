@@ -321,5 +321,18 @@ $(function() {
         $('.compose_server').on('change', function() {
             get_smtp_profile($('.compose_server').val());
         });
+        $('.compose_to, .compose_cc, .compose_bcc').on("keyup", function() {
+            let compose_element = $(this).val();
+            let number_recipients = 0;
+            const recipient_separator = [';',','];
+            for (let character_counter = 0; character_counter < compose_element.length; character_counter++) {
+                if (recipient_separator.indexOf(compose_element[character_counter]) > -1) {
+                    number_recipients++;
+                }
+            }
+            if ((number_recipients >= 20) && (recipient_separator.indexOf(compose_element[compose_element.length-1]) > -1)) {
+                Hm_Notices.show(['ERRYou have exceeded the limit of the number of recipients in the field '+this.getAttribute("placeholder")]);
+            }
+        });
     }
 });
