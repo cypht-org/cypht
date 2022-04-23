@@ -721,7 +721,7 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
-            $this->out('page_links', 'There is no pagination is this view, please visit the individual mail boxes.');
+            $this->out('page_links', 'There is no pagination in this view, please visit the individual mail boxes.');
         }
         else {
             $this->out('formatted_message_list', array());
