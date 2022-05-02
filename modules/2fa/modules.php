@@ -1,6 +1,12 @@
 <?php
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
+use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
+use Endroid\QrCode\Label\Font\NotoSans;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
 
-use CodeItNow\BarcodeBundle\Utils\QrCode;
 
 /**
  * 2FA modules
@@ -239,14 +245,23 @@ function base32_encode_str($str) {
  * @subpackage 2fa/functions
  */
 if (!hm_exists('generate_qr_code')) {
-function generate_qr_code($config, $username, $str) {
-    $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
-    require_once VENDOR_PATH.'autoload.php';
-    $qr_code = new QrCode();
-    $qr_code->setText($str);
-    $qr_code->setSize(200);
-    return $qr_code->generate();
-}}
+    function generate_qr_code($config, $username, $str) {
+        $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png'; //is this line worth it???
+        require_once VENDOR_PATH.'autoload.php'; //and this???
+
+        $result = Builder::create()
+        ->writer(new PngWriter())
+        ->writerOptions([])
+        ->data($str)
+        ->encoding(new Encoding('UTF-8'))
+        ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+        ->size(200)
+        ->margin(10)
+        ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+        ->build();
+        return $result->getDataUri();
+    }
+}
 
 /**
  * @subpackage 2fa/functions

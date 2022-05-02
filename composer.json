@@ -24,7 +24,6 @@
         "erusev/parsedown": "^1.8.0-beta-5",
         "christian-riesen/base32": "^1.3.2",
         "ezyang/htmlpurifier": "^4.13.0",
-        "codeitnowin/barcode": "^3.0.3",
 
         "php": ">=5.4",
         "ext-mbstring": "*",
@@ -32,7 +31,8 @@
         "ext-curl": "*",
         "ext-openssl": "*",
         "ext-session": "*",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "endroid/qr-code": "^4.4"
     },
     "suggest": {
         "ext-PDO": "To use database features, this needs to be installed",
