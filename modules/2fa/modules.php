@@ -139,7 +139,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.$png.'" />';
+            $qr_code .= '<img alt="" width="200" height="200" src="'.$png.'" />';
             $qr_code .= '</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
@@ -246,19 +246,17 @@ function base32_encode_str($str) {
  */
 if (!hm_exists('generate_qr_code')) {
     function generate_qr_code($config, $username, $str) {
-        $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png'; //is this line worth it???
-        require_once VENDOR_PATH.'autoload.php'; //and this???
-
+        require_once VENDOR_PATH.'autoload.php';
         $result = Builder::create()
-        ->writer(new PngWriter())
-        ->writerOptions([])
-        ->data($str)
-        ->encoding(new Encoding('UTF-8'))
-        ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
-        ->size(200)
-        ->margin(10)
-        ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-        ->build();
+            ->writer(new PngWriter())
+            ->writerOptions([])
+            ->data($str)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
+            ->size(200)
+            ->margin(10)
+            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->build();
         return $result->getDataUri();
     }
 }
