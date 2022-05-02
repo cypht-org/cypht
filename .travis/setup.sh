@@ -15,6 +15,10 @@ update_repos() {
 
 # Enable memcached extension
 setup_memcached() {
+    if [ "$TRAVIS_PHP_VERSION" != "8.1" ]; then
+        sudo apt-get install -y php-memcached
+        echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
+    fi
     if [ "$TRAVIS_PHP_VERSION" != "8.0" ]; then
         sudo apt-get install -y php-memcached
         echo 'extension=memcached.so' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -41,6 +45,9 @@ install_dovecot() {
 
 # Select the browser and driver config for Selenium tests
 selenium_config() {
+    if [ "$TRAVIS_PHP_VERSION" = "8.1" ]; then
+        mv .travis/creds.py-chrome creds.py
+    fi
     if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
         mv .travis/creds.py-chrome creds.py
     fi
@@ -49,9 +56,6 @@ selenium_config() {
     fi
     if [ "$TRAVIS_PHP_VERSION" = "7.3" ]; then
         mv .travis/creds.py-ff creds.py
-    fi
-    if [ "$TRAVIS_PHP_VERSION" = "7.2" ]; then
-        mv .travis/creds.py-edge creds.py
     fi
 }
 
@@ -120,6 +124,9 @@ install_apache() {
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
     if [ "$TRAVIS_PHP_VERSION" = "8.0" ]; then
+        sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
+    fi
+    if [ "$TRAVIS_PHP_VERSION" = "8.1" ]; then
         sudo cp .travis/www.conf ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.d/
     fi
 
