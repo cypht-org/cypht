@@ -7,7 +7,9 @@
  */
 
 /* compress output if possible */
-ini_set('zlib.output_compression', 'On');
+if (version_compare(PHP_VERSION, 8.0, '<')) {
+    ini_set('zlib.output_compression', 'On');
+}
 
 /* limit cookie life to the session */
 ini_set('session.cookie_lifetime', 0);
