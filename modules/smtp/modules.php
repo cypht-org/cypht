@@ -107,6 +107,52 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
+class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
+{
+    public function process() {
+        if (!$this->module_is_supported('imap')) {
+            return;
+        }
+        
+        if (array_key_exists('forward', $this->request->get)) {
+            $path = explode('_', $this->request->get['list_path']);
+            $imap = Hm_IMAP_List::connect($path[1]);
+            if ($imap->select_mailbox(hex2bin($path[2]))) {
+                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
+                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
+                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+                if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
+                    return;
+                }
+
+                # Attachment Download
+                $attached_files = [];
+                $this->session->set('uploaded_files', array());
+                if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
+                    foreach ($msg_struct[0]['subs'] as $ind => $sub) {
+                        if ($ind != '0.1') {
+                            $new_attachment['basename'] = $sub['description'];
+                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['size'] = $sub['size'];
+                            $new_attachment['type'] = $sub['type'];
+                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . $new_attachment['name'];
+                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            file_put_contents($file_path, $content);
+                            $new_attachment['tmp_name'] = $file_path;
+                            $new_attachment['filename'] = $file_path;
+                            $attached_files[$this->request->get['uid']][] = $new_attachment;
+                        }
+                    }
+                }
+                $this->session->set('uploaded_files', $attached_files);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
 class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('username', 'password'));
