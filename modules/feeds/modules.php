@@ -201,7 +201,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 }
             }
             elseif ($this->get('list_path') == 'combined_inbox') {
-                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+                $limit = 3; //$this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 $cutoff_timestamp = strtotime($date);
             }

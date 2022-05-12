@@ -1,9 +1,10 @@
 <?php
-use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelHigh;
-use Endroid\QrCode\Label\Alignment\LabelAlignmentCenter;
-use Endroid\QrCode\Label\Font\NotoSans;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 
@@ -247,17 +248,16 @@ function base32_encode_str($str) {
 if (!hm_exists('generate_qr_code')) {
     function generate_qr_code($config, $username, $str) {
         require_once VENDOR_PATH.'autoload.php';
-        $result = Builder::create()
-            ->writer(new PngWriter())
-            ->writerOptions([])
-            ->data($str)
-            ->encoding(new Encoding('UTF-8'))
-            ->errorCorrectionLevel(new ErrorCorrectionLevelHigh())
-            ->size(200)
-            ->margin(10)
-            ->roundBlockSizeMode(new RoundBlockSizeModeMargin())
-            ->build();
-        return $result->getDataUri();
+        $writer = new PngWriter();
+        $qr_code = QrCode::create($str)
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+            ->setSize(200)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));
+        return $writer->write($qr_code)->getDataUri();
     }
 }
 
