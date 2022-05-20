@@ -68,8 +68,8 @@ setup_cypht() {
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
     fi
     mv creds.py tests/selenium/
-    composer update -v -W
-    composer install
+    composer update -v
+    composer install -W
     php ./scripts/config_gen.php
 }
 
