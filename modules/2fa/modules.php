@@ -1,12 +1,12 @@
 <?php
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\Logo\Logo;
-use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
-use Endroid\QrCode\Writer\PngWriter;
+#use Endroid\QrCode\Color\Color;
+#use Endroid\QrCode\Encoding\Encoding;
+#use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+#use Endroid\QrCode\QrCode;
+#use Endroid\QrCode\Label\Label;
+#use Endroid\QrCode\Logo\Logo;
+#use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+#use Endroid\QrCode\Writer\PngWriter;
 
 
 /**
@@ -140,7 +140,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img alt="" width="200" height="200" src="'.$png.'" />';
+            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.base64_encode($png).'" />';
             $qr_code .= '</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
@@ -248,16 +248,8 @@ function base32_encode_str($str) {
 if (!hm_exists('generate_qr_code')) {
     function generate_qr_code($config, $username, $str) {
         require_once VENDOR_PATH.'autoload.php';
-        $writer = new PngWriter();
-        $qr_code = QrCode::create($str)
-            ->setEncoding(new Encoding('UTF-8'))
-            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
-            ->setSize(200)
-            ->setMargin(10)
-            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
-            ->setForegroundColor(new Color(0, 0, 0))
-            ->setBackgroundColor(new Color(255, 255, 255));
-        return $writer->write($qr_code)->getDataUri();
+        $qrCode = new Endroid\QrCode\QrCode($str);
+        return $qrCode->writeString();
     }
 }
 
