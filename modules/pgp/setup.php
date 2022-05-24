@@ -28,8 +28,8 @@ return array(
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'public_key' => FILTER_SANITIZE_STRING,
-        'public_key_email' => FILTER_SANITIZE_STRING,
+        'public_key' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'public_key_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'delete_public_key_id' => FILTER_VALIDATE_INT
     )
 );

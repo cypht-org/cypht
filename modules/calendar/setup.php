@@ -22,16 +22,16 @@ return array(
         'calendar',
     ),
     'allowed_post' => array(
-        'event_title' => FILTER_SANITIZE_STRING,
-        'event_detail' => FILTER_SANITIZE_STRING,
-        'event_date' => FILTER_SANITIZE_STRING,
-        'event_time' => FILTER_SANITIZE_STRING,
-        'event_repeat' => FILTER_SANITIZE_STRING,
-        'delete_id' => FILTER_SANITIZE_STRING
+        'event_title' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'event_detail' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'event_date' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'event_time' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'event_repeat' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'delete_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_get' => array(
-        'date' => FILTER_SANITIZE_STRING,
-        'view' => FILTER_SANITIZE_STRING,
-        'action' => FILTER_SANITIZE_STRING,
+        'date' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'view' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
 );

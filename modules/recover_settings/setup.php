@@ -19,6 +19,6 @@ return array(
     'allowed_post' => array(
         'old_password_recover' => FILTER_UNSAFE_RAW,
         'new_password_recover' => FILTER_UNSAFE_RAW,
-        'recover_settings' => FILTER_SANITIZE_STRING
+        'recover_settings' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );

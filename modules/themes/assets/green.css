@@ -7,7 +7,7 @@ img { opacity: .5 !important; }
 .msg_text_inner img, .apod_image img { opacity: 1 !important; }
 a { color: #222 !important; }
 .list_meta, a:hover { color: #000 !important; }
-.confirm_logout, .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #c7dcc8 !important; }
+#list_controls_menu, .confirm_logout, .msg_controls a, textarea, select, input, .toggle_link { color: #aaa; background-color: #c7dcc8 !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: transparent !important; }
 .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: transparent !important; }

@@ -10,7 +10,7 @@ a:hover { color: #fff !important; }
 textarea, select, input, .toggle_link, .msg_controls a { color: #ddd !important; background-color: #8e714b !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #836a4e !important; }
-.msg_controls, .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #79562d, #725a3b) !important; }
+#list_controls_menu, .msg_controls, .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #79562d, #725a3b) !important; }
 .debug, .subtitle, .settings_subtitle { color: #bbb !important; }
 .empty_list, .subject a { color: #ccc !important; }
 .sys_messages { background-color: #8e714b !important; }

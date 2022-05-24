@@ -48,21 +48,21 @@ return array(
         'ajax_nux_add_service',
     ),
     'allowed_get' => array(
-        'code' => FILTER_SANITIZE_STRING,
-        'state' => FILTER_SANITIZE_STRING,
-        'error' => FILTER_SANITIZE_STRING,
-        'security_token' => FILTER_SANITIZE_STRING
+        'code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'state' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'error' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'security_token' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false)
     ),
     'allowed_post' => array(
-        'nux_service' => FILTER_SANITIZE_STRING,
-        'nux_email' => FILTER_SANITIZE_STRING,
-        'nux_name' => FILTER_SANITIZE_STRING,
+        'nux_service' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_pass' => FILTER_UNSAFE_RAW,
-        'nux_account_name' => FILTER_SANITIZE_STRING
+        'nux_account_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 

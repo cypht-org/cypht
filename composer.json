@@ -24,7 +24,7 @@
         "erusev/parsedown": "^1.8.0-beta-5",
         "christian-riesen/base32": "^1.3.2",
         "ezyang/htmlpurifier": "^4.13.0",
-        "codeitnowin/barcode": "^3.0.3",
+        "endroid/qr-code": "^2.5.0",
 
         "php": ">=5.4",
         "ext-mbstring": "*",
@@ -42,6 +42,9 @@
         "ext-gnupg": "To use the PGP module set, this needs to be installed"
     },
     "config": {
-    	"optimize-autoloader": true
+    	"optimize-autoloader": true,
+        "allow-plugins": {
+            "endroid/installer": false
+        }
     }
 }

@@ -29,7 +29,7 @@ add_output('settings', 'theme_setting', true, 'feeds', 'language_setting', 'afte
 
 return array(
     'allowed_post' => array(
-        'theme_setting' => FILTER_SANITIZE_STRING
+        'theme_setting' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 
