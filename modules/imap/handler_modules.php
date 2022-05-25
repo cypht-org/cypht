@@ -55,7 +55,7 @@ class Hm_Handler_imap_forward_attachments extends Hm_Handler_Module {
             'size' => strlen($content)
         );
         $draft_id = next_draft_key($this->session);
-        attach_file($content, $file, $filepath, $draft_id, $this);
+        //attach_file($content, $file, $filepath, $draft_id, $this);
         $this->out('compose_draft_id', $draft_id);
     }
 }
@@ -1182,7 +1182,11 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
          * Used on the servers page to add a new IMAP server
          */
         if (isset($this->request->post['submit_imap_server'])) {
-            list($success, $form) = $this->process_form(array('new_imap_name', 'new_imap_address', 'new_imap_port'));
+            list($success, $form) = $this->process_form(
+                array('new_imap_name',
+                    'new_imap_address',
+                    'new_imap_port')
+            );
             if (!$success) {
                 $this->out('old_form', $form);
                 Hm_Msgs::add('ERRYou must supply a name, a server and a port');
@@ -1197,12 +1201,19 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                     $hidden = true;
                 }
                 if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 2)) {
-                    Hm_IMAP_List::add(array(
+                    $imap_list = array(
                         'name' => $form['new_imap_name'],
                         'server' => $form['new_imap_address'],
                         'hide' => $hidden,
                         'port' => $form['new_imap_port'],
-                        'tls' => $tls));
+                        'tls' => $tls);
+
+                    if (isset($this->request->post['sieve_config_username'])) {
+                        $imap_list['sieve_config_username'] = $this->request->post['sieve_config_username'];
+                        $imap_list['sieve_config_password'] = $this->request->post['sieve_config_password'];
+                        $imap_list['sieve_config_host'] = $this->request->post['sieve_config_host'];
+                    }
+                    Hm_IMAP_List::add($imap_list);
                     Hm_Msgs::add('Added server!');
                     $this->session->record_unsaved('IMAP server added');
                 }
