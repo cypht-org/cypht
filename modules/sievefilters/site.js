@@ -196,7 +196,7 @@ $(function () {
                     {'name': 'current_editing_script', 'value': current_editing_script_name},
                     {'name': 'script', 'value': $('.modal_sieve_script_textarea').val()}],
                 function(res) {
-
+                    window.location = window.location;
                 }
             );
         }
@@ -214,6 +214,11 @@ $(function () {
         });
         $('.add_script').on('click', function () {
             $('.script_modal_title').html('Add Script');
+            $('.modal_sieve_script_textarea').html('');
+            $('.modal_sieve_script_name').val('');
+            $('.modal_sieve_script_priority').val('');
+            is_editing_script = false;
+            current_editing_script_name = '';
             current_account = $(this).attr('account');
             edit_script_modal.open();
         });
@@ -433,7 +438,6 @@ $(function () {
                 if (condition.type === 'int') {
                     elem_type.html('<input type="number" />')
                 }
-                console.log(condition);
             }
         });
 
@@ -451,6 +455,30 @@ $(function () {
                     if (res.script_removed == '1') {
                         obj.parent().parent().remove();
                     }
+                }
+            );
+        });
+
+        /**
+         * Delete script event
+         */
+        $(document).on('click', '.edit_script', function (e) {
+            e.preventDefault();
+            let obj = $(this);
+            $('.script_modal_title').html('Edit Script');
+            current_account = $(this).attr('account');
+            is_editing_script = true;
+            current_editing_script_name = $(this).attr('script_name');
+            current_account = $(this).attr('imap_account');
+            $('.modal_sieve_script_name').val($(this).attr('script_name_parsed'));
+            $('.modal_sieve_script_priority').val($(this).attr('priority'));
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_script'},
+                    {'name': 'imap_account', 'value': $(this).attr('imap_account')},
+                    {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
+                function(res) {
+                    $('.modal_sieve_script_textarea').html(res.script);
+                    edit_script_modal.open();
                 }
             );
         });

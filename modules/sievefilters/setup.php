@@ -40,7 +40,8 @@ return array(
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
-        'script_removed' => array(FILTER_UNSAFE_RAW, false)
+        'script_removed' => array(FILTER_UNSAFE_RAW, false),
+        'script' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_get' => array(),
     'allowed_post' => array(

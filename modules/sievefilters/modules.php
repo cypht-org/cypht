@@ -13,6 +13,35 @@ use PhpSieveManager\ManageSieve\Client;
 /**
  * @subpackage sievefilters/handler
  */
+class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
+    public function process() {
+        foreach ($this->user_config->get('imap_servers') as $mailbox) {
+            if ($mailbox['name'] == $this->request->post['imap_account']) {
+                $imap_account = $mailbox;
+            }
+        }
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $script = $client->getScript($this->request->post['sieve_script_name']);
+        $this->out('script', $script);
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sieve_edit_output extends Hm_Output_Module {
+    public function output() {
+        $script = $this->get('script', '');
+        $this->out('script', $script);
+    }
+}
+
+
+/**
+ * @subpackage sievefilters/handler
+ */
 class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
     public function process() {
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
@@ -277,15 +306,16 @@ if (!hm_exists('get_mailbox_filters')) {
             if (end($exp_name) == 'cyphtfilter') {
                 $base_class = 'filter';
             }
+            $parsed_name = str_replace('_', ' ', $exp_name[0]);
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
                 <td>' . str_replace('_', ' ', $exp_name[sizeof($exp_name) - 3]) . '</td>
                 <td>
-                    <a href="#" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
+                    <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
                         <img width="16" height="16" src="' . Hm_Image_Sources::$edit . '" />
                     </a>
-                    <a href="#" imap_account="'.$mailbox['name'].'" style="padding-left: 5px;" script_name="'.$script_name.'" class="delete_'.$base_class.'">
+                    <a href="#" script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" style="padding-left: 5px;" script_name="'.$script_name.'" class="delete_'.$base_class.'">
                         <img width="16" height="16" src="' . Hm_Image_Sources::$minus . '" />
                     </a>
                 </td>
