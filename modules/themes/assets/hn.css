@@ -12,7 +12,7 @@ msg_controls a, textarea, select, input, .toggle_link { color: #aaa; }
 .mailbox_list_title { color: #000; }
 .confirm_logout, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #f6f6ef !important; }
 .src_name { color: #666 !important; background: none !important; background-color: #f6f6ef !important; }
-.content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; padding-bottom: 5px; padding-top: 5px; }
+#list_controls_menu, .content_title { color: #333; background: none !important; background-color: rgb(255, 102, 0) !important; font-size: 140%; font-weight: bold; padding-bottom: 5px; padding-top: 5px; }
 .content_title span { color: #333; }
 .main_menu { padding-top: 5px; }
 .debug, .subtitle { color: #999 !important; }

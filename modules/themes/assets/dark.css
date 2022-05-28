@@ -9,7 +9,7 @@ a:hover { color: #fff !important; }
 .selected_part, .toggle_recipients, textarea, select, input, .toggle_link { color: #aaa; background-color: #444 !important; }
 textarea { font-size: 100%; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
-.move_to_location, .move_to_title, li, ul, #to_contacts, #cc_contacts, #bcc_contacts, .msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background: none !important; background-color: #363636 !important; }
+#list_controls_menu, .move_to_location, .move_to_title, li, ul, #to_contacts, #cc_contacts, #bcc_contacts, .msg_parts, .info_content, .profile_content, .user_settings, .settings_table, .server_content div, .list_controls, .msg_controls a, .checkbox_label, .search_content, .msg_text, .compose_page, .list_sources, .confirm_logout, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background: none !important; background-color: #363636 !important; }
 .today { background-color: #222 !important; }
 .ke-content body * { background-color: #000 !important; }
 .src_name, .content_title { color: #aaa !important; background: linear-gradient(0deg, #333, #383838) !important; }

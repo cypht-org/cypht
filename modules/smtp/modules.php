@@ -140,26 +140,6 @@ class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
-class Hm_Handler_process_delete_draft extends Hm_Handler_Module {
-    public function process() {
-        list($success, $form) = $this->process_form(array('draft_id'));
-        if ($success) {
-            delete_uploaded_files($this->session, $form['draft_id']);
-            if (delete_draft($form['draft_id'], $this->session)) {
-                Hm_Msgs::add('Draft deleted');
-                $this->out('draft_id', $form['draft_id']);
-            }
-            else {
-                Hm_Msgs::add('ERRAn error occurred trying to delete the requested draft');
-                $this->out('draft_id', -1);
-            }
-        }
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
 class Hm_Handler_get_test_chunk extends Hm_Handler_Module {
     public function process() {
         $filepath = $this->config->get('attachment_dir');
@@ -236,14 +216,14 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
-            delete_draft($draft_id, $this->session);
             return;
         }
         
         if ($this->module_is_supported('imap')) {
             $uploaded_files = explode(',', $uploaded_files);
+            $userpath = md5($this->session->get('username', false));
             foreach($uploaded_files as $key => $file) {
-                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.$file;
+                $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
             }
             $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
                     'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
@@ -626,7 +606,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
-        
+
         /* parse attachments */
         $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
         foreach($uploaded_files as $key => $file) {
@@ -724,7 +704,18 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* clean up */
         $this->out('msg_sent', true);
         Hm_Msgs::add("Message Sent");
-        delete_draft($form['draft_id'], $this->session);
+
+        /* if it is a draft, remove it */
+        if ($this->module_is_supported('imap') && $imap_server) {
+            $imap_server = find_imap_by_smtp(
+                $this->user_config->get('imap_servers'),
+                $this->user_config->get('smtp_servers')[$smtp_id]
+            );
+
+            $specials = get_special_folders($this, $imap_server['id']);
+            delete_draft($form['draft_id'], $this->cache, $imap_server['id'], $specials['draft']);
+        }
+
         delete_uploaded_files($this->session, $form['draft_id']);
         if ($form['draft_id'] > 0) {
             delete_uploaded_files($this->session, 0);
@@ -1392,7 +1383,7 @@ function format_attachment_row($file, $output_mod) {
             $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
             '</td><td><a class="remove_attachment" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
-            '<div class="meter" style="width:100%"><span id="progress-'.
+            '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
             $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
             $unique_identifier.'"></span></span></div></td></tr>';
 }}
@@ -1439,12 +1430,13 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
  * @subpackage/functions
  */
 if (!hm_exists('delete_draft')) {
-function delete_draft($id, $session) {
-    $drafts = $session->get('compose_drafts', array());
-    if (array_key_exists($id, $drafts)) {
-        unset($drafts[$id]);
-        $session->set('compose_drafts', $drafts);
-        return true;
+function delete_draft($id, $cache, $imap_server_id, $folder) {
+    $imap = Hm_IMAP_List::connect($imap_server_id);
+    if ($imap->select_mailbox($folder)) {
+        if ($imap->message_action('DELETE', array($id))) {
+            $imap->message_action('EXPUNGE', array($id));
+            return true;
+        }
     }
     return false;
 }}

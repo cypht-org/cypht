@@ -10,7 +10,7 @@ textarea, select, input, .toggle_link { color: #aaa; background-color: #bbb !imp
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list { background-color: #ccc !important; }
 .confirm_logout, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #cfcfcf !important; }
-.msg_controls, .src_name, .content_title { color: #666 !important; background: linear-gradient(0deg, #bbb, #ccc) !important; }
+#list_controls_menu, .msg_controls, .src_name, .content_title { color: #666 !important; background: linear-gradient(0deg, #bbb, #ccc) !important; }
 .debug, .subtitle { color: #999 !important; }
 .settings_subtitle { color: #333 !important; }
 .empty_list, .subject a { color: #333 !important; }

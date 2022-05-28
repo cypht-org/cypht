@@ -15,7 +15,7 @@ add_handler('settings', 'process_enable_2fa', true, '2fa', 'save_user_settings',
 add_output('settings', 'enable_2fa_setting', true, '2fa', 'end_settings_form', 'before');
 
 return array( 'allowed_post' => array(
-    '2fa_code' => FILTER_SANITIZE_STRING,
+    '2fa_code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     '2fa_enable' => FILTER_VALIDATE_INT,
     '2fa_backup_codes' => array('filter' => FILTER_VALIDATE_INT, 'flags'  => FILTER_FORCE_ARRAY)
 ));

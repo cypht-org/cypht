@@ -12,7 +12,7 @@ a { color: green !important; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: green !important; }
 .loading_icon, .server_section { border-radius: 0px 0px 0px 0px !important; }
 .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #050505 !important; }
-.msg_controls, .src_name, .content_title { color: green !important; background: linear-gradient(0deg, #050505, #050505) !important; }
+#list_controls_menu, .msg_controls, .src_name, .content_title { color: green !important; background: linear-gradient(0deg, #050505, #050505) !important; }
 .debug, .subtitle, .settings_subtitle { color: green !important; }
 .settings_subtitle { padding-left: 0px !important; }
 .empty_list, .subject a { font-style: normal; color: green !important; }

@@ -24,6 +24,6 @@ return array(
     ),
     'allowed_post' => array(
         'inline_message' => FILTER_VALIDATE_INT,
-        'inline_message_style' => FILTER_SANITIZE_STRING
+        'inline_message_style' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );

@@ -9,7 +9,7 @@ a:hover { color: #39528c !important; }
 textarea, select, input, .toggle_link { border-color: #ccc !important; color: #666; background-color: #e8f0ff; }
 .loading_icon { background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAHCAIAAABx4H/3AAAACXBIWXMAAA4mAAAN/wHwU+XzAAAAB3RJTUUH4AMPFQ81DpVi0wAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAGjSURBVEjHjVVJot0gDLPkvN7/Gr1Gj9Jj9AWpCxICZPqsgvEgy0Pw+8/f72rbRV6LZRdZDsmlWPZaqsRFm1opUeRVm6RafYsjYl1VzYssVXNFxL/v5kSOKlFZw1b5WiUiwGR+AgATwJIkIgkCS4KMJRkRTZ7Esgw6AJIg4pOMiF8f7PpYsj4hEyR6qyRwfFR53B3a1w9ARIS8fdydO/P+SIfDzj9tja4EEPfxOD5ZnpSJTQesIY5XPeKsisRLIuyh9KHPLLgTya7XPQyS8AlRszgzUKnpU6rXh6pod7czAo8otesQIR+A7RciqqLeCn9US/aZoD4GAHnzSGCsmyv6EbqbyuTZduusKep0bR7Qugao4a5q45bPxE6RL2t2V8uXznq1sU0cIDw2l23flIZ88YyfgdXE48iH7cbj1CZ1GZ1rNs11vs0he7j2xc7qRgk9iNzn9nJttfXRdtaF2sY1fL/5+hcCxLQNjiiTnynxcx2Bmf0iP9PFvvmfd1YPAvtS8NVUnpvM448CgC0wz3P33Fny0IYcEwbAmyblD3q3brqH8x9z/ECOMpTSWwAAAABJRU5ErkJggg==') repeat-x top left; background-size: cover; background-position: 0px, 0px; }
 
-.confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #e8f0ff !important; }
+#list_controls_menu, .confirm_logout, .folder_list, .content_cell, .message_list, .configured_server, .add_server, .server_content, .server_section { background-color: #e8f0ff !important; }
 .list_controls { background: none !important; }
 .msg_controls, .src_name, .content_title { color: #8391b0 !important; background: linear-gradient(0deg, #c6d7ff, #e8f0ff) !important; }
 .debug, .subtitle { color: #3a5aa4 !important; }

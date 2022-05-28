@@ -10,6 +10,6 @@ add_module_to_all_pages('output', 'recaptcha_script', false, 'recaptcha', 'heade
 
 return array(
     'allowed_post' => array(
-        'g-recaptcha-response' => FILTER_SANITIZE_STRING
+        'g-recaptcha-response' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
