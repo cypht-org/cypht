@@ -383,9 +383,18 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">'.$this->trans('Server address').'</label>'.
             '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
-            '<input required type="number" id="new_imap_port" name="new_imap_port" class="port_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<tr class="sieve_config" style="display: none;"><td><div class="subtitle">'.$this->trans('Sieve Configuration').'</div></td></tr>'.
+            '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Username').'</label>'.
+            '<input type="text" id="sieve_config_username" name="sieve_config_username" class="txt_fld" placeholder="'.$this->trans('Username').'"></td></tr>'.
+            '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Password').'</label>'.
+            '<input type="text" id="sieve_config_password" name="sieve_config_password" class="txt_fld" placeholder="'.$this->trans('Password').'"></td></tr>'.
+            '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Host').'</label>'.
+            '<input type="text" id="sieve_config_host" name="sieve_config_host" class="txt_fld" placeholder="'.$this->trans('localhost:2049').'"></td></tr>'.
             '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
             '<label for="new_imap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
+            '<tr><td colspan="2"><input type="checkbox" id="enable_sieve_filter" name="enable_sieve_filter" class="" value="0">'.
+            '<label for="enable_sieve_filter">'.$this->trans('Enable Sieve Filters').'</label></td></tr>'.
             '<tr><td><input type="radio" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label>'.
             '<br /><input type="radio" name="tls" value="0" id="imap_notls" /><label for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
             '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
@@ -409,7 +418,8 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST">'.
+            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST
+">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add a JMAP Server').'</div><table>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_name">'.$this->trans('Account name').'</label>'.

@@ -980,6 +980,10 @@ if (hm_list_path() == 'sent') {
 }
 
 $(function() {
+    $(document).on('click', '#enable_sieve_filter', function () {
+        $('.sieve_config').toggle();
+    });
+
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
         setup_imap_folder_page();
     }
