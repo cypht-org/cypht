@@ -55,6 +55,8 @@ class Hm_Handler_imap_forward_attachments extends Hm_Handler_Module {
             'size' => strlen($content)
         );
         $draft_id = next_draft_key($this->session);
+        // This needs to be replaced with something that works with the new attachment
+        // code.
         //attach_file($content, $file, $filepath, $draft_id, $this);
         $this->out('compose_draft_id', $draft_id);
     }

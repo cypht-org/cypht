@@ -134,7 +134,11 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_list_controls() {
-        $this->assertEquals('<div class="list_controls">foobazbar</div>', list_controls('foo', 'bar', 'baz'));
+        $this->assertEquals('<div class="list_controls no_mobile">foobazbar</div>
+    <div class="list_controls on_mobile">
+        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M9.5%2013a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200zm0-5a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200zm0-5a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200z%22%20%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
+        <div id="list_controls_menu" classs="list_controls_menu">foobazbar</div>
+    </div>', list_controls('foo', 'bar', 'baz'));
     }
     /**
      * @preserveGlobalState disabled

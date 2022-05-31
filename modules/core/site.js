@@ -1133,7 +1133,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            document.cookie = 'hm_reload_folders=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             Hm_Utils.expand_core_settings();
             return true;
         }
@@ -1660,7 +1659,7 @@ $(function() {
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
         Hm_Message_List.select_combined_view();
         $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
-        $('.source_link').on("click", function() { $('.list_sources').toggle(); return false; });
+        $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
             $('.menu_unread > a').css('font-weight', 'normal');
             Hm_Folders.save_folder_list();
@@ -1680,6 +1679,10 @@ $(function() {
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
+        $('.list_controls.on_mobile').show();
+        $('.list_controls.no_mobile').hide();
+    } else {
+        $('.list_controls.on_mobile').hide();
     }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
     
@@ -1731,4 +1734,9 @@ function fixLtrInRtl() {
             };
         }
     }, 0)
+}
+
+function listControlsMenu() {
+    $('#list_controls_menu').toggle();
+    $('.list_sources').hide();
 }

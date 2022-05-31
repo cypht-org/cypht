@@ -70,7 +70,7 @@ if (!class_exists('Hm_Functions')) {
             $prefix = $lifetime != 0 && $lifetime < time() ? 'Deleting' : 'Setting';
             Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
                 $prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
-            if ((float) substr(phpversion(), 0, 3) >= 7.3) {
+            if (version_compare(PHP_VERSION, '7.3', '>=')) {
                 return setcookie($name, $value, array(
                     'expires' => $lifetime,
                     'path' => $path,

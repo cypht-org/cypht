@@ -1,6 +1,13 @@
 <?php
+#use Endroid\QrCode\Color\Color;
+#use Endroid\QrCode\Encoding\Encoding;
+#use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+#use Endroid\QrCode\QrCode;
+#use Endroid\QrCode\Label\Label;
+#use Endroid\QrCode\Logo\Logo;
+#use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+#use Endroid\QrCode\Writer\PngWriter;
 
-use CodeItNow\BarcodeBundle\Utils\QrCode;
 
 /**
  * 2FA modules
@@ -133,7 +140,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
-            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.$png.'" />';
+            $qr_code .= '<img alt="" width="200" height="200" src="data:image/png;base64,'.base64_encode($png).'" />';
             $qr_code .= '</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
             $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
@@ -239,14 +246,12 @@ function base32_encode_str($str) {
  * @subpackage 2fa/functions
  */
 if (!hm_exists('generate_qr_code')) {
-function generate_qr_code($config, $username, $str) {
-    $qr_code = rtrim($config->get('app_data_dir', ''), '/').'/'.$username.'2fa.png';
-    require_once VENDOR_PATH.'autoload.php';
-    $qr_code = new QrCode();
-    $qr_code->setText($str);
-    $qr_code->setSize(200);
-    return $qr_code->generate();
-}}
+    function generate_qr_code($config, $username, $str) {
+        require_once VENDOR_PATH.'autoload.php';
+        $qrCode = new Endroid\QrCode\QrCode($str);
+        return $qrCode->writeString();
+    }
+}
 
 /**
  * @subpackage 2fa/functions

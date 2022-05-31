@@ -33,11 +33,11 @@ return array(
         'ajax_nasa_disconnect',
     ),
     'allowed_post' => array(
-        'api_key' => FILTER_SANITIZE_STRING,
+        'api_key' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nasa_disconnect' => FILTER_VALIDATE_BOOLEAN,
     ),
     'allowed_get' => array(
-        'apod_date' => FILTER_SANITIZE_STRING,
+        'apod_date' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
     'allowed_output' => array(
         'nasa_action_status' => array(FILTER_VALIDATE_BOOLEAN, false),

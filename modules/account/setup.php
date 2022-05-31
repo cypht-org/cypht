@@ -31,14 +31,14 @@ return array(
         'change_password'
     ),
     'allowed_post' => array(
-        'create_username' => FILTER_SANITIZE_STRING,
+        'create_username' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'create_password' => FILTER_UNSAFE_RAW,
         'create_password_again' => FILTER_UNSAFE_RAW,
-        'delete_username' => FILTER_SANITIZE_STRING,
+        'delete_username' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'new_pass1' => FILTER_UNSAFE_RAW,
         'new_pass2' => FILTER_UNSAFE_RAW,
         'old_pass' => FILTER_UNSAFE_RAW,
-        'change_password' => FILTER_SANITIZE_STRING,
+        'change_password' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );
 

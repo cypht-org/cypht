@@ -45,25 +45,25 @@ return array(
         'ajax_autocomplete_contact'
     ),
     'allowed_post' => array(
-        'contact_email' => FILTER_SANITIZE_STRING,
-        'contact_name' => FILTER_SANITIZE_STRING,
-        'contact_phone' => FILTER_SANITIZE_STRING,
+        'contact_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_phone' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_id' => FILTER_VALIDATE_INT,
-        'contact_value' => FILTER_SANITIZE_STRING,
-        'edit_contact' => FILTER_SANITIZE_STRING,
-        'add_contact' => FILTER_SANITIZE_STRING,
-        'contact_source' => FILTER_SANITIZE_STRING,
-        'contact_type' => FILTER_SANITIZE_STRING
+        'contact_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'edit_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'add_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_VALIDATE_INT,
         'contact_page' => FILTER_VALIDATE_INT,
-        'contact_type' => FILTER_SANITIZE_STRING,
-        'contact_source' => FILTER_SANITIZE_STRING,
+        'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),
-        'contact_suggestions' => array(FILTER_SANITIZE_STRING, FILTER_REQUIRE_ARRAY)
+        'contact_suggestions' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY)
     ),
 );
 

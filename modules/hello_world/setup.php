@@ -101,7 +101,7 @@ return array(
      * value not defined here will be filtered out of an ajax response.
      */
     'allowed_output' => array(
-        'hello_world_ajax_result' => array(FILTER_SANITIZE_STRING, false)
+        'hello_world_ajax_result' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
     ),
 
     /**
