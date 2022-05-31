@@ -20,13 +20,13 @@ $(function () {
                     description: 'Subject',
                     type: 'string',
                     selected: true,
-                    options: ['Contains', 'Matches']
+                    options: ['Contains', 'Match']
                 },
                 {
                     name: 'body',
                     description: 'Body',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    options: ['Contains', 'Match']
                 },
                 {
                     name: 'size',
@@ -278,7 +278,7 @@ $(function () {
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
                 '                                <td>' +
-                '                                    <select class="add_condition_sieve_filters">' +
+                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions[]">' +
                 '                                        <optgroup label="Message">' +
                 message_fields +
                 '                                        </optgroup>' +
@@ -288,7 +288,7 @@ $(function () {
                 '                                    </select>' +
                 '                                </td>' +
                 '                                <td>' +
-                '                                    <select class="condition_options">' +
+                '                                    <select class="condition_options" name="sieve_selected_conditions_options[]">' +
                 '                                        <option>' +
                 '                                            Contains' +
                 '                                        </option>' +
@@ -304,7 +304,7 @@ $(function () {
                 '                                    </select>' +
                 '                                </td>' +
                 '                                <td>' +
-                '                                    <input type="text" />' +
+                '                                    <input type="text" name="sieve_selected_option_value[]" />' +
                 '                                </td>' +
                 '                                <td style="vertical-align: middle; width: 50px;">' +
                 '                                    <a href="#" class="delete_condition_modal_button">Delete</a>' +
@@ -330,7 +330,7 @@ $(function () {
             $('.filter_actions_modal_table').append(
                 '<tr style="border-bottom-color: black;">' +
                 '   <td>' +
-                '       <select class="sieve_actions_select">' +
+                '       <select class="sieve_actions_select" name="sieve_selected_actions">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
@@ -391,16 +391,16 @@ $(function () {
                     elem.html('');
                 }
                 if (selected_action.type === 'string') {
-                    elem.html('<input type="text" />');
+                    elem.html('<input name="sieve_selected_action_value[]" type="text" />');
                 }
                 if (selected_action.type === 'int') {
-                    elem.html('<input type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" type="number" />');
                 }
                 if (selected_action.type === 'number') {
-                    elem.html('<input type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" type="number" />');
                 }
                 if (selected_action.type === 'text') {
-                    elem.html('<textarea></textarea>');
+                    elem.html('<textarea name="sieve_selected_action_value[]"></textarea>');
                 }
             }
         })
@@ -433,10 +433,10 @@ $(function () {
                 elem.html(options_html);
 
                 if (condition.type === 'string') {
-                    elem_type.html('<input type="text" />')
+                    elem_type.html('<input name="sieve_selected_options_value[]" type="text" />')
                 }
                 if (condition.type === 'int') {
-                    elem_type.html('<input type="number" />')
+                    elem_type.html('<input name="sieve_selected_options_value[]" type="number" />')
                 }
             }
         });

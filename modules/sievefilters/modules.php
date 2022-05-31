@@ -169,6 +169,28 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th>Actions</th></tr>';
                 $res .= get_mailbox_filters($mailbox, true);
                 $res .= '</tbody></table>';
+                $res .= '<div style="height: 40px; margin-bottom: 10px;">
+                                <div style="width: 90%;">
+                                    <h3 style="margin-bottom: 2px;">If conditions are not met</h3>
+                                    <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
+                                </div>
+                            </div>
+                            <div style="background-color: #f7f2ef; margin-top: 25px; width: 90%;">
+                                <div style="padding: 10px;">
+                                    <div style="display: flex; height: 30px;">
+                                        <div style="width: 80%;">
+                                            <h5 style="margin-top: 0">Actions</h5>
+                                        </div>
+                                        <div style="flex-grow: 1; text-align: right;">
+                                            <button style="margin-right: 10px;" class="filter_modal_add_else_action_btn">Add Action</button>
+                                        </div>
+                                    </div>
+                                    <div style="width: 100%;">
+                                        <table class="filter_else_actions_modal_table">
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>';
                 $res .= '</div></div></div>';
             }
         }
@@ -255,28 +277,6 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     </div>
                     <div style="width: 100%;">
                         <table class="filter_actions_modal_table">
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div style="display: flex; height: 70px; margin-bottom: 10px;">
-                <div style="width: 100%;">
-                    <h3 style="margin-bottom: 2px;">If conditions are not met</h3>
-                    <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
-                </div>
-            </div>
-            <div style="background-color: #f7f2ef; margin-top: 25px;">
-                <div style="padding: 10px;">
-                    <div style="display: flex; height: 30px;">
-                        <div style="width: 80%;">
-                            <h5 style="margin-top: 0">Actions</h5>
-                        </div>
-                        <div style="flex-grow: 1; text-align: right;">
-                            <button style="margin-right: 10px;" class="filter_modal_add_else_action_btn">Add Action</button>
-                        </div>
-                    </div>
-                    <div style="width: 100%;">
-                        <table class="filter_else_actions_modal_table">
                         </table>
                     </div>
                 </div>
