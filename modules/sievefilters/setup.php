@@ -12,6 +12,18 @@ add_output('sievefilters', 'sievefilters_settings_accounts', true, 'sievefilters
 add_handler('sievefilters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 
+/* save filter */
+setup_base_ajax_page('ajax_sieve_save_filter', 'core');
+add_handler('ajax_sieve_save_filter', 'settings_load_imap',  true);
+add_handler('ajax_sieve_save_filter', 'sieve_save_filter',  true);
+add_output('ajax_sieve_save_filter', 'sieve_save_filter_output',  true);
+
+/* delete filter */
+setup_base_ajax_page('ajax_sieve_delete_filter', 'core');
+add_handler('ajax_sieve_delete_filter', 'settings_load_imap',  true);
+add_handler('ajax_sieve_delete_filter', 'sieve_delete_filter',  true);
+add_output('ajax_sieve_delete_filter', 'sieve_delete_output',  true);
+
 /* save script */
 setup_base_ajax_page('ajax_sieve_save_script', 'core');
 add_handler('ajax_sieve_save_script', 'settings_load_imap',  true);
@@ -36,7 +48,10 @@ return array(
         'sievefilters',
         'ajax_sieve_save_script',
         'ajax_sieve_edit_script',
-        'ajax_sieve_delete_script'
+        'ajax_sieve_delete_script',
+        'ajax_sieve_save_filter',
+        'ajax_sieve_edit_filter',
+        'ajax_sieve_delete_filter'
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -48,7 +63,11 @@ return array(
         'imap_account' => FILTER_SANITIZE_STRING,
         'sieve_script_name' => FILTER_SANITIZE_STRING,
         'sieve_script_priority' => FILTER_VALIDATE_INT,
+        'sieve_filter_name' => FILTER_SANITIZE_STRING,
+        'sieve_filter_priority' => FILTER_VALIDATE_INT,
         'script' => FILTER_UNSAFE_RAW,
-        'current_editing_script' => FILTER_SANITIZE_STRING
+        'current_editing_script' => FILTER_SANITIZE_STRING,
+        'conditions_json' => FILTER_UNSAFE_RAW,
+        'actions_json' => FILTER_UNSAFE_RAW
     )
 );

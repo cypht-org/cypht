@@ -42,6 +42,31 @@ class Hm_Output_sieve_edit_output extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/handler
  */
+class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
+    public function process() {
+        foreach ($this->user_config->get('imap_servers') as $mailbox) {
+            if ($mailbox['name'] == $this->request->post['imap_account']) {
+                $imap_account = $mailbox;
+            }
+        }
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $scripts = $client->listScripts();
+        foreach ($scripts as $script) {
+            if ($script == $this->request->post['sieve_script_name']) {
+                $client->removeScripts($this->request->post['sieve_script_name']);
+                $this->out('script_removed', true);
+            }
+        }
+        Hm_Msgs::add('Script removed');
+    }
+}
+
+
+/**
+ * @subpackage sievefilters/handler
+ */
 class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
     public function process() {
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
@@ -70,6 +95,206 @@ class Hm_Output_sieve_delete_output extends Hm_Output_Module {
     public function output() {
         $removed = $this->get('script_removed', false);
         $this->out('script_removed', $removed);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
+    public function process() {
+        foreach ($this->user_config->get('imap_servers') as $mailbox) {
+            if ($mailbox['name'] == $this->request->post['imap_account']) {
+                $imap_account = $mailbox;
+            }
+        }
+        $script_name = generate_filter_name($this->request->post['sieve_filter_name'], $this->request->post['sieve_filter_priority']);
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $conditions = json_decode($this->request->post['conditions_json']);
+        $actions = json_decode($this->request->post['actions_json']);
+
+        $filter = \PhpSieveManager\Filters\FilterFactory::create($script_name);
+        $custom_condition = new \PhpSieveManager\Filters\Condition(
+            "CYPHT GENERATED CONDITION"
+        );
+        foreach ($conditions as $condition) {
+            $cond = null;
+            if ($condition->condition == 'body') {
+                $filter->addRequirement('body');
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('body');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"'.$condition->value.'"');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"'.$condition->value.'"');
+                }
+                if ($condition->type == 'Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not body');
+                    $cond->matches('"'.$condition->value.'"');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not body');
+                    $cond->contains('"'.$condition->value.'"');
+                }
+            }
+            if ($condition->condition == 'subject') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"Subject" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"Subject" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"Subject" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"Subject" ["'.$condition->value.'"]');
+                }
+            }
+            if ($condition->condition == 'to') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"Delivered-To" ["'.$condition->value.'"]');
+                }
+            }
+            if ($condition->condition == 'from') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"From" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"From" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"From" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"From" ["'.$condition->value.'"]');
+                }
+            }
+            if ($condition->condition == 'bcc') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"Bcc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"Bcc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"Bcc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"Bcc" ["'.$condition->value.'"]');
+                }
+            }
+            if ($condition->condition == 'cc') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"Cc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"Cc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"Cc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"Cc" ["'.$condition->value.'"]');
+                }
+            }
+            if ($condition->condition == 'size') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('size');
+                if ($condition->type == 'Over') {
+                    $cond->over($condition->value.'K');
+                }
+                if ($condition->type == 'Under') {
+                    $cond->under($condition->value.'K');
+                }
+                if ($condition->type == '!Over') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not size');
+                    $cond->over($condition->value.'K');
+                }
+                if ($condition->type == '!Under') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not size');
+                    $cond->under($condition->value.'K');
+                }
+            }
+            if ($cond) {
+                $custom_condition->addCriteria($cond);
+            }
+        }
+
+        foreach ($actions as $action) {
+            if ($action->action == 'discard') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+                );
+            }
+            if ($action->action == 'keep') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
+            if ($action->action == 'copy') {
+                $filter->addRequirement('fileinto');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
+                );
+            }
+        }
+        $filter->setCondition($custom_condition);
+        $script_parsed = $filter->toScript();
+
+        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+        $header_obj .= "\n# ".base64_encode($this->request->post['conditions_json']);
+        $header_obj .= "\n# ".base64_encode($this->request->post['actions_json']);
+        $script_parsed = $header_obj."\n\n".$script_parsed;
+
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $scripts = $client->listScripts();
+        foreach ($scripts as $script) {
+            if ($script == 'main_script') {
+                $client->removeScripts('main_script');
+            }
+            if ($script == $this->request->post['current_editing_script']) {
+                $client->removeScripts($this->request->post['current_editing_script']);
+            }
+        }
+
+        $client->putScript(
+            $script_name,
+            $script_parsed
+        );
+
+        $scripts = $client->listScripts();
+        $main_script = generate_main_script($scripts);
+
+        $client->putScript(
+            'main_script',
+            $main_script
+        );
+        $client->activateScript('main_script');
     }
 }
 
@@ -241,8 +466,8 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                 </div>
             </div>
             <div style="margin-bottom: 10px; margin-top: 25px;">
-                <b>Filter Name:</b><input type="text" placeholder="Your filter name" style="margin-left: 10px;" /> 
-                <b style="margin-left: 50px;">Priority:</b><input type="number" placeholder="0" style="margin-left: 10px;" /> 
+                <b>Filter Name:</b><input type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
+                <b style="margin-left: 50px;">Priority:</b><input class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
             </div>
             <div style="display: flex; height: 70px; margin-bottom: 10px;">
                 <div style="width: 100%;">
@@ -326,9 +551,42 @@ if (!hm_exists('get_mailbox_filters')) {
     }
 }
 
+if (!hm_exists('generate_main_script')) {
+    function generate_main_script($script_list)
+    {
+        $parsed_list = [];
+        foreach ($script_list as $script_name) {
+            $ex_name = explode('-', $script_name);
+            if (!array_key_exists($ex_name[1], $parsed_list)) {
+                $parsed_list[$ex_name[1]] = [
+                    'priority' => $ex_name[1],
+                    'name' => $script_name,
+                ];
+            }
+        }
+
+        sort($parsed_list);
+
+        $include_header = 'require ["include"];'."\n\n";
+        $include_body = '';
+        foreach ($parsed_list as $include_script) {
+            $include_body .= 'include :personal "'.$include_script['name'].'"'."\n";
+        }
+        print_r($include_header.$include_body);die;
+        return $include_header.$include_body;
+    }
+}
+
 if (!hm_exists('generate_script_name')) {
     function generate_script_name($name, $priority)
     {
         return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cypht';
+    }
+}
+
+if (!hm_exists('generate_filter_name')) {
+    function generate_filter_name($name, $priority)
+    {
+        return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cyphtfilter';
     }
 }

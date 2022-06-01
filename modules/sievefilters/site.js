@@ -20,19 +20,19 @@ $(function () {
                     description: 'Subject',
                     type: 'string',
                     selected: true,
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 },
                 {
                     name: 'body',
                     description: 'Body',
                     type: 'string',
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 },
                 {
                     name: 'size',
                     description: 'Size (KB)',
                     type: 'int',
-                    options: ['Equal', 'Over', 'Under']
+                    options: ['Over', 'Under']
                 }
             ],
             'Header': [
@@ -40,25 +40,25 @@ $(function () {
                     name: 'to',
                     description: 'To',
                     type: 'string',
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 },
                 {
                     name: 'from',
                     description: 'From',
                     type: 'string',
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 },
                 {
                     name: 'cc',
                     description: 'CC',
                     type: 'string',
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 },
                 {
                     name: 'bcc',
                     description: 'BCC',
                     type: 'string',
-                    options: ['Contains', 'Match']
+                    options: ['Contains', 'Matches']
                 }
             ]
         }
@@ -78,22 +78,6 @@ $(function () {
                 description: 'Copy email to mailbox',
                 placeholder: 'Mailbox Name (Folder)',
                 type: 'string'
-            },
-            {
-                name: 'foward',
-                description: 'Forward this email to',
-                type: 'string',
-                placeholder: 'email@email.com',
-            },
-            {
-                name: 'reply_plain',
-                description: 'Reply the email with (Plain)',
-                type: 'text'
-            },
-            {
-                name: 'reply_html',
-                description: 'Reply the email with (HTML)',
-                type: 'text'
             },
             {
                 name: 'discard',
@@ -183,7 +167,64 @@ $(function () {
          *                                    FUNCTIONS
          **************************************************************************************/
         function save_filter(imap_account) {
+            let conditions_parsed = []
+            let actions_parsed = []
+            let conditions = $('select[name^=sieve_selected_conditions_field]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
 
+            let conditions_type = $('select[name^=sieve_selected_conditions_options]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
+
+            let conditions_value = $('input[name^=sieve_selected_option_value]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
+
+            let idx = 0;
+            conditions.forEach(function (elem) {
+                 conditions_parsed.push(
+                     {
+                         'condition': elem,
+                         'type': conditions_type[idx],
+                         'value': conditions_value[idx]
+                     }
+                 )
+                idx = idx + 1;
+            });
+
+            let actions_type = $('select[name^=sieve_selected_actions]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
+            let actions_value = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
+
+            idx = 0;
+            actions_type.forEach(function (elem) {
+                actions_parsed.push(
+                    {
+                        'action': elem,
+                        'value': actions_value[idx]
+                    }
+                )
+                idx = idx + 1;
+            });
+
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_filter'},
+                    {'name': 'imap_account', 'value': imap_account},
+                    {'name': 'sieve_filter_name', 'value': $('.modal_sieve_filter_name').val()},
+                    {'name': 'sieve_filter_priority', 'value': $('.modal_sieve_filter_priority').val()},
+                    {'name': 'is_editing_filter', 'value': is_editing_filter},
+                    {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
+                    {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
+                    {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
+                    ],
+                function(res) {
+                    
+                }
+            );
         }
 
         function save_script(imap_account) {
@@ -278,7 +319,7 @@ $(function () {
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
                 '                                <td>' +
-                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions[]">' +
+                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions_field[]">' +
                 '                                        <optgroup label="Message">' +
                 message_fields +
                 '                                        </optgroup>' +
@@ -289,17 +330,17 @@ $(function () {
                 '                                </td>' +
                 '                                <td>' +
                 '                                    <select class="condition_options" name="sieve_selected_conditions_options[]">' +
-                '                                        <option>' +
+                '                                        <option value="Contains">' +
                 '                                            Contains' +
                 '                                        </option>' +
-                '                                        <option>' +
-                '                                            NOT Contains' +
+                '                                        <option value="!Contains">' +
+                '                                            Not Contains' +
                 '                                        </option>' +
-                '                                        <option>' +
+                '                                        <option value="Matches">' +
                 '                                            Matches' +
                 '                                        </option>' +
-                '                                        <option>' +
-                '                                            NOT Matches' +
+                '                                        <option value="!Matches">' +
+                '                                            Not Matches' +
                 '                                        </option>' +
                 '                                    </select>' +
                 '                                </td>' +
@@ -330,12 +371,13 @@ $(function () {
             $('.filter_actions_modal_table').append(
                 '<tr style="border-bottom-color: black;">' +
                 '   <td>' +
-                '       <select class="sieve_actions_select" name="sieve_selected_actions">' +
+                '       <select class="sieve_actions_select" name="sieve_selected_actions[]">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
                 '    <td>' +
-                '    </td>' +
+                '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
+                '    </input>' +
                 '    <td style="vertical-align: middle; width: 50px;">' +
                 '           <a href="#" class="delete_action_modal_button">Delete</a>' +
                 '    </td>' +
@@ -388,7 +430,7 @@ $(function () {
             });
             if (selected_action) {
                 if (selected_action.type === 'none') {
-                    elem.html('');
+                    elem.html('<input name="sieve_selected_action_value[]" type="hidden" value="" />');
                 }
                 if (selected_action.type === 'string') {
                     elem.html('<input name="sieve_selected_action_value[]" type="text" />');
@@ -433,13 +475,32 @@ $(function () {
                 elem.html(options_html);
 
                 if (condition.type === 'string') {
-                    elem_type.html('<input name="sieve_selected_options_value[]" type="text" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="text" />')
                 }
                 if (condition.type === 'int') {
-                    elem_type.html('<input name="sieve_selected_options_value[]" type="number" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="number" />')
                 }
             }
         });
+
+        /**
+         * Delete filter event
+         */
+        $(document).on('click', '.delete_filter', function (e) {
+            e.preventDefault();
+            let obj = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_delete_filter'},
+                    {'name': 'imap_account', 'value': $(this).attr('imap_account')},
+                    {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
+                function(res) {
+                    if (res.script_removed == '1') {
+                        obj.parent().parent().remove();
+                    }
+                }
+            );
+        });
+
 
         /**
          * Delete script event
