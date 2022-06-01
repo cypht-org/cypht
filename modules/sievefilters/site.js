@@ -222,7 +222,7 @@ $(function () {
                     {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
                     ],
                 function(res) {
-                    
+
                 }
             );
         }
@@ -265,7 +265,7 @@ $(function () {
         });
         $('.edit_filter').on('click', function (e) {
             e.preventDefault();
-            let script_name = $(this).parent().parent().children().html();
+            let script_name = $(this).parent().parent().children().next().html();
             $('.filter_modal_title').html(script_name);
             edit_filter_modal.open();
         });

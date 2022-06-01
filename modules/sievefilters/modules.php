@@ -570,9 +570,8 @@ if (!hm_exists('generate_main_script')) {
         $include_header = 'require ["include"];'."\n\n";
         $include_body = '';
         foreach ($parsed_list as $include_script) {
-            $include_body .= 'include :personal "'.$include_script['name'].'"'."\n";
+            $include_body .= 'include :personal "'.$include_script['name'].'";'."\n";
         }
-        print_r($include_header.$include_body);die;
         return $include_header.$include_body;
     }
 }
