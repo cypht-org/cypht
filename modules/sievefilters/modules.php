@@ -53,12 +53,23 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
         $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
         $scripts = $client->listScripts();
+
         foreach ($scripts as $script) {
+            if ($script == 'main_script') {
+                $client->removeScripts('main_script');
+            }
             if ($script == $this->request->post['sieve_script_name']) {
                 $client->removeScripts($this->request->post['sieve_script_name']);
                 $this->out('script_removed', true);
             }
         }
+        $scripts = $client->listScripts();
+        $main_script = generate_main_script($scripts);
+        $client->putScript(
+            'main_script',
+            $main_script
+        );
+        $client->activateScript('main_script');
         Hm_Msgs::add('Script removed');
     }
 }
@@ -79,11 +90,22 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
+            if ($script == 'main_script') {
+                $client->removeScripts('main_script');
+            }
             if ($script == $this->request->post['sieve_script_name']) {
                 $client->removeScripts($this->request->post['sieve_script_name']);
                 $this->out('script_removed', true);
             }
         }
+        $scripts = $client->listScripts();
+        $main_script = generate_main_script($scripts);
+
+        $client->putScript(
+            'main_script',
+            $main_script
+        );
+        $client->activateScript('main_script');
         Hm_Msgs::add('Script removed');
     }
 }
@@ -528,8 +550,11 @@ if (!hm_exists('get_mailbox_filters')) {
             if (end($exp_name) == 'cypht') {
                 $base_class = 'script';
             }
-            if (end($exp_name) == 'cyphtfilter') {
+            else if (end($exp_name) == 'cyphtfilter') {
                 $base_class = 'filter';
+            }
+            else {
+                continue;
             }
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
             $script_list .= '
@@ -556,6 +581,9 @@ if (!hm_exists('generate_main_script')) {
     {
         $parsed_list = [];
         foreach ($script_list as $script_name) {
+            if ($script_name == 'main_script') {
+                continue;
+            }
             $ex_name = explode('-', $script_name);
             if (!array_key_exists($ex_name[1], $parsed_list)) {
                 $parsed_list[$ex_name[1]] = [
