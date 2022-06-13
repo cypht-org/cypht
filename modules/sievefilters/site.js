@@ -80,6 +80,18 @@ $(function () {
                 type: 'string'
             },
             {
+                name: 'flag',
+                description: 'Flag',
+                placeholder: 'SEEN',
+                type: 'string'
+            },
+            {
+                name: 'redirect',
+                description: 'Redirect',
+                placeholder: 'mail@mail.com',
+                type: 'string'
+            },
+            {
                 name: 'discard',
                 description: 'Discard',
                 type: 'none'
@@ -96,10 +108,8 @@ $(function () {
             closeLabel: "Close",
             cssClass: ['custom-class-1', 'custom-class-2'],
             onOpen: function () {
-                console.log('modal open');
             },
             onClose: function () {
-                console.log('modal closed');
             },
             beforeClose: function () {
                 // here's goes some logic
@@ -135,10 +145,13 @@ $(function () {
             closeLabel: "Close",
             cssClass: ['custom-class-1', 'custom-class-2'],
             onOpen: function () {
-                console.log('modal open');
             },
             onClose: function () {
-                console.log('modal closed');
+                $(".sieve_list_conditions_modal").html("");
+                $(".filter_actions_modal_table").html("");
+                $(".modal_sieve_filter_name").val("");
+                $(".modal_sieve_filter_priority").val("0");
+                $(".modal_sieve_filter_test").val("ANYOF");
             },
             beforeClose: function () {
                 // here's goes some logic
@@ -155,6 +168,7 @@ $(function () {
         // add a button
         edit_filter_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
             save_filter(current_account);
+            edit_filter_modal.close();
         });
 
         // add another button
@@ -220,9 +234,10 @@ $(function () {
                     {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
                     {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
                     {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
+                    {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()}
                     ],
                 function(res) {
-
+                    window.location = window.location;
                 }
             );
         }
@@ -294,10 +309,7 @@ $(function () {
             $(this).parent().parent().remove();
         });
 
-        /**
-         * Add Condition Button
-         */
-        $(document).on('click', '.sieve_add_condition_modal_button', function () {
+        function add_filter_condition() {
             let header_fields = '';
             let message_fields = '';
 
@@ -352,12 +364,16 @@ $(function () {
                 '                                </td>' +
                 '                            </tr>'
             );
-        });
+        }
 
         /**
-         * Add Action Button
+         * Add Condition Button
          */
-        $(document).on('click', '.filter_modal_add_action_btn', function () {
+        $(document).on('click', '.sieve_add_condition_modal_button', function () {
+            add_filter_condition();
+        });
+
+        function add_filter_action() {
             let possible_actions_html = '';
 
             possible_actions.forEach(function (value) {
@@ -383,6 +399,13 @@ $(function () {
                 '    </td>' +
                 '</tr>'
             );
+        }
+
+        /**
+         * Add Action Button
+         */
+        $(document).on('click', '.filter_modal_add_action_btn', function () {
+            add_filter_action();
         });
 
         /**
@@ -521,7 +544,7 @@ $(function () {
         });
 
         /**
-         * Delete script event
+         * Edit script event
          */
         $(document).on('click', '.edit_script', function (e) {
             e.preventDefault();
@@ -540,6 +563,46 @@ $(function () {
                 function(res) {
                     $('.modal_sieve_script_textarea').html(res.script);
                     edit_script_modal.open();
+                }
+            );
+        });
+
+        /**
+         * Edit filter event
+         */
+        $(document).on('click', '.edit_filter', function (e) {
+            e.preventDefault();
+            let obj = $(this);
+            current_account = $(this).attr('account');
+            is_editing_filter = true;
+            current_editing_filter_name = $(this).attr('script_name');
+            current_account = $(this).attr('imap_account');
+            $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
+            $('.modal_sieve_filter_priority').val($(this).attr('priority'));
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_filter'},
+                    {'name': 'imap_account', 'value': $(this).attr('imap_account')},
+                    {'name': 'sieve_script_name', 'value': $(this).attr('script_name')}],
+                function(res) {
+                    conditions = JSON.parse(JSON.parse(res.conditions));
+                    actions = JSON.parse(JSON.parse(res.actions));
+                    test_type = res.test_type;
+
+                    $(".modal_sieve_filter_test").val(test_type);
+                    conditions.forEach(function (condition) {
+                        add_filter_condition();
+                        $(".add_condition_sieve_filters").last().val(condition.condition);
+                        $(".add_condition_sieve_filters").last().trigger('change');
+                        $(".condition_options").last().val(condition.type);
+                        $("[name^=sieve_selected_option_value]").last().val(condition.value);
+                    });
+
+                    actions.forEach(function (action) {
+                        add_filter_action();
+                        $(".sieve_actions_select").last().val(action.action);
+                        $(".sieve_actions_select").last().trigger('change');
+                        $("[name^=sieve_selected_action_value]").last().val(action.value);
+                    });
                 }
             );
         });

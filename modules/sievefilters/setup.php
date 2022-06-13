@@ -18,6 +18,12 @@ add_handler('ajax_sieve_save_filter', 'settings_load_imap',  true);
 add_handler('ajax_sieve_save_filter', 'sieve_save_filter',  true);
 add_output('ajax_sieve_save_filter', 'sieve_save_filter_output',  true);
 
+/* edit filter */
+setup_base_ajax_page('ajax_sieve_edit_filter', 'core');
+add_handler('ajax_sieve_edit_filter', 'settings_load_imap',  true);
+add_handler('ajax_sieve_edit_filter', 'sieve_edit_filter',  true);
+add_output('ajax_sieve_edit_filter', 'sieve_edit_filter_output',  true);
+
 /* delete filter */
 setup_base_ajax_page('ajax_sieve_delete_filter', 'core');
 add_handler('ajax_sieve_delete_filter', 'settings_load_imap',  true);
@@ -56,7 +62,10 @@ return array(
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'script_removed' => array(FILTER_UNSAFE_RAW, false),
-        'script' => array(FILTER_UNSAFE_RAW, false)
+        'script' => array(FILTER_UNSAFE_RAW, false),
+        'conditions' => array(FILTER_UNSAFE_RAW, false),
+        'actions' => array(FILTER_UNSAFE_RAW, false),
+        'test_type' => array(FILTER_UNSAFE_RAW, false)
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
@@ -68,6 +77,7 @@ return array(
         'script' => FILTER_UNSAFE_RAW,
         'current_editing_script' => FILTER_SANITIZE_STRING,
         'conditions_json' => FILTER_UNSAFE_RAW,
-        'actions_json' => FILTER_UNSAFE_RAW
+        'actions_json' => FILTER_UNSAFE_RAW,
+        'filter_test_type' => FILTER_SANITIZE_STRING
     )
 );

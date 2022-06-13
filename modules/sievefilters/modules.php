@@ -13,6 +13,46 @@ use PhpSieveManager\ManageSieve\Client;
 /**
  * @subpackage sievefilters/handler
  */
+class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
+    public function process() {
+        foreach ($this->user_config->get('imap_servers') as $mailbox) {
+            if ($mailbox['name'] == $this->request->post['imap_account']) {
+                $imap_account = $mailbox;
+            }
+        }
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $script = $client->getScript($this->request->post['sieve_script_name']);
+        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
+        $this->out('conditions', json_encode(base64_decode($base64_obj)));
+        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+        $this->out('actions', json_encode(base64_decode($base64_obj)));
+        if (strstr($script, 'allof')) {
+            $this->out('test_type', 'ALLOF');
+        } else {
+            $this->out('test_type', 'ANYOF');
+        }
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sieve_edit_filter extends Hm_Output_Module {
+    public function output() {
+        $conditions = $this->get('conditions', '');
+        $this->out('conditions', $conditions);
+        $actions = $this->get('actions', '');
+        $this->out('actions', $actions);
+        $actions = $this->get('test_type', '');
+        $this->out('test_type', $actions);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
 class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
     public function process() {
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
@@ -134,10 +174,11 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $conditions = json_decode($this->request->post['conditions_json']);
         $actions = json_decode($this->request->post['actions_json']);
-
+        $test_type = strtolower($this->request->post['filter_test_type']);
+        
         $filter = \PhpSieveManager\Filters\FilterFactory::create($script_name);
         $custom_condition = new \PhpSieveManager\Filters\Condition(
-            "CYPHT GENERATED CONDITION"
+            "CYPHT GENERATED CONDITION", $test_type
         );
         foreach ($conditions as $condition) {
             $cond = null;
@@ -275,6 +316,16 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             if ($action->action == 'keep') {
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
+            if ($action->action == 'redirect') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction([$action->value])
+                );
+            }
+            if ($action->action == 'flag') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\FlagFilterAction([$action->value])
                 );
             }
             if ($action->action == 'copy') {
@@ -416,13 +467,13 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th>Actions</th></tr>';
                 $res .= get_mailbox_filters($mailbox, true);
                 $res .= '</tbody></table>';
-                $res .= '<div style="height: 40px; margin-bottom: 10px;">
+                $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
                                 <div style="width: 90%;">
                                     <h3 style="margin-bottom: 2px;">If conditions are not met</h3>
                                     <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
                                 </div>
                             </div>
-                            <div style="background-color: #f7f2ef; margin-top: 25px; width: 90%;">
+                            <div style="background-color: #f7f2ef; margin-top: 25px; width: 90%; display: none;">
                                 <div style="padding: 10px;">
                                     <div style="display: flex; height: 30px;">
                                         <div style="width: 80%;">
@@ -489,7 +540,12 @@ if (!hm_exists('get_classic_filter_modal_content')) {
             </div>
             <div style="margin-bottom: 10px; margin-top: 25px;">
                 <b>Filter Name:</b><input type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
-                <b style="margin-left: 50px;">Priority:</b><input class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
+                <b style="margin-left: 20px;">Priority:</b><input class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
+                <b style="margin-left: 20px;">Test:</b>
+                    <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin-left: 10px;"> 
+                        <option value="ANYOF">ANYOF (OR)</option>
+                        <option value="ALLOF">ALLOF (AND)</option>
+                    </select>
             </div>
             <div style="display: flex; height: 70px; margin-bottom: 10px;">
                 <div style="width: 100%;">
@@ -535,10 +591,19 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 if (!hm_exists('get_mailbox_filters')) {
     function get_mailbox_filters($mailbox, $html=false)
     {
-        $sieve_options = explode(':', $mailbox['sieve_config_host']);
-        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
-        $scripts = $client->listScripts();
+        try {
+            $sieve_options = explode(':', $mailbox['sieve_config_host']);
+            $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+            $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+            $scripts = [];
+            foreach ($client->listScripts() as $script) {
+                if ($script != 'main_script') {
+                    $scripts[] = $script;
+                }
+            }
+        } catch (PhpSieveManager\Exceptions\SocketException $e) {
+            return '';
+        }
 
         if ($html == false) {
             return $scripts;
