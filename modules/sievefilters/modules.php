@@ -649,12 +649,15 @@ if (!hm_exists('generate_main_script')) {
             if ($script_name == 'main_script') {
                 continue;
             }
-            $ex_name = explode('-', $script_name);
-            if (!array_key_exists($ex_name[1], $parsed_list)) {
-                $parsed_list[$ex_name[1]] = [
-                    'priority' => $ex_name[1],
-                    'name' => $script_name,
-                ];
+
+            if (strstr($script_name, 'cypht')) {
+                $ex_name = explode('-', $script_name);
+                if (!array_key_exists($ex_name[1], $parsed_list)) {
+                    $parsed_list[$ex_name[1]] = [
+                        'priority' => $ex_name[1],
+                        'name' => $script_name,
+                    ];
+                }
             }
         }
 
