@@ -165,12 +165,16 @@ class Hm_Output_sieve_delete_output extends Hm_Output_Module {
  */
 class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
     public function process() {
+        $priority =  $this->request->post['sieve_script_priority'];
+        if ($this->request->post['sieve_script_priority'] == '') {
+            $priority = 0;
+        }
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
             }
         }
-        $script_name = generate_filter_name($this->request->post['sieve_filter_name'], $this->request->post['sieve_filter_priority']);
+        $script_name = generate_filter_name($this->request->post['sieve_filter_name'], $priority);
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $conditions = json_decode($this->request->post['conditions_json']);
         $actions = json_decode($this->request->post['actions_json']);
@@ -376,7 +380,11 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
     public function process() {
-        $script_name = generate_script_name($this->request->post['sieve_script_name'], $this->request->post['sieve_script_priority']);
+        $priority =  $this->request->post['sieve_script_priority'];
+        if ($this->request->post['sieve_script_priority'] == '') {
+            $priority = 0;
+        }
+        $script_name = generate_script_name($this->request->post['sieve_script_name'], $priority);
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
