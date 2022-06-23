@@ -636,7 +636,6 @@ $(function () {
                     conditions = JSON.parse(JSON.parse(res.conditions));
                     actions = JSON.parse(JSON.parse(res.actions));
                     test_type = res.test_type;
-
                     $(".modal_sieve_filter_test").val(test_type);
                     conditions.forEach(function (condition) {
                         add_filter_condition();

@@ -76,6 +76,7 @@ return array(
         'sieve_filter_priority' => FILTER_VALIDATE_INT,
         'script' => FILTER_UNSAFE_RAW,
         'current_editing_script' => FILTER_SANITIZE_STRING,
+        'current_editing_filter_name' => FILTER_SANITIZE_STRING,
         'conditions_json' => FILTER_UNSAFE_RAW,
         'actions_json' => FILTER_UNSAFE_RAW,
         'filter_test_type' => FILTER_SANITIZE_STRING

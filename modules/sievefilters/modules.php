@@ -165,8 +165,8 @@ class Hm_Output_sieve_delete_output extends Hm_Output_Module {
  */
 class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
     public function process() {
-        $priority =  $this->request->post['sieve_script_priority'];
-        if ($this->request->post['sieve_script_priority'] == '') {
+        $priority =  $this->request->post['sieve_filter_priority'];
+        if ($this->request->post['sieve_filter_priority'] == '') {
             $priority = 0;
         }
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
@@ -354,8 +354,8 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             if ($script == 'main_script') {
                 $client->removeScripts('main_script');
             }
-            if ($script == $this->request->post['current_editing_script']) {
-                $client->removeScripts($this->request->post['current_editing_script']);
+            if ($script == $this->request->post['current_editing_filter_name']) {
+                $client->removeScripts($this->request->post['current_editing_filter_name']);
             }
         }
 
@@ -616,7 +616,7 @@ if (!hm_exists('get_mailbox_filters')) {
             return $scripts;
         }
 
-        $script_list = '';
+        $scripts_sorted = [];
         foreach ($scripts as $script_name) {
             $exp_name = explode('-', $script_name);
             if (end($exp_name) == 'cypht') {
@@ -629,6 +629,13 @@ if (!hm_exists('get_mailbox_filters')) {
                 continue;
             }
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
+            $scripts_sorted[$script_name] = $exp_name[sizeof($exp_name) - 2];
+        }
+        asort($scripts_sorted);
+
+        $script_list = '';
+        foreach ($scripts_sorted as $script_name => $sc) {
+            $exp_name = explode('-', $script_name);
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
@@ -651,7 +658,7 @@ if (!hm_exists('get_mailbox_filters')) {
 if (!hm_exists('generate_main_script')) {
     function generate_main_script($script_list)
     {
-        $parsed_list = [];
+        $sorted_list = [];
         foreach ($script_list as $script_name) {
             if ($script_name == 'main_script') {
                 continue;
@@ -659,17 +666,10 @@ if (!hm_exists('generate_main_script')) {
 
             if (strstr($script_name, 'cypht')) {
                 $ex_name = explode('-', $script_name);
-                if (!array_key_exists($ex_name[1], $parsed_list)) {
-                    $parsed_list[$ex_name[1]] = [
-                        'priority' => $ex_name[1],
-                        'name' => $script_name,
-                    ];
-                }
+                $sorted_list[$script_name] = $ex_name[1];
             }
         }
-
-        sort($parsed_list);
-
+        asort($sorted_list);
         $include_header = 'require ["include"];'."\n\n";
         $include_body = '';
         foreach ($parsed_list as $include_script) {
