@@ -636,6 +636,7 @@ if (!hm_exists('get_mailbox_filters')) {
         $script_list = '';
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
+            $parsed_name = str_replace('_', ' ', $exp_name[0]);
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
