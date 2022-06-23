@@ -468,10 +468,10 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
                 $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
-                $res .= '<div class="sievefilters_accounts pgp_block"><div class="pgp_subblock">';
+                $res .= '<div class="sievefilters_accounts filter_block"><div class="filter_subblock">';
                 $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
                 $res .= '<table class="filter_details"><tbody>';
-                $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th>Actions</th></tr>';
+                $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th style="width: 15%;">Actions</th></tr>';
                 $res .= get_mailbox_filters($mailbox, true);
                 $res .= '</tbody></table>';
                 $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
@@ -557,7 +557,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
             <div style="display: flex; height: 70px; margin-bottom: 10px;">
                 <div style="width: 100%;">
                     <h3 style="margin-bottom: 2px;">Conditions & Actions</h3>
-                    <small>Filters must have at least one condition. If no actions are provided the email will be delivered normally.</small>
+                    <small>Filters must have at least one action and one condition</small>
                 </div>
             </div>
             <div style="background-color: #f7f2ef; margin-top: 10px;">

@@ -167,8 +167,10 @@ $(function () {
 
         // add a button
         edit_filter_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
-            save_filter(current_account);
-            edit_filter_modal.close();
+            let result = save_filter(current_account);
+            if (result) {
+                edit_filter_modal.close();
+            }
         });
 
         // add another button
@@ -181,6 +183,7 @@ $(function () {
          *                                    FUNCTIONS
          **************************************************************************************/
         function save_filter(imap_account) {
+            let validation_failed = false
             let conditions_parsed = []
             let actions_parsed = []
             let conditions = $('select[name^=sieve_selected_conditions_field]').map(function(idx, elem) {
@@ -196,7 +199,18 @@ $(function () {
             }).get();
 
             let idx = 0;
+            if (conditions.length === 0) {
+                $('.sys_messages').html('<span class="err">You must provide at least one condition</span>');
+                Hm_Utils.show_sys_messages();
+                return false;
+            }
+
             conditions.forEach(function (elem) {
+                if (conditions_value[idx] === "") {
+                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    Hm_Utils.show_sys_messages();
+                    validation_failed = true;
+                }
                  conditions_parsed.push(
                      {
                          'condition': elem,
@@ -213,9 +227,24 @@ $(function () {
             let actions_value = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).val();
             }).get();
+            let actions_field_type = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+                return $(elem).attr('type');
+            }).get();
+
+            if (actions_type.length === 0) {
+                $('.sys_messages').html('<span class="err">You must provide at least one action</span>');
+                Hm_Utils.show_sys_messages();
+                return false;
+            }
 
             idx = 0;
             actions_type.forEach(function (elem) {
+                console.log(actions_field_type[idx])
+                if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
+                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    Hm_Utils.show_sys_messages();
+                    validation_failed = true;
+                }
                 actions_parsed.push(
                     {
                         'action': elem,
@@ -224,6 +253,16 @@ $(function () {
                 )
                 idx = idx + 1;
             });
+
+            if ($('.modal_sieve_filter_name').val() == "") {
+                $('.sys_messages').html('<span class="err">Filter name is required</span>');
+                Hm_Utils.show_sys_messages();
+                return false;
+            }
+
+            if (validation_failed) {
+                return false;
+            }
 
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_filter'},
@@ -243,6 +282,16 @@ $(function () {
         }
 
         function save_script(imap_account) {
+            if ($('.modal_sieve_script_name').val() === "") {
+                $('.sys_messages').html('<span class="err">You must provide a name for your script</span>');
+                Hm_Utils.show_sys_messages();
+                return false;
+            }
+            if ($('.modal_sieve_script_textarea').val() === "") {
+                $('.sys_messages').html('<span class="err">Empty script</span>');
+                Hm_Utils.show_sys_messages();
+                return false;
+            }
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_script'},
                     {'name': 'imap_account', 'value': imap_account},
@@ -331,7 +380,7 @@ $(function () {
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
                 '                                <td>' +
-                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions_field[]">' +
+                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions_field[]" style="width: 200px;">' +
                 '                                        <optgroup label="Message">' +
                 message_fields +
                 '                                        </optgroup>' +
@@ -356,7 +405,7 @@ $(function () {
                 '                                        </option>' +
                 '                                    </select>' +
                 '                                </td>' +
-                '                                <td>' +
+                '                                <td style="width: 50%;">' +
                 '                                    <input type="text" name="sieve_selected_option_value[]" />' +
                 '                                </td>' +
                 '                                <td style="vertical-align: middle; width: 50px;">' +
@@ -387,11 +436,11 @@ $(function () {
             $('.filter_actions_modal_table').append(
                 '<tr style="border-bottom-color: black;">' +
                 '   <td>' +
-                '       <select class="sieve_actions_select" name="sieve_selected_actions[]">' +
+                '       <select class="sieve_actions_select" name="sieve_selected_actions[]" style="width: 200px;">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
-                '    <td>' +
+                '    <td style="width: 50%;">' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td style="vertical-align: middle; width: 50px;">' +

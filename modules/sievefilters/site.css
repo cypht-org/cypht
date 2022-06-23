@@ -26,7 +26,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 100;
     display: flex;
     visibility: hidden;
     flex-direction: column;
@@ -88,7 +88,7 @@
     flex-shrink: 0;
     margin-top: auto;
     margin-bottom: auto;
-    width: 60%;
+    width: 1000px;
     border-radius: 4px;
     background: #fff;
     opacity: 1;
@@ -118,7 +118,7 @@
 .tingle-modal-box__footer--sticky {
     position: fixed;
     bottom: -200px;
-    z-index: 10001;
+    z-index: 101;
     opacity: 1;
     transition: bottom .3s ease-in-out .3s
 }
@@ -241,7 +241,7 @@
 @keyframes scale {
     0% {
         opacity: 0;
-        transform: scale(.9)
+        transform: scale(.8)
     }
     100% {
         opacity: 1;
@@ -257,4 +257,10 @@
 
 .filter_subblock {
     margin-bottom: 40px;
+}
+
+.filter_block {
+    margin-bottom: 30px;
+    margin-left: 40px;
+    padding-top: 20px;
 }
