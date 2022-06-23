@@ -151,7 +151,7 @@ $(function () {
                 $(".filter_actions_modal_table").html("");
                 $(".modal_sieve_filter_name").val("");
                 $(".modal_sieve_filter_priority").val("0");
-                $(".modal_sieve_filter_test").val("ANYOF");
+                $(".modal_sieve_filter_test").val("ALLOF");
             },
             beforeClose: function () {
                 // here's goes some logic

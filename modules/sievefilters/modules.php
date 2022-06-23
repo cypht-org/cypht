@@ -551,7 +551,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                 <b style="margin-left: 20px;">Test:</b>
                     <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin-left: 10px;"> 
                         <option value="ANYOF">ANYOF (OR)</option>
-                        <option value="ALLOF">ALLOF (AND)</option>
+                        <option value="ALLOF" selected>ALLOF (AND)</option>
                     </select>
             </div>
             <div style="display: flex; height: 70px; margin-bottom: 10px;">
