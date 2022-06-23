@@ -449,8 +449,7 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
         $socked_connected = $this->get('socket_connected', false);
 
         $res = '<div class="sievefilters_settings"><div class="content_title">'.$this->trans('Filters').'</div>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/pgp/sievefilters/tingle.min.css"></script>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/pgp/sievefilters/litegraph.css"></script>';
+        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         return $res;
     }
 }
@@ -468,7 +467,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 $num_filters = sizeof(get_mailbox_filters($mailbox));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
-                $res .= '<span class="private_key_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
+                $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
                 $res .= '<div class="sievefilters_accounts pgp_block"><div class="pgp_subblock">';
                 $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
                 $res .= '<table class="filter_details"><tbody>';

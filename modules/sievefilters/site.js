@@ -82,7 +82,7 @@ $(function () {
             {
                 name: 'flag',
                 description: 'Flag',
-                placeholder: 'SEEN',
+                placeholder: 'Example: SEEN',
                 type: 'string'
             },
             {
@@ -456,16 +456,16 @@ $(function () {
                     elem.html('<input name="sieve_selected_action_value[]" type="hidden" value="" />');
                 }
                 if (selected_action.type === 'string') {
-                    elem.html('<input name="sieve_selected_action_value[]" type="text" />');
+                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="text" />');
                 }
                 if (selected_action.type === 'int') {
-                    elem.html('<input name="sieve_selected_action_value[]" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'number') {
-                    elem.html('<input name="sieve_selected_action_value[]" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'text') {
-                    elem.html('<textarea name="sieve_selected_action_value[]"></textarea>');
+                    elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'"></textarea>');
                 }
             }
         })
