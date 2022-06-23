@@ -672,8 +672,8 @@ if (!hm_exists('generate_main_script')) {
         asort($sorted_list);
         $include_header = 'require ["include"];'."\n\n";
         $include_body = '';
-        foreach ($parsed_list as $include_script) {
-            $include_body .= 'include :personal "'.$include_script['name'].'";'."\n";
+        foreach ($sorted_list as $script_name => $include_script) {
+            $include_body .= 'include :personal "'.$script_name.'";'."\n";
         }
         return $include_header.$include_body;
     }
