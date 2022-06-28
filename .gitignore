@@ -19,3 +19,4 @@ tests/phpunit/data/foo.txt
 scripts/test.php
 /vendor/
 /.idea/
+composer.lock
