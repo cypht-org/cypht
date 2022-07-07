@@ -603,6 +603,26 @@ var imap_mark_as_read = function(uid, detail) {
     return false;
 };
 
+var block_unblock_sender = function(msg_uid, detail) {
+
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
+            {'name': 'imap_msg_uid', 'value': msg_uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+        function(res) {
+            if (res.router_user_msgs[0] == "Sender Blocked") {
+                $("#filter_block_txt").html('UNBLOCK SENDER');
+            }
+            if (res.router_user_msgs[0] == "Sender Unblocked") {
+                $("#filter_block_txt").html('BLOCK SENDER');
+            }
+        },
+        true,
+        true
+    );
+}
+
 var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     var class_name = false;
     if (!detail) {
@@ -655,6 +675,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
     $('#unread_message').on("click", function() { return inline_imap_unread_message(msg_uid, detail);});
+    $('#block_sender').on("click", function(e) { e.preventDefault(); return block_unblock_sender(msg_uid, detail);});
     fixLtrInRtl();
 };
 

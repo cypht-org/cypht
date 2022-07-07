@@ -8,7 +8,31 @@ $(function () {
     let current_editing_filter_name = '';
     let current_account;
 
-    if (hm_page_name() === 'sievefilters') {
+    if (hm_page_name() === 'block_list') {
+        $(document).on('click', '.unblock_button', function(e) {
+           e.preventDefault();
+           let sender = $(this).parent().parent().children().html();
+           let elem = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'sender', 'value': sender}
+                ],
+                function(res) {
+                    elem.parent().parent().remove();
+                    var num_filters = $("#filter_num_" + elem.attr('mailbox_id')).html();
+                    num_filters = parseInt(num_filters) - 1;
+                    $("#filter_num_" + elem.attr('mailbox_id')).html(num_filters);
+                }
+            );
+        });
+
+        $('.sievefilters_accounts_title').on("click", function () {
+            $(this).parent().find('.sievefilters_accounts').toggle();
+        });
+    }
+
+    if (hm_page_name() === 'sieve_filters') {
         /**
          * Possible Sieve fields
          * @type {{Message: [{name: string, options: string[], type: string, selected: boolean},{name: string, options: string[], type: string},{name: string, options: string[], type: string}], Header: [{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string}]}}
@@ -74,16 +98,28 @@ $(function () {
                 type: 'none'
             },
             {
+                name: 'stop',
+                description: 'Stop Filtering',
+                type: 'none'
+            },
+            {
                 name: 'copy',
                 description: 'Copy email to mailbox',
                 placeholder: 'Mailbox Name (Folder)',
-                type: 'string'
+                type: 'mailbox'
+            },
+            {
+                name: 'move',
+                description: 'Move email to mailbox',
+                placeholder: 'Mailbox Name (Folder)',
+                type: 'mailbox'
             },
             {
                 name: 'flag',
                 description: 'Flag',
                 placeholder: 'Example: SEEN',
-                type: 'string'
+                type: 'select',
+                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent']
             },
             {
                 name: 'redirect',
@@ -224,7 +260,7 @@ $(function () {
             let actions_type = $('select[name^=sieve_selected_actions]').map(function(idx, elem) {
                 return $(elem).val();
             }).get();
-            let actions_value = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+            let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).val();
             }).get();
             let actions_field_type = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
@@ -422,7 +458,7 @@ $(function () {
             add_filter_condition();
         });
 
-        function add_filter_action() {
+        function add_filter_action(default_value = '') {
             let possible_actions_html = '';
 
             possible_actions.forEach(function (value) {
@@ -434,7 +470,7 @@ $(function () {
             });
 
             $('.filter_actions_modal_table').append(
-                '<tr style="border-bottom-color: black;">' +
+                '<tr style="border-bottom-color: black;" default_value="'+default_value+'">' +
                 '   <td>' +
                 '       <select class="sieve_actions_select" name="sieve_selected_actions[]" style="width: 200px;">' +
                 '          ' + possible_actions_html +
@@ -515,6 +551,29 @@ $(function () {
                 }
                 if (selected_action.type === 'text') {
                     elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'"></textarea>');
+                }
+                if (selected_action.type === 'select') {
+                    options = '';
+                    selected_action.values.forEach(function(val) {
+                        options = options + '<option value="' + val + '">'+ val +'</option>'
+                    });
+                    elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                }
+                if (selected_action.type === 'mailbox') {
+                    let mailboxes = null;
+                    Hm_Ajax.request(
+                        [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
+                            {'name': 'imap_account', 'value': current_account} ],
+                        function(res) {
+                            mailboxes = JSON.parse(res.mailboxes);
+                            options = '';
+                            mailboxes.forEach(function(val) {
+                                options = options + '<option value="' + val + '">'+ val +'</option>'
+                            });
+                            elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                            $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
+                        }
+                    );
                 }
             }
         })
@@ -646,7 +705,7 @@ $(function () {
                     });
 
                     actions.forEach(function (action) {
-                        add_filter_action();
+                        add_filter_action(action.value);
                         $(".sieve_actions_select").last().val(action.action);
                         $(".sieve_actions_select").last().trigger('change');
                         $("[name^=sieve_selected_action_value]").last().val(action.value);

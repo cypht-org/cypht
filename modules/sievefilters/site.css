@@ -264,3 +264,8 @@
     margin-left: 40px;
     padding-top: 20px;
 }
+
+.unblock_button {
+    width: 16px;
+    cursor: pointer;
+}
