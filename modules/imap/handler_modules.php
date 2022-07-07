@@ -1692,7 +1692,12 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
-                    $this->out('sieve_filters_enabled', $this->module_is_supported('sievefilters'));
+
+                    $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
+
+                    if (array_key_exists('sieve_config_host', $server)) {
+                        $this->out('sieve_filters_enabled', $this->module_is_supported('sievefilters'));
+                    }
 
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
