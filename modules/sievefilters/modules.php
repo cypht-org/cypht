@@ -27,7 +27,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $script = $client->getScript($this->request->post['sieve_script_name']);
         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
         $this->out('conditions', json_encode(base64_decode($base64_obj)));
@@ -68,7 +68,7 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $script = $client->getScript($this->request->post['sieve_script_name']);
         $client->close();
         $this->out('script', $script);
@@ -98,7 +98,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
 
         foreach ($scripts as $script) {
@@ -135,7 +135,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == 'main_script') {
@@ -159,16 +159,19 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
     }
 }
 
-function get_blocked_senders($mailbox, $mailbox_id, $icon_svg) {
+function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg) {
     $sieve_options = explode(':', $mailbox['sieve_config_host']);
     $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-    $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
-    $scripts = $client->listScripts();
 
+    try {
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+    } catch (Exception $e) {
+        return '';
+    }
+    $scripts = $client->listScripts();
     if (!array_search('blocked_senders', $scripts, true)) {
         return '';
     }
-
     $current_script = $client->getScript('blocked_senders');
     if ($current_script != '') {
         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
@@ -177,16 +180,101 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg) {
             return '';
         }
         foreach ($blocked_list as $blocked_sender) {
+            if (explode('@', $blocked_sender)[0] == '') {
+                $blocked_sender = '*'.$blocked_sender;
+            }
             $blocked_senders[] = $blocked_sender;
         }
     }
 
     $ret = '';
     foreach ($blocked_senders as $sender) {
-        $ret .= '<tr><td>'.$sender.'</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'"</tr></td></tr>';
+        $ret .= '<tr><td>'.$sender.'</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
+        if (!strstr($sender, '*')) {
+            $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
+        }
+        $ret .= '</tr></td></tr>';
     }
     return $ret;
 }
+
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
+    public function process() {
+        foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
+            if ($idx == $this->request->post['imap_server_id']) {
+                $imap_account = $mailbox;
+            }
+        }
+
+        $email_sender = $this->request->post['sender'];
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+
+        $scripts = $client->listScripts();
+
+        $current_script = $client->getScript('blocked_senders');
+        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+        $blocked_list = json_decode(base64_decode($base64_obj));
+
+        $domain = explode('@', $this->request->post['sender'])[1];
+        $blocked_wildcard = '@'.$domain;
+        $new_blocked_list = [];
+        foreach ($blocked_list as $idx => $blocked_sender) {
+            if (!strstr($blocked_sender, $blocked_wildcard)) {
+                $new_blocked_list[] = $blocked_sender;
+            }
+        }
+        $new_blocked_list[] = $blocked_wildcard;
+
+        if(!array_search('blocked_senders', $scripts, true)) {
+            $client->putScript(
+                'blocked_senders',
+                ''
+            );
+        }
+
+        // Create Block List Filter
+        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+        $custom_condition = new \PhpSieveManager\Filters\Condition(
+            "CYPHT GENERATED CONDITION", 'anyof'
+        );
+        foreach ($new_blocked_list as $blocked_sender) {
+            $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+            $cond->contains('"From" ["'.$blocked_sender.'"]');
+            $custom_condition->addCriteria($cond);
+        }
+        $custom_condition->addAction(
+            new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+        );
+        $custom_condition->addAction(
+            new \PhpSieveManager\Filters\Actions\StopFilterAction()
+        );
+        $filter->setCondition($custom_condition);
+        $script_parsed = $filter->toScript();
+
+        $main_script = generate_main_script($scripts);
+
+        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+        $header_obj .= "\n# ".base64_encode(json_encode($new_blocked_list));
+        $script_parsed = $header_obj."\n\n".$script_parsed;
+        $client->putScript(
+            'blocked_senders',
+            $script_parsed
+        );
+        $client->putScript(
+            'main_script',
+            $main_script
+        );
+        $client->activateScript('main_script');
+        $client->close();
+    }
+}
+
 
 /**
  * @subpackage sievefilters/handler
@@ -243,11 +331,14 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             }
         }
 
-
         $email_sender = $this->request->post['sender'];
+        if (strstr($email_sender, '*')) {
+            $email_sender = str_replace('*', '', $email_sender);
+        }
+
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
 
         $scripts = $client->listScripts();
 
@@ -356,13 +447,13 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             return;
         }
         $msg_header = $imap->get_message_headers($form['imap_msg_uid']);
-        $test_pattern ="/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";        preg_match_all($pattern, $msg_header['From'], $email_senders);
+        $test_pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";        preg_match_all($pattern, $msg_header['From'], $email_senders);
         preg_match_all($test_pattern, $msg_header['From'], $email_sender);
         $email_sender = $email_sender[0][0];
 
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
 
         $scripts = $client->listScripts();
 
@@ -488,13 +579,23 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 if ($condition->type == 'Contains') {
                     $cond->contains('"'.$condition->value.'"');
                 }
-                if ($condition->type == 'Matches') {
+                if ($condition->type == '!Matches') {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not body');
                     $cond->matches('"'.$condition->value.'"');
                 }
-                if ($condition->type == 'Contains') {
+                if ($condition->type == '!Contains') {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not body');
                     $cond->contains('"'.$condition->value.'"');
+                }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('body');
+                    $cond->regex('"'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not body');
+                    $cond->regex('"'.$condition->value.'"');
                 }
             }
             if ($condition->condition == 'subject') {
@@ -513,6 +614,16 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
                     $cond->contains('"Subject" ["'.$condition->value.'"]');
                 }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"Subject" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"Subject" "'.$condition->value.'"');
+                }
             }
             if ($condition->condition == 'to') {
                 $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
@@ -529,6 +640,16 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 if ($condition->type == '!Contains') {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
                     $cond->contains('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"Delivered-To" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"Delivered-To" "'.$condition->value.'"');
                 }
             }
             if ($condition->condition == 'from') {
@@ -547,6 +668,16 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
                     $cond->contains('"From" ["'.$condition->value.'"]');
                 }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"From" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"From" "'.$condition->value.'"');
+                }
             }
             if ($condition->condition == 'bcc') {
                 $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
@@ -563,6 +694,16 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 if ($condition->type == '!Contains') {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
                     $cond->contains('"Bcc" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"Bcc" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"Bcc" "'.$condition->value.'"');
                 }
             }
             if ($condition->condition == 'cc') {
@@ -581,6 +722,55 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
                     $cond->contains('"Cc" ["'.$condition->value.'"]');
                 }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"Cc" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"Cc" "'.$condition->value.'"');
+                }
+            }
+            if ($condition->condition == 'to_or_cc') {
+                $cond_to = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"Cc" ["'.$condition->value.'"]');
+                    $cond_to->matches('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"Cc" ["'.$condition->value.'"]');
+                    $cond_to->contains('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond_to = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"Cc" ["'.$condition->value.'"]');
+                    $cond_to->matches('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond_to = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"Cc" ["'.$condition->value.'"]');
+                    $cond_to->contains('"Delivered-To" ["'.$condition->value.'"]');
+                }
+                if ($condition->type == 'Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond_to = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                    $cond->regex('"Cc" "'.$condition->value.'"');
+                    $cond_to->matches('"Delivered-To" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $filter->addRequirement('regex');
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond_to = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"Cc" "'.$condition->value.'"');
+                    $cond_to->matches('"Delivered-To" "'.$condition->value.'"');
+                }
+                $custom_condition->addCriteria($cond_to);
             }
             if ($condition->condition == 'size') {
                 $cond = \PhpSieveManager\Filters\FilterCriteria::if('size');
@@ -597,6 +787,30 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 if ($condition->type == '!Under') {
                     $cond = \PhpSieveManager\Filters\FilterCriteria::if('not size');
                     $cond->under($condition->value.'K');
+                }
+            }
+            if ($condition->condition == 'custom') {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                if ($condition->type == 'Matches') {
+                    $cond->matches('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Matches') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->matches('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
+                }
+                if ($condition->type == 'Contains') {
+                    $cond->contains('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Contains') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->contains('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
+                }
+                if ($condition->type == 'Regex') {
+                    $cond->regex('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
+                }
+                if ($condition->type == '!Regex') {
+                    $cond = \PhpSieveManager\Filters\FilterCriteria::if('not header');
+                    $cond->regex('"'.$condition->extra_option_value.'" "'.$condition->value.'"');
                 }
             }
             if ($cond) {
@@ -630,10 +844,28 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     new \PhpSieveManager\Filters\Actions\FlagFilterAction([$action->value])
                 );
             }
+            if ($action->action == 'addflag') {
+                $filter->addRequirement('imap4flags');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\AddFlagFilterAction([$action->value])
+                );
+            }
+            if ($action->action == 'removeflag') {
+                $filter->addRequirement('imap4flags');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\RemoveFlagFilterAction([$action->value])
+                );
+            }
             if ($action->action == 'move') {
                 $filter->addRequirement('fileinto');
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
+                );
+            }
+            if ($action->action == 'reject') {
+                $filter->addRequirement('reject');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([$action->value])
                 );
             }
             if ($action->action == 'copy') {
@@ -643,6 +875,12 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 );
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
+            if ($action->action == 'autoreply') {
+                $filter->addRequirement('vacation');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\VacationFilterAction([$action->extra_option_value, $action->value])
                 );
             }
         }
@@ -655,7 +893,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == 'main_script') {
@@ -700,7 +938,7 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == $this->request->post['current_editing_script']) {
@@ -781,7 +1019,12 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
 function get_blocked_senders_array($mailbox) {
     $sieve_options = explode(':', $mailbox['sieve_config_host']);
     $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-    $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+
+    try {
+        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+    } catch (Exception $e) {
+        return [];
+    }
     $scripts = $client->listScripts();
 
     if (!array_search('blocked_senders', $scripts, true)) {
@@ -796,6 +1039,9 @@ function get_blocked_senders_array($mailbox) {
             return [];
         }
         foreach ($blocked_list as $blocked_sender) {
+            if (explode('@', $blocked_sender)[0] == '') {
+                $blocked_sender = '*'.$blocked_sender;
+            }
             $blocked_senders[] = $blocked_sender;
         }
     }
@@ -811,7 +1057,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         foreach($mailboxes as $idx => $mailbox) {
-            if (isset($mailbox['sieve_config_username'])) {
+            if (isset($mailbox['sieve_config_host'])) {
                 $num_blocked = sizeof(get_blocked_senders_array($mailbox));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
@@ -820,7 +1066,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
                 // $res .= '<button class="block_sender" account="'.$mailbox['name'].'">Block Sender</button>';
                 $res .= '<table class="filter_details"><tbody>';
                 $res .= '<tr><th style="width: 80px;">Sender</th><th style="width: 15%;">Actions</th></tr>';
-                $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::$unlocked));
+                $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::$minus), $this->html_safe(Hm_Image_Sources::$globe));
                 $res .= '</tbody></table>';
                 $res .= '</div></div></div>';
             }
@@ -838,7 +1084,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         foreach($mailboxes as $mailbox) {
-            if (isset($mailbox['sieve_config_username'])) {
+            if (isset($mailbox['sieve_config_host'])) {
                 $num_filters = sizeof(get_mailbox_filters($mailbox));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
@@ -976,7 +1222,7 @@ if (!hm_exists('get_mailbox_filters')) {
         try {
             $sieve_options = explode(':', $mailbox['sieve_config_host']);
             $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-            $client->connect($mailbox['sieve_config_username'], $mailbox['sieve_config_password'], false, "", "PLAIN");
+            $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
             $scripts = [];
             foreach ($client->listScripts() as $script) {
                 if (strstr($script, 'cypht')) {

@@ -88,7 +88,7 @@
     flex-shrink: 0;
     margin-top: auto;
     margin-bottom: auto;
-    width: 1000px;
+    width: 1200px;
     border-radius: 4px;
     background: #fff;
     opacity: 1;
@@ -266,6 +266,11 @@
 }
 
 .unblock_button {
+    width: 16px;
+    cursor: pointer;
+}
+
+.block_domain_button {
     width: 16px;
     cursor: pointer;
 }

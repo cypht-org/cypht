@@ -27,6 +27,21 @@ $(function () {
             );
         });
 
+        $(document).on('click', '.block_domain_button', function(e) {
+            e.preventDefault();
+            let sender = $(this).parent().parent().children().html();
+            let elem = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'sender', 'value': sender}
+                ],
+                function(res) {
+                    //window.location = window.location;
+                }
+            );
+        });
+
         $('.sievefilters_accounts_title').on("click", function () {
             $(this).parent().find('.sievefilters_accounts').toggle();
         });
@@ -44,13 +59,13 @@ $(function () {
                     description: 'Subject',
                     type: 'string',
                     selected: true,
-                    options: ['Contains', 'Matches']
+                    options: ['Contains', 'Matches', 'Regex']
                 },
                 {
                     name: 'body',
                     description: 'Body',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    options: ['Contains', 'Matches', 'Regex']
                 },
                 {
                     name: 'size',
@@ -64,25 +79,44 @@ $(function () {
                     name: 'to',
                     description: 'To',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    extra_option: false,
+                    options: ['Contains', 'Matches', 'Regex']
                 },
                 {
                     name: 'from',
                     description: 'From',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    extra_option: false,
+                    options: ['Contains', 'Matches', 'Regex']
                 },
                 {
                     name: 'cc',
                     description: 'CC',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    extra_option: false,
+                    options: ['Contains', 'Matches', 'Regex']
+                },
+                {
+                    name: 'to_or_cc',
+                    description: 'To or CC',
+                    type: 'string',
+                    extra_option: false,
+                    options: ['Contains', 'Matches', 'Regex']
                 },
                 {
                     name: 'bcc',
                     description: 'BCC',
                     type: 'string',
-                    options: ['Contains', 'Matches']
+                    extra_option: false,
+                    options: ['Contains', 'Matches', 'Regex']
+                },
+                {
+                    name: 'custom',
+                    description: 'Custom',
+                    type: 'string',
+                    extra_option: true,
+                    extra_option_description: 'Field Name',
+                    options: ['Contains', 'Matches', 'Regex']
                 }
             ]
         }
@@ -95,42 +129,81 @@ $(function () {
             {
                 name: 'keep',
                 description: 'Deliver (Keep)',
-                type: 'none'
+                type: 'none',
+                extra_field: false
             },
             {
                 name: 'stop',
                 description: 'Stop Filtering',
-                type: 'none'
+                type: 'none',
+                extra_field: false
             },
             {
                 name: 'copy',
                 description: 'Copy email to mailbox',
                 placeholder: 'Mailbox Name (Folder)',
-                type: 'mailbox'
+                type: 'mailbox',
+                extra_field: false
             },
             {
                 name: 'move',
                 description: 'Move email to mailbox',
                 placeholder: 'Mailbox Name (Folder)',
-                type: 'mailbox'
+                type: 'mailbox',
+                extra_field: false
             },
             {
                 name: 'flag',
                 description: 'Flag',
                 placeholder: 'Example: SEEN',
                 type: 'select',
-                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent']
+                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+                extra_field: false
+            },
+            {
+                name: 'addflag',
+                description: 'Add Flag',
+                placeholder: 'Example: SEEN',
+                type: 'select',
+                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+                extra_field: false
+            },
+            {
+                name: 'removeflag',
+                description: 'Remove Flag',
+                placeholder: 'Example: SEEN',
+                type: 'select',
+                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+                extra_field: false
             },
             {
                 name: 'redirect',
                 description: 'Redirect',
                 placeholder: 'mail@mail.com',
-                type: 'string'
+                type: 'string',
+                extra_field: false
+            },
+            {
+                name: 'reject',
+                description: 'Reject',
+                placeholder: 'Reject message',
+                type: 'string',
+                extra_field: false
             },
             {
                 name: 'discard',
                 description: 'Discard',
-                type: 'none'
+                type: 'none',
+                extra_field: false
+            },
+            {
+                name: 'autoreply',
+                placeholder: 'Reply Message',
+                description: 'Reply Message',
+                type: 'text',
+                extra_field: true,
+                extra_field_type: 'string',
+                extra_field_placeholder: 'Subject'
             }
         ]
 
@@ -234,6 +307,10 @@ $(function () {
                 return $(elem).val();
             }).get();
 
+            let conditions_extra_value = $('input[name^=sieve_selected_extra_option_value]').map(function(idx, elem) {
+                return $(elem).val();
+            }).get();
+
             let idx = 0;
             if (conditions.length === 0) {
                 $('.sys_messages').html('<span class="err">You must provide at least one condition</span>');
@@ -242,7 +319,7 @@ $(function () {
             }
 
             conditions.forEach(function (elem) {
-                if (conditions_value[idx] === "") {
+                if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
                     $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
                     Hm_Utils.show_sys_messages();
                     validation_failed = true;
@@ -251,6 +328,8 @@ $(function () {
                      {
                          'condition': elem,
                          'type': conditions_type[idx],
+                         'extra_option': conditions[idx].extra_option,
+                         'extra_option_value': conditions_extra_value[idx],
                          'value': conditions_value[idx]
                      }
                  )
@@ -264,6 +343,9 @@ $(function () {
                 return $(elem).val();
             }).get();
             let actions_field_type = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+                return $(elem).attr('type');
+            }).get();
+            let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
                 return $(elem).attr('type');
             }).get();
 
@@ -284,7 +366,9 @@ $(function () {
                 actions_parsed.push(
                     {
                         'action': elem,
-                        'value': actions_value[idx]
+                        'value': actions_value[idx],
+                        'extra_option': actions_type[idx].extra_option,
+                        'extra_option_value': actions_extra_value[idx],
                     }
                 )
                 idx = idx + 1;
@@ -412,7 +496,7 @@ $(function () {
                     header_fields += '<option value="'+value.name+'">' + value.description + '</option>';
                 }
             });
-
+            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_value" name="sieve_selected_extra_option_value[]" /></td>';
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
                 '                                <td>' +
@@ -425,6 +509,7 @@ $(function () {
                 '                                        </optgroup>' +
                 '                                    </select>' +
                 '                                </td>' +
+                extra_options +
                 '                                <td>' +
                 '                                    <select class="condition_options" name="sieve_selected_conditions_options[]">' +
                 '                                        <option value="Contains">' +
@@ -439,9 +524,15 @@ $(function () {
                 '                                        <option value="!Matches">' +
                 '                                            Not Matches' +
                 '                                        </option>' +
+                '                                        <option value="Regex">' +
+                '                                            Regex' +
+                '                                        </option>' +
+                '                                        <option value="!Regex">' +
+                '                                            Not Regex' +
+                '                                        </option>' +
                 '                                    </select>' +
                 '                                </td>' +
-                '                                <td style="width: 50%;">' +
+                '                                <td style="width: 43%;">' +
                 '                                    <input type="text" name="sieve_selected_option_value[]" />' +
                 '                                </td>' +
                 '                                <td style="vertical-align: middle; width: 50px;">' +
@@ -469,6 +560,7 @@ $(function () {
                 possible_actions_html += '<option value="'+value.name+'">' + value.description + '</option>';
             });
 
+            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_action_value" name="sieve_selected_extra_action_value[]" /></td>';
             $('.filter_actions_modal_table').append(
                 '<tr style="border-bottom-color: black;" default_value="'+default_value+'">' +
                 '   <td>' +
@@ -476,7 +568,8 @@ $(function () {
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
-                '    <td style="width: 50%;">' +
+                extra_options +
+                '    <td style="width: 43%;">' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td style="vertical-align: middle; width: 50px;">' +
@@ -528,7 +621,8 @@ $(function () {
          * Action change
          */
         $(document).on('change', '.sieve_actions_select', function () {
-            let elem = $(this).parent().next();
+            let elem = $(this).parent().next().next();
+            let elem_extra = $(this).parent().next().find('.condition_extra_action_value');
             let action_name = $(this).val();
             let selected_action;
             possible_actions.forEach(function (action) {
@@ -537,11 +631,15 @@ $(function () {
                }
             });
             if (selected_action) {
+                if (selected_action.extra_field) {
+                    elem_extra.attr('type', 'text');
+                    elem_extra.attr('placeholder', selected_action.extra_field_placeholder)
+                }
                 if (selected_action.type === 'none') {
                     elem.html('<input name="sieve_selected_action_value[]" type="hidden" value="" />');
                 }
                 if (selected_action.type === 'string') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="text" />');
+                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="text" value="" />');
                 }
                 if (selected_action.type === 'int') {
                     elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
@@ -550,7 +648,7 @@ $(function () {
                     elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'text') {
-                    elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'"></textarea>');
+                    elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" style="width: 235px;"></textarea>');
                 }
                 if (selected_action.type === 'select') {
                     options = '';
@@ -584,7 +682,8 @@ $(function () {
         $(document).on('change', '.add_condition_sieve_filters', function () {
             let condition_name = $(this).val();
             let elem = $(this).parent().next().find('.condition_options');
-            let elem_type = $(this).parent().next().next();
+            let elem_extra = $(this).parent().next().find('.condition_extra_value');
+            let elem_type = $(this).parent().next().next().next();
             let condition;
             let options_html = '';
             let input_type_html = '';
@@ -599,6 +698,12 @@ $(function () {
                 }
             });
             if (condition) {
+                if (condition.extra_option === true) {
+                    elem_extra.attr('type', 'text');
+                    elem_extra.attr('placeholder', condition.extra_option_description);
+                } else {
+                    elem_extra.attr('type', 'hidden');
+                }
                 condition.options.forEach(function (option) {
                     options_html += '<option value="'+option+'">'+option+'</option>';
                     options_html += '<option value="!'+option+'">Not '+option+'</option>';
@@ -701,6 +806,7 @@ $(function () {
                         $(".add_condition_sieve_filters").last().val(condition.condition);
                         $(".add_condition_sieve_filters").last().trigger('change');
                         $(".condition_options").last().val(condition.type);
+                        $("[name^=sieve_selected_extra_option_value]").last().val(condition.extra_option_value);
                         $("[name^=sieve_selected_option_value]").last().val(condition.value);
                     });
 
@@ -708,6 +814,7 @@ $(function () {
                         add_filter_action(action.value);
                         $(".sieve_actions_select").last().val(action.action);
                         $(".sieve_actions_select").last().trigger('change');
+                        $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
                         $("[name^=sieve_selected_action_value]").last().val(action.value);
                     });
                 }

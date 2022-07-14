@@ -390,10 +390,6 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
             '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr class="sieve_config" style="display: none;"><td><div class="subtitle">'.$this->trans('Sieve Configuration').'</div></td></tr>'.
-            '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Username').'</label>'.
-            '<input type="text" id="sieve_config_username" name="sieve_config_username" class="txt_fld" placeholder="'.$this->trans('Username').'"></td></tr>'.
-            '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Password').'</label>'.
-            '<input type="text" id="sieve_config_password" name="sieve_config_password" class="txt_fld" placeholder="'.$this->trans('Password').'"></td></tr>'.
             '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Host').'</label>'.
             '<input type="text" id="sieve_config_host" name="sieve_config_host" class="txt_fld" placeholder="'.$this->trans('localhost:2049').'"></td></tr>'.
             '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
