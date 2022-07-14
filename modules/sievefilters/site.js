@@ -346,7 +346,7 @@ $(function () {
                 return $(elem).attr('type');
             }).get();
             let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
-                return $(elem).attr('type');
+                return $(elem).val();
             }).get();
 
             if (actions_type.length === 0) {
@@ -396,7 +396,7 @@ $(function () {
                     {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()}
                     ],
                 function(res) {
-                    window.location = window.location;
+                    //window.location = window.location;
                 }
             );
         }
