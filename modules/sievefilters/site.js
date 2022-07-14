@@ -37,7 +37,7 @@ $(function () {
                     {'name': 'sender', 'value': sender}
                 ],
                 function(res) {
-                    //window.location = window.location;
+                    window.location = window.location;
                 }
             );
         });
@@ -396,7 +396,7 @@ $(function () {
                     {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()}
                     ],
                 function(res) {
-                    //window.location = window.location;
+                    window.location = window.location;
                 }
             );
         }
