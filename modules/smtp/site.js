@@ -14,6 +14,10 @@ var get_smtp_profile = function(profile_value) {
     }
 };
 
+var check_attachment_dir_access = function() {
+    Hm_Notices.show(['ERRPlease the attachments directory does not exist or is inaccessible on the server']);
+};
+
 var smtp_test_action = function(event) {
     event.preventDefault();
     var form = $(this).parent();
@@ -321,5 +325,8 @@ $(function() {
         $('.compose_server').on('change', function() {
             get_smtp_profile($('.compose_server').val());
         });
+        if($('.compose_attach_button').attr('disabled') == 'disabled'){
+            check_attachment_dir_access();
+        };
     }
 });

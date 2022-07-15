@@ -333,6 +333,12 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
         }
+        if (file_exists($this->config->get('attachment_dir')) && is_dir($this->config->get('attachment_dir'))) {
+            $this->out('attachment_dir_access', true);
+        } else {
+            $this->out('attachment_dir_access', false);
+            Hm_Msgs::add('ERRPlease the attachments directory does not exist or is inaccessible on the server');
+        }
 
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
@@ -1087,10 +1093,11 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }    
 
+        $disabled_attachment = $this->get('attachment_dir_access') ? '' : 'disabled="disabled"';
         $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" /><input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
-            '" name="compose_attach_button" type="button" />';
+            '" name="compose_attach_button" type="button" '.$disabled_attachment.' />';
         return $res;
     }
 }
