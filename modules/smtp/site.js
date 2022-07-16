@@ -15,7 +15,7 @@ var get_smtp_profile = function(profile_value) {
 };
 
 var check_attachment_dir_access = function() {
-    Hm_Notices.show(['ERRPlease the attachments directory does not exist or is inaccessible on the server']);
+    Hm_Notices.show(['ERRAttachment storage unavailable, please contact your site administrator']);
 };
 
 var smtp_test_action = function(event) {
