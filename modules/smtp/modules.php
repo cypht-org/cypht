@@ -337,7 +337,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
-            Hm_Msgs::add('ERRPlease the attachments directory does not exist or is inaccessible on the server');
+            Hm_Msgs::add('ERRAttachment storage unavailable, please contact your site administrator');
         }
 
         $this->out('compose_draft', $draft, false);
