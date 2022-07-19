@@ -226,8 +226,15 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            $addr = addr_split($headers['To']);
-            $size = count($addr);
+            $lc_headers = lc_headers($headers); 
+            if (array_key_exists('to', $lc_headers)) {
+                $addr_list = process_address_fld($lc_headers['to']);
+                $size = count($addr_list);
+            }
+            if (array_key_exists('cc', $lc_headers)) {
+                $addr_list = process_address_fld($lc_headers['cc']);
+                $size += count($addr_list);
+            }
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
@@ -236,7 +243,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
             if (!isset($headers['Flags']) || !stristr($headers['Flags'], 'draft')) {
                 $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
-                if ($reply_all || $size > 1) {
+                if ($size > 1) {
                     $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 }
                 else {
