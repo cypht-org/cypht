@@ -8,6 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+define('MAX_RECIPIENT_WARNING', 20);
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
 
@@ -25,6 +26,7 @@ class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
             );
             $reply_details = $this->session->get($cache_name, false);
             if ($reply_details) {
+                recip_count_check($reply_details['msg_headers'], $this);
                 $this->out('reply_details', $reply_details);
             }
         }
@@ -94,6 +96,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 }
 
                 if ($imap_draft) {
+                    recip_count_check($imap_draft, $this);
                     $this->out('draft_id', $this->request->get['uid']);
                     $this->out('imap_draft', $imap_draft);
                 }
@@ -1934,4 +1937,22 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $user_data = $user_config->dump();
     $session->set('user_data', $user_data);
     Hm_Debug::add('Default SMTP server added');
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('recip_count_check')) {
+function recip_count_check($headers, $omod) {
+    $headers = lc_headers($headers);
+    $recip_count = 0;
+    if (array_key_exists('to', $headers) && $headers['to']) {
+        $recip_count += count(process_address_fld($headers['to']));
+    }
+    if (array_key_exists('cc', $headers) && $headers['cc']) {
+        $recip_count += count(process_address_fld($headers['cc']));
+    }
+    if ($recip_count > MAX_RECIPIENT_WARNING) {
+        Hm_Msgs::add('ERRMessage contains more than the maximum number of recipients, proceed with caution');
+    }
 }}

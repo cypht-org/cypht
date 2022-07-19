@@ -2,7 +2,7 @@
 
 var get_smtp_profile = function(profile_value) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
-        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option']);
+        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option'], true);
     }
     else {
         Hm_Ajax.request(
