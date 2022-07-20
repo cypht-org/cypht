@@ -620,7 +620,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
             if ($start_page == $val) {
                 $res .= 'selected="selected" ';
                 if ($start_page != 'none') {
-                    $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -657,7 +657,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
             if ($default_sort_order == $val) {
                 $res .= 'selected="selected" ';
                 if ($default_sort_order != 'arrival') {
-                    $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -694,7 +694,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             if ($list_style == $val) {
                 $res .= 'selected="selected" ';
                 if ($list_style != 'email_style') {
-                    $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -881,7 +881,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
             $sources = $settings['unread_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="unread_setting"><td><label for="unread_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -925,7 +925,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
             $sources = $settings['flagged_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -972,7 +972,7 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_email_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -996,7 +996,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1072,7 +1072,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             if ($id == $mylang) {
                 $res .= 'selected="selected" ';
                 if ($id != 'en') {
-                    $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
                 }
             }
             $res .= 'value="'.$id.'">'.$lang.'</option>';
@@ -1107,7 +1107,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             if ($zone == $myzone) {
                 $res .= 'selected="selected" ';
                 if ($zone != 'Africa/Abidjan') {
-                    $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
                 }
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';

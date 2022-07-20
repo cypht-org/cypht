@@ -1619,7 +1619,7 @@ var reset_default_value_checkbox = function() {
 };
 
 var reset_default_value_select = function() {
-    let field = this.parentElement.parentElement.parentElement.firstChild;
+    let field = this.parentElement.parentElement.firstChild;
     let tab_static_default_value = {"inline_message_style" : 0, "smtp_compose_type" : 0, "theme_setting" : 0,
     "timezone" : 0, "list_style" : 0, "idle_time" : 4, "start_page" : 0, "default_sort_order" : 0,
     "unread_since" : 1, "flagged_since" : 1, "all_since" : 1, "all_email_since" : 1, "feed_since" : 0,
@@ -1654,7 +1654,7 @@ var reset_default_value_select = function() {
 };
 
 var reset_default_value_input = function() {
-    let field = this.parentElement.parentElement.parentElement.firstChild;
+    let field = this.parentElement.parentElement.firstChild;
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
         this.parentElement.setAttribute("restore_aria_label","Restore default value")

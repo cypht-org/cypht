@@ -878,7 +878,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $limit = $settings['feed_limit'];
         }
         if ($limit != 20) {
-            $reset = '<div><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span></div>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
             '<td><input type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';

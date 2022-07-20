@@ -263,7 +263,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .toggle_recipients { top: 8px !important; right: 0px !important; }
 .mobile .prevnext, .mobile .news_cell .subject div img { width: 20px; height: 20px; }
 .mobile .long_session { float: left; clear: both; }
-.reset_default_value_checkbox, .reset_default_value_select, .reset_default_value_input { vertical-align: bottom; transform: scaleX(-1); width: 18px; height: 18px; }
+.reset_default_value_checkbox, .reset_default_value_select, .reset_default_value_input { vertical-align: bottom; transform: scaleX(-1); width: 18px; height: 18px; margin-bottom: 3px; margin-left: 6px; }
 .tooltip_restore { position: relative; }
 .tooltip_restore:hover:after, .tooltip_restore:focus:after { content: attr(restore_aria_label); position: absolute; top: -2.4em; left: 50%; transform: translateX(-50%); z-index: 1; white-space: nowrap; padding: 5px 14px; background: #777; color: #fff; border-radius: 4px; font-size: 1rem; }
 [restore_aria_label]:hover:before, [restore_aria_label]:focus:before { content: "▼"; position: absolute; top: -1em; left: 50%; transform: translateX(-50%); color: #777; }
