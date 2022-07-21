@@ -25,9 +25,10 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
                 $imap_account = $mailbox;
             }
         }
+
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $script = $client->getScript($this->request->post['sieve_script_name']);
         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
         $this->out('conditions', json_encode(base64_decode($base64_obj)));
@@ -68,7 +69,7 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $script = $client->getScript($this->request->post['sieve_script_name']);
         $client->close();
         $this->out('script', $script);
@@ -98,7 +99,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
 
         foreach ($scripts as $script) {
@@ -135,7 +136,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == 'main_script') {
@@ -213,7 +214,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
         $email_sender = $this->request->post['sender'];
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
 
         $scripts = $client->listScripts();
 
@@ -285,15 +286,15 @@ class Hm_Handler_sieve_get_mailboxes_script extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-        $idx = null;
+        $imap_server_id = null;
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
                 $imap_server_id = $idx;
             }
         }
-        $cache = Hm_IMAP_List::get_cache($this->cache, $idx);
-        $imap = Hm_IMAP_List::connect($idx, $cache);
+        $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+        $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
         if (!imap_authed($imap)) {
             Hm_Msgs::add('ERRIMAP Authentication Failed');
             return;
@@ -336,9 +337,16 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             $email_sender = str_replace('*', '', $email_sender);
         }
 
+        $default_behaviour = 'Discard';
+        if ($this->user_config->get('sieve_block_default_behaviour')) {
+            if (array_key_exists($this->request->post['imap_server_id'], $this->user_config->get('sieve_block_default_behaviour'))) {
+                $default_behaviour = $this->user_config->get('sieve_block_default_behaviour')[$this->request->post['imap_server_id']];
+            }
+        }
+
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
 
         $scripts = $client->listScripts();
 
@@ -386,9 +394,17 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             $cond->contains('"From" ["'.$blocked_sender.'"]');
             $custom_condition->addCriteria($cond);
         }
-        $custom_condition->addAction(
-            new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
-        );
+
+        if ($default_behaviour == 'Discard') {
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+            );
+        }
+        elseif ($default_behaviour == 'Reject') {
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction()
+            );
+        }
         $custom_condition->addAction(
             new \PhpSieveManager\Filters\Actions\StopFilterAction()
         );
@@ -453,7 +469,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
 
         $scripts = $client->listScripts();
 
@@ -893,7 +909,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == 'main_script') {
@@ -938,7 +954,7 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         $sieve_options = explode(':', $imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($mailbox['user'], $mailbox['pass'], false, "", "PLAIN");
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
         $scripts = $client->listScripts();
         foreach ($scripts as $script) {
             if ($script == $this->request->post['current_editing_script']) {
@@ -949,6 +965,32 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
             $script_name,
             $this->request->post['script']
         );
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_sieve_block_change_behaviour_script extends Hm_Handler_Module {
+    public function process() {
+        $imap_server_id = $this->request->post['imap_server_id'];
+        if (!$this->user_config->get('sieve_block_default_behaviour')) {
+            $this->user_config->set('sieve_block_default_behaviour', []);
+        }
+        $behaviours = $this->user_config->get('sieve_block_default_behaviour');
+        $behaviours[$imap_server_id] = $this->request->post['selected_behaviour'];
+        $this->user_config->set('sieve_block_default_behaviour', $behaviours);
+        $this->session->record_unsaved('Changed Sieve Block behaviour');
+        $this->session->set('user_data', $this->user_config->dump());
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sieve_lock_change_behaviour_output extends Hm_Output_Module {
+    public function output() {
+
     }
 }
 
@@ -1048,6 +1090,22 @@ function get_blocked_senders_array($mailbox) {
     return $blocked_senders;
 }
 
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_load_behaviour extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->user_config->get('sieve_block_default_behaviour')) {
+            $this->out('sieve_block_default_behaviour', $this->user_config->get('sieve_block_default_behaviour'));
+        } else {
+            $this->out('sieve_block_default_behaviour', []);
+        }
+    }
+}
+
 /**
  * @subpackage sievefilters/output
  */
@@ -1057,13 +1115,24 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         foreach($mailboxes as $idx => $mailbox) {
+            $behaviours = $this->get('sieve_block_default_behaviour');
+            $default_behaviour = 'Discard';
+            if (array_key_exists($idx, $behaviours)) {
+                $default_behaviour = $behaviours[$idx];
+            }
             if (isset($mailbox['sieve_config_host'])) {
+                if ($default_behaviour == 'Discard') {
+                    $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'"><option value="Discard">Discard</option><option value="Reject">Bounce</option></select>';
+                }
+                elseif ($default_behaviour == 'Reject') {
+                    $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'"><option value="Discard">Discard</option><option value="Reject" selected>Bounce</option></select>';
+                }
                 $num_blocked = sizeof(get_blocked_senders_array($mailbox));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
                 $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
                 $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
-                // $res .= '<button class="block_sender" account="'.$mailbox['name'].'">Block Sender</button>';
+                $res .=  $default_behaviour_html;
                 $res .= '<table class="filter_details"><tbody>';
                 $res .= '<tr><th style="width: 80px;">Sender</th><th style="width: 15%;">Actions</th></tr>';
                 $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::$minus), $this->html_safe(Hm_Image_Sources::$globe));

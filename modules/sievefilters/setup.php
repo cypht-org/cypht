@@ -17,6 +17,7 @@ add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters'
 // block list
 add_output('block_list', 'blocklist_settings_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('block_list', 'blocklist_settings_accounts', true, 'sievefilters', 'blocklist_settings_start', 'after');
+add_handler('block_list', 'load_behaviour', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('block_list', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'blocklist_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 
@@ -90,6 +91,16 @@ add_handler('ajax_sieve_block_domain', 'settings_load_imap',  true);
 add_handler('ajax_sieve_block_domain', 'sieve_block_domain_script',  true);
 add_output('ajax_sieve_block_domain', 'sieve_block_domain_output',  true);
 
+
+/* change blocking default behaviour */
+setup_base_ajax_page('ajax_sieve_block_change_behaviour', 'core');
+add_handler('ajax_sieve_block_change_behaviour', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_sieve_block_change_behaviour', 'login', false, 'core');
+add_handler('ajax_sieve_block_change_behaviour', 'settings_load_imap',  true);
+add_handler('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_script',  true);
+add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_output',  true);
+
+
 return array(
     'allowed_pages' => array(
         'block_list',
@@ -103,7 +114,8 @@ return array(
         'ajax_sieve_block_unblock',
         'ajax_sieve_unblock_sender',
         'ajax_sieve_get_mailboxes',
-        'ajax_sieve_block_domain'
+        'ajax_sieve_block_domain',
+        'ajax_sieve_block_change_behaviour'
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -130,6 +142,7 @@ return array(
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_server_id' => FILTER_VALIDATE_INT,
         'folder' => FILTER_SANITIZE_STRING,
-        'sender' => FILTER_UNSAFE_RAW
+        'sender' => FILTER_UNSAFE_RAW,
+        'selected_behaviour' => FILTER_SANITIZE_STRING
     )
 );

@@ -1348,6 +1348,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
      * This list is cached in the session between page loads by Hm_Handler_save_imap_servers
      */
     public function process() {
+        $this->out('sieve_filters_enabled', $this->module_is_supported('sievefilters'));
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
         $updated = false;
@@ -1505,6 +1506,42 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
+
+            $sieve_enabled = false;
+            if ($this->module_is_supported('sievefilters')) {
+                if (!isset($this->request->post['imap_sieve_host'])) {
+                    foreach ($this->get('imap_servers', array()) as $index => $vals) {
+                        if ($index == $form['imap_server_id']) {
+                            $selected_imap = $vals;
+                            break;
+                        }
+                    }
+                    if (isset($selected_imap['sieve_config_host'])) {
+                        $sieve_enabled = true;
+                        $sieve_hostname = $selected_imap['sieve_config_host'];
+                    }
+                } else {
+                    $sieve_enabled = true;
+                    $sieve_hostname = $this->request->post['imap_sieve_host'];
+                }
+                if ($sieve_enabled) {
+                    require_once VENDOR_PATH.'autoload.php';
+                    try {
+                        $host_config = explode(':', $sieve_hostname);
+                        $sieve_host = $host_config[0];
+                        $sieve_port = '4190';
+                        if (count($host_config) > 1) {
+                            $sieve_port = $host_config[1];
+                        }
+                        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                        $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                    } catch (Exception $e) {
+                        Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                        return;
+                    }
+                }
+            }
+
             $imap = false;
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             if ($success) {
@@ -1567,6 +1604,24 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
         $just_saved_credentials = false;
         if (isset($this->request->post['imap_save'])) {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
+
+            if (isset($this->request->post['imap_sieve_host'])) {
+                require_once VENDOR_PATH . 'autoload.php';
+                try {
+                    $host_config = explode(':', $this->request->post['imap_sieve_host']);
+                    $sieve_host = $host_config[0];
+                    $sieve_port = '4190';
+                    if (count($host_config) > 1) {
+                        $sieve_port = $host_config[1];
+                    }
+                    $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                    $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                } catch (Exception $e) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                    return;
+                }
+            }
+
             if (!$success) {
                 Hm_Msgs::add('ERRUsername and Password are required to save a connection');
             }

@@ -9,6 +9,19 @@ $(function () {
     let current_account;
 
     if (hm_page_name() === 'block_list') {
+        $(document).on('change', '.select_default_behaviour', function(e) {
+            let elem = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
+                    {'name': 'selected_behaviour', 'value': elem.val()},
+                    {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
+                ],
+                function(res) {
+                    console.log(res);
+                }
+            );
+        });
+
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
            let sender = $(this).parent().parent().children().html();
@@ -621,6 +634,8 @@ $(function () {
          * Action change
          */
         $(document).on('change', '.sieve_actions_select', function () {
+            let tr_elem = $(this).parent().parent();
+            console.log(tr_elem.attr('default_value'));
             let elem = $(this).parent().next().next();
             let elem_extra = $(this).parent().next().find('.condition_extra_action_value');
             let action_name = $(this).val();
@@ -631,6 +646,7 @@ $(function () {
                }
             });
             if (selected_action) {
+                elem_extra.attr('type', 'hidden');
                 if (selected_action.extra_field) {
                     elem_extra.attr('type', 'text');
                     elem_extra.attr('placeholder', selected_action.extra_field_placeholder)
@@ -653,7 +669,11 @@ $(function () {
                 if (selected_action.type === 'select') {
                     options = '';
                     selected_action.values.forEach(function(val) {
-                        options = options + '<option value="' + val + '">'+ val +'</option>'
+                        if (tr_elem.attr('default_value') === val) {
+                            options = options + '<option value="' + val + '" selected>'+ val +'</option>'
+                        } else {
+                            options = options + '<option value="' + val + '">'+ val +'</option>'
+                        }
                     });
                     elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
                 }
@@ -666,7 +686,11 @@ $(function () {
                             mailboxes = JSON.parse(res.mailboxes);
                             options = '';
                             mailboxes.forEach(function(val) {
-                                options = options + '<option value="' + val + '">'+ val +'</option>'
+                                if (tr_elem.attr('default_value') === val) {
+                                    options = options + '<option value="' + val + '" selected>'+ val +'</option>'
+                                } else {
+                                    options = options + '<option value="' + val + '">'+ val +'</option>'
+                                }
                             });
                             elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
                             $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
@@ -807,7 +831,9 @@ $(function () {
                         $(".add_condition_sieve_filters").last().trigger('change');
                         $(".condition_options").last().val(condition.type);
                         $("[name^=sieve_selected_extra_option_value]").last().val(condition.extra_option_value);
-                        $("[name^=sieve_selected_option_value]").last().val(condition.value);
+                        if ($("[name^=sieve_selected_option_value]").last().is('input')) {
+                            $("[name^=sieve_selected_option_value]").last().val(condition.value);
+                        }
                     });
 
                     actions.forEach(function (action) {
@@ -815,7 +841,9 @@ $(function () {
                         $(".sieve_actions_select").last().val(action.action);
                         $(".sieve_actions_select").last().trigger('change');
                         $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
-                        $("[name^=sieve_selected_action_value]").last().val(action.value);
+                        if ($("[name^=sieve_selected_option_action_value]").last().is('input')) {
+                            $("[name^=sieve_selected_option_action_value]").last().val(action.value);
+                        }
                     });
                 }
             );
