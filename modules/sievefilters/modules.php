@@ -401,8 +401,9 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             );
         }
         elseif ($default_behaviour == 'Reject') {
+            $filter->addRequirement('reject');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\RejectFilterAction()
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
             );
         }
         $custom_condition->addAction(
@@ -982,6 +983,81 @@ class Hm_Handler_sieve_block_change_behaviour_script extends Hm_Handler_Module {
         $this->user_config->set('sieve_block_default_behaviour', $behaviours);
         $this->session->record_unsaved('Changed Sieve Block behaviour');
         $this->session->set('user_data', $this->user_config->dump());
+        $default_behaviour = $this->request->post['selected_behaviour'];
+
+        foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
+            if ($idx == $this->request->post['imap_server_id']) {
+                $imap_account = $mailbox;
+            }
+        }
+
+        $sieve_options = explode(':', $imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
+        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
+
+        $scripts = $client->listScripts();
+
+        if(!array_search('blocked_senders', $scripts, true)) {
+            $client->putScript(
+                'blocked_senders',
+                ''
+            );
+        }
+
+        $blocked_senders = [];
+        $current_script = $client->getScript('blocked_senders');
+
+        if ($current_script == '') {
+            return;
+        }
+
+        if ($current_script != '') {
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+            $blocked_list = json_decode(base64_decode($base64_obj));
+            foreach ($blocked_list as $blocked_sender) {
+                $blocked_senders[] = $blocked_sender;
+            }
+        }
+
+        // Create Block List Filter
+        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+        $custom_condition = new \PhpSieveManager\Filters\Condition(
+            "CYPHT GENERATED CONDITION", 'anyof'
+        );
+        foreach ($blocked_senders as $blocked_sender) {
+            $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+            $cond->contains('"From" ["'.$blocked_sender.'"]');
+            $custom_condition->addCriteria($cond);
+        }
+
+        if ($default_behaviour == 'Discard') {
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+            );
+        }
+        elseif ($default_behaviour == 'Reject') {
+            $filter->addRequirement('reject');
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
+            );
+        }
+        $custom_condition->addAction(
+            new \PhpSieveManager\Filters\Actions\StopFilterAction()
+        );
+        $filter->setCondition($custom_condition);
+        $script_parsed = $filter->toScript();
+
+        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+        $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
+        $script_parsed = $header_obj."\n\n".$script_parsed;
+
+        $client->putScript(
+            'blocked_senders',
+            $script_parsed
+        );
+        $client->close();
+
+        Hm_Msgs::add('Default behaviour changed');
     }
 }
 
