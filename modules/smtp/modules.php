@@ -8,6 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+define('MAX_RECIPIENT_WARNING', 20);
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
 
@@ -25,6 +26,7 @@ class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
             );
             $reply_details = $this->session->get($cache_name, false);
             if ($reply_details) {
+                recip_count_check($reply_details['msg_headers'], $this);
                 $this->out('reply_details', $reply_details);
             }
         }
@@ -94,12 +96,59 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 }
 
                 if ($imap_draft) {
+                    recip_count_check($imap_draft, $this);
                     $this->out('draft_id', $this->request->get['uid']);
                     $this->out('imap_draft', $imap_draft);
                 }
                 return;
             }
             Hm_Msgs::add('ERRCould not load the IMAP mailbox.');
+        }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
+{
+    public function process() {
+        if (!$this->module_is_supported('imap')) {
+            return;
+        }
+        
+        if (array_key_exists('forward', $this->request->get)) {
+            $path = explode('_', $this->request->get['list_path']);
+            $imap = Hm_IMAP_List::connect($path[1]);
+            if ($imap->select_mailbox(hex2bin($path[2]))) {
+                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
+                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
+                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+                if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
+                    return;
+                }
+
+                # Attachment Download
+                $attached_files = [];
+                $this->session->set('uploaded_files', array());
+                if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
+                    foreach ($msg_struct[0]['subs'] as $ind => $sub) {
+                        if ($ind != '0.1') {
+                            $new_attachment['basename'] = $sub['description'];
+                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['size'] = $sub['size'];
+                            $new_attachment['type'] = $sub['type'];
+                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . $new_attachment['name'];
+                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            file_put_contents($file_path, $content);
+                            $new_attachment['tmp_name'] = $file_path;
+                            $new_attachment['filename'] = $file_path;
+                            $attached_files[$this->request->get['uid']][] = $new_attachment;
+                        }
+                    }
+                }
+                $this->session->set('uploaded_files', $attached_files);
+            }
         }
     }
 }
@@ -286,6 +335,12 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         }
         if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
+        }
+        if (file_exists($this->config->get('attachment_dir')) && is_dir($this->config->get('attachment_dir'))) {
+            $this->out('attachment_dir_access', true);
+        } else {
+            $this->out('attachment_dir_access', false);
+            Hm_Msgs::add('ERRAttachment storage unavailable, please contact your site administrator');
         }
 
         $this->out('compose_draft', $draft, false);
@@ -1041,10 +1096,11 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }    
 
+        $disabled_attachment = $this->get('attachment_dir_access') ? '' : 'disabled="disabled"';
         $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" /><input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
             '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
             '<input class="compose_attach_button" value="'.$this->trans('Attach').
-            '" name="compose_attach_button" type="button" />';
+            '" name="compose_attach_button" type="button" '.$disabled_attachment.' />';
         return $res;
     }
 }
@@ -1888,4 +1944,22 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $user_data = $user_config->dump();
     $session->set('user_data', $user_data);
     Hm_Debug::add('Default SMTP server added');
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('recip_count_check')) {
+function recip_count_check($headers, $omod) {
+    $headers = lc_headers($headers);
+    $recip_count = 0;
+    if (array_key_exists('to', $headers) && $headers['to']) {
+        $recip_count += count(process_address_fld($headers['to']));
+    }
+    if (array_key_exists('cc', $headers) && $headers['cc']) {
+        $recip_count += count(process_address_fld($headers['cc']));
+    }
+    if ($recip_count > MAX_RECIPIENT_WARNING) {
+        Hm_Msgs::add('ERRMessage contains more than the maximum number of recipients, proceed with caution');
+    }
 }}
