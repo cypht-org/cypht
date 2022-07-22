@@ -54,6 +54,11 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
             return;
         }
 
+        if(!extension_loaded('imagick')){
+            Hm_Msgs::add('ERR2FA The imagick extension is required to use 2fa feature, please contact your administrator for fixing this');
+            return;
+        }
+
         list($secret, $simple) = get_2fa_key($this->config);
         if (!$secret) {
             Hm_Debug::add('2FA module set enabled, but no shared secret configured');
