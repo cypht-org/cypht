@@ -39,12 +39,18 @@
         "ext-redis": "To use Redis for caching, this needs to be installed",
         "ext-gd": "To use 2fa, this needs to be installed for the QR code display",
         "ext-memcached": "To use Memcached for caching, this needs to be installed",
-        "ext-gnupg": "To use the PGP module set, this needs to be installed"
+        "ext-gnupg": "To use the PGP module set, this needs to be installed",
+        "ext-imagick":"To use 2fa, this needs to be installed for the QR code display"
     },
     "config": {
     	"optimize-autoloader": true,
         "allow-plugins": {
             "endroid/installer": false
         }
+    },
+    "scripts": {
+        "post-update-cmd": "composer suggest",
+        "post-package-install":"composer suggest",
+        "post-install-cmd": "composer suggest"
     }
 }
