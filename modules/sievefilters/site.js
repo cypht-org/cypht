@@ -22,6 +22,7 @@ $(function () {
             );
         });
 
+        
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
            let sender = $(this).parent().parent().children().html();
