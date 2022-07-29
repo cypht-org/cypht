@@ -2,7 +2,7 @@
 
 var get_smtp_profile = function(profile_value) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
-        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option']);
+        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option'], true);
     }
     else {
         Hm_Ajax.request(
@@ -12,6 +12,10 @@ var get_smtp_profile = function(profile_value) {
             }
         );
     }
+};
+
+var check_attachment_dir_access = function() {
+    Hm_Notices.show(['ERRAttachment storage unavailable, please contact your site administrator']);
 };
 
 var smtp_test_action = function(event) {
@@ -321,5 +325,8 @@ $(function() {
         $('.compose_server').on('change', function() {
             get_smtp_profile($('.compose_server').val());
         });
+        if($('.compose_attach_button').attr('disabled') == 'disabled'){
+            check_attachment_dir_access();
+        };
     }
 });

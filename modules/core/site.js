@@ -307,7 +307,7 @@ var Hm_Ajax_Request = function() { return {
 var Hm_Notices = {
     hide_id: false,
 
-    show: function(msgs) {
+    show: function(msgs, keep) {
         var msg_list = [];
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
@@ -317,7 +317,18 @@ var Hm_Notices = {
                 msg_list.push(msgs[i]);
             }
         }
-        $('.sys_messages').html(msg_list.join(', '));
+        if (!keep) {
+            $('.sys_messages').html(msg_list.join(', '));
+        }
+        else {
+            var existing = $('.sys_messages').html();
+            if (existing) {
+                $('.sys_messages').append('<br />'+msg_list.join(', '));
+            }
+            else {
+                $('.sys_messages').html(msg_list.join(', '));
+            }
+        }
         $('.sys_messages').show();
         $('.sys_messages').on('click', function() {
             $('.sys_messages').hide();

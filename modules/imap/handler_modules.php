@@ -889,11 +889,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         }
                     }
                     if ($form['action_type'] == 'archive') {
-                        if (array_key_exists($server, $specials)) {
-                            if (array_key_exists('archive', $specials[$server])) {
-                                if ($specials[$server]['archive']) {
-                                    $archive_folder = $specials[$server]['archive'];
-                                }
+                        if(array_key_exists('archive', $specials)) {
+                            if($specials['archive']) {
+                                $archive_folder = $specials['archive'];
                             }
                         }
                     }
