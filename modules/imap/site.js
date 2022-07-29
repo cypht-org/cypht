@@ -1004,6 +1004,10 @@ $(function() {
         $('.sieve_config').toggle();
     });
 
+    $(document).on('keyup', '#new_imap_address', function () {
+        $('#sieve_config_host').val($(this).val() + ':4190')
+    });
+
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
         setup_imap_folder_page();
     }
