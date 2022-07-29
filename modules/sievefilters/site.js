@@ -583,6 +583,7 @@ $(function () {
                 '    </td>' +
                 extra_options +
                 '    <td style="width: 43%;">' +
+                '    <img style="display: none" src="/modules/sievefilters/assets/spinner.gif" />' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td style="vertical-align: middle; width: 50px;">' +
@@ -679,6 +680,7 @@ $(function () {
                 }
                 if (selected_action.type === 'mailbox') {
                     let mailboxes = null;
+                    tr_elem.children().find('img').attr('style', '');
                     Hm_Ajax.request(
                         [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
                             {'name': 'imap_account', 'value': current_account} ],
