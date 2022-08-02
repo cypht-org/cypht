@@ -715,6 +715,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             return;
         }
 
+        /* delete attachments email*/
+        foreach ($uploaded_files as $uploaded_file) {
+            if ($uploaded_file['filename']) {
+                unlink($uploaded_file['filename']);
+            }
+        }
+
         /* check for auto-bcc */
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
         if ($auto_bcc) {
