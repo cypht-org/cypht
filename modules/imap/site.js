@@ -565,7 +565,12 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                     $('.msg_text').append(res.msg_parts);
                     set_message_content(list_path, uid);
                     document.title = $('.header_subject th').text();
-                    imap_message_view_finished();
+
+                    if (res.show_pagination_links) {
+                        imap_message_view_finished();
+                    } else {
+                        imap_message_view_finished(false, false, true);
+                    }    
                 }
                 else {
                     $('.reply_link, .reply_all_link, .forward_link').each(function() {

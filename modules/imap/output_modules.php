@@ -863,6 +863,23 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable pagination links on the message view
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_pagination_links extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('pagination_links', $settings) && $settings['pagination_links']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="pagination_links">'.
+            $this->trans('Show next & previous emails when reading a message').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="pagination_links" name="pagination_links" value="1" /></td></tr>';
+    }
+}
+
+/**
  * Output imap prefetch ids
  * @subpackage imap/output
  */

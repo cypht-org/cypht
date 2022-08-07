@@ -589,6 +589,7 @@ return array(
     'feed item' => 'item feed',
     'Allow handling of mailto links' => 'Izinkan penanganan tautan mailto',
     'Show folders' => 'Tampilkan folder',
+    'Show next & previous emails when reading a message' => false
 ); 
 
 ?>
