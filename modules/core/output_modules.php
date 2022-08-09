@@ -606,6 +606,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
         $options = start_page_opts();
         $settings = $this->get('user_settings', array());
         $res = '';
+        $reset = '';
 
         if (array_key_exists('start_page', $settings)) {
             $start_page = $settings['start_page'];
