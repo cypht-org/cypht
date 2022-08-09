@@ -473,6 +473,9 @@ var display_imap_mailbox = function(res) {
     $('input[type=checkbox]').on("click", function(e) {
         Hm_Message_List.toggle_msg_controls();
     });
+    $('.checkbox_label').on("click", function(e) {
+        setTimeout(search_selected_for_imap, 100);
+    });
     cache_imap_page();
 };
 
