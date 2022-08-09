@@ -870,7 +870,7 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
     protected function output() {
         $checked = '';
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('pagination_links', $settings) && $settings['pagination_links']) {
+        if (!array_key_exists('pagination_links', $settings) || (array_key_exists('pagination_links', $settings) && $settings['pagination_links'])) {
             $checked = ' checked="checked"';
         }
         return '<tr class="general_setting"><td><label for="pagination_links">'.
