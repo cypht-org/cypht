@@ -211,6 +211,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     }
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
+                    $this->out('nux_server_id', $new_id);
+                    $this->out('nux_service_name', $form['nux_service']);
                 }
                 else {
                     Hm_IMAP_List::del($new_id);

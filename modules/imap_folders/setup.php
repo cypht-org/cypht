@@ -60,6 +60,11 @@ add_handler('ajax_imap_special_folder', 'load_imap_servers_from_config', true, '
 add_handler('ajax_imap_special_folder', 'process_special_folder', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
 add_handler('ajax_imap_special_folder', 'save_user_data', true, 'core', 'process_special_folder', 'after');
 
+setup_base_ajax_page('ajax_imap_accept_special_folders', 'core');
+add_handler('ajax_imap_accept_special_folders', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_accept_special_folders', 'process_accept_special_folders', true, 'imap_folders', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_accept_special_folders', 'save_user_data', true, 'core', 'process_special_folders', 'after');
+
 add_handler('ajax_hm_folders', 'imap_folder_check', true, 'imap_folders', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'folders_page_link', true, 'imap_folders', 'settings_menu_end', 'before');
 
@@ -70,7 +75,8 @@ return array(
         'ajax_imap_folders_create',
         'ajax_imap_folders_rename',
         'ajax_imap_special_folder',
-        'ajax_imap_clear_special_folder'
+        'ajax_imap_clear_special_folder',
+        'ajax_imap_accept_special_folders'
     ),
     'allowed_output' => array(
         'imap_folders_success' => array(FILTER_VALIDATE_INT, false),
@@ -80,6 +86,7 @@ return array(
     'allowed_post' => array(
         'parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'new_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'special_folder_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'special_folder_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'imap_service_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
