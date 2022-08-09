@@ -756,6 +756,18 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             }
         }
 
+        # Delete draft after send
+        if ($form['draft_id'] > 0) {
+            $msg_path = explode('_', $this->request->post['compose_msg_path']);
+            $msg_uid = $this->request->post['compose_msg_uid'];
+
+            $imap = Hm_IMAP_List::connect($msg_path[1]);
+            if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
+                $imap->message_action('DELETE', array($msg_uid));
+                $imap->message_action('EXPUNGE', array($msg_uid));
+            }
+        }
+
         /* clean up */
         $this->out('msg_sent', true);
         Hm_Msgs::add("Message Sent");
