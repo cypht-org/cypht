@@ -589,7 +589,8 @@ return array(
     'Search Results' => 'Otsingutulemused',
     'feed item' => 'kirje uudisvoost',
     'Allow handling of mailto links' => 'Luba mailto-viidete kasutamist',
-    'Show folders' => 'Näita kaustu'
+    'Show folders' => 'Näita kaustu',
+    'Archive to the original folder' => false
 ); 
 
 ?>

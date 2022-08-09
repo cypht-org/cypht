@@ -944,3 +944,19 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * Option for the maximum number of messages per source for the All E-mail  page
+ * @subpackage imap/output
+ */
+class Hm_Output_original_folder_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="original_folder">'.
+            $this->trans('Archive to the original folder').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" /></td></tr>';
+    }
+}

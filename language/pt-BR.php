@@ -581,7 +581,8 @@ return array(
     'Search Results' => false,
     'feed item' => false,
     'Allow handling of mailto links' => false,
-    'Show folders' => false
+    'Show folders' => false,
+    'Archive to the original folder' => false
 );
 
 ?>

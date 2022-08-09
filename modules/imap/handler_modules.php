@@ -106,6 +106,22 @@ class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from archive to original folder setting archive page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_original_folder_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are true and false
+     */
+    public function process() {
+        function original_folder_callback($val) {
+            return $val;
+        }
+        process_site_setting('original_folder', $this, 'original_folder_callback', false, true);
+    }
+}
+
+/**
  * Process "unread_on_open" setting for the message view page in the settings page
  * @subpackage imap/handler
  */
@@ -806,14 +822,26 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                 $errors++;
             }
 
+            $form_folder = hex2bin($form['folder']);
+
             /* select source folder */
-            if ($errors || !$imap->select_mailbox(hex2bin($form['folder']))) {
+            if ($errors || !$imap->select_mailbox($form_folder)) {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
                 $errors++;
             }
 
+            /* path according to original option setting */
+            if ($this->user_config->get('original_folder_setting', false)) {
+                $dest_path = $archive_folder.'/'.$form_folder;
+                if (!$imap->select_mailbox(hex2bin($dest_path))) {
+                    $imap->create_mailbox($dest_path);
+                }
+            } else {
+                $dest_path = $archive_folder;
+            }
+            
             /* try to move the message */
-            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
+            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $dest_path)) {
                 Hm_Msgs::add("Message archived");
             }
             else {
