@@ -1342,9 +1342,12 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
         $added = false;
         $updated = false;
         $new_servers = array();
-        $max = 0;
-        $index = 0;
-        foreach ($servers as $server) {
+        if (count($servers) == 0) {
+            $max = 0;
+        } else {
+            $max = max(array_keys($servers));
+        }
+        foreach ($servers as $id => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
                     $updated = true;
@@ -1352,12 +1355,10 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 }
             }
             $new_servers[] = $server;
-            $max = $index;
-            Hm_IMAP_List::add($server, $index);
+            Hm_IMAP_List::add($server, $id);
             if (array_key_exists('default', $server) && $server['default']) {
                 $added = true;
             }
-            $index++;
         }
         $max++;
         if ($updated) {
