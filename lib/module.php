@@ -394,7 +394,7 @@ abstract class Hm_Handler_Module {
     private function check_field($val) {
         switch (true) {
             case is_array($val):
-            case is_string($val):
+            case trim((string) $val) !== '':
             case $val === '0':
             case $val === 0:
                 return $val;
