@@ -64,6 +64,7 @@ add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_hea
 
 /* message view page */
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
+add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -313,8 +314,10 @@ return array(
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
+        'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
-        'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'attachment_file' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
 
     'allowed_post' => array(

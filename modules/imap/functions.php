@@ -338,7 +338,7 @@ function process_imap_message_ids($ids) {
  * @return string
  */
 if (!hm_exists('format_msg_part_row')) {
-function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false, $mobile=false) {
+function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $rm_link, $use_icons=false, $simple_view=false, $mobile=false) {
     $allowed = array(
         'textplain',
         'texthtml',
@@ -446,7 +446,23 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
                 '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
-        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+        if ($lc_type == "textplain" || $lc_type == "multipartmixed") {
+            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'"></a></td>';
+        }
+        else {
+            $file_path = $output_mod->get('attachment_dir')."/".$output_mod->html_safe(decode_fld($desc));
+            if (file_exists($file_path)) {
+                $remove_attachment_action = "enable_remove";
+                $rm_link = "?".$rm_link."&amp;imap_msg_part=".$output_mod->html_safe($id)."&attachment_file=".$output_mod->html_safe(decode_fld($desc));;
+            }
+            else {
+                $remove_attachment_action = "disable_remove";
+                $rm_link = "";
+            }
+            $res .= '<td class="remove_attachment"><span class="'.$remove_attachment_action.'" ><a href="'.$rm_link.'">'.$output_mod->trans('Remove').'</a></span></td>';
+        }
+        $res .= '</tr>';
     }
     return $res;
 }}
@@ -521,7 +537,7 @@ function get_imap_size($vals) {
  * @return string
  */
 if (!hm_exists('format_msg_part_section')) {
-function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0) {
+function format_msg_part_section($struct, $output_mod, $part, $dl_link, $rm_link, $level=0) {
     $res = '';
     $simple_view = $output_mod->get('simple_msg_part_view', false);
     $use_icons = $output_mod->get('use_message_part_icons', false);
@@ -531,18 +547,18 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     }
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
+            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $rm_link, $use_icons, $simple_view, $mobile);
             if (!$row) {
                 $level--;
             }
             $res .= $row;
             if (isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $rm_link, ($level + 1));
             }
         }
         else {
             if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $rm_link, $level);
             }
         }
     }

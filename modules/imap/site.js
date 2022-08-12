@@ -258,6 +258,14 @@ var imap_flag_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
+var imap_msg_remove_attachment = function(event) {
+    if (!hm_delete_prompt()) {
+        return false;
+    }
+    window.location.href = event.target.firstChild.getAttribute("href");
+};
+
+
 var imap_status_update = function() {
     var id;
     var i;
@@ -651,6 +659,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').on("click", function() { return imap_delete_message(); });
+    $('.enable_remove').on('click', imap_msg_remove_attachment);
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});

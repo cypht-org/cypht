@@ -30,7 +30,9 @@
 .header_subject th div img { margin-right: 10px; margin-left: 11px; }
 .msg_parts { table-layout: fixed; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
 .msg_parts td { padding: 3px; padding-right: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 20%; }
-.download_link { width: 100px; }
+.download_link, .remove_attachment { width: 100px; }
+.enable_remove a, .disable_remove a { cursor: default; pointer-events: none; text-decoration: none; }
+.disable_remove a { color: grey; }
 .row_indent_0 { display: inline; padding: 0px; }
 .row_indent_1 { display: inline; padding-left: 15px; }
 .row_indent_2 { display: inline; padding-left: 30px; }
@@ -80,7 +82,7 @@
 .mobile .part_size { width: 50px !important; }
 .mobile .part_encoding { display: none; }
 .mobile .part_charset { display: none; }
-.mobile .download_link { width: 50px !important; overflow: visible !important; margin-left: 25px; }
+.mobile .download_link, .mobile .remove_attachment { width: 50px !important; overflow: visible !important; margin-left: 25px; }
 .mobile .part_desc, .mobile .part_size { margin-left: 25px; }
 .mobile .unflag_send_div { float: right; clear: right; margin-top: 10px; }
 #archive_val { padding-left: 20px; }

@@ -459,7 +459,6 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
      */
     public function process() {
         if (array_key_exists('imap_download_message', $this->request->get) && $this->request->get['imap_download_message']) {
-
             $server_id = NULL;
             $uid = NULL;
             $folder = NULL;
@@ -523,6 +522,25 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                 }
             }
             Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+        }
+    }
+}
+
+/**
+ * Delete an attachment on the server
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
+    public function process() {
+        if ((array_key_exists('imap_remove_attachment', $this->request->get) && $this->request->get['imap_remove_attachment']) && (array_key_exists('attachment_file', $this->request->get) && $this->request->get['attachment_file'])) {
+            $filepath = $this->config->get('attachment_dir')."/".md5($this->session->get('username', false))."/".$this->request->get['attachment_file'];
+            if (file_exists($filepath)) {
+                unlink($filepath);
+                Hm_Msgs::add('File deleted');
+            }
+            else {
+                Hm_Msgs::add('ERRUnable to delete the file, it may not exist');
+            }
         }
     }
 }
@@ -1672,11 +1690,13 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('imap_msg_part', "$part");
                     $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
                     $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', false));
+                    $this->out('attachment_dir', $this->config->get('attachment_dir')."/".md5($this->session->get('username', false)));
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $this->out('msg_remove_attachment_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_remove_attachment=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
 
                     if (!$prefetch) {
