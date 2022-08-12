@@ -68,6 +68,7 @@
 .imap_keyword { width: 120px; }
 .msg_part_icon { opacity: .4; padding-right: 5px; }
 .msg_part_placeholder { visibility: hidden; }
+.block_sender_link { color: brown; }
 
 .msg_part_desc { width: 40%; }
 .msg_part_mime { width: 25%; }

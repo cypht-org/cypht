@@ -348,6 +348,8 @@ return array(
         'new_imap_hidden' => FILTER_VALIDATE_BOOLEAN,
         'new_imap_port' => FILTER_VALIDATE_INT,
         'new_imap_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'sieve_config_host' => FILTER_SANITIZE_STRING,
+        'imap_sieve_host' => FILTER_SANITIZE_STRING,
         'tls' => FILTER_VALIDATE_BOOLEAN,
         'folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'force_update' => FILTER_VALIDATE_BOOLEAN,
