@@ -138,6 +138,22 @@ class Hm_Handler_process_simple_msg_parts extends Hm_Handler_Module {
 }
 
 /**
+ * Process "pagination links" setting for the message view page in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_pagination_links extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function pagination_links_callback($val) {
+            return $val;
+        }
+        process_site_setting('pagination_links', $this, 'pagination_links_callback', false, true);
+    }
+}
+
+/**
  * Process "message part icons" setting for the message view page in the settings page
  * @subpackage imap/handler
  */
@@ -1595,6 +1611,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('msg_server_id', $form['imap_server_id']);
             $this->out('msg_folder', $form['folder']);
             $this->out('msg_list_path', 'imap_'.$form['imap_server_id'].'_'.$form['folder']);
+            $this->out('show_pagination_links', $this->user_config->get('pagination_links_setting', true));
             $part = false;
             $prefetch = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {

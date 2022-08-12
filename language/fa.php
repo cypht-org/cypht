@@ -633,7 +633,8 @@ return array(
     "9"=>"۹",
     "Page Not Found!"=>"صفحه پیدا نشد!",
     "Nothingness"=>"هیچ",
-    "Nope"=>"نه خیر"
+    "Nope"=>"نه خیر",
+    'Show next & previous emails when reading a message' => false
 );
 
 ?>
