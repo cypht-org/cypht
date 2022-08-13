@@ -805,7 +805,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
         $archive_folder = false;
         $errors = 0;
-
+        
         $specials = get_special_folders($this, $form['imap_server_id']);
         if (array_key_exists('archive', $specials) && $specials['archive']) {
             $archive_folder = $specials['archive'];
@@ -823,25 +823,23 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             }
 
             $form_folder = hex2bin($form['folder']);
-
+            
             /* select source folder */
             if ($errors || !$imap->select_mailbox($form_folder)) {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
                 $errors++;
             }
-
+            
             /* path according to original option setting */
             if ($this->user_config->get('original_folder_setting', false)) {
-                $dest_path = $archive_folder.'/'.$form_folder;
-                if (!$imap->select_mailbox(hex2bin($dest_path))) {
-                    $imap->create_mailbox($dest_path);
+                $archive_folder .= '/'.$form_folder;
+                if (!count($imap->get_mailbox_status($archive_folder))) {
+                    $imap->create_mailbox($archive_folder);
                 }
-            } else {
-                $dest_path = $archive_folder;
             }
             
             /* try to move the message */
-            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $dest_path)) {
+            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
                 Hm_Msgs::add("Message archived");
             }
             else {
@@ -940,6 +938,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                 }
                                 elseif ($form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
+                                    /* path according to original option setting */
+                                    if ($this->user_config->get('original_folder_setting', false)) {
+                                        $archive_folder .= '/'.hex2bin($folder);
+                                        $dest_path_exists = count($imap->get_mailbox_status($archive_folder));
+                                        if (!$dest_path_exists) {
+                                            $imap->create_mailbox($archive_folder);
+                                        }
+                                    }
                                     if (!$imap->message_action('MOVE', $uids, $archive_folder)) {
                                         $errs++;
                                     }
