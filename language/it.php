@@ -134,7 +134,7 @@ return array(
     'Invalid username or password' => 'Nome utente o password errati',
     'Update' => 'Aggiorna',
     'Save' => 'Salva',
-    'Factory Reset' => 'Ripristino delle impostazioni di fabbrica',
+    'Restore Defaults' => 'Ripristina le impostazioni predifinite',
     'Sources' => 'Fonti',
     'Configure' => 'Configura',
     'Refresh' => 'Aggiorna',

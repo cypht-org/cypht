@@ -134,7 +134,7 @@ return array(
     'Invalid username or password' => 'Foute gebruikersnaam of wachtwoord',
     'Update' => 'Updaten',
     'Save' => 'Opslaan',
-    'Factory Reset' => 'Fabrieksinstellingen',
+    'Restore Defaults' => 'Standaardinstellingen herstellen',
     'Sources' => 'Bronnen',
     'Configure' => 'Configureren',
     'Refresh' => 'Herladen',

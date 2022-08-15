@@ -134,7 +134,7 @@ return array(
     'Invalid username or password' => 'Login sau parolă greșite',
     'Update' => 'Actualizează',
     'Save' => 'Salvați',
-    'Factory Reset' => 'Resetare din fabrică',
+    'Restore Defaults' => 'Restabiliti setarile de baza',
     'Sources' => 'Surse',
     'Configure' => 'Configurare',
     'Refresh' => 'Reîncărcare',
