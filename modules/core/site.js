@@ -615,6 +615,7 @@ function Message_List() {
     this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('msg_controls_visible');
+            setTimeout(search_selected_for_imap, 100);
         }
         else {
             $('.msg_controls').removeClass('msg_controls_visible');
