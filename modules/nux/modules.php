@@ -169,14 +169,18 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
             if (Nux_Quick_Services::exists($form['nux_service'])) {
                 $details = Nux_Quick_Services::details($form['nux_service']);
                 $details['name'] = $form['nux_name'];
-                Hm_IMAP_List::add(array(
+                $imap_list = array(
                     'name' => $details['name'],
                     'server' => $details['server'],
                     'port' => $details['port'],
                     'tls' => $details['tls'],
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
-                ));
+                );
+                if (in_array($form['nux_service'], ['gandi']) && $this->module_is_supported('sievefilters')) {
+                    $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
+                }
+                Hm_IMAP_List::add($imap_list);
                 $servers = Hm_IMAP_List::dump(false, true);
                 $ids = array_keys($servers);
                 $new_id = array_pop($ids);
