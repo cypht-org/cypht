@@ -128,21 +128,21 @@ return array(
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'imap_account' => FILTER_SANITIZE_STRING,
-        'sieve_script_name' => FILTER_SANITIZE_STRING,
+        'imap_account' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'sieve_script_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sieve_script_priority' => FILTER_VALIDATE_INT,
-        'sieve_filter_name' => FILTER_SANITIZE_STRING,
+        'sieve_filter_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sieve_filter_priority' => FILTER_VALIDATE_INT,
         'script' => FILTER_UNSAFE_RAW,
-        'current_editing_script' => FILTER_SANITIZE_STRING,
-        'current_editing_filter_name' => FILTER_SANITIZE_STRING,
+        'current_editing_script' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'current_editing_filter_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'conditions_json' => FILTER_UNSAFE_RAW,
         'actions_json' => FILTER_UNSAFE_RAW,
-        'filter_test_type' => FILTER_SANITIZE_STRING,
+        'filter_test_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_server_id' => FILTER_VALIDATE_INT,
-        'folder' => FILTER_SANITIZE_STRING,
+        'folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sender' => FILTER_UNSAFE_RAW,
-        'selected_behaviour' => FILTER_SANITIZE_STRING
+        'selected_behaviour' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
