@@ -135,7 +135,7 @@ return array(
     'Invalid username or password' => 'İstifadəçi adı və ya parolda səhv',
     'Update' => 'Yeniləmək',
     'Save' => 'Saxlamaq',
-    'Factory Reset' => 'Zavod reset',
+    'Restore Defaults' => 'Defoltları bərpa edin',
     'Sources' => 'Mənbələr',
     'Configure' => 'Qurmaq',
     'Refresh' => 'Yeniləmək',
@@ -587,6 +587,7 @@ return array(
     'Show folders' => false,
     'Show next & previous emails when reading a message' => false,
     'Archive to the original folder' => false
+
 ); 
 
 ?>

@@ -152,7 +152,7 @@ return array(
     "Invalid username or password"=>"نام کاربری یا رمز ورود نامعتبر است",
     "Update"=>"به روز رسانی",
     "Save"=>"ذخیره",
-    "Factory Reset"=>"بازنشانی کارخانه",
+    "Restore Defaults"=>"بازیابی پیش فرض ها",
     "Sources"=>"منابع",
     "Configure"=>"پیکربندی کنید",
     "Refresh"=>"تازه کردن",

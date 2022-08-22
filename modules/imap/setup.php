@@ -34,6 +34,7 @@ add_handler('settings', 'process_original_folder_setting', true, 'imap', 'date',
 add_handler('settings', 'process_text_only_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_msg_part_icons', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_simple_msg_parts', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_pagination_links', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -44,8 +45,10 @@ add_output('settings', 'original_folder_setting', true, 'imap', 'imap_msg_icons_
 add_output('settings', 'text_only_setting', true, 'imap', 'list_style_setting', 'after');
 add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'msg_list_icons_setting', 'after');
 add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_setting', 'after');
+add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_simple_msg_parts', 'after');
+add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -310,6 +313,7 @@ return array(
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
+        'show_pagination_links' => array(FILTER_VALIDATE_BOOLEAN, false)
     ),
 
     'allowed_get' => array(
@@ -329,6 +333,7 @@ return array(
         'text_only' => FILTER_VALIDATE_BOOLEAN,
         'msg_part_icons' => FILTER_VALIDATE_BOOLEAN,
         'simple_msg_parts' => FILTER_VALIDATE_BOOLEAN,
+        'pagination_links' => FILTER_VALIDATE_BOOLEAN,
         'unread_on_open' => FILTER_VALIDATE_BOOLEAN,
         'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -345,6 +350,8 @@ return array(
         'new_imap_hidden' => FILTER_VALIDATE_BOOLEAN,
         'new_imap_port' => FILTER_VALIDATE_INT,
         'new_imap_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'sieve_config_host' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'imap_sieve_host' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'tls' => FILTER_VALIDATE_BOOLEAN,
         'folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'force_update' => FILTER_VALIDATE_BOOLEAN,

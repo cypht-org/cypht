@@ -92,6 +92,7 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
             0 => 'Forever'
         );
         $settings = $this->get('user_settings', array());
+        $reset = '';
 
         if (array_key_exists('idle_time', $settings)) {
             $idle_time = $settings['idle_time'];
@@ -105,10 +106,13 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
             $res .= '<option ';
             if ($idle_time == $val) {
                 $res .= 'selected="selected" ';
+                if ($idle_time != '0') {
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
         }
-        $res .= '</select></td></tr>';
+        $res .= '</select>'.$reset.'</td></tr>';
         return $res;
     }
 }

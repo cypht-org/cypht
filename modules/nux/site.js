@@ -42,6 +42,17 @@ var nux_add_account = function() {
 
 var display_final_nux_step = function(res) {
     if (res.nux_account_added) {
+        if (confirm('Do you accept special folders?')) {
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
+                {'name': 'imap_server_id', value: res.nux_server_id},
+                {'name': 'imap_service_name', value: res.nux_service_name}],
+                function(res) {
+                    window.location.href = "?page=servers";
+                }
+            );
+        }
+            
         window.location.href = "?page=servers";
     }
 };

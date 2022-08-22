@@ -57,7 +57,7 @@
 .jmap_section, .sent_setting, .imap_section { display: none; }
 .imap_server_setup .content_title { cursor: pointer; }
 .ctr_divider { padding-left: 5px; padding-right: 5px; color: #eee; vertical-align: 2px; font-weight: normal; font-size: 90%; }
-.move_to_location { text-transform: none; z-index: 1; position: absolute; display: none; background-color: #fff; padding: 10px; border: solid 1px #ede8e6; font-weight: normal; padding-right: 25px; padding-left: 0px; font-size: 80%; top: 34px; min-width: 55px; right: 2px; border-top: none; padding-top: 0px; }
+.move_to_location { text-transform: none; z-index: 50; position: absolute; display: none; background-color: #fff; padding: 10px; border: solid 1px #ede8e6; font-weight: normal; padding-right: 25px; padding-left: 0px; font-size: 80%; top: 34px; min-width: 55px; right: 2px; border-top: none; padding-top: 0px; }
 .move_to_location a { border: none; font-size: 100%; }
 .move_to_title { padding: 5px; padding-top: 10px; padding-left: 10px; background-color: #fff; border-bottom: solid 1px #ede8e6; margin-right: -25px; }
 .move_to_title span { float: right; font-size: 90%; }
@@ -68,6 +68,7 @@
 .imap_keyword { width: 120px; }
 .msg_part_icon { opacity: .4; padding-right: 5px; }
 .msg_part_placeholder { visibility: hidden; }
+.block_sender_link { color: brown; }
 
 .msg_part_desc { width: 40%; }
 .msg_part_mime { width: 25%; }
