@@ -32,7 +32,8 @@
         "ext-curl": "*",
         "ext-openssl": "*",
         "ext-session": "*",
-        "ext-fileinfo": "*"
+        "ext-fileinfo": "*",
+        "webklex/composer-info": "^0.0.1"
     },
     "suggest": {
         "ext-PDO": "To use database features, this needs to be installed",
