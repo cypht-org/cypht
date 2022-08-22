@@ -134,7 +134,7 @@ return array(
     'Invalid username or password' => false,
     'Update' => false,
     'Save' => false,
-    'Factory Reset' => false,
+    'Restore Defaults' => false,
     'Sources' => false,
     'Configure' => false,
     'Refresh' => false,

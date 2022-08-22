@@ -1152,7 +1152,7 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
             '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
             '</td></tr></table></form>'.
             '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Factory Reset').'" /></form>'.
+            '<input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Restore Defaults').'" /></form>'.
             '</div>';
     }
 }

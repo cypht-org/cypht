@@ -134,7 +134,7 @@ return array(
     'Invalid username or password' => 'Usuário ou senha inválido(s)',
     'Update' => 'Atualizar',
     'Save' => 'Salvar',
-    'Factory Reset' => 'Restauração de fábrica',
+    'Restore Defaults' => 'Restaurar padrões',
     'Sources' => 'Origens',
     'Configure' => 'Configurar',
     'Refresh' => 'Atualizar',
