@@ -634,7 +634,8 @@ return array(
     "Page Not Found!"=>"صفحه پیدا نشد!",
     "Nothingness"=>"هیچ",
     "Nope"=>"نه خیر",
-    'Show next & previous emails when reading a message' => false
+    'Show next & previous emails when reading a message' => false,
+    'Archive to the original folder' => false
 );
 
 ?>

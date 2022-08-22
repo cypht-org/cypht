@@ -590,7 +590,8 @@ return array(
     'feed item' => 'kirje uudisvoost',
     'Allow handling of mailto links' => 'Luba mailto-viidete kasutamist',
     'Show folders' => 'Näita kaustu',
-    'Show next & previous emails when reading a message' => false
+    'Show next & previous emails when reading a message' => false,
+    'Archive to the original folder' => false
 ); 
 
 ?>
