@@ -567,18 +567,16 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                     $('.msg_text').append(res.msg_parts);
                     set_message_content(list_path, uid);
                     document.title = $('.header_subject th').text();
-
-                    if (res.show_pagination_links) {
-                        imap_message_view_finished();
-                    } else {
-                        imap_message_view_finished(false, false, true);
-                    }    
+                    imap_message_view_finished();
                 }
                 else {
                     $('.reply_link, .reply_all_link, .forward_link').each(function() {
                         $(this).attr("href", $(this).data("href"));
                         $(this).removeClass('disabled_link');
                     });
+                }
+                if (!res.show_pagination_links) {
+                    $('.prev, .next').hide();
                 }
             },
             [],
