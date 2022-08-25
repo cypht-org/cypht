@@ -762,7 +762,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $msg_uid = $this->request->post['compose_msg_uid'];
 
             $imap = Hm_IMAP_List::connect($msg_path[1]);
-            if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
+            if ($imap && $imap->select_mailbox(hex2bin($msg_path[2]))) {
                 $imap->message_action('DELETE', array($msg_uid));
                 $imap->message_action('EXPUNGE', array($msg_uid));
             }
