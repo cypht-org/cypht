@@ -1013,6 +1013,10 @@ $(function() {
         $('#sieve_config_host').val($(this).val() + ':4190')
     });
 
+    $(document).on('click', '.checkbox_label', function(e) {
+        setTimeout(search_selected_for_imap, 100);
+    });
+
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
         setup_imap_folder_page();
     }
