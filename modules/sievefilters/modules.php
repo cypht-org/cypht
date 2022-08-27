@@ -1311,11 +1311,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
                 </div>
             </div>
-            <div style="margin-bottom: 10px; margin-top: 25px; ">
-                <b>Filter Name:</b><input type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
-                <b style="margin-left: 20px;">Priority:</b><input class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
-                <b style="margin-left: 20px;">Test:</b>
-                    <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin-left: 10px;"> 
+            <div style="margin-bottom: 10px; margin-top: 45px; display:flex; justify-content: end; align-items:stretch; flex-direction: column;">
+                <b style="margin:5px 0px;">Filter Name:</b><input style="margin:5px 0px; padding:5px;" type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
+                <b style="margin:5px 0px;">Priority:</b><input style="margin:5px 0px; padding:5px;" class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
+                <b  style="margin:5px 0px;">Test:</b>
+                    <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin:5px 0px; padding:5px;" > 
                         <option value="ANYOF">ANYOF (OR)</option>
                         <option value="ALLOF" selected>ALLOF (AND)</option>
                     </select>
