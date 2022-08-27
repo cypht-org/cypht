@@ -351,3 +351,73 @@ table.sieve_list_conditions_modal th {
         text-align: right;
     }
 }
+
+
+table.filter_actions_modal_table caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+  }
+  
+  table.filter_actions_modal_table  tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: .35em;
+  }
+  
+  table.filter_actions_modal_table  th,
+  table.filter_actions_modal_table  td {
+    padding: .625em;
+    text-align: center;
+  }
+  
+  table.filter_actions_modal_table  th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+  }
+  
+  @media screen and (max-width: 600px) {
+    table.filter_actions_modal_table  {
+      border: 0;
+    }
+  
+    table.filter_actions_modal_table  caption {
+      font-size: 1.3em;
+    }
+    
+    table.filter_actions_modal_table  thead {
+      border: none;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+    
+    table.filter_actions_modal_table  tr {
+      border-bottom: 3px solid #ddd;
+      display: block;
+      margin-bottom: .625em;
+    }
+    
+    table.filter_actions_modal_table  td {
+      border-bottom: 1px solid #ddd;
+      display: block;
+      font-size: .8em;
+      text-align: right;
+    }
+    
+    table.filter_actions_modal_table  td::before {
+      content: attr(data-label);
+      float: left;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    
+    table.filter_actions_modal_table  td:last-child {
+      border-bottom: 0;
+    }
+  }
+  
