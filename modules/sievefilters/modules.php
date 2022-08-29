@@ -1336,7 +1336,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <button style="margin-right: 10px;" class="sieve_add_condition_modal_button">Add Condition</button>
                         </div>
                     </div>
-                    <div style="width: 100%;">
+                    <div style="width: 100%; margin-top:20px;">
                         <table class="sieve_list_conditions_modal">
                         </table>
                     </div>
@@ -1351,7 +1351,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <button style="margin-right: 10px;" class="filter_modal_add_action_btn">Add Action</button>
                         </div>
                     </div>
-                    <div style="width: 100%;">
+                    <div style="width: 100%; margin-top:20px;">
                         <table class="filter_actions_modal_table">
                         </table>
                     </div>
