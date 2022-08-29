@@ -309,7 +309,7 @@ table.sieve_list_conditions_modal tr {
 table.sieve_list_conditions_modal th,
 table.sieve_list_conditions_modal td {
     padding: .625em;
-    text-align: center;
+    text-align: left !important;
 }
 
 table.sieve_list_conditions_modal th {
@@ -348,7 +348,6 @@ table.sieve_list_conditions_modal th {
         border-bottom: 1px solid #ddd;
         display: block;
         font-size: .8em;
-        text-align: right;
     }
 }
 
@@ -367,7 +366,7 @@ table.filter_actions_modal_table tr {
 table.filter_actions_modal_table th,
 table.filter_actions_modal_table td {
     padding: .625em;
-    text-align: center;
+    text-align: left !important;
 }
 
 table.filter_actions_modal_table th {
