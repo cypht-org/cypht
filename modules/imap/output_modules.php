@@ -237,7 +237,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $addr_list = process_address_fld($lc_headers['cc']);
                 $size += count($addr_list);
             }
-
+            if (array_key_exists('from', $lc_headers)) {
+                $imap_server_id = explode('_', $this->get('msg_list_path'))[1];
+                $server = Hm_IMAP_List::get($imap_server_id, false);
+                $addr_list = process_address_fld($lc_headers['from']);
+                $addr_list = array_filter($addr_list, function ($addr) use($server) {
+                    return $addr['email'] != $server['user'];
+                });
+                $size += count($addr_list);
+            }
+            
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
