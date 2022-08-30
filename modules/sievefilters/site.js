@@ -193,7 +193,7 @@ $(function () {
             {
                 name: 'redirect',
                 description: 'Redirect',
-                placeholder: 'mail@mail.com',
+                placeholder: 'mail@example.org',
                 type: 'string',
                 extra_field: false
             },
