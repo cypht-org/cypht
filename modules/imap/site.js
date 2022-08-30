@@ -472,9 +472,6 @@ var display_imap_mailbox = function(res) {
     $('input[type=checkbox]').on("click", function(e) {
         Hm_Message_List.toggle_msg_controls();
     });
-    $('.checkbox_label').on("click", function(e) {
-        setTimeout(search_selected_for_imap, 100);
-    });
     cache_imap_page();
 };
 
@@ -1012,6 +1009,10 @@ $(function() {
 
     $(document).on('keyup', '#new_imap_address', function () {
         $('#sieve_config_host').val($(this).val() + ':4190')
+    });
+
+    $(document).on('click', '.checkbox_label', function(e) {
+        setTimeout(search_selected_for_imap, 100);
     });
 
     if (hm_page_name() === 'message_list' && hm_list_path().substr(0, 4) === 'imap') {
