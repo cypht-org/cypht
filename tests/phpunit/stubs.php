@@ -78,12 +78,4 @@ if (!defined("IMAP_TEST")) {
     }
 }
 
-class Hm_POP3 {
-    static public $allow_connection = true;
-    static public $allow_auth = true;
-    public function connect() { if (self::$allow_connection) { return true; } return false; }
-    public function auth() { if (self::$allow_auth) { return true; } return false; }
-    public function puke() {}
-}
-
 ?>

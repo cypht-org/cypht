@@ -1381,7 +1381,7 @@ var Hm_Utils = {
                 return {'type': type, 'server_id' : server_id, 'folder' : folder, 'uid': uid};
             }
         }
-        else if (path_type == 'pop3' || path_type == 'feeds') {
+        else if (path_type == 'feeds') {
             parts = path.split('_', 3);
             if (parts.length > 1) {
                 type = parts[0];

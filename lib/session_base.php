@@ -461,7 +461,7 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function standard_auth() {
-        if ($this->auth_type && in_array($this->auth_type, array('DB', 'LDAP', 'IMAP', 'POP3'), true)) {
+        if ($this->auth_type && in_array($this->auth_type, array('DB', 'LDAP', 'IMAP'), true)) {
             return sprintf('Hm_Auth_%s', $this->auth_type);
         }
         return false;

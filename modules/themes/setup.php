@@ -19,7 +19,6 @@ add_handler('ajax_imap_combined_inbox', 'load_theme', true, 'themes', 'load_user
 add_handler('ajax_imap_flagged', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_search', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_imap_sent', 'load_theme', true, 'themes', 'load_user_data', 'after');
-add_handler('ajax_pop3_folder_display', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_wordpess_notifications', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_feed_combined', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_github_data', 'load_theme', true, 'themes', 'load_user_data', 'after');
