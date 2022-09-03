@@ -197,3 +197,17 @@ Nux_Quick_Services::add('gandi', array(
         'host' => 'mail.gandi.net'
     )
 ));
+
+Nux_Quick_Services::add('kolabnow', array(
+    'server' => 'imap.kolabnow.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Kolab Now',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.kolabnow.com',
+        'port' => 465,
+        'tls' => true
+    )
+));
