@@ -83,7 +83,6 @@ abstract class Hm_Config {
         $this->config = array(
             "version"=>$this->config["version"], 
             "feeds"=>$this->config["feeds"], 
-            "pop3_servers"=>$this->config["pop3_servers"], 
             "imap_servers"=>$this->config["imap_servers"], 
             "smtp_servers"=>$this->config["smtp_servers"]
         );
@@ -142,7 +141,7 @@ abstract class Hm_Config {
      */
     public function filter_servers() {
         $removed = array();
-        $excluded = array('pop3_servers', 'imap_servers','smtp_servers');
+        $excluded = array('imap_servers','smtp_servers');
         $no_password = $this->get('no_password_save_setting', false);
         foreach ($this->config as $key => $vals) {
             if (in_array($key, $excluded, true)) {
@@ -306,7 +305,6 @@ class Hm_User_Config_File extends Hm_Config {
         $this->config = array(
             "version"=>$this->config["version"], 
             "feeds"=>$this->config["feeds"], 
-            "pop3_servers"=>$this->config["pop3_servers"], 
             "imap_servers"=>$this->config["imap_servers"], 
             "smtp_servers"=>$this->config["smtp_servers"]
         );
@@ -462,7 +460,6 @@ class Hm_User_Config_DB extends Hm_Config {
         $this->config = array(
             "version"=>$this->config["version"], 
             "feeds"=>$this->config["feeds"], 
-            "pop3_servers"=>$this->config["pop3_servers"], 
             "imap_servers"=>$this->config["imap_servers"], 
             "smtp_servers"=>$this->config["smtp_servers"]
         );
@@ -566,7 +563,7 @@ function load_user_config_object($config) {
  */
 function crypt_state($config) {
     if ($config->get('single_server_mode') &&
-        in_array($config->get('auth_type'), array('IMAP', 'POP3'), true)) {
+        in_array($config->get('auth_type'), array('IMAP'), true)) {
         return false;
     }
     return true;
