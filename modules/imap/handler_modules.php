@@ -1259,7 +1259,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                         'port' => $form['new_imap_port'],
                         'tls' => $tls);
 
-                    if (isset($this->request->post['sieve_config_host'])) {
+                    if (isset($this->request->post['sieve_config_host']) && $this->request->post['sieve_config_host']) {
                         $imap_list['sieve_config_host'] = $this->request->post['sieve_config_host'];
                     }
                     Hm_IMAP_List::add($imap_list);

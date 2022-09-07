@@ -351,9 +351,10 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $default_value = '';
                 if (isset($vals['sieve_config_host'])) {
                     $default_value = $vals['sieve_config_host'];
+                
+                    $res .=  '<span><label class="screen_reader" for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label>'.
+                            '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="credentials imap_sieve_host_input" placeholder="Sieve Host" type="text" name="imap_sieve_host" value="'.$default_value.'"></span>';
                 }
-                $res .=  '<span><label class="screen_reader" for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label>'.
-                         '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="credentials imap_sieve_host_input" placeholder="Sieve Host" type="text" name="imap_sieve_host" value="'.$default_value.'"></span>';
             }
 
             if (!isset($vals['user']) || !$vals['user']) {

@@ -1008,7 +1008,15 @@ $(function() {
     });
 
     $(document).on('keyup', '#new_imap_address', function () {
-        $('#sieve_config_host').val($(this).val() + ':4190')
+        if ($('#enable_sieve_filter').is(':checked') && $(this).val()) {
+            $('#sieve_config_host').val($(this).val() + ':4190');
+        } else {
+            $('#sieve_config_host').val('');
+        }
+    });
+
+    $(document).on('change', '#enable_sieve_filter', function () {
+        $('#new_imap_address').trigger('keyup');
     });
 
     $(document).on('click', '.checkbox_label', function(e) {
