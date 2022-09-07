@@ -177,7 +177,10 @@ $(function() {
             Hm_Ajax.add_callback_hook('*', capture_subject_click);
             Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
             Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
-            Hm_Ajax.add_callback_hook('ajax_imap_unread',msg_inline_close);
+            Hm_Ajax.add_callback_hook('ajax_imap_archive_message', msg_inline_close);
+            if (hm_list_path().substr(0, 4) !== 'imap') {
+                Hm_Ajax.add_callback_hook('ajax_imap_unread', msg_inline_close);
+            }
             if (hm_list_path().substr(0, 4) === 'imap') {
                 Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
             }
