@@ -7,7 +7,10 @@
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
-define('GIT_COMMITS_URL', 'https://github.com/jasonmunro/cypht/commit/');
+define('COMMITS_URL', 'https://github.com/jasonmunro/cypht/commit/');
+
+require_once VENDOR_PATH.'autoload.php';
+use Webklex\ComposerInfo\ComposerInfo;
 
 /**
  * Build server information data
@@ -25,12 +28,38 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         $res['handlers'] = Hm_Handler_Modules::dump();
         $res['output'] = Hm_Output_Modules::dump();
 
-        $res['branch_name'] = trim(exec('git rev-parse --abbrev-ref HEAD'));
-        $res['commit_hash'] = trim(exec('git log --pretty="%h" -n1 HEAD'));
-        $res['commit_url'] = GIT_COMMITS_URL.$res['commit_hash'];
-        $commit_date = new \DateTime(trim(exec('git log -n1 --pretty=%ci HEAD')));
-        $commit_date->setTimezone(new \DateTimeZone('UTC'));
-        $res['commit_date'] = $commit_date->format('Y-m-d H:i:s');
+        $branch_name = '-';
+        $commit_hash = '-';
+        $commit_url = '-';
+        $commit_date = '-';
+
+        new ComposerInfo([
+            'location'=>VENDOR_PATH.'composer/installed.json'
+        ]);
+        $package = ComposerInfo::getPackage("jason-munro/cypht");
+        if ($package) {
+            // Cypht is embedded
+            $branch_name = str_replace(['dev-', '-dev'], '', $package['version']);
+            $commit_hash = substr($package['dist']['reference'], 0, 8);
+            $commit_url = COMMITS_URL.$commit_hash;
+            $commit_date = $package['time'];
+        } elseif (exec('git --version')) {
+            // Standalone cypht
+            $branch_name = trim(exec('git rev-parse --abbrev-ref HEAD'));
+            $commit_hash = trim(exec('git log --pretty="%h" -n1 HEAD'));
+            $commit_url = COMMITS_URL.$commit_hash;
+            $commit_date = trim(exec('git log -n1 --pretty=%ci HEAD'));
+        }
+
+        $res['branch_name'] = $branch_name;
+        $res['commit_hash'] = $commit_hash;
+        $res['commit_url'] = $commit_url;
+
+        if ($commit_date != '-') {
+            $commit_date = new \DateTime($commit_date);
+            $commit_date->setTimezone(new \DateTimeZone('UTC'));
+            $res['commit_date'] = $commit_date->format('Y-m-d H:i:s');
+        }
 
         $this->out('server_info', $res);
     }
@@ -134,7 +163,7 @@ class Hm_Output_server_information extends Hm_Output_Module {
                 '<tr><th>Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
                 '<tr><th>SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
                 '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
-                '<tr><th>Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'">'.$server_info['commit_hash'].'</a>('.$server_info['commit_date'].')</td></tr>'.
+                '<tr><th>Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
                 '</table></div>';
         }
         return '';
