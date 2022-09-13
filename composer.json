@@ -33,7 +33,8 @@
         "ext-openssl": "*",
         "ext-session": "*",
         "ext-fileinfo": "*",
-        "webklex/composer-info": "^0.0.1"
+        "webklex/composer-info": "^0.0.1",
+        "composer" : "^2.0.0"
     },
     "suggest": {
         "ext-PDO": "To use database features, this needs to be installed",
@@ -50,6 +51,8 @@
         }
     },
     "scripts": {
+        "pre-install-cmd":  "composer check-platform-reqs",
+        "pre-update-cmd": "composer check-platform-reqs",
         "post-update-cmd": "composer suggest",
         "post-package-install":"composer suggest",
         "post-install-cmd": "composer suggest"
