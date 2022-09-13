@@ -1281,9 +1281,9 @@ if (!hm_exists('get_script_modal_content')) {
                     <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
                 </div>
             </div>
-            <div style="margin-bottom: 10px; margin-top: 25px;">
-                <b>Filter Name:</b><input class="modal_sieve_script_name" type="text" placeholder="Your filter name" style="margin-left: 10px;" /> 
-                <b style="margin-left: 50px;">Priority:</b><input class="modal_sieve_script_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
+            <div style="margin-bottom: 10px; margin-top: 45px; display:flex; justify-content: end; align-items:stretch; flex-direction: column;">
+                <b style="margin:5px 0px;">Filter Name:</b><input  style="margin:5px 0px; padding:5px;" class="modal_sieve_script_name" type="text" placeholder="Your filter name" /> 
+                <b style="margin:5px 0px;">Priority:</b><input style="margin:5px 0px; padding:5px;" class="modal_sieve_script_priority" type="number" placeholder="0"  /> 
             </div>
             <div style="display: flex; height: 70px; margin-bottom: 10px;">
                 <div style="width: 100%;">
@@ -1291,8 +1291,8 @@ if (!hm_exists('get_script_modal_content')) {
                     <small>Paste the Sieve script in the field below. Manually added scripts cannot be edited with the filters interface.</small>
                 </div>
             </div>
-            <div style="margin-bottom: 10px;">
-                <textarea style="width: 100%;" rows="30" class="modal_sieve_script_textarea"></textarea>
+            <div style="margin-bottom: 10px; margin-top:22px;">
+                <textarea style="width: 100%;" rows="20" class="modal_sieve_script_textarea"></textarea>
             </div>
         </div>';
     }
@@ -1311,11 +1311,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
                 </div>
             </div>
-            <div style="margin-bottom: 10px; margin-top: 25px;">
-                <b>Filter Name:</b><input type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
-                <b style="margin-left: 20px;">Priority:</b><input class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
-                <b style="margin-left: 20px;">Test:</b>
-                    <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin-left: 10px;"> 
+            <div style="margin-bottom: 10px; margin-top: 45px; display:flex; justify-content: end; align-items:stretch; flex-direction: column;">
+                <b style="margin:5px 0px;">Filter Name:</b><input style="margin:5px 0px; padding:5px;" type="text" class="modal_sieve_filter_name" placeholder="Your filter name" style="margin-left: 10px;" /> 
+                <b style="margin:5px 0px;">Priority:</b><input style="margin:5px 0px; padding:5px;" class="modal_sieve_filter_priority" type="number" placeholder="0" style="margin-left: 10px;" /> 
+                <b  style="margin:5px 0px;">Test:</b>
+                    <select class="modal_sieve_filter_test" name="test_type" placeholder="0" style="margin:5px 0px; padding:5px;" > 
                         <option value="ANYOF">ANYOF (OR)</option>
                         <option value="ALLOF" selected>ALLOF (AND)</option>
                     </select>
@@ -1336,7 +1336,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <button style="margin-right: 10px;" class="sieve_add_condition_modal_button">Add Condition</button>
                         </div>
                     </div>
-                    <div style="width: 100%;">
+                    <div style="width: 100%; margin-top:20px;">
                         <table class="sieve_list_conditions_modal">
                         </table>
                     </div>
@@ -1351,7 +1351,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <button style="margin-right: 10px;" class="filter_modal_add_action_btn">Add Action</button>
                         </div>
                     </div>
-                    <div style="width: 100%;">
+                    <div style="width: 100%; margin-top:20px;">
                         <table class="filter_actions_modal_table">
                         </table>
                     </div>

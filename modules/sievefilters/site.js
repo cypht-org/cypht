@@ -549,7 +549,7 @@ $(function () {
                 '                                <td style="width: 43%;">' +
                 '                                    <input type="text" name="sieve_selected_option_value[]" />' +
                 '                                </td>' +
-                '                                <td style="vertical-align: middle; width: 50px;">' +
+                '                                <td style="vertical-align: middle; width: 70px;">' +
                 '                                    <a href="#" class="delete_condition_modal_button">Delete</a>' +
                 '                                </td>' +
                 '                            </tr>'
@@ -587,7 +587,7 @@ $(function () {
                 '    <img style="display: none" src="/modules/sievefilters/assets/spinner.gif" />' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
-                '    <td style="vertical-align: middle; width: 50px;">' +
+                '    <td style="vertical-align: middle; width: 70px;">' +
                 '           <a href="#" class="delete_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'
@@ -624,7 +624,7 @@ $(function () {
                 '    </td>' +
                 '    <td>' +
                 '    </td>' +
-                '    <td style="vertical-align: middle; width: 50px;">' +
+                '    <td style="vertical-align: middle; width: 70px;">' +
                 '           <a href="#" class="delete_else_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'

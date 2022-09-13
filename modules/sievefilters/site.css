@@ -68,7 +68,9 @@
     border: none;
     background-color: transparent;
     color: #fff;
-    cursor: pointer
+    cursor: pointer;
+    text-align: right;
+    padding: 10px;
 }
 
 .tingle-modal__close svg * {
@@ -185,57 +187,63 @@
     float: right
 }
 
-@media (max-width :540px) {
-    .tingle-modal {
-        top: 0;
-        display: block;
-        padding-top: 60px;
-        width: 100%
-    }
-    .tingle-modal-box {
-        width: auto;
-        border-radius: 0
-    }
-    .tingle-modal-box__content {
-        overflow-y: scroll
-    }
-    .tingle-modal--noClose {
-        top: 0
-    }
-    .tingle-modal--noOverlayClose {
-        padding-top: 0
-    }
-    .tingle-modal-box__footer .tingle-btn {
-        display: block;
-        float: none;
-        margin-bottom: 1rem;
-        width: 100%
-    }
-    .tingle-modal__close {
-        top: 0;
-        right: 0;
-        left: 0;
-        display: block;
-        width: 100%;
-        height: 60px;
-        border: none;
-        background-color: #2c3e50;
-        box-shadow: none;
-        color: #fff
-    }
-    .tingle-modal__closeLabel {
-        display: inline-block;
-        vertical-align: middle;
-        font-size: 1.6rem;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
-    }
-    .tingle-modal__closeIcon {
-        display: inline-block;
-        margin-right: .8rem;
-        width: 1.6rem;
-        vertical-align: middle;
-        font-size: 0
-    }
+.mobile .tingle-modal {
+    top: 0;
+    display: block;
+    padding-top: 60px;
+    width: 100%
+}
+
+.mobile .tingle-modal-box {
+    width: auto;
+    border-radius: 0
+}
+
+.mobile .tingle-modal-box__content {
+    overflow-y: scroll
+}
+
+.mobile .tingle-modal--noClose {
+    top: 0
+}
+
+.mobile .tingle-modal--noOverlayClose {
+    padding-top: 0
+}
+
+.mobile .tingle-modal-box__footer .tingle-btn {
+    display: block;
+    float: none;
+    margin-bottom: 1rem;
+    width: 100%
+}
+
+.mobile .tingle-modal__close {
+    top: 0;
+    right: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 60px;
+    border: none;
+    background-color: #2c3e50;
+    box-shadow: none;
+    color: #fff
+}
+
+.mobile .tingle-modal__closeLabel {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 1rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif
+}
+
+.mobile .tingle-modal__closeIcon {
+    display: inline-block;
+    margin-right: .4rem;
+    width: 1rem;
+    vertical-align: middle;
+    font-size: 0
 }
 
 @keyframes scale {
@@ -243,13 +251,15 @@
         opacity: 0;
         transform: scale(.8)
     }
+
     100% {
         opacity: 1;
         transform: scale(1)
     }
 }
 
-.filters_count, .key_count {
+.filters_count,
+.key_count {
     float: right;
     margin-right: 120px;
     font-size: 90%;
@@ -273,4 +283,136 @@
 .block_domain_button {
     width: 16px;
     cursor: pointer;
+}
+
+.sieve_list_conditions_modal {
+    border: 1px solid #ccc;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    table-layout: fixed;
+}
+
+
+table.sieve_list_conditions_modal caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+}
+
+table.sieve_list_conditions_modal tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: .35em;
+}
+
+table.sieve_list_conditions_modal th,
+table.sieve_list_conditions_modal td {
+    padding: .625em;
+    text-align: left !important;
+}
+
+table.sieve_list_conditions_modal th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.mobile table.sieve_list_conditions_modal {
+    border: 0;
+}
+
+.mobile table.sieve_list_conditions_modal caption {
+    font-size: 1.3em;
+}
+
+.mobile table.sieve_list_conditions_modal thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.mobile table.sieve_list_conditions_modal tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+    margin-bottom: .625em;
+}
+
+.mobile table.sieve_list_conditions_modal td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: .8em;
+}
+
+
+
+table.filter_actions_modal_table caption {
+    font-size: 1.5em;
+    margin: .5em 0 .75em;
+}
+
+table.filter_actions_modal_table tr {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    padding: .35em;
+}
+
+table.filter_actions_modal_table th,
+table.filter_actions_modal_table td {
+    padding: .625em;
+    text-align: left !important;
+}
+
+table.filter_actions_modal_table th {
+    font-size: .85em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+}
+
+.mobile table.filter_actions_modal_table {
+    border: 0;
+}
+
+.mobile table.filter_actions_modal_table caption {
+    font-size: 1.3em;
+}
+
+.mobile table.filter_actions_modal_table thead {
+    border: none;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.mobile table.filter_actions_modal_table tr {
+    border-bottom: 3px solid #ddd;
+    display: block;
+    margin-bottom: .625em;
+}
+
+.mobile table.filter_actions_modal_table td {
+    border-bottom: 1px solid #ddd;
+    display: block;
+    font-size: .8em;
+    text-align: right;
+}
+
+.mobile table.filter_actions_modal_table td::before {
+    content: attr(data-label);
+    float: left;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.mobile table.filter_actions_modal_table td:last-child {
+    border-bottom: 0;
 }
