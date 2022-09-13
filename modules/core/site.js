@@ -1145,6 +1145,7 @@ var Hm_Folders = {
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
             Hm_Utils.expand_core_settings();
+            document.cookie = "hm_reload_folders=1; max-age=0";
             return true;
         }
         return false;
