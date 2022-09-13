@@ -333,9 +333,6 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
-            $draft_id = $this->request->get['uid'];
-        }
         if (file_exists($this->config->get('attachment_dir')) && is_dir($this->config->get('attachment_dir'))) {
             $this->out('attachment_dir_access', true);
         } else {
@@ -345,6 +342,10 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
 
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
+
+        if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
+            $draft_id = $this->request->get['uid'];
+        }
         
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
@@ -1032,7 +1033,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
             $draft_id = $msg_uid;
         }
-
+        
         $imap_server_id = explode('_', $msg_path)[1];
         $imap_server = Hm_IMAP_List::get($imap_server_id, false);
         $reply_from = process_address_fld($reply['msg_headers']['From']);
