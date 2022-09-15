@@ -288,7 +288,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 if (isset($imap_server['sieve_config_host'])) {
                     $txt .= ' | <a class="block_sender_link hlink" id="block_sender" href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></a>';
                 } else {
-                    $txt .= ' | <span title="This server is not configured with Sieve, which is required for blocking senders"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
 
