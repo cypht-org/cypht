@@ -924,22 +924,30 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 foreach ($ids as $server => $folders) {
                     $specials = get_special_folders($this, $server);
                     $trash_folder = false;
-                    $archive_folder = false;
-                    if ($form['action_type'] == 'delete') {
-                        if (array_key_exists('trash', $specials) && $specials['trash']) {
-                            $trash_folder = $specials['trash'];
-                        }
-                    }
-                    if ($form['action_type'] == 'archive') {
-                        if(array_key_exists('archive', $specials)) {
-                            if($specials['archive']) {
-                                $archive_folder = $specials['archive'];
-                            }
-                        }
-                    }
+                    $archive_folder = false;                    
                     $cache = Hm_IMAP_List::get_cache($this->cache, $server);
                     $imap = Hm_IMAP_List::connect($server, $cache);
                     if (imap_authed($imap)) {
+                        $server_details = $this->user_config->get('imap_servers')[$server];
+                        if ($form['action_type'] == 'delete') {
+                            if (array_key_exists('trash', $specials)) {
+                                if ($specials['trash']) {
+                                    $trash_folder = $specials['trash'];
+                                } else {
+                                    Hm_Msgs::add(sprintf('ERRNo trash folder configured for %s', $server_details['name']));
+                                }
+                            }
+                        }
+                        if ($form['action_type'] == 'archive') {
+                            if(array_key_exists('archive', $specials)) {
+                                if($specials['archive']) {
+                                    $archive_folder = $specials['archive'];
+                                } else {
+                                    Hm_Msgs::add(sprintf('ERRNo archive folder configured for %s', $server_details['name']));
+                                }
+                            }
+                        }
+
                         foreach ($folders as $folder => $uids) {
                             if ($imap->select_mailbox(hex2bin($folder))) {
                                 $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
