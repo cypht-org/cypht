@@ -164,7 +164,7 @@ class Hm_Output_login_end extends Hm_Output_Module {
      * Closes the login form
      */
     protected function output() {
-        return '</form>';
+        return '</form></div>';
     }
 }
 
@@ -178,8 +178,11 @@ class Hm_Output_login_start extends Hm_Output_Module {
      */
     protected function output() {
         if (!$this->get('router_login_state')) {
-            $css = '<style type="text/css">.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;'.
-                'background-color:#fff;font-size:130%;height:auto;}.logged_out{display:block !important;}.sys_messages'.
+            $css = '<style type="text/css">body,html{max-width:100vw; overflow-x:hidden;}.form-container{background-color:#6eb549;'.
+                'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url(../asset/images/cloud.png);'.
+                'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
+                'display:grid; place-items:center; height:100vh; width:100vw;}.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;'.
+                'background-color:red;font-size:130%;height:auto;}.logged_out{display:block !important;}.sys_messages'.
                 '{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;'.
                 'margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:'.
                 '5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin-left:-12px;}.mobile .g-recaptcha{'.
@@ -195,7 +198,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session'.
                 '{float:left;}.long_session input{padding:0px;float:none;}.mobile .long_session{float:left;clear:both;}</style>';
 
-        return $css.'<form class="login_form" method="POST">';
+        return $css.'<div class="form-container"><form class="login_form" method="POST">';
         }
         else {
             return '<form class="logout_form" method="POST">';
