@@ -685,6 +685,19 @@ class Hm_IMAP extends Hm_IMAP_Cache {
         return $attributes;
     }
 
+     /**
+     * Subscribe/Unsubscribe folder
+     * @param string $mailbox IMAP mailbox to check
+     * @param string $action boolean
+     * @return boolean failure or success
+     */
+    public function mailbox_subscription($mailbox, $action) {
+        $command = ($action? 'SUBSCRIBE': 'UNSUBSCRIBE').' "'.$this->utf7_encode($mailbox).'"'."\r\n";
+        $this->send_command($command);
+        $response = $this->get_response(false, true);
+        return $this->check_response($response, true);
+    }
+
     /* ------------------ SELECTED STATE COMMANDS -------------------------- */
 
     /**
@@ -2129,7 +2142,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     public function get_folder_list_by_level($level='') {
         $result = array();
-        $folders = $this->get_mailbox_list(false, $level, '%');
+        $folders = $this->get_mailbox_list(true, $level, '%');
         foreach ($folders as $name => $folder) {
             $result[$name] = array(
                 'delim' => $folder['delim'],
@@ -2138,6 +2151,29 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 'noselect' => $folder['noselect'],
                 'id' => bin2hex($folder['basename']),
                 'name_parts' => $folder['name_parts'],
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * return all the folders with subscribed attribute
+     * @return array list of folders
+     */
+    public function get_mailbox_list_with_subscription() {
+        $result = array();
+        $all_folders = $this->get_mailbox_list();
+        $subscribed_folders = array_column($this->get_mailbox_list(true), 'basename');
+        foreach ($all_folders as $name => $folder) {
+            $result[$name] = array(
+                'name' => $folder['name'],
+                'delim' => $folder['delim'],
+                'basename' => $folder['basename'],
+                'children' => $folder['has_kids'],
+                'noselect' => $folder['noselect'],
+                'id' => bin2hex($folder['basename']),
+                'name_parts' => $folder['name_parts'],
+                'subscribed' => in_array($folder['basename'], $subscribed_folders)
             );
         }
         return $result;

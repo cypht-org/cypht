@@ -9,3 +9,17 @@
 #draft_val, #sent_val, #trash_val, #junk_val { padding-left: 20px; }
 .manage_folder_icon { vertical-align: -3px; opacity: .3 }
 .manage_folder_link { color: #999 !important; }
+
+.folders_subscription { width: 100%; display: inline-block; }
+.folders_subscription input { float: right; }
+.folder_actions { width: 100%; display: inline-block; vertical-align: top; margin-left: 1%; }
+
+@media (min-width: 687px) {
+    .folders_subscription { width: 30% }
+    .folder_actions { width: 65%; }
+}
+
+@media (min-width: 1201px) {
+    .folders_subscription { width: 25% }
+    .folder_actions { width: 72%; }
+}

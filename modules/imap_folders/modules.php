@@ -336,6 +336,31 @@ class Hm_Handler_imap_folder_check extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage imap_folders/handler
+ */
+class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('folder', 'subscription_state'));
+        if ($success) {
+            $imap_server_id = $this->request->get['imap_server_id'];
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if (is_object($imap) && $imap->get_state() == 'authenticated') {
+                $folder = hex2bin($form['folder']);
+                $success = $imap->mailbox_subscription($folder, $form['subscription_state']);
+                if ($success) {
+                    Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $folder));
+                    $this->cache->del('imap_folders_imap_'.$imap_server_id.'_');
+                } else {
+                    Hm_Msgs::add(sprintf('ERRAn error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder));
+                }
+                $this->out('imap_folder_subscription', $success);
+            }
+        }
+    }
+}
+
+/**
  * @subpackage imap_folders/output
  */
 class Hm_Output_folders_server_select extends Hm_Output_Module {
@@ -575,6 +600,31 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/output
  */
+class Hm_Output_folders_folder_subscription extends Hm_Output_Module {
+    protected function output() {
+        if (($server = $this->get('folder_server')) === NULL) {
+            return;
+        }
+        $imap = Hm_IMAP_List::connect($server, false);
+        $folders = $imap->get_mailbox_list_with_subscription();
+        $results = '<ul class="folders_subscription inner_list">';
+        foreach ($folders as $folder) {
+            $padding = substr_count($folder['name'], '/');
+            $padding = $padding > 0? $padding * 1.3: $padding;
+            $folder_name = $this->html_safe($folder['id']);
+            $results .= '<li style="padding-left: '.$padding.'rem" class="imap_'.$server.'_'.$folder_name.'">';
+            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
+            $results .= $this->html_safe($folder['basename']);
+            $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$folder_name.'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').' />';
+        }
+        $results .= '</ul>';
+        return $results;
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
 class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') === NULL) {
@@ -653,6 +703,23 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
                 </div>
             </div>';
 
+            $res .= '</div>';
+    }
+}
+
+class Hm_Output_folders_actions_content_start extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div class="folder_actions">';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
+class Hm_Output_folders_actions_content_end extends Hm_Output_Module {
+    protected function output() {
+        $res = '</div>';
         return $res;
     }
 }

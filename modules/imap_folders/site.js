@@ -214,6 +214,20 @@ var assign_special_folder = function(id, folder, type, callback) {
     );
 };
 
+var folder_subscribe = function(name, state) {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_subscription'},
+        {'name': 'subscription_state', 'value': state},
+        {'name': 'folder', 'value': name}],
+        function(res) {
+            if (!res.imap_folder_subscription) {
+                var el = $('#'+name);
+                el.prop('checked', !el.prop('checked'));
+            }
+        }
+    );
+};
+
 var folder_page_create = function() {
     var par = $('#create_parent').val();
     var folder = $('#create_value').val().trim();
@@ -273,4 +287,6 @@ $(function() {
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
     $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
     $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
+
+    $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
 });
