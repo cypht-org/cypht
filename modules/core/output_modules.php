@@ -178,30 +178,29 @@ class Hm_Output_login_start extends Hm_Output_Module {
      */
     protected function output() {
         if (!$this->get('router_login_state')) {
-            $css = '<style type="text/css">body,html{max-width:100vw; overflow-x:hidden;}.form-container{background-color:#6eb549;'.
+            $css = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#6eb549;'.
                 'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url(../asset/images/cloud.png);'.
                 'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
-                'display:grid; place-items:center; height:100vh; width:100vw;}.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;'.
-                'background-color:red;font-size:130%;height:auto;}.logged_out{display:block !important;}.sys_messages'.
+                'display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages'.
                 '{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;'.
                 'margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:'.
                 '5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin-left:-12px;}.mobile .g-recaptcha{'.
                 'clear:left;margin-left:20px;}.title{font-weight:normal;padding:0px;margin:0px;margin-left:20px;'.
-                'margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{max-width:100%;min-height:100%;'.
+                'margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{min-width:100px !important;'.
                 'background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,'.
-                '#fff);font-size:1em;height:100%;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
+                '#fff);font-size:1em;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
                 'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid '.
                 '1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute'.
-                ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;'.
-                'padding-top:60px;height:300px;border-radius:0px 0px 20px 0px;margin:0px;background-color:#f5f5f5;'.
-                'width:300px;padding-left:20px;}.login_form input{clear:both;float:left;padding:4px;margin-left:20px;'.
-                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session'.
+                ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{display:flex; justify-content:space-evenly; align-items:center; flex-direction:column;font-size:90%;'.
+                'box-shadow: rgba(255, 255, 255, 0.7) 0px 1px 0px;padding-top:60px;height:360px;border-radius:0px 0px 20px 0px;margin:0px;background-color:rgba(0,0,0,.6);'.
+                'width:300px;}.login_form input{clear:both;float:left;padding:4px;'.
+                'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px; height:25px;}.err{color:red !important;}.long_session'.
                 '{float:left;}.long_session input{padding:0px;float:none;}.mobile .long_session{float:left;clear:both;}</style>';
 
         return $css.'<div class="form-container"><form class="login_form" method="POST">';
         }
         else {
-            return '<form class="logout_form" method="POST">';
+            return '<div class="form-container"><form class="logout_form" method="POST">';
         }
     }
 }
@@ -221,7 +220,8 @@ class Hm_Output_login extends Hm_Output_Module {
             ' <label for="stay_logged_in">'.$this->trans('Stay logged in').'</label></div>';
         }
         if (!$this->get('router_login_state')) {
-            return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
+            return '<img src="../asset/images/logo.svg" style="height:90px;">'.
+                '<!--h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1-->'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="screen_reader" for="username">'.$this->trans('Username').'</label>'.
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
