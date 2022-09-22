@@ -185,10 +185,11 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
             $headers['Content-Type'] = 'application/json';
         }
         $this->out('http_headers', $headers, false);
-        if ($this->session->get('hm_reload_folders', false)) {
-            $this->session->set('hm_reload_folders', $this->session->get('hm_reload_folders') + 1);
+        if (array_key_exists('hm_reload_folders', $this->request->cookie)) {
+            elog("reload folders cookie set");
+            $this->session->set('hm_reload_folders', $this->session->get('hm_reload_folders', 0) + 1);
         }
-        if ($this->session->get('hm_reload_folders', false) > 3) {
+        if ($this->session->get('hm_reload_folders', false) > 2) {
             $this->session->delete_cookie($this->request, 'hm_reload_folders');
             $this->session->del('hm_reload_folders');
         }

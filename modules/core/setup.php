@@ -187,7 +187,8 @@ return array(
         'CYPHTID' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'hm_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'hm_session' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_msgs'    => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'hm_msgs'    => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'hm_reload_folders'    => FILTER_VALIDATE_INT
     ),
     'allowed_server' => array(
         'REQUEST_URI' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
