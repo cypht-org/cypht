@@ -186,7 +186,6 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
         }
         $this->out('http_headers', $headers, false);
         if (array_key_exists('hm_reload_folders', $this->request->cookie)) {
-            elog("reload folders cookie set");
             $this->session->set('hm_reload_folders', $this->session->get('hm_reload_folders', 0) + 1);
         }
         if ($this->session->get('hm_reload_folders', false) > 2) {
