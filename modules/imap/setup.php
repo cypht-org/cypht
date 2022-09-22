@@ -47,7 +47,6 @@ add_output('settings', 'imap_msg_icons_setting', true, 'imap', 'msg_list_icons_s
 add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
-add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_simple_msg_parts', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
 
 /* compose page data */
