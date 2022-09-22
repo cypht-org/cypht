@@ -20,3 +20,4 @@ scripts/test.php
 /vendor/
 /.idea/
 composer.lock
+lib/hm3/users/
