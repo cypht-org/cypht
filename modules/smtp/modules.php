@@ -389,6 +389,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 }
                 if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
                     Hm_SMTP_List::add( array(
+                        'id' => uniqid(),
                         'name' => $form['new_smtp_name'],
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
@@ -413,8 +414,24 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
+
+    private function generateId($servers) {
+        $changed = false;
+        foreach ($servers as $index => $server) {
+            if (!array_key_exists('id', $server)) {
+                $servers[$index]['id'] = uniqid();
+                $changed = true;
+            }
+        }
+        if ($changed) {
+            $this->session->record_unsaved('SMTP server ID updated');
+        }
+        return $servers;
+    }
+
     public function process() {
         $servers = Hm_SMTP_List::dump();
+        $servers = $this->generateId($servers);
         $this->out('smtp_servers', $servers);
         $this->out('compose_drafts', $this->session->get('compose_drafts', array()));
     }
@@ -424,8 +441,24 @@ class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
+
+    private function generateId($servers) {
+        $changed = false;
+        foreach ($servers as $index => $server) {
+            if (!array_key_exists('id', $server)) {
+                $servers[$index]['id'] = uniqid();
+                $changed = true;
+            }
+        }
+        if ($changed) {
+            $this->session->record_unsaved('SMTP server ID updated');
+        }
+        return $servers;
+    }
+
     public function process() {
         $servers = Hm_SMTP_List::dump(false, true);
+        $servers = $this->generateId($servers);
         $this->user_config->set('smtp_servers', $servers);
     }
 }
@@ -446,6 +479,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                     Hm_Msgs::add('ERRThis server and username are already configured');
                     return;
                 }
+                $form['smtp_server_id'] = uniqid();
                 $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
                 if (smtp_authed($smtp)) {
                     $just_saved_credentials = true;
@@ -1452,36 +1486,36 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            foreach (profiles_by_smtp_id($profiles, $id) as $index => $profile) {
+            foreach (profiles_by_smtp_id($profiles, $vals['id']) as $index => $profile) {
                 if ($profile['default']) {
-                    $default = $id.'.'.($index + 1);
+                    $default = $vals['id'].'.'.($index + 1);
                 }
-                if ((string) $selected_id === sprintf('%s.%s', $id, ($index + 1))) {
-                    $selected = $id.'.'.($index + 1);
+                if ((string) $selected_id === sprintf('%s.%s', $vals['id'], ($index + 1))) {
+                    $selected = $vals['id'].'.'.($index + 1);
                 }
                 elseif ($recip && trim($recip) == $profile['address']) {
-                    $selected = $id.'.'.($index + 1);
+                    $selected = $vals['id'].'.'.($index + 1);
                 }
             }
-            if (!$selected && $selected_id !== false && $id == $selected_id) {
-                $selected = $id;
+            if (!$selected && $selected_id !== false && $vals['id'] == $selected_id) {
+                $selected = $vals['id'];
             }
             if (!$selected && $recip && trim($recip) == trim($vals['user'])) {
-                $selected = $id;
+                $selected = $vals['id'];
             }
         }
         if ($selected === false && $default !== false) {
             $selected = $default;
         }
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $smtp_profiles = profiles_by_smtp_id($profiles, $id);
+            $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
                     $res .= '<option ';
-                    if ((string) $selected === sprintf('%s.%s', $id, ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($id))) {
+                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
                         $res .= 'selected="selected" ';
                     }
-                    $res .= 'value="'.$output_mod->html_safe($id.'.'.($index+1)).'">';
+                    $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
                     $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $profile['address'], $vals['name']));
                     $res .= '</option>';
                 }
@@ -1491,7 +1525,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                 if ($selected === $id) {
                     $res .= 'selected="selected" ';
                 }
-                $res .= 'value="'.$output_mod->html_safe($id).'">';
+                $res .= 'value="'.$output_mod->html_safe($vals['id']).'">';
                 $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
                 $res .= '</option>';
             }
@@ -1620,7 +1654,7 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
     $addresses = array_unique($addresses);
     foreach ($addresses as $address) {
         foreach ($smtp_servers as $id => $vals) {
-            foreach (profiles_by_smtp_id($profiles, $id) as $profile) {
+            foreach (profiles_by_smtp_id($profiles, $vals['id']) as $profile) {
                 if ($profile['address'] == $address) {
                     return $address;
                 }
@@ -2083,7 +2117,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $smtp_tls = $config->get('default_smtp_tls', true);
     $servers = $user_config->get('smtp_servers', array());
     foreach ($servers as $index => $server) {
-        Hm_SMTP_List::add($server, $index);
+        Hm_SMTP_List::add($server, $server['id']);
     }
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),

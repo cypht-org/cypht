@@ -23,7 +23,12 @@ trait Hm_Server_Connect {
         if (!array_key_exists($id, self::$server_list)) {
             return false;
         }
-        $server = self::$server_list[$id];
+        foreach (self::$server_list as $server_l) {
+            if ($server['id'] == $id) {
+                $server = $server_l;
+            }
+        }
+
         if ($server['object']) {
             return $server['object'];
         }
@@ -31,6 +36,7 @@ trait Hm_Server_Connect {
         if ($user === false || $pass === false) {
             return false;
         }
+
         if (self::service_connect($id, $server, $user, $pass, $cache)) {
             return self::enable_server($id, $user, $pass, $save_credentials);
         }

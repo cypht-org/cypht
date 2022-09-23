@@ -346,7 +346,11 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div class="form-floating mb-3">';
     $res .= '<select required name="profile_smtp" class="form-select">';
     foreach ($smtp_servers as $id => $server) {
-        $res .= '<option '.(($id == $form_vals['smtp_id']) ? 'selected="selected"' : '').' value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
+        $res .= '<option ';
+        if ($server['id'] == $form_vals['smtp_id']) {
+            $res .= 'selected="selected"';
+        }
+        $res .= 'value="'.$out_mod->html_safe($server['id']).'">'.$out_mod->html_safe($server['name']).'</option>';
     }
     $res .= '</select>';
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';

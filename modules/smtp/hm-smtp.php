@@ -16,6 +16,7 @@ class Hm_SMTP_List {
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         $config = array(
+            'id'        => $id,
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
@@ -28,9 +29,10 @@ class Hm_SMTP_List {
         if (array_key_exists('no_auth', $server)) {
             $config['no_auth'] = true;
         }
-        self::$server_list[$id]['object'] = new Hm_SMTP($config);
-        if (!self::$server_list[$id]['object']->connect()) {
-            return self::$server_list[$id]['object'];
+        self::$server_list[]['object'] = new Hm_SMTP($config);
+
+        if (!end(self::$server_list)['object']->connect()) {
+            return end(self::$server_list)['object'];
         }
         return false;
     }
