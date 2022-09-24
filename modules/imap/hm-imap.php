@@ -431,7 +431,11 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $check_for_new = false;
 
                 /* full folder name, includes an absolute path of parent folders */
-                $folder = $this->utf7_decode($vals[(count($vals) - 1)]);
+                if ($vals[(count($vals) - 1)] == ')' && $lsub) {
+                    $folder = $this->utf7_decode($vals[6]);
+                } else {
+                    $folder = $this->utf7_decode($vals[(count($vals) - 1)]);
+                }
 
                 /* sometimes LIST responses have dupes */
                 if (isset($folders[$folder]) || !$folder) {
@@ -2140,31 +2144,10 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $level mailbox name or empty string for the top level
      * @return array list of matching folders
      */
-    public function get_folder_list_by_level($level='') {
+    public function get_folder_list_by_level($level='', $only_subscribed=false, $with_subscription_state = false) {
         $result = array();
-        $folders = $this->get_mailbox_list(true, $level, '%');
+        $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
         foreach ($folders as $name => $folder) {
-            $result[$name] = array(
-                'delim' => $folder['delim'],
-                'basename' => $folder['basename'],
-                'children' => $folder['has_kids'],
-                'noselect' => $folder['noselect'],
-                'id' => bin2hex($folder['basename']),
-                'name_parts' => $folder['name_parts'],
-            );
-        }
-        return $result;
-    }
-
-    /**
-     * return all the folders with subscribed attribute
-     * @return array list of folders
-     */
-    public function get_mailbox_list_with_subscription() {
-        $result = array();
-        $all_folders = $this->get_mailbox_list();
-        $subscribed_folders = array_column($this->get_mailbox_list(true), 'basename');
-        foreach ($all_folders as $name => $folder) {
             $result[$name] = array(
                 'name' => $folder['name'],
                 'delim' => $folder['delim'],
@@ -2173,8 +2156,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 'noselect' => $folder['noselect'],
                 'id' => bin2hex($folder['basename']),
                 'name_parts' => $folder['name_parts'],
-                'subscribed' => in_array($folder['basename'], $subscribed_folders)
             );
+        }
+        if ($with_subscription_state) {
+            $subscribed_folders = array_column($this->get_mailbox_list(true), 'name');
+            foreach ($result as $key => $folder) {
+                $result[$key]['subscribed'] = in_array($folder['name'], $subscribed_folders);
+            }
         }
         return $result;
     }

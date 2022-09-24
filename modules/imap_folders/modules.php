@@ -361,6 +361,19 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the folder subscription setting in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        function only_subscribed_folders_setting_callback($val) {
+            return $val;
+        }
+        process_site_setting('only_subscribed_folders', $this, 'only_subscribed_folders_setting_callback', false, true);
+    }
+}
+
+/**
  * @subpackage imap_folders/output
  */
 class Hm_Output_folders_server_select extends Hm_Output_Module {
@@ -600,31 +613,6 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/output
  */
-class Hm_Output_folders_folder_subscription extends Hm_Output_Module {
-    protected function output() {
-        if (($server = $this->get('folder_server')) === NULL) {
-            return;
-        }
-        $imap = Hm_IMAP_List::connect($server, false);
-        $folders = $imap->get_mailbox_list_with_subscription();
-        $results = '<ul class="folders_subscription inner_list">';
-        foreach ($folders as $folder) {
-            $padding = substr_count($folder['name'], '/');
-            $padding = $padding > 0? $padding * 1.3: $padding;
-            $folder_name = $this->html_safe($folder['id']);
-            $results .= '<li style="padding-left: '.$padding.'rem" class="imap_'.$server.'_'.$folder_name.'">';
-            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
-            $results .= $this->html_safe($folder['basename']);
-            $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$folder_name.'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').' />';
-        }
-        $results .= '</ul>';
-        return $results;
-    }
-}
-
-/**
- * @subpackage imap_folders/output
- */
 class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') === NULL) {
@@ -707,20 +695,41 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_folders_actions_content_start extends Hm_Output_Module {
+class Hm_Output_folders_folder_subscription extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="folder_actions">';
-        return $res;
+        if ($this->get('only_subscribed_folders_setting', 0) && ($server = $this->get('folder_server')) !== NULL) {
+            $res = '<div class="folder_row"><a href="#" class="subscribe_parent_folder" style="display:none;">';
+            $res .= $this->trans('Select Folder').'</a><span class="subscribe_parent"></span></div>';
+            $res .= '<ul class="folders subscribe_parent_folder_select"><li class="suscribe_title"></li></ul>';
+            $res .= '<input type="hidden" value="" id="subscribe_parent" />';
+            return $res;
+        }
+    }
+}
+
+/**
+ * @subpackage imap_folders/handler
+ */
+class Hm_Handler_get_only_subscribed_folders_setting extends Hm_Handler_Module {
+    public function process() {
+        $this->out('only_subscribed_folders_setting', $this->user_config->get('only_subscribed_folders_setting', 0));
     }
 }
 
 /**
  * @subpackage imap_folders/output
  */
-class Hm_Output_folders_actions_content_end extends Hm_Output_Module {
+class Hm_Output_folders_folder_subscription_button extends Hm_Output_Module {
     protected function output() {
-        $res = '</div>';
-        return $res;
+        if ($this->get('only_subscribed_folders_setting', 0)) {
+            $server = $this->get('folder_server');
+            $results = '<div class="folder_subscription_btn"><a href="?page=folders_subscription';
+            $results .= !is_null($server)? '&imap_server_id='.$server: '';
+            // $results .= '.
+            $results .= '" title="'.$this->trans('Folders subscription').'"><img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="20" height="20" /> ';
+            $results .= '</a></div>';
+            return $results;
+        }
     }
 }
 
@@ -761,6 +770,16 @@ class Hm_Output_folders_create_dialog extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/output
  */
+class Hm_Output_folders_subscription_content_start extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div class="content_title">'.$this->trans('Folders subscription').'</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
 class Hm_Output_folders_content_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="content_title">'.$this->trans('Folders').'</div>';
@@ -784,6 +803,23 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
             }
             $this->concat('formatted_folder_list', $res);
         }
+    }
+}
+
+/**
+ * Option to enable/disable showing only subscribed folders
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('only_subscribed_folders', $settings) && $settings['only_subscribed_folders']) {
+            $checked = ' checked="checked"';
+        }
+        return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
+            $this->trans('Showing subscribed folders only').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" value="1" /></td></tr>';
     }
 }
 

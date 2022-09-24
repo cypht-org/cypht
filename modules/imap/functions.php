@@ -141,6 +141,9 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         else {
             $results .= $output_mod->html_safe($folder['basename']);
         }
+        if (isset($folder['subscribed'])) {
+            $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$output_mod->html_safe($folder_name).'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').($folder['name'] == 'INBOX'? ' disabled="disabled"': '').' />';
+        }
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }
     if ($manage) {

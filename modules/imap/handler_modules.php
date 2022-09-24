@@ -730,7 +730,12 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
-                $msgs = $imap->get_folder_list_by_level(hex2bin($folder));
+                $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
+                $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+                if ($with_subscription) {
+                    $only_subscribed = false;
+                }
+                $msgs = $imap->get_folder_list_by_level(hex2bin($folder), $only_subscribed, $with_subscription);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }

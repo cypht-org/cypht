@@ -1,6 +1,6 @@
 'use strict';
 
-var folder_page_folder_list = function(container, title, link_class, target, id_dest) {
+var folder_page_folder_list = function(container, title, link_class, target, id_dest, subscription = false) {
     var id = $('#imap_server_folder').val();
     var folder_location = $('.'+container);
     $('li', folder_location).not('.'+title).remove();
@@ -9,7 +9,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
-    $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
+    $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
     $('a', folder_location).not('.'+link_class).not('.close').off('click');
     $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
     $('.close', folder_location).on("click", function() {
@@ -22,8 +22,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     return false;
 };
 
-
-var expand_folders_page_list = function(path, container, link_class, target, id_dest) {
+var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.'+container));
     if ($('li', list).length === 0) {
@@ -32,7 +31,8 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
-                {'name': 'folder', 'value': detail.folder}],
+                {'name': 'folder', 'value': detail.folder},
+                {'name': 'subscription_state', 'value': lsub}],
                 function(res) {
                     if (res.imap_expanded_folder_path) {
                         var folder_location = $('.'+container);
@@ -41,9 +41,12 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), folder_location).append(folders);
                         $('.imap_folder_link', folder_location).addClass(link_class).removeClass('imap_folder_link');
                         $('.'+link_class, folder_location).off('click');
-                        $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest); });
+                        $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, lsub); });
                         $('a', folder_location).not('.'+link_class).not('.close').off('click');
                         $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
+                        if (lsub) {
+                            $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
+                        }
                     }
                 }
             );
@@ -223,6 +226,8 @@ var folder_subscribe = function(name, state) {
             if (!res.imap_folder_subscription) {
                 var el = $('#'+name);
                 el.prop('checked', !el.prop('checked'));
+            } else {
+                Hm_Folders.reload_folders(true);
             }
         }
     );
@@ -258,11 +263,18 @@ var folder_page_create = function() {
 };
 
 $(function() {
-    if (hm_page_name() == 'folders') {
+    if (hm_page_name() == 'folders' || hm_page_name() == 'folders_subscription') {
         $('#imap_server_folder').on("change", function() {
             $(this).parent().parent().submit();
         });
+    }
+    if (hm_page_name() == 'folders') {
         $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
+    }
+    if (hm_page_name() == 'folders_subscription') {
+        $('.subscribe_parent_folder').on("click", function() { return folder_page_folder_list('subscribe_parent_folder_select', 'suscribe_title', 'imap_parent_folder_link', '', 'subscribe_parent', true); });
+        $('.subscribe_parent_folder').trigger('click');
+        $('.imap_parent_folder_link').trigger('click');
     }
     $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
     $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
@@ -287,6 +299,4 @@ $(function() {
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
     $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
     $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
-
-    $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
 });
