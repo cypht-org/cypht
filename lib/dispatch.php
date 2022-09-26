@@ -66,6 +66,7 @@ trait Hm_Dispatch_Redirect {
      * @return string
      */
     public function validate_request_uri($uri) {
+        $uri = html_entity_decode($uri);
         if ($uri === '') {
             return '/';
         }
