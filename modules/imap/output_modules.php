@@ -148,8 +148,9 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
             }
             $part = $this->get('imap_msg_part', '1');
             $args = $this->get('msg_download_args', '');
+            $att_args = $this->get('msg_attachment_remove_args', '');
             $showMsgArgs = $this->get('msg_show_args', '');
-            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args);
+            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args, $att_args);
             $res .= '</table>';
             $res .= format_attached_image_section($this->get('msg_struct'), $this, $showMsgArgs);
             $this->out('msg_parts', $res);

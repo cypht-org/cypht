@@ -37,7 +37,8 @@
         "ext-session": "*",
         "ext-fileinfo": "*",
         "webklex/composer-info": "^0.0.1",
-        "composer" : "^2.0.0"
+        "composer" : "^2.0.0",
+        "zbateson/mail-mime-parser": "^2.4"
     },
     "suggest": {
         "ext-PDO": "To use database features, this needs to be installed",

@@ -521,21 +521,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('imap_download_message', $this->request->get) && $this->request->get['imap_download_message']) {
 
-            $server_id = NULL;
-            $uid = NULL;
-            $folder = NULL;
-            $msg_id = NULL;
-
-            if (array_key_exists('uid', $this->request->get) && $this->request->get['uid']) {
-                $uid = $this->request->get['uid'];
-            }
-            if (array_key_exists('list_path', $this->request->get) && preg_match("/^imap_(\d+)_(.+)/", $this->request->get['list_path'], $matches)) {
-                $server_id = $matches[1];
-                $folder = hex2bin($matches[2]);
-            }
-            if (array_key_exists('imap_msg_part', $this->request->get) && preg_match("/^[0-9\.]+$/", $this->request->get['imap_msg_part'])) {
-                $msg_id = preg_replace("/^0.{1}/", '', $this->request->get['imap_msg_part']);
-            }
+            list($server_id, $uid, $folder, $msg_id) = get_request_params($this->request->get);
             if ($server_id !== NULL && $uid !== NULL && $folder !== NULL && $msg_id !== NULL) {
                 $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
                 $imap = Hm_IMAP_List::connect($server_id, $cache);
@@ -654,6 +640,46 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
                 $this->out('list_sort', $default_sort_order);
             }
+        }
+    }
+}
+
+/**
+ * Delete an attachment on the server
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('imap_remove_attachment', $this->request->get) && $this->request->get['imap_remove_attachment']) {
+            list($server_id, $uid, $folder, $msg_id) = get_request_params($this->request->get);
+            if ($server_id !== NULL && $uid !== NULL && $folder !== NULL && $msg_id !== NULL) {
+                $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
+                $imap = Hm_IMAP_List::connect($server_id, $cache);
+                if (imap_authed($imap)) {
+                    if ($imap->select_mailbox($folder)) {
+                        $msg = $imap->get_message_content($uid, 0, false, false);
+                        if ($msg) {
+                            $attachment_id = get_attachment_id_for_mail_parser($imap, $uid, $this->request->get['imap_msg_part']);
+                            if ($attachment_id !== false) {
+                                $msg = remove_attachment($attachment_id, $msg);
+                                if ($imap->append_start($folder, strlen($msg))) {
+                                    $imap->append_feed($msg."\r\n");
+                                    if ($imap->append_end()) {
+                                        if ($imap->message_action('DELETE', array($uid))) {
+                                            $imap->message_action('EXPUNGE', array($uid));
+                                            Hm_Msgs::add('Attachment deleted');
+                                            $this->out('redirect_url', '?page=message_list&list_path='.$this->request->get['list_path']);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                        }
+                    }
+                }
+            }
+            Hm_Msgs::add('ERRAn Error occurred trying to remove attachment to the message');
         }
     }
 }
@@ -1851,7 +1877,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
                     $this->out('msg_text', $msg_text);
-                    $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
+                    $download_args = sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']);
+                    $this->out('msg_download_args', $download_args.'&amp;imap_download_message=1');
+                    $this->out('msg_attachment_remove_args', $download_args.'&amp;imap_remove_attachment=1');
                     $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
 
                     if (!$prefetch) {

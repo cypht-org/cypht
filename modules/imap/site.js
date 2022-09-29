@@ -1089,6 +1089,14 @@ $(function() {
         $('#new_imap_address').trigger('keyup');
     });
 
+    $(document).on('click', '.remove_attachment', function (e) {
+        if (!hm_delete_prompt()) {
+            e.preventDefault();
+            return false;
+        }
+        return true;
+    });
+
     $(document).on('click', '.checkbox_label', function(e) {
         setTimeout(search_selected_for_imap, 100);
     });
