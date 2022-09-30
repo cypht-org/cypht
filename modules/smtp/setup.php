@@ -132,7 +132,8 @@ return array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),
         'draft_subject' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'draft_id' => array(FILTER_VALIDATE_INT, false),
-        'profile_value' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
+        'profile_value' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
+        'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
@@ -172,7 +173,8 @@ return array(
         'smtp_auto_bcc' => FILTER_VALIDATE_INT,
         'profile_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'send_uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'send_uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'next_email_post_archive' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 

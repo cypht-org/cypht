@@ -645,7 +645,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive'));
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post_archive'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
@@ -754,6 +754,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $imap->message_action('ARCHIVE', array($msg_uid));
                     $imap->message_action('MOVE', array($msg_uid), $archive_folder);
                 }
+            }
+            if ($form['next_email_post_archive']) {
+                $this->out('msg_sent_and_archived', $form['next_email_post_archive']);
             }
         }
 
@@ -1063,6 +1066,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
             '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
+            '<input type="hidden" name="next_email_post_archive" class="compose_next_email_post_archive" value="" />'.
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
             '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
             '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
