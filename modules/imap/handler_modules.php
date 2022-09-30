@@ -1309,6 +1309,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
             if (array_key_exists('host', $parsed) && @get_headers($form['new_jmap_address'])) {
 
                 Hm_IMAP_List::add(array(
+                    'id' => uniqid(),
                     'name' => $form['new_jmap_name'],
                     'server' => $form['new_jmap_address'],
                     'hide' => $hidden,

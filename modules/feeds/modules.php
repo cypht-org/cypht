@@ -398,6 +398,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             if ($found) {
                 $this->out('reload_folders', true);
                 Hm_Feed_List::add(array(
+                    'id' => uniqid(),
                     'name' => $form['new_feed_name'],
                     'server' => $href,
                     'tls' => false,
@@ -449,7 +450,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
-            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
         
     }
@@ -492,7 +493,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 if ($server_id !== false && $index != $server_id) {
                     continue;
                 }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
             }
         }
     }

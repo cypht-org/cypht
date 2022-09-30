@@ -186,15 +186,10 @@ trait Hm_Server_List {
      * @param int $id server id
      * @return void
      */
-    public static function add($atts, $id=false) {
+    public static function add($atts) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        if ($id !== false) {
-            self::$server_list[$id] = $atts;
-        }
-        else {
-            self::$server_list[] = $atts;
-        }
+        self::$server_list[] = $atts;
     }
 
     /**
@@ -203,9 +198,11 @@ trait Hm_Server_List {
      * @return bool true on success
      */
     public static function del($id) {
-        if (array_key_exists($id, self::$server_list)) {
-            unset(self::$server_list[$id]);
-            return true;
+        foreach (self::$server_list as $idx => $srv) {
+            if ($srv['id'] == $id) {
+                unset(self::$server_list[$idx]);
+                return true;
+            }
         }
         return false;
     }
@@ -236,8 +233,10 @@ trait Hm_Server_List {
      * @return array
      */
     public static function get($id, $full) {
-        if (array_key_exists($id, self::$server_list)) {
-            $server = self::$server_list[$id];
+        foreach (self::$server_list as $srv) {
+            if ($srv['id'] == $id) {
+                $server = $srv;
+            }
             if (!$full) {
                 return self::clean($server);
             }

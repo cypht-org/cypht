@@ -116,6 +116,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         $data = $this->get('profiles');
         $profile = array(
+            'id' => uniqid(),
             'name' => html_entity_decode($form['profile_name'], ENT_QUOTES),
             'sig' => $sig,
             'smtp_id' => $form['profile_smtp'],
@@ -281,7 +282,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($smtp).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
+                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-gear-fill"></i></a></td>'.
                     '</tr>';
             }

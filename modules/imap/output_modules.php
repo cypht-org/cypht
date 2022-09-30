@@ -424,7 +424,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-
+            $server_id = $vals['id'];
             if (array_key_exists('type', $vals) && $vals['type'] == 'jmap') {
                 continue;
             }
@@ -459,24 +459,24 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             
             // IMAP Username
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
-            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('IMAP username').'</label></div>';
             
             // IMAP Password
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
-            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('IMAP password').'</label></div>';
             
             // Sieve Host (Conditional)
             if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
                 $default_value = $vals['sieve_config_host'];
                 $res .= '<div class="form-floating mb-3">';
-                $res .= '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
-                $res .= '<label for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label></div>';
+                $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
+                $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
             
             // Buttons
@@ -654,7 +654,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
         }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-
+            $server_id = $vals['id'];
             if (!array_key_exists('type', $vals) || $vals['type'] != 'jmap') {
                 continue;
             }
@@ -683,21 +683,21 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             }
             $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
-            $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']));
             
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
 
             // JMAP Username
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
-            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('JMAP username').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('JMAP username').'</label></div>';
 
             // JMAP Password
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
-            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('JMAP password').'</label></div>';
 
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
@@ -735,8 +735,8 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
-                '<td class="imap_detail_'.$index.'"></td></tr>';
+            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
+                '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
         }
         return $res;
     }
