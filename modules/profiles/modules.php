@@ -20,12 +20,17 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
             $id = $this->request->get['profile_id'];
         }
         $accounts = $this->get('profiles');
-        if ($id !== false) {
-            if (count($accounts) > $id) {
-                $this->out('edit_profile', $accounts[$id]);
-                $this->out('default_email_domain', $this->config->get('default_email_domain'));
-                $this->out('edit_profile_id', $id);
+
+        foreach ($accounts as $acc) {
+            if ($acc['id'] == $id) {
+                $account = $acc;
             }
+        }
+
+        if ($id !== false) {
+            $this->out('edit_profile', $account);
+            $this->out('default_email_domain', $this->config->get('default_email_domain'));
+            $this->out('edit_profile_id', $id);
         }
         else {
             $this->out('new_profile_id', count($accounts));

@@ -29,7 +29,7 @@ return array(
     ),
     'allowed_post' => array(
         'profile_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_id' => FILTER_VALIDATE_INT,
+        'profile_id' => FILTER_UNSAFE_RAW,
         'profile_replyto' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_smtp' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_imap' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -39,6 +39,6 @@ return array(
         'profile_delete' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_get' => array(
-        'profile_id' => FILTER_VALIDATE_INT,
+        'profile_id' => FILTER_UNSAFE_RAW,
     ),
 );
