@@ -43,6 +43,32 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
+    public function process() {
+        $this->out('sieve_filters_enabled', true);
+    }
+}
+
+/**
+ * @subpackage sievefilters/handler
+ */
+class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module {
+    public function process() {
+        $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
+        $sieve_filters_enabled = false;
+        $factory = get_sieve_client_factory($this->config);
+        $client = $factory->init($this->user_config, $server);
+        if ($client) {
+            $sieve_filters_enabled = true;
+            $this->out('sieve_filters_client', $client);
+        }
+        $this->out('sieve_filters_enabled', $sieve_filters_enabled);
+    }
+}
+
+/**
  * @subpackage sievefilters/output
  */
 class Hm_Output_sieve_edit_filter extends Hm_Output_Module {
@@ -164,7 +190,7 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
         return '';
     }
     $scripts = $client->listScripts();
-    if (!array_search('blocked_senders', $scripts, true)) {
+    if (array_search('blocked_senders', $scripts, true) === false) {
         return '';
     }
     $current_script = $client->getScript('blocked_senders');
@@ -225,7 +251,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
         }
         $new_blocked_list[] = $blocked_wildcard;
 
-        if(!array_search('blocked_senders', $scripts, true)) {
+        if(array_search('blocked_senders', $scripts, true) === false) {
             $client->putScript(
                 'blocked_senders',
                 ''
@@ -342,7 +368,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
 
         $scripts = $client->listScripts();
 
-        if(!array_search('blocked_senders', $scripts, true)) {
+        if(array_search('blocked_senders', $scripts, true) === false) {
             $client->putScript(
                 'blocked_senders',
                 ''
@@ -465,7 +491,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
         $scripts = $client->listScripts();
 
-        if(!array_search('blocked_senders', $scripts, true)) {
+        if(array_search('blocked_senders', $scripts, true) === false) {
             $client->putScript(
                 'blocked_senders',
                 ''
@@ -474,6 +500,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
         $blocked_senders = [];
         $current_script = $client->getScript('blocked_senders');
+
         $unblock_sender = false;
         if ($current_script != '') {
             $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
@@ -986,7 +1013,7 @@ class Hm_Handler_sieve_block_change_behaviour_script extends Hm_Handler_Module {
 
         $scripts = $client->listScripts();
 
-        if(!array_search('blocked_senders', $scripts, true)) {
+        if(array_search('blocked_senders', $scripts, true) === false) {
             $client->putScript(
                 'blocked_senders',
                 ''
@@ -1134,7 +1161,7 @@ function get_blocked_senders_array($mailbox, $site_config, $user_config) {
     }
     $scripts = $client->listScripts();
 
-    if (!array_search('blocked_senders', $scripts, true)) {
+    if (array_search('blocked_senders', $scripts, true) === false) {
         return [];
     }
 
@@ -1185,7 +1212,9 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             if (array_key_exists($idx, $behaviours)) {
                 $default_behaviour = $behaviours[$idx];
             }
-            if (isset($mailbox['sieve_config_host'])) {
+            $factory = get_sieve_client_factory($this->get('site_config'));
+            $client = $factory->init($this->get('user_config'), $mailbox);
+            if ($client) {
                 if ($default_behaviour == 'Discard') {
                     $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'"><option value="Discard">Discard</option><option value="Reject">Bounce</option></select>';
                 }
