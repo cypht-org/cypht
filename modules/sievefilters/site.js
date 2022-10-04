@@ -585,7 +585,7 @@ $(function () {
                 '    </td>' +
                 extra_options +
                 '    <td style="width: 43%;">' +
-                '    <img style="display: none" src="/modules/sievefilters/assets/spinner.gif" />' +
+                '    <img style="display: none" src="modules/core/assets/images/spinner.gif" />' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td style="vertical-align: middle; width: 70px;">' +
