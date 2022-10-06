@@ -166,7 +166,7 @@ class Hm_Handler_process_pagination_links extends Hm_Handler_Module {
         function pagination_links_callback($val) {
             return $val;
         }
-        process_site_setting('pagination_links', $this, 'pagination_links_callback', false, true);
+        process_site_setting('pagination_links', $this, 'pagination_links_callback', true, true);
     }
 }
 
