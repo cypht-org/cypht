@@ -5,6 +5,9 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('sieve_filters');
 output_source('sievefilters');
 
+add_module_to_all_pages('handler', 'sieve_filters_enabled', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
+
 setup_base_page('sieve_filters', 'core');
 setup_base_page('block_list', 'core');
 
