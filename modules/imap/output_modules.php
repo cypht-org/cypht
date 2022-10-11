@@ -916,13 +916,17 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
 class Hm_Output_imap_pagination_links extends Hm_Output_Module {
     protected function output() {
         $checked = '';
+        $reset = '';
         $settings = $this->get('user_settings', array());
         if (!array_key_exists('pagination_links', $settings) || (array_key_exists('pagination_links', $settings) && $settings['pagination_links'])) {
             $checked = ' checked="checked"';
+        } else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="pagination_links">'.
+        $res = '<tr class="general_setting"><td><label for="pagination_links">'.
             $this->trans('Show next & previous emails when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="pagination_links" name="pagination_links" value="1" /></td></tr>';
+            '<td><input type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
+        return $res;
     }
 }
 
@@ -1027,12 +1031,14 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
 class Hm_Output_original_folder_setting extends Hm_Output_Module {
     protected function output() {
         $checked = '';
+        $reset = '';
         $settings = $this->get('user_settings', array());
         if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
     }
 }
