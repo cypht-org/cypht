@@ -853,7 +853,8 @@ function Message_List() {
     };
 
     this.prev_next_links = function(cache, class_name) {
-        var href;
+        var phref;
+        var nhref;
         var target;
         var subject;
         var plink = false;
@@ -864,17 +865,18 @@ function Message_List() {
         var next = current.next();
         target = $('.msg_headers tr').last();
         if (prev.length) {
-            href = prev.find('.subject').find('a').prop('href');
+            phref = prev.find('.subject').find('a').prop('href');
             subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
+            plink = '<a class="plink" href="'+phref+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
-            href = next.find('.subject').find('a').prop('href');
+            nhref = next.find('.subject').find('a').prop('href');
             subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+subject+'</a>';
+            nlink = '<a class="nlink" href="'+nhref+'"><div class="prevnext next_img"></div> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
+        return [phref, nhref];
     };
 
     this.check_empty_list = function() {
