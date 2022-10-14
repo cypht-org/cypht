@@ -122,9 +122,6 @@ function reply_to_address($headers, $type) {
             }
         }
     }
-    if (!array_key_exists('delivered-to', $headers) && array_key_exists('to', $headers)) {
-        list($parsed, $msg_to) = format_reply_address($headers['to'], $parsed); 
-    }
     if ($type == 'reply_all') {
         if ($delivered_address) {
             $parsed[] = $delivered_address;
