@@ -1204,7 +1204,7 @@ var Hm_Folders = {
         $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
-            e.target.innerHTML = '<img src="modules/core/assets/images/spinner.gif" />';
+            e.target.innerHTML = '<img src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />';
             setTimeout(function() {
                 Hm_Folders.update_folder_list();
                 e.target.innerHTML = text;

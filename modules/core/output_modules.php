@@ -552,6 +552,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", "'.$this->html_safe($this->get('uid', '')).'"); };'.
             'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
+            'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
