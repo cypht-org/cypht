@@ -355,8 +355,8 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                 }
             }
         }
-        if ($this->get('msg_sent_and_archived')) {
-            $this->out('redirect_url', htmlspecialchars_decode($this->get('msg_sent_and_archived')));
+        if ($this->get('msg_next_link')) {
+            $this->out('redirect_url', htmlspecialchars_decode($this->get('msg_next_link')));
         }
     }
 }
