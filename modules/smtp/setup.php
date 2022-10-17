@@ -174,7 +174,7 @@ return array(
         'profile_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'send_uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'next_email_post_archive' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'next_email_post' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 

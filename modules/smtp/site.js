@@ -111,14 +111,6 @@ var smtp_delete_draft = function(id) {
 };
 
 var send_archive = function() {
-    var msg_uid = hm_msg_uid();
-    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-    var class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
-    var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
-    var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
-    if (next_message) {
-        $('.compose_next_email_post_archive').val(next_message);
-    }
     $('.compose_post_archive').val(1);
     document.getElementsByClassName("smtp_send")[0].click();
 }
@@ -309,7 +301,15 @@ $(function() {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_form').on('submit', function() { 
+        $('.compose_form').on('submit', function() {
+            var msg_uid = hm_msg_uid();
+            var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+            var class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
+            var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
+            var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
+            if (next_message) {
+                $('.compose_next_email_data').val(next_message);
+            }
             var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
             $('#send_uploaded_files').val(uploaded_files);
             Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); 
