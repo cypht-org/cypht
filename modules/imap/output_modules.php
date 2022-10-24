@@ -1068,3 +1068,21 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
             '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
     }
 }
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_review_sent_email extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $reset = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('review_sent_email', $settings) && $settings['review_sent_email']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="review_sent_email">'.
+            $this->trans('Review sent message').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
+    }
+}
