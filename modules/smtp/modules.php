@@ -1126,7 +1126,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
 
-        if ($this->get('list_path') && $reply_type == 'reply') {
+        if ($this->get('list_path')) {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }
 
