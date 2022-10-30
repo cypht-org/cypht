@@ -833,8 +833,8 @@ class Hm_JMAP {
             'internal_date' => $msg['receivedAt'],
             'size' => $msg['size'],
             'date' => $msg['sentAt'],
-            'from' => $this->combine_addresses($msg['from']),
-            'to' => $this->combine_addresses($msg['to']),
+            'from' => (is_array($msg['from']) ? $this->combine_addresses($msg['from']) : $msg['from']),
+            'to' => (is_array($msg['to']) ? $this->combine_addresses($msg['to']) : $msg['to']),
             'subject' => $msg['subject'],
             'content-type' => '',
             'timestamp' => strtotime($msg['receivedAt']),
@@ -842,7 +842,7 @@ class Hm_JMAP {
             'x-priority' => '',
             'type' => 'jmap',
             'references' => '',
-            'message_id' => implode(' ', $msg['messageId']),
+            'message_id' => (is_array($msg['messageId']) ? implode(' ', $msg['messageId']) : ''),
             'x_auto_bcc' => ''
         );
     }
