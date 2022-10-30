@@ -861,6 +861,7 @@ class Hm_JMAP {
             preg_replace("/\/$/", '', $url),
             $data['apiUrl']
         );
+	$this->api_url = $data['apiUrl'];
         $this->download_url = sprintf(
             '%s%s',
             preg_replace("/\/$/", '', $url),
