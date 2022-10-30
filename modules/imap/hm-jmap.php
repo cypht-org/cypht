@@ -995,7 +995,7 @@ class Hm_JMAP {
         return json_encode(array(
             'using' => count($caps) == 0 ? $this->default_caps : $caps,
             'methodCalls' => $methods
-        ));
+        ), JSON_UNESCAPED_SLASHES);
     }
 
     /**
