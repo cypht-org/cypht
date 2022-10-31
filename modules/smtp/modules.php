@@ -1033,7 +1033,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 $cc = $imap_draft['Cc'];
             }
             if (array_key_exists('From', $imap_draft)) {
-                $from = $imap_draft['From'];
+                $from = $imap_draft['From'];select_mailbox
             }
             $draft_id = $msg_uid;
         }
@@ -1528,6 +1528,7 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
 if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
     $imap = Hm_IMAP_List::connect($imap_server_id);
+    if ( ! $imap ) return false;
     if ($imap->select_mailbox($folder)) {
         if ($imap->message_action('DELETE', array($id))) {
             $imap->message_action('EXPUNGE', array($id));
@@ -1573,7 +1574,7 @@ if (!hm_exists('rrmdir')) {
                     if (filetype($dir . "/" . $object) == "dir") {
                         rrmdir($dir . "/" . $object); 
                     } else {
-                        unlink($dir . "/" . $object);
+                        unlink($dir . "/" . $object);select_mailbox
                     }
                 }
             }
