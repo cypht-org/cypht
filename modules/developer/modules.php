@@ -40,15 +40,32 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         if ($package) {
             // Cypht is embedded
             $branch_name = str_replace(['dev-', '-dev'], '', $package['version']);
-            $commit_hash = substr($package['dist']['reference'], 0, 8);
+            $commit_hash = substr($package['dist']['reference'], 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = $package['time'];
         } elseif (exec('git --version')) {
             // Standalone cypht
             $branch_name = trim(exec('git rev-parse --abbrev-ref HEAD'));
-            $commit_hash = trim(exec('git log --pretty="%h" -n1 HEAD'));
+            $commit_hash = substr(trim(exec('git log --pretty="%H" -n1 HEAD')), 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = trim(exec('git log -n1 --pretty=%ci HEAD'));
+        }
+
+        if ($commit_hash != '-') {
+            // Get right commit date (not merge date) if not a local commit
+            $ch = Hm_Functions::c_init();
+            $res = array();
+            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits/'.$commit_hash);
+            Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
+            $curl_result = Hm_Functions::c_exec($ch);
+            if (trim($curl_result)) {
+                if (!strstr($curl_result, 'No commit found for SHA')) {
+                    $json_commit = json_decode($curl_result);
+                    $commit_date = $json_commit->commit->author->date;
+                }
+            }
         }
 
         $res['branch_name'] = $branch_name;
@@ -58,7 +75,7 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         if ($commit_date != '-') {
             $commit_date = new \DateTime($commit_date);
             $commit_date->setTimezone(new \DateTimeZone('UTC'));
-            $res['commit_date'] = $commit_date->format('Y-m-d H:i:s');
+            $res['commit_date'] = $commit_date->format('M d, Y');
         }
 
         $this->out('server_info', $res);
