@@ -342,6 +342,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
 
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
+        $this->out('pgp_enabled', $this->module_is_supported('pgp'));
 
         if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
@@ -717,6 +718,20 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             return;
         }
 
+        # Autocrypt
+        $autocrypt_keys = $this->user_config->get('autocrypt_keys');
+        $tmp_dir = ini_get('keyring_dir') ? ini_get('keyring_dir') : '/keyring';
+        putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+        $res = gnupg_init();
+        gnupg_setarmor($res, 0);
+        foreach ($autocrypt_keys as $autocrypt_key) {
+            if (strstr($from, $autocrypt_key['email'])) {
+                $mime->set_autocrypt_header(base64_encode(gnupg_export($res,$autocrypt_key['key_fingerprint'])));
+            }
+        }
+        #print_r($mime->get_mime_msg());
+        #die;
+
         /* send the message */
         $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
         if ($err_msg) {
@@ -968,6 +983,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
+        $pgp_enabled = $this->get('pgp_enabled', 0);
         
         if (!$msg_path) {
             $msg_path = $this->get('compose_msg_path', '');
@@ -1112,6 +1128,12 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
+
+        // Autocrypt Header Key
+        if ($pgp_enabled) {
+            $res .= '<span class="send_public_key_check"><label>'.$this->trans('Send header public key').'</label>';
+            $res .= '<input type="checkbox" name="autocrypt_send_public_key"/><input type="hidden" name="autocrypt_pgp_key" id="autocrypt_pgp_key" value="" /></span>';
+        }
 
         if ($this->get('list_path') && $reply_type == 'reply') {
             $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';

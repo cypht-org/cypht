@@ -50,6 +50,12 @@ class Hm_MIME_Msg {
         $this->body = $body;
     }
 
+    function set_autocrypt_header($public_key = NULL) {
+        $pattern = '/[a-z0-9_\-\+\.]+@[a-z0-9\-]+\.([a-z]{2,4})(?:\.[a-z]{2})?/i';
+        preg_match_all($pattern, $this->headers['From'], $matches);
+        $this->headers['Autocrypt'] = 'addr='.str_replace(['<', '>'], '', $matches[0][0]).'; prefer-encrypt=mutual; keydata='.$public_key;
+    }
+
     /* return headers array */
     function get_headers() {
       return $this->headers;
@@ -88,8 +94,8 @@ class Hm_MIME_Msg {
     }
 
     /* output mime message */
-    function get_mime_msg() {
-        $this->prep_message_body();
+    function get_mime_msg($encrypt=false) {
+        $this->prep_message_body($encrypt);
         $res = '';
         $headers = '';
         foreach ($this->headers as $name => $val) {
@@ -224,15 +230,25 @@ class Hm_MIME_Msg {
         return $this->qp_encode(implode('', $new_lines));
     }
 
-    function prep_message_body() {
+    function prep_message_body($encrypt) {
+        $encrypt = true;
         $body = $this->body;
         if (!$this->html) {
             $body = mb_convert_encoding(trim($body), "HTML-ENTITIES", "UTF-8");
             $body = mb_convert_encoding($body, "UTF-8", "HTML-ENTITIES");
             if (!empty($this->attachments)) {
-                $this->headers['Content-Type'] = 'multipart/mixed; boundary='.$this->boundary;
-                $body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
-                    $this->boundary, $this->format_message_text($body));
+                if (array_key_exists('Autocrypt', $this->headers) && $encrypt) {
+                    $this->headers['Content-Type'] = 'multipart/encrypted; protocol="application/pgp-encrypted"; boundary=' . $this->boundary;
+                    $pgp_header = 'Content-Type: application/octet-stream; name="encrypted.asc"'."\r\n";
+                    $pgp_header .= 'Content-Description: OpenPGP encrypted message"'."\r\n";
+                    $pgp_header .= 'Content-Disposition: inline; filename="encrypted.asc";'."\r\n";
+                    $body = sprintf("--%s\r\nContent-Type: application/pgp-encrypted;\r\n".'Content-Description: PGP/MIME version identification'."\r\n\r\n".'Version: 1'."\r\n\r\n--".$this->boundary."\r\n".$pgp_header."\r\n"."%s"."\r\n\r\n"."--".$this->boundary.'--',
+                        $this->boundary, $this->format_message_text($body));
+                } else {
+                    $this->headers['Content-Type'] = 'multipart/mixed; boundary=' . $this->boundary;
+                    $body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",
+                        $this->boundary, $this->format_message_text($body));
+                }
             }
             else {
                 $this->headers['Content-Type'] = 'text/plain; charset=UTF-8; format=flowed';

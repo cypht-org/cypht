@@ -75,9 +75,11 @@ var Hm_Pgp = {
             }
             options['privateKeys'] = key;
         }
+
         return openpgp.encrypt(options).then(function(ciphertext) {
             var encrypted = ciphertext.data;
             $('#compose_body').val(encrypted);
+            $('#autocrypt_pgp_key').val(keytext);
             Hm_Pgp.show_result();
             return true;
         });
@@ -98,9 +100,11 @@ var Hm_Pgp = {
             var decrypted = await key.decrypt(pass);
         }
         catch (e) {
-            Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
-            Hm_Pgp.show_result();
-            return;
+            if (e.toString() != 'Error: Key packet is already decrypted.') {
+                Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
+                Hm_Pgp.show_result();
+                return;
+            }
         }
         return openpgp.decrypt({message: msg, privateKeys: [key]}).then(function(plaintext) {
             var plain = plaintext.data;
@@ -172,23 +176,18 @@ var Hm_Pgp = {
     },
 
     process_settings: async function() {
-        var sign = $('#pgp_sign').val();
-        if (!sign) {
-            sign = false;
-        }
-        var encrypt = $('#pgp_encrypt').val();
-        if (!encrypt) {
-            encrypt = false;
-        }
-        if (encrypt && sign) {
-            await Hm_Pgp.get_passphrase(Hm_Pgp.encrypt_text, encrypt, sign);
-        }
-        else if (encrypt) {
-            await Hm_Pgp.encrypt_text(false, encrypt);
-        }
-        else if (sign) {
-            await Hm_Pgp.get_passphrase(Hm_Pgp.sign_text, sign);
-        }
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_encrypt_by_fingerprint'},
+                {'name': 'body', 'value': $("#compose_body").val()},
+                {'name': 'fingerprint', 'value': $("#pgp_encrypt").val()},
+                {'name': 'from', 'value': $(".compose_server").val()},
+                {'name': 'hm_page_key', 'value': $('#hm_page_key').val()}],
+            function(res) {
+                $("#compose_body").val(res.encrypted_message);
+            },
+            [],
+            true
+        );
     },
 
     show_result: function() {
@@ -260,6 +259,20 @@ var Hm_Pgp = {
     check_pgp_msg: async function(res) {
         var keylist = await Hm_Pgp.private_key_options();
 
+        $("#import_public_key_form").on('submit', function (event) {
+            event.preventDefault();
+            Hm_Ajax.request(
+                [{'name': 'public_key', 'value': $('#public_key_header_field').val()},
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_public_key_import_string'},
+                    {'name': 'hm_page_key', 'value': $('#hm_page_key').val()},
+                    {'name': 'public_key_email', 'value': $('#key_import_email').val()}],
+                function(res) {
+                },
+                [],
+                true
+            );
+        });
+
         if (keylist && res.pgp_msg_part) {
             $('.pgp_private_keys').html(keylist);
             $('.pgp_msg_controls').show();
@@ -324,10 +337,21 @@ $(function() {
     }
     else if (hm_page_name() == 'pgp') {
         $('.priv_title').on("click", function() { $('.priv_keys').toggle(); });
+        $('.priv_ac_title').on("click", function() { $('.priv_ac_keys').toggle(); });
         $('.public_title').on("click", function() { $('.public_keys').toggle(); });
         $('.delete_pgp_key').on("click", function() { return hm_delete_prompt(); });
         $('#priv_key').on("change", function(evt) { Hm_Pgp.read_private_key(evt); });
         Hm_Pgp.list_private_keys();
+        $(document).on('click', '.generate_ac_keys_button', function() {
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_generate_autocrypt_keys'},
+                 {'name': 'hm_page_key', 'value': $('#hm_page_key').val()}],
+                function(res) {
+                },
+                [],
+                true
+            );
+        });
         if (window.location.hash == '#public_keys') {
             $('.public_keys').toggle();
         }
