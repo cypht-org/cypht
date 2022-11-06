@@ -154,6 +154,7 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
             
             Hm_Msgs::add('Special folders assigned');
             $this->session->record_unsaved('Special folders assigned');
+            $this->session->close_early();
         }
     }
 }
