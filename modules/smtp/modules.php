@@ -761,31 +761,14 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $this->out('msg_next_link', $form['next_email_post']);
         }
 
-        # Delete draft after send
-        if ($form['draft_id'] > 0) {
-            $msg_path = explode('_', $this->request->post['compose_msg_path']);
-            $msg_uid = $this->request->post['compose_msg_uid'];
-
-            $imap = Hm_IMAP_List::connect($msg_path[1]);
-            if ($imap && $imap->select_mailbox(hex2bin($msg_path[2]))) {
-                $imap->message_action('DELETE', array($msg_uid));
-                $imap->message_action('EXPUNGE', array($msg_uid));
-            }
-        }
-
         /* clean up */
         $this->out('msg_sent', true);
         Hm_Msgs::add("Message Sent");
 
         /* if it is a draft, remove it */
-        if ($this->module_is_supported('imap') && $imap_server) {
-            $imap_server = find_imap_by_smtp(
-                $this->user_config->get('imap_servers'),
-                $this->user_config->get('smtp_servers')[$smtp_id]
-            );
-
-            $specials = get_special_folders($this, $imap_server['id']);
-            delete_draft($form['draft_id'], $this->cache, $imap_server['id'], $specials['draft']);
+        if ($this->module_is_supported('imap') && $imap_server && $form['draft_id'] > 0) {
+            $specials = get_special_folders($this, $imap_server);
+            delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
 
         delete_uploaded_files($this->session, $form['draft_id']);
