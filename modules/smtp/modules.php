@@ -1105,6 +1105,24 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
         }
 
+        // replying a message takes the original imap server and tries to find a profile
+        // matching that server to preselect on the list of available smtp options
+        // relying on recipient here might fail as real recipient is sometimes different
+        // than the address specified in the profile
+        if (! empty($reply) && $imap_server) {
+            foreach ($this->get('compose_profiles') as $profile) {
+                if ($profile['server'] == $imap_server['server'] && $profile['user'] == $imap_server['user']) {
+                    $smtp_profiles = profiles_by_smtp_id($this->get('compose_profiles'), $profile['smtp_id']);
+                    foreach ($smtp_profiles as $index => $smtp_profile) {
+                        if ($profile == $smtp_profile) {
+                            $selected_id = $profile['smtp_id'] . '.' . ($index + 1);
+                            break 2;
+                        }
+                    }
+                }
+            }
+        }
+
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
             '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
