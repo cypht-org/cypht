@@ -347,6 +347,7 @@ $(function() {
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_generate_autocrypt_keys'},
                  {'name': 'hm_page_key', 'value': $('#hm_page_key').val()}],
                 function(res) {
+                    window.location = window.location;
                 },
                 [],
                 true

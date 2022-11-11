@@ -303,21 +303,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '</th></tr>';
             $txt .= '</th></tr>';
 
-
-            $headers = $this->get('msg_headers', array());
-            if (array_key_exists('Autocrypt', $headers)) {
-                $exploded_autocrypt_header = explode('keydata=', $headers['Autocrypt']);
-                $exploded_autocrypt_email_header = explode('addr=', $headers['Autocrypt']);
-                if (count($exploded_autocrypt_header) >= 1) {
-                    $pgp_key = end($exploded_autocrypt_header);
-                    $exploded_email_header = explode(';', end($exploded_autocrypt_email_header));
-                    $key_email = reset($exploded_email_header);
-                    $txt .= '<tr class="autocrypt_key_header_import_warning"><td colspan="2"><div>The sender sent their public key in the message header ';
-                    $txt .= '<form id="import_public_key_form" method="POST" action="?page=pgp#public_keys"><input type="hidden" id="key_import_email" value="'.$key_email.'" /><input id="hm_page_key" type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" /><input type="hidden" id="autocrypt_field" value="1" name="autocrypt"><input type="hidden" id="public_key_header_field" value="'.$pgp_key.'" name="public_key"><button type="submit" id="import_public_button">Import</button></form>';
-                    $txt .= '</div></td></tr>';
-                }
-            }
-
             $txt .= '</table>';
 
             $this->out('msg_headers', $txt, false);

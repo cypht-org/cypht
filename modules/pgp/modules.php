@@ -33,7 +33,6 @@ class Hm_Handler_ajax_encrypt_by_fingerprint extends Hm_Handler_Module
         $gpg = gnupg_init();
         gnupg_setarmor($gpg,1);
         gnupg_addencryptkey($gpg ,$form['fingerprint']);
-
         $from_exploded = explode('.', $form['from']);
         $from = reset($from_exploded);
         $info = gnupg_keyinfo($gpg, '');
