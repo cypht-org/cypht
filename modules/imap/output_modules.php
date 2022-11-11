@@ -282,10 +282,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
-            
+
             if ($this->get('sieve_filters_enabled')) {
                 $imap_server = Hm_IMAP_List::get($this->get('msg_server_id'), false);
-                if (isset($imap_server['sieve_config_host'])) {
+                if ($this->get('sieve_filters_client')) {
                     $txt .= ' | <a class="block_sender_link hlink" id="block_sender" href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></a>';
                 } else {
                     $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
@@ -468,8 +468,7 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
             '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST
-">'.
+            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add a JMAP Server').'</div><table>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_name">'.$this->trans('Account name').'</label>'.
@@ -919,13 +918,17 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
 class Hm_Output_imap_pagination_links extends Hm_Output_Module {
     protected function output() {
         $checked = '';
+        $reset = '';
         $settings = $this->get('user_settings', array());
         if (!array_key_exists('pagination_links', $settings) || (array_key_exists('pagination_links', $settings) && $settings['pagination_links'])) {
             $checked = ' checked="checked"';
+        } else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="pagination_links">'.
+        $res = '<tr class="general_setting"><td><label for="pagination_links">'.
             $this->trans('Show next & previous emails when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="pagination_links" name="pagination_links" value="1" /></td></tr>';
+            '<td><input type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
+        return $res;
     }
 }
 
@@ -1030,12 +1033,14 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
 class Hm_Output_original_folder_setting extends Hm_Output_Module {
     protected function output() {
         $checked = '';
+        $reset = '';
         $settings = $this->get('user_settings', array());
         if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
     }
 }

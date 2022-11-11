@@ -5,6 +5,9 @@ if (!defined('DEBUG_MODE')) { die(); }
 handler_source('sieve_filters');
 output_source('sievefilters');
 
+add_module_to_all_pages('handler', 'sieve_filters_enabled', true, 'imap', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
+
 setup_base_page('sieve_filters', 'core');
 setup_base_page('block_list', 'core');
 
@@ -61,8 +64,6 @@ add_output('ajax_sieve_delete_script', 'sieve_delete_output',  true);
 setup_base_ajax_page('ajax_sieve_block_unblock', 'core');
 add_handler('ajax_sieve_block_unblock', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_sieve_block_unblock', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_sieve_block_unblock', 'login', false, 'core');
-add_handler('ajax_sieve_block_unblock', 'load_user_data',  true, 'core');
 add_handler('ajax_sieve_block_unblock', 'sieve_block_unblock_script',  true);
 add_output('ajax_sieve_block_unblock', 'sieve_block_unblock_output',  true);
 
@@ -70,15 +71,12 @@ add_output('ajax_sieve_block_unblock', 'sieve_block_unblock_output',  true);
 setup_base_ajax_page('ajax_sieve_unblock_sender', 'core');
 add_handler('ajax_sieve_unblock_sender', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_sieve_unblock_sender', 'load_smtp_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_sieve_unblock_sender', 'login', false, 'core');
-add_handler('ajax_sieve_unblock_sender', 'load_user_data',  true, 'core');
 add_handler('ajax_sieve_unblock_sender', 'sieve_unblock_sender',  true);
 add_output('ajax_sieve_unblock_sender', 'sieve_block_unblock_output',  true);
 
 /* get mailboxes script */
 setup_base_ajax_page('ajax_sieve_get_mailboxes', 'core');
 add_handler('ajax_sieve_get_mailboxes', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_sieve_get_mailboxes', 'login', false, 'core');
 add_handler('ajax_sieve_get_mailboxes', 'settings_load_imap',  true);
 add_handler('ajax_sieve_get_mailboxes', 'sieve_get_mailboxes_script',  true);
 add_output('ajax_sieve_get_mailboxes', 'sieve_get_mailboxes_output',  true);
@@ -86,7 +84,6 @@ add_output('ajax_sieve_get_mailboxes', 'sieve_get_mailboxes_output',  true);
 /* get mailboxes script */
 setup_base_ajax_page('ajax_sieve_block_domain', 'core');
 add_handler('ajax_sieve_block_domain', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_sieve_block_domain', 'login', false, 'core');
 add_handler('ajax_sieve_block_domain', 'settings_load_imap',  true);
 add_handler('ajax_sieve_block_domain', 'sieve_block_domain_script',  true);
 add_output('ajax_sieve_block_domain', 'sieve_block_domain_output',  true);
@@ -95,7 +92,6 @@ add_output('ajax_sieve_block_domain', 'sieve_block_domain_output',  true);
 /* change blocking default behaviour */
 setup_base_ajax_page('ajax_sieve_block_change_behaviour', 'core');
 add_handler('ajax_sieve_block_change_behaviour', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
-add_handler('ajax_sieve_block_change_behaviour', 'login', false, 'core');
 add_handler('ajax_sieve_block_change_behaviour', 'settings_load_imap',  true);
 add_handler('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_script',  true);
 add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_output',  true);

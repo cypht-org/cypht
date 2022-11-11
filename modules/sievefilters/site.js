@@ -1,7 +1,168 @@
+/**
+ * Possible Sieve fields
+ * @type {{Message: [{name: string, options: string[], type: string, selected: boolean},{name: string, options: string[], type: string},{name: string, options: string[], type: string}], Header: [{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string}]}}
+ */
+var hm_sieve_condition_fields = function() {
+    return {
+        'Message': [
+            {
+                name: 'subject',
+                description: 'Subject',
+                type: 'string',
+                selected: true,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'body',
+                description: 'Body',
+                type: 'string',
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'size',
+                description: 'Size (KB)',
+                type: 'int',
+                options: ['Over', 'Under']
+            }
+        ],
+        'Header': [
+            {
+                name: 'to',
+                description: 'To',
+                type: 'string',
+                extra_option: false,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'from',
+                description: 'From',
+                type: 'string',
+                extra_option: false,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'cc',
+                description: 'CC',
+                type: 'string',
+                extra_option: false,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'to_or_cc',
+                description: 'To or CC',
+                type: 'string',
+                extra_option: false,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'bcc',
+                description: 'BCC',
+                type: 'string',
+                extra_option: false,
+                options: ['Contains', 'Matches', 'Regex']
+            },
+            {
+                name: 'custom',
+                description: 'Custom',
+                type: 'string',
+                extra_option: true,
+                extra_option_description: 'Field Name',
+                options: ['Contains', 'Matches', 'Regex']
+            }
+        ]
+    };
+};
+
+/**
+ * Possible Sieve actions
+ * @type {[{name: string, description: string, placeholder: string, type: string, selected: boolean},{name: string, description: string, placeholder: string, type: string},{name: string, description: string, type: string},{name: string, description: string, type: string},{name: string, description: string, placeholder: string, type: string}]}
+ */
+var hm_sieve_possible_actions = function() {
+    return [
+        {
+            name: 'keep',
+            description: 'Deliver (Keep)',
+            type: 'none',
+            extra_field: false
+        },
+        {
+            name: 'stop',
+            description: 'Stop Filtering',
+            type: 'none',
+            extra_field: false
+        },
+        {
+            name: 'copy',
+            description: 'Copy email to mailbox',
+            placeholder: 'Mailbox Name (Folder)',
+            type: 'mailbox',
+            extra_field: false
+        },
+        {
+            name: 'move',
+            description: 'Move email to mailbox',
+            placeholder: 'Mailbox Name (Folder)',
+            type: 'mailbox',
+            extra_field: false
+        },
+        {
+            name: 'flag',
+            description: 'Flag',
+            placeholder: 'Example: SEEN',
+            type: 'select',
+            values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+            extra_field: false
+        },
+        {
+            name: 'addflag',
+            description: 'Add Flag',
+            placeholder: 'Example: SEEN',
+            type: 'select',
+            values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+            extra_field: false
+        },
+        {
+            name: 'removeflag',
+            description: 'Remove Flag',
+            placeholder: 'Example: SEEN',
+            type: 'select',
+            values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
+            extra_field: false
+        },
+        {
+            name: 'redirect',
+            description: 'Redirect',
+            placeholder: 'mail@example.org',
+            type: 'string',
+            extra_field: false
+        },
+        {
+            name: 'reject',
+            description: 'Reject',
+            placeholder: 'Reject message',
+            type: 'string',
+            extra_field: false
+        },
+        {
+            name: 'discard',
+            description: 'Discard',
+            type: 'none',
+            extra_field: false
+        },
+        {
+            name: 'autoreply',
+            placeholder: 'Reply Message',
+            description: 'Reply Message',
+            type: 'text',
+            extra_field: true,
+            extra_field_type: 'string',
+            extra_field_placeholder: 'Subject'
+        }
+    ];
+};
+
 $(function () {
 
-    let condition_fields;
-    let possible_actions;
     let is_editing_script = false;
     let current_editing_script_name = '';
     let is_editing_filter = false;
@@ -22,7 +183,6 @@ $(function () {
             );
         });
 
-        
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
            let sender = $(this).parent().parent().children().html();
@@ -62,165 +222,6 @@ $(function () {
     }
 
     if (hm_page_name() === 'sieve_filters') {
-        /**
-         * Possible Sieve fields
-         * @type {{Message: [{name: string, options: string[], type: string, selected: boolean},{name: string, options: string[], type: string},{name: string, options: string[], type: string}], Header: [{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string},{name: string, options: string[], type: string}]}}
-         */
-        condition_fields = {
-            'Message': [
-                {
-                    name: 'subject',
-                    description: 'Subject',
-                    type: 'string',
-                    selected: true,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'body',
-                    description: 'Body',
-                    type: 'string',
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'size',
-                    description: 'Size (KB)',
-                    type: 'int',
-                    options: ['Over', 'Under']
-                }
-            ],
-            'Header': [
-                {
-                    name: 'to',
-                    description: 'To',
-                    type: 'string',
-                    extra_option: false,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'from',
-                    description: 'From',
-                    type: 'string',
-                    extra_option: false,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'cc',
-                    description: 'CC',
-                    type: 'string',
-                    extra_option: false,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'to_or_cc',
-                    description: 'To or CC',
-                    type: 'string',
-                    extra_option: false,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'bcc',
-                    description: 'BCC',
-                    type: 'string',
-                    extra_option: false,
-                    options: ['Contains', 'Matches', 'Regex']
-                },
-                {
-                    name: 'custom',
-                    description: 'Custom',
-                    type: 'string',
-                    extra_option: true,
-                    extra_option_description: 'Field Name',
-                    options: ['Contains', 'Matches', 'Regex']
-                }
-            ]
-        }
-
-        /**
-         * Possible Sieve actions
-         * @type {[{name: string, description: string, placeholder: string, type: string, selected: boolean},{name: string, description: string, placeholder: string, type: string},{name: string, description: string, type: string},{name: string, description: string, type: string},{name: string, description: string, placeholder: string, type: string}]}
-         */
-        possible_actions = [
-            {
-                name: 'keep',
-                description: 'Deliver (Keep)',
-                type: 'none',
-                extra_field: false
-            },
-            {
-                name: 'stop',
-                description: 'Stop Filtering',
-                type: 'none',
-                extra_field: false
-            },
-            {
-                name: 'copy',
-                description: 'Copy email to mailbox',
-                placeholder: 'Mailbox Name (Folder)',
-                type: 'mailbox',
-                extra_field: false
-            },
-            {
-                name: 'move',
-                description: 'Move email to mailbox',
-                placeholder: 'Mailbox Name (Folder)',
-                type: 'mailbox',
-                extra_field: false
-            },
-            {
-                name: 'flag',
-                description: 'Flag',
-                placeholder: 'Example: SEEN',
-                type: 'select',
-                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-                extra_field: false
-            },
-            {
-                name: 'addflag',
-                description: 'Add Flag',
-                placeholder: 'Example: SEEN',
-                type: 'select',
-                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-                extra_field: false
-            },
-            {
-                name: 'removeflag',
-                description: 'Remove Flag',
-                placeholder: 'Example: SEEN',
-                type: 'select',
-                values: ['Seen', 'Answered', 'Flagged', 'Deleted', 'Draft', 'Recent'],
-                extra_field: false
-            },
-            {
-                name: 'redirect',
-                description: 'Redirect',
-                placeholder: 'mail@example.org',
-                type: 'string',
-                extra_field: false
-            },
-            {
-                name: 'reject',
-                description: 'Reject',
-                placeholder: 'Reject message',
-                type: 'string',
-                extra_field: false
-            },
-            {
-                name: 'discard',
-                description: 'Discard',
-                type: 'none',
-                extra_field: false
-            },
-            {
-                name: 'autoreply',
-                placeholder: 'Reply Message',
-                description: 'Reply Message',
-                type: 'text',
-                extra_field: true,
-                extra_field_type: 'string',
-                extra_field_placeholder: 'Subject'
-            }
-        ]
-
         /**************************************************************************************
          *                             TINGLE SCRIPT MODAL
          **************************************************************************************/
@@ -496,14 +497,14 @@ $(function () {
             let header_fields = '';
             let message_fields = '';
 
-            condition_fields.Message.forEach(function (value) {
+            hm_sieve_condition_fields().Message.forEach(function (value) {
                 if (value.selected === true) {
                     message_fields += '<option selected value="'+value.name+'">' + value.description + '</option>';
                 } else {
                     message_fields += '<option value="'+value.name+'">' + value.description + '</option>';
                 }
             });
-            condition_fields.Header.forEach(function (value) {
+            hm_sieve_condition_fields().Header.forEach(function (value) {
                 if (value.selected === true) {
                     header_fields += '<option selected value="'+value.name+'">' + value.description + '</option>';
                 } else {
@@ -566,7 +567,7 @@ $(function () {
         function add_filter_action(default_value = '') {
             let possible_actions_html = '';
 
-            possible_actions.forEach(function (value) {
+            hm_sieve_possible_actions().forEach(function (value) {
                 if (value.selected === true) {
                     possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                     return;
@@ -607,7 +608,7 @@ $(function () {
         $(document).on('click', '.filter_modal_add_else_action_btn', function () {
             let possible_actions_html = '';
 
-            possible_actions.forEach(function (value) {
+            hm_sieve_possible_actions().forEach(function (value) {
                 if (value.selected === true) {
                     possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                     return;
@@ -642,7 +643,7 @@ $(function () {
             let elem_extra = $(this).parent().next().find('.condition_extra_action_value');
             let action_name = $(this).val();
             let selected_action;
-            possible_actions.forEach(function (action) {
+            hm_sieve_possible_actions().forEach(function (action) {
                if (action_name === action.name) {
                     selected_action = action;
                }
@@ -708,18 +709,18 @@ $(function () {
          */
         $(document).on('change', '.add_condition_sieve_filters', function () {
             let condition_name = $(this).val();
-            let elem = $(this).parent().next().find('.condition_options');
+            let elem = $(this).parent().next().next().find('.condition_options');
             let elem_extra = $(this).parent().next().find('.condition_extra_value');
             let elem_type = $(this).parent().next().next().next();
             let condition;
             let options_html = '';
             let input_type_html = '';
-            condition_fields.Message.forEach(function (cond) {
+            hm_sieve_condition_fields().Message.forEach(function (cond) {
                 if (condition_name === cond.name) {
                     condition = cond;
                 }
             });
-            condition_fields.Header.forEach(function (cond) {
+            hm_sieve_condition_fields().Header.forEach(function (cond) {
                 if (condition_name === cond.name) {
                     condition = cond;
                 }
@@ -742,6 +743,9 @@ $(function () {
                 }
                 if (condition.type === 'int') {
                     elem_type.html('<input name="sieve_selected_option_value[]" type="number" />')
+                }
+                if (condition.type === 'none') {
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="hidden" value="none" />')
                 }
             }
         });

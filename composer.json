@@ -51,8 +51,6 @@
         }
     },
     "scripts": {
-        "pre-install-cmd":  "composer check-platform-reqs",
-        "pre-update-cmd": "composer check-platform-reqs",
         "post-update-cmd": "composer suggest",
         "post-package-install":"composer suggest",
         "post-install-cmd": "composer suggest"

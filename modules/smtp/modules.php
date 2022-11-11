@@ -646,7 +646,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive'));
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
@@ -795,6 +795,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
                     $imap->message_action('MOVE', array($msg_uid), $archive_folder);
                 }
             }
+        }
+
+        if ($form['next_email_post']) {
+            $this->out('msg_next_link', $form['next_email_post']);
         }
 
         # Delete draft after send
@@ -1078,9 +1082,17 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $imap_server_id = explode('_', $msg_path)[1];
         $imap_server = Hm_IMAP_List::get($imap_server_id, false);
         $reply_from = process_address_fld($reply['msg_headers']['From']);
-        
-        if ($reply_from[0]['email'] != $imap_server['user'] && strpos($to, $reply_from[0]['email']) === false) {
+       
+        if ($reply_type == 'reply_all' && $reply_from[0]['email'] != $imap_server['user'] && strpos($to, $reply_from[0]['email']) === false) {
             $to .= ', '.$reply_from[0]['label'].' '.$reply_from[0]['email'];
+        }
+
+        // Prevent sending message to oneself
+        if (strpos($reply_from[0]['email'], $to) !== false) {
+            $excluded = [$to];
+            $to = format_reply_address($reply['msg_headers']['To'], $excluded)[1]; 
+            $cc = format_reply_address($reply['msg_headers']['Cc'], $excluded)[1]; 
+            $bcc = format_reply_address($reply['msg_headers']['Bcc'], $excluded)[1];
         }
         
         $send_disabled = '';
@@ -1104,6 +1116,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
             '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
+            '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
             '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
             '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.

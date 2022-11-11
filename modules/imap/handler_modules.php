@@ -166,7 +166,7 @@ class Hm_Handler_process_pagination_links extends Hm_Handler_Module {
         function pagination_links_callback($val) {
             return $val;
         }
-        process_site_setting('pagination_links', $this, 'pagination_links_callback', false, true);
+        process_site_setting('pagination_links', $this, 'pagination_links_callback', true, true);
     }
 }
 
@@ -354,6 +354,9 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                     }
                 }
             }
+        }
+        if ($this->get('msg_next_link')) {
+            $this->out('redirect_url', htmlspecialchars_decode($this->get('msg_next_link')));
         }
     }
 }
@@ -1404,7 +1407,6 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
      * This list is cached in the session between page loads by Hm_Handler_save_imap_servers
      */
     public function process() {
-        $this->out('sieve_filters_enabled', $this->module_is_supported('sievefilters'));
         $servers = $this->user_config->get('imap_servers', array());
         $added = false;
         $updated = false;
@@ -1871,12 +1873,6 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_text', $msg_text);
                     $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_download_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
                     $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
-
-                    $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
-
-                    if (array_key_exists('sieve_config_host', $server)) {
-                        $this->out('sieve_filters_enabled', $this->module_is_supported('sievefilters'));
-                    }
 
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);

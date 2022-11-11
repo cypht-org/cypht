@@ -853,7 +853,8 @@ function Message_List() {
     };
 
     this.prev_next_links = function(cache, class_name) {
-        var href;
+        var phref;
+        var nhref;
         var target;
         var subject;
         var plink = false;
@@ -864,17 +865,18 @@ function Message_List() {
         var next = current.next();
         target = $('.msg_headers tr').last();
         if (prev.length) {
-            href = prev.find('.subject').find('a').prop('href');
+            phref = prev.find('.subject').find('a').prop('href');
             subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+href+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
+            plink = '<a class="plink" href="'+phref+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
-            href = next.find('.subject').find('a').prop('href');
+            nhref = next.find('.subject').find('a').prop('href');
             subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+href+'"><div class="prevnext next_img"></div> '+subject+'</a>';
+            nlink = '<a class="nlink" href="'+nhref+'"><div class="prevnext next_img"></div> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
+        return [phref, nhref];
     };
 
     this.check_empty_list = function() {
@@ -1640,7 +1642,7 @@ var reset_default_value_checkbox = function() {
         this.style.transform = "scaleX(1)";
         this.parentElement.setAttribute("restore_aria_label","Restore current value");
         checkbox.setAttribute("current_value", checkbox.checked);
-        checkbox.checked = false;
+        checkbox.checked = !checkbox.checked;
         checkbox.disabled = true;
     }
     else {
@@ -1712,7 +1714,14 @@ var Hm_Message_List = new Message_List();
 
 /* executes on onload, has access to other module code */
 $(function() {
-
+    /* Remove disabled attribute to send checkbox */
+    $('.save_settings').on("click", function (e) {
+        $('.general_setting input[type=checkbox]').each(function () {
+            if (this.hasAttribute('disabled') && this.checked) {
+                this.removeAttribute('disabled');
+            }
+        });
+    })
     /* setup settings and server pages */
     if (hm_page_name() == 'settings') {
         Hm_Utils.expand_core_settings();
