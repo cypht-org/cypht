@@ -405,7 +405,7 @@ class Hm_Cache {
      * @param Hm_Config $config site config object
      * @return void
      */
-    private function check_session($config) {
+    protected function check_session($config) {
         $this->type = 'noop';
         $this->backend = new Hm_Noop_Cache();
         if ($config->get('allow_session_cache')) {
@@ -417,7 +417,7 @@ class Hm_Cache {
      * @param Hm_Config $config site config object
      * @return boolean
      */
-    private function check_redis($config) {
+    protected function check_redis($config) {
         if ($config->get('enable_redis', false)) {
             $backend = new Hm_Redis($config);
             if ($backend->is_active()) {
@@ -433,7 +433,7 @@ class Hm_Cache {
      * @param Hm_Config $config site config object
      * @return boolean
      */
-    private function check_memcache($config) {
+    protected function check_memcache($config) {
         if ($config->get('enable_memcached', false)) {
             $backend = new Hm_Memcached($config);
             if ($backend->is_active()) {
@@ -450,7 +450,7 @@ class Hm_Cache {
      * @param string $msg_type log message
      * @return void
      */
-    private function log($key, $msg_type) {
+    protected function log($key, $msg_type) {
         switch ($msg_type) {
         case 'save':
             Hm_Debug::add(sprintf('CACHE: saving "%s" using %s', $key, $this->type));
@@ -511,7 +511,7 @@ class Hm_Cache {
      * @param mixed $default value to return if not found
      * @return mixed
      */
-    private function redis_get($key, $default) {
+    protected function redis_get($key, $default) {
         $res = $this->backend->get($this->key_hash($key), $this->session->enc_key);
         if (!$res) {
             $this->log($key, 'miss');
@@ -526,7 +526,7 @@ class Hm_Cache {
      * @param mixed $default value to return if not found
      * @return mixed
      */
-    private function memcache_get($key, $default) {
+    protected function memcache_get($key, $default) {
         $res = $this->backend->get($this->key_hash($key), $this->session->enc_key);
         if (!$res && $this->backend->last_err() == Memcached::RES_NOTFOUND) {
             $this->log($key, 'miss');
@@ -542,7 +542,7 @@ class Hm_Cache {
      * @param integer $lifetime how long to cache (if applicable for the backend)
      * @return boolean
      */
-    private function session_set($key, $val, $lifetime) {
+    protected function session_set($key, $val, $lifetime) {
         $this->log($key, 'save');
         $this->session->set($this->key_hash($key), $val);
         return true;
@@ -553,7 +553,7 @@ class Hm_Cache {
      * @param mixed $default value to return if not found
      * @return mixed
      */
-    private function session_get($key, $default) {
+    protected function session_get($key, $default) {
         $res = $this->session->get($this->key_hash($key), $default);
         if ($res === $default) {
             $this->log($key, 'miss');
@@ -567,7 +567,7 @@ class Hm_Cache {
      * @param string $key name to delete
      * @return boolean
      */
-    private function session_del($key) {
+    protected function session_del($key) {
         $this->log($key, 'del');
         return $this->session->del($this->key_hash($key));
     }
@@ -577,7 +577,7 @@ class Hm_Cache {
      * @param mixed $default value to return if not found
      * @return mixed
      */
-    private function noop_get($key, $default) {
+    protected function noop_get($key, $default) {
         return $default;
     }
 
@@ -585,7 +585,7 @@ class Hm_Cache {
      * @param string $key key to make the hash unique
      * @return string
      */
-    private function key_hash($key) {
+    protected function key_hash($key) {
         return sprintf('hm_cache_%s', hash('sha256', (sprintf('%s%s%s%s', $key, SITE_ID,
             $this->session->get('fingerprint'), $this->session->get('username')))));
     }
@@ -594,7 +594,7 @@ class Hm_Cache {
      * @param string $key name to delete
      * @return boolean
      */
-    private function generic_del($key) {
+    protected function generic_del($key) {
         $this->log($key, 'del');
         return $this->backend->del($this->key_hash($key));
     }
@@ -605,8 +605,47 @@ class Hm_Cache {
      * @param integer $lifetime how long to cache (if applicable for the backend)
      * @return boolean
      */
-    private function generic_set($key, $val, $lifetime) {
+    protected function generic_set($key, $val, $lifetime) {
         $this->log($key, 'save');
         return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
     }
 }
+
+/**
+ * Setup the cache
+ */
+class Hm_Cache_Setup {
+
+    private $config;
+    private $session;
+
+    /**
+     * @param object $config site configuration
+     */
+    public function __construct($config, $session) {
+        $this->config = $config;
+        $this->session = $session;
+    }
+
+    /**
+     * @return object
+     */
+    public function setup_cache() {
+        $cache_class = $this->get_cache_class();
+        Hm_Debug::add(sprintf('Using %s for cache', $cache_class));
+        return new $cache_class($this->config, $this->session);
+    }
+
+    /**
+     * @return string
+     */
+    private function get_cache_class() {
+        $custom_cache_class = $this->config->get('cache_class', 'Custom_Cache');
+        $cache_class = 'Hm_Cache';
+        if (class_exists($custom_cache_class)) {
+            $cache_class = $custom_cache_class;
+        }
+        return $cache_class;
+    }
+}
+
