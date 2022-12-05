@@ -215,13 +215,21 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $from = '[No From]';
             $nofrom = ' nofrom';
         }
-        if ($list_sort == 'date') {
-            $date_field = 'date';
+        $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
+        if ($is_snoozed) {
+            $snooze_header = parse_snooze_header('X-Snoozed: '.$msg['x_snoozed']);
+            $date = $snooze_header['until'];
+            $timestamp = strtotime($date);
         } else {
-            $date_field = 'internal_date';
-        }
-        $timestamp = strtotime($msg[$date_field]);
-        $date = translate_time_str(human_readable_interval($msg[$date_field]), $output_module);
+            if ($list_sort == 'date') {
+                $date_field = 'date';
+            } else {
+                $date_field = 'internal_date';
+            }
+            $date = translate_time_str(human_readable_interval($msg[$date_field]), $output_module);
+            $timestamp = strtotime($msg[$date_field]);
+        }    
+        
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';
@@ -286,7 +294,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags),
-                    array('date_callback', $date, $timestamp),
+                    array('date_callback', $date, $timestamp, $is_snoozed),
                     array('icon_callback', $flags)
                 ),
                 $id,
@@ -1247,3 +1255,148 @@ function get_request_params($request) {
 
     return [$server_id, $uid, $folder, $msg_id];
 }}
+
+if (!hm_exists('snooze_message')) {
+function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
+    if (!$imap->select_mailbox($folder)) {
+        return false;
+    }
+    if (!$snooze_tag) {
+        $imap->message_action('UNREAD', array($msg_id));
+    }
+    $msg = $imap->get_message_content($msg_id, 0);
+    preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
+    if (count($matches)) {
+        $msg = str_replace($matches[0], '', $msg);
+        $old_folder = parse_snooze_header($matches[0])['from'];
+    }
+    if ($snooze_tag) {
+        $from = $old_folder ?? $folder;
+        $msg = "$snooze_tag;\n \tfrom $from\n".$msg;
+    }
+    $msg = str_replace("\r\n", "\n", $msg);
+    $msg = str_replace("\n", "\r\n", $msg);
+    $msg = rtrim($msg)."\r\n";
+
+    $res = false;
+    $snooze_folder = 'Snoozed';
+    if ($snooze_tag) {
+        if (!count($imap->get_mailbox_status($snooze_folder))) {
+            $imap->create_mailbox($snooze_folder);
+        }
+        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, strlen($msg))) {
+            $imap->append_feed($msg."\r\n");
+            if ($imap->append_end()) {
+                if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
+                    $imap->message_action('EXPUNGE', array($msg_id));
+                    $res = true;
+                }
+            }
+        }
+    } else {
+        $snooze_headers = parse_snooze_header($matches[0]);
+        $original_folder = $snooze_headers['from'];
+        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, strlen($msg))) {
+            $imap->append_feed($msg."\r\n");
+            if ($imap->append_end()) {
+                if ($imap->select_mailbox($snooze_folder) && $imap->message_action('DELETE', array($msg_id))) {
+                    $imap->message_action('EXPUNGE', array($msg_id));
+                    $res = true;
+                }
+            }
+        }
+    }
+    return $res;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_snooze_header')) {
+function parse_snooze_header($snooze_header)
+{
+    $snooze_header = str_replace('X-Snoozed: ', '', $snooze_header);
+    $result = [];
+    foreach (explode(';', str_replace("\r\n", " ", $snooze_header)) as $kv)
+    {
+        $kv = trim($kv);
+        $spacePos = strpos($kv, ' ');
+        if ($spacePos > 0) {
+            $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+        } else {
+            $result[$kv] = true;
+        }
+    }
+    return $result;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('get_snooze_date')) {
+function get_snooze_date($format, $only_label = false) {
+    if ($format == 'later_in_day') {
+        $date_string = 'today 18:00';
+        $label = 'Later in the day';
+    } elseif ($format == 'tomorrow') {
+        $date_string = '+1 day 08:00';
+        $label = 'Tomorrow';
+    } elseif ($format == 'next_weekend') {
+        $date_string = 'next Saturday 08:00';
+        $label = 'Next weekend';
+    } elseif ($format == 'next_week') {
+        $date_string = 'next week 08:00';
+        $label = 'Next week';
+    } elseif ($format == 'next_month') {
+        $date_string = 'next month 08:00';
+        $label = 'Next month';
+    } else {
+        $date_string = $format;
+        $label = 'Certain date';
+    }
+    $time = strtotime($date_string);
+    if ($only_label) {
+        return [$label, date('D, H:i', $time)];
+    }
+    return date('D, d M Y H:i', $time);
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('snooze_formats')) {
+function snooze_formats() {
+    return array(
+        'tomorrow',
+        'next_weekend',
+        'next_week',
+        'next_month'
+    );
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('snooze_dropdown')) {
+function snooze_dropdown($output, $unsnooze = false) {
+    if (date('H') <= 16) {
+        $values = array_merge(['later_in_day'], snooze_formats());
+    }
+    $txt = '<div style="display: inline-block;">';
+    $txt .= '<a class="snooze_link hlink" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
+    $txt .= '<div class="snooze_dropdown" style="display:none;">';
+    foreach ($values as $format) {
+        $labels = get_snooze_date($format, true);
+        $txt .= '<a href="#" class="snooze_helper" data-value="'.$format.'">'.$output->trans($labels[0]).' <span>'.$labels[1].'</span></a>';
+    }
+    $txt .= '<label for="snooze_input_date" class="snooze_date_picker">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<input class="snooze_input" style="display:none;">';
+    if ($unsnooze) {
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper">'.$output->trans('Unsnooze').'</a>';
+    }
+    $txt .= '</div></div>';
+
+    return $txt;
+}}
+

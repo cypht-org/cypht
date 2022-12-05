@@ -317,3 +317,4 @@ div.unseen, .unseen .subject { font-weight: 700; }
     padding-bottom: 5px;
     background-color: #fff;
 }
+.snoozed_date { color: teal !important; }
