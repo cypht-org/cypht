@@ -262,7 +262,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 }
             }
             elseif (count($moved) == 0) {
-                Hm_Msgs::add('ERRUnable to move/copy selected messages');
+                Hm_Msgs::add('ERR Unable to move/copy selected messages');
             }
             if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
                 $msgs = Hm_Msgs::get();
@@ -957,6 +957,86 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
             }
             if (!$flag_result) {
                 Hm_Msgs::add('ERRAn error occurred trying to flag this message');
+            }
+        }
+    }
+}
+
+/**
+ * Snooze message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP to snooze the selected message uid
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_snooze_ids', 'imap_snooze_until'));
+        if (!$success) {
+            return;
+        }
+        $snoozed_messages = 0;
+        $snooze_tag = null;
+        if ($form['imap_snooze_until'] != 'unsnooze') {
+            $at = date('D, d M Y H:i:s O');
+            $until = get_snooze_date($form['imap_snooze_until']);
+            $snooze_tag = "X-Snoozed: at $at;\n \tuntil $until";
+        }
+        $ids = explode(',', $form['imap_snooze_ids']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if (imap_authed($imap)) {
+                $folder = hex2bin($folder);
+                if (snooze_message($imap, $msg_id, $folder, $snooze_tag)) {
+                    $snoozed_messages++;
+                }
+            }
+        }
+        $this->out('snoozed_messages', $snoozed_messages);
+        if ($snoozed_messages == count($ids)) {
+            $msg = 'Messages snoozed';
+        } elseif ($snoozed_messages > 0) {
+            $msg = 'Some messages have been snoozed';
+        } else {
+            $msg = 'ERRFailed to snooze selected messages';
+        }
+        Hm_Msgs::add($msg);
+        $msgs = Hm_Msgs::get();
+        Hm_Msgs::flush();
+        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+    }
+}
+
+/**
+ * Unsnooze messages
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP unsnooze messages in snoozed directory
+     * This should use cron
+     */
+    public function process() {
+        $servers = Hm_IMAP_List::dump();
+        foreach (array_keys($servers) as $server_id) {
+            $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
+            $imap = Hm_IMAP_List::connect($server_id, $cache);
+            if (imap_authed($imap)) {
+                $folder = 'Snoozed';
+                $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
+                foreach ($ret[1] as $msg) {
+                    $msg_headers = $imap->get_message_headers($msg['uid']);
+                    try {
+                        $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
+                        if (new DateTime($snooze_headers['until']) <= new DateTime()) {
+                            snooze_message($imap, $msg['uid'], $folder, null);
+                        }
+                    } catch (Exception $e) {
+                        Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
+                    }
+                }
             }
         }
     }
