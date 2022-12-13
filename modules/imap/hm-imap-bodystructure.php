@@ -308,11 +308,13 @@ class Hm_IMAP_Struct {
      */
     private function id_single_part($vals) {
         $res = array();
+        $single_format = false;
         if (isset($vals[0]) && strtolower($vals[0]) == 'text') {
             $flds = $this->text_format;
         }
         else {
             $flds = $this->single_format;
+            $single_format = true;
         }
         foreach($flds as $name => $pos) {
             if (isset($vals[$pos])) {
@@ -321,6 +323,14 @@ class Hm_IMAP_Struct {
             else {
                 $res[$name] = false;
             }
+        }
+        // This is an edge case for improperly formatted parts
+        if ($single_format && !$res['size'] && is_numeric($res['encoding'])) {
+            $res['file_attributes'] = $res['md5'];
+            $res['md5'] = $res['size'];
+            $res['size'] = $res['encoding'];
+            $res['encoding'] = $res['description'];
+            $res['description'] = false;
         }
         return $res;
     }
