@@ -1062,14 +1062,14 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
             '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
             '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
-            '<div class="to_outer"><input autocomplete="off" value="'.$this->html_safe($to).
-            '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" />'.
+            '<div class="to_outer"><div class="compose_container"><div class="bubbles"></div><input autocomplete="off" value="'.$this->html_safe($to).
+            '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" /></div>'.
             '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
-            '<div class="recipient_fields"><input autocomplete="off" value="'.$this->html_safe($cc).
+            '<div class="recipient_fields"><div class="compose_container"><div class="bubbles"></div><input autocomplete="off" value="'.$this->html_safe($cc).
             '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').
-            '" /><div id="cc_contacts"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
+            '" /><div id="cc_contacts"></div></div><div class="compose_container" ><div class="bubbles"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
             '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
-            '</div><div id="bcc_contacts"></div><input value="'.$this->html_safe($subject).
+            '<div id="bcc_contacts"></div></div></div><input value="'.$this->html_safe($subject).
             '" required name="compose_subject" class="compose_subject" type="text" placeholder="'.
             $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
             $this->html_safe($body).'</textarea>';
