@@ -1282,7 +1282,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 }
             }
         }
-        $this->out('is_module_supported', $this->module_is_supported('jmap'));
+        $this->out('is_jmap_supported', $this->module_is_supported('jmap'));
     }
 }
 
