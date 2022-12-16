@@ -462,6 +462,11 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
+
+        if(!$this->get('is_module_supported')){
+            return '<div class="jmap_server_setup"><div class="jmap_section" style="display: none;">';
+         }
+
         $count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap';}));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
