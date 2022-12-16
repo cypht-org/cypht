@@ -463,7 +463,7 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
             return '';
         }
 
-        if(!$this->get('is_module_supported')){
+        if(!$this->get('is_jmap_supported')){
             return '<div class="jmap_server_setup"><div class="jmap_section" style="display: none;">';
          }
 
