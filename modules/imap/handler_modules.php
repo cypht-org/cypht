@@ -1282,6 +1282,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 }
             }
         }
+        $this->out('is_module_supported', $this->module_is_supported('jmap'));
     }
 }
 
@@ -1340,6 +1341,7 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
         }
     }
 }
+
 
 /**
  * Load IMAP servers for message list pages
