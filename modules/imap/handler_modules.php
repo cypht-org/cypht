@@ -614,8 +614,11 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
-                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE));
-                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SINCE));
+                $this->out('custom_list_controls_type', 'add');
+                if (array_key_exists('keyword', $this->request->get)) {
+                    $this->out('list_keyword', $this->request->get['keyword']);
+                }
+                $this->out('list_meta', false, false);
             }
             if (array_key_exists('sort', $this->request->get)) {
                 if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
@@ -1044,7 +1047,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_sent extends Hm_Handler_Module {
     /**
-     * Returns list of message data for the Everthing page
+     * Returns list of message data for the sent page
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
@@ -1071,6 +1074,14 @@ class Hm_Handler_imap_sent extends Hm_Handler_Module {
             if (count($folders) > 0) {
                 $auto_folder = $folders[0];
                 $this->out('auto_sent_folder', $msg_list[0]['server_name'].' '.$auto_folder);
+            }
+            if (array_key_exists('keyword', $this->request->get)) {
+                $keyword = $this->request->get['keyword'];
+                $search_pattern = "/$keyword/i";
+                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
+                    return preg_grep($search_pattern, $filter_msg_list);
+                });
+                $msg_list = $search_result;
             }
             $this->out('folder_status', $status);
             $this->out('imap_sent_data', $msg_list);
