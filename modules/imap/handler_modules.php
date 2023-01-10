@@ -614,11 +614,12 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
+                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE));
+                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SINCE));
                 $this->out('custom_list_controls_type', 'add');
                 if (array_key_exists('keyword', $this->request->get)) {
                     $this->out('list_keyword', $this->request->get['keyword']);
                 }
-                $this->out('list_meta', false, false);
             }
             if (array_key_exists('sort', $this->request->get)) {
                 if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
