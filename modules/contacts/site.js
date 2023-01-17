@@ -17,25 +17,59 @@ var delete_contact = function(id, source, type) {
     );
 };
 
-var add_contact_from_message_view = function(from_popup) {
+var add_contact_from_message_view = function () {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
-
-    if(from_popup) {
-        contact = $('#contact_info').text().replace('>','').replace('<','');
+  
+    if (contact) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'contact_value', value: contact },
+          { name: 'contact_source', value: source },
+        ],
+        function (res) {
+          $('.add_contact_controls').toggle();
+          window.location.reload();
+          remove_message_content();
+        }
+      );
     }
+  };
+  
+  var add_contact_from_popup = function () {
+    var source = 'local:local';
+    var contact = $('#contact_info').text().replace('>', '').replace('<', '');
+  
+    if (contact) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'contact_value', value: contact },
+          { name: 'contact_source', value: source },
+        ],
+        function (res) {
+          $('.popup .show').removeClass('show');
+          window.location.reload();
+          remove_message_content();
+        }
+      );
+    }
+  };
+
+var add_contact_from_popup = function() {
+    var source = 'local:local';
+    var contact = $('#contact_info').text().replace('>','').replace('<','');
 
     if (contact) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
-            function(res) { 
-                if(!fromPopup){
-                    $('.add_contact_controls').toggle();
-                }else{
-                    $(".popup .show").removeClass('show');
-                } 
+            function (res) { 
+                $(".popup .show").removeClass('show');
+                window.location.reload();
+                remove_message_content();
             }
         );
     }
