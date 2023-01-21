@@ -8,6 +8,7 @@
 
 define('MAX_PER_SOURCE', 1000);
 define('DEFAULT_PER_SOURCE', 20);
+define('DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER', 500);
 define('DEFAULT_SINCE', '-1 week');
 define('DEFAULT_SEARCH_FLD', 'TEXT');
 
