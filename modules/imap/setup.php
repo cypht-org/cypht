@@ -37,6 +37,7 @@ add_handler('settings', 'process_simple_msg_parts', true, 'imap', 'date', 'after
 add_handler('settings', 'process_pagination_links', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_max_google_contacts_number', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -48,6 +49,7 @@ add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_se
 add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
+add_output('settings', 'max_google_contacts_number', true, 'imap', 'imap_per_page_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -370,6 +372,7 @@ return array(
         'imap_move_page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'compose_unflag_send' => FILTER_VALIDATE_BOOLEAN,
         'imap_per_page' => FILTER_VALIDATE_INT,
+        'max_google_contacts_number' => FILTER_VALIDATE_INT,
         'original_folder' => FILTER_VALIDATE_BOOLEAN
     )
 );
