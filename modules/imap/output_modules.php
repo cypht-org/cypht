@@ -966,6 +966,27 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to set number of google contacts
+ * @subpackage imap/output
+ */
+class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $max_google_contacts_number = 20;
+        $reset = '';
+        if (array_key_exists('max_google_contacts_number', $settings)) {
+            $max_google_contacts_number = $settings['max_google_contacts_number'];
+        }
+        if ($max_google_contacts_number != 500) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
+            $this->trans('Max google contacts number').'</label></td><td><input type="text" id="max_google_contacts_number" '.
+            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option to enable/disable message part icons on the message view
  * @subpackage imap/output
  */
