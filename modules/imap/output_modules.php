@@ -972,12 +972,12 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
 class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
-        $max_google_contacts_number = 20;
+        $max_google_contacts_number = DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER;
         $reset = '';
         if (array_key_exists('max_google_contacts_number', $settings)) {
             $max_google_contacts_number = $settings['max_google_contacts_number'];
         }
-        if ($max_google_contacts_number != 500) {
+        if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
