@@ -978,10 +978,10 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
             $max_google_contacts_number = $settings['max_google_contacts_number'];
         }
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
-            $this->trans('Max google contacts number').'</label></td><td><input type="text" id="max_google_contacts_number" '.
+            $this->trans('Max google contacts number').'</label></td><td><input type="number" id="max_google_contacts_number" '.
             'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
     }
 }

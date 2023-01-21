@@ -1690,6 +1690,8 @@ var reset_default_value_select = function() {
 
 var reset_default_value_input = function() {
     let field = this.parentElement.parentElement.firstChild;
+    const defaultValue = this.getAttribute("default-value");
+
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
         this.parentElement.setAttribute("restore_aria_label","Restore default value")
@@ -1703,6 +1705,9 @@ var reset_default_value_input = function() {
         this.parentElement.setAttribute("restore_aria_label","Restore current value");
         field.setAttribute("current_value", field.value);
         field.value = 20;
+        if(defaultValue) {
+            field.value = defaultValue;
+        }
         field.style.backgroundColor = "#eee";
         field.style.pointerEvents = "none";
         field.style.touchAction = "none";
