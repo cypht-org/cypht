@@ -126,14 +126,13 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             'user' => $user,
             'type' => 'imap'
         );
-        $profiles = new Hm_Profiles($this);
         if ($this->repositories->profiles->findById($form['profile_id'])) {
             $profile['id'] = $form['profile_id'];
             $this->repositories->profiles->save($profile);
         }
 
         if ($default) {
-            $profiles->set_default($form['profile_id']);
+            $this->repositories->profiles->setDefault($form['profile_id']);
         }
         $this->repositories->profiles->save($profile);
     }
