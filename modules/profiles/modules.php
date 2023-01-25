@@ -67,21 +67,17 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-        $data = $this->get('profiles');
-        if (count($data) > $form['profile_id']) {
-            $profiles = new Hm_Profiles($this);
-            $del_profile = $profiles->get($form['profile_id']);
-            if ($del_profile && array_key_exists('autocreate', $del_profile)) {
+
+        if (($profile = $this->repositories->profiles->findById($form['profile_id']))) {
+            if (array_key_exists('autocreate', $profile)) {
                 Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
                 return;
             }
-            if ($profiles->del($form['profile_id'])) {
-                $this->session->record_unsaved('Profile deleted');
-                Hm_Msgs::add('Profile Deleted');
-                $profiles->save($this->user_config);
-                $user_data = $this->user_config->dump();
-                $this->session->set('user_data', $user_data);
-            }
+            $this->repositories->profiles->delete($form['profile_id']);
+            Hm_Msgs::add('Profile Deleted');
+        } else {
+            Hm_Msgs::add('ERRProfile ID not found');
+            return;
         }
     }
 }
@@ -119,9 +115,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $default = true;
         }
 
-        $data = $this->get('profiles');
         $profile = array(
-            'id' => uniqid(),
             'name' => html_entity_decode($form['profile_name'], ENT_QUOTES),
             'sig' => $sig,
             'smtp_id' => $form['profile_smtp'],
@@ -133,24 +127,15 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             'type' => 'imap'
         );
         $profiles = new Hm_Profiles($this);
-        if (count($data) > $form['profile_id']) {
-            if ($profiles->edit($form['profile_id'], $profile)) {
-                $this->session->record_unsaved('Profile updated');
-                Hm_Msgs::add('Profile Updated');
-            }
+        if ($this->repositories->profiles->findById($form['profile_id'])) {
+            $profile['id'] = $form['profile_id'];
+            $this->repositories->profiles->save($profile);
         }
-        else {
-            if ($profiles->add($profile)) {
-                $this->session->record_unsaved('Profile added');
-                Hm_Msgs::add('Profile Added');
-            }
-        }
+
         if ($default) {
             $profiles->set_default($form['profile_id']);
         }
-        $profiles->save($this->user_config);
-        $user_data = $this->user_config->dump();
-        $this->session->set('user_data', $user_data);
+        $this->repositories->profiles->save($profile);
     }
 }
 
@@ -159,9 +144,8 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
  */
 class Hm_Handler_profile_data extends Hm_Handler_Module {
     public function process() {
-        $accounts = array();
-        $profiles = new Hm_Profiles($this);
-        $this->out('profiles', $profiles->list_all());
+        #$profiles = new Hm_Profiles($this);
+        $this->out('profiles', $this->repositories->profiles->getAll());
     }
 }
 

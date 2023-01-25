@@ -218,6 +218,7 @@ class Hm_Module_Exec {
     public $filters = array();
     public $handlers = array();
     public $outputs = array();
+    public $repositories = array();
 
     /**
      * @param object $config site config

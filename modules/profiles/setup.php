@@ -1,7 +1,6 @@
 <?php
 
 if (!defined('DEBUG_MODE')) { die(); }
-
 handler_source('profiles');
 output_source('profiles');
 
