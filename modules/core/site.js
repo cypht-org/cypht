@@ -1802,7 +1802,25 @@ $(function() {
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
     }
-    
+
+    let is_dirty = false;
+    $(window).on('click', function (event) {
+        if (event.target && event.target.nodeName === 'BUTTON') {
+            // Process clicks..
+        }
+    }
+
+    $(window).on('beforeunload', function (event) {
+        if (is_dirty) {
+            event.preventDefault();
+            return event.returnValue = 'Unsaved changes will be lost! Re-enter your password to save and exit';
+        }
+    });
+
+    $(document).on('click', 'a,[type=submit]', function() {
+        $(window).off('beforeunload');
+    });
+
     fixLtrInRtl()
 });
 
