@@ -1257,9 +1257,11 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         $mailboxes = $this->get('imap_accounts', array());
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
+        $sieve_supported = 0;
         foreach($mailboxes as $mailbox) {
             $factory = get_sieve_client_factory($this->get('site_config'));
             $client = $factory->init($this->get('user_config'), $mailbox);
+            $sieve_supported += (int) $client;
             if ($client) {
                 $num_filters = sizeof(get_mailbox_filters($mailbox, false, $this->get('site_config'), $this->get('user_config')));
                 $res .= '<div class="sievefilters_accounts_item">';
@@ -1295,6 +1297,9 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                             </div>';
                 $res .= '</div></div></div>';
             }
+        }
+        if ($sieve_supported == 0) {
+            $res .= '<div class="empty_list">None of the configured IMAP servers support Sieve</div>';
         }
         return $res;
     }
