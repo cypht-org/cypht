@@ -1567,7 +1567,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
 
             $sieve_enabled = false;
-            if ($this->module_is_supported('sievefilters')) {
+            if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                 if (!isset($this->request->post['imap_sieve_host'])) {
                     foreach ($this->get('imap_servers', array()) as $index => $vals) {
                         if ($index == $form['imap_server_id']) {
