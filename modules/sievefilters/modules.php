@@ -47,7 +47,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
-        $this->out('sieve_filters_enabled', true);
+        $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', true));
     }
 }
 
@@ -57,12 +57,14 @@ class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
 class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module {
     public function process() {
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
-        $sieve_filters_enabled = false;
-        $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $server);
-        if ($client) {
-            $sieve_filters_enabled = true;
-            $this->out('sieve_filters_client', $client);
+        $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', true);
+        if ($sieve_filters_enabled) {
+            $factory = get_sieve_client_factory($this->config);
+            $client = $factory->init($this->user_config, $server);
+            if ($client) {
+                $sieve_filters_enabled = true;
+                $this->out('sieve_filters_client', $client);
+            }
         }
         $this->out('sieve_filters_enabled', $sieve_filters_enabled);
     }
@@ -1111,12 +1113,15 @@ class Hm_Handler_settings_load_imap extends Hm_Handler_Module {
  */
 class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=sieve_filters">';
+        if (!$this->get('sieve_filters_enabled')) {
+            return '';
+        }
+        $res = '<li class="menu_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$book).'" alt="" width="16" height="16" /> ';
         }
         $res .= $this->trans('Filters').'</a></li>';
-        $res .= '<li class="menu_profiles"><a class="unread_link" href="?page=block_list">';
+        $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$circle_x).'" alt="" width="16" height="16" /> ';
         }
@@ -1203,6 +1208,9 @@ class Hm_Handler_load_behaviour extends Hm_Handler_Module
  */
 class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
     protected function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '<div class="empty_list">' . $this->trans('Sieve filter is deactivated') . '</div>';
+        }
         $mailboxes = $this->get('imap_accounts', array());
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
@@ -1243,6 +1251,9 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
  */
 class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
     protected function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            return '<div class="empty_list">' . $this->trans('Sieve filter is deactivated') . '</div>';
+        }
         $mailboxes = $this->get('imap_accounts', array());
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
@@ -1286,6 +1297,37 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
             }
         }
         return $res;
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/handler
+ */
+class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
+    public function process() {
+        function sieve_enabled_callback($val) { return $val; }
+        process_site_setting('enable_sieve_filter', $this, 'sieve_enabled_callback', true, true);
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/output
+ */
+class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) {
+            $checked = ' checked="checked"';
+            $reset = '';
+        }
+        else {
+            $checked = '';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="enable_sieve_filter">'.
+            $this->trans('Enable sieve filter').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.
+            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" />'.$reset.'</td></tr>';
     }
 }
 
