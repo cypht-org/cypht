@@ -1444,15 +1444,19 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 else {
                     $name = $this->config->get('imap_auth_name', 'Default');
                 }
-                Hm_IMAP_List::add(array( 
+                $imap_details = array( 
                     'name' => $name,
                     'default' => true,
                     'server' => $auth_server['server'],
                     'port' => $auth_server['port'],
                     'tls' => $auth_server['tls'],
                     'user' => $auth_server['username'],
-                    'pass' => $auth_server['password']),
-                $max);
+                    'pass' => $auth_server['password']
+                );
+                if (! empty($auth_server['sieve_config_host']) && count(explode(':', $auth_server['sieve_config_host'])) == 2) {
+                    $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
+                }
+                Hm_IMAP_List::add($imap_details, $max);
             }
         }
     }
