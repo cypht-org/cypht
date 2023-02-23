@@ -99,6 +99,10 @@ function imap_auth_port_setting($current) {
     return '<tr><td>IMAP authentication server port</td><td><input type="number" value="'.$current.'" name="imap_auth_port" /></td></tr>';
 }
 
+function imap_auth_sieve_conf_host_setting($current) {
+    return '<tr><td>Sieve configuration</td><td><input type="number" value="'.$current.'" name="imap_auth_sieve_conf_host" /></td></tr>';
+}
+
 function imap_auth_server_setting($current) {
     return '<tr><td>IMAP authentication server hostname</td><td><input type="text" value="'.$current.'" name="imap_auth_server" /></td></tr>';
 }
@@ -249,6 +253,7 @@ function setting_defaults() {
             'imap_auth_server' => 'localhost',
             'imap_auth_port' => '143',
             'imap_auth_tls' => '',
+            'imap_auth_sieve_conf_host' => ''
         ),
         'POP3' => array(
             'pop3_auth_name' => 'localhost',
