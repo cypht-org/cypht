@@ -414,7 +414,8 @@ function Message_List() {
         'combined_inbox': 'formatted_combined_inbox',
         'email': 'formatted_all_mail',
         'unread': 'formatted_unread_data',
-        'flagged': 'formatted_flagged_data'
+        'flagged': 'formatted_flagged_data',
+        'drafts': 'formatted_draft_data'
     };
 
     this.run_callbacks = function (completed) {
@@ -1061,6 +1062,7 @@ function Message_List() {
     this.set_all_mail_state = function() { self.set_message_list_state('formatted_all_mail'); };
     this.set_combined_inbox_state = function() { self.set_message_list_state('formatted_combined_inbox'); };
     this.set_flagged_state = function() { self.set_message_list_state('formatted_flagged_data'); };
+    this.set_draft_state = function() { self.set_message_list_state('formatted_draft_data'); };
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
     this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
 };
@@ -1430,7 +1432,7 @@ var Hm_Utils = {
         var results = {}
         var i;
         var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting'];
+        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.drafts_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {

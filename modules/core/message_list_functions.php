@@ -44,6 +44,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
         $mailbox_list_title = array('Everything');
     }
+    elseif ($path == 'drafts') {
+        $list_path = 'drafts';
+        $message_list_since = $handler->user_config->get('draft_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('draft_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Drafts');
+    }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }}
 
@@ -566,7 +572,6 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     else {
         $sort_str = '';
     }
-
     $max_pages = ceil($total/$page_size);
     if ($max_pages == 1) {
         return '';

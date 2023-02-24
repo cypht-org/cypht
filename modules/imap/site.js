@@ -376,6 +376,10 @@ var imap_combined_flagged_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_flagged', Hm_Message_List.set_flagged_state);
 };
 
+var imap_draft_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_draft', Hm_Message_List.set_draft_state);
+};
+
 var imap_combined_inbox_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
 };
@@ -643,6 +647,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         }
         else if (hm_list_parent() === 'flagged') {
             Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
+        }
+        else if (hm_list_parent() === 'draft') {
+            Hm_Message_List.prev_next_links('formatted_draft_data', class_name);
         }
         else if (hm_list_parent() === 'advanced_search') {
             Hm_Message_List.prev_next_links('formatted_advanced_search_data', class_name);

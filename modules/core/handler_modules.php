@@ -385,6 +385,19 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the max per source setting for the Draft page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_draft_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('draft_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Flagged page in the settings page
  * @subpackage core/handler
  */
@@ -420,6 +433,19 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('all_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process "since" setting for the Draft page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_draft_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('draft_since', $this, 'since_setting_callback');
     }
 }
 

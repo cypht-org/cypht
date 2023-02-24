@@ -755,6 +755,24 @@ class Hm_Output_filter_sent_data extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Sent E-mail page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_draft_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the All E-mail message list
+     */
+    protected function output() {
+        if ($this->get('imap_draft_data')) {
+            prepare_imap_message_list($this->get('imap_draft_data'), $this, 'drafts');
+        }
+        else {
+            $this->out('formatted_message_list', array());
+        }
+    }
+}
+
+/**
  * Format message headers for the All E-mail page
  * @subpackage imap/output
  */

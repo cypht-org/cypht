@@ -42,6 +42,8 @@ add_handler('settings', 'process_flagged_source_max_setting', true, 'core', 'dat
 add_handler('settings', 'process_unread_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_draft_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_draft_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
@@ -73,7 +75,10 @@ add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
 add_output('settings', 'flagged_since_setting', true, 'core', 'start_flagged_settings', 'after');
 add_output('settings', 'flagged_source_max_setting', true, 'core', 'flagged_since_setting', 'after');
-add_output('settings', 'start_everything_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'start_draft_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'draft_since_setting', true, 'core', 'start_draft_settings', 'after');
+add_output('settings', 'draft_source_max_setting', true, 'core', 'draft_since_setting', 'after');
+add_output('settings', 'start_everything_settings', true, 'core', 'draft_source_max_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
@@ -250,7 +255,9 @@ return array(
         'all_email_per_source' => FILTER_VALIDATE_INT,
         'all_email_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'all_per_source' => FILTER_VALIDATE_INT,
+        'draft_per_source' => FILTER_VALIDATE_INT,
         'all_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'draft_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'no_folder_icons' => FILTER_VALIDATE_BOOLEAN,
         'mailto_handler' => FILTER_VALIDATE_BOOLEAN,
         'list_style' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
