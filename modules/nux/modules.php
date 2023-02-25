@@ -169,6 +169,10 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
             if (Nux_Quick_Services::exists($form['nux_service'])) {
                 $details = Nux_Quick_Services::details($form['nux_service']);
                 $details['name'] = $form['nux_name'];
+                if ($form['nux_service'] == 'all-inkl') {
+                    $details['server'] = $this->request->post['nux_all_inkl_login'].$details['server'];
+                    $details['smtp']['server'] = $this->request->post['nux_all_inkl_login'].$details['smtp']['server'] ;
+                }
                 $imap_list = array(
                     'name' => $details['name'],
                     'server' => $details['server'],
