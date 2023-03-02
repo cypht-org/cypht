@@ -1030,7 +1030,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
 
         // Prevent sending message to oneself
-        if (strpos($reply_from[0]['email'], $to) !== false) {
+        if ($to && strpos($reply_from[0]['email'], $to) !== false) {
             $excluded = [$to];
             $to = format_reply_address($reply['msg_headers']['To'], $excluded)[1]; 
             $cc = format_reply_address($reply['msg_headers']['Cc'], $excluded)[1]; 
