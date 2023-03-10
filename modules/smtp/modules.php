@@ -1024,19 +1024,11 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $imap_server_id = explode('_', $msg_path)[1];
         $imap_server = Hm_IMAP_List::get($imap_server_id, false);
         $reply_from = process_address_fld($reply['msg_headers']['From']);
-       
+      
         if ($reply_type == 'reply_all' && $reply_from[0]['email'] != $imap_server['user'] && strpos($to, $reply_from[0]['email']) === false) {
             $to .= ', '.$reply_from[0]['label'].' '.$reply_from[0]['email'];
         }
 
-        // Prevent sending message to oneself
-        if ($to && strpos($reply_from[0]['email'], $to) !== false) {
-            $excluded = [$to];
-            $to = format_reply_address($reply['msg_headers']['To'], $excluded)[1]; 
-            $cc = format_reply_address($reply['msg_headers']['Cc'], $excluded)[1]; 
-            $bcc = format_reply_address($reply['msg_headers']['Bcc'], $excluded)[1];
-        }
-        
         $send_disabled = '';
         if (count($this->get('smtp_servers', array())) == 0) {
             $send_disabled = 'disabled="disabled" ';
