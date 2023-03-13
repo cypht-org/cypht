@@ -1082,7 +1082,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         if (empty($recip) && !empty($from)) {
             /* This solves the problem when a profile is not associated with the email */
             $server_found = false;
-            foreach ($this->module_output()['smtp_profiles'] as $id => $server) {
+            foreach ($this->module_output()['compose_profiles'] as $id => $server) {
                 if ($server['address'] == $from) {
                     $server_found = true;
                 }
@@ -1483,9 +1483,9 @@ function format_attachment_row($file, $output_mod) {
 if (!hm_exists('get_primary_recipient')) {
 function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=False) {
     $addresses = array();
-    $flds = array('delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+    $flds = array('to', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
     if ($is_draft) {
-        $flds = array('from','delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
+        $flds = array('from', 'to', 'delivered-to', 'x-delivered-to', 'envelope-to', 'x-original-to', 'cc', 'reply-to');
     }
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
