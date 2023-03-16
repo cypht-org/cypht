@@ -211,3 +211,17 @@ Nux_Quick_Services::add('kolabnow', array(
         'tls' => true
     )
 ));
+
+Nux_Quick_Services::add('all-inkl', array(
+    'server' => '.kasserver.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'All-inkl',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => '.kasserver.com',
+        'port' => 465,
+        'tls' => true
+    )
+));

@@ -64,7 +64,8 @@ return array(
         'nux_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_pass' => FILTER_UNSAFE_RAW,
-        'nux_account_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'nux_account_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_all_inkl_login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 
