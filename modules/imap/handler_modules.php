@@ -1457,6 +1457,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                     $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
                 }
                 Hm_IMAP_List::add($imap_details, $max);
+                $servers = Hm_IMAP_List::dump(false, true);
+                $this->user_config->set('imap_servers', $servers);
             }
         }
     }
