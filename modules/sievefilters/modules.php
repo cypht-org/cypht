@@ -1261,8 +1261,8 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         foreach($mailboxes as $mailbox) {
             $factory = get_sieve_client_factory($this->get('site_config'));
             $client = $factory->init($this->get('user_config'), $mailbox);
-            $sieve_supported += (int) $client;
             if ($client) {
+                $sieve_supported++;
                 $num_filters = sizeof(get_mailbox_filters($mailbox, false, $this->get('site_config'), $this->get('user_config')));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
