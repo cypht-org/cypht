@@ -1472,7 +1472,7 @@ if (!hm_exists('get_mailbox_filters')) {
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
-                <td>' . str_replace('_', ' ', $exp_name[sizeof($exp_name) - 3]) . '</td>
+                <td>' . str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2))) . '</td>
                 <td>
                     <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
                         <img width="16" height="16" src="' . Hm_Image_Sources::$edit . '" />
