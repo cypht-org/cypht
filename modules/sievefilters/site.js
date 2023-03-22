@@ -755,6 +755,9 @@ $(function () {
          */
         $(document).on('click', '.delete_filter', function (e) {
             e.preventDefault();
+            if (!confirm('Do you want to delete filter?')) {
+                return;
+            }
             let obj = $(this);
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_delete_filter'},
@@ -774,6 +777,9 @@ $(function () {
          */
         $(document).on('click', '.delete_script', function (e) {
             e.preventDefault();
+            if (!confirm('Do you want to delete script?')) {
+                return;
+            }
             let obj = $(this);
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_delete_script'},
