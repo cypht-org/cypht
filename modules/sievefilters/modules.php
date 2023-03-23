@@ -1478,7 +1478,7 @@ if (!hm_exists('get_mailbox_filters')) {
                         <img width="16" height="16" src="' . Hm_Image_Sources::$edit . '" />
                     </a>
                     <a href="#" script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" style="padding-left: 5px;" script_name="'.$script_name.'" class="delete_'.$base_class.'">
-                        <img width="16" height="16" src="' . Hm_Image_Sources::$minus . '" />
+                        <img width="16" height="16" src="' . Hm_Image_Sources::close('#d80f0f') . '" />
                     </a>
                 </td>
             </tr>
