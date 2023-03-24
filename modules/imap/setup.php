@@ -137,6 +137,17 @@ add_handler('ajax_imap_sent', 'imap_sent',  true);
 add_handler('ajax_imap_sent', 'save_imap_cache',  true);
 add_output('ajax_imap_sent', 'filter_sent_data', true);
 
+/* ajax trash callback data */
+setup_base_ajax_page('ajax_imap_trash', 'core');
+add_handler('ajax_imap_trash', 'message_list_type', true, 'core');
+add_handler('ajax_imap_trash', 'imap_message_list_type', true);
+add_handler('ajax_imap_trash', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_trash', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_trash', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_trash', 'imap_trash',  true);
+add_handler('ajax_imap_trash', 'save_imap_cache',  true);
+add_output('ajax_imap_trash', 'filter_trash_data', true);
+
 /* ajax folder status callback data */
 setup_base_ajax_page('ajax_imap_folder_status', 'core');
 add_handler('ajax_imap_folder_status', 'message_list_type', true, 'core');
@@ -281,6 +292,7 @@ return array(
         'ajax_imap_sent',
         'ajax_imap_flagged',
         'ajax_imap_folder_expand',
+        'ajax_imap_trash',
         'ajax_imap_folder_display',
         'ajax_imap_combined_inbox',
         'ajax_imap_search',

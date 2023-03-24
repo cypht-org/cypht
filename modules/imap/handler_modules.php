@@ -1112,6 +1112,43 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
 }
 
 /**
+ * Get message headers for the combined trash page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_trash extends Hm_Handler_Module {
+    /**
+     * Returns list of message data for the Everthing page
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $limit = $this->user_config->get('trash_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('trash_since_setting', DEFAULT_SINCE));
+            $ids = explode(',', $form['imap_server_ids']);
+            $folder = bin2hex('INBOX');
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
+            }
+            else {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
+            }
+            $folders = array();
+            foreach ($msg_list as $msg) {
+                if (hex2bin($msg['folder']) != hex2bin($folder)) {
+                    $folders[] = hex2bin($msg['folder']);
+                }
+            }
+            $this->out('folder_status', $status);
+            $this->out('imap_trash_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
+        }
+    }
+}
+
+/**
  * Get message headers for the Flagged page
  * @subpackage imap/handler
  */
@@ -1375,6 +1412,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             case 'sent':
                 $callback = 'imap_sent_content';
                 break;
+            case 'trash':
+                $callback = 'imap_trash_content';
+                break;
             default:
                 $callback = 'imap_background_unread_content';
                 break;
@@ -1383,8 +1423,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             if ($callback != 'imap_background_unread_content') {
                 $this->out('move_copy_controls', true);
             }
-            if ($path == 'sent') {
-                foreach (imap_sent_sources($callback, $this) as $vals) {
+            if ($path == 'sent' || $path == 'trash') {
+                $folder = $path == 'trash'? 'trash': 'sent';
+                foreach (imap_sent_sources($callback, $this, $folder) as $vals) {
                     $this->append('data_sources', $vals);
                 }
             }

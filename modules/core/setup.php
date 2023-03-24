@@ -43,6 +43,8 @@ add_handler('settings', 'process_unread_source_max_setting', true, 'core', 'date
 add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_trash_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_trash_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
@@ -73,7 +75,10 @@ add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
 add_output('settings', 'flagged_since_setting', true, 'core', 'start_flagged_settings', 'after');
 add_output('settings', 'flagged_source_max_setting', true, 'core', 'flagged_since_setting', 'after');
-add_output('settings', 'start_everything_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'start_trash_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'trash_since_setting', true, 'core', 'start_trash_settings', 'after');
+add_output('settings', 'trash_source_max_setting', true, 'core', 'trash_since_setting', 'after');
+add_output('settings', 'start_everything_settings', true, 'core', 'trash_source_max_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
@@ -245,6 +250,8 @@ return array(
         'language' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'trash_per_source' => FILTER_VALIDATE_INT,
+        'trash_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'all_email_per_source' => FILTER_VALIDATE_INT,

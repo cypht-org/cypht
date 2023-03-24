@@ -755,6 +755,24 @@ class Hm_Output_filter_sent_data extends Hm_Output_Module {
 }
 
 /**
+ * Format message headers for the Trash E-mail page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_trash_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the All E-mail message list
+     */
+    protected function output() {
+        if ($this->get('imap_trash_data')) {
+            prepare_imap_message_list($this->get('imap_trash_data'), $this, 'trash');
+        }
+        else {
+            $this->out('formatted_message_list', array());
+        }
+    }
+}
+
+/**
  * Format message headers for the All E-mail page
  * @subpackage imap/output
  */

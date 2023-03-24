@@ -799,6 +799,21 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
 }
 
 /**
+ * Starts the Trash section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_trash_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$trash.'" width="16" height="16" />'.
+            $this->trans('Trash').'</td></tr>';
+    }
+}
+
+/**
  * Start the Everything section on the settings page
  * @subpackage core/output
  */
@@ -1031,6 +1046,30 @@ class Hm_Output_all_email_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the maximum number of messages per source for the Trash page
+ * @subpackage core/output
+ */
+class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('trash_per_source', $settings)) {
+            $sources = $settings['trash_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="trash_setting"><td><label for="trash_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="trash_per_source" name="trash_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option for the "received since" date range for the Everything page
  * @subpackage core/output
  */
@@ -1047,6 +1086,26 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
         return '<tr class="all_setting"><td><label for="all_since">'.
             $this->trans('Show messages received since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'all_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "trash since" date range for the Trash page
+ * @subpackage core/output
+ */
+class Hm_Output_trash_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_trash_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE; 
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('trash_since', $settings) && $settings['trash_since']) {
+            $since = $settings['trash_since'];
+        }
+        return '<tr class="trash_setting"><td><label for="trash_since">'.
+            $this->trans('Show trash messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'trash_since', $this).'</td></tr>';
     }
 }
 
@@ -1245,6 +1304,11 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> ';
         }
         $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$trash).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Trash').'</a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
