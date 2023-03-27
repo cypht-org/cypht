@@ -766,7 +766,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         Hm_Msgs::add("Message Sent");
 
         /* if it is a draft, remove it */
-        if ($this->module_is_supported('imap') && $imap_server && $form['draft_id'] > 0) {
+        if ($this->module_is_supported('imap') && $imap_server !== false && $form['draft_id'] > 0) {
             $specials = get_special_folders($this, $imap_server);
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
