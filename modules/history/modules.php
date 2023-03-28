@@ -263,6 +263,7 @@ class Hm_Output_history_content  extends Hm_Output_Module {
         }
         $res = '';
         $data = $this->get('msg_history', array());
+        $data = array_reverse($data);
         foreach ($data as $url => $row) {
             $from_class = 'from';
             if (!$row['from']) {
