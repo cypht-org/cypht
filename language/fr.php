@@ -575,6 +575,7 @@ return array(
     'Archive to the original folder' => false,
     'Move To Blocked Folder' => 'Déplacer vers le dossier Bloqués',
     'Sieve server capabilities' => 'Capacités du serveur Sieve',
+    'Connection To Sieve Server Failed' => 'Échec de la connexion au serveur Sieve'
 ); 
 
 ?>

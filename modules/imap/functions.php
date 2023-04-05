@@ -1402,3 +1402,22 @@ function snooze_dropdown($output, $unsnooze = false) {
     return $txt;
 }}
 
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_sieve_config_host')) {
+function parse_sieve_config_host($host) {
+    $url = parse_url($host);
+    if (! isset($url['host']) || ! isset($url['scheme'])) {
+        throw new Exception('Invalid host provided');
+    }
+    $host = $url['host'];
+    $tls = false;
+    $port = isset($url['port'])? $url['port']: '4190';
+    if ($url['scheme'] == 'ssl') {
+        $host = 'ssl://'.$host;
+    } else {
+        $tls = true;
+    }
+    return [$host, $port, $tls];
+}}

@@ -1720,12 +1720,17 @@ class Hm_Sieve_Client_Factory {
     public function init($user_config = null, $imap_account = null)
     {
         if ($imap_account && ! empty($imap_account['sieve_config_host'])) {
-            $sieve_options = explode(':', $imap_account['sieve_config_host']);
-            $client = new PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-            $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
-            return $client;
-        } else {
-            return null;
+            try {
+                list($sieve_hostname, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+                $client = new PhpSieveManager\ManageSieve\Client($sieve_hostname, $sieve_port);
+                $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
+                return $client;
+            } catch (Exception $e) {
+                // An error occured
+            }
         }
+
+        Hm_Msgs::add('ERRConnection To Sieve Server Failed');
+        return null;
     }
 }
