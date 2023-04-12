@@ -1202,7 +1202,15 @@ var Hm_Folders = {
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
         $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
-        $('.update_message_list').on("click", function() { return Hm_Folders.update_folder_list(); });
+        $('.update_message_list').on("click", function(e) {
+            var text = e.target.innerHTML;
+            e.target.innerHTML = '<img src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />';
+            Hm_Folders.update_folder_list();
+            Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
+                e.target.innerHTML = text;
+            }); 
+            return false;
+        });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
         $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
