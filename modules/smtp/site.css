@@ -29,3 +29,4 @@
 .meter span {display: block; height: 100%; }
 .progress {background-color: #4323f5; animation: progressBar 1s ease-in-out; animation-fill-mode:both; }
 @keyframes progressBar { 0% { width: 0; } 100% { width: 100%; }}
+.send_public_key_check { margin-left: 15px;}

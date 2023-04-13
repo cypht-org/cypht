@@ -342,6 +342,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
 
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
+        $this->out('pgp_enabled', $this->module_is_supported('pgp'));
 
         if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
@@ -702,8 +703,47 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             return;
         }
 
+        $autocrypt_enabled = false;
+        // Autocrypt
+        if ($this->module_is_supported('pgp')) {
+            $tmp_dir = ini_get('keyring_dir') ? ini_get('keyring_dir') : '/keyring';
+            putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+            $gpg = gnupg_init();
+            gnupg_setarmor($gpg,1);
+
+            // Auto Encrypt
+            $keys = $this->user_config->get('pgp_public_keys', array());
+            foreach ($keys as $key) {
+                if ($key['email'] == $to) {
+                    gnupg_addencryptkey($gpg, $key['fingerprint']);
+                }
+            }
+            foreach ($this->user_config->get('autocrypt_keys', array()) as $key) {
+                if ($key['email'] == $from && !$autocrypt_enabled) {
+                    gnupg_addsignkey($gpg, $key['key_fingerprint']);
+                    gnupg_addencryptkey($gpg ,$key['key_fingerprint']);
+                    $encrypted_msg = gnupg_sign($gpg, $body);
+                    $encrypted_msg = gnupg_encrypt($gpg, $encrypted_msg);
+                    $body = $encrypted_msg;
+                    $autocrypt_enabled = true;
+
+                }
+            }
+        }
+
         /* build message */
         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to);
+
+        if ($this->module_is_supported('pgp')) {
+            # Autocrypt
+            $autocrypt_keys = $this->user_config->get('autocrypt_keys');
+            gnupg_setarmor($gpg, 0);
+            foreach ($autocrypt_keys as $autocrypt_key) {
+                if (strstr($from, $autocrypt_key['email'])) {
+                    $mime->set_autocrypt_header(base64_encode(gnupg_export($gpg, $autocrypt_key['key_fingerprint'])));
+                }
+            }
+        }
 
         /* add attachments */
         $mime->add_attachments($uploaded_files);
@@ -718,7 +758,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
+        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg($autocrypt_enabled));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
             repopulate_compose_form($draft, $this);
@@ -729,7 +769,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg($autocrypt_enabled));
         }
 
         /* check for associated IMAP server to save a copy */
@@ -955,6 +995,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
+        $pgp_enabled = $this->get('pgp_enabled', 0);
         
         if (!$msg_path) {
             $msg_path = $this->get('compose_msg_path', '');

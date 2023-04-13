@@ -1800,7 +1800,75 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     if ($part == 0 || (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text'))) {
                         $save_reply_text = true;
                     }
+
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);
+
+                    // AUTOCRYPT
+                    if ($this->module_is_supported('pgp')) {
+                        if (strstr($msg_headers['Content-Type'], 'pgp-encrypted') && array_key_exists('Autocrypt', $msg_headers)
+                            && ($this->request->post['imap_msg_part'] == "" || $this->request->post['imap_msg_part'] == "false")) {
+                            $tmp_dir = ini_get('keyring_dir') ? ini_get('keyring_dir') : '/keyring';
+                            putenv(sprintf('GNUPGHOME=%s/.gnupg', $tmp_dir));
+                            $gpg = gnupg_init();
+
+                            //Import autocrypt key automatically
+                            $exploded_autocrypt_header = explode('keydata=', $msg_headers['Autocrypt']);
+                            $exploded_autocrypt_email_header = explode('addr=', $msg_headers['Autocrypt']);
+                            $exploded_email_header = explode(';', end($exploded_autocrypt_email_header));
+                            if (count($exploded_autocrypt_header) >= 1) {
+                                $pgp_key = end($exploded_autocrypt_header);
+                                $key_email = reset($exploded_email_header);
+                                $keys = $this->user_config->get('pgp_public_keys', array());
+                                $found = false;
+                                foreach ($keys as $id => $key) {
+                                    if ($key['email'] == $key_email & !$found) {
+                                        $data = base64_decode($pgp_key);
+                                        $info = gnupg_import($gpg, $data);
+                                        $keys[$id] = array('fingerprint' => $info['fingerprint'], 'key' => $data, 'email' => $key_email);
+                                        $found = true;
+                                    }
+                                }
+                                if (!$found) {
+                                    $data = base64_decode($pgp_key);
+                                    $info = gnupg_import($gpg, $data);
+                                    $keys[] = array('fingerprint' => $info['fingerprint'], 'key' => $data, 'email' => $key_email);
+                                }
+                                $this->session->record_unsaved('Public key imported');
+                                $this->session->set('pgp_public_keys', $keys, true);
+                            }
+
+                            //Autocrypt
+                            foreach ($imap->get_message_structure($form['imap_msg_uid'])[0]['subs'] as $key => $sub) {
+                                if ($sub['subtype'] == 'octet-stream') {
+                                    $encrypted_message = $imap->get_message_content($form['imap_msg_uid'], explode('.', $key)[1]);
+                                }
+                            }
+
+                            //Autocrypt Decrypt
+                            gnupg_setarmor($gpg, 1);
+                            gnupg_cleardecryptkeys($gpg);
+                            $current_user_key = null;
+                            $saved_keys = gnupg_keyinfo($gpg, '');
+                            foreach ($this->user_config->get('autocrypt_keys', array()) as $key) {
+                                if (strstr($msg_headers['Delivered-To'], $key['email'])) {
+                                    $current_user_key = $key;
+                                }
+                            }
+                            try {
+                                gnupg_seterrormode($gpg, gnupg::ERROR_EXCEPTION);
+                                gnupg_adddecryptkey($gpg, $current_user_key['key_fingerprint'], '');
+                                $decrypted_message = gnupg_decrypt($gpg, $encrypted_message);
+                            } catch (Exception $e) {
+
+                            }
+
+                            $msg_text = $decrypted_message;
+                            preg_match('/^Subject: .*$/m', $decrypted_message, $matches);
+                            $subject = str_replace('Subject:', '', $matches[0]);
+                            $msg_headers['Subject'] = mb_decode_mimeheader($subject);
+                        }
+                    }
+
                     $this->out('list_headers', get_list_headers($msg_headers));
                     $this->out('msg_headers', $msg_headers);
                     $this->out('imap_prefecth', $prefetch);

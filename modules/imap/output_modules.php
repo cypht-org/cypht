@@ -301,6 +301,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
             $txt .= '</th></tr>';
+            $txt .= '</th></tr>';
+
             $txt .= '</table>';
 
             $this->out('msg_headers', $txt, false);
