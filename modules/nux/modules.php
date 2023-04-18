@@ -22,27 +22,29 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
             $this->out('nux_dev_news', $cache);
             return;
         }
-        $ch = Hm_Functions::c_init();
         $res = array();
-        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits');
-        Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
-        $curl_result = Hm_Functions::c_exec($ch);
-        if (trim($curl_result)) {
-            if (strstr($curl_result, 'API rate limit exceeded')) {
-                return;
-            }
-            $json_commits = json_decode($curl_result);
-            foreach($json_commits as $c) {
-                $msg = trim($c->commit->message);
-                $res[] = array(
-                   'hash' => $c->sha,
-                   'shash' => substr($c->sha, 0, 8),
-                   'name' => $c->commit->author->name,
-                   'age' => date('D, M d', strtotime($c->commit->author->date)),
-                   'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
-                );
+        $ch = Hm_Functions::c_init();
+        if ($ch) {
+            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits');
+            Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
+            $curl_result = Hm_Functions::c_exec($ch);
+            if (trim($curl_result)) {
+                if (strstr($curl_result, 'API rate limit exceeded')) {
+                    return;
+                }
+                $json_commits = json_decode($curl_result);
+                foreach($json_commits as $c) {
+                    $msg = trim($c->commit->message);
+                    $res[] = array(
+                    'hash' => $c->sha,
+                    'shash' => substr($c->sha, 0, 8),
+                    'name' => $c->commit->author->name,
+                    'age' => date('D, M d', strtotime($c->commit->author->date)),
+                    'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                    );
+                }
             }
         }
         $this->cache->set('nux_dev_news', $res);
