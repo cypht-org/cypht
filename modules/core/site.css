@@ -308,6 +308,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
     z-index: 10 !important;
 }
 
+div.warning_message { margin-bottom: 20px !important; }
 #list_controls_menu {
     position: absolute;
     width: 50px; 

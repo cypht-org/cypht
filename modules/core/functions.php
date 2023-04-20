@@ -600,3 +600,18 @@ function get_special_folders($mod, $id) {
     }
     return array();
 }
+
+if (!hm_exists('is_gmail_server')) {
+function is_gmail_server($mod, $server, $text, $disabled) {
+    if ($server == $text && !$disabled){
+        return '<div class="warning_message">'.
+            sprintf($mod->trans('Make sure your %s less secure app access %s '.
+            'and your App password are enabled. For more details about the '.
+            'configuration of IMAP, POP and SMTP click %s here %s'),
+            '<a href="https://myaccount.google.com/lesssecureapps" target="_blank">', '</a>',
+            '<a href="https://developers.google.com/gmail/imap/imap-smtp" target="_blank">', '</a>').
+            '</div>';
+    } else {
+        return '';
+    }
+}}
