@@ -88,3 +88,4 @@
 
 .attached_image { margin-right: 20px; margin-bottom: 20px; height: 200px; }
 .attached_image_box { display: flex; flex-wrap: wrap; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
+.list_meta { float: none; margin-left: 37%; }
