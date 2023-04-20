@@ -94,6 +94,19 @@ class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the max google contacts input in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_max_google_contacts_number extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('max_google_contacts_number', $this, 'max_source_setting_callback', DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Sent E-mail page in the settings page
  * @subpackage imap/handler
  */
