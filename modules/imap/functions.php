@@ -29,7 +29,7 @@ function imap_sources($callback, $mod, $folder = 'sent') {
         }
         $folders = get_special_folders($mod, $index);
         if (array_key_exists($folder, $folders) && $folders[$folder]) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex('Drafts'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders[$folder]), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);

@@ -972,3 +972,4 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
         process_site_setting('drafts_since', $this, 'since_setting_callback');
     }
 }
+

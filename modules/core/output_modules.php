@@ -1052,6 +1052,65 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
 }
 
 /**
+ * Starts the Junk section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_junk_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$junk.'" width="16" height="16" />'.
+            $this->trans('Junk').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('junk_per_source', $settings)) {
+            $sources = $settings['junk_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="junk_setting"><td><label for="junk_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="junk_per_source" name="junk_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "junk since" date range for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_junk_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_junk_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE; 
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('junk_since', $settings) && $settings['junk_since']) {
+            $since = $settings['junk_since'];
+        }
+        return '<tr class="junk_setting"><td><label for="junk_since">'.
+            $this->trans('Show junk messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'junk_since', $this).'</td></tr>';
+    }
+}
+
+/**
  * Option for the language setting
  * @subpackage core/output
  */

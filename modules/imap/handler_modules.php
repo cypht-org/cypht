@@ -1398,6 +1398,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             case 'drafts':
                 $callback = 'imap_folder_content';
                 break;
+            case 'junk':
+                $callback = 'imap_junk_content';
+                break;
             default:
                 $callback = 'imap_background_unread_content';
                 break;

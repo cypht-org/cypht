@@ -380,6 +380,10 @@ var imap_combined_inbox_content = function(id, folder) {
 
 var imap_folder_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_folder_data', cache_folder_data);
+}
+
+var imap_junk_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_junk', Hm_Message_List.set_junk_state);
 };
 
 var cache_imap_page = function() {
