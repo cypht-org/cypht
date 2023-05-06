@@ -961,6 +961,15 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_start_junk_settings() {
+        $test = new Output_Test('start_junk_settings', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6%200l-1%201%202%202%201-1-2-2zm-2%202l-4%204v2h2l4-4-2-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" /Junk</td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_start_unread_settings() {
         $test = new Output_Test('start_unread_settings', 'core');
         $res = $test->run();

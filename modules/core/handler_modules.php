@@ -868,3 +868,28 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('junk_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('junk_since', $this, 'since_setting_callback');
+    }
+}

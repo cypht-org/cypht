@@ -383,6 +383,10 @@ var imap_combined_inbox_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
 };
 
+var imap_junk_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_junk', Hm_Message_List.set_junk_state);
+};
+
 var cache_imap_page = function() {
     var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
     var data = Hm_Message_List.filter_list();
@@ -689,6 +693,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         }
         else if (hm_list_parent() === 'sent') {
             Hm_Message_List.prev_next_links('formatted_sent_data', class_name);
+        }
+        else if (hm_list_parent() === 'junk') {
+            Hm_Message_List.prev_next_links('formatted_junk_data', class_name);
         }
         else {
             var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();

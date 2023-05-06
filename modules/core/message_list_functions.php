@@ -44,6 +44,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
         $mailbox_list_title = array('Everything');
     }
+    elseif ($path == 'junk') {
+        $list_path = 'junk';
+        $message_list_since = $handler->user_config->get('junk_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Junk');
+    }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }}
 

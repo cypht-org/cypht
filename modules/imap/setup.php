@@ -150,6 +150,17 @@ add_handler('ajax_imap_sent', 'imap_sent',  true);
 add_handler('ajax_imap_sent', 'save_imap_cache',  true);
 add_output('ajax_imap_sent', 'filter_sent_data', true);
 
+/* ajax junk callback data */
+setup_base_ajax_page('ajax_imap_junk', 'core');
+add_handler('ajax_imap_junk', 'message_list_type', true, 'core');
+add_handler('ajax_imap_junk', 'imap_message_list_type', true);
+add_handler('ajax_imap_junk', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_junk', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_junk', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_junk', 'imap_junk',  true);
+add_handler('ajax_imap_junk', 'save_imap_cache',  true);
+add_output('ajax_imap_junk', 'filter_junk_data', true);
+
 /* ajax folder status callback data */
 setup_base_ajax_page('ajax_imap_folder_status', 'core');
 add_handler('ajax_imap_folder_status', 'message_list_type', true, 'core');
@@ -326,6 +337,7 @@ return array(
         'ajax_imap_folder_status',
         'ajax_imap_snooze',
         'ajax_imap_unsnooze',
+        'ajax_imap_junk',
     ),
 
     'allowed_output' => array(

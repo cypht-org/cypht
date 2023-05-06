@@ -19,7 +19,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @return array
  */
 if (!hm_exists('imap_sent_sources')) {
-function imap_sent_sources($callback, $mod) {
+function imap_sent_sources($callback, $mod, $folder = 'sent') {
     $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -27,8 +27,8 @@ function imap_sent_sources($callback, $mod) {
             continue;
         }
         $folders = get_special_folders($mod, $index);
-        if (array_key_exists('sent', $folders) && $folders['sent']) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        if (array_key_exists($folder, $folders) && $folders[$folder]) {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders[$folder]), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);

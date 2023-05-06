@@ -1515,6 +1515,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             case 'sent':
                 $callback = 'imap_sent_content';
                 break;
+            case 'junk':
+                $callback = 'imap_junk_content';
+                break;
             default:
                 $callback = 'imap_background_unread_content';
                 break;
@@ -1523,8 +1526,9 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             if ($callback != 'imap_background_unread_content') {
                 $this->out('move_copy_controls', true);
             }
-            if ($path == 'sent') {
-                foreach (imap_sent_sources($callback, $this) as $vals) {
+            if ($path == 'sent' || $path == 'junk') {
+                $folder = $path == 'junk'? 'junk': 'sent';
+                foreach (imap_sent_sources($callback, $this, $folder) as $vals) {
                     $this->append('data_sources', $vals);
                 }
             }
