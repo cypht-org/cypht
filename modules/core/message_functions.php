@@ -232,7 +232,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
     }
     elseif ($type == 'forward') {
         $flds = array();
-        foreach( array('From', 'Date', 'Subject') as $fld) {
+        foreach( array('From', 'Date', 'Subject', 'To', 'Cc') as $fld) {
             if (array_key_exists($fld, $headers)) {
                 $flds[$fld] = $headers[$fld];
             }
