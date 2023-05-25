@@ -24,8 +24,12 @@ function format_msg_html($str, $images=false) {
     }
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
-    $purifier = new HTMLPurifier($config);
-    return @$purifier->purify($str);
+    try {
+        $purifier = new HTMLPurifier($config);
+        return $purifier->purify($str);
+    } catch (Exception $e) {
+        return '';
+    }
 }}
 
 /**
