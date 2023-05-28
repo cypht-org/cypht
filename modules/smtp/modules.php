@@ -120,7 +120,7 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
         if (array_key_exists('forward', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
             $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap->select_mailbox(hex2bin($path[2]))) {
+            if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
                 $msg_struct = $imap->get_message_structure($this->request->get['uid']);
                 list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
                 $msg_header = $imap->get_message_headers($this->request->get['uid']);
