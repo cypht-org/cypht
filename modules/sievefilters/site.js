@@ -357,7 +357,7 @@ $(function () {
             let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).val();
             }).get();
-            let actions_field_type = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+            let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).attr('type');
             }).get();
             let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
