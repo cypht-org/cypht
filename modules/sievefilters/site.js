@@ -854,8 +854,8 @@ $(function () {
                         $(".sieve_actions_select").last().val(action.action);
                         $(".sieve_actions_select").last().trigger('change');
                         $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
-                        if ($("[name^=sieve_selected_option_action_value]").last().is('input')) {
-                            $("[name^=sieve_selected_option_action_value]").last().val(action.value);
+                        if ($("[name^=sieve_selected_action_value]").last().is('input')) {
+                            $("[name^=sieve_selected_action_value]").last().val(action.value);
                         }
                     });
                 }
