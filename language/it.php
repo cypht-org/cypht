@@ -5,6 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 return array(
     'interface_lang' => 'it',
     'interface_direction' => 'ltr',
+    
     'Main' => 'Principale',
     'Username' => 'Nome utente',
     'Password' => 'Password',
@@ -307,7 +308,7 @@ return array(
     'Telephone Number' => 'Numero di telefono',
     'Send To' => 'Invia a',
     'local' => 'locale',
-    'Add Local' => 'Aggiungi locale',
+    'Add Local Contact' => 'Aggiungi contatto locale',
     'Delete search' => 'Elimina ricerca',
     'Delete saved search' => 'Elimina ricerca salvata',
     'Save search' => 'Salva ricerca',
@@ -335,7 +336,7 @@ return array(
     'Contact Deleted' => 'Contatto eliminato',
     'Contact Updated' => 'Contatto aggiornato',
     'Contact Added' => 'Contatto aggiunto',
-    'Update Local' => 'Aggiorna locale',
+    'Update Local Contact' => 'Aggiorna contatto locale',
     'Add an Event' => 'Aggiungi un evento',
     'Time' => 'Ora',
     'Repeat' => 'Ripeti',
