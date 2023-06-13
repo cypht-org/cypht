@@ -5,7 +5,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 return array(
     'interface_lang' => 'it',
     'interface_direction' => 'ltr',
-    
+
     'Main' => 'Principale',
     'Username' => 'Nome utente',
     'Password' => 'Password',
@@ -20,7 +20,7 @@ return array(
     'Logout' => 'Uscire',
     '%d configured' => '%d configurato',
     'Today' => 'Oggi',
-    'You Need to have Javascript enabled to use HM3, sorry about that!' => 'È necessario avere abilitato Javascript per usare Cypht, mi dispiace!',
+    'You need to have Javascript enabled to use %s, sorry about that!' => 'È necessario avere abilitato Javascript per usare Cypht, mi dispiace!',
     'Unsaved changes will be lost! Re-enter your password to save and exit.' => 'Le modifiche non salvate andranno perse. Re-inserire la password per salvare ed uscire.',
     'Save and Logout' => 'Salva ed esci',
     'Just Logout' => 'Esci',
@@ -53,7 +53,7 @@ return array(
     'Source' => 'Fonte',
     'From' => 'Da',
     'Subject' => 'Oggetto',
-    'Date' => 'Data',
+    'Sent Date' => 'Data invio',
     'IMAP Servers' => 'I server IMAP',
     'Add an IMAP Server' => 'Aggiungere un server IMAP',
     'Account name' => 'Nome utente',
@@ -308,7 +308,7 @@ return array(
     'Telephone Number' => 'Numero di telefono',
     'Send To' => 'Invia a',
     'local' => 'locale',
-    'Add Local Contact' => 'Aggiungi contatto locale',
+    'Add Local' => 'Aggiungi contatto locale',
     'Delete search' => 'Elimina ricerca',
     'Delete saved search' => 'Elimina ricerca salvata',
     'Save search' => 'Salva ricerca',
@@ -336,7 +336,7 @@ return array(
     'Contact Deleted' => 'Contatto eliminato',
     'Contact Updated' => 'Contatto aggiornato',
     'Contact Added' => 'Contatto aggiunto',
-    'Update Local Contact' => 'Aggiorna contatto locale',
+    'Update Local' => 'Aggiorna contatto locale',
     'Add an Event' => 'Aggiungi un evento',
     'Time' => 'Ora',
     'Repeat' => 'Ripeti',
@@ -364,7 +364,7 @@ return array(
     'Folder to rename is required' => 'È necessario specificare la cartella da rinominare',
     'Create a New Folder' => 'Crea una nuova cartella',
     'New Folder Name' => 'Nuovo nome cartella',
-    'Select Parent Folder (optional)' => 'Seleziona cartella padre (opzionale)'.
+    'Select Parent Folder (optional)' => 'Seleziona cartella padre (opzionale)',
     'Rename a Folder' => 'Rinomina una cartella',
     'Rename' => 'Rinomina',
     'Delete a Folder' => 'Elimina una cartella',
@@ -584,6 +584,6 @@ return array(
     'Show folders' => 'Mostra cartelle',
     'Show next & previous emails when reading a message' => 'Mostra email successive e precedenti durante la lettura di un messaggio',
     'Archive to the original folder' => 'Archivia nella cartella originale'
-);
+); 
 
 ?>
