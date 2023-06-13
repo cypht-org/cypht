@@ -303,6 +303,21 @@ $(function () {
             edit_filter_modal.close();
         });
 
+        function ordinal_number(n)
+        {
+            let ord = 'th';
+
+            if (n % 10 == 1 && n % 100 != 11) {
+                ord = 'st';
+            } else if (n % 10 == 2 && n % 100 != 12) {
+                ord = 'nd';
+            } else if (n % 10 == 3 && n % 100 != 13) {
+                ord = 'rd';
+            }
+
+            return n + ord;
+        }
+
         /**************************************************************************************
          *                                    FUNCTIONS
          **************************************************************************************/
@@ -333,9 +348,13 @@ $(function () {
                 return false;
             }
 
-            conditions.forEach(function (elem) {
+            $('.sys_messages').html('');
+            conditions.forEach(function (elem, key) {
                 if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
-                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    let order = ordinal_number(key + 1);
+                    let previous_messages = $('.sys_messages').html();
+                    previous_messages += previous_messages ? '<br>': '';
+                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' condition (' + elem + ') must be provided</span>');
                     Hm_Utils.show_sys_messages();
                     validation_failed = true;
                 }
@@ -371,10 +390,13 @@ $(function () {
             }
 
             idx = 0;
-            actions_type.forEach(function (elem) {
+            actions_type.forEach(function (elem, key) {
                 console.log(actions_field_type[idx])
                 if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
-                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    let order = ordinal_number(key + 1);
+                    let previous_messages = $('.sys_messages').html();
+                    previous_messages += previous_messages ? '<br>': '';
+                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' action (' + elem + ') must be provided</span>');
                     Hm_Utils.show_sys_messages();
                     validation_failed = true;
                 }
