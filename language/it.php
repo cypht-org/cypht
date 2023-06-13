@@ -176,7 +176,7 @@ return array(
     'You don\'t have any %s sources' => 'Non c\'è alcuna Fonte %s',
     'You have %d %s source' => 'C\'è %d Fonte %s',
     'You have %d %s sources' => 'Ci sono %d Fonti %s',
-    'Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.' => 'Cypht è un programma di webmail. È possibile utilizzarlo per accedere agli account di posta elettronica da qualsiasi servizio che offre IMAP, POP3, o l\'accesso SMTP - che la maggior parte fanno.',
+    'Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.' => 'Cypht è un programma di webmail. È possibile utilizzarlo per accedere agli account di posta elettronica da qualsiasi servizio che offre IMAP e SMTP, come i servizi più comuni.',
     'Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP/POP3 sections below.' => 'Aggiungere rapidamente un account da parte dei fornitori di posta elettronica più diffusi. Per configurare manualmente un account, utilizzare le sezioni IMAP / SMTP / POP3 sotto.',
     'Select an E-mail provider' => 'Seleziona un provider e-mail',
     'AOL' => 'AOL',
