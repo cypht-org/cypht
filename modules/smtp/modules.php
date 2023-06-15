@@ -1359,7 +1359,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
                     $res .= '<option ';
-                    if ((string) $selected === sprintf('%s.%s', $id, ($index + 1))) {
+                    if ((string) $selected === sprintf('%s.%s', $id, ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($id))) {
                         $res .= 'selected="selected" ';
                     }
                     $res .= 'value="'.$output_mod->html_safe($id.'.'.($index+1)).'">';
