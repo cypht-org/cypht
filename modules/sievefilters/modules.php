@@ -1263,7 +1263,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
             $client = $factory->init($this->get('user_config'), $mailbox);
             if ($client) {
                 $sieve_supported++;
-                $num_filters = sizeof(get_mailbox_filters($mailbox, false, $this->get('site_config'), $this->get('user_config')));
+                $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
                 $res .= '<div class="sievefilters_accounts_item">';
                 $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
                 $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
@@ -1271,7 +1271,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
                 $res .= '<table class="filter_details"><tbody>';
                 $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th style="width: 15%;">Actions</th></tr>';
-                $res .= get_mailbox_filters($mailbox, true, $this->get('site_config'), $this->get('user_config'));
+                $res .= get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), true);
                 $res .= '</tbody></table>';
                 $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
                                 <div style="width: 90%;">
@@ -1429,7 +1429,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 }
 
 if (!hm_exists('get_mailbox_filters')) {
-    function get_mailbox_filters($mailbox, $html=false, $site_config, $user_config)
+    function get_mailbox_filters($mailbox, $site_config, $user_config, $html=false)
     {
         try {
             $factory = get_sieve_client_factory($site_config);
