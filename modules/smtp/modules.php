@@ -1088,6 +1088,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             foreach ($this->module_output()['compose_profiles'] as $id => $server) {
                 if ($server['address'] == $from) {
                     $server_found = true;
+                    $smtp_profiles = profiles_by_smtp_id($this->get('compose_profiles'), $server['smtp_id']);
+                    foreach ($smtp_profiles as $index => $smtp_profile) {
+                        if ($server == $smtp_profile) {
+                            $selected_id = $server['smtp_id'] . '.' . ($index + 1);
+                            break 2;
+                        }
+                    }
                 }
             }
             if (!$server_found) {
