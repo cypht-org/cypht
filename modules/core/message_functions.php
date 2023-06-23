@@ -174,7 +174,7 @@ function format_reply_address($fld, $excluded) {
     if ($res) {
         return array($addr, implode(', ', array_map(function($v) {
             if (trim($v['label'])) {
-                return $v['label'].' '.$v['email'];
+                return str_replace([',', ';'], '', $v['label']).' '.$v['email'];
             }
             else {
                 return $v['email'];

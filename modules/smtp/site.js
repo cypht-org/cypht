@@ -277,6 +277,82 @@ var init_resumable_upload = function () {
     });
 }
 
+var move_recipient_to_section = function(e) {
+    e.preventDefault();
+    var id = e.dataTransfer.getData("text");
+    var target = $(e.target);
+    if (!target.hasClass('compose_container')) {
+        target = target.closest('.compose_container');
+    }
+    target.find('.bubbles').append($('#'+id));
+    var input = target.find('input');
+    input.focus();
+    resize_input(input[0]);
+};
+
+var allow_drop = function(e) {
+    e.preventDefault();
+};
+
+var drag = function(e) {
+    e.dataTransfer.setData('text', e.target.id);
+};
+
+var bubbles_to_text = function(input) {
+    var value = '';
+    $(input).prev().children().each(function() {
+        if (value) {
+            value = value + ', ';
+        }
+        value = value + $(this).attr('data-value');
+        $(this).remove();
+    });
+    if (value) {
+        if ($(input).val()) {
+            value = value + ', ' + $(input).val();
+        }
+        $(input).val(value);
+    }
+    $(input).css('width', '95%');
+};
+
+var resize_input = function(input) {
+    $(input).css('width', 'auto');
+    var input_width = $(input).parent().outerWidth() - $(input).position().left;
+    $(input).css('width', input_width);
+};
+
+var text_to_bubbles = function(input) {
+    if ($(input).val()) {
+        var recipients = $(input).val().split(/,|;/);
+        var invalid_recipients = '';
+        for (var i = 0; i < recipients.length; i++) {
+            if (is_valid_recipient(recipients[i])) {
+                append_bubble(recipients[i].trim(), input);
+            } else {
+                if (invalid_recipients) {
+                    invalid_recipients = invalid_recipients + ', ';
+                }
+                invalid_recipients = invalid_recipients + recipients[i];
+            }
+        }
+        $(input).val(invalid_recipients);
+    }
+    resize_input(input);
+};
+
+var bubble_index = 0;
+var append_bubble = function(value, to) {
+    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble" draggable="true" ondragstart="drag(event)" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
+    $(to).prev().append(bubble);
+    bubble_index++;
+};
+
+var is_valid_recipient = function(recipient) {
+    var valid_regex = /^[\w ]*[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    return recipient.match(valid_regex);
+};
+
 $(function() {    
     if (hm_page_name() === 'settings') {
         $('#clear_chunks_button').on('click', function(e) {
@@ -312,7 +388,7 @@ $(function() {
             }
             var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
             $('#send_uploaded_files').val(uploaded_files);
-            Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input'); 
+            Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
             $('.smtp_send_archive').addClass('disabled_input'); 
             $('.smtp_send').on("click", function() { return false; }); 
         });
@@ -336,5 +412,29 @@ $(function() {
         if($('.compose_attach_button').attr('disabled') == 'disabled'){
             check_attachment_dir_access();
         };
+
+        $('.compose_container').attr('ondrop', 'move_recipient_to_section(event)').attr('ondragover', 'allow_drop(event)');
+        $('.compose_to, .compose_cc, .compose_bcc').on('keypress', function(e) {
+            if(e.which == 13) {
+                e.preventDefault();
+                if (is_valid_recipient($(this).val())) {
+                    text_to_bubbles(this);
+                }
+            }
+        });
+        $('.compose_subject, .compose_body, .compose_server, .smtp_send, .smtp_send_archive').on('focus', function(e) {
+            $('.compose_to, .compose_cc, .compose_bcc').each(function() {
+                bubbles_to_text(this);
+            });
+        });
+        $('.compose_to, .compose_cc, .compose_bcc').on('focus', function(e) {
+            text_to_bubbles(this);
+        });
+        $('.compose_container').on('click', function() {
+            $(this).find('input').focus();
+        });
+        $(document).on('click', '.bubble_close', function() {
+            $(this).parent().remove();
+        });
     }
 });
