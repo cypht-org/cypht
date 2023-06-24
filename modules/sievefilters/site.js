@@ -171,13 +171,37 @@ $(function () {
 
     if (hm_page_name() === 'block_list') {
         $(document).on('change', '.select_default_behaviour', function(e) {
-            let elem = $(this);
+            if ($(this).val() == 'Discard') {
+                // $(this).closest('.filter_subblock')
+                //     .find('.submit_default_behavior')
+                //     .toggle('click');
+                $(this).closest('.filter_subblock')
+                    .find('.select_default_reject_message')
+                    .remove();
+            } else {
+                $('<input type="text" class="select_default_reject_message" placeholder="Reject message" />').insertAfter($(this));
+            }
+        });
+        $(document).on('click', '.submit_default_behavior', function(e) {
+            let parent = $(this).closest('.filter_subblock');
+            let elem = parent.find('.select_default_behaviour');
+            let submit = $(this);
+
+            const payload = [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
+                {'name': 'selected_behaviour', 'value': elem.val()},
+                {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
+            ];
+            if (elem.val() == 'Reject') {
+                const reject = parent.find('.select_default_reject_message');
+                payload.push({'name': 'reject_message', 'value': reject.val()});
+            }
+
+            submit.css('opacity', '0.3');
             Hm_Ajax.request(
-                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
-                    {'name': 'selected_behaviour', 'value': elem.val()},
-                    {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
-                ],
+                payload,
                 function(res) {
+                    submit.css('opacity', '1');
                     console.log(res);
                 }
             );

@@ -1766,6 +1766,9 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('msg_server_id', $form['imap_server_id']);
             $this->out('msg_folder', $form['folder']);
             $this->out('msg_list_path', 'imap_'.$form['imap_server_id'].'_'.$form['folder']);
+            $this->out('site_config', $this->config);
+            $this->out('user_config', $this->user_config);
+            $this->out('imap_accounts', $this->user_config->get('imap_servers'), array());
             $this->out('show_pagination_links', $this->user_config->get('pagination_links_setting', true));
             $part = false;
             $prefetch = false;
