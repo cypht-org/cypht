@@ -1,5 +1,5 @@
 {
-    "name": "jason-munro/cypht",
+    "name": "cypht-org/cypht",
     "type": "project",
     "description": "Lightweight Open Source webmail written in PHP and JavaScript",
     "keywords": ["php", "webmail", "webmail-client", "imap", "smtp", "news-reader", "rss", "atom", "e-mail", "jmap"],
@@ -10,8 +10,8 @@
         "email": "jason@cypht.org",
         "issues": "https://github.com/cypht-org/cypht/issues",
         "chat": "https://gitter.im/cypht-org/community",
-        "wiki": "https://github.com/jasonmunro/cypht/wiki",
-        "source": "https://github.com/jasonmunro/cypht/",
+        "wiki": "https://github.com/cypht-org/cypht/wiki",
+        "source": "https://github.com/cypht-org/cypht/",
         "docs": "https://cypht.org/documentation.html"
     },
     "authors":[
