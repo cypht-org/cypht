@@ -7,7 +7,7 @@
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
-define('COMMITS_URL', 'https://github.com/jasonmunro/cypht/commit/');
+define('COMMITS_URL', 'https://github.com/cypht-org/cypht/commit/');
 
 require_once VENDOR_PATH.'autoload.php';
 use Webklex\ComposerInfo\ComposerInfo;
@@ -98,7 +98,7 @@ class Hm_Output_dev_content extends Hm_Output_Module {
             'not yet complete, has a lot of useful information'.
             '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html">http://cypht.org/docs/code_docs/index.html</a>'.
             '<br /><br />Finally there is a "hello world" module with lots of comments included in the project download and browsable at github'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/jasonmunro/cypht/tree/master/modules/hello_world">https://github.com/jasonmunro/cypht/tree/master/modules/hello_world</a>'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
             '</div></div>';
     }
 }
