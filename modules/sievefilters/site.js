@@ -171,10 +171,7 @@ $(function () {
 
     if (hm_page_name() === 'block_list') {
         $(document).on('change', '.select_default_behaviour', function(e) {
-            if ($(this).val() == 'Discard') {
-                // $(this).closest('.filter_subblock')
-                //     .find('.submit_default_behavior')
-                //     .toggle('click');
+            if ($(this).val() != 'Reject') {
                 $(this).closest('.filter_subblock')
                     .find('.select_default_reject_message')
                     .remove();

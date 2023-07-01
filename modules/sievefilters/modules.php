@@ -1202,11 +1202,12 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $factory = get_sieve_client_factory($this->get('site_config'));
             $client = $factory->init($this->get('user_config'), $mailbox);
             if ($client) {
-                if ($default_behaviour == 'Discard') {
-                    $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'"><option value="Discard">Discard</option><option value="Reject">Reject</option></select>';
-                }
-                elseif ($default_behaviour == 'Reject') {
-                    $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'"><option value="Discard">Discard</option><option value="Reject" selected>Reject</option></select><input type="text" class="select_default_reject_message" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
+                $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'">'
+                .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
+                .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
+                .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
+                if ($default_behaviour == 'Reject') {
+                    $default_behaviour_html .= '<input type="text" class="select_default_reject_message" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
                 }
                 $default_behaviour_html .= '<button class="submit_default_behavior">Submit</button>';
                 $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
