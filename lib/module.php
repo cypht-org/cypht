@@ -434,6 +434,14 @@ abstract class Hm_Handler_Module {
         return in_array(strtolower($name), $this->config->get_modules(true), true);
     }
 
+    public function save_hm_msgs() {
+        $msgs = Hm_Msgs::get();
+        if (!empty($msgs)) {
+            Hm_Msgs::flush();
+            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+        }
+    }
+
     /**
      * Handler modules need to override this method to do work
      */

@@ -1115,7 +1115,7 @@ var imap_setup_snooze = function() {
                 if (res.snoozed_messages > 0) {
                     Hm_Folders.reload_folders(true);
                     var path = hm_list_parent()? hm_list_parent(): hm_list_path();
-                    window.location.href = '?page=message_list&list_path='+path;
+                    window.location.replace('?page=message_list&list_path='+path);
                 }
             }
         );
