@@ -1317,7 +1317,7 @@ function parse_snooze_header($snooze_header)
 {
     $snooze_header = str_replace('X-Snoozed: ', '', $snooze_header);
     $result = [];
-    foreach (explode(';', str_replace("\r\n", " ", $snooze_header)) as $kv)
+    foreach (explode(';', $snooze_header) as $kv)
     {
         $kv = trim($kv);
         $spacePos = strpos($kv, ' ');
@@ -1366,12 +1366,16 @@ function get_snooze_date($format, $only_label = false) {
  */
 if (!hm_exists('snooze_formats')) {
 function snooze_formats() {
-    return array(
+    $values = array(
         'tomorrow',
         'next_weekend',
         'next_week',
         'next_month'
     );
+    if (date('H') <= 16) {
+        $values = array_push($values, 'later_in_day');
+    }
+    return $values;
 }}
 
 /**
@@ -1379,9 +1383,7 @@ function snooze_formats() {
  */
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
-    if (date('H') <= 16) {
-        $values = array_merge(['later_in_day'], snooze_formats());
-    }
+    $values = snooze_formats();
     $txt = '<div style="display: inline-block;">';
     $txt .= '<a class="snooze_link hlink" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
     $txt .= '<div class="snooze_dropdown" style="display:none;">';

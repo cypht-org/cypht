@@ -262,12 +262,10 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 }
             }
             elseif (count($moved) == 0) {
-                Hm_Msgs::add('ERR Unable to move/copy selected messages');
+                Hm_Msgs::add('ERRUnable to move/copy selected messages');
             }
             if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
-                $msgs = Hm_Msgs::get();
-                Hm_Msgs::flush();
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+                $this->save_hm_msgs();
             }
             $this->out('move_count', $moved);
         }
@@ -854,9 +852,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 Hm_Msgs::add('Message deleted');
                 $this->out('imap_delete_error', false);
             }
-            $msgs = Hm_Msgs::get();
-            Hm_Msgs::flush();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+            $this->save_hm_msgs();
         }
     }
 }
@@ -921,9 +917,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
             }
         }
-        $msgs = Hm_Msgs::get();
-        Hm_Msgs::flush();
-        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+        $this->save_hm_msgs();
     }
 }
 
@@ -980,7 +974,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
         if ($form['imap_snooze_until'] != 'unsnooze') {
             $at = date('D, d M Y H:i:s O');
             $until = get_snooze_date($form['imap_snooze_until']);
-            $snooze_tag = "X-Snoozed: at $at;\n \tuntil $until";
+            $snooze_tag = "X-Snoozed: at $at; until $until";
         }
         $ids = explode(',', $form['imap_snooze_ids']);
         foreach ($ids as $msg_part) {
@@ -1003,9 +997,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             $msg = 'ERRFailed to snooze selected messages';
         }
         Hm_Msgs::add($msg);
-        $msgs = Hm_Msgs::get();
-        Hm_Msgs::flush();
-        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+        $this->save_hm_msgs();
     }
 }
 
@@ -1025,16 +1017,21 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($server_id, $cache);
             if (imap_authed($imap)) {
                 $folder = 'Snoozed';
+                if (!count($imap->get_mailbox_status($folder))) {
+                    continue;
+                }
                 $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
                     $msg_headers = $imap->get_message_headers($msg['uid']);
-                    try {
-                        $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
-                        if (new DateTime($snooze_headers['until']) <= new DateTime()) {
-                            snooze_message($imap, $msg['uid'], $folder, null);
+                    if (isset($msg_headers['X-Snoozed'])) {
+                        try {
+                            $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
+                            if (new DateTime($snooze_headers['until']) <= new DateTime()) {
+                                snooze_message($imap, $msg['uid'], $folder, null);
+                            }
+                        } catch (Exception $e) {
+                            Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
                         }
-                    } catch (Exception $e) {
-                        Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
                     }
                 }
             }
