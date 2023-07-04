@@ -201,7 +201,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                     'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session'.
                     '{float:left;}.long_session input{padding:0px;float:none;}.mobile .long_session{float:left;clear:both;}</style>';
     
-            return $css.'<form class="login_form" method="POST">';
+                return $css.'<form class="login_form" method="POST">';
             }
             else {
                 return '<form class="logout_form" method="POST">';
@@ -230,7 +230,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 '.label__signin{width:210px; margin:0px 0px -18px 0px;}
                 </style>';
 
-        return $css.'<div class="form-container"><form class="login_form" method="POST">';
+            return $css.'<div class="form-container"><form class="login_form" method="POST">';
         }
         else {
             return '<div class="form-container"><form class="logout_form" method="POST">';
