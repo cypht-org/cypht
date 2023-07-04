@@ -597,6 +597,8 @@ class Hm_Handler_login extends Hm_Handler_Module {
      */
     public $validate_request = true;
     public function process() {
+        $this->out('fancy_login_allowed', $this->config->get('fancy_login', 'n'));
+        error_log($this->config->get('fancy_login', 'n'));
         $this->out('is_mobile', $this->request->mobile);
         if ($this->get('create_username', false)) {
             return;
