@@ -144,7 +144,7 @@ return array(
         'selected_behaviour' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'enable_sieve_filter' => FILTER_VALIDATE_INT,
         'scope' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'block_action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'reject_message' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
