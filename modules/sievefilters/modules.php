@@ -459,7 +459,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder', 'action', 'scope'));
+        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder', 'block_action', 'scope'));
 
         if (!$success) {
             return;
@@ -546,7 +546,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 $actions = block_filter(
                     $filter,
                     $this->user_config,
-                    $this->request->post['action'],
+                    $this->request->post['block_action'],
                     $this->request->post['imap_server_id'],
                     $blocked_sender,
                     $this->request->post['reject_message']

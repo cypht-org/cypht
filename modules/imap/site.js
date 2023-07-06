@@ -632,7 +632,7 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
             {'name': 'imap_msg_uid', 'value': msg_uid},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder},
-            {'name': 'action', 'value': action},
+            {'name': 'block_action', 'value': action},
             {'name': 'scope', 'value': scope},
             {'name': 'reject_message', 'value': reject_message}
         ],
