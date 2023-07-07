@@ -303,7 +303,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     .'<select name="block_action" id="block_action">'
                     .'<option value="default">'.$this->trans('Default action').'</option>'
                     .'<option value="discard">'.$this->trans('Discard').'</option>'
-                    .'<option value="blocked">'.$this->trans('Move To Blocked').'</option>'
+                    .'<option value="blocked">'.$this->trans('Move To Blocked Folder').'</option>'
                     .'<option value="reject_default">'.$this->trans('Reject With Default Message').'</option>'
                     .'<option value="reject_with_message">'.$this->trans('Reject With Specific Message').'</option>'
                     .'</select></div><div><button type="submit" id="block_sender">'.$this->trans('Block').'</button></div></form>'

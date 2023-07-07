@@ -583,7 +583,8 @@ return array(
     'Allow handling of mailto links' => 'Consenti la gestione dei collegamenti mailto',
     'Show folders' => 'Mostra cartelle',
     'Show next & previous emails when reading a message' => 'Mostra email successive e precedenti durante la lettura di un messaggio',
-    'Archive to the original folder' => 'Archivia nella cartella originale'
+    'Archive to the original folder' => 'Archivia nella cartella originale',
+    'Move To Blocked Folder' => false
 ); 
 
 ?>
