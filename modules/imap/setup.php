@@ -76,6 +76,12 @@ add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', '
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
+/* message view page */
+add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
+add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
+add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
+add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
 /* ajax mark as read */
 setup_base_ajax_page('ajax_imap_mark_as_read', 'core');
 add_handler('ajax_imap_mark_as_read', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -322,6 +328,7 @@ return array(
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
+        'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
         'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
@@ -379,5 +386,4 @@ return array(
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
     )
 );
-
 

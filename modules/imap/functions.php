@@ -1,5 +1,7 @@
 <?php
 
+use ZBateson\MailMimeParser\Message;
+
 /**
  * IMAP modules
  * @package modules
@@ -338,7 +340,7 @@ function process_imap_message_ids($ids) {
  * @return string
  */
 if (!hm_exists('format_msg_part_row')) {
-function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $use_icons=false, $simple_view=false, $mobile=false) {
+function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $at_args, $use_icons=false, $simple_view=false, $mobile=false) {
     $allowed = array(
         'textplain',
         'texthtml',
@@ -437,7 +439,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     if ($mobile) {
         $res .= '<div class="part_size">'.$output_mod->html_safe($size);
         $res .= '</div><div class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</div>';
-        $res .= '<div class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></div></td></tr>';
+        $res .= '<div class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></div></td>';
     }
     else {
         $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
@@ -446,10 +448,58 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
                 '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
-        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+        if ($lc_type == "textplain" || $lc_type == "multipartmixed") {
+            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'"></a></td>';
+        }
     }
+    if (isset($vals['file_attributes']['attachment'])) {
+        $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
+    }
+    $res .= '</tr>';
     return $res;
 }}
+
+/*
+ * Returns the modified message
+ * @param int $attachment_id from get_attachment_id_for_mail_parser
+ * @param string $msg raw message
+ * @return string
+ */
+if (!hm_exists('remove_attachment')) {
+    function remove_attachment($att_id, $msg) {
+        $message = Message::from($msg, false);
+        $message->removeAttachmentPart($att_id);
+
+        return (string) $message;
+    }
+}
+
+/*
+ * ZBateson\MailMimeParser uses 0-based index for attachments
+ * Which mixes embedded images and attachments
+ * @param Hm_IMAP $imap Imap object
+ * @param int $msg message id
+ * @param string $msg_id message part
+ * @return int
+ */
+if (!hm_exists('get_attachment_id_for_mail_parser')) {
+    function get_attachment_id_for_mail_parser($imap, $uid, $msg_id) {
+        $count = -1;
+        $id = false;
+        $struct = $imap->get_message_structure($uid);
+        foreach ($struct[0]['subs'] as $key => $sub) {
+            if (! empty($sub['file_attributes'])) {
+                $count++;
+                if ($key == $msg_id && isset($sub['file_attributes']['attachment'])) {
+                    $id = $count;
+                    break;
+                }
+            }
+        }
+        return $id;
+    }
+}
 
 /*
  * Find a message part description/filename
@@ -521,7 +571,7 @@ function get_imap_size($vals) {
  * @return string
  */
 if (!hm_exists('format_msg_part_section')) {
-function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0) {
+function format_msg_part_section($struct, $output_mod, $part, $dl_link, $at_link, $level=0) {
     $res = '';
     $simple_view = $output_mod->get('simple_msg_part_view', false);
     $use_icons = $output_mod->get('use_message_part_icons', false);
@@ -531,18 +581,18 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     }
     foreach ($struct as $id => $vals) {
         if (is_array($vals) && isset($vals['type'])) {
-            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
+            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $at_link, $use_icons, $simple_view, $mobile);
             if (!$row) {
                 $level--;
             }
             $res .= $row;
             if (isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, ($level + 1));
             }
         }
         else {
             if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
+                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, $level);
             }
         }
     }
@@ -1144,3 +1194,26 @@ function get_personal_ns($imap) {
     );
 }}
 
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('get_request_params')) {
+function get_request_params($request) {
+    $server_id = NULL;
+    $uid = NULL;
+    $folder = NULL;
+    $msg_id = NULL;
+
+    if (array_key_exists('uid', $request) && $request['uid']) {
+        $uid = $request['uid'];
+    }
+    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\d+)_(.+)/", $request['list_path'], $matches)) {
+        $server_id = $matches[1];
+        $folder = hex2bin($matches[2]);
+    }
+    if (array_key_exists('imap_msg_part', $request) && preg_match("/^[0-9\.]+$/", $request['imap_msg_part'])) {
+        $msg_id = preg_replace("/^0.{1}/", '', $request['imap_msg_part']);
+    }
+
+    return [$server_id, $uid, $folder, $msg_id];
+}}
