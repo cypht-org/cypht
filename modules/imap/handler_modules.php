@@ -1094,55 +1094,6 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
 }
 
 /**
- * Get message headers for the Sent page
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_sent extends Hm_Handler_Module {
-    /**
-     * Returns list of message data for the sent page
-     */
-    public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
-            $limit = $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('sent_since_setting', DEFAULT_SINCE));
-            $ids = explode(',', $form['imap_server_ids']);
-            $folder = bin2hex('INBOX');
-            if (array_key_exists('folder', $this->request->post)) {
-                $folder = $this->request->post['folder'];
-            }
-            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
-            }
-            else {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
-            }
-            $folders = array();
-            foreach ($msg_list as $msg) {
-                if (hex2bin($msg['folder']) != hex2bin($folder)) {
-                    $folders[] = hex2bin($msg['folder']);
-                }
-            }
-            if (count($folders) > 0) {
-                $auto_folder = $folders[0];
-                $this->out('auto_sent_folder', $msg_list[0]['server_name'].' '.$auto_folder);
-            }
-            if (array_key_exists('keyword', $this->request->get)) {
-                $keyword = $this->request->get['keyword'];
-                $search_pattern = "/$keyword/i";
-                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
-                    return preg_grep($search_pattern, $filter_msg_list);
-                });
-                $msg_list = $search_result;
-            }
-            $this->out('folder_status', $status);
-            $this->out('imap_sent_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
-        }
-    }
-}
-
-/**
  * Get message headers for the Everthing page
  * @subpackage imap/handler
  */
@@ -1436,7 +1387,16 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             case 'sent':
-                $callback = 'imap_sent_content';
+                $callback = 'imap_folder_content';
+                break;
+            case 'junk':
+                $callback = 'imap_folder_content';
+                break;
+            case 'trash':
+                $callback = 'imap_folder_content';
+                break;
+            case 'drafts':
+                $callback = 'imap_folder_content';
                 break;
             default:
                 $callback = 'imap_background_unread_content';
@@ -1446,8 +1406,8 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             if ($callback != 'imap_background_unread_content') {
                 $this->out('move_copy_controls', true);
             }
-            if ($path == 'sent') {
-                foreach (imap_sent_sources($callback, $this) as $vals) {
+            if (in_array($path, ['sent', 'junk', 'trash', 'drafts'])) {
+                foreach (imap_sources($callback, $this, $path) as $vals) {
                     $this->append('data_sources', $vals);
                 }
             }
@@ -1942,5 +1902,55 @@ class Hm_Handler_process_review_sent_email_setting extends Hm_Handler_Module {
             return $val;
         }
         process_site_setting('review_sent_email', $this, 'review_sent_email_callback', false, true);
+    }
+}
+
+/**
+ * Get message headers for the Sent page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
+    /**
+     * Returns list of message data for the sent page
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $path = $this->request->get['list_path'];
+            $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
+            $ids = explode(',', $form['imap_server_ids']);
+            $folder = bin2hex('INBOX');
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
+            }
+            else {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
+            }
+            $folders = array();
+            foreach ($msg_list as $msg) {
+                if (hex2bin($msg['folder']) != hex2bin($folder)) {
+                    $folders[] = hex2bin($msg['folder']);
+                }
+            }
+            if (count($folders) > 0) {
+                $auto_folder = $folders[0];
+                $this->out('auto_'.$path.'_folder', $msg_list[0]['server_name'].' '.$auto_folder);
+            }
+            if (array_key_exists('keyword', $this->request->get)) {
+                $keyword = $this->request->get['keyword'];
+                $search_pattern = "/$keyword/i";
+                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
+                    return preg_grep($search_pattern, $filter_msg_list);
+                });
+                $msg_list = $search_result;
+            }
+            $this->out('folder_status', $status);
+            $this->out('imap_'.$path.'_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
+        }
     }
 }

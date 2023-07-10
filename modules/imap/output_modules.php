@@ -758,16 +758,16 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 }
 
 /**
- * Format message headers for the Sent E-mail page
+ * Format message headers for the Sent, Junk, Draft, Trash E-mail page
  * @subpackage imap/output
  */
-class Hm_Output_filter_sent_data extends Hm_Output_Module {
+class Hm_Output_filter_data extends Hm_Output_Module {
     /**
      * Build ajax response for the All E-mail message list
      */
     protected function output() {
-        if ($this->get('imap_sent_data')) {
-            prepare_imap_message_list($this->get('imap_sent_data'), $this, 'sent');
+        if ($this->get('imap_'.$this->get('list_path').'_data')) {
+            prepare_imap_message_list($this->get('imap_'.$this->get('list_path').'_data'), $this, $this->get('list_path'));
         }
         else {
             $this->out('formatted_message_list', array());
