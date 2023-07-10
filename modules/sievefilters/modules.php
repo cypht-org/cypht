@@ -182,7 +182,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
     }
 }
 
-function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config) {
+function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config, $module) {
     try {
         $factory = get_sieve_client_factory($site_config);
         $client = $factory->init($user_config, $mailbox);
@@ -194,9 +194,12 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
         return '';
     }
     $current_script = $client->getScript('blocked_senders');
+    $blocked_list_actions = [];
     if ($current_script != '') {
         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
         $blocked_list = json_decode(base64_decode($base64_obj));
+        $base64_obj_actions = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[2]);
+        $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
         if (!$blocked_list) {
             return '';
         }
@@ -208,13 +211,34 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
         }
     }
 
+    $actions_map = [
+        'blocked' => $module->trans('Move To Blocked'),
+        'reject_with_message' => $module->trans('Reject With Message'),
+        'reject_default' => $module->trans('Reject'),
+        'discard' => $module->trans('Discard'),
+        'default' => $module->trans('Default'),
+    ];
     $ret = '';
     foreach ($blocked_senders as $sender) {
-        $ret .= '<tr><td>'.$sender.'</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
+        $reject_message = $blocked_list_actions[$sender]['reject_message'];
+        $ret .= '<tr><td>'.$sender.'</td><td>';
+        if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
+            $action = $blocked_list_actions[$sender]['action'] ?: 'default';
+            $ret .= $actions_map[$action];
+            if ($action == 'reject_with_message') {
+                $ret .= ' - '.$reject_message;
+            }
+        } else {
+            $action = 'default';
+            $ret .= 'Default';
+        }
+        $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <img width="15" height="15" alt="'.
+            $module->trans('Change Behavior').'" src="'.Hm_Image_Sources::$edit.'" /></a>';
+        $ret .= '</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
         if (!strstr($sender, '*')) {
             $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
         }
-        $ret .= '</tr></td></tr>';
+        $ret .= '</td></tr>';
     }
     return $ret;
 }
@@ -459,7 +483,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder', 'block_action', 'scope'));
+        list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope'));
 
         if (!$success) {
             return;
@@ -471,20 +495,27 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             }
         }
 
-        $imap = Hm_IMAP_List::connect($this->request->post['imap_server_id']);
+        if (isset($this->request->post['imap_msg_uid'])) {
+            $imap = Hm_IMAP_List::connect($this->request->post['imap_server_id']);
 
-        if (!imap_authed($imap)) {
-            Hm_Msgs::add('ERRIMAP Authentication Failed');
+            if (!imap_authed($imap)) {
+                Hm_Msgs::add('ERRIMAP Authentication Failed');
+                return;
+            }
+            if (!$imap->select_mailbox(hex2bin($this->request->post['folder']))) {
+                Hm_Msgs::add('ERRIMAP Mailbox select error');
+                return;
+            }
+            $msg_header = $imap->get_message_headers($form['imap_msg_uid']);
+            $test_pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
+            preg_match_all($test_pattern, $msg_header['From'], $email_sender);
+            $email_sender = $email_sender[0][0];
+        } elseif (!empty($this->request->post['sender'])) {
+            $email_sender = $this->request->post['sender'];
+        } else {
+            Hm_Msgs::add('ERRSender not found');
             return;
         }
-        if (!$imap->select_mailbox(hex2bin($this->request->post['folder']))) {
-            Hm_Msgs::add('ERRIMAP Mailbox select error');
-            return;
-        }
-        $msg_header = $imap->get_message_headers($form['imap_msg_uid']);
-        $test_pattern = "/(?:[a-z0-9!#$%&'*+=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/";
-        preg_match_all($test_pattern, $msg_header['From'], $email_sender);
-        $email_sender = $email_sender[0][0];
 
         $scope = 'sender';
         if (isset($this->request->post['scope']) && $this->request->post['scope'] == 'domain') {
@@ -525,6 +556,9 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             if ($base64_obj_actions) {
                 $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
             }
+        }
+        if (isset($this->request->post['change_behavior']) && $unblock_sender) {
+            $unblock_sender = false;
         }
         if ($unblock_sender == false || $current_script == '') {
             $blocked_senders[] = $email_sender;
@@ -595,10 +629,14 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         $client->activateScript('main_script');
         $client->close();
 
-        if ($unblock_sender) {
-            Hm_Msgs::add($scope_title . ' Unblocked');
+        if (isset($this->request->post['change_behavior'])) {
+            Hm_Msgs::add($scope_title . ' Behavior Changed');
         } else {
-            Hm_Msgs::add($scope_title . ' Blocked');
+            if ($unblock_sender) {
+                Hm_Msgs::add($scope_title . ' Unblocked');
+            } else {
+                Hm_Msgs::add($scope_title . ' Blocked');
+            }
         }
     }
 }
@@ -1218,9 +1256,10 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
                 $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
                 $res .=  $default_behaviour_html;
                 $res .= '<table class="filter_details"><tbody>';
-                $res .= '<tr><th style="width: 80px;">Sender</th><th style="width: 15%;">Actions</th></tr>';
-                $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::$minus), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'));
+                $res .= '<tr><th style="width: 20px;">Sender</th><th style="width: 40%;">Behavior</th><th style="width: 15%;">Actions</th></tr>';
+                $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::close('#d80f0f')), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'), $this);
                 $res .= '</tbody></table>';
+                $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
                 $res .= '</div></div></div>';
             }
         }
@@ -1611,6 +1650,29 @@ if (!hm_exists('block_filter')) {
 
         $filter->setCondition($custom_condition);
 
+        return $ret;
+    }
+}
+
+if (!hm_exists('block_filter_dropdown')) {
+    function block_filter_dropdown($mod, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block') {
+        $ret = '<div class="dropdown">'
+        .'<form id="block_sender_form">';
+        if ($with_scope) {
+            $ret .= '<div><label>'.$mod->trans('Who Is Blocked').'</label>'
+            .'<select name="scope">'
+            .'<option value="sender">'.$mod->trans('This Sender').'</option>'
+            .'<option value="domain">'.$mod->trans('Whole domain').'</option></select></div>';
+        }
+        $ret .= '<div><label>'.$mod->trans('Action').'</label>'
+        .'<select name="block_action" id="block_action">'
+        .'<option value="default">'.$mod->trans('Default action').'</option>'
+        .'<option value="discard">'.$mod->trans('Discard').'</option>'
+        .'<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
+        .'<option value="reject_default">'.$mod->trans('Reject With Default Message').'</option>'
+        .'<option value="reject_with_message">'.$mod->trans('Reject With Specific Message').'</option>'
+        .'</select></div><div><button type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
+        .'</div></div>';
         return $ret;
     }
 }

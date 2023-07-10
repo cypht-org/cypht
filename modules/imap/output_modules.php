@@ -293,21 +293,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
-                    $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>
-                    <div class="dropdown">'
-                    .'<form id="block_sender_form"><div><label>'.$this->trans('Who Is Blocked').'</label>'
-                    .'<select name="scope">'
-                    .'<option value="sender">'.$this->trans('This Sender').'</option>'
-                    .'<option value="domain">'.$this->trans('Whole domain').'</option></select></div>'
-                    .'<div><label>'.$this->trans('Action').'</label>'
-                    .'<select name="block_action" id="block_action">'
-                    .'<option value="default">'.$this->trans('Default action').'</option>'
-                    .'<option value="discard">'.$this->trans('Discard').'</option>'
-                    .'<option value="blocked">'.$this->trans('Move To Blocked Folder').'</option>'
-                    .'<option value="reject_default">'.$this->trans('Reject With Default Message').'</option>'
-                    .'<option value="reject_with_message">'.$this->trans('Reject With Specific Message').'</option>'
-                    .'</select></div><div><button type="submit" id="block_sender">'.$this->trans('Block').'</button></div></form>'
-                    .'</div></div>';
+                    $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                    $txt .= block_filter_dropdown($this);
                 } else {
                     $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
