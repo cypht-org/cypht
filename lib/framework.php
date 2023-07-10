@@ -139,7 +139,12 @@ if (!class_exists('Hm_Functions')) {
          * @return resource|false
          */
         public static function c_init() {
-            return curl_init();
+            if (extension_loaded('curl')) {
+                return curl_init();
+            } else {
+                Hm_Msgs::add('ERRPlease enable the cURL extension.');
+                return false;
+            }
         }
 
         /**
