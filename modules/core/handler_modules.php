@@ -893,3 +893,55 @@ class Hm_Handler_process_junk_since_setting extends Hm_Handler_Module {
         process_site_setting('junk_since', $this, 'since_setting_callback');
     }
 }
+
+/**
+ * Process input from the max per source setting for the Trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('trash_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('trash_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process input from the max per source setting for the Draft page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('drafts_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the Drafts page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('drafts_since', $this, 'since_setting_callback');
+    }
+}

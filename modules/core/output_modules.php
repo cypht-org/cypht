@@ -1052,65 +1052,6 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
 }
 
 /**
- * Starts the Junk section on the settings page
- * @subpackage core/output
- */
-class Hm_Output_start_junk_settings extends Hm_Output_Module {
-    /**
-     * Settings in this section control the flagged messages view
-     */
-    protected function output() {
-        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$junk.'" width="16" height="16" />'.
-            $this->trans('Junk').'</td></tr>';
-    }
-}
-
-/**
- * Option for the maximum number of messages per source for the Junk page
- * @subpackage core/output
- */
-class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
-    /**
-     * Processed by Hm_Handler_process_all_source_max_setting
-     */
-    protected function output() {
-        $sources = DEFAULT_PER_SOURCE;
-        $settings = $this->get('user_settings', array());
-        $reset = '';
-        if (array_key_exists('junk_per_source', $settings)) {
-            $sources = $settings['junk_per_source'];
-        }
-        if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
-        }
-        return '<tr class="junk_setting"><td><label for="junk_per_source">'.
-            $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="junk_per_source" name="junk_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
-    }
-}
-
-/**
- * Option for the "junk since" date range for the Junk page
- * @subpackage core/output
- */
-class Hm_Output_junk_since_setting extends Hm_Output_Module {
-    /**
-     * Processed by Hm_Handler_process_junk_since_setting
-     */
-    protected function output() {
-        $since = DEFAULT_SINCE; 
-        $settings = $this->get('user_settings', array());
-        if (array_key_exists('junk_since', $settings) && $settings['junk_since']) {
-            $since = $settings['junk_since'];
-        }
-        return '<tr class="junk_setting"><td><label for="junk_since">'.
-            $this->trans('Show junk messages since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'junk_since', $this).'</td></tr>';
-    }
-}
-
-/**
  * Option for the language setting
  * @subpackage core/output
  */
@@ -1310,6 +1251,16 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$junk).'" alt="" width="16" height="16" /> ';
         }
         $res .= $this->trans('Junk').'</a></li>';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$trash).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Trash').'</a></li>';
+        $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$draft).'" alt="" width="16" height="16" /> ';
+        }
+        $res .= $this->trans('Drafts').'</a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1849,5 +1800,182 @@ class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
         $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
         // $res = "<strong>COPY/MOVE</strong>";
         $this->concat('msg_controls_extra', $res);
+    }
+}
+
+/**
+ * Starts the Junk section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_junk_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$junk.'" width="16" height="16" />'.
+            $this->trans('Junk').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('junk_per_source', $settings)) {
+            $sources = $settings['junk_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="junk_setting"><td><label for="junk_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="junk_per_source" name="junk_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "junk since" date range for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_junk_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_junk_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('junk_since', $settings) && $settings['junk_since']) {
+            $since = $settings['junk_since'];
+        }
+        return '<tr class="junk_setting"><td><label for="junk_since">'.
+            $this->trans('Show junk messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'junk_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Starts the Trash section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_trash_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$trash.'" width="16" height="16" />'.
+            $this->trans('Trash').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Trash page
+ * @subpackage core/output
+ */
+class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('trash_per_source', $settings)) {
+            $sources = $settings['trash_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="trash_setting"><td><label for="trash_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="trash_per_source" name="trash_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "trash since" date range for the Trash page
+ * @subpackage core/output
+ */
+class Hm_Output_trash_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_trash_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('trash_since', $settings) && $settings['trash_since']) {
+            $since = $settings['trash_since'];
+        }
+        return '<tr class="trash_setting"><td><label for="trash_since">'.
+            $this->trans('Show trash messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'trash_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Starts the Draft section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_drafts_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the flagged messages view
+     */
+    protected function output() {
+        return '<tr><td data-target=".drafts_setting" colspan="2" class="settings_subtitle">'.
+            '<img alt="" src="'.Hm_Image_Sources::$draft.'" width="16" height="16" />'.
+            $this->trans('Drafts').'</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Draft page
+ * @subpackage core/output
+ */
+class Hm_Output_drafts_source_max_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_all_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('drafts_per_source', $settings)) {
+            $sources = $settings['drafts_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="drafts_setting"><td><label for="drafts_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td><input type="text" size="2" id="drafts_per_source" name="drafts_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option for the "draft since" date range for the Draft page
+ * @subpackage core/output
+ */
+class Hm_Output_drafts_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_draft_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('drafts_since', $settings) && $settings['drafts_since']) {
+            $since = $settings['drafts_since'];
+        }
+        return '<tr class="drafts_setting"><td><label for="drafts_since">'.
+            $this->trans('Show draft messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'drafts_since', $this).'</td></tr>';
     }
 }

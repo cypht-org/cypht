@@ -18,17 +18,18 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @param string $inbox include inbox in search for auto-bcc messages
  * @return array
  */
-if (!hm_exists('imap_sent_sources')) {
-function imap_sent_sources($callback, $mod, $folder = 'sent') {
+if (!hm_exists('imap_sources')) {
+function imap_sources($callback, $mod, $folder = 'sent') {
     $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
     $sources = array();
+    $folder = $folder == 'drafts' ? 'draft': $folder;
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
             continue;
         }
         $folders = get_special_folders($mod, $index);
         if (array_key_exists($folder, $folders) && $folders[$folder]) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders[$folder]), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex('Drafts'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
