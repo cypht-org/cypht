@@ -327,9 +327,9 @@ function setup_db($config) {
     $config->set('db_socket', '/tmp/test.db');
     $config->set('db_driver', 'mysql');
     $config->set('db_host', '127.0.0.1');
-    $config->set('db_name', 'test');
-    $config->set('db_user', 'test');
-    $config->set('db_pass', '123456');
+    $config->set('db_name', 'cypht_test');
+    $config->set('db_user', 'cypht_test');
+    $config->set('db_pass', 'cypht_test');
 }
 function flatten($str) {
     return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));

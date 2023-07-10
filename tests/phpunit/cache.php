@@ -1,6 +1,6 @@
 <?php
 
-use PHPunit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 /**
  * tests for Hm_Uid_Cache

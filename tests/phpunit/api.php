@@ -1,6 +1,6 @@
 <?php
 
-use PHPunit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class Hm_Test_API_Curl extends TestCase {
 
