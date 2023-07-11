@@ -2,9 +2,9 @@
 
 # This will no longer be used. Anyone interested can simply ready the Git commit log.
 
-CYPHT_DIR="/home/jason/cypht"
-VERSION="v1.1.0-rc4"
-SINCE="2017-05-11"
+CYPHT_DIR="/home/vicy/work/cypht"
+VERSION="v1.3.0"
+SINCE="2021-07-07"
 
 cd "$CYPHT_DIR"
 git log --pretty=format:'%h%  - %s [%aD]' \
