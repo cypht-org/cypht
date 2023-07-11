@@ -25,9 +25,9 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
         $res = array();
         $ch = Hm_Functions::c_init();
         if ($ch) {
-            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits');
+            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/cypht-org/cypht/commits');
             Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
             Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
             $curl_result = Hm_Functions::c_exec($ch);
             if (trim($curl_result)) {
