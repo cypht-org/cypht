@@ -529,25 +529,55 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $level=0
     if ($mobile) {
         $simple_view = true;
     }
-    foreach ($struct as $id => $vals) {
-        if (is_array($vals) && isset($vals['type'])) {
-            $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
-            if (!$row) {
-                $level--;
+
+    if(!$simple_view){
+        foreach ($struct as $id => $vals) {
+            if (is_array($vals) && isset($vals['type'])) {
+                $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
+                if (!$row) {
+                    $level--;
+                }
+                $res .= $row;
+                if (isset($vals['subs'])) {
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+                }
             }
-            $res .= $row;
-            if (isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+            else {
+                if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
+                }
             }
         }
-        else {
-            if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
-            }
-        }
+    }else{
+        $res = format_attachment($struct,  $output_mod, $part, $dl_link);
     }
     return $res;
 }}
+
+function format_attachment ($struct,  $output_mod, $part, $dl_args) {
+    $res = '';
+
+    foreach ($struct as $id => $vals) {
+        if($vals['type'] != 'multipart' && isset($vals['file_attributes']) && !empty($vals['file_attributes'])) {
+            $size = get_imap_size($vals);
+            $desc = get_part_desc($vals, $id, $part);
+
+            $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
+            $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
+            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
+            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
+
+            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+        }
+
+        if(isset($vals['subs'])) {
+            $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args);
+            $res =$sub_res;
+        }
+    }
+
+    return $res;
+}
 
 /**
  * Format the attached images section
