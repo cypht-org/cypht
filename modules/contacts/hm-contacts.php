@@ -25,7 +25,7 @@ class Hm_Contact_Store {
         return true;
     }
 
-    public function get($id, $default = false, $email_address = ""){
+    public function get($id, $default=false, $email_address=""){
         if(array_key_exists($id, $this->contacts)) {
             return $this->contacts[$id];
         }

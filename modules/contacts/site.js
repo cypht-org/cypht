@@ -17,7 +17,7 @@ var delete_contact = function(id, source, type) {
     );
 };
 
-var add_contact_from_message_view = function () {
+var add_contact_from_message_view = function() {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
   

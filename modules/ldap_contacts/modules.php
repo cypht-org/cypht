@@ -17,7 +17,7 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
     public function process() {
         $ldap_config = $this->get('ldap_config');
         list($success, $form) = $this->process_form(array('contact_source', 'contact_value'));
-        if (!$success) { 
+        if (!$success) {
             return;
         }
         list($type, $source) = explode(':', $form['contact_source']);
