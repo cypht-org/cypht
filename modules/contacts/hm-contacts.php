@@ -25,14 +25,14 @@ class Hm_Contact_Store {
         return true;
     }
 
-    public function get($id, $email_address="", $default=false) {
+    public function get($id, $default = false, $email_address = ""){
         if(array_key_exists($id, $this->contacts)) {
             return $this->contacts[$id];
         }
 
         if(!empty($email_address)){
-             $res = false;
-             foreach ($this->contacts as $id => $contact) {
+            $res = false;
+            foreach ($this->contacts as $id => $contact) {
                 if ($contact->value('email_address') == $email_address) {
                     $res = $contact;
                     break;

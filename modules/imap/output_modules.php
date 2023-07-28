@@ -196,7 +196,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $value = sprintf('%s (%s)', $dt->format('c Z'), human_readable_interval($value));
                             } catch (Exception $e) {}
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
-                        }
+                            }
                         elseif($fld == 'from'){
 
                             $regexp = '/\s*(.*[^\s])\s*<\s*(.*[^\s])\s*>/';
@@ -214,7 +214,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 }
                             }
 
-                            $contact = ($this->get('contact_store'))->get(null, $contact_email);
+                            $contact = ($this->get('contact_store'))->get(null, false, $contact_email);
                             $contact_exists = !empty($contact);
 
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
@@ -266,7 +266,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                             </button>
                                         </div>';
                             }
-                            
+
                             $txt .= '           </div>
                                             </div>
                                         </td>
@@ -304,7 +304,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            $lc_headers = lc_headers($headers); 
+            $lc_headers = lc_headers($headers);
             if (array_key_exists('to', $lc_headers)) {
                 $addr_list = process_address_fld($lc_headers['to']);
                 $size = count($addr_list);
@@ -322,7 +322,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 });
                 $size += count($addr_list);
             }
-            
+
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
@@ -448,7 +448,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $default_value = '';
                 if (isset($vals['sieve_config_host'])) {
                     $default_value = $vals['sieve_config_host'];
-                
+
                     $res .=  '<span><label class="screen_reader" for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label>'.
                             '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="credentials imap_sieve_host_input" placeholder="Sieve Host" type="text" name="imap_sieve_host" value="'.$default_value.'"></span>';
                 }
