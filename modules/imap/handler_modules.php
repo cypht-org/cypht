@@ -150,7 +150,7 @@ class Hm_Handler_process_simple_msg_parts extends Hm_Handler_Module {
         function simple_msg_view_callback($val) {
             return $val;
         }
-        process_site_setting('simple_msg_parts', $this, 'simple_msg_view_callback', false, true);
+        process_site_setting('simple_msg_parts', $this, 'simple_msg_view_callback', true, true);
     }
 }
 
@@ -1798,7 +1798,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
                     $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
-                    $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', false));
+                    $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', true));
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }
