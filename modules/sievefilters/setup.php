@@ -88,7 +88,6 @@ add_handler('ajax_sieve_block_domain', 'settings_load_imap',  true);
 add_handler('ajax_sieve_block_domain', 'sieve_block_domain_script',  true);
 add_output('ajax_sieve_block_domain', 'sieve_block_domain_output',  true);
 
-
 /* change blocking default behaviour */
 setup_base_ajax_page('ajax_sieve_block_change_behaviour', 'core');
 add_handler('ajax_sieve_block_change_behaviour', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -113,7 +112,7 @@ return array(
         'ajax_sieve_unblock_sender',
         'ajax_sieve_get_mailboxes',
         'ajax_sieve_block_domain',
-        'ajax_sieve_block_change_behaviour'
+        'ajax_sieve_block_change_behaviour',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -145,6 +144,7 @@ return array(
         'enable_sieve_filter' => FILTER_VALIDATE_INT,
         'scope' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'block_action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'reject_message' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'reject_message' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'change_behavior' => FILTER_VALIDATE_BOOL
     )
 );

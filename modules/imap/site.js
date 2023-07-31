@@ -741,13 +741,6 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         }
         return block_unblock_sender(msg_uid, detail, $(this).data('target'), 'unblock', sender);
     });
-    $('#block_action').on('change', function(e) {
-        if ($(this).val() == 'reject_with_message') {
-            $('<div id="reject_message"><label>Message</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
-        } else {
-            $('#reject_message').remove();
-        }
-    });
     fixLtrInRtl();
 };
 

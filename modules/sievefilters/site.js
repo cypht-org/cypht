@@ -169,6 +169,14 @@ $(function () {
     let current_editing_filter_name = '';
     let current_account;
 
+    $(document).on('change', '#block_action', function(e) {
+        if ($(this).val() == 'reject_with_message') {
+            $('<div id="reject_message"><label>Message</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
+        } else {
+            $('#reject_message').remove();
+        }
+    });
+
     if (hm_page_name() === 'block_list') {
         $(document).on('change', '.select_default_behaviour', function(e) {
             if ($(this).val() != 'Reject') {
@@ -194,18 +202,20 @@ $(function () {
                 payload.push({'name': 'reject_message', 'value': reject.val()});
             }
 
-            submit.css('opacity', '0.3');
+            submit.attr('disabled', 1);
             Hm_Ajax.request(
                 payload,
                 function(res) {
-                    submit.css('opacity', '1');
-                    console.log(res);
+                    submit.removeAttr('disabled');
                 }
             );
         });
 
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
+           if (!confirm('Do you want to unblock sender?')) {
+                return;
+            }
            let sender = $(this).parent().parent().children().html();
            let elem = $(this);
             Hm_Ajax.request(
@@ -222,7 +232,61 @@ $(function () {
             );
         });
 
+        $(document).on('click', '#edit_blocked_behavior', function(e) {
+            e.preventDefault();
+            let parent = $(this).closest('tr');
+            let elem = parent.find('#block_action');
+            let sender = $(this).closest('tr').children().first().html();
+            let scope = sender.startsWith('*@') ? 'domain': 'sender';
+
+            $('.dropdown').toggle();
+            Hm_Ajax.request(
+                [
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
+                    {'name': 'imap_server_id', 'value': $(this).data('mailbox-id')},
+                    {'name': 'block_action', 'value': elem.val()},
+                    {'name': 'scope', 'value': scope},
+                    {'name': 'sender', 'value': sender},
+                    {'name': 'reject_message', 'value': $('#reject_message_textarea').val() ?? ''},
+                    {'name': 'change_behavior', 'value': true}
+                ],
+                function(res) {
+                    if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0])) {
+                        window.location = window.location;
+                    }
+                }
+            );
+        });
+
+        $(document).on('click', '.toggle-behavior-dropdown', function(e) {
+            e.preventDefault();
+            var default_val = $(this).data('action');
+            $('.dropdown').insertAfter(this).toggle();
+            $('#block_sender_form').trigger('reset');
+            $('#reject_message').remove();
+            $('#block_action').val(default_val).trigger('change');
+            $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
+            if (default_val == 'reject_with_message') {
+                $('#reject_message_textarea').val($(this).data('reject-message'));
+            }
+        });
+
         $(document).on('click', '.block_domain_button', function(e) {
+            e.preventDefault();
+            let sender = $(this).parent().parent().children().html();
+            let elem = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'sender', 'value': sender}
+                ],
+                function(res) {
+                    window.location = window.location;
+                }
+            );
+        });
+
+        $(document).on('click', '.edit_email_behavior_submit', function(e) {
             e.preventDefault();
             let sender = $(this).parent().parent().children().html();
             let elem = $(this);
