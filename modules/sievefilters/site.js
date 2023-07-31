@@ -236,14 +236,14 @@ $(function () {
             e.preventDefault();
             let parent = $(this).closest('tr');
             let elem = parent.find('#block_action');
-            let sender = $(this).closest('tr').children().html();
+            let sender = $(this).closest('tr').children().first().html();
             let scope = sender.startsWith('*@') ? 'domain': 'sender';
 
             $('.dropdown').toggle();
             Hm_Ajax.request(
                 [
                     {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
-                    {'name': 'imap_server_id', 'value': $(this).closest('.dropdown').prev().attr('mailbox_id')},
+                    {'name': 'imap_server_id', 'value': $(this).data('mailbox-id')},
                     {'name': 'block_action', 'value': elem.val()},
                     {'name': 'scope', 'value': scope},
                     {'name': 'sender', 'value': sender},
@@ -265,6 +265,7 @@ $(function () {
             $('#block_sender_form').trigger('reset');
             $('#reject_message').remove();
             $('#block_action').val(default_val).trigger('change');
+            $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
             if (default_val == 'reject_with_message') {
                 $('#reject_message_textarea').val($(this).data('reject-message'));
             }

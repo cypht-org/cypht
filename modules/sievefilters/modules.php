@@ -196,12 +196,18 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
     $current_script = $client->getScript('blocked_senders');
     $blocked_list_actions = [];
     if ($current_script != '') {
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-        $blocked_list = json_decode(base64_decode($base64_obj));
-        $base64_obj_actions = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[2]);
-        $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
+        $script_split = preg_split('#\r?\n#', $current_script, 0);
+        if (!isset($script_split[1])) {
+            return '';
+        }
+        $base64_obj = str_replace("# ", "", $script_split[1]);
+        $blocked_list = json_decode(base64_decode($base64_obj));        
         if (!$blocked_list) {
             return '';
+        }
+        if (isset($script_split[2])) {
+            $base64_obj_actions = str_replace("# ", "", $script_split[2]);
+            $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
         }
         foreach ($blocked_list as $blocked_sender) {
             if (explode('@', $blocked_sender)[0] == '') {
@@ -1259,10 +1265,10 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
                 $res .= '<tr><th style="width: 20px;">Sender</th><th style="width: 40%;">Behavior</th><th style="width: 15%;">Actions</th></tr>';
                 $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::close('#d80f0f')), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'), $this);
                 $res .= '</tbody></table>';
-                $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
                 $res .= '</div></div></div>';
             }
         }
+        $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
         return $res;
     }
 }
