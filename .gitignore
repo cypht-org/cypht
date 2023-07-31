@@ -21,3 +21,5 @@ scripts/test.php
 /.idea/
 composer.lock
 lib/hm3/users/
+scripts/hm3.ini
+scripts/hm3.rc
