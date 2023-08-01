@@ -960,7 +960,7 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
         }
     }
 
-    if (array_key_exists('disposition', $struct) && is_array($struct['disposition']) && array_key_exists('attachment', $struct['disposition'])) {
+    if (array_key_exists('disposition', $struct) && is_array($struct['disposition']) && array_key_exists('attachment', $struct['disposition']) && is_array($struct['disposition']['attachment'])) {
         for ($i=0;$i<count($struct['disposition']['attachment']);$i++) {
             if (strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['disposition']['attachment'])) {
