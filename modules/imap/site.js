@@ -268,6 +268,7 @@ var imap_status_update = function() {
             var process_result = function(res) {
                 var id = res.imap_status_server_id;
                 $('.imap_status_'+id).html(res.imap_status_display);
+                $('.imap_detail_'+id).html(res.imap_detail_display);
             };
             for (i=0;i<ids.length;i++) {
                 id=ids[i];

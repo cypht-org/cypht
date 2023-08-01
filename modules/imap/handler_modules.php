@@ -1212,6 +1212,7 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
+            $capabilities = [];
             foreach ($ids as $id) {
                 $cache = Hm_IMAP_List::get_cache($this->cache, $id);
                 $start_time = microtime(true);
@@ -1220,6 +1221,21 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
                 if (imap_authed($imap)) {
                     $this->out('imap_connect_status', $imap->get_state());
                     $this->out('imap_status_server_id', $id);
+                    $imap_account = Hm_IMAP_List::get($id, true);
+                    if (isset($imap_account['sieve_config_host'])) {
+                        if (isset($capabilities[$imap_account['sieve_config_host']])) {
+                            $this->out('sieve_server_capabilities', $capabilities[$imap_account['sieve_config_host']]);
+                            continue;
+                        }
+                        require_once APP_PATH.'modules/sievefilters/modules.php';
+                        $clientFactory = new Hm_Sieve_Client_Factory();
+                        $client = $clientFactory->init(null, $imap_account);
+                        if ($client) {
+                            $this->out('sieve_server_capabilities', $client->getCapabilities());
+                            $capabilities[$imap_account['sieve_config_host']] = $client->getCapabilities();
+                        }
+                    }
+
                 }
                 else {
                     $this->out('imap_connect_status', 'disconnected');
