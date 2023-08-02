@@ -7,7 +7,7 @@
 .nux_password, .app_password { margin: 10px; margin-left: 0px; margin-top: 0px; width: 280px; }
 .reset_nux_form { float: right; padding: 20px; padding-bottom: 40px; font-size: 110%; }
 .nux_submit { margin-bottom: 20px; }
-.nux_account_name, .nux_username, #service_select { margin-bottom: 10px; width: 280px; padding: 3px; }
+.nux_account_name, .nux_username, #service_select, .nux_extra_fields { margin-bottom: 10px; width: 280px; padding: 3px; }
 #nux_email { margin-bottom: 10px; }
 .nux_help, .nux_dev_news, .nux_welcome { padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; }
 .nux_welcome, .nux_help { min-width: 320px; max-width: 480px; min-height: 400px; }

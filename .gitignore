@@ -19,7 +19,9 @@ tests/phpunit/data/foo.txt
 scripts/test.php
 /vendor/
 /.idea/
-composer.lock
+*.sublime-project
+*.sublime-workspace
+composer.phar
 lib/hm3/users/
 scripts/hm3.ini
 scripts/hm3.rc

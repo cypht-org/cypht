@@ -17,7 +17,14 @@ class Hm_Handler_load_gmail_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
         if ($this->module_is_supported('imap')) {
-            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session);
+            $settings = $this->get('user_settings', array());
+            $max_google_contacts_number = DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER;
+
+            if (array_key_exists('max_google_contacts_number', $settings)) {
+                $max_google_contacts_number = $settings['max_google_contacts_number'];
+            }
+
+            $contacts = fetch_gmail_contacts($this->config, $contacts, $this->session, $max_google_contacts_number);
         }
         $this->append('contact_sources', 'gmail');
         $this->out('contact_store', $contacts, false);
@@ -64,7 +71,7 @@ function parse_contact_xml($xml, $source) {
  * @subpackage gmail_contacts/functions
  */
 if (!hm_exists('fetch_gmail_contacts')) {
-function fetch_gmail_contacts($config, $contact_store, $session=false) {
+function fetch_gmail_contacts($config, $contact_store, $session=false, $max_google_contacts_number = 500) {
     if ($session && $session->get('gmail_contacts') && is_array($session->get('gmail_contacts')) && count($session->get('gmail_contacts')) > 0) {
         $contact_store->import($session->get('gmail_contacts'));
         return $contact_store;
@@ -79,7 +86,8 @@ function fetch_gmail_contacts($config, $contact_store, $session=false) {
                     $server = Hm_IMAP_List::dump($id, true);
                 }
             }
-            $url = 'https://www.google.com/m8/feeds/contacts/'.$server['user'].'/full?max-results=500';
+
+            $url = 'https://www.google.com/m8/feeds/contacts/' . $server['user'] . '/full?max-results='. $max_google_contacts_number;
             $contacts = parse_contact_xml(gmail_contacts_request($server['pass'], $url), $server['name']);
             if (count($contacts) > 0) {
                 $contact_store->import($contacts);

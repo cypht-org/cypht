@@ -148,8 +148,9 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
             }
             $part = $this->get('imap_msg_part', '1');
             $args = $this->get('msg_download_args', '');
+            $att_args = $this->get('msg_attachment_remove_args', '');
             $showMsgArgs = $this->get('msg_show_args', '');
-            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args);
+            $res .=  format_msg_part_section($this->get('msg_struct'), $this, $part, $args, $att_args);
             $res .= '</table>';
             $res .= format_attached_image_section($this->get('msg_struct'), $this, $showMsgArgs);
             $this->out('msg_parts', $res);
@@ -284,9 +285,16 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
 
             if ($this->get('sieve_filters_enabled')) {
-                $imap_server = Hm_IMAP_List::get($this->get('msg_server_id'), false);
+                $server_id = $this->get('msg_server_id');
+                $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
-                    $txt .= ' | <a class="block_sender_link hlink" id="block_sender" href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></a>';
+                    $sender = addr_parse($headers['From'])['email'];
+                    $domain = '*@'.get_domain($sender);
+                    $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
+                    $sender_blocked = in_array($sender, $blocked_senders);
+                    $domain_blocked = in_array($domain, $blocked_senders);
+                    $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                    $txt .= block_filter_dropdown($this);
                 } else {
                     $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
@@ -462,6 +470,11 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
+
+        if(!$this->get('is_jmap_supported')){
+            return '<div class="jmap_server_setup"><div class="jmap_section" style="display: none;">';
+         }
+
         $count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap';}));
         $count = sprintf($this->trans('%d configured'), $count);
         return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
@@ -967,6 +980,27 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to set number of google contacts
+ * @subpackage imap/output
+ */
+class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $max_google_contacts_number = DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER;
+        $reset = '';
+        if (array_key_exists('max_google_contacts_number', $settings)) {
+            $max_google_contacts_number = $settings['max_google_contacts_number'];
+        }
+        if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
+            $this->trans('Max google contacts number').'</label></td><td><input type="number" id="max_google_contacts_number" '.
+            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option to enable/disable message part icons on the message view
  * @subpackage imap/output
  */
@@ -1041,5 +1075,23 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_review_sent_email extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $reset = '';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('review_sent_email', $settings) && $settings['review_sent_email']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="review_sent_email">'.
+            $this->trans('Review sent message').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
     }
 }

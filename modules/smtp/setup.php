@@ -134,6 +134,7 @@ return array(
         'draft_id' => array(FILTER_VALIDATE_INT, false),
         'profile_value' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,

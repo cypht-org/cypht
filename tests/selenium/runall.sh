@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PYTHON=$(command -v python)
+PYTHON=$(command -v python3)
 rm -rf __pycache__/
 
 #for suite in login.py folder_list.py pages.py profiles.py settings.py servers.py send.py inline_msg.py search.py keyboard_shortcuts.py

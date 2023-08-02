@@ -1,6 +1,6 @@
 <?php
 
-use PHPunit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 
 /**

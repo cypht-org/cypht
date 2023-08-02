@@ -1,6 +1,6 @@
 <?php
 
-use PHPunit\Framework\TestCase;
+use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Core_Message_List_Functions extends TestCase {
 
@@ -136,7 +136,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_list_controls() {
         $this->assertEquals('<div class="list_controls no_mobile">foobazbar</div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cpath%20d%3D%22M9.5%2013a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200zm0-5a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200zm0-5a1.5%201.5%200%201%201-3%200%201.5%201.5%200%200%201%203%200z%22%20%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
+        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
         <div id="list_controls_menu" classs="list_controls_menu">foobazbar</div>
     </div>', list_controls('foo', 'bar', 'baz'));
     }
@@ -162,8 +162,8 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_search_field_selection() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<select id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option></select>', search_field_selection('TEXT', $mod));
-        $this->assertEquals('<select id="search_fld" name="search_fld"><option value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option></select>', search_field_selection('foo', $mod));
+        $this->assertEquals('<select id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('TEXT', $mod));
+        $this->assertEquals('<select id="search_fld" name="search_fld"><option value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('foo', $mod));
     }
     /**
      * @preserveGlobalState disabled

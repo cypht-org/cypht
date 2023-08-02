@@ -225,6 +225,10 @@ class Hm_Handler_process_carddav_auth_settings extends Hm_Handler_Module {
         if (array_key_exists('carddav_passwords', $this->request->post)) {
             $passwords = $this->request->post['carddav_passwords'];
         }
+                
+        if(empty($settings)){
+            $settings = array_fill_keys(array_keys($users),[]);
+        }
         foreach ($settings as $name => $vals) {
             if (array_key_exists($name, $users)) {
                 $results[$name]['user'] = $users[$name];

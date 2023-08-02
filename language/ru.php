@@ -585,7 +585,8 @@ return array(
     'Allow handling of mailto links' => false,
     'Show folders' => false,
     'Show next & previous emails when reading a message' => false,
-    'Archive to the original folder' => false
+    'Archive to the original folder' => false,
+    'Move To Blocked Folder' => false
 ); 
 
 ?>

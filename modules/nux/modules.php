@@ -22,27 +22,29 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
             $this->out('nux_dev_news', $cache);
             return;
         }
-        $ch = Hm_Functions::c_init();
         $res = array();
-        Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits');
-        Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
-        $curl_result = Hm_Functions::c_exec($ch);
-        if (trim($curl_result)) {
-            if (strstr($curl_result, 'API rate limit exceeded')) {
-                return;
-            }
-            $json_commits = json_decode($curl_result);
-            foreach($json_commits as $c) {
-                $msg = trim($c->commit->message);
-                $res[] = array(
-                   'hash' => $c->sha,
-                   'shash' => substr($c->sha, 0, 8),
-                   'name' => $c->commit->author->name,
-                   'age' => date('D, M d', strtotime($c->commit->author->date)),
-                   'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
-                );
+        $ch = Hm_Functions::c_init();
+        if ($ch) {
+            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/cypht-org/cypht/commits');
+            Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+            Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
+            $curl_result = Hm_Functions::c_exec($ch);
+            if (trim($curl_result)) {
+                if (strstr($curl_result, 'API rate limit exceeded')) {
+                    return;
+                }
+                $json_commits = json_decode($curl_result);
+                foreach($json_commits as $c) {
+                    $msg = trim($c->commit->message);
+                    $res[] = array(
+                    'hash' => $c->sha,
+                    'shash' => substr($c->sha, 0, 8),
+                    'name' => $c->commit->author->name,
+                    'age' => date('D, M d', strtotime($c->commit->author->date)),
+                    'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                    );
+                }
             }
         }
         $this->cache->set('nux_dev_news', $res);
@@ -169,6 +171,10 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
             if (Nux_Quick_Services::exists($form['nux_service'])) {
                 $details = Nux_Quick_Services::details($form['nux_service']);
                 $details['name'] = $form['nux_name'];
+                if ($form['nux_service'] == 'all-inkl') {
+                    $details['server'] = $this->request->post['nux_all_inkl_login'].$details['server'];
+                    $details['smtp']['server'] = $this->request->post['nux_all_inkl_login'].$details['smtp']['server'] ;
+                }
                 $imap_list = array(
                     'name' => $details['name'],
                     'server' => $details['server'],
@@ -177,7 +183,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
                 );
-                if (in_array($form['nux_service'], ['gandi']) && $this->module_is_supported('sievefilters')) {
+                if (in_array($form['nux_service'], ['gandi']) && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
                 }
                 Hm_IMAP_List::add($imap_list);
@@ -303,7 +309,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
-            $res .= sprintf('<tr><td><a href="https://github.com/jasonmunro/cypht/commit/%s">%s</a>'.
+            $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
                 $this->html_safe($vals['hash']),
                 $this->html_safe($vals['shash']),

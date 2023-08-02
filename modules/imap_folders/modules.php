@@ -154,6 +154,7 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
             
             Hm_Msgs::add('Special folders assigned');
             $this->session->record_unsaved('Special folders assigned');
+            $this->session->close_early();
         }
     }
 }
@@ -204,7 +205,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                 $old_folder = prep_folder_name($imap, $form['folder'], true);
                 $new_folder = prep_folder_name($imap, $form['new_folder'], false, $parent_str);
                 if ($new_folder && $old_folder && $imap->rename_mailbox($old_folder, $new_folder)) {
-                    if ($this->module_is_supported('sievefilters')) {
+                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                         $imap_servers = $this->user_config->get('imap_servers');
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
@@ -260,7 +261,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $del_folder = prep_folder_name($imap, $form['folder'], true);
-                if ($this->module_is_supported('sievefilters')) {
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
                         return;
@@ -569,7 +570,7 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
     function get_sieve_linked_mailbox ($imap_account, $module) {
-        if (!$module->module_is_supported('sievefilters')) {
+        if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', true)) {
             return;
         }
         require_once VENDOR_PATH.'autoload.php';

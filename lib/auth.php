@@ -190,7 +190,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $imap = new Hm_IMAP();
-        list($server, $port, $tls) = get_auth_config($this->site_config, 'imap');
+        list($server, $port, $tls, $sieve_config) = get_auth_config($this->site_config, 'imap');
         if (!$user || !$pass || !$server || !$port) {
             Hm_Debug::add($imap->show_debug(true));
             Hm_Debug::add('Invalid IMAP auth configuration settings');
@@ -198,7 +198,8 @@ class Hm_Auth_IMAP extends Hm_Auth {
         }
         $this->imap_settings = array('server' => $server, 'port' => $port,
             'tls' => $tls, 'username' => $user, 'password' => $pass,
-            'no_caps' => false, 'blacklisted_extensions' => array('enable')
+            'no_caps' => false, 'blacklisted_extensions' => array('enable'),
+            'sieve_config_host' => $sieve_config
         );
         return $this->check_connection($imap);
     }
@@ -390,5 +391,9 @@ function get_auth_config($config, $prefix) {
     $server = $config->get($prefix.'_auth_server', false);
     $port = $config->get($prefix.'_auth_port', false);
     $tls = $config->get($prefix.'_auth_tls', false);
-    return array($server, $port, $tls);
+    $ret = array($server, $port, $tls);
+    if ($prefix == 'imap') {
+        $ret[] = $config->get($prefix.'_auth_sieve_conf_host', false);
+    }
+    return $ret;
 }

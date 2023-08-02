@@ -591,7 +591,8 @@ return array(
     'Allow handling of mailto links' => 'Luba mailto-viidete kasutamist',
     'Show folders' => 'Näita kaustu',
     'Show next & previous emails when reading a message' => false,
-    'Archive to the original folder' => false
+    'Archive to the original folder' => false,
+    'Move To Blocked Folder' => false
 ); 
 
 ?>

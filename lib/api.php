@@ -31,6 +31,9 @@ class Hm_API_Curl {
      */
     public function command($url, $headers=array(), $post=array(), $body='', $method=false) {
         $ch = Hm_Functions::c_init();
+        if (!$ch) {
+            return [];
+        }
         $this->curl_setopt($ch, $url, $headers);
         $this->curl_setopt_post($ch, $post);
         if ($method) {

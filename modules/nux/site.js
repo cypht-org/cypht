@@ -9,6 +9,7 @@ var display_next_nux_step = function(res) {
         $('.nux_step_two').html('');
         document.getElementById('service_select').getElementsByTagName('option')[0].selected = 'selected';
         $('.nux_username').val('');
+        $('.nux_extra_fields').remove();
         return false;
     });
 };
@@ -20,13 +21,17 @@ var nux_add_account = function() {
     var name = $('.nux_name').val();
     var email = $('#nux_email').val();
     var pass = $('.nux_password').val();
+    var extra_fields = [];
+    $('input.nux_extra_fields').each(function () {
+        extra_fields.push({ 'name': $(this).attr('id'), 'value': $(this).val() });
+    });
     if (name.length && service.length && email.length && pass.length) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_nux_add_service'},
             {'name': 'nux_service', 'value': service},
             {'name': 'nux_email', 'value': email},
             {'name': 'nux_name', 'value': name},
-            {'name': 'nux_pass', 'value': pass}],
+            {'name': 'nux_pass', 'value': pass}, ...extra_fields],
             display_final_nux_step,
             [],
             false
@@ -112,10 +117,21 @@ var expand_server_settings = function() {
     }
 };
 
+var add_extra_fields = function(select, id, label, placeholder) {
+    $(select).next().next().after('<input type="text" id="nux_'+id+'" class="nux_extra_fields" placeholder="'+placeholder+'"><label class="screen_reader nux_extra_fields" for="nux_'+id+'">'+label+'</label><br class="nux_extra_fields">');
+};
+
 $(function() {
     if (hm_page_name() === 'servers') {
         expand_server_settings();
         $('.nux_next_button').on("click", nux_service_select);
+        $('#service_select').on("change", function() {
+            if ($(this).val() == 'all-inkl') {
+                add_extra_fields(this, 'all_inkl_login', 'Login', 'Your All-inkl Login');
+            } else {
+                $('.nux_extra_fields').remove();
+            }
+        });
     }
     else if (hm_page_name() === 'message_list') {
         var list_path = hm_list_path();

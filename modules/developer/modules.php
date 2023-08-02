@@ -7,7 +7,7 @@
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
-define('COMMITS_URL', 'https://github.com/jasonmunro/cypht/commit/');
+define('COMMITS_URL', 'https://github.com/cypht-org/cypht/commit/');
 
 require_once VENDOR_PATH.'autoload.php';
 use Webklex\ComposerInfo\ComposerInfo;
@@ -54,15 +54,17 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         if ($commit_hash != '-') {
             // Get right commit date (not merge date) if not a local commit
             $ch = Hm_Functions::c_init();
-            Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits/'.$commit_hash);
-            Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-            Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
-            $curl_result = Hm_Functions::c_exec($ch);
-            if (trim($curl_result)) {
-                if (!strstr($curl_result, 'No commit found for SHA')) {
-                    $json_commit = json_decode($curl_result);
-                    $commit_date = $json_commit->commit->author->date;
+            if ($ch) {
+                Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits/'.$commit_hash);
+                Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+                Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
+                Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
+                $curl_result = Hm_Functions::c_exec($ch);
+                if (trim($curl_result)) {
+                    if (!strstr($curl_result, 'No commit found for SHA')) {
+                        $json_commit = json_decode($curl_result);
+                        $commit_date = $json_commit->commit->author->date;
+                    }
                 }
             }
         }
@@ -98,7 +100,7 @@ class Hm_Output_dev_content extends Hm_Output_Module {
             'not yet complete, has a lot of useful information'.
             '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html">http://cypht.org/docs/code_docs/index.html</a>'.
             '<br /><br />Finally there is a "hello world" module with lots of comments included in the project download and browsable at github'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/jasonmunro/cypht/tree/master/modules/hello_world">https://github.com/jasonmunro/cypht/tree/master/modules/hello_world</a>'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
             '</div></div>';
     }
 }

@@ -169,22 +169,53 @@ $(function () {
     let current_editing_filter_name = '';
     let current_account;
 
+    $(document).on('change', '#block_action', function(e) {
+        if ($(this).val() == 'reject_with_message') {
+            $('<div id="reject_message"><label>Message</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
+        } else {
+            $('#reject_message').remove();
+        }
+    });
+
     if (hm_page_name() === 'block_list') {
         $(document).on('change', '.select_default_behaviour', function(e) {
-            let elem = $(this);
+            if ($(this).val() != 'Reject') {
+                $(this).closest('.filter_subblock')
+                    .find('.select_default_reject_message')
+                    .remove();
+            } else {
+                $('<input type="text" class="select_default_reject_message" placeholder="Reject message" />').insertAfter($(this));
+            }
+        });
+        $(document).on('click', '.submit_default_behavior', function(e) {
+            let parent = $(this).closest('.filter_subblock');
+            let elem = parent.find('.select_default_behaviour');
+            let submit = $(this);
+
+            const payload = [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
+                {'name': 'selected_behaviour', 'value': elem.val()},
+                {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
+            ];
+            if (elem.val() == 'Reject') {
+                const reject = parent.find('.select_default_reject_message');
+                payload.push({'name': 'reject_message', 'value': reject.val()});
+            }
+
+            submit.attr('disabled', 1);
             Hm_Ajax.request(
-                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_change_behaviour'},
-                    {'name': 'selected_behaviour', 'value': elem.val()},
-                    {'name': 'imap_server_id', 'value': elem.attr('imap_account')}
-                ],
+                payload,
                 function(res) {
-                    console.log(res);
+                    submit.removeAttr('disabled');
                 }
             );
         });
 
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
+           if (!confirm('Do you want to unblock sender?')) {
+                return;
+            }
            let sender = $(this).parent().parent().children().html();
            let elem = $(this);
             Hm_Ajax.request(
@@ -201,7 +232,61 @@ $(function () {
             );
         });
 
+        $(document).on('click', '#edit_blocked_behavior', function(e) {
+            e.preventDefault();
+            let parent = $(this).closest('tr');
+            let elem = parent.find('#block_action');
+            let sender = $(this).closest('tr').children().first().html();
+            let scope = sender.startsWith('*@') ? 'domain': 'sender';
+
+            $('.dropdown').toggle();
+            Hm_Ajax.request(
+                [
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
+                    {'name': 'imap_server_id', 'value': $(this).data('mailbox-id')},
+                    {'name': 'block_action', 'value': elem.val()},
+                    {'name': 'scope', 'value': scope},
+                    {'name': 'sender', 'value': sender},
+                    {'name': 'reject_message', 'value': $('#reject_message_textarea').val() ?? ''},
+                    {'name': 'change_behavior', 'value': true}
+                ],
+                function(res) {
+                    if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0])) {
+                        window.location = window.location;
+                    }
+                }
+            );
+        });
+
+        $(document).on('click', '.toggle-behavior-dropdown', function(e) {
+            e.preventDefault();
+            var default_val = $(this).data('action');
+            $('.dropdown').insertAfter(this).toggle();
+            $('#block_sender_form').trigger('reset');
+            $('#reject_message').remove();
+            $('#block_action').val(default_val).trigger('change');
+            $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
+            if (default_val == 'reject_with_message') {
+                $('#reject_message_textarea').val($(this).data('reject-message'));
+            }
+        });
+
         $(document).on('click', '.block_domain_button', function(e) {
+            e.preventDefault();
+            let sender = $(this).parent().parent().children().html();
+            let elem = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'sender', 'value': sender}
+                ],
+                function(res) {
+                    window.location = window.location;
+                }
+            );
+        });
+
+        $(document).on('click', '.edit_email_behavior_submit', function(e) {
             e.preventDefault();
             let sender = $(this).parent().parent().children().html();
             let elem = $(this);
@@ -303,6 +388,21 @@ $(function () {
             edit_filter_modal.close();
         });
 
+        function ordinal_number(n)
+        {
+            let ord = 'th';
+
+            if (n % 10 == 1 && n % 100 != 11) {
+                ord = 'st';
+            } else if (n % 10 == 2 && n % 100 != 12) {
+                ord = 'nd';
+            } else if (n % 10 == 3 && n % 100 != 13) {
+                ord = 'rd';
+            }
+
+            return n + ord;
+        }
+
         /**************************************************************************************
          *                                    FUNCTIONS
          **************************************************************************************/
@@ -333,9 +433,13 @@ $(function () {
                 return false;
             }
 
-            conditions.forEach(function (elem) {
+            $('.sys_messages').html('');
+            conditions.forEach(function (elem, key) {
                 if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
-                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    let order = ordinal_number(key + 1);
+                    let previous_messages = $('.sys_messages').html();
+                    previous_messages += previous_messages ? '<br>': '';
+                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' condition (' + elem + ') must be provided</span>');
                     Hm_Utils.show_sys_messages();
                     validation_failed = true;
                 }
@@ -357,7 +461,7 @@ $(function () {
             let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).val();
             }).get();
-            let actions_field_type = $('input[name^=sieve_selected_action_value]').map(function(idx, elem) {
+            let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
                 return $(elem).attr('type');
             }).get();
             let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
@@ -371,10 +475,13 @@ $(function () {
             }
 
             idx = 0;
-            actions_type.forEach(function (elem) {
+            actions_type.forEach(function (elem, key) {
                 console.log(actions_field_type[idx])
                 if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
-                    $('.sys_messages').html('<span class="err">All fields of actions and conditions must be provided</span>');
+                    let order = ordinal_number(key + 1);
+                    let previous_messages = $('.sys_messages').html();
+                    previous_messages += previous_messages ? '<br>': '';
+                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' action (' + elem + ') must be provided</span>');
                     Hm_Utils.show_sys_messages();
                     validation_failed = true;
                 }
@@ -585,7 +692,7 @@ $(function () {
                 '    </td>' +
                 extra_options +
                 '    <td style="width: 43%;">' +
-                '    <img style="display: none" src="/modules/sievefilters/assets/spinner.gif" />' +
+                '    <img style="display: none" src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td style="vertical-align: middle; width: 70px;">' +
@@ -755,6 +862,9 @@ $(function () {
          */
         $(document).on('click', '.delete_filter', function (e) {
             e.preventDefault();
+            if (!confirm('Do you want to delete filter?')) {
+                return;
+            }
             let obj = $(this);
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_delete_filter'},
@@ -774,6 +884,9 @@ $(function () {
          */
         $(document).on('click', '.delete_script', function (e) {
             e.preventDefault();
+            if (!confirm('Do you want to delete script?')) {
+                return;
+            }
             let obj = $(this);
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_delete_script'},
@@ -848,8 +961,8 @@ $(function () {
                         $(".sieve_actions_select").last().val(action.action);
                         $(".sieve_actions_select").last().trigger('change');
                         $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
-                        if ($("[name^=sieve_selected_option_action_value]").last().is('input')) {
-                            $("[name^=sieve_selected_option_action_value]").last().val(action.value);
+                        if ($("[name^=sieve_selected_action_value]").last().is('input')) {
+                            $("[name^=sieve_selected_action_value]").last().val(action.value);
                         }
                     });
                 }

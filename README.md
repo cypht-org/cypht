@@ -11,12 +11,12 @@ father's webmail. Cypht is like a news reader, but for E-mail. Cypht does not
 replace your existing accounts - it combines them into one. And it's also a
 news reader.
 
-![screenshot](https://github.com/jasonmunro/cypht-website/blob/master/img/cypht_shot1.png "Unread View").
+![screenshot](https://github.com/cypht-org/cypht-website/blob/master/img/cypht_shot1.png "Unread View").
 
 The driving force behind Cypht development is to provide combined views for
 multiple accounts, but it's also a standard E-mail client that lets you browse
-and manage IMAP folders (or POP3 inboxes), and send outbound messages with
-SMTP.
+and manage IMAP folders and send outbound messages with SMTP.
+
 
 Cypht is an application built entirely of plugins, or as we call them, module
 sets (which is obviously way cooler sounding than plugins), that are executed

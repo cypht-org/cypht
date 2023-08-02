@@ -1,7 +1,7 @@
 Requirements
 ------------
 
-Cypht requires at least PHP 5.4, with the OpenSSL and cURL extensions. You will
+Cypht requires at least PHP 5.6, with the OpenSSL and cURL extensions. You will
 also need PDO support if using any database features. Testing is done on
 Debian and Ubuntu platforms with Nginx, Apache, standard PHP, and HHVM. We also
 use Composer to manage our few PHP dependencies.
@@ -38,7 +38,7 @@ mkdir cypht-temp
 cd cypht-temp
 
 # grab latest code
-wget https://github.com/jasonmunro/cypht/archive/master.zip
+wget https://github.com/cypht-org/cypht/archive/master.zip
 
 # unpack the archive
 unzip master.zip
@@ -181,7 +181,7 @@ Cypht can connect to github and aggregate notification data about repository
 activity.
 
 Example github.ini file:
-https://github.com/jasonmunro/cypht/blob/master/modules/github/github.ini
+https://github.com/cypht-org/cypht/blob/master/modules/github/github.ini
 
 Authorize an application for github:
 https://github.com/settings/developers
@@ -192,7 +192,7 @@ preferable to normal IMAP authentication because Cypht never has access to your
 account password.
 
 Example oauth2 ini file:
-https://github.com/jasonmunro/cypht/blob/master/modules/imap/oauth2.ini
+https://github.com/cypht-org/cypht/blob/master/modules/imap/oauth2.ini
 
 Authorize an application for gmail
 https://console.developers.google.com/project
@@ -204,13 +204,13 @@ LDAP contacts
 Cypht can use an LDAP server for contacts.
 
 Example ldap.ini file:
-https://github.com/jasonmunro/cypht/blob/master/modules/ldap_contacts/ldap.ini
+https://github.com/cypht-org/cypht/blob/master/modules/ldap_contacts/ldap.ini
 
 WordPress
 Cypht can aggregate WordPress.com notifications.
 
 Example wordpress.ini file:
-https://github.com/jasonmunro/cypht/blob/master/modules/wordpress/wordpress.ini
+https://github.com/cypht-org/cypht/blob/master/modules/wordpress/wordpress.ini
 
 Authorize an application for WordPress.com:
 https://developer.wordpress.com/apps/
@@ -219,7 +219,7 @@ Custom themes
 You can create your own themes for Cypht. Edit the themes.ini file to include
 your theme, and put the css file in modules/themes/assets.
 
-https://github.com/jasonmunro/cypht/blob/master/modules/themes/themes.ini
+https://github.com/cypht-org/cypht/blob/master/modules/themes/themes.ini
 
 Having problems?
 

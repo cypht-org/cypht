@@ -77,14 +77,22 @@
 .msg_part_charset { width: 8%; }
 .msg_part_download { width: 10%; }
 
+.download_link, .remove_attachment { width: 100px; }
+.remove_attachment a, .disable_remove a { cursor: default; pointer-events: none; text-decoration: none; }
+.disable_remove a { color: grey; }
+
 .mobile .msg_parts td { padding-bottom: 5px !important; width: 25%; padding-left: 3px !important;}
 .mobile .part_size { width: 50px !important; }
 .mobile .part_encoding { display: none; }
 .mobile .part_charset { display: none; }
-.mobile .download_link { width: 50px !important; overflow: visible !important; margin-left: 25px; }
+.mobile .download_link, .mobile .remove_attachment { width: 50px !important; overflow: visible !important; margin-left: 25px; }
 .mobile .part_desc, .mobile .part_size { margin-left: 25px; }
 .mobile .unflag_send_div { float: right; clear: right; margin-top: 10px; }
 #archive_val { padding-left: 20px; }
 
 .attached_image { margin-right: 20px; margin-bottom: 20px; height: 200px; }
 .attached_image_box { display: flex; flex-wrap: wrap; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
+.list_meta { float: none; margin-left: 37%; }
+.dropdown { display: none; position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
+.dropdown a { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; cursor: pointer; }
+.dropdown a:hover { background-color: #eee; }

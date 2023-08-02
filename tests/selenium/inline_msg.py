@@ -25,7 +25,7 @@ class InlineMsgTests(SettingsHelpers):
         self.wait_on_class('header_subject')
         detail_subject = self.by_class('header_subject')
         header = detail_subject.find_element_by_tag_name('th')
-        assert header.text.startswith('Test')
+        assert header.text.startswith('recent')
 
 
 if __name__ == '__main__':

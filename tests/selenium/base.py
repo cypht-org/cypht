@@ -65,7 +65,7 @@ class WebTest:
         pass_el = self.by_name('password')
         user_el.send_keys(user)
         pass_el.send_keys(password)
-        self.by_id('login').click()
+        self.by_css('input[value=Login]').click()
 
     def change_val(self, el, val):
         self.driver.execute_script('''

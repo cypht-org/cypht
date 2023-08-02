@@ -38,6 +38,8 @@ add_handler('settings', 'process_pagination_links', true, 'imap', 'date', 'after
 add_handler('settings', 'process_enable_simple_download_options', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_max_google_contacts_number', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_review_sent_email_setting', true, 'imap', 'date', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -50,6 +52,8 @@ add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_se
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
 add_output('settings', 'enable_simple_download_options', true, 'imap', 'imap_per_page_setting', 'after');
+add_output('settings', 'max_google_contacts_number', true, 'imap', 'imap_per_page_setting', 'after');
+add_output('settings', 'review_sent_email', true, 'imap', 'imap_pagination_links', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -70,6 +74,12 @@ add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_hea
 
 /* message view page */
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
+add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
+add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
+add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
+/* message view page */
+add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -320,6 +330,7 @@ return array(
     'allowed_get' => array(
         'imap_server_id' => FILTER_VALIDATE_INT,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
+        'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
         'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
@@ -373,8 +384,9 @@ return array(
         'imap_move_page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'compose_unflag_send' => FILTER_VALIDATE_BOOLEAN,
         'imap_per_page' => FILTER_VALIDATE_INT,
-        'original_folder' => FILTER_VALIDATE_BOOLEAN
+        'max_google_contacts_number' => FILTER_VALIDATE_INT,
+        'original_folder' => FILTER_VALIDATE_BOOLEAN,
+        'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
     )
 );
-
 

@@ -504,7 +504,7 @@ function validate_search_terms($terms) {
  */
 if (!hm_exists('validate_search_fld')) {
 function validate_search_fld($fld) {
-    if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT'))) {
+    if (in_array($fld, array('TEXT', 'BODY', 'FROM', 'SUBJECT', 'TO', 'CC'))) {
         return $fld;
     }
     return false;
@@ -524,6 +524,8 @@ function search_field_selection($current, $output_mod) {
         'BODY' => 'Message body',
         'SUBJECT' => 'Subject',
         'FROM' => 'From',
+        'TO' => 'To',
+        'CC' => 'Cc',
     );
     $res = '<select id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {

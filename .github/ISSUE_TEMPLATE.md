@@ -1,6 +1,6 @@
 <!--
 Please take a look at the issue templates at
-https://github.com/jasonmunro/cypht/issues/new/choose
+https://github.com/cypht-org/cypht/issues/new/choose
 before submitting a new issue.
 Following one of the issue templates will ensure maintainers can route your request efficiently.
 

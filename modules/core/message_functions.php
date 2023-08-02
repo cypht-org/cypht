@@ -24,8 +24,12 @@ function format_msg_html($str, $images=false) {
     }
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
-    $purifier = new HTMLPurifier($config);
-    return @$purifier->purify($str);
+    try {
+        $purifier = new HTMLPurifier($config);
+        return $purifier->purify($str);
+    } catch (Exception $e) {
+        return '';
+    }
 }}
 
 /**
@@ -170,7 +174,7 @@ function format_reply_address($fld, $excluded) {
     if ($res) {
         return array($addr, implode(', ', array_map(function($v) {
             if (trim($v['label'])) {
-                return $v['label'].' '.$v['email'];
+                return str_replace([',', ';'], '', $v['label']).' '.$v['email'];
             }
             else {
                 return $v['email'];
@@ -232,7 +236,7 @@ function reply_lead_in($headers, $type, $to, $output_mod) {
     }
     elseif ($type == 'forward') {
         $flds = array();
-        foreach( array('From', 'Date', 'Subject') as $fld) {
+        foreach( array('From', 'Date', 'Subject', 'To', 'Cc') as $fld) {
             if (array_key_exists($fld, $headers)) {
                 $flds[$fld] = $headers[$fld];
             }
