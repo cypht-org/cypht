@@ -608,7 +608,7 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
     $res = '';
 
     foreach ($struct as $id => $vals) {
-        if($vals['type'] != 'multipart' && isset($vals['file_attributes']) && !empty($vals['file_attributes'])) {
+        if(is_array($vals) && $vals['type'] != 'multipart' && isset($vals['file_attributes']) && !empty($vals['file_attributes'])) {
             $size = get_imap_size($vals);
             $desc = get_part_desc($vals, $id, $part);
 
@@ -620,7 +620,7 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
             $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
         }
 
-        if(isset($vals['subs'])) {
+        if(is_array($vals) && isset($vals['subs'])) {
             $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args);
             $res =$sub_res;
         }
