@@ -346,7 +346,6 @@ return array(
         'msg_part_icons' => FILTER_VALIDATE_BOOLEAN,
         'simple_msg_parts' => FILTER_VALIDATE_BOOLEAN,
         'pagination_links' => FILTER_VALIDATE_BOOLEAN,
-        'imap_per_page_setting' => FILTER_VALIDATE_BOOLEAN,
         'unread_on_open' => FILTER_VALIDATE_BOOLEAN,
         'imap_allow_images' => FILTER_VALIDATE_BOOLEAN,
         'imap_delete' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
