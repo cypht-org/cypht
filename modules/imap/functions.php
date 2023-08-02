@@ -1408,16 +1408,14 @@ function snooze_dropdown($output, $unsnooze = false) {
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
-    if (! isset($url['host']) || ! isset($url['scheme'])) {
-        throw new Exception('Invalid host provided');
-    }
-    $host = $url['host'];
+    $host = $url['host'] ?? $url['path'];
+    $port = $url['port'] ?? '4190';
+    $scheme = $url['scheme'] ?? 'tcp://';
     $tls = false;
-    $port = isset($url['port'])? $url['port']: '4190';
-    if ($url['scheme'] == 'ssl') {
-        $host = 'ssl://'.$host;
-    } else {
+    if ($scheme != 'ssl') {
         $tls = true;
+    } else {
+        $host = $scheme.$host;
     }
     return [$host, $port, $tls];
 }}
