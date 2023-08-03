@@ -403,15 +403,25 @@ function decode_fld($string) {
             $encoding = $fld[0];
             $fld = substr($fld, (strpos($fld, '?') + 1));
             if (strtoupper($encoding) == 'B') {
-                $fld = mb_convert_encoding(base64_decode($fld), 'UTF-8', $charset);
+                $fld = convert_to_utf8(base64_decode($fld), $charset);
             }
             elseif (strtoupper($encoding) == 'Q') {
-                $fld = mb_convert_encoding(quoted_printable_decode(str_replace('_', ' ', $fld)), 'UTF-8', $charset);
+                $fld = convert_to_utf8(quoted_printable_decode(str_replace('_', ' ', $fld)), $charset);
             }
             $string = str_replace($v, $fld, $string);
         }
     }
     return trim($string);
+}}
+
+if (!hm_exists('convert_to_utf8')) {
+function convert_to_utf8($data, $from_encoding) {
+    try {
+        $data = mb_convert_encoding($data, 'UTF-8', $from_encoding);
+    } catch (ValueError $e) {
+        $data = iconv($from_encoding, 'UTF-8', $data); 
+    }
+    return $data;
 }}
 
 /**

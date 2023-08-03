@@ -35,6 +35,7 @@
         "ext-openssl": "*",
         "ext-session": "*",
         "ext-fileinfo": "*",
+        "ext-iconv": "*",
         "webklex/composer-info": "^0.0.1",
         "composer" : "^2.0.0",
         "zbateson/mail-mime-parser": "^2.4"
