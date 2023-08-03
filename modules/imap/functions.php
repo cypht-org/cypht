@@ -608,7 +608,7 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
     $res = '';
 
     foreach ($struct as $id => $vals) {
-        if(is_array($vals) && $vals['type'] != 'multipart' && isset($vals['file_attributes']) && !empty($vals['file_attributes'])) {
+        if(is_array($vals) && isset($vals['type']) && $vals['type'] != 'multipart' && isset($vals['file_attributes']) && !empty($vals['file_attributes'])) {
             $size = get_imap_size($vals);
             $desc = get_part_desc($vals, $id, $part);
 
