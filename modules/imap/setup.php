@@ -35,6 +35,7 @@ add_handler('settings', 'process_text_only_setting', true, 'imap', 'date', 'afte
 add_handler('settings', 'process_msg_part_icons', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_simple_msg_parts', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_pagination_links', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_enable_simple_download_options', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_max_google_contacts_number', true, 'imap', 'date', 'after');
@@ -50,6 +51,7 @@ add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_se
 add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
+add_output('settings', 'enable_simple_download_options', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'max_google_contacts_number', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'review_sent_email', true, 'imap', 'imap_pagination_links', 'after');
 

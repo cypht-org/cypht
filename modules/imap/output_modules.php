@@ -914,6 +914,7 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
             $checked = ' checked="checked"';
+        } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="simple_msg_parts">'.
