@@ -59,7 +59,9 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         var count = 0;
                         $(list_div).html('');
                         for (i in res.contact_suggestions) {
-                            div.html(res.contact_suggestions[i]);
+                            var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
+                            
+                            div.html(suggestion.contact);
                             if ($(class_name).val().match(div.text())) {
                                 continue;
                             }
@@ -70,7 +72,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                                 first = '';
                             }
                             count++;
-                            $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion unread_link">'+res.contact_suggestions[i]+'</a>');
+                            $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion" data-id="'+suggestion.contact_id+'" data-type="'+suggestion.type+'" data-source="'+suggestion.source+'" unread_link">'+suggestion.contact+'</a>');
                         }
                         if (count > 0) {
                             $(list_div).show();
@@ -147,6 +149,10 @@ var setup_autocomplete_events = function(class_name, list_div, fld_val) {
 };
 
 var add_autocomplete = function(event, class_name, list_div, fld_val) {
+    $(class_name).attr("data-id", $(event.target).data('id'));
+    $(class_name).attr("data-type", $(event.target).data('type'));
+    $(class_name).attr("data-source", $(event.target).data('source'));
+
     if (!fld_val) {
         fld_val = get_search_term(class_name);
     }
