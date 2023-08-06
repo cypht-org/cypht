@@ -41,7 +41,7 @@
 .bubble_dropdown-content {display: none;position: absolute;background-color: #f9f9f9;padding: 10px;border: 1px solid #ddd; min-width: 160px; z-index: 1;}
 .bubble_dropdown-content.show {display: block;}
 .bubble_dropdown-content ul {list-style-type: none;padding: 0;margin: 0;}
-.bubble_dropdown-content ul li span {display: flex; align-items: center; padding: 8px 4px;text-decoration: none;color: #333;}
-.bubble_dropdown-content ul li span:hover { background-color: #f1f1f1;cursor: pointer;}
+.bubble_dropdown-content ul li span, .bubble_dropdown-content ul li a {display: flex; align-items: center; padding: 8px 4px;text-decoration: none;color: #333;}
+.bubble_dropdown-content ul li span:hover, .bubble_dropdown-content ul li a:hover { background-color: #f1f1f1;cursor: pointer;}
 .bubble_dropdown-content ul li img { width: 16px;height: 16px;margin-right: 8px;}
 
