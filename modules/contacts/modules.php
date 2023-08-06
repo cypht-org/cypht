@@ -221,16 +221,21 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
     protected function output() {
         $suggestions = array();
-        foreach ($this->get('contact_suggestions', array()) as $contact) {
-            if (trim($contact->value('display_name'))) {
-                $suggestions[] = $this->html_safe(sprintf(
-                    '%s %s', $contact->value('display_name'), $contact->value('email_address')
-                ));
-            }
-            else {
-                $suggestions[] = $this->html_safe(sprintf(
-                    '%s', $contact->value('email_address')
-                ));
+        foreach ($this->get('contact_suggestions', array()) as $item) {
+            if(is_array($item)){
+                $contact = $item[1];
+                $contact_id = $item[0];
+
+                if (trim($contact->value('display_name'))) {
+                    $suggestions[] = $this->html_safe(sprintf(
+                        '{"contact_id":%s, "contact": "%s %s", "type": "%s", "source": "%s"}', $contact_id, $contact->value('display_name'), $contact->value('email_address'), $contact->value('type'), $contact->value('source')
+                    ));
+                }
+                else {
+                    $suggestions[] = $this->html_safe(sprintf(
+                        '%s', $contact->value('email_address')
+                    ));
+                }
             }
         }
         $this->out('contact_suggestions', $suggestions);

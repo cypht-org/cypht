@@ -54,7 +54,7 @@ class Hm_Contact_Store {
                     continue;
                 }
                 if ($this->search_contact($contact, $fld, $term)) {
-                    $res[$id] = $contact;
+                    $res[$id] = [$id, $contact];
                     $found[$contact->value('email_address')] = 1;
                 }
             }
