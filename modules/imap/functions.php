@@ -1411,11 +1411,7 @@ function parse_sieve_config_host($host) {
     $host = $url['host'] ?? $url['path'];
     $port = $url['port'] ?? '4190';
     $scheme = $url['scheme'] ?? 'tcp://';
-    $tls = false;
-    if ($scheme != 'ssl') {
-        $tls = true;
-    } else {
-        $host = $scheme.$host;
-    }
+    $tls = $scheme === 'tls';
+    // $host = '$scheme://'.$host;
     return [$host, $port, $tls];
 }}
