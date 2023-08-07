@@ -373,8 +373,8 @@ var toggle_bubble_dropdown = function(element) {
 }
 
 var copy_text_to_clipboard = function(e) {
-    e.parentNode.parentNode.remove();
     navigator.clipboard.writeText(e.dataset.value);
+    $(".bubble_dropdown-content").remove();
 }
 
 var is_valid_recipient = function(recipient) {
@@ -463,7 +463,8 @@ $(function() {
             $(this).find('input').focus();
         });
         $(document).on('click', '.bubble_close', function(e) {
-            e.stopPropagation();
+            e.stopPropagation();   
+            $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });
     }
