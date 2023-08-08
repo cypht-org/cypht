@@ -736,13 +736,12 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
             $res .= '<span class="down">'.$this->trans('Down').'</span>';
         }
         $this->out('imap_status_display', $res);
-
         $res = '';
         $capabilities = $this->get('sieve_server_capabilities', array());
         if ($capabilities) {
             $res .= '<span class="sieve_extensions">'.implode(', ', $capabilities).'</span>';
         }
-        $this->out('imap_detail_display', $res);
+        $this->out('sieve_detail_display', $res);
     }
 }
 
