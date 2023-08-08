@@ -9,6 +9,8 @@ add_module_to_all_pages('handler', 'sieve_filters_enabled', true, 'sievefilters'
 add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
 add_handler('ajax_hm_folders', 'sieve_filters_enabled', true, 'core', 'load_user_data', 'after');
 
+add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_status', 'before');
+
 setup_base_page('sieve_filters', 'core');
 setup_base_page('block_list', 'core');
 
@@ -113,7 +115,7 @@ return array(
         'ajax_sieve_unblock_sender',
         'ajax_sieve_get_mailboxes',
         'ajax_sieve_block_domain',
-        'ajax_sieve_block_change_behaviour'
+        'ajax_sieve_block_change_behaviour',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -122,7 +124,8 @@ return array(
         'conditions' => array(FILTER_UNSAFE_RAW, false),
         'actions' => array(FILTER_UNSAFE_RAW, false),
         'test_type' => array(FILTER_UNSAFE_RAW, false),
-        'mailboxes' => array(FILTER_UNSAFE_RAW, false)
+        'mailboxes' => array(FILTER_UNSAFE_RAW, false),
+        'sieve_detail_display' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
