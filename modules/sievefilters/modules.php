@@ -1363,6 +1363,39 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * Check the status of an SIEVE server
+ * @subpackage sieve/handler
+ */
+class Hm_Handler_sieve_status extends Hm_Handler_Module {
+    protected static $capabilities = [];
+
+    /**
+     * Output used on the info page to display the server status
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $ids = explode(',', $form['imap_server_ids']);
+            foreach ($ids as $id) {
+                $imap_account = Hm_IMAP_List::get($id, true);
+                if (isset($imap_account['sieve_config_host'])) {
+                    if (isset(self::$capabilities[$imap_account['sieve_config_host']])) {
+                        $this->out('sieve_server_capabilities', self::$capabilities[$imap_account['sieve_config_host']]);
+                        continue;
+                    }
+                    $clientFactory = new Hm_Sieve_Client_Factory();
+                    $client = $clientFactory->init(null, $imap_account);
+                    if ($client) {
+                        $this->out('sieve_server_capabilities', $client->getCapabilities());
+                        self::$capabilities[$imap_account['sieve_config_host']] = $client->getCapabilities();
+                    }
+                }
+            }
+        }
+    }
+}
+
 if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {

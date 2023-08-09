@@ -261,7 +261,8 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<div class="content_title">Status</div><table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
-                $this->trans('Status').'</th></tr></thead><tbody>';
+                $this->trans('Status').'</th><th>'.
+                $this->trans('Sieve server capabilities').'</th></tr></thead><tbody>';
         return $res;
     }
 }
