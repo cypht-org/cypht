@@ -644,7 +644,7 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
                 $("#filter_block_txt").html(title);
                 $("#filter_block_txt")
                     .parent()
-                    .removeClass('dropdown-toggle')
+                    .removeClass('cypht-dropdown-toggle')
                     .attr('id', 'unblock_sender')
                     .data('target', scope);
             }
@@ -652,7 +652,7 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
                 $("#filter_block_txt").html('BLOCK SENDER');
                 $("#filter_block_txt")
                     .parent()
-                    .addClass('dropdown-toggle')
+                    .addClass('cypht-dropdown-toggle')
                     .removeAttr('id');
             }
         },
@@ -1138,7 +1138,7 @@ $(function() {
     Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
 
-    $(document).on('click', '.dropdown-toggle', function(e) {
+    $(document).on('click', '.cypht-dropdown-toggle', function(e) {
         e.preventDefault();
         $(this).next().toggle();
     });
