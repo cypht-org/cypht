@@ -1695,7 +1695,7 @@ if (!hm_exists('block_filter')) {
 
 if (!hm_exists('block_filter_dropdown')) {
     function block_filter_dropdown($mod, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block') {
-        $ret = '<div class="dropdown">'
+        $ret = '<div class="cypht-dropdown">'
         .'<form id="block_sender_form">';
         if ($with_scope) {
             $ret .= '<div><label>'.$mod->trans('Who Is Blocked').'</label>'
