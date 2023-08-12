@@ -190,7 +190,7 @@ function hm_theme_icons($color='white') {
             $raw = rawurldecode(Hm_Image_Sources::$$name);
             $pre = substr($raw, 0, 19);
             $img = substr($raw, 19);
-            Hm_Image_Sources::$$name = $pre.rawurlencode(str_replace('/>', 'fill="'.$color.'" />', $img));
+            Hm_Image_Sources::$$name = $pre.rawurlencode(str_replace('/>', ' fill="'.$color.'" />', $img));
         }
     }
 }}
