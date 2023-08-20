@@ -23,12 +23,13 @@ jobs:
       - name: Composer (php-actions)
         uses: php-actions/composer@v6
         with:
-          php_version: "7.2"
+          php_version: "7.4"
 
       - name: PHPUnit (php-actions)
         uses: php-actions/phpunit@v3
         with:
           configuration: tests/phpunit/phpunit.xml
-          php_version: "7.2"
+          php_version: "7.4"
+          version:"2.0.0"
 
 
