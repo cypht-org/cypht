@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Uid_Cache extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         Test_Uid_Cache::load(array(array('foo', 'bar'),array()));
     }
     /**
@@ -67,7 +67,7 @@ class Hm_Test_Uid_Cache extends TestCase {
 class Hm_Test_Hm_Memcache extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
     /**
@@ -175,7 +175,7 @@ class Hm_Test_Hm_Memcache extends TestCase {
 class Hm_Test_Hm_Redis extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
     /**
@@ -277,7 +277,7 @@ class Hm_Test_Hm_Redis extends TestCase {
 class Hm_Test_Hm_Cache extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->config = new Hm_Mock_Config();
     }
     /**

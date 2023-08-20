@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Functions extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -228,7 +228,7 @@ class Hm_Test_Core_Functions_Debug extends TestCase {
 
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**

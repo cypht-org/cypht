@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Modules_Output extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
@@ -101,7 +101,7 @@ class Hm_Test_Modules_Output extends TestCase {
 class Hm_Test_Handler_Module extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
@@ -193,7 +193,7 @@ class Hm_Test_Handler_Module_Debug extends TestCase {
 
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->parent = build_parent_mock();
         $this->handler_mod = new Hm_Handler_Test($this->parent, 'home');
     }
@@ -213,7 +213,7 @@ class Hm_Test_Handler_Module_Debug extends TestCase {
 class Hm_Test_Output_Module extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->output_mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
     }
     /**

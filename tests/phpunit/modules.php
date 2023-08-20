@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         Hm_Test_Module_List::add('test', 'date', false, false, 'after', true, 'core');
     }
     /**
@@ -136,7 +136,7 @@ class Hm_Test_Modules extends TestCase {
 class Hm_Test_Module_Exec extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->module_exec = new Hm_Module_Exec($config);
     }
@@ -188,8 +188,8 @@ class Hm_Test_Module_Exec extends TestCase {
      * @runInSeparateProcess
      */
     public function test_run_output_module() {
-        require '../../modules/core/setup.php';
-        require '../../modules/core/modules.php';
+        require 'modules/core/setup.php';
+        require 'modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Output_Modules::add('test', 'date', false, false, false, true, 'core');
@@ -205,8 +205,8 @@ class Hm_Test_Module_Exec extends TestCase {
      * @runInSeparateProcess
      */
     public function test_run_handler_modules() {
-        require '../../modules/core/setup.php';
-        require '../../modules/core/modules.php';
+        require 'modules/core/setup.php';
+        require 'modules/core/modules.php';
         $request = new Hm_Mock_Request('HTTP');
         $session = new Hm_Mock_Session();
         Hm_Handler_Modules::add('test', 'date', false, false, false, true, 'core');
@@ -296,7 +296,7 @@ class Hm_Test_Module_Exec_Debug extends TestCase {
 
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->module_exec = new Hm_Module_Exec($config);
     }
@@ -325,7 +325,7 @@ class Hm_Test_Module_Exec_Debug extends TestCase {
 class Hm_Test_Module_Functions extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled

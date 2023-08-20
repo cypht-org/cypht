@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Format extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $config = new Hm_Mock_Config();
         $this->json = new Hm_Format_JSON($config);
         $this->html5 = new Hm_Format_HTML5($config);
@@ -44,7 +44,7 @@ class Hm_Test_Format extends TestCase {
 }
 class Hm_Test_Transform extends TestCase {
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled

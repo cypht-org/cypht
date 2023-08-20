@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Webdav_Formats extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled

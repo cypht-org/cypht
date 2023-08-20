@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_PHP_Session extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -274,7 +274,7 @@ class Hm_Test_PHP_Session extends TestCase {
 class Hm_Test_Redis_Session extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -299,7 +299,7 @@ class Hm_Test_Redis_Session extends TestCase {
 class Hm_Test_Memcached_Session extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -401,7 +401,7 @@ class Hm_Test_Memcached_Session extends TestCase {
 class Hm_Test_DB_Session extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         ini_set('session.use_cookies', '0');
         session_cache_limiter('');
         $this->config = new Hm_Mock_Config();
@@ -558,7 +558,7 @@ class Hm_Test_DB_Session extends TestCase {
 class Hm_Test_Session_Functions extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'tests/phpunit/bootstrap.php'; 
         $this->config = new Hm_Mock_Config();
         require APP_PATH.'modules/site/lib.php';
     }

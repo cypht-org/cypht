@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Output extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->http = new Hm_Output_HTTP();
     }
     /**
@@ -40,7 +40,7 @@ class Hm_Test_Output extends TestCase {
 class Hm_Test_Msgs extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -105,7 +105,7 @@ class Hm_Test_Msgs extends TestCase {
 class Hm_Test_Debug extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -127,7 +127,7 @@ class Hm_Test_Debug extends TestCase {
 class Hm_Test_Elog extends TestCase {
     public function setUp(): void {
         define( 'DEBUG_MODE', true);
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled

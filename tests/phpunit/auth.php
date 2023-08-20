@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Auth extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $this->config = new Hm_Mock_Config();
         setup_db($this->config);
     }

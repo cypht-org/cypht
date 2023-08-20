@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Handler_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require 'tests/phpunit/bootstrap.php';
+        require 'tests/phpunit/helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -567,8 +567,8 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require 'tests/phpunit/bootstrap.php';
+        require 'tests/phpunit/helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -1479,8 +1479,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require 'tests/phpunit/bootstrap.php';
+        require 'tests/phpunit/helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**

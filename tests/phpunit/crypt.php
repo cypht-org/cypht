@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Crypt extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -59,7 +59,7 @@ class Hm_Test_Crypt_Base extends TestCase {
 
     public function setUp(): void {
         define('LIBSODIUM', false);
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
     }
     /**
      * @preserveGlobalState disabled
@@ -166,7 +166,7 @@ class Hm_Test_Crypt_Base extends TestCase {
 class Hm_Test_Request_Key extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require 'tests/phpunit/bootstrap.php';
         $session = new Hm_Mock_Session();
         $request = new Hm_Mock_Request('AJAX');
         Hm_Request_Key::load($session, $request, false);
