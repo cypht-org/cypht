@@ -16,6 +16,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+
+      - name: Set up MariaDB
+        uses: getong/mariadb-action@v1.1
+        with:
+         host port: 3306
+         container port: 3306
+         mysql database: 'cypht_test'
+         mysql root password: 'cypht_test'
+         mysql user: 'cypht_test'
+         mysql password: 'cypht_test'
+
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
