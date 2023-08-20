@@ -23,7 +23,7 @@ jobs:
       - name: Composer (php-actions)
         uses: php-actions/composer@v6
         with:
-        php_version: "7.2"
+          php_version: "7.2"
 
       - name: PHPUnit (php-actions)
         uses: php-actions/phpunit@v3
