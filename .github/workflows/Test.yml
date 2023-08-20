@@ -30,6 +30,5 @@ jobs:
         with:
           configuration: tests/phpunit/phpunit.xml
           php_version: "7.4"
-          version:"2.0.0"
 
 
