@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 return array(
-    'interface_lang' => 'zh',
+    'interface_lang' => 'zh-Hans',
     'interface_direction' => 'ltr',
 
     'Main' => '主要',
