@@ -166,10 +166,24 @@ class Hm_Output_login_end extends Hm_Output_Module {
     protected function output() {
         $js = '<script type="text/javascript">
         document.querySelector("#username").addEventListener("change",function() {
-            this.value !== this.value.trim() && alert("Username contains a leading or trailing space")
+            let msg = document.querySelector(".sys_messages");
+            if (this.value !== this.value.trim() && msg) { 
+                msg.innerHTML = "Username contains a leading or trailing space, If you are sure ignore this warning and continue!";
+                msg.style.display = "block";
+            } else {
+                msg.innerHTML = "";
+                msg.style.display = "none";
+            }
         });
         document.querySelector("#password").addEventListener("change",function() {
-            this.value !== this.value.trim() && alert("Password contains a leading or trailing space")
+            let msg = document.querySelector(".sys_messages");
+            if (this.value !== this.value.trim() && msg) { 
+                msg.innerHTML = "Password contains a leading or trailing space, If you are sure ignore this warning and continue!";
+                msg.style.display = "block";
+            } else {
+                msg.innerHTML = "";
+                msg.style.display = "none";
+            }
         });</script>';
         return '</form>'.$js;
     }
