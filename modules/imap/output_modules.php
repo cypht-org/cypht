@@ -832,7 +832,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
             $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
-                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort'))));
+                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort')), $this->html_safe($this->get('list_keyword'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
