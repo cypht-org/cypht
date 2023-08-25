@@ -569,7 +569,7 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
         $sort_str = '';
     }
     if ($keyword) {
-        $keyword_str = '&amp;sort='.$keyword;
+        $keyword_str = '&amp;keyword='.$keyword;
     }
     else {
         $keyword_str = '';
