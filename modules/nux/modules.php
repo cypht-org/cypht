@@ -154,8 +154,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
             else {
                 Hm_Msgs::add('ERRAn Error Occurred');
             }
-            $msgs = Hm_Msgs::get();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
+            $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
         }
     }
@@ -215,10 +214,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     Hm_Msgs::add('E-mail account successfully added');
-                    $msgs = Hm_Msgs::get();
-                    if (!empty($msgs)) {
-                        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
-                    }
+                    $this->save_hm_msgs();
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     $this->out('nux_server_id', $new_id);

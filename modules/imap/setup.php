@@ -71,6 +71,7 @@ add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type
 add_handler('message_list', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message_list', 'imap_custom_controls', true, 'imap', 'message_list_heading', 'before');
 add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_heading', 'before');
+add_output('message_list', 'snooze_msg_control', true, 'imap', 'imap_custom_controls', 'after');
 
 /* message view page */
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
@@ -284,6 +285,22 @@ add_output('ajax_imap_all_email', 'filter_all_email', true);
 add_handler('ajax_update_server_pw', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_update_server_pw', 'save_imap_servers', true, 'imap', 'save_user_data', 'before');
 
+/* snooze email */
+setup_base_ajax_page('ajax_imap_snooze', 'core');
+add_handler('ajax_imap_snooze', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_snooze', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
+add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
+
+/* unsnooze emails in snoozed folders */
+setup_base_ajax_page('ajax_imap_unsnooze', 'core');
+add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_unsnooze', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_unsnooze', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_unsnooze', 'save_imap_cache',  true);
+add_handler('ajax_imap_unsnooze', 'imap_unsnooze_message',  true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -307,6 +324,8 @@ return array(
         'ajax_imap_mark_as_read',
         'ajax_imap_move_copy_action',
         'ajax_imap_folder_status',
+        'ajax_imap_snooze',
+        'ajax_imap_unsnooze',
     ),
 
     'allowed_output' => array(
@@ -324,7 +343,8 @@ return array(
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
-        'show_pagination_links' => array(FILTER_VALIDATE_BOOLEAN, false)
+        'show_pagination_links' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'snoozed_messages' => array(FILTER_VALIDATE_INT, false),
     ),
 
     'allowed_get' => array(
@@ -386,6 +406,8 @@ return array(
         'max_google_contacts_number' => FILTER_VALIDATE_INT,
         'original_folder' => FILTER_VALIDATE_BOOLEAN,
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
+        'imap_snooze_ids' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'imap_snooze_until' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     )
 );
 
