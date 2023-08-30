@@ -343,7 +343,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
 
-        if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
+        if ($draft_id <= 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
         }
         
