@@ -587,6 +587,3 @@ return array(
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
 ); 
-
-?>
-
