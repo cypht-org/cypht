@@ -6,7 +6,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
 
     public function setUp(): void {
         date_default_timezone_set('UTC');
-        require 'bootstrap.php';
+        require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**

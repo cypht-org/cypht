@@ -129,7 +129,7 @@ class Hm_Test_User_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_path() {
-        $this->assertEquals('./data/testuser.txt',  $this->config->get_path('testuser'));
+        $this->assertEquals(APP_PATH.'tests/phpunit/data/testuser.txt',  $this->config->get_path('testuser'));
     }
     /**
      * @preserveGlobalState disabled
@@ -181,7 +181,7 @@ class Hm_Test_Site_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_site_load() {
-        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
+        $config = new Hm_Site_Config_File(APP_PATH.'tests/phpunit/data/siteconfig.rc');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
     /**
@@ -189,7 +189,7 @@ class Hm_Test_Site_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_user_defaults() {
-        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
+        $config = new Hm_Site_Config_File(APP_PATH.'tests/phpunit/data/siteconfig.rc');
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
     public function tearDown(): void {

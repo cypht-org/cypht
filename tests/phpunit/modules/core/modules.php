@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Handler_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -466,7 +466,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     public function test_save_user_data() {
         $test = new Handler_Test('save_user_data', 'core');
         $res = $test->run();
-        $this->assertEquals(array('user_settings_dir' => './data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
+        $this->assertEquals(array('user_settings_dir' => APP_PATH.'tests/phpunit/data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
     }
     /**
      * @preserveGlobalState disabled
@@ -567,8 +567,8 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -1110,7 +1110,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1479,8 +1479,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
