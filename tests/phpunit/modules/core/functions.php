@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Functions extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
+        require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -228,7 +228,7 @@ class Hm_Test_Core_Functions_Debug extends TestCase {
 
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
+        require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -237,7 +237,7 @@ class Hm_Test_Core_Functions_Debug extends TestCase {
      */
     public function test_get_ini_debug() {
         $mock_config = new Hm_Mock_Config();
-        $mock_config->data['app_data_dir'] = './data';
+        $mock_config->data['app_data_dir'] = APP_PATH.'tests/phpunit/data';
         $mock_config->data['foo.ini'] = 'bar';
         $this->assertEquals(array('foo' => 'bar'), get_ini($mock_config, 'foo.ini'));
         $this->assertEquals(array(), get_ini($mock_config, 'no.ini'));
