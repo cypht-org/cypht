@@ -1373,7 +1373,7 @@ function snooze_formats() {
         'next_month'
     );
     if (date('H') <= 16) {
-        $values = array_push($values, 'later_in_day');
+        array_push($values, 'later_in_day');
     }
     return $values;
 }}
