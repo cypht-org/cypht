@@ -217,7 +217,7 @@ textarea { font-size: 100%; }
 .info_content, .user_settings, .search_content, .list_sources, .confirm_logout, .confirm_logout {
 	background: none !important; background-color: #363636 !important;
 }
-.settings_table, .pop3_section, .imap_server_setup, .nux_add_account {
+.settings_table, .imap_server_setup, .nux_add_account {
 	background: #3c4453 !important;
 }
 .imap_filter {

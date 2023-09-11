@@ -38,23 +38,6 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
         }
         $server = $missing[$form['server_pw_id']];
         switch ($server['type']) {
-            case 'POP3':
-                $current = Hm_POP3_List::dump($server['id']);
-                $current['pass'] = $form['password'];
-                unset($current['nopass']);
-                Hm_POP3_List::add($current, $server['id']);
-                $pop3 = Hm_POP3_List::connect($server['id'], false);
-                if ($pop3->state == 'authed') {
-                    Hm_Msgs::add('Password Updated');
-                    $this->out('connect_status', true);
-                }
-                else {
-                    unset($current['pass']);
-                    Hm_POP3_List::add($current, $server['id']);
-                    Hm_Msgs::add('ERRUnable to authenticate to the POP3 server');
-                    $this->out('connect_status', false);
-                }
-                break;
             case 'SMTP':
                 $current = Hm_SMTP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
@@ -112,16 +95,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
                     $vals['id'] = $index;
                     $vals['type'] = 'IMAP';
                     $key = 'imap_'.$index;
-                    $missing[$key] = $vals;
-                }
-            }
-        }
-        if ($this->module_is_supported('pop3')) {
-            foreach (Hm_POP3_List::dump() as $index => $vals) {
-                if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
-                    $vals['type'] = 'POP3';
-                    $key = 'pop3_'.$index;
                     $missing[$key] = $vals;
                 }
             }

@@ -51,51 +51,6 @@ class Hm_Handler_history_record_feed_message extends Hm_Handler_Module {
 }
 
 /**
- * @subpackage history/handler
- */
-class Hm_Handler_history_record_pop3_message extends Hm_Handler_Module {
-    public function process() {
-        $headers = lc_headers($this->get('pop3_message_headers', array()));
-        if (count($headers) == 0) {
-            return;
-        }
-        $history = $this->session->get('msg_history', array());
-        $url = sprintf('?page=message&uid=%s&list_path=%s', $this->request->post['pop3_uid'],
-            $this->request->post['pop3_list_path']);
-        if (array_key_exists($url, $history)) {
-            return;
-        }
-        $path = explode('_', $this->request->post['pop3_list_path']);
-        $pop3_data = Hm_POP3_List::dump($path[1]);
-        $id = sprintf('pop3_%s_%s', $path[1], $this->request->post['pop3_uid']);
-        $date = '';
-        if (array_key_exists('date', $headers)) {
-            $date = trim($headers['date']);
-        }
-        if (!$date && array_key_exists('delivery-date', $headers)) {
-            $date = trim($headers['delivery-date']);
-        }
-        $from = '';
-        if (array_key_exists('from', $headers)) {
-            $from = trim($headers['from']);
-        }
-        $subject = '';
-        if (array_key_exists('subject', $headers)) {
-            $subject = trim($headers['subject']);
-        }
-        $history[$url] = array(
-            'source' => $pop3_data['name'],
-            'id' => $id,
-            'subject' => $subject,
-            'from' => $from,
-            'date' => $date,
-            'type' => 'pop3'
-        );
-        $this->session->set('msg_history', $history);
-    }
-}
-
-/**
  * @subpackage history/output
  */
 class Hm_Github_Output_Module extends Hm_Output_Module { protected function output() { return ''; } }

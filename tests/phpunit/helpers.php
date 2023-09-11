@@ -77,18 +77,6 @@ class Handler_Test {
         return $this->run_only();
     }
 }
-class Hm_POP3_List extends Hm_Server_Wrapper {
-    public static $state = '';
-    public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
-        self::$server_list[$id]['object'] = new Hm_POP3();
-        self::$server_list[$id]['connected'] = true;
-        self::$server_list[$id]['object']->state = self::$state;
-        return self::$server_list[$id]['object'];
-    }
-    public static function change_state($val) {
-        self::$state = $val;
-    }
-}
 class Hm_SMTP_List extends Hm_Server_Wrapper {
     public static $state = '';
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {

@@ -27,7 +27,6 @@ class Hm_Discover_Services {
     private $smtp_tls = false;
     private $smtp_ports = array(587, 465, 25);
     private $imap_ports = array(993, 143);
-    private $pop3_ports = array(995, 110);
     private $transports = array('tls://' => true, 'tcp://' => false);
     private $service = false;
     private $mail_pre = '';
@@ -85,9 +84,6 @@ class Hm_Discover_Services {
         }
         $this->check_imap_ports();
         if (!$this->port) {
-            $this->check_pop3_ports();
-        }
-        if (!$this->port) {
             return array();
         }
         $this->check_ports($this->smtp_ports, true);
@@ -136,13 +132,6 @@ class Hm_Discover_Services {
         $this->check_ports($this->imap_ports);
         if ($this->port) {
             $this->type = 'imap';
-        }
-    }
-
-    private function check_pop3_ports() {
-        $this->check_ports($this->pop3_ports);
-        if ($this->port) {
-            $this->type = 'pop3';
         }
     }
 
