@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This will no longer be used. Anyone interested can simply ready the Git commit log.
+# Should we continue to use this?
 
 CYPHT_DIR="/home/jason/cypht"
 VERSION="v1.1.0-rc4"
