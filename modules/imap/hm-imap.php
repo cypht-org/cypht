@@ -1090,7 +1090,13 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             if ($esearch_enabled) {
                 $res = $esearch_res;
             }
-            return $this->cache_return_val($res, $cache_command);
+            $found_messages_uids = $this->cache_return_val($res, $cache_command);
+            $found_messages_list = self::get_message_list($found_messages_uids);
+            usort($found_messages_list, 'sort_by_internal_date');
+
+            $found_messages_sorted_uids = array_column($found_messages_list, 'uid');
+
+            return $found_messages_sorted_uids;
         }
         return $res;
     }

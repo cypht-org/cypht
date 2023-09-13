@@ -683,7 +683,7 @@ function filter_message_part($vals) {
 }}
 
 /**
- * Sort callback to sort by internal date
+ * Sort callback to sort by internal date from most recent to oldest
  * @subpackage imap/functions
  * @param array $a first message detail
  * @param array $b second message detail
@@ -692,7 +692,7 @@ function filter_message_part($vals) {
 if (!hm_exists('sort_by_internal_date')) {
 function sort_by_internal_date($a, $b) {
     if ($a['internal_date'] == $b['internal_date']) return 0;
-    return (strtotime($a['internal_date']) < strtotime($b['internal_date']))? -1 : 1;
+    return (strtotime($a['internal_date']) > strtotime($b['internal_date']))? -1 : 1;
 }}
 
 /**
