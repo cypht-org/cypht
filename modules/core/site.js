@@ -1848,6 +1848,6 @@ function fixLtrInRtl() {
 }
 
 function listControlsMenu() {
-    $('#list_controls_menu').toggle();
+    $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
 }
