@@ -55,7 +55,7 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
             // Get right commit date (not merge date) if not a local commit
             $ch = Hm_Functions::c_init();
             if ($ch) {
-                Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/jasonmunro/cypht/commits/'.$commit_hash);
+                Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/cypht-org/cypht/commits/'.$commit_hash);
                 Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
                 Hm_Functions::c_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
                 Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
