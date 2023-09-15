@@ -1217,3 +1217,17 @@ function get_request_params($request) {
 
     return [$server_id, $uid, $folder, $msg_id];
 }}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_sieve_config_host')) {
+function parse_sieve_config_host($host) {
+    $url = parse_url($host);
+    $host = $url['host'] ?? $url['path'];
+    $port = $url['port'] ?? '4190';
+    $scheme = $url['scheme'] ?? 'tcp://';
+    $tls = $scheme === 'tls';
+    // $host = '$scheme://'.$host;
+    return [$host, $port, $tls];
+}}

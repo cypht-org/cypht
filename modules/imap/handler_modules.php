@@ -1516,7 +1516,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                     'user' => $auth_server['username'],
                     'pass' => $auth_server['password']
                 );
-                if (! empty($auth_server['sieve_config_host']) && count(explode(':', $auth_server['sieve_config_host'])) == 2) {
+                if (! empty($auth_server['sieve_config_host'])) {
                     $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
                 }
                 Hm_IMAP_List::add($imap_details, $max);
@@ -1657,14 +1657,9 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                 if ($sieve_enabled) {
                     require_once VENDOR_PATH.'autoload.php';
                     try {
-                        $host_config = explode(':', $sieve_hostname);
-                        $sieve_host = $host_config[0];
-                        $sieve_port = '4190';
-                        if (count($host_config) > 1) {
-                            $sieve_port = $host_config[1];
-                        }
+                        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($sieve_hostname);
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                        $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
                     } catch (Exception $e) {
                         Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                         return;
@@ -1738,14 +1733,9 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
             if (isset($this->request->post['imap_sieve_host'])) {
                 require_once VENDOR_PATH . 'autoload.php';
                 try {
-                    $host_config = explode(':', $this->request->post['imap_sieve_host']);
-                    $sieve_host = $host_config[0];
-                    $sieve_port = '4190';
-                    if (count($host_config) > 1) {
-                        $sieve_port = $host_config[1];
-                    }
+                    list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
                     $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                    $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                    $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
                 } catch (Exception $e) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                     return;
