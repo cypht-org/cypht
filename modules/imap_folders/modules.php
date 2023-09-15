@@ -95,7 +95,7 @@ class Hm_Handler_process_clear_special_folder extends Hm_Handler_Module {
 class Hm_Handler_process_special_folder extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('special_folder_type', 'folder', 'imap_server_id'));
-        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive'), true)) {
+        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive', 'junk'), true)) {
             return;
         }
         $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
@@ -112,7 +112,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         }
         $specials = $this->user_config->get('special_imap_folders', array());
         if (!array_key_exists($form['imap_server_id'], $specials)) {
-            $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '');
+            $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
         }
         $specials[$form['imap_server_id']][$form['special_folder_type']] = $new_folder;
         $this->user_config->set('special_imap_folders', $specials);
@@ -141,11 +141,11 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
 
             $specials = $this->user_config->get('special_imap_folders', array());
             if ($exposed = $imap->get_special_use_mailboxes()) {
-                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '');
+                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '', 'junk' => '');
             } else if ($form['imap_service_name'] == 'gandi') {
-                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive');
+                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive', 'junk' => 'Junk');
             } else {
-                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '');
+                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
             }     
             $this->user_config->set('special_imap_folders', $specials);
 
@@ -292,6 +292,7 @@ class Hm_Handler_special_folders extends Hm_Handler_Module {
                 $this->out('trash_folder', $specials[$this->request->get['imap_server_id']]['trash']);
                 $this->out('archive_folder', $specials[$this->request->get['imap_server_id']]['archive']);
                 $this->out('draft_folder', $specials[$this->request->get['imap_server_id']]['draft']);
+                $this->out('junk_folder', $specials[$this->request->get['imap_server_id']]['junk']);
             }
         }
         else {
@@ -513,6 +514,35 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
         $res .= '<input type="hidden" value="" id="trash_source" />';
         $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Update').'" /> ';
         $res .= ' <input type="button" id="clear_trash_folder" value="'.$this->trans('Remove').'" /><br /><br />';
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
+class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('folder_server') === NULL) {
+            return;
+        }
+        $junk_folder = $this->get('junk_folder', $this->trans('Not set'));
+        if (!$junk_folder) {
+            $junk_folder = $this->trans('Not set');
+        }
+        $res = '<div data-target=".junk_folder_dialog" class="settings_subtitle">'.$this->trans('Junk Folder');
+        $res .= ':<span id="junk_val">'.$junk_folder.'</span></div>';
+        $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
+        $res .= '<div class="folder_dialog junk_folder_dialog">';
+        $res .= '<div class="sp_description">'.$this->trans('If set, spams will be saved in this folder').'</div>';
+        $res .= '<div class="folder_row"><a href="#" class="select_junk_folder">';
+        $res .= $this->trans('Select Folder').'</a>: <span class="selected_junk"></span></div>';
+        $res .= '<ul class="folders junk_folder_select"><li class="junk_title"><a href="#" class="close">';
+        $res .= $this->trans('Cancel').'</a></li></ul>';
+        $res .= '<input type="hidden" value="" id="junk_source" />';
+        $res .= ' <input type="button" id="set_junk_folder" value="'.$this->trans('Update').'" /> ';
+        $res .= ' <input type="button" id="clear_junk_folder" value="'.$this->trans('Remove').'" /><br /><br />';
         $res .= '</div>';
         return $res;
     }

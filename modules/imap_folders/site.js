@@ -181,6 +181,17 @@ var folder_page_assign_draft = function() {
     }
 };
 
+var folder_page_assign_junk = function() {
+    var id = $('#imap_server_folder').val();
+    var folder = $('#junk_source').val();
+    if (id && folder) {
+        assign_special_folder(id, folder, 'junk', function(res) {
+            $('#junk_val').text(res.imap_special_name);
+            $('.selected_junk').text('');
+        });
+    }
+};
+
 var clear_special_folder = function(type) {
     var id = $('#imap_server_folder').val();
     if (id) {
@@ -246,6 +257,7 @@ $(function() {
     $('.select_sent_folder').on("click", function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
     $('.select_archive_folder').on("click", function() { return folder_page_folder_list('archive_folder_select', 'archive_title', 'imap_archive_folder_link', 'selected_archive', 'archive_source'); });
     $('.select_draft_folder').on("click", function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
+    $('.select_junk_folder').on("click", function() { return folder_page_folder_list('junk_folder_select', 'junk_title', 'imap_junk_folder_link', 'selected_junk', 'junk_source'); });
     $('.select_rename_parent_folder').on("click", function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
     $('#create_folder').on("click", function() { folder_page_create(); return false; });
     $('#delete_folder').on("click", function() { folder_page_delete(); return false; });
@@ -255,6 +267,7 @@ $(function() {
     $('#set_sent_folder').on("click", function() { folder_page_assign_sent(); return false; });
     $('#set_archive_folder').on("click", function() { folder_page_assign_archive(); return false; });
     $('#set_draft_folder').on("click", function() { folder_page_assign_draft(); return false; });
+    $('#set_junk_folder').on("click", function() { folder_page_assign_junk(); return false; });
 
     $('#clear_trash_folder').on("click", function() { clear_special_folder('trash'); return false; });
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
