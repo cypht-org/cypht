@@ -578,6 +578,8 @@ return array(
     'Archive to the original folder' => false,
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
+    'Connection To Sieve Server Failed' => false
+
 ); 
 
 ?>
