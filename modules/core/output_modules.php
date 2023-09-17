@@ -227,7 +227,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                 'margin-top:10px;margin-bottom:10px;}#username,#password{width:200px; height:25px;} .err{color:red !important;}.long_session'.
                 '{float:left;}.long_session input{padding:0px;float:none;font-size:18px;}.mobile .long_session{float:left;clear:both;} @media screen and (min-width:400px){.login_form{width:400px;}}'.
                 '.user-icon__signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-120px; box-shadow: #6eb549 .4px 2.4px 6.2px; }'.
-                '.label__signin{width:210px; margin:0px 0px -18px 0px;}
+                '.label__signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;}
                 </style>';
 
             return $css.'<div class="form-container"><form class="login_form" method="POST">';
