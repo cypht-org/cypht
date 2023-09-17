@@ -33,9 +33,10 @@ build_config();
  * @return void
  * */
 function check_php() {
+    $minVersion = 7.4;
     $version = phpversion();
-    if (substr($version, 0, 3) < 5.4) {
-        die('Cypht requires PHP version 5.4 or greater');
+    if (substr($version, 0, 3) < $minVersion) {
+        die("Cypht requires PHP version $minVersion or greater");
     }
     if (!function_exists('mb_strpos')) {
         die('Cypht requires PHP MB support');
