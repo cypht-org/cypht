@@ -218,7 +218,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                     '.user-icon_signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-75px; box-shadow: #6eb549 .4px 2.4px 6.2px; }'.
                     '.label_signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;}'.
                     '.login_form {float : none; padding-left : 0px; padding : 8px; }@media (max-height : 500px){ .user-icon_signin{display:none;}}'.
-                    '.tfa_error{margin-left:0 !important;color:#f93838 !important;}'.
+                    '.tfa_error{margin-left:0 !important; margin-right:0 !important; color:#f93838 !important;}'.
                     '</style>';
                 echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
                 '" dir="'.$this->html_safe($dir).'"><head><meta charset="utf-8" />'.
