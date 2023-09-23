@@ -193,8 +193,8 @@ class Hm_Output_login_start extends Hm_Output_Module {
                     'margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{max-width:100%;min-height:100%;'.
                     'background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,'.
                     '#fff);font-size:1em;height:100%;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
-                    'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid '.
-                    '1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute'.
+                    'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:outset '.
+                    '1px #ddd;background-color:#fff;color:#333;border-radius:6px;}.screen_reader{position:absolute'.
                     ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;'.
                     'padding-top:60px;height:300px;border-radius:0px 0px 20px 0px;margin:0px;background-color:#f5f5f5;'.
                     'width:300px;padding-left:20px;}.login_form input{clear:both;float:left;padding:4px;margin-left:20px;'.
@@ -208,7 +208,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
             }
         }
         if (!$this->get('router_login_state')) {
-            $css = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#6eb549;'.
+            $css = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;'.
                 'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url('.WEB_ROOT.'modules/core/assets/images/cloud.png);'.
                 'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
                 'display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages'.
@@ -272,7 +272,7 @@ class Hm_Output_login extends Hm_Output_Module {
                 '<input autofocus required type="text" placeholder="'.$this->trans('Username').'" id="username" name="username" value="">'.
                 ' <label class="label_signin" for="password">'.$this->trans('Password').'</label>'.
                 '<input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password">'.
-                $stay_logged_in.' <input style="cursor:pointer; display:block; width:50%; background-color:#6eb549; color:white; height:40px;" type="submit" id="login" value="'.$this->trans('Login').'" />';
+                $stay_logged_in.' <input style="cursor:pointer; display:block; width:210px; background-color:#6eb549; color:white; height:40px;" type="submit" id="login" value="'.$this->trans('Login').'" />';
         }
         else {
             $settings = $this->get('changed_settings', array());

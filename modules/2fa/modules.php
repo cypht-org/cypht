@@ -197,7 +197,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 '" /></form></body></html>';
             }
             else{
-                $style = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#6eb549;'.
+                $style = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;'.
                     'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url('.WEB_ROOT.'modules/core/assets/images/cloud.png);'.
                     'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
                     'display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages'.
@@ -208,8 +208,8 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                     'margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{min-width:100px !important;'.
                     'background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,'.
                     '#fff);font-size:1em;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
-                    'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid '.
-                    '1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute'.
+                    'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:outset '.
+                    '1px #ddd;background-color:#fff;color:#333;border-radius:6px;}.screen_reader{position:absolute'.
                     ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{display:flex; justify-content:space-evenly; align-items:center; flex-direction:column;font-size:90%;'.
                     'padding-top:60px;height:360px;border-radius:20px 20px 20px 20px;margin:0px;background-color:rgba(0,0,0,.6);'.
                     'width:300px;}.login_form input{clear:both;float:left;padding:4px;'.
@@ -232,7 +232,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 '<label class="label_signin" for="2fa_code">'.$this->trans('Enter the 6 digit code from your Authenticator application').
                 '</label></div><input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
                 '<input autofocus required id="2fa_code" style="width:200px; height:25px;" type="number" name="2fa_code" value="" placeholder="'.
-                $this->trans('Login code').'" /><input style="cursor:pointer; display:block; width:50%; background-color:#6eb549; color:white; height:40px;" type="submit" value="'.$this->trans('Submit').
+                $this->trans('Login code').'" /><input style="cursor:pointer; display:block; width: 210px; background-color:#6eb549; color:white; height:40px;" type="submit" value="'.$this->trans('Submit').
                 '" /></form></div></body></html>';
             }
             Hm_Functions::cease();
