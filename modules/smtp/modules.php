@@ -1531,6 +1531,9 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
 if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
     $imap = Hm_IMAP_List::connect($imap_server_id);
+    if (! imap_authed($imap)) {
+        return false;
+    }
     if ($imap->select_mailbox($folder)) {
         if ($imap->message_action('DELETE', array($id))) {
             $imap->message_action('EXPUNGE', array($id));
