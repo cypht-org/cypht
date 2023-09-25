@@ -4,7 +4,7 @@
  * NUX modules
  * @package modules
  * @subpackage nux
- * @todo filter/disable features depending on imap/pop3 module sets
+ * @todo filter/disable features depending on imap module sets
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
@@ -59,7 +59,6 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
     public function process() {
 
         $imap_servers = NULL;
-        $pop3_servers = NULL;
         $smtp_servers = NULL;
         $feed_servers = NULL;
         $profiles = NULL;
@@ -68,9 +67,6 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
 
         if (data_source_available($modules, 'imap')) {
             $imap_servers = count(Hm_IMAP_List::dump(false));
-        }
-        if (data_source_available($modules, 'pop3')) {
-            $pop3_servers = count(Hm_POP3_List::dump(false));
         }
         if (data_source_available($modules, 'feeds')) {
             $feed_servers = count(Hm_Feed_List::dump(false));
@@ -85,7 +81,6 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
 
         $this->out('nux_server_setup', array(
             'imap' => $imap_servers,
-            'pop3' => $pop3_servers,
             'feeds' => $feed_servers,
             'smtp' => $smtp_servers,
             'profiles' => $profiles
@@ -154,8 +149,7 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
             else {
                 Hm_Msgs::add('ERRAn Error Occurred');
             }
-            $msgs = Hm_Msgs::get();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
+            $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
         }
     }
@@ -215,10 +209,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     Hm_Msgs::add('E-mail account successfully added');
-                    $msgs = Hm_Msgs::get();
-                    if (!empty($msgs)) {
-                        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(serialize($msgs)));
-                    }
+                    $this->save_hm_msgs();
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     $this->out('nux_server_id', $new_id);
@@ -273,7 +264,7 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
         }
         return '<div class="quick_add_section">'.
             '<div class="nux_step_one">'.
-            $this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP/POP3 sections below.').
+            $this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP sections below.').
             '<br /><br /><label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
             ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
             '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
@@ -329,7 +320,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_help"><div class="nux_title">'.$this->trans('Help').'</div>'.
-            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, POP3, or SMTP access - which most do.').' '.
+            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
         '</div>';
     }
 }
@@ -344,7 +335,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         }
         $server_data = $this->get('nux_server_setup', array());
         $tz = $this->get('tzone');
-        $protos = array('imap', 'pop3', 'smtp', 'feeds', 'profiles');
+        $protos = array('imap', 'smtp', 'feeds', 'profiles');
 
         $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
         $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');

@@ -169,7 +169,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $small_headers = array('subject', 'date', 'from', 'to', 'cc', 'flags');
+            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'cc', 'flags');
             $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -189,6 +189,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $txt .= ' <img alt="" class="account_icon" src="'.Hm_Image_Sources::$star.'" width="16" height="16" /> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
+                        }
+                        elseif ($fld == 'x-snoozed') {
+                            $snooze_header = parse_snooze_header($value);
+                            $txt .= '<tr class="header_'.$fld.'"><th>';
+                            $txt .= $this->trans('Snoozed').'</th><td>'.$this->trans('Until').' '.$this->html_safe($snooze_header['until']).' <a href="#" data-value="unsnooze" class="unsnooze snooze_helper">Unsnooze</a></td></tr>';
                         }
                         elseif ($fld == 'date') {
                             try {
@@ -357,7 +362,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
-            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';  
+            $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
 
             if ($this->get('sieve_filters_enabled')) {
                 $server_id = $this->get('msg_server_id');
@@ -826,16 +832,16 @@ class Hm_Output_filter_unread_data extends Hm_Output_Module {
 }
 
 /**
- * Format message headers for the Sent E-mail page
+ * Format message headers for the Sent, Junk, Draft, Trash E-mail page
  * @subpackage imap/output
  */
-class Hm_Output_filter_sent_data extends Hm_Output_Module {
+class Hm_Output_filter_data extends Hm_Output_Module {
     /**
      * Build ajax response for the All E-mail message list
      */
     protected function output() {
-        if ($this->get('imap_sent_data')) {
-            prepare_imap_message_list($this->get('imap_sent_data'), $this, 'sent');
+        if ($this->get('imap_'.$this->get('list_path').'_data')) {
+            prepare_imap_message_list($this->get('imap_'.$this->get('list_path').'_data'), $this, $this->get('list_path'));
         }
         else {
             $this->out('formatted_message_list', array());
@@ -901,7 +907,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
             $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
-                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort'))));
+                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort')), $this->html_safe($this->get('list_keyword'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
@@ -1174,5 +1180,18 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Add snooze dialog to the message list controls
+ * @subpackage imap/output
+ */
+class Hm_Output_snooze_msg_control extends Hm_Output_Module {
+    protected function output() {
+        $parts = explode('_', $this->get('list_path'));
+        $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
+        $res = snooze_dropdown($this, $unsnooze);
+        $this->concat('msg_controls_extra', $res);
     }
 }

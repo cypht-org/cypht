@@ -74,23 +74,6 @@ function select_box($name, $selected, $opts) {
     return $res;
 }
 
-function pop3_auth_name_setting($current) {
-    return '<tr><td>POP3 authentication server name</td><td><input type="text" value="'.$current.'" name="pop3_auth_name" /></td></tr>';
-}
-
-function pop3_auth_port_setting($current) {
-    return '<tr><td>POP3 authentication server port</td><td><input type="number" value="'.$current.'" name="pop3_auth_port" /></td></tr>';
-}
-
-function pop3_auth_server_setting($current) {
-    return '<tr><td>POP3 authentication server hostname</td><td><input type="text" value="'.$current.'" name="pop3_auth_server" /></td></tr>';
-}
-
-function pop3_auth_tls_setting($current) {
-    return '<tr><td>POP3 authentication server TLS</td><td><input type="checkbox" value="1" '.($current ? 'checked="checked" ' : '').
-        ' name="pop3_auth_tls" /></td></tr>';
-}
-
 function imap_auth_name_setting($current) {
     return '<tr><td>IMAP authentication server name</td><td><input type="text" value="'.$current.'" name="imap_auth_name" /></td></tr>';
 }
@@ -113,7 +96,7 @@ function imap_auth_tls_setting($current) {
 }
 
 function auth_type_setting($selected=false) {
-    return '<tr><td>Authentication Type</td><td>'.select_box('auth_type', $selected, array('DB', 'IMAP', 'POP3')).'</td></tr>';
+    return '<tr><td>Authentication Type</td><td>'.select_box('auth_type', $selected, array('DB', 'IMAP')).'</td></tr>';
 }
 
 function default_smtp_name_setting($current) {
@@ -255,12 +238,6 @@ function setting_defaults() {
             'imap_auth_tls' => '',
             'imap_auth_sieve_conf_host' => ''
         ),
-        'POP3' => array(
-            'pop3_auth_name' => 'localhost',
-            'pop3_auth_server' => 'localhost',
-            'pop3_auth_port' => '110',
-            'pop3_auth_tls' => '',
-        ),
         'SMTP' => array(
             'default_smtp_name' => '',
             'default_smtp_server' => '',
@@ -281,12 +258,12 @@ function output_modules($settings) {
     echo '<div class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$caret.
         '" /> Module Sets</div><div class="config_settings_container">'.
         '<table class="settings_table config_settings">';
-    $mod_str = 'core,contacts,feeds,pop3,imap,smtp,site,account,idle_timer,calendar,'.
+    $mod_str = 'core,contacts,feeds,imap,smtp,site,account,idle_timer,calendar,'.
         'themes,nux,developer,github,wordpress,history,saved_searches,nasa';
     if (array_key_exists('modules', $settings)) {
         $mod_str = $settings['modules'];
     }
-    $mods = array('core', 'contacts', 'feeds', 'pop3', 'imap', 'smtp', 'site', 'account',
+    $mods = array('core', 'contacts', 'feeds', 'imap', 'smtp', 'site', 'account',
         'idle_timer', 'calendar', 'themes', 'nux,developer', 'github', 'wordpress',
         'history', 'saved_searches', 'nasa');
     foreach ($mods as $mod) {
@@ -347,7 +324,6 @@ function output_page($source) { ?><!DOCTYPE html><html dir="ltr" class="ltr_page
                 <?php output_settings(read_config($source)) ?>
                 <?php output_modules(read_config($source)) ?>
                 <input type="button" class="btn" name="test_imap" value="Test IMAP" />
-                <input type="button" class="btn" name="test_pop3" value="Test POP3" />
                 <input type="button" class="btn" name="test_smtp" value="Test SMTP" /><br />
                 <input type="button" class="btn" name="test_smtp" value="Test Database" />
                 <input type="button" class="btn" name="test_files" value="Test Files" />

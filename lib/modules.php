@@ -140,7 +140,7 @@ trait Hm_Modules {
 
     /**
      * Assign the module set name
-     * @param string $source the name of the module set (imap, pop3, core, etc)
+     * @param string $source the name of the module set (imap, core, etc)
      * @return void
      */
     public static function set_source($source) {

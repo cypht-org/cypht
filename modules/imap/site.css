@@ -94,9 +94,23 @@
 .attached_image { margin-right: 20px; margin-bottom: 20px; height: 200px; }
 .attached_image_box { display: flex; flex-wrap: wrap; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
 .list_meta { float: none; margin-left: 37%; }
-.dropdown { display: none; position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
-.dropdown a { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; cursor: pointer; }
-.dropdown a:hover { background-color: #eee; }
+.cypht-dropdown { display: none; position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
+.cypht-dropdown a { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; cursor: pointer; }
+.cypht-dropdown a:hover { background-color: #eee; }
+#block_sender_form { padding: 15px; display: block; }
+#block_sender_form label, #block_sender_form select, #block_sender_form textarea, #block_sender_form button { display: block; margin: 3px 0; width: 100%; }
+#block_sender_form button { color: #fff; background-color: brown; cursor: pointer; }
+#block_sender_form label { text-transform: capitalize; }
+
+.snooze_date_picker, .snooze_helper { color: #333; text-transform: capitalize; }
+.snooze_date_picker { border-top: 1px solid #ddd; }
+.snooze_dropdown { position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
+.snooze_date_picker:hover, .snooze_helper:hover { background-color: #eee; }
+.header_links a.snooze_date_picker, .header_links a.snooze_helper, .msg_controls a.snooze_date_picker, .msg_controls a.snooze_helper { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; }
+.snooze_helper span { float: right; }
+.snooze_date_picker { display: block; padding: 8px 15px; color: #333; font-size: 1rem; cursor: pointer; }
+.unsnooze { color: teal; }
+.header_x-snoozed .unsnooze { margin-left: 20px; }
 
 
 /* Popup container - can be anything you want */

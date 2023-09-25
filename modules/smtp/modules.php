@@ -343,7 +343,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         $this->out('compose_draft', $draft, false);
         $this->out('compose_draft_id', $draft_id);
 
-        if ($draft_id == 0 && array_key_exists('uid', $this->request->get)) {
+        if ($draft_id <= 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
         }
         
@@ -734,7 +734,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* check for associated IMAP server to save a copy */
         if ($imap_server !== false) {
-            $this->out('save_sent_server', $imap_server);
+            $this->out('save_sent_server', $imap_server, false);
             $this->out('save_sent_msg', $mime);
         }
         else {
@@ -1531,6 +1531,9 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
 if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
     $imap = Hm_IMAP_List::connect($imap_server_id);
+    if (! imap_authed($imap)) {
+        return false;
+    }
     if ($imap->select_mailbox($folder)) {
         if ($imap->message_action('DELETE', array($id))) {
             $imap->message_action('EXPUNGE', array($id));

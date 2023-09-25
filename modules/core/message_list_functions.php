@@ -44,6 +44,24 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
         $mailbox_list_title = array('Everything');
     }
+    elseif ($path == 'junk') {
+        $list_path = 'junk';
+        $message_list_since = $handler->user_config->get('junk_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Junk');
+    }
+    elseif ($path == 'trash') {
+        $list_path = 'trash';
+        $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Trash');
+    }
+    elseif ($path == 'drafts') {
+        $list_path = 'drafts';
+        $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('drafts_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Drafts');
+    }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }}
 
@@ -281,10 +299,11 @@ function subject_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('date_callback')) {
 function date_callback($vals, $style, $output_mod) {
+    $snooze_class = isset($vals[2]) && $vals[2]? ' snoozed_date': '';
     if ($style == 'news') {
-        return sprintf('<div class="msg_date">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $snooze_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
-    return sprintf('<td class="msg_date" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $snooze_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
 
 /**
@@ -551,7 +570,7 @@ function search_field_selection($current, $output_mod) {
  * @return string
  */
 if (!hm_exists('build_page_links')) {
-function build_page_links($page_size, $current_page, $total, $path, $filter=false, $sort=false) {
+function build_page_links($page_size, $current_page, $total, $path, $filter=false, $sort=false, $keyword=false) {
     $links = '';
     $first = '';
     $last = '';
@@ -567,6 +586,12 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     }
     else {
         $sort_str = '';
+    }
+    if ($keyword) {
+        $keyword_str = '&amp;keyword='.$keyword;
+    }
+    else {
+        $keyword_str = '';
     }
 
     $max_pages = ceil($total/$page_size);
@@ -585,16 +610,16 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     $next = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
 
     if ($floor > 1 ) {
-        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1'.$filter_str.$sort_str.'">1</a> ... ';
+        $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1'.$keyword_str.$filter_str.$sort_str.'">1</a> ... ';
     }
     if ($ceil < $max_pages) {
-        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.$filter_str.$sort_str.'">'.$max_pages.'</a>';
+        $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.$keyword_str.$filter_str.$sort_str.'">'.$max_pages.'</a>';
     }
     if ($current_page > 1) {
-        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
+        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$keyword_str.$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
     }
     if ($max_pages > 1 && $current_page < $max_pages) {
-        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$keyword_str.$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
     }
     for ($i=1;$i<=$max_pages;$i++) {
         if ($i < $floor || $i > $ceil) {
@@ -604,7 +629,7 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
         if ($i == $current_page) {
             $links .= 'class="current_page" ';
         }
-        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$filter_str.$sort_str.'">'.$i.'</a>';
+        $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$keyword_str.$filter_str.$sort_str.'">'.$i.'</a>';
     }
     return $prev.' '.$first.$links.$last.' '.$next;
 }}

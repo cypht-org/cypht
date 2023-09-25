@@ -38,23 +38,6 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
         }
         $server = $missing[$form['server_pw_id']];
         switch ($server['type']) {
-            case 'POP3':
-                $current = Hm_POP3_List::dump($server['id']);
-                $current['pass'] = $form['password'];
-                unset($current['nopass']);
-                Hm_POP3_List::add($current, $server['id']);
-                $pop3 = Hm_POP3_List::connect($server['id'], false);
-                if ($pop3->state == 'authed') {
-                    Hm_Msgs::add('Password Updated');
-                    $this->out('connect_status', true);
-                }
-                else {
-                    unset($current['pass']);
-                    Hm_POP3_List::add($current, $server['id']);
-                    Hm_Msgs::add('ERRUnable to authenticate to the POP3 server');
-                    $this->out('connect_status', false);
-                }
-                break;
             case 'SMTP':
                 $current = Hm_SMTP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
@@ -112,16 +95,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
                     $vals['id'] = $index;
                     $vals['type'] = 'IMAP';
                     $key = 'imap_'.$index;
-                    $missing[$key] = $vals;
-                }
-            }
-        }
-        if ($this->module_is_supported('pop3')) {
-            foreach (Hm_POP3_List::dump() as $index => $vals) {
-                if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
-                    $vals['type'] = 'POP3';
-                    $key = 'pop3_'.$index;
                     $missing[$key] = $vals;
                 }
             }
@@ -895,3 +868,80 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('junk_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('junk_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process input from the max per source setting for the Trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('trash_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('trash_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process input from the max per source setting for the Draft page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('drafts_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the Drafts page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('drafts_since', $this, 'since_setting_callback');
+    }
+}

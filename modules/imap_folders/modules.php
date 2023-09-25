@@ -95,7 +95,7 @@ class Hm_Handler_process_clear_special_folder extends Hm_Handler_Module {
 class Hm_Handler_process_special_folder extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('special_folder_type', 'folder', 'imap_server_id'));
-        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive'), true)) {
+        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive', 'junk'), true)) {
             return;
         }
         $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
@@ -112,7 +112,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         }
         $specials = $this->user_config->get('special_imap_folders', array());
         if (!array_key_exists($form['imap_server_id'], $specials)) {
-            $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '');
+            $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
         }
         $specials[$form['imap_server_id']][$form['special_folder_type']] = $new_folder;
         $this->user_config->set('special_imap_folders', $specials);
@@ -141,11 +141,11 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
 
             $specials = $this->user_config->get('special_imap_folders', array());
             if ($exposed = $imap->get_special_use_mailboxes()) {
-                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '');
+                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '', 'junk' => '');
             } else if ($form['imap_service_name'] == 'gandi') {
-                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive');
+                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive', 'junk' => 'Junk');
             } else {
-                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '');
+                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
             }     
             $this->user_config->set('special_imap_folders', $specials);
 
@@ -211,31 +211,35 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
                         if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
                             require_once VENDOR_PATH.'autoload.php';
-                            $sieve_options = explode(':', $imap_account['sieve_config_host']);
-                            $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-                            $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
-                            $script_names = array_filter(
-                                $linked_mailboxes,
-                                function ($value) use($old_folder) { 
-                                    return $value == $old_folder;
-                                }
-                            );
-                            $script_names = array_keys($script_names);
-                            foreach ($script_names as $script_name) {
-                                $script_parsed = $client->getScript($script_name);
-                                $script_parsed = str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $script_parsed);
-                                
-                                $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
-                                $new_actions = base64_encode(str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $old_actions));
-                                $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
-                                $client->removeScripts($script_name);
-                                $client->putScript(
-                                    $script_name,
-                                    $script_parsed
+                            list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+                            try {
+                                $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                                $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
+                                $script_names = array_filter(
+                                    $linked_mailboxes,
+                                    function ($value) use($old_folder) { 
+                                        return $value == $old_folder;
+                                    }
                                 );
+                                $script_names = array_keys($script_names);
+                                foreach ($script_names as $script_name) {
+                                    $script_parsed = $client->getScript($script_name);
+                                    $script_parsed = str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $script_parsed);
+                                    
+                                    $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
+                                    $new_actions = base64_encode(str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $old_actions));
+                                    $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
+                                    $client->removeScripts($script_name);
+                                    $client->putScript(
+                                        $script_name,
+                                        $script_parsed
+                                    );
+                                }
+                                $client->close();
+                                Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well');
+                            } catch (Exception $e) {
+                                Hm_Msgs::add("ERRFailed to rename folder in sieve scripts");
                             }
-                            $client->close();
-                            Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well');
                         }
                     }
                     Hm_Msgs::add('Folder renamed');
@@ -292,6 +296,7 @@ class Hm_Handler_special_folders extends Hm_Handler_Module {
                 $this->out('trash_folder', $specials[$this->request->get['imap_server_id']]['trash']);
                 $this->out('archive_folder', $specials[$this->request->get['imap_server_id']]['archive']);
                 $this->out('draft_folder', $specials[$this->request->get['imap_server_id']]['draft']);
+                $this->out('junk_folder', $specials[$this->request->get['imap_server_id']]['junk']);
             }
         }
         else {
@@ -521,6 +526,35 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
 /**
  * @subpackage imap_folders/output
  */
+class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('folder_server') === NULL) {
+            return;
+        }
+        $junk_folder = $this->get('junk_folder', $this->trans('Not set'));
+        if (!$junk_folder) {
+            $junk_folder = $this->trans('Not set');
+        }
+        $res = '<div data-target=".junk_folder_dialog" class="settings_subtitle">'.$this->trans('Junk Folder');
+        $res .= ':<span id="junk_val">'.$junk_folder.'</span></div>';
+        $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
+        $res .= '<div class="folder_dialog junk_folder_dialog">';
+        $res .= '<div class="sp_description">'.$this->trans('If set, spams will be saved in this folder').'</div>';
+        $res .= '<div class="folder_row"><a href="#" class="select_junk_folder">';
+        $res .= $this->trans('Select Folder').'</a>: <span class="selected_junk"></span></div>';
+        $res .= '<ul class="folders junk_folder_select"><li class="junk_title"><a href="#" class="close">';
+        $res .= $this->trans('Cancel').'</a></li></ul>';
+        $res .= '<input type="hidden" value="" id="junk_source" />';
+        $res .= ' <input type="button" id="set_junk_folder" value="'.$this->trans('Update').'" /> ';
+        $res .= ' <input type="button" id="clear_junk_folder" value="'.$this->trans('Remove').'" /><br /><br />';
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage imap_folders/output
+ */
 class Hm_Output_folders_create_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {
@@ -574,21 +608,26 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
             return;
         }
         require_once VENDOR_PATH.'autoload.php';
-        $sieve_options = explode(':', $imap_account['sieve_config_host']);
-        $client = new \PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-        $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
-        $scripts = $client->listScripts();
-        $folders = [];
-        foreach ($scripts as $s) {
-            $script = $client->getScript($s);
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
-            $obj = json_decode(base64_decode($base64_obj))[0];
-            if ($obj && in_array($obj->action, ['copy', 'move'])) {
-                $folders[$s] = $obj->value;
+        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+        try {
+            $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
+            $scripts = $client->listScripts();
+            $folders = [];
+            foreach ($scripts as $s) {
+                $script = $client->getScript($s);
+                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+                $obj = json_decode(base64_decode($base64_obj))[0];
+                if ($obj && in_array($obj->action, ['copy', 'move'])) {
+                    $folders[$s] = $obj->value;
+                }
             }
+            $client->close();
+            return $folders;
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
-        $client->close();
-        return $folders;
     }
 }
 

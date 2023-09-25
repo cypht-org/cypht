@@ -239,7 +239,7 @@ $(function () {
             let sender = $(this).closest('tr').children().first().html();
             let scope = sender.startsWith('*@') ? 'domain': 'sender';
 
-            $('.dropdown').toggle();
+            $('.cypht-dropdown').toggle();
             Hm_Ajax.request(
                 [
                     {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
@@ -261,7 +261,7 @@ $(function () {
         $(document).on('click', '.toggle-behavior-dropdown', function(e) {
             e.preventDefault();
             var default_val = $(this).data('action');
-            $('.dropdown').insertAfter(this).toggle();
+            $('.cypht-dropdown').insertAfter(this).toggle();
             $('#block_sender_form').trigger('reset');
             $('#reject_message').remove();
             $('#block_action').val(default_val).trigger('change');

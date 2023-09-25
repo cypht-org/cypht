@@ -257,7 +257,7 @@ class Hm_Dispatch {
      * @return void
      */
     private function close_connections() {
-        foreach (array('Hm_IMAP_List', 'Hm_POP3_List', 'Hm_SMTP_List') as $class) {
+        foreach (array('Hm_IMAP_List', 'Hm_SMTP_List') as $class) {
             if (Hm_Functions::class_exists($class)) {
                 $class::clean_up();
             }

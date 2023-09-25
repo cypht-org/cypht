@@ -47,7 +47,7 @@ class Hm_Handler_process_recover_settings_form extends Hm_Handler_login {
 class Hm_Handler_check_for_lost_settings extends Hm_Handler_login {
     public function process() {
         if ($this->session->loaded && $this->get('load_settings_failed') &&
-            in_array($this->session->auth_class, array('Hm_Auth_IMAP', 'Hm_Auth_POP3', true))) {
+            in_array($this->session->auth_class, array('Hm_Auth_IMAP', true))) {
             $this->session->set('load_recover_options', true);
             $this->session->set('old_settings_str', $this->user_config->encrypted_str);
             Hm_Msgs::add('ERRUnable to load your settings! You may be able to recover them on the "Recover Settings" page in the Main menu.');
@@ -82,9 +82,6 @@ class Hm_Output_recover_settings_page extends Hm_Output_Module {
         $auth = $this->get('auth_type');
         if ($auth == 'Hm_Auth_IMAP') {
             $type = 'IMAP';
-        }
-        else {
-            $type = 'POP3';
         }
         $res = '<div class="recover_settings_content"><div class="content_title">'.$this->trans('Recover Settings').'</div>';
         $res .= '<div class="recover_form">'.$this->trans('Settings detected that we could not decrypt.').' <b>';

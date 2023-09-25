@@ -1,15 +1,5 @@
 'use strict';
 
-var inline_pop3_msg = function(details, uid, list_path, inline_msg_loaded_callback) {
-    details['uid'] = uid;
-    var path = '.'+details['type']+'_'+details['server_id']+'_'+uid;
-    clear_open_msg(inline_msg_style());
-    msg_container(inline_msg_style(), path);
-    pop3_message_view(uid, list_path, inline_msg_loaded_callback);
-    $('div', $(path)).removeClass('unseen');
-    return false;
-};
-
 var inline_wp_msg = function(uid, list_path, inline_msg_loaded_callback) {
     clear_open_msg(inline_msg_style());
     msg_container(inline_msg_style(), '.'+uid);
@@ -136,7 +126,7 @@ var capture_subject_click = function() {
         var inline_msg_loaded_callback = function() {
             $('.header_subject th').append('<span class="close_inline_msg">X</span>');
             $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
+            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback, false, $(this).data('allowImages')); });
             update_imap_links(uid, details);
         };
 
@@ -149,10 +139,6 @@ var capture_subject_click = function() {
             }
             else if (details['type'] == 'imap') {
                 inline_imap_msg(details, uid, list_path, inline_msg_loaded_callback);
-                return false;
-            }
-            else if (details['type'] == 'pop3') {
-                inline_pop3_msg(details, uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
             else if (list_path.substr(0, 6) == 'github') {

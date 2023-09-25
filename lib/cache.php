@@ -16,7 +16,7 @@
 
 /**
  * Helper struct to provide data sources the don't track messages read or flagged state
- * (like POP3 or RSS) with an alternative.
+ * (like RSS) with an alternative.
  * @package framework
  * @subpackage cache
  */

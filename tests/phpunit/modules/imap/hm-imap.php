@@ -6,7 +6,7 @@ class Hm_Test_Hm_IMAP extends TestCase {
 
     public function setUp(): void {
         define('IMAP_TEST', true);
-        require 'bootstrap.php';
+        require __DIR__.'/../../bootstrap.php';
         require APP_PATH.'modules/imap/hm-imap.php';
         require APP_PATH.'modules/core/message_functions.php';
         $this->create();

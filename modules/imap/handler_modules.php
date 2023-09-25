@@ -265,9 +265,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRUnable to move/copy selected messages');
             }
             if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
-                $msgs = Hm_Msgs::get();
-                Hm_Msgs::flush();
-                $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+                $this->save_hm_msgs();
             }
             $this->out('move_count', $moved);
         }
@@ -854,9 +852,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 Hm_Msgs::add('Message deleted');
                 $this->out('imap_delete_error', false);
             }
-            $msgs = Hm_Msgs::get();
-            Hm_Msgs::flush();
-            $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+            $this->save_hm_msgs();
         }
     }
 }
@@ -921,9 +917,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
             }
         }
-        $msgs = Hm_Msgs::get();
-        Hm_Msgs::flush();
-        $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
+        $this->save_hm_msgs();
     }
 }
 
@@ -957,6 +951,89 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
             }
             if (!$flag_result) {
                 Hm_Msgs::add('ERRAn error occurred trying to flag this message');
+            }
+        }
+    }
+}
+
+/**
+ * Snooze message
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP to snooze the selected message uid
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_snooze_ids', 'imap_snooze_until'));
+        if (!$success) {
+            return;
+        }
+        $snoozed_messages = 0;
+        $snooze_tag = null;
+        if ($form['imap_snooze_until'] != 'unsnooze') {
+            $at = date('D, d M Y H:i:s O');
+            $until = get_snooze_date($form['imap_snooze_until']);
+            $snooze_tag = "X-Snoozed: at $at; until $until";
+        }
+        $ids = explode(',', $form['imap_snooze_ids']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if (imap_authed($imap)) {
+                $folder = hex2bin($folder);
+                if (snooze_message($imap, $msg_id, $folder, $snooze_tag)) {
+                    $snoozed_messages++;
+                }
+            }
+        }
+        $this->out('snoozed_messages', $snoozed_messages);
+        if ($snoozed_messages == count($ids)) {
+            $msg = 'Messages snoozed';
+        } elseif ($snoozed_messages > 0) {
+            $msg = 'Some messages have been snoozed';
+        } else {
+            $msg = 'ERRFailed to snooze selected messages';
+        }
+        Hm_Msgs::add($msg);
+        $this->save_hm_msgs();
+    }
+}
+
+/**
+ * Unsnooze messages
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
+    /**
+     * Use IMAP unsnooze messages in snoozed directory
+     * This should use cron
+     */
+    public function process() {
+        $servers = Hm_IMAP_List::dump();
+        foreach (array_keys($servers) as $server_id) {
+            $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
+            $imap = Hm_IMAP_List::connect($server_id, $cache);
+            if (imap_authed($imap)) {
+                $folder = 'Snoozed';
+                if (!count($imap->get_mailbox_status($folder))) {
+                    continue;
+                }
+                $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
+                foreach ($ret[1] as $msg) {
+                    $msg_headers = $imap->get_message_headers($msg['uid']);
+                    if (isset($msg_headers['X-Snoozed'])) {
+                        try {
+                            $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
+                            if (new DateTime($snooze_headers['until']) <= new DateTime()) {
+                                snooze_message($imap, $msg['uid'], $folder, null);
+                            }
+                        } catch (Exception $e) {
+                            Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
+                        }
+                    }
+                }
             }
         }
     }
@@ -1088,55 +1165,6 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array('SINCE', $date), array($fld, $terms)));
             $this->out('imap_search_results', $msg_list);
             $this->out('folder_status', $status);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
-        }
-    }
-}
-
-/**
- * Get message headers for the Sent page
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_sent extends Hm_Handler_Module {
-    /**
-     * Returns list of message data for the sent page
-     */
-    public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
-            $limit = $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('sent_since_setting', DEFAULT_SINCE));
-            $ids = explode(',', $form['imap_server_ids']);
-            $folder = bin2hex('INBOX');
-            if (array_key_exists('folder', $this->request->post)) {
-                $folder = $this->request->post['folder'];
-            }
-            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
-            }
-            else {
-                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
-            }
-            $folders = array();
-            foreach ($msg_list as $msg) {
-                if (hex2bin($msg['folder']) != hex2bin($folder)) {
-                    $folders[] = hex2bin($msg['folder']);
-                }
-            }
-            if (count($folders) > 0) {
-                $auto_folder = $folders[0];
-                $this->out('auto_sent_folder', $msg_list[0]['server_name'].' '.$auto_folder);
-            }
-            if (array_key_exists('keyword', $this->request->get)) {
-                $keyword = $this->request->get['keyword'];
-                $search_pattern = "/$keyword/i";
-                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
-                    return preg_grep($search_pattern, $filter_msg_list);
-                });
-                $msg_list = $search_result;
-            }
-            $this->out('folder_status', $status);
-            $this->out('imap_sent_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
     }
@@ -1436,7 +1464,16 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                 $callback = 'imap_all_mail_content';
                 break;
             case 'sent':
-                $callback = 'imap_sent_content';
+                $callback = 'imap_folder_content';
+                break;
+            case 'junk':
+                $callback = 'imap_folder_content';
+                break;
+            case 'trash':
+                $callback = 'imap_folder_content';
+                break;
+            case 'drafts':
+                $callback = 'imap_folder_content';
                 break;
             default:
                 $callback = 'imap_background_unread_content';
@@ -1446,8 +1483,8 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
             if ($callback != 'imap_background_unread_content') {
                 $this->out('move_copy_controls', true);
             }
-            if ($path == 'sent') {
-                foreach (imap_sent_sources($callback, $this) as $vals) {
+            if (in_array($path, ['sent', 'junk', 'trash', 'drafts'])) {
+                foreach (imap_sources($callback, $this, $path) as $vals) {
                     $this->append('data_sources', $vals);
                 }
             }
@@ -1516,7 +1553,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                     'user' => $auth_server['username'],
                     'pass' => $auth_server['password']
                 );
-                if (! empty($auth_server['sieve_config_host']) && count(explode(':', $auth_server['sieve_config_host'])) == 2) {
+                if (! empty($auth_server['sieve_config_host'])) {
                     $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
                 }
                 Hm_IMAP_List::add($imap_details, $max);
@@ -1657,14 +1694,9 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                 if ($sieve_enabled) {
                     require_once VENDOR_PATH.'autoload.php';
                     try {
-                        $host_config = explode(':', $sieve_hostname);
-                        $sieve_host = $host_config[0];
-                        $sieve_port = '4190';
-                        if (count($host_config) > 1) {
-                            $sieve_port = $host_config[1];
-                        }
+                        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($sieve_hostname);
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                        $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
                     } catch (Exception $e) {
                         Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                         return;
@@ -1738,14 +1770,9 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
             if (isset($this->request->post['imap_sieve_host'])) {
                 require_once VENDOR_PATH . 'autoload.php';
                 try {
-                    $host_config = explode(':', $this->request->post['imap_sieve_host']);
-                    $sieve_host = $host_config[0];
-                    $sieve_port = '4190';
-                    if (count($host_config) > 1) {
-                        $sieve_port = $host_config[1];
-                    }
+                    list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
                     $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                    $client->connect($form['imap_user'], $form['imap_pass'], false, "", "PLAIN");
+                    $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
                 } catch (Exception $e) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                     return;
@@ -1952,5 +1979,55 @@ class Hm_Handler_process_review_sent_email_setting extends Hm_Handler_Module {
             return $val;
         }
         process_site_setting('review_sent_email', $this, 'review_sent_email_callback', false, true);
+    }
+}
+
+/**
+ * Get message headers for the Sent page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
+    /**
+     * Returns list of message data for the sent page
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $path = $this->request->get['list_path'];
+            $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
+            $ids = explode(',', $form['imap_server_ids']);
+            $folder = bin2hex('INBOX');
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
+            }
+            else {
+                list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
+            }
+            $folders = array();
+            foreach ($msg_list as $msg) {
+                if (hex2bin($msg['folder']) != hex2bin($folder)) {
+                    $folders[] = hex2bin($msg['folder']);
+                }
+            }
+            if (count($folders) > 0) {
+                $auto_folder = $folders[0];
+                $this->out('auto_'.$path.'_folder', $msg_list[0]['server_name'].' '.$auto_folder);
+            }
+            if (array_key_exists('keyword', $this->request->get)) {
+                $keyword = $this->request->get['keyword'];
+                $search_pattern = "/$keyword/i";
+                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
+                    return preg_grep($search_pattern, $filter_msg_list);
+                });
+                $msg_list = $search_result;
+            }
+            $this->out('folder_status', $status);
+            $this->out('imap_'.$path.'_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
+        }
     }
 }

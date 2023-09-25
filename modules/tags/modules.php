@@ -15,7 +15,6 @@ class Hm_Handler_mod_env extends Hm_Handler_Module {
     public function process() {
         $this->out('mod_support', array_filter(array(
             $this->module_is_supported('imap') ? 'imap' : false,
-            $this->module_is_supported('pop3') ? 'pop3' : false,
             $this->module_is_supported('feeds') ? 'feeds' : false,
             $this->module_is_supported('github') ? 'github' : false,
             $this->module_is_supported('wordpress') ? 'wordpress' : false

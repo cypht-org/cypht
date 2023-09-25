@@ -66,6 +66,7 @@ function interface_langs() {
         'hu' => 'Hungarian',
         'pt-BR' => 'Brazilian Portuguese',
         'az' => 'Azerbaijani',
+        'zh-Hans' => 'Chinese Simplified',
     );
 }}
 
@@ -160,7 +161,7 @@ function group_data_sources($array) {
  */
 if (!hm_exists('email_is_active')) {
 function email_is_active($mod_list) {
-    if (in_array('imap', $mod_list, true) || in_array('pop3', $mod_list, true)) {
+    if (in_array('imap', $mod_list, true)) {
         return true;
     }
     return false;
