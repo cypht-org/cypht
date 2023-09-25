@@ -1176,3 +1176,10 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     }
     return false;
 };
+
+var imap_show_add_contact_popup = function() {
+    var popup = document.getElementById("contact_popup");
+    if(!popup.classList.contains("show")) {
+        popup.classList.toggle("show");
+    }
+};

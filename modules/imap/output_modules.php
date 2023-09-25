@@ -197,6 +197,56 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             } catch (Exception $e) {}
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                         }
+                        elseif($fld == 'from'){
+
+                            $regexp = '/\s*(.*[^\s])\s*<\s*(.*[^\s])\s*>/';
+
+                            $contact_email = "";
+                            $contact_name = "";
+
+                            if(preg_match($regexp, $value, $matches)){
+                                $contact_name = $matches[1];
+                                $contact_email =  $matches[2];
+                            }else{
+                                $EmailRegexp = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
+                                if(preg_match($EmailRegexp, $value, $matches)){
+                                    $contact_email = $matches[0][0];
+                                }
+                            }
+
+                            $contacts = $this->get('contact_store');
+                            $contact_exists = !empty($contacts->get(null, $contact_email));
+
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value);
+
+                            if($contact_exists){
+                                $txt .= '<div class="popup" onclick="imap_show_add_contact_popup()">
+                                            <img alt="" src="'.Hm_Image_Sources::$person.'" width="16" height="16" />
+                                            <div class="popup-container" id="contact_popup">
+
+                                            </div>
+                                        </div> ';
+                            } else {
+                                $backends = $this->get('contact_edit', array());
+                                $txt .= '<div class="popup" onclick="imap_show_add_contact_popup()">
+                                            <img alt="" src="'.Hm_Image_Sources::$book.'" width="16" height="16" />
+                                            <div class="popup-container" id="contact_popup">';
+
+                                $txt .= '<div class="add_contact"><form class="add_contact_form" method="POST">'.
+                                        '<input required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
+                                        'value="'.$contact_email.'" /> *<br />'.
+                                        '<input required placeholder="" id="contact_name" type="text" name="contact_name" '.
+                                        'value="'.$contact_name.'" /> *<br />'.
+                                        '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" /> <br />'.
+                                        '<select id="contact_source">';
+                                foreach ($backends as $val) {
+                                    $txt .= '<option value="'.$this->html_safe($val).'">'.$this->html_safe($val).'</option>';
+                                }
+                                $txt .= '</select> <br /> <input onclick="return add_contact_from_message_view(false)" class="add_contact_button" type="button" value="'.$this->trans('Add').'"/> </form></div></div></div>';
+                            }
+                            
+                            $txt .= '</td></tr>';
+                        }
                         else {
                             if (strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');

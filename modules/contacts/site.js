@@ -17,7 +17,7 @@ var delete_contact = function(id, source, type) {
     );
 };
 
-var add_contact_from_message_view = function() {
+var add_contact_from_message_view = function(fromHeader = true) {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
     if (contact) {
@@ -25,7 +25,16 @@ var add_contact_from_message_view = function() {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
-            function(res) { $('.add_contact_controls').toggle(); }
+            function(res) { 
+                if(fromHeader){ 
+                    $('.add_contact_controls').toggle();
+                }else{
+                    var popup = document.getElementById("contact_popup");
+                    if(popup.classList.contains("show")) {
+                        popup.classList.toggle("show");
+                    }
+                } 
+            }
         );
     }
 };
