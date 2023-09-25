@@ -23,3 +23,5 @@ scripts/test.php
 *.sublime-workspace
 composer.phar
 lib/hm3/users/
+/scripts/hm3.ini
+/scripts/hm3.rc
