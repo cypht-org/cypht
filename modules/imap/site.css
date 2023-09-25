@@ -114,12 +114,12 @@
   /* The actual popup */
   .popup > .popup-container {
     visibility: hidden;
-    width: 200px;
+    min-width: 250px;
     background-color: #fff;
-    border: 1px black solid;
-    text-align: center;
+    border: 1px #0000004d solid;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     border-radius: 6px;
-    padding: 20px 0;
+    padding: 5px 10px;
     position: absolute;
     z-index: 1;
     top: 125%;
@@ -156,8 +156,20 @@
   .show > .icon_arrow_up {
     display: block;
   }
+
   .show > .icon_arrow_down {
     display: none;
+  }
+
+  .popup-container_header {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 10px;
+  }
+
+  .popup-container_footer {
+    display: flex;
+    justify-content: center;
   }
 
 

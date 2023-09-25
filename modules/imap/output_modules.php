@@ -214,25 +214,57 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 }
                             }
 
-                            $contacts = $this->get('contact_store');
-                            $contact_exists = !empty($contacts->get(null, $contact_email));
-
-                            $rr = print_r($contacts->get(null, $contact_email), true);
+                            $contact = ($this->get('contact_store'))->get(null, $contact_email);
+                            $contact_exists = !empty($contact);
 
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
                                         </th>
                                             <td>
-                                                <div class="popup" onclick="imap_show_add_contact_popup()"> 
+                                                <div class="popup" onclick="imap_show_add_contact_popup(event)"> 
                                                     <span id="contact_info">' . $this->html_safe($value) . '
                                                     </span>
                                                     <img alt="" class="icon_arrow_up" src="'.Hm_Image_Sources::$arrow_drop_up.'" width="20" height="20" />
                                                     <img alt="" class="icon_arrow_down" src="'.Hm_Image_Sources::$arrow_drop_down.'" width="20" height="20" />
-                                                    <div class="popup-container"  id="contact_popup">';
+                                                    <div class="popup-container"  id="contact_popup">
+                                                        <div class="popup-container_header">
+                                                            <a onclick="imap_show_add_contact_popup()">x</a>
+                                                        </div>';
 
                             if($contact_exists){
-                                $txt .= '<input class="view_contact_btn" type="button" value="'.$this->trans('Show contact').'"/>';
+                                $txt .= '<div>
+                                            <table>
+                                                <tr>
+                                                    <td><strong>Name :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('display_name')).'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Email :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('email_address')).'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tel :</strong></td>
+                                                    <td>
+                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                                                        $this->html_safe($contact->value('phone_number')).'</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Source :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('source')).'
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>';
                             } else {
-                                $txt .= '<button onclick="return add_contact_from_message_view(true)" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'</button>';
+                                $txt .= '<div class="popup-container_footer">
+                                            <button onclick="return add_contact_from_popup()" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'
+                                            </button>
+                                        </div>';
                             }
                             
                             $txt .= '           </div>
