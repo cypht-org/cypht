@@ -20,7 +20,7 @@ var delete_contact = function(id, source, type) {
 var add_contact_from_message_view = function() {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
-  
+
     if (contact) {
       Hm_Ajax.request(
         [
@@ -30,26 +30,6 @@ var add_contact_from_message_view = function() {
         ],
         function (res) {
           $('.add_contact_controls').toggle();
-          window.location.reload();
-          remove_message_content();
-        }
-      );
-    }
-  };
-  
-  var add_contact_from_popup = function () {
-    var source = 'local:local';
-    var contact = $('#contact_info').text().replace('>', '').replace('<', '');
-  
-    if (contact) {
-      Hm_Ajax.request(
-        [
-          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
-          { name: 'contact_value', value: contact },
-          { name: 'contact_source', value: source },
-        ],
-        function (res) {
-          $('.popup .show').removeClass('show');
           window.location.reload();
           remove_message_content();
         }
@@ -66,10 +46,10 @@ var add_contact_from_popup = function() {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
-            function (res) { 
+            function (res) {
                 $(".popup .show").removeClass('show');
-                window.location.reload();
                 remove_message_content();
+                window.location.reload();
             }
         );
     }
@@ -105,7 +85,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         $(list_div).html('');
                         for (i in res.contact_suggestions) {
                             var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
-                            
+
                             div.html(suggestion.contact);
                             if ($(class_name).val().match(div.text())) {
                                 continue;
