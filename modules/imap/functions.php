@@ -85,7 +85,7 @@ function imap_data_sources($callback, $custom=array()) {
 }}
 
 /**
- * Prepare and format message list data 
+ * Prepare and format message list data
  * @subpackage imap/functions
  * @param array $msgs list of message headers to format
  * @param object $mod Hm_Output_Module
