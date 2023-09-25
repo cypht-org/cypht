@@ -100,7 +100,6 @@
 
 /* Popup container - can be anything you want */
 .popup {
-    margin-left: 5px;
     position: relative;
     display: inline-block;
     cursor: pointer;
@@ -108,25 +107,26 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    display: flex;
+    align-items: center;
   }
 
   /* The actual popup */
-  .popup .popup-container {
+  .popup > .popup-container {
     visibility: hidden;
-    width: 350px;
+    width: 200px;
     background-color: #fff;
     border: 1px black solid;
     text-align: center;
     border-radius: 6px;
-    padding: 8px 0;
+    padding: 20px 0;
     position: absolute;
     z-index: 1;
     top: 125%;
-    margin-left: -169px;
   }
 
   /* Popup arrow */
-  .popup .popup-container::after {
+  .popup > .popup-container::after {
     content: "";
     position: absolute;
     bottom: 100%;
@@ -137,12 +137,29 @@
     border-color: transparent transparent #555 transparent;
   }
 
+  .popup > .icon_arrow_up {
+    display: none;
+  }
+
+  .popup > .icon_arrow_down {
+    display: block;
+  }
+
+
   /* Toggle this class - hide and show the popup */
-  .popup .show {
+  .show > .popup-container {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
   }
+
+  .show > .icon_arrow_up {
+    display: block;
+  }
+  .show > .icon_arrow_down {
+    display: none;
+  }
+
 
   /* Add animation (fade in the popup) */
   @-webkit-keyframes fadeIn {

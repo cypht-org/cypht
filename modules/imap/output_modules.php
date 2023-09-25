@@ -217,35 +217,28 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $contacts = $this->get('contact_store');
                             $contact_exists = !empty($contacts->get(null, $contact_email));
 
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value);
+                            $rr = print_r($contacts->get(null, $contact_email), true);
+
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
+                                        </th>
+                                            <td>
+                                                <div class="popup" onclick="imap_show_add_contact_popup()"> 
+                                                    <span id="contact_info">' . $this->html_safe($value) . '
+                                                    </span>
+                                                    <img alt="" class="icon_arrow_up" src="'.Hm_Image_Sources::$arrow_drop_up.'" width="20" height="20" />
+                                                    <img alt="" class="icon_arrow_down" src="'.Hm_Image_Sources::$arrow_drop_down.'" width="20" height="20" />
+                                                    <div class="popup-container"  id="contact_popup">';
 
                             if($contact_exists){
-                                $txt .= '<div class="popup" onclick="imap_show_add_contact_popup()">
-                                            <img alt="" src="'.Hm_Image_Sources::$person.'" width="16" height="16" />
-                                            <div class="popup-container" id="contact_popup">
-
-                                            </div>
-                                        </div> ';
+                                $txt .= '<input class="view_contact_btn" type="button" value="'.$this->trans('Show contact').'"/>';
                             } else {
-                                $backends = $this->get('contact_edit', array());
-                                $txt .= '<div class="popup" onclick="imap_show_add_contact_popup()">
-                                            <img alt="" src="'.Hm_Image_Sources::$book.'" width="16" height="16" />
-                                            <div class="popup-container" id="contact_popup">';
-
-                                $txt .= '<div class="add_contact"><form class="add_contact_form" method="POST">'.
-                                        '<input required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
-                                        'value="'.$contact_email.'" /> *<br />'.
-                                        '<input required placeholder="" id="contact_name" type="text" name="contact_name" '.
-                                        'value="'.$contact_name.'" /> *<br />'.
-                                        '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" /> <br />'.
-                                        '<select id="contact_source">';
-                                foreach ($backends as $val) {
-                                    $txt .= '<option value="'.$this->html_safe($val).'">'.$this->html_safe($val).'</option>';
-                                }
-                                $txt .= '</select> <br /> <input onclick="return add_contact_from_message_view(false)" class="add_contact_button" type="button" value="'.$this->trans('Add').'"/> </form></div></div></div>';
+                                $txt .= '<button onclick="return add_contact_from_message_view(true)" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'</button>';
                             }
                             
-                            $txt .= '</td></tr>';
+                            $txt .= '           </div>
+                                            </div>
+                                        </td>
+                                    </tr>';
                         }
                         else {
                             if (strtolower($name) == 'flags') {

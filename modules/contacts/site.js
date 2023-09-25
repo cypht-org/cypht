@@ -17,22 +17,24 @@ var delete_contact = function(id, source, type) {
     );
 };
 
-var add_contact_from_message_view = function(fromHeader = true) {
+var add_contact_from_message_view = function(from_popup) {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
+
+    if(from_popup) {
+        contact = $('#contact_info').text().replace('>','').replace('<','');
+    }
+
     if (contact) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
             function(res) { 
-                if(fromHeader){ 
+                if(!fromPopup){
                     $('.add_contact_controls').toggle();
                 }else{
-                    var popup = document.getElementById("contact_popup");
-                    if(popup.classList.contains("show")) {
-                        popup.classList.toggle("show");
-                    }
+                    $(".popup .show").removeClass('show');
                 } 
             }
         );
