@@ -97,7 +97,7 @@ var smtp_delete_action = function(event) {
     );
 };
 
-var smpt_error_if_there_is_leading_or_trailing_space = function(element) {
+var error_if_there_is_leading_or_trailing_space = function(element) {
     if (element.val() !== element.val().trim()) {
         if (element.attr('name').slice(-4) === 'user') {
             Hm_Notices.show(['ERRUsername contains a leading or trailing space, If you are sure ignore this warning and continue!']);
@@ -199,7 +199,7 @@ if (hm_page_name() === 'servers') {
     $('.forget_smtp_connection').on('click', smtp_forget_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
     $('.server_content').on('change', '.credentials, .smtp_password, .nux_password', function() {
-        smpt_error_if_there_is_leading_or_trailing_space($(this));
+        error_if_there_is_leading_or_trailing_space($(this));
     });
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
     if (dsp === 'block' || dsp === 'none') {
