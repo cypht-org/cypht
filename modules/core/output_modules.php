@@ -168,7 +168,7 @@ class Hm_Output_login_end extends Hm_Output_Module {
         document.querySelector("#username").addEventListener("change",function() {
             let msg = document.querySelector(".sys_messages");
             if (this.value !== this.value.trim() && msg) { 
-                msg.innerHTML = "Username contains a leading or trailing space, If you are sure ignore this warning and continue!";
+                msg.innerHTML = "<span class=\"err\">Username contains a leading or trailing space, If you are sure ignore this warning and continue!</span>";
                 msg.style.display = "block";
             } else {
                 msg.innerHTML = "";
@@ -178,7 +178,7 @@ class Hm_Output_login_end extends Hm_Output_Module {
         document.querySelector("#password").addEventListener("change",function() {
             let msg = document.querySelector(".sys_messages");
             if (this.value !== this.value.trim() && msg) { 
-                msg.innerHTML = "Password contains a leading or trailing space, If you are sure ignore this warning and continue!";
+                msg.innerHTML = "<span class=\"err\">Password contains a leading or trailing space, If you are sure ignore this warning and continue!</span>";
                 msg.style.display = "block";
             } else {
                 msg.innerHTML = "";

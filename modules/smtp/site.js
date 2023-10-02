@@ -97,6 +97,20 @@ var smtp_delete_action = function(event) {
     );
 };
 
+var smpt_error_if_there_is_leading_or_trailing_space = function(element) {
+    if (element.val() !== element.val().trim()) {
+        if (element.attr('name').slice(-4) === 'user') {
+            Hm_Notices.show(['ERRUsername contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        } else if (element.attr('name').slice(-4) === 'pass') {
+            Hm_Notices.show(['ERRPassword contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        } else if (element.attr('name') === 'nux_password') {
+            Hm_Notices.show(['ERRE-mail Password contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        }
+    } else {
+        Hm_Notices.hide(true);
+    }
+};
+
 var smtp_delete_draft = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_draft'},
@@ -184,6 +198,9 @@ if (hm_page_name() === 'servers') {
     $('.save_smtp_connection').on('click', smtp_save_action);
     $('.forget_smtp_connection').on('click', smtp_forget_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
+    $('.server_content').on('change', '.credentials, .smtp_password, .nux_password', function() {
+        smpt_error_if_there_is_leading_or_trailing_space($(this));
+    });
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
     if (dsp === 'block' || dsp === 'none') {
         $('.smtp_section').css('display', dsp);
@@ -269,7 +286,7 @@ var init_resumable_upload = function () {
     });
     $('.remove_attachment').on('click', function(e) {
         e.preventDefault();
-        var fileUniqueId = $(this).attr('id').replace('remove-', '');
+         var fileUniqueId = $(this).attr('id').replace('remove-', '');
         $(this).parent().parent().next('tr').remove();
         $(this).parent().parent().remove();
         file = r.getFromUniqueIdentifier(fileUniqueId);
@@ -418,7 +435,9 @@ $(function() {
             var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
             $('#send_uploaded_files').val(uploaded_files);
             Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
-            $('.smtp_send_archive').addClass('disabled_input'); 
+            $('.smtp_send_archive').addClass('disabled_input'); $('.compose_server').on('change', function() {
+            get_smtp_profile($('.compose_server').val());
+        });
             $('.smtp_send').on("click", function() { return false; }); 
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
@@ -435,9 +454,7 @@ $(function() {
         if ($('.sys_messages').text() != 'Message Sent') {
             get_smtp_profile($('.compose_server').val());
         }
-        $('.compose_server').on('change', function() {
-            get_smtp_profile($('.compose_server').val());
-        });
+        
         if($('.compose_attach_button').attr('disabled') == 'disabled'){
             check_attachment_dir_access();
         };
