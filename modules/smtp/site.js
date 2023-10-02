@@ -97,6 +97,20 @@ var smtp_delete_action = function(event) {
     );
 };
 
+var smpt_error_if_there_is_leading_or_trailing_space = function(element) {
+    if (element.val() !== element.val().trim()) {
+        if (element.attr('name').slice(-4) === 'user') {
+            Hm_Notices.show(['ERRUsername contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        } else if (element.attr('name').slice(-4) === 'pass') {
+            Hm_Notices.show(['ERRPassword contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        } else if (element.attr('name') === 'nux_password') {
+            Hm_Notices.show(['ERRE-mail Password contains a leading or trailing space, If you are sure ignore this warning and continue!']);
+        }
+    } else {
+        Hm_Notices.hide(true);
+    }
+};
+
 var smtp_delete_draft = function(id) {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_delete_draft'},
@@ -184,6 +198,9 @@ if (hm_page_name() === 'servers') {
     $('.save_smtp_connection').on('click', smtp_save_action);
     $('.forget_smtp_connection').on('click', smtp_forget_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
+    $('.server_content').on('change', '.credentials, .smtp_password, .nux_password', function() {
+        smpt_error_if_there_is_leading_or_trailing_space($(this));
+    });
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
     if (dsp === 'block' || dsp === 'none') {
         $('.smtp_section').css('display', dsp);

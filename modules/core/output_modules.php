@@ -164,7 +164,28 @@ class Hm_Output_login_end extends Hm_Output_Module {
      * Closes the login form
      */
     protected function output() {
-        return '</form>';
+        $js = '<script type="text/javascript">
+        document.querySelector("#username").addEventListener("change",function() {
+            let msg = document.querySelector(".sys_messages");
+            if (this.value !== this.value.trim() && msg) { 
+                msg.innerHTML = "<span class=\"err\">Username contains a leading or trailing space, If you are sure ignore this warning and continue!</span>";
+                msg.style.display = "block";
+            } else {
+                msg.innerHTML = "";
+                msg.style.display = "none";
+            }
+        });
+        document.querySelector("#password").addEventListener("change",function() {
+            let msg = document.querySelector(".sys_messages");
+            if (this.value !== this.value.trim() && msg) { 
+                msg.innerHTML = "<span class=\"err\">Password contains a leading or trailing space, If you are sure ignore this warning and continue!</span>";
+                msg.style.display = "block";
+            } else {
+                msg.innerHTML = "";
+                msg.style.display = "none";
+            }
+        });</script>';
+        return '</form>'.$js;
     }
 }
 
