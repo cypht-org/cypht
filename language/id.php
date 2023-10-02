@@ -591,7 +591,9 @@ return array(
     'Show folders' => 'Tampilkan folder',
     'Show next & previous emails when reading a message' => false,
     'Archive to the original folder' => false,
-    'Move To Blocked Folder' => false
+    'Move To Blocked Folder' => false,
+    'Sieve server capabilities' => false,
+    'Connection To Sieve Server Failed' => false
 ); 
 
 ?>

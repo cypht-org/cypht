@@ -9,6 +9,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 
 require_once VENDOR_PATH.'autoload.php';
 use PhpSieveManager\ManageSieve\Client;
+use PhpSieveManager\Exceptions\SocketException;
 
 require_once APP_PATH.'modules/imap/functions.php';
 require_once APP_PATH.'modules/imap/hm-imap.php';
@@ -25,18 +26,23 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
         }
 
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
-        $script = $client->getScript($this->request->post['sieve_script_name']);
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
-        $this->out('conditions', json_encode(base64_decode($base64_obj)));
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
-        $this->out('actions', json_encode(base64_decode($base64_obj)));
-        if (strstr($script, 'allof')) {
-            $this->out('test_type', 'ALLOF');
-        } else {
-            $this->out('test_type', 'ANYOF');
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $script = $client->getScript($this->request->post['sieve_script_name']);
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
+            $this->out('conditions', json_encode(base64_decode($base64_obj)));
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+            $this->out('actions', json_encode(base64_decode($base64_obj)));
+            if (strstr($script, 'allof')) {
+                $this->out('test_type', 'ALLOF');
+            } else {
+                $this->out('test_type', 'ANYOF');
+            }
+            $client->close();
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
-        $client->close();
     }
 }
 
@@ -58,10 +64,12 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', true);
         if ($sieve_filters_enabled) {
             $factory = get_sieve_client_factory($this->config);
-            $client = $factory->init($this->user_config, $server);
-            if ($client) {
+            try {
+                $client = $factory->init($this->user_config, $server);
                 $sieve_filters_enabled = true;
                 $this->out('sieve_filters_client', $client);
+            } catch (Exception $e) {
+                Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
             }
         }
         $this->out('sieve_filters_enabled', $sieve_filters_enabled);
@@ -93,10 +101,14 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
             }
         }
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
-        $script = $client->getScript($this->request->post['sieve_script_name']);
-        $client->close();
-        $this->out('script', $script);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $script = $client->getScript($this->request->post['sieve_script_name']);
+            $client->close();
+            $this->out('script', $script);
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+        }
     }
 }
 
@@ -122,27 +134,31 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
             }
         }
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
-        $scripts = $client->listScripts();
-
-        foreach ($scripts as $script) {
-            if ($script == 'main_script') {
-                $client->removeScripts('main_script');
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+        
+            $scripts = $client->listScripts();
+            foreach ($scripts as $script) {
+                if ($script == 'main_script') {
+                    $client->removeScripts('main_script');
+                }
+                if ($script == $this->request->post['sieve_script_name']) {
+                    $client->removeScripts($this->request->post['sieve_script_name']);
+                    $this->out('script_removed', true);
+                }
             }
-            if ($script == $this->request->post['sieve_script_name']) {
-                $client->removeScripts($this->request->post['sieve_script_name']);
-                $this->out('script_removed', true);
-            }
+            $scripts = $client->listScripts();
+            $main_script = generate_main_script($scripts);
+            $client->putScript(
+                'main_script',
+                $main_script
+            );
+            $client->activateScript('main_script');
+            $client->close();
+            Hm_Msgs::add('Script removed');
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         }
-        $scripts = $client->listScripts();
-        $main_script = generate_main_script($scripts);
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
-        Hm_Msgs::add('Script removed');
     }
 }
 
@@ -158,38 +174,44 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
             }
         }
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
-        $scripts = $client->listScripts();
-        foreach ($scripts as $script) {
-            if ($script == 'main_script') {
-                $client->removeScripts('main_script');
-            }
-            if ($script == $this->request->post['sieve_script_name']) {
-                $client->removeScripts($this->request->post['sieve_script_name']);
-                $this->out('script_removed', true);
-            }
-        }
-        $scripts = $client->listScripts();
-        $main_script = generate_main_script($scripts);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
 
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
-        Hm_Msgs::add('Script removed');
+            $scripts = $client->listScripts();
+            foreach ($scripts as $script) {
+                if ($script == 'main_script') {
+                    $client->removeScripts('main_script');
+                }
+                if ($script == $this->request->post['sieve_script_name']) {
+                    $client->removeScripts($this->request->post['sieve_script_name']);
+                    $this->out('script_removed', true);
+                }
+            }
+            $scripts = $client->listScripts();
+            $main_script = generate_main_script($scripts);
+
+            $client->putScript(
+                'main_script',
+                $main_script
+            );
+            $client->activateScript('main_script');
+            $client->close();
+            Hm_Msgs::add('Script removed');
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+        }
     }
 }
 
-function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config) {
+function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config, $module) {
+    $factory = get_sieve_client_factory($site_config);
     try {
-        $factory = get_sieve_client_factory($site_config);
         $client = $factory->init($user_config, $mailbox);
+        $scripts = $client->listScripts();
     } catch (Exception $e) {
+        Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         return '';
     }
-    $scripts = $client->listScripts();
     if (array_search('blocked_senders', $scripts, true) === false) {
         return '';
     }
@@ -233,65 +255,69 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
 
         $email_sender = $this->request->post['sender'];
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
 
-        $scripts = $client->listScripts();
+            $current_script = $client->getScript('blocked_senders');
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+            $blocked_list = json_decode(base64_decode($base64_obj));
 
-        $current_script = $client->getScript('blocked_senders');
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-        $blocked_list = json_decode(base64_decode($base64_obj));
-
-        $domain = get_domain($this->request->post['sender']);
-        $blocked_wildcard = '@'.$domain;
-        $new_blocked_list = [];
-        foreach ($blocked_list as $idx => $blocked_sender) {
-            if (!strstr($blocked_sender, $blocked_wildcard)) {
-                $new_blocked_list[] = $blocked_sender;
+            $domain = get_domain($this->request->post['sender']);
+            $blocked_wildcard = '@'.$domain;
+            $new_blocked_list = [];
+            foreach ($blocked_list as $idx => $blocked_sender) {
+                if (!strstr($blocked_sender, $blocked_wildcard)) {
+                    $new_blocked_list[] = $blocked_sender;
+                }
             }
-        }
-        $new_blocked_list[] = $blocked_wildcard;
+            $new_blocked_list[] = $blocked_wildcard;
 
-        if(array_search('blocked_senders', $scripts, true) === false) {
+            if(array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+            }
+
+            // Create Block List Filter
+            $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+            $custom_condition = new \PhpSieveManager\Filters\Condition(
+                "CYPHT GENERATED CONDITION", 'anyof'
+            );
+            foreach ($new_blocked_list as $blocked_sender) {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                $cond->contains('"From" ["'.$blocked_sender.'"]');
+                $custom_condition->addCriteria($cond);
+            }
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+            );
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\StopFilterAction()
+            );
+            $filter->setCondition($custom_condition);
+            $script_parsed = $filter->toScript();
+
+            $main_script = generate_main_script($scripts);
+
+            $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+            $header_obj .= "\n# ".base64_encode(json_encode($new_blocked_list));
+            $script_parsed = $header_obj."\n\n".$script_parsed;
             $client->putScript(
                 'blocked_senders',
-                ''
+                $script_parsed
             );
+            $client->putScript(
+                'main_script',
+                $main_script
+            );
+            $client->activateScript('main_script');
+            $client->close();
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
-
-        // Create Block List Filter
-        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
-        $custom_condition = new \PhpSieveManager\Filters\Condition(
-            "CYPHT GENERATED CONDITION", 'anyof'
-        );
-        foreach ($new_blocked_list as $blocked_sender) {
-            $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
-            $cond->contains('"From" ["'.$blocked_sender.'"]');
-            $custom_condition->addCriteria($cond);
-        }
-        $custom_condition->addAction(
-            new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
-        );
-        $custom_condition->addAction(
-            new \PhpSieveManager\Filters\Actions\StopFilterAction()
-        );
-        $filter->setCondition($custom_condition);
-        $script_parsed = $filter->toScript();
-
-        $main_script = generate_main_script($scripts);
-
-        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
-        $header_obj .= "\n# ".base64_encode(json_encode($new_blocked_list));
-        $script_parsed = $header_obj."\n\n".$script_parsed;
-        $client->putScript(
-            'blocked_senders',
-            $script_parsed
-        );
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
     }
 }
 
@@ -364,92 +390,96 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
 
-        $scripts = $client->listScripts();
-
-        if(array_search('blocked_senders', $scripts, true) === false) {
-            $client->putScript(
-                'blocked_senders',
-                ''
-            );
-        }
-
-        $blocked_senders = [];
-        $current_script = $client->getScript('blocked_senders');
-        $unblock_sender = false;
-        if ($current_script != '') {
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-            $blocked_list = json_decode(base64_decode($base64_obj));
-            foreach ($blocked_list as $blocked_sender) {
-                if ($blocked_sender != $email_sender) {
-                    $blocked_senders[] = $blocked_sender;
-                    continue;
-                }
-                $unblock_sender = true;
+            if(array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
             }
-        }
-        if ($unblock_sender == false || $current_script == '') {
-            $blocked_senders[] = $email_sender;
-        }
 
-        if (count($blocked_senders) == 0 && $unblock_sender) {
+            $blocked_senders = [];
+            $current_script = $client->getScript('blocked_senders');
+            $unblock_sender = false;
+            if ($current_script != '') {
+                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+                $blocked_list = json_decode(base64_decode($base64_obj));
+                foreach ($blocked_list as $blocked_sender) {
+                    if ($blocked_sender != $email_sender) {
+                        $blocked_senders[] = $blocked_sender;
+                        continue;
+                    }
+                    $unblock_sender = true;
+                }
+            }
+            if ($unblock_sender == false || $current_script == '') {
+                $blocked_senders[] = $email_sender;
+            }
+
+            if (count($blocked_senders) == 0 && $unblock_sender) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+                Hm_Msgs::add('Sender Unblocked');
+                return;
+            }
+
+            // Create Block List Filter
+            $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+            $custom_condition = new \PhpSieveManager\Filters\Condition(
+                "CYPHT GENERATED CONDITION", 'anyof'
+            );
+            foreach ($blocked_senders as $blocked_sender) {
+                $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
+                $cond->contains('"From" ["'.$blocked_sender.'"]');
+                $custom_condition->addCriteria($cond);
+            }
+
+            if ($default_behaviour == 'Discard') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
+                );
+            }
+            elseif ($default_behaviour == 'Reject') {
+                $filter->addRequirement('reject');
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
+                );
+            }
+            $custom_condition->addAction(
+                new \PhpSieveManager\Filters\Actions\StopFilterAction()
+            );
+            $filter->setCondition($custom_condition);
+            $script_parsed = $filter->toScript();
+
+            $main_script = generate_main_script($scripts);
+
+            $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+            $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
+            $script_parsed = $header_obj."\n\n".$script_parsed;
             $client->putScript(
                 'blocked_senders',
-                ''
+                $script_parsed
             );
-            Hm_Msgs::add('Sender Unblocked');
+            $client->putScript(
+                'main_script',
+                $main_script
+            );
+            $client->activateScript('main_script');
+            $client->close();
+
+            if ($unblock_sender) {
+                Hm_Msgs::add('Sender Unblocked');
+            } else {
+                Hm_Msgs::add('Sender Blocked');
+            }
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
             return;
-        }
-
-        // Create Block List Filter
-        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
-        $custom_condition = new \PhpSieveManager\Filters\Condition(
-            "CYPHT GENERATED CONDITION", 'anyof'
-        );
-        foreach ($blocked_senders as $blocked_sender) {
-            $cond = \PhpSieveManager\Filters\FilterCriteria::if('header');
-            $cond->contains('"From" ["'.$blocked_sender.'"]');
-            $custom_condition->addCriteria($cond);
-        }
-
-        if ($default_behaviour == 'Discard') {
-            $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\DiscardFilterAction()
-            );
-        }
-        elseif ($default_behaviour == 'Reject') {
-            $filter->addRequirement('reject');
-            $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\RejectFilterAction([""])
-            );
-        }
-        $custom_condition->addAction(
-            new \PhpSieveManager\Filters\Actions\StopFilterAction()
-        );
-        $filter->setCondition($custom_condition);
-        $script_parsed = $filter->toScript();
-
-        $main_script = generate_main_script($scripts);
-
-        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
-        $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
-        $script_parsed = $header_obj."\n\n".$script_parsed;
-        $client->putScript(
-            'blocked_senders',
-            $script_parsed
-        );
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
-
-        if ($unblock_sender) {
-            Hm_Msgs::add('Sender Unblocked');
-        } else {
-            Hm_Msgs::add('Sender Blocked');
         }
     }
 }
@@ -494,111 +524,122 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         $scope_title = ucfirst($scope);
 
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
 
-        $scripts = $client->listScripts();
+            if(array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+            }
 
-        if(array_search('blocked_senders', $scripts, true) === false) {
+            $blocked_senders = [];
+            $current_script = $client->getScript('blocked_senders');
+
+            $blocked_list_actions = [];
+            $unblock_sender = false;
+            if ($current_script != '') {
+                $script_split = preg_split('#\r?\n#', $current_script, 0);
+                $base64_obj = str_replace("# ", "", $script_split[1]);
+                $blocked_list = json_decode(base64_decode($base64_obj));
+                foreach ($blocked_list as $blocked_sender) {
+                    if ($blocked_sender != $email_sender) {
+                        $blocked_senders[] = $blocked_sender;
+                        continue;
+                    }
+                    $unblock_sender = true;
+                }
+                $base64_obj_actions = str_replace("# ", "", $script_split[2]);
+                if ($base64_obj_actions) {
+                    $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
+                }
+            }
+            if (isset($this->request->post['change_behavior']) && $unblock_sender) {
+                $unblock_sender = false;
+            }
+            if ($unblock_sender == false || $current_script == '') {
+                $blocked_senders[] = $email_sender;
+            }
+            $blocked_senders = array_unique($blocked_senders);
+
+            if (count($blocked_senders) == 0 && $unblock_sender) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+                Hm_Msgs::add($scope_title . ' Unblocked');
+                return;
+            }
+
+            $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
+            foreach ($blocked_senders as $blocked_sender) {
+                if ($blocked_sender == $email_sender) {
+                    $actions = block_filter(
+                        $filter,
+                        $this->user_config,
+                        $this->request->post['block_action'],
+                        $this->request->post['imap_server_id'],
+                        $blocked_sender,
+                        $this->request->post['reject_message']
+                    );
+                } elseif (array_key_exists($blocked_sender, $blocked_list_actions)) {
+                    $reject_message = '';
+                    if ($blocked_list_actions[$blocked_sender]['action'] == 'reject_with_message') {
+                        $reject_message = $blocked_list_actions[$blocked_sender]['reject_message'];
+                    }
+                    $actions = block_filter(
+                        $filter,
+                        $this->user_config,
+                        $blocked_list_actions[$blocked_sender]['action'],$this->request->post['imap_server_id'],
+                        $blocked_sender,
+                        $reject_message
+                    );
+                } else {
+                    $actions = block_filter(
+                        $filter,
+                        $this->user_config,
+                        'default',
+                        $this->request->post['imap_server_id'],
+                        $blocked_sender
+                    );
+                }
+                $blocked_list_actions[$blocked_sender] = $actions;
+            }
+
+            $script_parsed = $filter->toScript();
+
+            $main_script = generate_main_script($scripts);
+
+            $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
+            $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
+            $header_obj .= "\n# ".base64_encode(json_encode($blocked_list_actions));
+            $script_parsed = $header_obj."\n\n".$script_parsed;
+
             $client->putScript(
                 'blocked_senders',
-                ''
+                $script_parsed
             );
-        }
-
-        $blocked_senders = [];
-        $current_script = $client->getScript('blocked_senders');
-
-        $blocked_list_actions = [];
-        $unblock_sender = false;
-        if ($current_script != '') {
-            $script_split = preg_split('#\r?\n#', $current_script, 0);
-            $base64_obj = str_replace("# ", "", $script_split[1]);
-            $blocked_list = json_decode(base64_decode($base64_obj));
-            foreach ($blocked_list as $blocked_sender) {
-                if ($blocked_sender != $email_sender) {
-                    $blocked_senders[] = $blocked_sender;
-                    continue;
-                }
-                $unblock_sender = true;
-            }
-            $base64_obj_actions = str_replace("# ", "", $script_split[2]);
-            if ($base64_obj_actions) {
-                $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
-            }
-        }
-        if ($unblock_sender == false || $current_script == '') {
-            $blocked_senders[] = $email_sender;
-        }
-        $blocked_senders = array_unique($blocked_senders);
-
-        if (count($blocked_senders) == 0 && $unblock_sender) {
             $client->putScript(
-                'blocked_senders',
-                ''
+                'main_script',
+                $main_script
             );
-            Hm_Msgs::add($scope_title . ' Unblocked');
-            return;
-        }
+            $client->activateScript('main_script');
+            $client->close();
 
-        $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
-        foreach ($blocked_senders as $blocked_sender) {
-            if ($blocked_sender == $email_sender) {
-                $actions = block_filter(
-                    $filter,
-                    $this->user_config,
-                    $this->request->post['block_action'],
-                    $this->request->post['imap_server_id'],
-                    $blocked_sender,
-                    $this->request->post['reject_message']
-                );
-            } elseif (array_key_exists($blocked_sender, $blocked_list_actions)) {
-                $reject_message = '';
-                if ($blocked_list_actions[$blocked_sender]['action'] == 'reject_with_message') {
-                    $reject_message = $blocked_list_actions[$blocked_sender]['reject_message'];
-                }
-                $actions = block_filter(
-                    $filter,
-                    $this->user_config,
-                    $blocked_list_actions[$blocked_sender]['action'],$this->request->post['imap_server_id'],
-                    $blocked_sender,
-                    $reject_message
-                );
+            if (isset($this->request->post['change_behavior'])) {
+                Hm_Msgs::add($scope_title . ' Behavior Changed');
             } else {
-                $actions = block_filter(
-                    $filter,
-                    $this->user_config,
-                    'default',
-                    $this->request->post['imap_server_id'],
-                    $blocked_sender
-                );
+                if ($unblock_sender) {
+                    Hm_Msgs::add($scope_title . ' Unblocked');
+                } else {
+                    Hm_Msgs::add($scope_title . ' Blocked');
+                }
             }
-            $blocked_list_actions[$blocked_sender] = $actions;
-        }
-
-        $script_parsed = $filter->toScript();
-
-        $main_script = generate_main_script($scripts);
-
-        $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
-        $header_obj .= "\n# ".base64_encode(json_encode($blocked_senders));
-        $header_obj .= "\n# ".base64_encode(json_encode($blocked_list_actions));
-        $script_parsed = $header_obj."\n\n".$script_parsed;
-
-        $client->putScript(
-            'blocked_senders',
-            $script_parsed
-        );
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
-
-        if ($unblock_sender) {
-            Hm_Msgs::add($scope_title . ' Unblocked');
-        } else {
-            Hm_Msgs::add($scope_title . ' Blocked');
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
     }
 }
@@ -961,32 +1002,36 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
+            foreach ($scripts as $script) {
+                if ($script == 'main_script') {
+                    $client->removeScripts('main_script');
+                }
+                if ($script == $this->request->post['current_editing_filter_name']) {
+                    $client->removeScripts($this->request->post['current_editing_filter_name']);
+                }
+            }
 
-        $scripts = $client->listScripts();
-        foreach ($scripts as $script) {
-            if ($script == 'main_script') {
-                $client->removeScripts('main_script');
-            }
-            if ($script == $this->request->post['current_editing_filter_name']) {
-                $client->removeScripts($this->request->post['current_editing_filter_name']);
-            }
+            $client->putScript(
+                $script_name,
+                $script_parsed
+            );
+
+            $scripts = $client->listScripts();
+            $main_script = generate_main_script($scripts);
+
+            $client->putScript(
+                'main_script',
+                $main_script
+            );
+            $client->activateScript('main_script');
+            $client->close();
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
-
-        $client->putScript(
-            $script_name,
-            $script_parsed
-        );
-
-        $scripts = $client->listScripts();
-        $main_script = generate_main_script($scripts);
-
-        $client->putScript(
-            'main_script',
-            $main_script
-        );
-        $client->activateScript('main_script');
-        $client->close();
     }
 }
 
@@ -1006,17 +1051,22 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
             }
         }
         $factory = get_sieve_client_factory($this->config);
-        $client = $factory->init($this->user_config, $imap_account);
-        $scripts = $client->listScripts();
-        foreach ($scripts as $script) {
-            if ($script == $this->request->post['current_editing_script']) {
-                $client->removeScripts($this->request->post['current_editing_script']);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
+            foreach ($scripts as $script) {
+                if ($script == $this->request->post['current_editing_script']) {
+                    $client->removeScripts($this->request->post['current_editing_script']);
+                }
             }
+            $client->putScript(
+                $script_name,
+                $this->request->post['script']
+            );
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
         }
-        $client->putScript(
-            $script_name,
-            $this->request->post['script']
-        );
     }
 }
 
@@ -1126,34 +1176,35 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
 }
 
 function get_blocked_senders_array($mailbox, $site_config, $user_config) {
+    $factory = get_sieve_client_factory($site_config);
     try {
-        $factory = get_sieve_client_factory($site_config);
         $client = $factory->init($user_config, $mailbox);
-    } catch (Exception $e) {
-        return [];
-    }
-    $scripts = $client->listScripts();
+        $scripts = $client->listScripts();
 
-    if (array_search('blocked_senders', $scripts, true) === false) {
-        return [];
-    }
-
-    $blocked_senders = [];
-    $current_script = $client->getScript('blocked_senders');
-    if ($current_script != '') {
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-        $blocked_list = json_decode(base64_decode($base64_obj));
-        if (!$blocked_list) {
+        if (array_search('blocked_senders', $scripts, true) === false) {
             return [];
         }
-        foreach ($blocked_list as $blocked_sender) {
-            if (explode('@', $blocked_sender)[0] == '') {
-                $blocked_sender = '*'.$blocked_sender;
+
+        $blocked_senders = [];
+        $current_script = $client->getScript('blocked_senders');
+        if ($current_script != '') {
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+            $blocked_list = json_decode(base64_decode($base64_obj));
+            if (!$blocked_list) {
+                return [];
             }
-            $blocked_senders[] = $blocked_sender;
+            foreach ($blocked_list as $blocked_sender) {
+                if (explode('@', $blocked_sender)[0] == '') {
+                    $blocked_sender = '*'.$blocked_sender;
+                }
+                $blocked_senders[] = $blocked_sender;
+            }
         }
+        return $blocked_senders;
+    } catch (Exception $e) {
+        Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+        return [];
     }
-    return $blocked_senders;
 }
 
 
@@ -1199,30 +1250,26 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             if (array_key_exists($idx, $reject_messages)) {
                 $default_reject_message = $reject_messages[$idx];
             }
-            $factory = get_sieve_client_factory($this->get('site_config'));
-            $client = $factory->init($this->get('user_config'), $mailbox);
-            if ($client) {
-                $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'">'
-                .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
-                .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
-                .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
-                if ($default_behaviour == 'Reject') {
-                    $default_behaviour_html .= '<input type="text" class="select_default_reject_message" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
-                }
-                $default_behaviour_html .= '<button class="submit_default_behavior">Submit</button>';
-                $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
-                $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
-                $res .= '<div class="sievefilters_accounts_item">';
-                $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
-                $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
-                $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
-                $res .=  $default_behaviour_html;
-                $res .= '<table class="filter_details"><tbody>';
-                $res .= '<tr><th style="width: 80px;">Sender</th><th style="width: 15%;">Actions</th></tr>';
-                $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::$minus), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'));
-                $res .= '</tbody></table>';
-                $res .= '</div></div></div>';
+            $default_behaviour_html = 'Default Behaviour: <select class="select_default_behaviour" imap_account="'.$idx.'">'
+            .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
+            .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
+            .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
+            if ($default_behaviour == 'Reject') {
+                $default_behaviour_html .= '<input type="text" class="select_default_reject_message" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
             }
+            $default_behaviour_html .= '<button class="submit_default_behavior">Submit</button>';
+            $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
+            $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
+            $res .= '<div class="sievefilters_accounts_item">';
+            $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
+            $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
+            $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
+            $res .=  $default_behaviour_html;
+            $res .= '<table class="filter_details"><tbody>';
+            $res .= '<tr><th style="width: 20px;">Sender</th><th style="width: 40%;">Behavior</th><th style="width: 15%;">Actions</th></tr>';
+            $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::close('#d80f0f')), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'), $this);
+            $res .= '</tbody></table>';
+            $res .= '</div></div></div>';
         }
         return $res;
     }
@@ -1241,44 +1288,40 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         $res .= get_script_modal_content();
         $sieve_supported = 0;
         foreach($mailboxes as $mailbox) {
-            $factory = get_sieve_client_factory($this->get('site_config'));
-            $client = $factory->init($this->get('user_config'), $mailbox);
-            if ($client) {
-                $sieve_supported++;
-                $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
-                $res .= '<div class="sievefilters_accounts_item">';
-                $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
-                $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
-                $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
-                $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
-                $res .= '<table class="filter_details"><tbody>';
-                $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th style="width: 15%;">Actions</th></tr>';
-                $res .= get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), true);
-                $res .= '</tbody></table>';
-                $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
-                                <div style="width: 90%;">
-                                    <h3 style="margin-bottom: 2px;">If conditions are not met</h3>
-                                    <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
+            $sieve_supported++;
+            $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
+            $res .= '<div class="sievefilters_accounts_item">';
+            $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
+            $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
+            $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
+            $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
+            $res .= '<table class="filter_details"><tbody>';
+            $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th style="width: 15%;">Actions</th></tr>';
+            $res .= get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), true);
+            $res .= '</tbody></table>';
+            $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
+                            <div style="width: 90%;">
+                                <h3 style="margin-bottom: 2px;">If conditions are not met</h3>
+                                <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
+                            </div>
+                        </div>
+                        <div style="background-color: #f7f2ef; margin-top: 25px; width: 90%; display: none;">
+                            <div style="padding: 10px;">
+                                <div style="display: flex; height: 30px;">
+                                    <div style="width: 80%;">
+                                        <h5 style="margin-top: 0">Actions</h5>
+                                    </div>
+                                    <div style="flex-grow: 1; text-align: right;">
+                                        <button style="margin-right: 10px;" class="filter_modal_add_else_action_btn">Add Action</button>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <table class="filter_else_actions_modal_table">
+                                    </table>
                                 </div>
                             </div>
-                            <div style="background-color: #f7f2ef; margin-top: 25px; width: 90%; display: none;">
-                                <div style="padding: 10px;">
-                                    <div style="display: flex; height: 30px;">
-                                        <div style="width: 80%;">
-                                            <h5 style="margin-top: 0">Actions</h5>
-                                        </div>
-                                        <div style="flex-grow: 1; text-align: right;">
-                                            <button style="margin-right: 10px;" class="filter_modal_add_else_action_btn">Add Action</button>
-                                        </div>
-                                    </div>
-                                    <div style="width: 100%;">
-                                        <table class="filter_else_actions_modal_table">
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>';
-                $res .= '</div></div></div>';
-            }
+                        </div>';
+            $res .= '</div></div></div>';
         }
         if ($sieve_supported == 0) {
             $res .= '<div class="empty_list">None of the configured IMAP servers support Sieve</div>';
@@ -1413,8 +1456,8 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 if (!hm_exists('get_mailbox_filters')) {
     function get_mailbox_filters($mailbox, $site_config, $user_config, $html=false)
     {
+        $factory = get_sieve_client_factory($site_config);
         try {
-            $factory = get_sieve_client_factory($site_config);
             $client = $factory->init($user_config, $mailbox);
             $scripts = [];
             foreach ($client->listScripts() as $script) {
@@ -1422,8 +1465,9 @@ if (!hm_exists('get_mailbox_filters')) {
                     $scripts[] = $script;
                 }
             }
-        } catch (PhpSieveManager\Exceptions\SocketException $e) {
-            return '';
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return $html ? []: '';
         }
 
         if ($html == false) {
@@ -1619,12 +1663,12 @@ class Hm_Sieve_Client_Factory {
     public function init($user_config = null, $imap_account = null)
     {
         if ($imap_account && ! empty($imap_account['sieve_config_host'])) {
-            $sieve_options = explode(':', $imap_account['sieve_config_host']);
-            $client = new PhpSieveManager\ManageSieve\Client($sieve_options[0], $sieve_options[1]);
-            $client->connect($imap_account['user'], $imap_account['pass'], false, "", "PLAIN");
+            list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+            $client = new PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+            $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
             return $client;
         } else {
-            return null;
+            throw new Exception('Invalid config host');
         }
     }
 }

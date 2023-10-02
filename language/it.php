@@ -584,7 +584,9 @@ return array(
     'Show folders' => 'Mostra cartelle',
     'Show next & previous emails when reading a message' => 'Mostra email successive e precedenti durante la lettura di un messaggio',
     'Archive to the original folder' => 'Archivia nella cartella originale',
-    'Move To Blocked Folder' => false
+    'Move To Blocked Folder' => false,
+    'Sieve server capabilities' => false,
+    'Connection To Sieve Server Failed' => false
 ); 
 
 ?>
