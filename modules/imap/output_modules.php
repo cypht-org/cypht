@@ -169,7 +169,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
     protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
-            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'cc', 'flags');
+            $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
             $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
@@ -278,6 +278,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                             </div>
                                         </td>
                                     </tr>';
+                        }
+                        elseif ($fld == 'reply-to') {
+                            if (str_replace(['<','>'], '', $headers['From']) !== $value) {
+                                $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>&lt;'.$this->html_safe($value).'&gt;</td></tr>';
+                            } else {
+                                $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            }
                         }
                         else {
                             if (strtolower($name) == 'flags') {
