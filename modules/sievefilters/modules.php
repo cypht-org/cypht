@@ -208,67 +208,67 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
     try {
         $client = $factory->init($user_config, $mailbox);
         $scripts = $client->listScripts();
+        if (array_search('blocked_senders', $scripts, true) === false) {
+            return '';
+        }
+        $current_script = $client->getScript('blocked_senders');
+        $blocked_list_actions = [];
+        if ($current_script != '') {
+            $script_split = preg_split('#\r?\n#', $current_script, 0);
+            if (!isset($script_split[1])) {
+                return '';
+            }
+            $base64_obj = str_replace("# ", "", $script_split[1]);
+            $blocked_list = json_decode(base64_decode($base64_obj));        
+            if (!$blocked_list) {
+                return '';
+            }
+            if (isset($script_split[2])) {
+                $base64_obj_actions = str_replace("# ", "", $script_split[2]);
+                $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
+            }
+            foreach ($blocked_list as $blocked_sender) {
+                if (explode('@', $blocked_sender)[0] == '') {
+                    $blocked_sender = '*'.$blocked_sender;
+                }
+                $blocked_senders[] = $blocked_sender;
+            }
+        }
+
+        $actions_map = [
+            'blocked' => $module->trans('Move To Blocked'),
+            'reject_with_message' => $module->trans('Reject With Message'),
+            'reject_default' => $module->trans('Reject'),
+            'discard' => $module->trans('Discard'),
+            'default' => $module->trans('Default'),
+        ];
+        $ret = '';
+        foreach ($blocked_senders as $sender) {
+            $reject_message = $blocked_list_actions[$sender]['reject_message'];
+            $ret .= '<tr><td>'.$sender.'</td><td>';
+            if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
+                $action = $blocked_list_actions[$sender]['action'] ?: 'default';
+                $ret .= $actions_map[$action];
+                if ($action == 'reject_with_message') {
+                    $ret .= ' - '.$reject_message;
+                }
+            } else {
+                $action = 'default';
+                $ret .= 'Default';
+            }
+            $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <img width="15" height="15" alt="'.
+                $module->trans('Change Behavior').'" src="'.Hm_Image_Sources::$edit.'" /></a>';
+            $ret .= '</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
+            if (!strstr($sender, '*')) {
+                $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
+            }
+            $ret .= '</td></tr>';
+        }
+        return $ret;
     } catch (Exception $e) {
         Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         return '';
     }
-    if (array_search('blocked_senders', $scripts, true) === false) {
-        return '';
-    }
-    $current_script = $client->getScript('blocked_senders');
-    $blocked_list_actions = [];
-    if ($current_script != '') {
-        $script_split = preg_split('#\r?\n#', $current_script, 0);
-        if (!isset($script_split[1])) {
-            return '';
-        }
-        $base64_obj = str_replace("# ", "", $script_split[1]);
-        $blocked_list = json_decode(base64_decode($base64_obj));        
-        if (!$blocked_list) {
-            return '';
-        }
-        if (isset($script_split[2])) {
-            $base64_obj_actions = str_replace("# ", "", $script_split[2]);
-            $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
-        }
-        foreach ($blocked_list as $blocked_sender) {
-            if (explode('@', $blocked_sender)[0] == '') {
-                $blocked_sender = '*'.$blocked_sender;
-            }
-            $blocked_senders[] = $blocked_sender;
-        }
-    }
-
-    $actions_map = [
-        'blocked' => $module->trans('Move To Blocked'),
-        'reject_with_message' => $module->trans('Reject With Message'),
-        'reject_default' => $module->trans('Reject'),
-        'discard' => $module->trans('Discard'),
-        'default' => $module->trans('Default'),
-    ];
-    $ret = '';
-    foreach ($blocked_senders as $sender) {
-        $reject_message = $blocked_list_actions[$sender]['reject_message'];
-        $ret .= '<tr><td>'.$sender.'</td><td>';
-        if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
-            $action = $blocked_list_actions[$sender]['action'] ?: 'default';
-            $ret .= $actions_map[$action];
-            if ($action == 'reject_with_message') {
-                $ret .= ' - '.$reject_message;
-            }
-        } else {
-            $action = 'default';
-            $ret .= 'Default';
-        }
-        $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <img width="15" height="15" alt="'.
-            $module->trans('Change Behavior').'" src="'.Hm_Image_Sources::$edit.'" /></a>';
-        $ret .= '</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
-        if (!strstr($sender, '*')) {
-            $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
-        }
-        $ret .= '</td></tr>';
-    }
-    return $ret;
 }
 
 
