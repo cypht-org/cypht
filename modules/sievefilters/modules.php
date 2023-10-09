@@ -208,37 +208,38 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
     try {
         $client = $factory->init($user_config, $mailbox);
         $scripts = $client->listScripts();
+    
+        if (array_search('blocked_senders', $scripts, true) === false) {
+            return '';
+        }
+        $current_script = $client->getScript('blocked_senders');
+        if ($current_script != '') {
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+            $blocked_list = json_decode(base64_decode($base64_obj));
+            if (!$blocked_list) {
+                return '';
+            }
+            foreach ($blocked_list as $blocked_sender) {
+                if (explode('@', $blocked_sender)[0] == '') {
+                    $blocked_sender = '*'.$blocked_sender;
+                }
+                $blocked_senders[] = $blocked_sender;
+            }
+        }
+
+        $ret = '';
+        foreach ($blocked_senders as $sender) {
+            $ret .= '<tr><td>'.$sender.'</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
+            if (!strstr($sender, '*')) {
+                $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
+            }
+            $ret .= '</tr></td></tr>';
+        }
+        return $ret;
     } catch (Exception $e) {
         Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         return '';
     }
-    if (array_search('blocked_senders', $scripts, true) === false) {
-        return '';
-    }
-    $current_script = $client->getScript('blocked_senders');
-    if ($current_script != '') {
-        $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-        $blocked_list = json_decode(base64_decode($base64_obj));
-        if (!$blocked_list) {
-            return '';
-        }
-        foreach ($blocked_list as $blocked_sender) {
-            if (explode('@', $blocked_sender)[0] == '') {
-                $blocked_sender = '*'.$blocked_sender;
-            }
-            $blocked_senders[] = $blocked_sender;
-        }
-    }
-
-    $ret = '';
-    foreach ($blocked_senders as $sender) {
-        $ret .= '<tr><td>'.$sender.'</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
-        if (!strstr($sender, '*')) {
-            $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
-        }
-        $ret .= '</tr></td></tr>';
-    }
-    return $ret;
 }
 
 
