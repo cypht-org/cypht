@@ -342,7 +342,7 @@ return array(
         'imap_expanded_folder_path' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
-        'imap_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
@@ -351,7 +351,7 @@ return array(
     ),
 
     'allowed_get' => array(
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
@@ -361,7 +361,7 @@ return array(
     'allowed_post' => array(
         'server_port' => FILTER_VALIDATE_INT,
         'server' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_server_ids' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_user' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_pass' => FILTER_UNSAFE_RAW,
