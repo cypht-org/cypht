@@ -39,6 +39,8 @@ class SettingsHelpers(WebTest):
         if mod and not self.mod_active(mod):
             return
         self.settings_section(section)
+        if name == 'enable_keyboard_shortcuts':
+            checked = self.by_name(name).is_selected()
         if checked:
             self.is_checked(name)
         else:
