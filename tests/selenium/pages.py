@@ -122,6 +122,8 @@ class PageTests(WebTest):
     def password(self):
         if not self.mod_active('account'):
             return
+        if self.auth_type != 'DB':
+            return
         list_item = self.by_class('menu_change_password')
         list_item.find_element_by_tag_name('a').click()
         self.wait_with_folder_list()

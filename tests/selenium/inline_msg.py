@@ -13,6 +13,7 @@ class InlineMsgTests(SettingsHelpers):
 
     def set_inline_message_test(self):
         self.checkbox_test('general_setting', 'inline_message', False, 'inline_message')
+        self.dropdown_test('email_setting', 'all_email_since', '-1 week', '-5 years')
 
     def navigate_msg_test(self):
         self.by_css('[data-source=".email_folders"]').click()
