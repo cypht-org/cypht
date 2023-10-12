@@ -1,3 +1,4 @@
+from selenium.webdriver.common.by import By
 from base import WebTest, USER, PASS
 from runner import test_runner
 
@@ -11,7 +12,7 @@ class ProfileTest(WebTest):
     def load_profile_page(self):
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_profiles')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text == 'Profiles'
 
@@ -33,7 +34,7 @@ class ProfileTest(WebTest):
         
     def edit_profile(self):
         table = self.by_class('profile_details')
-        table.find_element_by_tag_name('a').click()
+        table.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         name = self.by_name('profile_name')
         name.send_keys('New Name')
@@ -43,7 +44,7 @@ class ProfileTest(WebTest):
         
     def del_profile(self):
         table = self.by_class('profile_details')
-        table.find_element_by_tag_name('a').click()
+        table.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.by_name('profile_delete').click()
         self.wait_on_sys_message()

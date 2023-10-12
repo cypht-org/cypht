@@ -7,13 +7,13 @@
 # remote_creds.example.py:  Configure the Selenium tests to run with BrowserStack
 # local_creds.example.py:   Configure the Selenium tests to run locally
 
-import re
-from creds import SITE_URL, USER, PASS, get_driver
 from selenium.webdriver.common.by import By
-from selenium.common import exceptions
-from contextlib import contextmanager
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as exp_cond
+from selenium.common import exceptions
+import re
+from contextlib import contextmanager
+from creds import SITE_URL, USER, PASS, get_driver
 
 INI_PATH = '../../hm3.ini'
 
@@ -83,35 +83,35 @@ class WebTest:
 
     def logout_no_save(self):
         print(" - logging out")
-        self.driver.find_element_by_class_name('logout_link').click()
+        self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
         logout = self.by_id('logout_without_saving').click()
 
     def logout(self):
         print(" - logging out")
-        self.driver.find_element_by_class_name('logout_link').click()
+        self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
 
     def end(self):
         self.driver.quit()
 
     def by_id(self, el_id):
         print(" - finding element by id {0}".format(el_id))
-        return self.driver.find_element_by_id(el_id)
+        return self.driver.find_element(By.ID, el_id)
 
     def by_tag(self, name):
         print(" - finding element by tag name {0}".format(name))
-        return self.driver.find_element_by_tag_name(name)
+        return self.driver.find_element(By.TAG_NAME, name)
 
     def by_name(self, name):
         print(" - finding element by name {0}".format(name))
-        return self.driver.find_element_by_name(name)
+        return self.driver.find_element(By.NAME, name)
 
     def by_css(self, selector):
         print(" - finding element by selector {0}".format(selector))
-        return self.driver.find_element_by_css_selector(selector)
+        return self.driver.find_element(By.CSS_SELECTOR, selector)
 
     def by_class(self, class_name):
         print(" - finding element by class {0}".format(class_name))
-        return self.driver.find_element_by_class_name(class_name)
+        return self.driver.find_element(By.CLASS_NAME, class_name)
 
     def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=30):
         print(" - waiting for page by {0}: {1} ...".format(el_type, el_value))
@@ -125,9 +125,15 @@ class WebTest:
         self.wait(By.CLASS_NAME, "main_menu")
 
     def wait_on_sys_message(self, timeout=30):
-        wait = WebDriverWait(self.driver, timeout)
-        element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
-)
+        #wait = WebDriverWait(self.driver, timeout)
+        #element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
+        try:
+            element_text = WebDriverWait(self.driver, timeout).until(
+                exp_cond.presence_of_element_located((By.CLASS_NAME, "sys_messages")))
+            print(element_text)
+            return element_text != ""
+        except exceptions.StaleElementReferenceException:
+            return False
 
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':

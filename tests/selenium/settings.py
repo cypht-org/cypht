@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import Select
 from base import WebTest, USER, PASS
 from runner import test_runner
-from selenium.webdriver.support.ui import Select
-
 
 class SettingsHelpers(WebTest):
 
@@ -30,7 +30,7 @@ class SettingsHelpers(WebTest):
         if not self.by_class('settings').is_displayed():
             self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_settings')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
@@ -104,7 +104,9 @@ class SettingsTests(SettingsHelpers):
         self.checkbox_test('general_setting', 'msg_part_icons', False)
 
     def simple_msg_parts_test(self):
-        self.checkbox_test('general_setting', 'simple_msg_parts', False)
+        #self.checkbox_test('general_setting', 'simple_msg_parts', False)
+        # This setting is checked by default in the latest version.
+        self.checkbox_test('general_setting', 'simple_msg_parts', True)
 
     def text_only_test(self):
         self.checkbox_test('general_setting', 'text_only', False)

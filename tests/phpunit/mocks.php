@@ -323,9 +323,9 @@ class Hm_Functions {
     }
 }
 function setup_db($config) {
-    $config->set('db_connection_type', 'host');
-    $config->set('db_socket', '/tmp/test.db');
-    $config->set('db_driver', 'mysql');
+    $config->set('db_connection_type', 'test_db_type');
+    $config->set('db_socket', '/tmp/hm3/test.db');
+    $config->set('db_driver', 'test_db_driver');
     $config->set('db_host', '127.0.0.1');
     $config->set('db_name', 'cypht_test');
     $config->set('db_user', 'cypht_test');

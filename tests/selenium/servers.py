@@ -1,3 +1,4 @@
+from selenium.webdriver.common.by import By
 from base import WebTest, USER, PASS
 from runner import test_runner
 from creds import IMAP_ID
@@ -15,7 +16,7 @@ class ServersTest(WebTest):
     def load_servers_page(self):
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_servers')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text == 'Servers'
 

@@ -5,7 +5,7 @@ phpunit_tests() {
 }
 
 selenium_tests() {
-    cd tests/selenium/ && sh ./runall.sh && cd ../../
+    cd tests/selenium/ && bash ./runall.sh && cd ../../
 }
 
 # Main
@@ -13,12 +13,11 @@ echo "database: ${DB}"
 echo "php-version: ${PHP_V}"
 echo "test-arg: ${TEST_ARG}"
 
-ARG="${TEST_ARG}"
-case "$ARG" in
+case "${TEST_ARG}" in
     phpunit)
         phpunit_tests
     ;;
-    ui)
+    selenium)
         selenium_tests
     ;;
     *)

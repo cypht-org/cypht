@@ -1,0 +1,72 @@
+name: Test CI -selenium
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  Test-selenium:
+    name: (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['7.4']
+        database: ['sqlite']
+
+    env:
+        PHP_V: ${{ matrix.php-versions }}
+        DB: ${{ matrix.database }}
+        TEST_ARG: 'selenium'
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "System Install Dependencies"
+        run: |
+            sudo hostnamectl set-hostname cypht-test.org
+            sudo usermod -aG docker www-data
+            sudo chmod g+s -R "$(pwd)"
+            sudo setfacl -d -m g::rwx "$(pwd)"
+            # chrome
+            #wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor > /etc/apt/trusted.gpg.d/google.gpg
+            sudo wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+            sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+            sudo apt-get update
+            sudo apt-get install -y google-chrome-stable dovecot-imapd dovecot-lmtpd postfix python3-pip
+            sudo bash .github/tests/selenium/webdriver/webdriver.sh
+            pip install -r tests/selenium/requirements.txt
+
+      - name: "Set up PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_V }}
+          extensions: pdo, sodium, curl, mbstring, xml, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, imagick, bcmath, tidy, soap, xdebug, bcmath
+          tools: phpunit, composer
+          ini-values: cgi.fix_pathinfo=1
+        env:
+          fail-fast: true
+
+      - name: "Composer Install Dependencies"
+        run: |
+            composer install
+
+      - name: "Script: setup.sh"
+        run: bash .github/tests/setup.sh
+
+      - name: "Script: test.sh"
+        run: bash .github/tests/test.sh
+
+
+
+
+

@@ -1,10 +1,11 @@
 #!/usr/bin/python
 
+from selenium.common.exceptions import ElementNotVisibleException, ElementNotInteractableException
+from selenium.webdriver.common.keys import Keys
 from base import WebTest, USER, PASS, SITE_URL
 from runner import test_runner
-from selenium.webdriver.common.keys import Keys
 from settings import SettingsHelpers
-from selenium.common.exceptions import ElementNotVisibleException, ElementNotInteractableException
+
 
 
 class KeyboardShortcutTests(SettingsHelpers):

@@ -1,0 +1,59 @@
+name: Test CI -phpunit
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  Test-phpunit:
+    name: (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-versions: ['7.4']
+        # php-versions: ['7.4', '8.2']
+        database: ['mysql', 'postgres', 'sqlite']
+
+    env:
+        PHP_V: ${{ matrix.php-versions }}
+        DB: ${{ matrix.database }}
+        TEST_ARG: 'phpunit'
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: "System Install Dependencies"
+        run: |
+            sudo hostnamectl set-hostname cypht-test.org
+
+      - name: "Set up PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_V }}
+          extensions: pdo, sodium, curl, mbstring, xml, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, imagick, bcmath, tidy, soap, xdebug, bcmath
+          tools: phpunit, composer
+          ini-values: cgi.fix_pathinfo=1
+        env:
+          fail-fast: true
+
+      - name: "Composer Install Dependencies"
+        run: |
+            composer install
+
+      - name: "Script: setup.sh"
+        run: bash .github/tests/setup.sh
+
+      - name: "Script: test.sh"
+        run: bash .github/tests/test.sh
+
+
