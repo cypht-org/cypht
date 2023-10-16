@@ -712,7 +712,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
-            Hm_Msgs::add("ERRNo valid receipts found");
+            Hm_Msgs::add("ERRNo valid recipients found");
             repopulate_compose_form($draft, $this);
             return;
         }
