@@ -225,7 +225,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
                                         </th>
                                             <td>
-                                                <div class="popup" onclick="imap_show_add_contact_popup(event)"> 
+                                                <div class="popup" onclick="imap_show_add_contact_popup(event)">
                                                     <span id="contact_info">' . $this->html_safe($value) . '
                                                     </span>
                                                     <img alt="" class="icon_arrow_up" src="'.Hm_Image_Sources::$arrow_drop_up.'" width="20" height="20" />
@@ -233,7 +233,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                                     <div class="popup-container"  id="contact_popup">
                                                         <div class="popup-container_header">
                                                             <a onclick="imap_show_add_contact_popup()">x</a>
-                                                        </div>';
+                                                        </div>
+                                                        <div id="contact_popup_body">';
 
                             if($contact_exists){
                                 $txt .= '<div>
@@ -267,12 +268,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                         </div>';
                             } else {
                                 $txt .= '<div class="popup-container_footer">
-                                            <button onclick="return add_contact_from_popup()" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'
+                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'
                                             </button>
                                         </div>';
                             }
 
-                            $txt .= '           </div>
+                            $txt .= '               </div>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>';
@@ -362,7 +364,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
-            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';  
+            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
 
             if ($this->get('sieve_filters_enabled')) {

@@ -162,17 +162,17 @@
 
 
   /* Toggle this class - hide and show the popup */
-  .show > .popup-container {
+  .show.popup-container {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s;
   }
 
-  .show > .icon_arrow_up {
+  .show.icon_arrow_up {
     display: block;
   }
 
-  .show > .icon_arrow_down {
+  .show.icon_arrow_down {
     display: none;
   }
 
@@ -197,4 +197,22 @@
   @keyframes fadeIn {
     from {opacity: 0;}
     to {opacity:1 ;}
+  }
+
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .fade {
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+  }
+
+  .fade-out {
+    animation-name: fadeOut;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
   }
