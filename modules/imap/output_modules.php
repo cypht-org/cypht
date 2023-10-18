@@ -201,6 +201,83 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 $value = sprintf('%s (%s)', $dt->format('c Z'), human_readable_interval($value));
                             } catch (Exception $e) {}
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            }
+                        elseif($fld == 'from'){
+
+                            $regexp = '/\s*(.*[^\s])\s*<\s*(.*[^\s])\s*>/';
+
+                            $contact_email = "";
+                            $contact_name = "";
+
+                            if(preg_match($regexp, $value, $matches)){
+                                $contact_name = $matches[1];
+                                $contact_email =  $matches[2];
+                            }else{
+                                $EmailRegexp = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
+                                if(preg_match($EmailRegexp, $value, $matches)){
+                                    $contact_email = $matches[0][0];
+                                }
+                            }
+
+                            $contact = ($this->get('contact_store'))->get(null, false, $contact_email);
+                            $contact_exists = !empty($contact);
+
+                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
+                                        </th>
+                                            <td>
+                                                <div class="popup" onclick="imap_show_add_contact_popup(event)">
+                                                    <span id="contact_info">' . $this->html_safe($value) . '
+                                                    </span>
+                                                    <img alt="" class="icon_arrow_up" src="'.Hm_Image_Sources::$arrow_drop_up.'" width="20" height="20" />
+                                                    <img alt="" class="icon_arrow_down" src="'.Hm_Image_Sources::$arrow_drop_down.'" width="20" height="20" />
+                                                    <div class="popup-container"  id="contact_popup">
+                                                        <div class="popup-container_header">
+                                                            <a onclick="imap_show_add_contact_popup()">x</a>
+                                                        </div>
+                                                        <div id="contact_popup_body">';
+
+                            if($contact_exists){
+                                $txt .= '<div>
+                                            <table>
+                                                <tr>
+                                                    <td><strong>Name :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('display_name')).'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Email :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('email_address')).'
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Tel :</strong></td>
+                                                    <td>
+                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                                                        $this->html_safe($contact->value('phone_number')).'</a>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Source :</strong></td>
+                                                    <td>
+                                                        '.$this->html_safe($contact->value('source')).'
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>';
+                            } else {
+                                $txt .= '<div class="popup-container_footer">
+                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'
+                                            </button>
+                                        </div>';
+                            }
+
+                            $txt .= '               </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>';
                         }
                         else {
                             if (strtolower($name) == 'flags') {
@@ -234,7 +311,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
-            $lc_headers = lc_headers($headers); 
+            $lc_headers = lc_headers($headers);
             if (array_key_exists('to', $lc_headers)) {
                 $addr_list = process_address_fld($lc_headers['to']);
                 $size = count($addr_list);
@@ -252,7 +329,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 });
                 $size += count($addr_list);
             }
-            
+
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
             $txt .= '<div class="msg_move_to">'.
@@ -287,7 +364,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
-            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';  
+            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
 
             if ($this->get('sieve_filters_enabled')) {
@@ -379,7 +456,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $default_value = '';
                 if (isset($vals['sieve_config_host'])) {
                     $default_value = $vals['sieve_config_host'];
-                
+
                     $res .=  '<span><label class="screen_reader" for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label>'.
                             '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="credentials imap_sieve_host_input" placeholder="Sieve Host" type="text" name="imap_sieve_host" value="'.$default_value.'"></span>';
                 }

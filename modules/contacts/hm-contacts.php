@@ -25,11 +25,24 @@ class Hm_Contact_Store {
         return true;
     }
 
-    public function get($id, $default=false) {
-        if (!array_key_exists($id, $this->contacts)) {
-            return $default;
+    public function get($id, $default=false, $email_address=""){
+        if(array_key_exists($id, $this->contacts)) {
+            return $this->contacts[$id];
         }
-        return $this->contacts[$id];
+
+        if(!empty($email_address)){
+            $res = false;
+            foreach ($this->contacts as $id => $contact) {
+                if ($contact->value('email_address') == $email_address) {
+                    $res = $contact;
+                    break;
+                }
+            }
+
+            return $res;
+        }
+
+        return $default;
     }
 
     public function search($flds) {
