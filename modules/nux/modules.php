@@ -184,6 +184,11 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 $servers = Hm_IMAP_List::dump(false, true);
                 $ids = array_keys($servers);
                 $new_id = array_pop($ids);
+                if (in_server_list('Hm_IMAP_List', $new_id, $form['nux_email'])) {
+                    Hm_IMAP_List::del($new_id);
+                    Hm_Msgs::add('ERRThis IMAP server and username are already configured');
+                    return;
+                }
                 $imap = Hm_IMAP_List::connect($new_id, false);
                 if ($imap && $imap->get_state() == 'authenticated') {
                     if (isset($details['smtp'])) {
@@ -197,7 +202,14 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                         ));
                         $this->session->record_unsaved('SMTP server added');
                         $smtp_servers = Hm_SMTP_List::dump(false, true);
-                        $this->user_config->set('smtp_servers', $smtp_servers);
+                        $ids = array_keys($servers);
+                        $new_smtp_id = array_pop($ids);
+                        if (in_server_list('Hm_SMTP_List', $new_smtp_id, $form['nux_email'])) {
+                            Hm_SMTP_List::del($new_smtp_id);
+                            Hm_Msgs::add('ERRThis SMTP server and username are already configured');
+                        } else {
+                            $this->user_config->set('smtp_servers', $smtp_servers);
+                        }
                     }
                     $this->user_config->set('imap_servers', $servers);
                     Hm_IMAP_List::clean_up();

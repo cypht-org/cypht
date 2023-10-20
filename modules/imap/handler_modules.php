@@ -1369,7 +1369,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCould not add server: %s', $errstr));
                 }
             }
         }
