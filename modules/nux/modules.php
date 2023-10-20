@@ -177,7 +177,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
                 );
-                if (in_array($form['nux_service'], ['gandi']) && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
+                if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
                 }
                 Hm_IMAP_List::add($imap_list);
