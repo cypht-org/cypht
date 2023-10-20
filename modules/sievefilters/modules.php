@@ -1467,7 +1467,7 @@ if (!hm_exists('get_mailbox_filters')) {
             }
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
-            return $html ? []: '';
+            return !$html ? []: '';
         }
 
         if ($html == false) {
