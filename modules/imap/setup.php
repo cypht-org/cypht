@@ -74,12 +74,7 @@ add_output('message_list', 'move_copy_controls', true, 'imap', 'message_list_hea
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
-add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
-
-/* message view page */
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
-add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
-add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* ajax mark as read */
