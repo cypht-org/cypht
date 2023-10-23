@@ -1325,7 +1325,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                 if (isset($this->request->post['new_imap_hidden'])) {
                     $hidden = true;
                 }
-                if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 2)) {
+                if ($con = fsockopen($form['new_imap_address'], $form['new_imap_port'], $errno, $errstr, 5)) {
                     $imap_list = array(
                         'name' => $form['new_imap_name'],
                         'server' => $form['new_imap_address'],
