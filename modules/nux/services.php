@@ -237,6 +237,10 @@ Nux_Quick_Services::add('migadu', array(
         'server' => 'smtp.migadu.com',
         'port' => 465,
         'tls' => true
+    ),
+    'sieve' => array(
+        'port' => 4190,
+        'host' => 'tls://imap.migadu.com'
     )
 ));
 
