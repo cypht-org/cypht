@@ -252,6 +252,10 @@ Nux_Quick_Services::add('postale', array(
         'port' => 465,
         'tls' => true
     ),
+    'sieve' => array(
+        'port' => 4190,
+        'host' => 'tls://mail.postale.io'
+    )
 ));
 
 Nux_Quick_Services::add('mailbox', array(
