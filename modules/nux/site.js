@@ -1,5 +1,16 @@
 'use strict';
 
+function handleSmtpImapCheckboxChange(checkbox) {
+    if (checkbox.id === 'nux_config_is_receiver') {
+        if(checkbox.checked) $('#step_config-smtp_bloc').show();
+        else $('#step_config-smtp_bloc').hide();
+    }
+
+    if (checkbox.id === 'nux_config_is_sender') {
+        if(checkbox.checked) $('#step_config-imap_bloc').show();
+        else $('#step_config-imap_bloc').hide();
+    }
+}
 function display_config_step(stepNumber) {
     if(stepNumber == 2) {
 

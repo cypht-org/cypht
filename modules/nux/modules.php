@@ -518,11 +518,11 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                     <select id="nux_config_provider" class="stepper_input" name="nux_config_provider"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
                                </div>
                                <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_config_is_sender" checked />
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_sender" checked />
                                     <label for="nux_config_is_sender">Sender account</label>
                                </div>
                                <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_config_is_receiver" checked />
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_receiver" checked />
                                     <label for="nux_config_is_receiver">Receiver account</label>
                                </div>
 
@@ -544,7 +544,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                            </div>
                                        </div>
                                    </div>
-                                   <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
+                                   <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
                                       <label>IMAP</label>
                                       <div class="step_config-form_item">
                                           <label for="nux_config_imap_address">Address</label>
