@@ -19,6 +19,15 @@ add_handler('ajax_nux_service_select', 'date', true, 'core');
 add_handler('ajax_nux_service_select', 'http_headers', true, 'core');
 add_output('ajax_nux_service_select', 'filter_service_select', true);
 
+add_handler('ajax_get_nux_service_details', 'login', false, 'core');
+add_handler('ajax_get_nux_service_details', 'load_user_data', true, 'core');
+add_handler('ajax_get_nux_service_details', 'setup_nux', true);
+add_handler('ajax_get_nux_service_details', 'get_nux_service_details', true);
+add_handler('ajax_get_nux_service_details', 'language',  true, 'core');
+add_handler('ajax_get_nux_service_details', 'date', true, 'core');
+add_handler('ajax_get_nux_service_details', 'http_headers', true, 'core');
+add_output('ajax_get_nux_service_details', 'service_details', true);
+
 add_handler('ajax_nux_add_service', 'login', false, 'core');
 add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
 add_handler('ajax_nux_add_service', 'setup_nux', true);
@@ -46,6 +55,7 @@ add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list
 return array(
     'allowed_pages' => array(
         'ajax_nux_service_select',
+        'ajax_get_nux_service_details',
         'ajax_nux_add_service',
     ),
     'allowed_get' => array(

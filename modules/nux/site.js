@@ -18,6 +18,24 @@ function display_config_step(stepNumber) {
         if (!isValid) {
             return
         }
+
+        let providerKey = getEmailProviderKey($('#nux_config_email').val());
+        $("#nux_config_provider").val(providerKey);
+
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
+                {'name': 'nux_service', 'value': providerKey},
+                {'name': 'nux_account_name', 'value': $('#nux_config_profile_name').val()},
+                {'name': 'nux_email', 'value': $('#nux_config_email').val()}],
+            function(res) {
+                if(res.nux_service_step_two){
+                    let serverConfig = JSON.parse(res.nux_service_step_two)
+                    console.log("ajax_nux_service_select", serverConfig)
+                }
+            },
+            [],
+            false
+        );
     }
     // Hide all step elements
     var steps = document.querySelectorAll('.step_config');
@@ -31,6 +49,41 @@ function display_config_step(stepNumber) {
         selectedStep.style.display = 'block';
     }
 }
+
+function getEmailProviderKey(email) {
+    const emailProviderMap = {
+        "all-inkl": ["all-inkl.de", "all-inkl.com"],
+        "aol": ["aol.com"],
+        "fastmail": ["fastmail.com"],
+        "gandi": ["gandi.net"],
+        "gmail": ["gmail.com"],
+        "gmx": ["gmx.com", "gmx.de"],
+        "icloud": ["icloud.com"],
+        "inbox": ["inbox.com"],
+        "kolabnow": ["kolabnow.com"],
+        "mailcom": ["mail.com"],
+        "mailbox": ["mailbox.org"],
+        "migadu": ["migadu.com"],
+        "office365": ["office365.com"],
+        "outlook": ["outlook.com", "outlook.fr"],
+        "postale": ["postale.io"],
+        "yahoo": ["yahoo.com"],
+        "yandex": ["yandex.com", "yandex.ru"],
+        "zoho": ["zoho.com"]
+    };
+
+    const emailParts = email.split("@");
+    const provider = emailParts[1].toLowerCase();
+
+    for (const providerKey in emailProviderMap) {
+        if (emailProviderMap[providerKey].some(p => p.includes(provider))) {
+            return providerKey;
+        }
+    }
+
+    return "";
+}
+
 
 var display_next_nux_step = function(res) {
     $('.nux_step_two').html(res.nux_service_step_two);

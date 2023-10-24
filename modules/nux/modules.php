@@ -267,6 +267,23 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage nux/handler
+ */
+class Hm_Handler_get_nux_service_details extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('nux_service'));
+        if ($success) {
+            if (Nux_Quick_Services::exists($form['nux_service'])) {
+                $details = Nux_Quick_Services::details($form['nux_service']);
+
+                $this->out('nux_add_service_details', $details);
+                $this->session->set('nux_add_service_details', $details);
+            }
+        }
+    }
+}
+
+/**
  * @subpackage nux/output
  */
 class Hm_Output_quick_add_dialog extends Hm_Output_Module {
@@ -302,6 +319,16 @@ class Hm_Output_filter_service_select extends Hm_Output_Module {
                 $this->out('nux_service_step_two',  credentials_form($details, $this));
             }
         }
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
+class Hm_Output_service_details extends Hm_Output_Module {
+    protected function output() {
+        $details = $this->get('nux_add_service_details', array());
+        $this->out('service_details',  json_encode($details));
     }
 }
 
