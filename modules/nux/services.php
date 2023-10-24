@@ -225,3 +225,53 @@ Nux_Quick_Services::add('all-inkl', array(
         'tls' => true
     )
 ));
+
+Nux_Quick_Services::add('migadu', array(
+    'server' => 'imap.migadu.com',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Migadu',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.migadu.com',
+        'port' => 465,
+        'tls' => true
+    ),
+    'sieve' => array(
+        'port' => 4190,
+        'host' => 'tls://imap.migadu.com'
+    )
+));
+
+Nux_Quick_Services::add('postale', array(
+    'server' => 'mail.postale.io',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Postale',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'mail.postale.io',
+        'port' => 465,
+        'tls' => true
+    ),
+    'sieve' => array(
+        'port' => 4190,
+        'host' => 'tls://mail.postale.io'
+    )
+));
+
+Nux_Quick_Services::add('mailbox', array(
+    'server' => 'imap.mailbox.org',
+    'type' => 'imap',
+    'tls' => true,
+    'port' => 993,
+    'name' => 'Mailbox',
+    'auth' => 'login',
+    'smtp' => array(
+        'server' => 'smtp.mailbox.org',
+        'port' => 465,
+        'tls' => true
+    ),
+));

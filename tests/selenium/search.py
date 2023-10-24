@@ -2,6 +2,7 @@ from time import sleep
 from base import WebTest, USER, PASS
 from creds import RECIP
 from runner import test_runner
+from selenium.webdriver.support.ui import Select
 
 class SearchTest(WebTest):
 
@@ -19,6 +20,7 @@ class SearchTest(WebTest):
     def keyword_search(self):
         terms = self.by_id('search_terms')
         terms.send_keys('test')
+        Select(self.by_name('search_since')).select_by_value('-5 years')
         self.by_class('search_update').click();
         self.wait_with_folder_list()
         sleep(1)

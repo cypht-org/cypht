@@ -31,11 +31,15 @@ class WebTest:
 
     def read_ini(self):
         self.modules = []
+        self.auth_type = ''
         ini = open(INI_PATH)
         for row in ini.readlines():
             if re.match('^modules\[\]\=', row):
                 parts = row.split('=')
                 self.modules.append(parts[1].strip())
+            if re.match('^auth_type=', row):
+                parts = row.split('=')
+                self.auth_type = row[1]
 
     def load(self):
         print(" - loading site")

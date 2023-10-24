@@ -77,12 +77,7 @@ add_output('message_list', 'snooze_msg_control', true, 'imap', 'imap_custom_cont
 add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
-add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
-
-/* message view page */
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
-add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
-add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* ajax mark as read */
@@ -342,7 +337,7 @@ return array(
         'imap_expanded_folder_path' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
-        'imap_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'combined_inbox_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
@@ -351,7 +346,7 @@ return array(
     ),
 
     'allowed_get' => array(
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
@@ -361,7 +356,7 @@ return array(
     'allowed_post' => array(
         'server_port' => FILTER_VALIDATE_INT,
         'server' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_server_ids' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_user' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_pass' => FILTER_UNSAFE_RAW,
