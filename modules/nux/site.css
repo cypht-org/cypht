@@ -30,7 +30,7 @@
 .step_config-title {display: flex;align-items: center;gap: 10px;}
 .step_config-title > span {font-size: small;}
 .step_config-title > h2 {color: #777}
-.stepper_input {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF;color: #C0C0C0;border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
+.stepper_input {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF; border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
 
 .step_config-form_item {margin: 10px 0px;}
 .step_config-form_item-checkbox {}
@@ -49,3 +49,4 @@
 .step_config-smtp_imap_port_bloc > input { width: 100px;}
 .step_config-smtp_bloc {margin-bottom: 10px;}
 .step_config-imap_bloc {margin-bottom: 10px;}
+.server_config_section { display: none; }

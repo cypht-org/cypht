@@ -29,7 +29,7 @@ add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'language'
 add_handler('servers', 'process_add_smtp_server', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('servers', 'add_smtp_servers_to_page_data', true, 'smtp', 'process_add_smtp_server', 'after');
 add_handler('servers', 'save_smtp_servers', true, 'smtp', 'add_smtp_servers_to_page_data', 'after');
-add_output('servers', 'add_smtp_server_dialog', true, 'smtp', 'quick_add_section', 'after');
+add_output('servers', 'add_smtp_server_dialog', true, 'smtp', 'quick_add_dialog', 'after');
 add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'add_smtp_server_dialog', 'after');
 
 add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_settings', 'before');
