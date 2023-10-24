@@ -1,6 +1,24 @@
 'use strict';
 
 function display_config_step(stepNumber) {
+    if(stepNumber == 2) {
+
+        var isValid = true;
+
+        [{key: 'nux_config_profile_name', value: $('#nux_config_profile_name').val()},
+            {key: 'nux_config_email', value: $('#nux_config_email').val()},
+            {key: 'nux_config_password', value: $('#nux_config_password').val()}].forEach((item) => {
+                if(!item.value) {
+                    $(`#${item.key}-error`).text('Required');
+                    isValid = false;
+                }
+                else $(`#${item.key}-error`).text('');
+        })
+
+        if (!isValid) {
+            return
+        }
+    }
     // Hide all step elements
     var steps = document.querySelectorAll('.step_config');
     for (var i = 0; i < steps.length; i++) {

@@ -50,3 +50,4 @@
 .step_config-smtp_bloc {margin-bottom: 10px;}
 .step_config-imap_bloc {margin-bottom: 10px;}
 .server_config_section { display: none; }
+.error-message {color: red; font-size: small;}

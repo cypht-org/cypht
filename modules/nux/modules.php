@@ -457,16 +457,19 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                     <label for="nux_config_profile_name">Profile Name</label>
                                     <br />
                                     <input type="text" class="stepper_input" id="nux_config_profile_name" placeholder="Profile name" />
+                                    <span id="nux_config_profile_name-error" class="error-message"></span>
                                </div>
                                <div class="step_config-form_item">
                                     <label for="nux_config_email">Email</label>
                                     <br />
                                     <input type="email"  class="stepper_input" id="nux_config_email" placeholder="email" />
+                                    <span id="nux_config_email-error" class="error-message"></span>
                                </div>
                                <div class="step_config-form_item">
                                     <label for="nux_config_password">Password</label>
                                     <br />
                                     <input type="password"  class="stepper_input" id="nux_config_password" placeholder="password" />
+                                    <span id="nux_config_password-error" class="error-message"></span>
                                </div>
                             </form>
                         </div>
