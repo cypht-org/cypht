@@ -28,9 +28,20 @@ function display_config_step(stepNumber) {
                 {'name': 'nux_account_name', 'value': $('#nux_config_profile_name').val()},
                 {'name': 'nux_email', 'value': $('#nux_config_email').val()}],
             function(res) {
-                if(res.nux_service_step_two){
-                    let serverConfig = JSON.parse(res.nux_service_step_two)
-                    console.log("ajax_nux_service_select", serverConfig)
+                if(res.service_details){
+                    let serverConfig = JSON.parse(res.service_details)
+
+                    $("#nux_config_smtp_address").val(serverConfig.smtp.server);
+                    $("#nux_config_smtp_port").val(serverConfig.smtp.port);
+
+                    if(serverConfig.smtp.tls)$("input[name='nux_config_smtp_con_type'][value='tls']").prop("checked", true);
+                    else $("input[name='nux_config_smtp_con_type'][value='start_tls_or_unencrypted']").prop("checked", true);
+
+                    $("#nux_config_imap_address").val(serverConfig.server);
+                    $("#nux_config_imap_port").val(serverConfig.port);
+
+                    if(serverConfig.tls)$("input[name='nux_config_imap_con_type'][value='tls']").prop("checked", true);
+                    else $("input[name='nux_config_imap_con_type'][value='start_tls_or_unencrypted']").prop("checked", true);
                 }
             },
             [],

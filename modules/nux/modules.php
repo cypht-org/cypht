@@ -537,9 +537,9 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                        <div class="step_config-smtp_imap_port_bloc">
                                            <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_smtp_port"/>
                                            <div>
-                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_con_type" value="TLS">
+                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_con_type" value="tls">
                                                <label for="smtp_tls">Use TLS</label><br>
-                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_con_type" value="STARTTLS or unencrypted">
+                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_con_type" value="start_tls_or_unencrypted">
                                                <label for="smtp_start_tls">STARTTLS or unencrypted</label><br>
                                            </div>
                                        </div>
@@ -549,14 +549,14 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                       <div class="step_config-form_item">
                                           <label for="nux_config_imap_address">Address</label>
                                           <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_password" placeholder="Address" />
+                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_imap_address" placeholder="Address" />
                                       </div>
                                       <div class="step_config-smtp_imap_port_bloc">
                                          <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_imap_port"/>
                                          <div>
-                                             <input type="radio" id="imap_tls" name="nux_config_imap_con_type" value="TLS">
+                                             <input type="radio" id="imap_tls" name="nux_config_imap_con_type" value="tls">
                                              <label for="imap_tls">Use TLS</label><br>
-                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_con_type" value="STARTTLS or unencrypted">
+                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_con_type" value="start_tls_or_unencrypted">
                                              <label for="imap_start_tls">STARTTLS or unencrypted</label><br>
                                          </div>
                                       </div>

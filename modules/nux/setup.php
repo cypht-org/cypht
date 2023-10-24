@@ -66,6 +66,7 @@ return array(
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
+        'service_details' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
         'nux_server_id' => array(FILTER_VALIDATE_INT, false),
         'nux_service_name' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
