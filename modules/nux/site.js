@@ -1,5 +1,19 @@
 'use strict';
 
+function display_config_step(stepNumber) {
+    // Hide all step elements
+    var steps = document.querySelectorAll('.step_config');
+    for (var i = 0; i < steps.length; i++) {
+        steps[i].style.display = 'none';
+    }
+
+    // Show the selected step
+    var selectedStep = document.getElementById('step_config_' + stepNumber);
+    if (selectedStep) {
+        selectedStep.style.display = 'block';
+    }
+}
+
 var display_next_nux_step = function(res) {
     $('.nux_step_two').html(res.nux_service_step_two);
     $('.nux_step_one').hide();
@@ -57,7 +71,7 @@ var display_final_nux_step = function(res) {
                 }
             );
         }
-            
+
         window.location.href = "?page=servers";
     }
 };

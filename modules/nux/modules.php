@@ -341,7 +341,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');
         $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div><ul>';
-        
+
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
             if ($proto == 'feeds') {
@@ -418,6 +418,123 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
             $this->trans('Add an E-mail Account').'</div>';
+    }
+}
+
+
+
+class Hm_Output_server_config_stepper extends Hm_Output_Module {
+    protected function output() {
+        return '
+        <div class="stepper">
+                <div class="step-container">
+                    <div id="step_config_1" class="step step_config">
+                        <div class="step_config-title">
+                            <h2>Step 1</h2>
+                            <span>(Authentication)</span>
+                        </div>
+                        <div>
+                            <form>
+                               <div class="step_config-form_item">
+                                    <label for="nux_profileName">Profile Name</label>
+                                    <br />
+                                    <input type="text" class="stepper_input" id="nux_profileName" placeholder="Profile name" />
+                               </div>
+                               <div class="step_config-form_item">
+                                    <label for="nux_email">Email</label>
+                                    <br />
+                                    <input type="email"  class="stepper_input" id="nux_email" placeholder="email" />
+                               </div>
+                               <div class="step_config-form_item">
+                                    <label for="nux_password">Password</label>
+                                    <br />
+                                    <input type="password"  class="stepper_input" id="nux_password" placeholder="password" />
+                               </div>
+                            </form>
+                        </div>
+                        <div class="step_config-actions">
+                            <button class="nux_stepper_btn" onclick="display_config_step(2)">Cancel</button>
+                            <button class="nux_stepper_btn" onclick="display_config_step(2)">Next</button>
+                        </div>
+                    </div>
+                    <div id="step_config_2" class="step step_config">
+                        <div class="step_config-title">
+                            <h2>Step 2</h2>
+                            <span>(Mail server configuration)</span>
+                        </div>
+                        <div>
+                            <form>
+                               <div class="step_config-form_item">
+                                    <label for="nux_service_name">Provider</label>
+                                    <br />
+                                    <input type="text" class="stepper_input" id="nux_service_name" placeholder="Provider" />
+                               </div>
+                               <div class="step_config-form_item">
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_is_sender" checked />
+                                    <label for="nux_is_sender">Sender account</label>
+                               </div>
+                               <div class="step_config-form_item">
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_is_receiver" checked />
+                                    <label for="nux_is_receiver">Receiver account</label>
+                               </div>
+
+                               <div class="step_config-smtp_imap_bloc">
+                                    <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
+                                       <label>SMTP</label>
+                                       <div class="step_config-form_item">
+                                           <label for="nux_smtp_address">Address</label>
+                                           <br />
+                                           <input type="text" style="height: 20px;"  class="stepper_input" id="nux_password" placeholder="Address" />
+                                       </div>
+                                       <div class="step_config-smtp_imap_port_bloc">
+                                           <input type="number" style="height: 20px;" class="stepper_input" id="nux_password"/>
+                                           <div>
+                                               <input type="radio" id="smtp_tsl" name="smtp_con_type" value="TLS">
+                                               <label for="java">Use TLS</label><br>
+                                               <input type="radio" id="start_tls" name="smtp_con_type" value="STARTTLS or unencrypted">
+                                               <label for="start_tls">STARTTLS or unencrypted</label><br>
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
+                                      <label>IMAP</label>
+                                      <div class="step_config-form_item">
+                                          <label for="nux_smtp_address">Address</label>
+                                          <br />
+                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_password" placeholder="Address" />
+                                      </div>
+                                      <div class="step_config-smtp_imap_port_bloc">
+                                          <input type="number" style="height: 20px;" class="stepper_input" id="nux_password"/>
+                                          <div>
+                                              <input type="radio" id="smtp_tsl" name="smtp_con_type" value="TLS">
+                                              <label for="java">Use TLS</label><br>
+                                              <input type="radio" id="start_tls" name="smtp_con_type" value="STARTTLS or unencrypted">
+                                              <label for="start_tls">STARTTLS or unencrypted</label><br>
+                                          </div>
+                                      </div>
+                                  </div>
+                               </div>
+
+                               <div class="step_config-form_item">
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_is_sender" checked />
+                                    <label for="nux_is_sender">Sender account</label>
+                               </div>
+                               <div class="step_config-form_item">
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_is_receiver" checked />
+                                    <label for="nux_is_receiver">Receiver account</label>
+                               </div>
+                            </form>
+                        </div>
+                        <div class="step_config-actions">
+                            <button class="nux_stepper_btn" onclick="display_config_step(1)">Previous</button>
+                            <button class="nux_stepper_btn" onclick="display_config_step(0)">Cancel</button>
+                            <button class="nux_stepper_btn" onclick="display_config_step(3)">Finish</button>
+                        </div>
+                    </div>
+                    <button id="step_config_0" class="nux_stepper_btn step_config current_config_step" onclick="display_config_step(1)">Add a server</button>
+                </div>
+            </div>
+';
     }
 }
 

@@ -25,3 +25,27 @@
 .mobile .nux_dev_news, .mobile .nux_help, .mobile .nux_welcome { max-width: 90%; width: 90%; margin: 10px  auto; padding-left: 10px; padding-right: 5px; float: none; min-height: 200px; }
 .mobile .nux_dev_news { width: 90%; overflow: hidden; }
 .mobile .nux_welcome ul { padding-left: 10px; }
+
+.nux_stepper_btn {width: 120px;height: 32px;padding: 0px 10px 0px 10px;background: #EBEBEB;color: #232323;border-color: #232323; border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: center;}
+.step_config-title {display: flex;align-items: center;gap: 10px;}
+.step_config-title > span {font-size: small;}
+.step_config-title > h2 {color: #777}
+.stepper_input {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF;color: #C0C0C0;border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
+
+.step_config-form_item {margin: 10px 0px;}
+.step_config-form_item-checkbox {}
+.step_config-form_item > label {color: #232323;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
+.step_config-actions {display: flex;justify-content: space-between;margin-top: 15px;}
+.nux_stepper_btn:hover {cursor: pointer;}
+.stepper {display: flex;overflow: hidden;padding: 10px 30px 15px 30px;}
+.step_config {width: 100%;transition: transform 0.5s;display: none;}
+.current_config_step {display: block;}
+.step-container {display: flex;width: 400px;}
+
+.step_config-smtp_imap_bloc { padding: 15px; background: #EBEBEB; }
+
+.step_config-smtp_imap_port_bloc {display: flex; font-size: 10px;}
+
+.step_config-smtp_imap_port_bloc > input { width: 100px;}
+.step_config-smtp_bloc {margin-bottom: 10px;}
+.step_config-imap_bloc {margin-bottom: 10px;}
