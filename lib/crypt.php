@@ -179,7 +179,7 @@ class Hm_Crypt_Base {
         if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
             return false;
         }
-        /* requires PHP >= 5.6 */
+        /* requires PHP >= 7.4 */
         if (Hm_Functions::function_exists('hash_equals')) {
             return hash_equals($a, $b);
         }
