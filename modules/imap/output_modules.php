@@ -281,7 +281,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         }
                         elseif ($fld == 'reply-to') {
                             $from = addr_parse($headers['From']);
-                            
+
                             $replyEmails = array_map(function ($addr) {
                                 return $addr['email'];
                             }, process_address_fld($headers['Reply-To']));
@@ -289,7 +289,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             if (count($replyEmails) === 1 && ($replyEmails[0] === $from['email'])) {
                                 $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
                             } else {
-                                $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>&lt;'.$this->html_safe(join(',', $replyEmails)).'&gt;</td></tr>';
+                                $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe(join(',', $replyEmails)).'</td></tr>';
                             }
                         }
                         else {
