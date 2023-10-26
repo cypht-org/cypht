@@ -1299,11 +1299,11 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $email = false;
-        $single = $this->get('single_server_mode');
         if (array_key_exists('email_folders', merge_folder_list_details($this->get('folder_sources', array())))) {
             $email = true;
         }
-        if (!$single) {
+        $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
+        if ($total_accounts > 2) {
             $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
@@ -1404,7 +1404,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
                 $res .= '<div style="display: none;" ';
             }
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
-            if ($name == 'Email' && !$single) {
+            if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
