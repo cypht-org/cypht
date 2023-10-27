@@ -178,6 +178,9 @@ function hm_theme_icons($color='white') {
         'camera' => false,
         'menu' => false,
         'three_dot' => false,
+        'trash' => false,
+        'draft' => false,
+        'junk' => false,
 
         'w' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AgKAxYt3lxNfAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAzElEQVQ4y+3TMSvFURjH8b9Qt5h0bV6CwaqYlLp1V6lbdsnsLXgBhmsz8AIUd7izlNVgt0kRRikfy6N+3f68AHm28z3ffufpPOc0zX812mup9jZq/YpOsZUUG8ziOdhahJ8E3wo+wCi7OA5xWKyDt+Dn4V9ikAHrIT5VV9u4C/6OBXTxgrkMmMJ9yH1cYAc3wXexh7O2yzwMcVynzGM/+BWu0WsLWJ6YxGnxRXwU+8QjZn4a6W0EbAYfBT/67U0clPSA6YmxfdfqH/sKX5nYdtZS9A38AAAAAElFTkSuQmCC',
 
