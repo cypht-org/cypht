@@ -8,6 +8,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+
 define('MAX_RECIPIENT_WARNING', 20);
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
@@ -1793,10 +1795,11 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
         $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
     }
     if ($body_type == 2) {
-        require_once VENDOR_PATH.'erusev/parsedown/Parsedown.php';
-        $parsedown = new Parsedown();
-        $parsedown->setSafeMode(true);
-        $body = $parsedown->text($body);
+        $converter = new GithubFlavoredMarkdownConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+        $body = $converter->convert($body);
     }
     return array($body, $cc, $bcc, $in_reply_to, $draft);
 }}
