@@ -664,9 +664,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         );
 
         /* parse attachments */
-        $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
-        foreach($uploaded_files as $key => $file) {
-            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+        $uploaded_files = [];
+        if (!empty($this->request->post['send_uploaded_files'])) {
+            $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
+            foreach($uploaded_files as $key => $file) {
+                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+            }
         }
 
         $uploaded_files = get_uploaded_files_from_array(
