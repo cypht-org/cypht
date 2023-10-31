@@ -33,8 +33,10 @@
 .stepper_input {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF; border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
 
 .step_config-form_item {margin: 10px 0px;}
+.step_config-form_item.nested {margin-left: 20px !important;}
 .step_config-form_item-checkbox {}
 .step_config-form_item > label {color: #232323;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
+.step_config-form_item > textarea {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF; border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
 .step_config-actions {display: flex;justify-content: space-between;margin-top: 15px;}
 .nux_stepper_btn:hover {cursor: pointer;}
 .stepper {display: flex;overflow: hidden;padding: 10px 30px 15px 30px;}

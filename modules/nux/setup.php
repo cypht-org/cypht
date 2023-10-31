@@ -21,12 +21,22 @@ add_output('ajax_nux_service_select', 'filter_service_select', true);
 
 add_handler('ajax_get_nux_service_details', 'login', false, 'core');
 add_handler('ajax_get_nux_service_details', 'load_user_data', true, 'core');
-add_handler('ajax_get_nux_service_details', 'setup_nux', true);
 add_handler('ajax_get_nux_service_details', 'get_nux_service_details', true);
 add_handler('ajax_get_nux_service_details', 'language',  true, 'core');
 add_handler('ajax_get_nux_service_details', 'date', true, 'core');
 add_handler('ajax_get_nux_service_details', 'http_headers', true, 'core');
 add_output('ajax_get_nux_service_details', 'service_details', true);
+
+add_handler('ajax_quick_server_setup_nux', 'login', false, 'core');
+add_handler('ajax_quick_server_setup_nux', 'load_user_data', true, 'core');
+add_handler('ajax_quick_server_setup_nux', 'setup_nux', true);
+add_handler('ajax_quick_server_setup_nux', 'load_smtp_servers_from_config',  true, 'smtp');
+add_handler('ajax_quick_server_setup_nux', 'load_imap_servers_from_config',  true, 'imap');
+add_handler('ajax_quick_server_setup_nux', 'quick_server_setup_nux', true);
+add_handler('ajax_quick_server_setup_nux', 'save_user_data',  true, 'core');
+add_handler('ajax_quick_server_setup_nux', 'language',  true, 'core');
+add_handler('ajax_quick_server_setup_nux', 'date', true, 'core');
+add_handler('ajax_quick_server_setup_nux', 'http_headers', true, 'core');
 
 add_handler('ajax_nux_add_service', 'login', false, 'core');
 add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
@@ -57,6 +67,7 @@ return array(
         'ajax_nux_service_select',
         'ajax_get_nux_service_details',
         'ajax_nux_add_service',
+        'ajax_quick_server_setup_nux',
     ),
     'allowed_get' => array(
         'code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -77,7 +88,23 @@ return array(
         'nux_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_pass' => FILTER_UNSAFE_RAW,
         'nux_account_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'nux_all_inkl_login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'nux_all_inkl_login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_profile_name'  => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_password' => FILTER_UNSAFE_RAW,
+        'nux_config_provider' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_is_sender' => FILTER_VALIDATE_BOOLEAN,
+        'nux_config_is_receiver' => FILTER_VALIDATE_BOOLEAN,
+        'nux_config_smtp_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_smtp_port' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_smtp_tls' => FILTER_VALIDATE_BOOLEAN,
+        'nux_config_imap_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_imap_port' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_imap_tls' => FILTER_VALIDATE_BOOLEAN,
+        'nux_enable_sieve' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_create_profile' => FILTER_VALIDATE_BOOLEAN,
+        'nux_profile_is_default' => FILTER_VALIDATE_BOOLEAN,
+        'nux_profile_signature' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );
 

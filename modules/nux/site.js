@@ -1,5 +1,65 @@
 'use strict';
 
+
+function submitSmtpImapServer() {
+
+    var formData = {};
+
+    // Retrieve and assign the input values directly to the formData object
+    formData.profileName = document.getElementById('nux_config_profile_name').value;
+    formData.email = document.getElementById('nux_config_email').value;
+    formData.password = document.getElementById('nux_config_password').value;
+    formData.provider = document.getElementById('nux_config_provider').value;
+    formData.isSender = document.getElementById('nux_config_is_sender').checked;
+    formData.isReceiver = document.getElementById('nux_config_is_receiver').checked;
+    formData.smtpAddress = document.getElementById('nux_config_smtp_address').value;
+    formData.smtpPort = document.getElementById('nux_config_smtp_port').value;
+    formData.smtpConType = document.querySelector('input[name="nux_config_smtp_tls"]:checked').value;
+    formData.imapAddress = document.getElementById('nux_config_imap_address').value;
+    formData.imapPort = document.getElementById('nux_config_imap_port').value;
+    formData.imapConType = document.querySelector('input[name="nux_config_imap_tls"]:checked').value;
+    formData.enableSieve = document.getElementById('nux_enable_sieve').checked;
+    formData.createProfile = document.getElementById('nux_create_profile').checked;
+    formData.isProfilDefault = document.getElementById('nux_profile_is_default').checked;
+    formData.profileSignatue = document.getElementById('nux_profile_signature').value;
+
+    // Submit the form data via AJAX
+    Hm_Ajax.request(
+        [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_quick_server_setup_nux'},
+            {'name': 'nux_config_profile_name', 'value': formData.profileName},
+            {'name': 'nux_config_email', 'value': formData.email},
+            {'name': 'nux_config_password', 'value': formData.password},
+            {'name': 'nux_config_provider', 'value': formData.provider},
+            {'name': 'nux_config_is_sender', 'value': formData.isSender},
+            {'name': 'nux_config_is_receiver', 'value': formData.isReceiver},
+            {'name': 'nux_config_smtp_address', 'value': formData.smtpAddress},
+            {'name': 'nux_config_smtp_port', 'value': formData.smtpPort},
+            {'name': 'nux_config_smtp_tls', 'value': formData.smtpConType},
+            {'name': 'nux_config_imap_address', 'value': formData.imapAddress},
+            {'name': 'nux_config_imap_port', 'value': formData.imapPort},
+            {'name': 'nux_config_imap_tls', 'value': formData.imapConType},
+            {'name': 'nux_enable_sieve', 'value': formData.enableSieve},
+            {'name': 'nux_create_profile', 'value': formData.createProfile},
+            {'name': 'nux_profile_is_default', 'value': formData.isProfilDefault},
+            {'name': 'nux_profile_signature', 'value': formData.profileSignatue},
+        ],
+        function (res) {
+            console.log("res", res);
+            // Handle the AJAX response here
+        }
+    );
+}
+
+function handleCreateProfileCheckboxChange(checkbox) {
+    if(checkbox.checked) {
+        $('#nux_profile_signature_bloc').show();
+        $('#nux_profile_default_bloc').show();
+    }else{
+        $('#nux_profile_signature_bloc').hide();
+        $('#nux_profile_default_bloc').hide();
+    }
+}
 function handleSmtpImapCheckboxChange(checkbox) {
     if (checkbox.id === 'nux_config_is_receiver') {
         if(checkbox.checked) $('#step_config-smtp_bloc').show();
@@ -9,6 +69,17 @@ function handleSmtpImapCheckboxChange(checkbox) {
     if (checkbox.id === 'nux_config_is_sender') {
         if(checkbox.checked) $('#step_config-imap_bloc').show();
         else $('#step_config-imap_bloc').hide();
+    }
+
+    if($('#nux_config_is_sender').checked &&
+        $('#nux_config_is_receiver').checked){
+        $('#nux_profile_signature_bloc').show();
+        $('#nux_profile_default_bloc').show();
+        $('#nux_profile_checkbox_bloc').show();
+    }else{
+        $('#nux_profile_signature_bloc').hide();
+        $('#nux_profile_default_bloc').hide();
+        $('#nux_profile_checkbox_bloc').hide();
     }
 }
 function display_config_step(stepNumber) {
@@ -35,9 +106,7 @@ function display_config_step(stepNumber) {
 
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
-                {'name': 'nux_service', 'value': providerKey},
-                {'name': 'nux_account_name', 'value': $('#nux_config_profile_name').val()},
-                {'name': 'nux_email', 'value': $('#nux_config_email').val()}],
+                {'name': 'nux_service', 'value': providerKey},],
             function(res) {
                 if(res.service_details){
                     let serverConfig = JSON.parse(res.service_details)
@@ -45,19 +114,24 @@ function display_config_step(stepNumber) {
                     $("#nux_config_smtp_address").val(serverConfig.smtp.server);
                     $("#nux_config_smtp_port").val(serverConfig.smtp.port);
 
-                    if(serverConfig.smtp.tls)$("input[name='nux_config_smtp_con_type'][value='tls']").prop("checked", true);
-                    else $("input[name='nux_config_smtp_con_type'][value='start_tls_or_unencrypted']").prop("checked", true);
+                    if(serverConfig.smtp.tls)$("input[name='nux_config_smtp_tls'][value='true']").prop("checked", true);
+                    else $("input[name='nux_config_smtp_tls'][value='false']").prop("checked", true);
 
                     $("#nux_config_imap_address").val(serverConfig.server);
                     $("#nux_config_imap_port").val(serverConfig.port);
 
-                    if(serverConfig.tls)$("input[name='nux_config_imap_con_type'][value='tls']").prop("checked", true);
-                    else $("input[name='nux_config_imap_con_type'][value='start_tls_or_unencrypted']").prop("checked", true);
+                    if(serverConfig.tls)$("input[name='nux_config_imap_tls'][value='true']").prop("checked", true);
+                    else $("input[name='nux_config_imap_tls'][value='false']").prop("checked", true);
                 }
             },
             [],
             false
         );
+    }
+
+    if(stepNumber == 3) {
+        submitSmtpImapServer();
+        return
     }
     // Hide all step elements
     var steps = document.querySelectorAll('.step_config');

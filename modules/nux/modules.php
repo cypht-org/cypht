@@ -248,6 +248,120 @@ class Hm_Handler_setup_nux extends Hm_Handler_Module {
 /**
  * @subpackage nux/handler
  */
+class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array(
+           'nux_config_profile_name',
+           'nux_config_email',
+           'nux_config_password',
+           'nux_config_provider',
+           'nux_config_is_sender',
+           'nux_config_is_receiver',
+           'nux_config_smtp_address',
+           'nux_config_smtp_port',
+           'nux_config_smtp_tls',
+           'nux_config_imap_address',
+           'nux_config_imap_port',
+           'nux_config_imap_tls',
+           'nux_enable_sieve',
+           'nux_create_profile',
+           'nux_profile_is_default',
+           'nux_profile_signature'
+           ));
+
+        if ($success) {
+             /*
+             *  Connect to SMTP server if user wants to send emails
+             */
+             if($form['nux_config_is_sender']){
+                 if ($con = @fsockopen($form['nux_config_smtp_address'], $form['nux_config_smtp_port'], $errno, $errstr, 2)) {
+
+                     Hm_SMTP_List::add( array(
+                         'name' => $form['nux_config_profile_name'],
+                         'server' => $form['nux_config_smtp_address'],
+                         'port' => $form['nux_config_smtp_port'],
+                         'user' => $form['nux_config_email'],
+                         'pass' => $form['nux_config_password'],
+                         'tls' => $form['nux_config_smtp_tls']));
+
+                     $smtp_servers = Hm_SMTP_List::dump(false, true);
+                     $ids = array_keys($smtp_servers);
+                     $smtp_server_id = array_pop($ids);
+
+
+                      $smtp = Hm_SMTP_List::connect($smtp_server_id, false, $form['nux_config_email'], $form['nux_config_password'], true);
+                      if (is_object($smtp) && $smtp->state == 'authed') {
+                          $this->user_config->set('smtp_servers', $smtp_servers);
+                          $just_saved_credentials = true;
+                          $this->session->record_unsaved('SMTP server saved');
+                      }
+                      else {
+                          Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                          Hm_SMTP_List::forget_credentials($smtp_server_id);
+                          return;
+                      }
+                 } else {
+                     Hm_Msgs::add(sprintf('ERRCan not add connect to the SMTP server: %s', $errstr));
+                     return;
+                 }
+             }
+
+             /*
+              *  Connect to IMAP server if user wants to receive emails
+              */
+             if($form['nux_config_is_receiver']){
+                 if ($con = fsockopen($form['nux_config_imap_address'], $form['nux_config_imap_port'], $errno, $errstr, 5)) {
+                      $imap_list = array(
+                          'name' => $form['nux_config_profile_name'],
+                          'server' => $form['nux_config_imap_address'],
+                          'hide' => false,
+                          'port' => $form['nux_config_imap_port'],
+                          'user' => $form['nux_config_email'],
+                          'pass' => $form['nux_config_password'],
+                          'tls' => $form['nux_config_imap_tls']);
+
+
+                      Hm_IMAP_List::add($imap_list);
+                      $servers = Hm_IMAP_List::dump(false, true);
+                      $ids = array_keys($servers);
+                      $imap_server_id = array_pop($ids);
+                      Hm_IMAP_List::clean_up();
+
+
+                      $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+                      $imap = Hm_IMAP_List::connect($imap_server_id, $cache, $form['nux_config_email'], $form['nux_config_password'], true);
+                      if (imap_authed($imap)) {
+                          $this->user_config->set('imap_servers', $servers);
+                          $just_saved_credentials = true;
+                          $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
+                      }
+                      else {
+                          Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
+                          Hm_IMAP_List::forget_credentials($imap_server_id);
+                          return;
+                      }
+                  }else {
+                      Hm_Msgs::add(sprintf('ERRCan not add connect to the IMAP server: %s', $errstr));
+                      return;
+                 }
+
+                 Hm_Msgs::add("Server saved");
+             }
+
+             if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile']) {
+                 error_log($form['nux_create_profile']);
+                 error_log($form['nux_profile_signature']);
+                 error_log($form['nux_profile_is_default']);
+
+                 Hm_Msgs::add("SAVE PROFILE");
+             }
+        }
+    }
+}
+
+/**
+ * @subpackage nux/handler
+ */
 class Hm_Handler_process_nux_service extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('nux_service', 'nux_email'));
@@ -481,7 +595,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                         <div>
                             <form>
                                <div class="step_config-form_item">
-                                    <label for="nux_config_profile_name">Profile Name</label>
+                                    <label for="nux_config_profile_name">Name</label>
                                     <br />
                                     <input type="text" class="stepper_input" id="nux_config_profile_name" placeholder="Profile name" />
                                     <span id="nux_config_profile_name-error" class="error-message"></span>
@@ -537,9 +651,9 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                        <div class="step_config-smtp_imap_port_bloc">
                                            <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_smtp_port"/>
                                            <div>
-                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_con_type" value="tls">
+                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_tls" value="true">
                                                <label for="smtp_tls">Use TLS</label><br>
-                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_con_type" value="start_tls_or_unencrypted">
+                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_tls" value="false">
                                                <label for="smtp_start_tls">STARTTLS or unencrypted</label><br>
                                            </div>
                                        </div>
@@ -554,22 +668,29 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                       <div class="step_config-smtp_imap_port_bloc">
                                          <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_imap_port"/>
                                          <div>
-                                             <input type="radio" id="imap_tls" name="nux_config_imap_con_type" value="tls">
+                                             <input type="radio" id="imap_tls" name="nux_config_imap_tls" value="true">
                                              <label for="imap_tls">Use TLS</label><br>
-                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_con_type" value="start_tls_or_unencrypted">
+                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_tls" value="false">
                                              <label for="imap_start_tls">STARTTLS or unencrypted</label><br>
                                          </div>
                                       </div>
-                                  </div>
+                                   </div>
+                                   <div class="step_config-form_item">
+                                        <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" />
+                                        <label for="nux_enable_sieve">Enable Sieve</label>
+                                   </div>
                                </div>
-
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" />
-                                    <label for="nux_enable_sieve">Enable Sieve</label>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_create_profile" checked />
+                               <div class="step_config-form_item" id="nux_profile_checkbox_bloc">
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="nux_create_profile" checked />
                                     <label for="nux_create_profile">Create Profile</label>
+                               </div>
+                               <div class="step_config-form_item nested" id="nux_profile_signature_bloc">
+                                   <label for="nux_profile_signature">Signature</label>
+                                   <textarea id="nux_profile_signature" name="nux_profile_signature" checked ></textarea>
+                               </div>
+                               <div class="step_config-form_item nested" id="nux_profile_default_bloc">
+                                   <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_profile_is_default" checked />
+                                   <label for="nux_profile_is_default">Set this profile default</label>
                                </div>
                             </form>
                         </div>
