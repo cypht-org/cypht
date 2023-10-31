@@ -5,8 +5,8 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Core_Handler_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -466,7 +466,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
     public function test_save_user_data() {
         $test = new Handler_Test('save_user_data', 'core');
         $res = $test->run();
-        $this->assertEquals(array('user_settings_dir' => './data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
+        $this->assertEquals(array('user_settings_dir' => APP_PATH.'tests/phpunit/data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
     }
     /**
      * @preserveGlobalState disabled
@@ -567,8 +567,8 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules extends TestCase {
 
     public function setUp(): void {
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**
@@ -1479,8 +1479,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
 class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function setUp(): void {
         define('DEBUG_MODE', true);
-        require 'bootstrap.php';
-        require 'helpers.php';
+        require __DIR__.'/../../bootstrap.php';
+        require __DIR__.'/../../helpers.php';
         require APP_PATH.'modules/core/modules.php';
     }
     /**

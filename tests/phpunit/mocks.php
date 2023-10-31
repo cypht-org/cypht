@@ -144,7 +144,7 @@ class Hm_Mock_Config {
     public $mods = array();
     public $user_defaults = array();
     public $data = array(
-        'user_settings_dir' => './data',
+        'user_settings_dir' => APP_PATH.'tests/phpunit/data',
         'default_language' => 'es',
         'default_setting_inline_message' => true
     );
