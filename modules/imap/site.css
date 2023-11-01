@@ -111,3 +111,108 @@
 .snooze_date_picker { display: block; padding: 8px 15px; color: #333; font-size: 1rem; cursor: pointer; }
 .unsnooze { color: teal; }
 .header_x-snoozed .unsnooze { margin-left: 20px; }
+
+
+/* Popup container - can be anything you want */
+.popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+  }
+
+  /* The actual popup */
+  .popup > .popup-container {
+    visibility: hidden;
+    min-width: 250px;
+    background-color: #fff;
+    border: 1px #0000004d solid;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 1;
+    top: 125%;
+  }
+
+  /* Popup arrow */
+  .popup > .popup-container::after {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #555 transparent;
+  }
+
+  .popup > .icon_arrow_up {
+    display: none;
+  }
+
+  .popup > .icon_arrow_down {
+    display: block;
+  }
+
+
+  /* Toggle this class - hide and show the popup */
+  .show.popup-container {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
+
+  .show.icon_arrow_up {
+    display: block;
+  }
+
+  .show.icon_arrow_down {
+    display: none;
+  }
+
+  .popup-container_header {
+    display: flex;
+    justify-content: end;
+    margin-bottom: 10px;
+  }
+
+  .popup-container_footer {
+    display: flex;
+    justify-content: center;
+  }
+
+
+  /* Add animation (fade in the popup) */
+  @-webkit-keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+  }
+
+  @keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity:1 ;}
+  }
+
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  .fade {
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+  }
+
+  .fade-out {
+    animation-name: fadeOut;
+  }
+
+  .fade-in {
+    animation-name: fadeIn;
+  }

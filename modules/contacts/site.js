@@ -20,12 +20,49 @@ var delete_contact = function(id, source, type) {
 var add_contact_from_message_view = function() {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
+
     if (contact) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'contact_value', value: contact },
+          { name: 'contact_source', value: source },
+        ],
+        function (res) {
+          $('.add_contact_controls').toggle();
+          window.location.reload();
+          remove_message_content();
+        }
+      );
+    }
+  };
+
+var add_contact_from_popup = function(event) {
+    event.stopPropagation()
+    var source = 'local:local';
+    var contact = $('#contact_info').text().replace('>','').replace('<','');
+
+
+    if (contact) {
+        var emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+        var email = contact.match(emailRegex)[0];
+        var name = contact.replace(emailRegex, "");
+
+        var saveContactContent = `<div><table>
+                                            <tr><td><strong>Name :</strong></td><td>${name}</td></tr>
+                                            <tr><td><strong>Email :</strong></td><td>${email}</td></tr>
+                                            <tr><td><strong>Source :</strong></td><td>Local</td></tr>
+                                </table></div>`
+
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
-            function(res) { $('.add_contact_controls').toggle(); }
+            function (res) {
+                $("#contact_popup_body").html(saveContactContent);
+                sessionStorage.removeItem(`${window.location.pathname}imap_4_${hm_list_path()}`);
+                sessionStorage.removeItem(`${window.location.pathname}${hm_msg_uid()}_${hm_list_path()}`);
+            }
         );
     }
 };
@@ -60,7 +97,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         $(list_div).html('');
                         for (i in res.contact_suggestions) {
                             var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
-                            
+
                             div.html(suggestion.contact);
                             if ($(class_name).val().match(div.text())) {
                                 continue;

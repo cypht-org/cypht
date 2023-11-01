@@ -301,7 +301,7 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
             }
 
             Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
-            
+
             $('.page_links').html(res.page_links);
             cache_imap_page();
         },
@@ -793,7 +793,7 @@ var imap_prefetch_message_content = function(uid, server_id, folder) {
 var imap_prefetch_msgs = function() {
     var detail;
     var key;
-    
+
     $(Hm_Utils.get_from_local_storage('formatted_unread_data')).each(function() {
         if ($(this).attr('class').match(/^imap/)) {
             detail = Hm_Utils.parse_folder_path($(this).attr('class'), 'imap');
@@ -902,7 +902,7 @@ var imap_move_copy = function(e, action, context) {
     folders.show();
     $('.imap_folder_link', folders).addClass('imap_move_folder_link').removeClass('imap_folder_link');
     if (action == 'move') {
-        label = $('.move_to_string1').val(); 
+        label = $('.move_to_string1').val();
     }
     else {
         label = $('.move_to_string2').val();
@@ -1131,7 +1131,7 @@ var imap_setup_snooze = function() {
     });
 }
 
-var imap_unsnooze_messages = function() { 
+var imap_unsnooze_messages = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unsnooze'}],
         function() {},
@@ -1186,7 +1186,7 @@ $(function() {
     else if (hm_page_name() === 'info') {
         setTimeout(imap_status_update, 100);
     }
-    
+
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
         imap_setup_snooze();
     }
@@ -1259,4 +1259,15 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
         );
     }
     return false;
+};
+
+var imap_show_add_contact_popup = function() {
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
+};
+
+var imap_hide_add_contact_popup = function(event) {
+    event.stopPropagation()
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
 };

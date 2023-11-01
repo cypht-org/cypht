@@ -309,12 +309,14 @@ div.unseen, .unseen .subject { font-weight: 700; }
 }
 
 #list_controls_menu {
+    flex-direction: column;
+    align-items: flex-end;
     position: absolute;
-    width: 50px; 
     right: 0px;
     display: none;
-    padding-left: 14px;
-    padding-bottom: 5px;
+    padding: 0px 5px 5px 10px;
     background-color: #fff;
 }
+.mobile #list_controls_menu.show { display: flex; }
+.mobile .imap_sort { width: 100%; }
 .snoozed_date { color: teal !important; }
