@@ -9,8 +9,8 @@ chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 chrome_options.BinaryLocation = "/usr/bin/google-chrome"
 
-RECIP='testuser@localhost.localdomain'
-IMAP_ID='2'
+RECIP='testuser@localhost.org'
+IMAP_ID='0'
 DRIVER_CMD =Service('/usr/bin/chromedriver')
 SITE_URL = 'http://cypht-test.org'
 USER = 'testuser'

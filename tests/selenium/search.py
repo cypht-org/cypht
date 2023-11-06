@@ -26,11 +26,8 @@ class SearchTest(WebTest):
         self.wait_with_folder_list()
         sleep(1)
         table = self.by_class('message_table_body')
-        # This test does not work.
-        # So I modified the assert value to make it pass.
-        # Maybe it's because the email wasn't actually received.
-        #assert len(table.find_elements(By.TAG_NAME, 'tr')) > 0
-        assert len(table.find_elements(By.TAG_NAME, 'tr')) >= 0
+        assert len(table.find_elements(By.TAG_NAME, 'tr')) > 0
+        #assert len(table.find_elements(By.TAG_NAME, 'tr')) >= 0
 
     def reset_search(self):
         self.by_class('search_reset').click()

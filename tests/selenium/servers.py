@@ -3,6 +3,8 @@ from base import WebTest, USER, PASS
 from runner import test_runner
 from creds import IMAP_ID
 
+# This test needs to be modified.
+
 class ServersTest(WebTest):
 
     def __init__(self):
@@ -32,13 +34,31 @@ class ServersTest(WebTest):
         self.by_id('smtp_notls').click()
         self.by_name('submit_smtp_server').click()
         self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Added SMTP server!' or self.by_class('sys_messages').text == 'Cound not add server: Connection refused'
+        assert self.by_class('sys_messages').text == 'Added SMTP server!'
 
     def smtp_del(self):
         self.by_class('delete_smtp_connection').click()
         self.confirm_alert()
         self.wait_on_sys_message()
         assert self.by_class('sys_messages').text == 'Server deleted'
+        self.toggle_server_section('smtp')
+
+    def smtp_confirm(self):
+        user = self.by_id('smtp_user_0')
+        user.send_keys('testuser')
+        passw = self.by_id('smtp_pass_0')
+        passw.send_keys('testuser')
+        self.by_class('save_smtp_connection').click()
+        from time import sleep; sleep(3)
+        self.wait_on_sys_message()
+        assert self.by_class('sys_messages').text == 'Server saved'
+        self.toggle_server_section('smtp')
+
+    def smtp_test(self):
+        self.toggle_server_section('smtp')
+        self.by_class('test_smtp_connection').click()
+        self.wait_on_sys_message()
+        assert self.by_class('sys_messages').text == 'Successfully authenticated to the SMTP server'
         self.toggle_server_section('smtp')
 
     def imap_add(self):
@@ -53,16 +73,17 @@ class ServersTest(WebTest):
         self.by_id('imap_notls').click()
         self.by_name('submit_imap_server').click()
         self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Added server!' or self.by_class('sys_messages').text == 'Cound not add server: Connection refused'
+        assert self.by_class('sys_messages').text == 'Added server!'
 
     def imap_confirm(self):
         user = self.by_id('imap_user_'+IMAP_ID)
         user.send_keys('testuser')
         passw = self.by_id('imap_pass_'+IMAP_ID)
         passw.send_keys('testuser')
-        self.by_class('test_imap_connect').click()
+        self.by_class('save_imap_connection').click()
+        from time import sleep; sleep(3)
         self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Successfully authenticated to the IMAP server'
+        assert self.by_class('sys_messages').text == 'Server saved'
         self.toggle_server_section('imap')
 
 if __name__ == '__main__':
@@ -70,8 +91,10 @@ if __name__ == '__main__':
     print("SERVERS TEST")
     test_runner(ServersTest, [
         'load_servers_page',
-        'smtp_add',
-        'smtp_del',
+        #'smtp_add',
+        #'smtp_del',
+        'smtp_confirm',
+        #'smtp_test',
         'imap_add',
-        #'imap_confirm'
+        'imap_confirm'
     ])

@@ -100,8 +100,11 @@ bootstrap_unit_tests() {
 # Add a system user dovecot will use for authentication
 setup_user() {
 	STATUS_TITLE "Setup MailUser"
-	sudo useradd -m -d /home/testuser -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
-	sudo usermod -a -G mail testuser
+	sudo useradd -m -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
+	sudo mkdir -p /home/testuser/mail/.imap/INBOX
+	sudo chown -R testuser:testuser /home/testuser
+	sudo usermod -aG mail testuser
+	sudo usermod -aG postdrop testuser
 	STATUS_DONE
 }
 
@@ -120,9 +123,7 @@ setup_dovecot() {
 # config postfix
 setup_postfix() {
 	STATUS_TITLE "Setup Postfix"
-	sudo systemctl stop postfix.service
-	sudo -H postconf virtual_transport=lmtp:unix:private/dovecot-lmtp
-	sudo systemctl start postfix.service
+	sudo bash .github/tests/scripts/postfix.sh
 	if [ "$(sudo systemctl is-active postfix.service)" == "active" ]; then
 		STATUS_DONE
 	else
