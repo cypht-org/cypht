@@ -266,10 +266,13 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
            'nux_enable_sieve',
            'nux_create_profile',
            'nux_profile_is_default',
-           'nux_profile_signature'
+           'nux_profile_signature',
+           'nux_profile_reply_to'
            ));
 
         if ($success) {
+             $smtp_server_id = null;
+             $imap_server_id = null;
              /*
              *  Connect to SMTP server if user wants to send emails
              */
@@ -348,12 +351,28 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                  Hm_Msgs::add("Server saved");
              }
 
-             if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile']) {
-                 error_log($form['nux_create_profile']);
-                 error_log($form['nux_profile_signature']);
-                 error_log($form['nux_profile_is_default']);
+             if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile'] && isset(imap_server_id)) {
+                 $profile = array(
+                             'name' => $form['nux_config_profile_name'],
+                             'sig' => $form['nux_profile_signature'],
+                             'smtp_id' => $imap_server_id,
+                             'replyto' => $form['nux_profile_reply_to'],
+                             'default' => $form['nux_profile_is_default'],
+                             'address' => $form['nux_config_email'],
+                             'server' =>  $form['nux_config_imap_address'],
+                             'user' => $form['nux_config_email'],
+                             'type' => 'imap'
+                         );
 
-                 Hm_Msgs::add("SAVE PROFILE");
+                  $profiles = new Hm_Profiles($this);
+                  $profiles->add($profile);
+                  $this->session->record_unsaved('Profile added');
+
+                  $profiles->save($this->user_config);
+                  $user_data = $this->user_config->dump();
+                  $this->session->set('user_data', $user_data);
+
+                  Hm_Msgs::add('Profile Added');
              }
         }
     }
@@ -582,10 +601,10 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
     return '<div class="smtp_imap_server_setup">
          <div data-target=".server_config_section" class="server_section">'.
                 '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'. $this->trans('IMAP & SMTP Servers').'
-                 <div class="server_count">10</div>
+                 <div class="server_count">-</div>
          </div>
          <div class="server_config_section">
-            <div class="stepper">
+            <div class="stepper" id="nux_config_stepper">
                 <div class="step-container">
                     <div id="step_config_1" class="step step_config">
                         <div class="step_config-title">
@@ -684,20 +703,32 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                     <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="nux_create_profile" checked />
                                     <label for="nux_create_profile">Create Profile</label>
                                </div>
-                               <div class="step_config-form_item nested" id="nux_profile_signature_bloc">
-                                   <label for="nux_profile_signature">Signature</label>
-                                   <textarea id="nux_profile_signature" name="nux_profile_signature" checked ></textarea>
-                               </div>
-                               <div class="step_config-form_item nested" id="nux_profile_default_bloc">
-                                   <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_profile_is_default" checked />
-                                   <label for="nux_profile_is_default">Set this profile default</label>
+                               <div class="nested" id="nux_profile_bloc">
+                                   <div class="step_config-form_item nested">
+                                       <label for="nux_profile_reply_to">Reply to</label>
+                                       <br />
+                                        <input type="email"  class="stepper_input" id="nux_profile_reply_to" />
+                                  </div>
+                                   <div class="step_config-form_item nested">
+                                       <label for="nux_profile_signature">Signature</label>
+                                       <textarea id="nux_profile_signature" name="nux_profile_signature" checked ></textarea>
+                                   </div>
+                                   <div class="step_config-form_item nested">
+                                       <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_profile_is_default" checked />
+                                       <label for="nux_profile_is_default">Set this profile default</label>
+                                   </div>
                                </div>
                             </form>
+                        </div>
+                        <div class="nux_config_form_loader hide" id="nux_config_form_loader">
+                            <img width="24" height="24" src="'.Hm_Image_Sources::$spinner.'" alt="loader" />
                         </div>
                         <div class="step_config-actions">
                             <button class="nux_stepper_btn" onclick="display_config_step(1)">Previous</button>
                             <button class="nux_stepper_btn" onclick="display_config_step(0)">Cancel</button>
-                            <button class="nux_stepper_btn" onclick="display_config_step(3)">Finish</button>
+                            <button class="nux_stepper_btn" onclick="display_config_step(3)">
+                                Finish
+                            </button>
                         </div>
                     </div>
                     <button id="step_config_0" class="nux_stepper_btn step_config current_config_step" onclick="display_config_step(1)">Add a new server</button>

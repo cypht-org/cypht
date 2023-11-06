@@ -2,62 +2,58 @@
 
 
 function submitSmtpImapServer() {
+    $('#nux_config_form_loader').removeClass('hide');
+    $('.step_config-actions').addClass('hide');
 
-    var formData = {};
+    var requestData = [
+        { name: 'hm_ajax_hook', value: 'ajax_quick_server_setup_nux' },
+        { name: 'nux_config_profile_name', value: $('#nux_config_profile_name').val() },
+        { name: 'nux_config_email', value: $('#nux_config_email').val() },
+        { name: 'nux_config_password', value: $('#nux_config_password').val() },
+        { name: 'nux_config_provider', value: $('#nux_config_provider').val() },
+        { name: 'nux_config_is_sender', value: $('#nux_config_is_sender').prop('checked') },
+        { name: 'nux_config_is_receiver', value: $('#nux_config_is_receiver').prop('checked') },
+        { name: 'nux_config_smtp_address', value: $('#nux_config_smtp_address').val() },
+        { name: 'nux_config_smtp_port', value: $('#nux_config_smtp_port').val() },
+        { name: 'nux_config_smtp_tls', value: $('input[name="nux_config_smtp_tls"]:checked').val() },
+        { name: 'nux_config_imap_address', value: $('#nux_config_imap_address').val() },
+        { name: 'nux_config_imap_port', value: $('#nux_config_imap_port').val() },
+        { name: 'nux_config_imap_tls', value: $('input[name="nux_config_imap_tls"]:checked').val() },
+        { name: 'nux_enable_sieve', value: $('#nux_enable_sieve').prop('checked') },
+        { name: 'nux_create_profile', value: $('#nux_create_profile').prop('checked') },
+        { name: 'nux_profile_is_default', value: $('#nux_profile_is_default').prop('checked') },
+        { name: 'nux_profile_signature', value: $('#nux_profile_signature').val() },
+        { name: 'nux_profile_reply_to', value: $('#nux_profile_reply_to').val() }
+    ];
 
-    // Retrieve and assign the input values directly to the formData object
-    formData.profileName = document.getElementById('nux_config_profile_name').value;
-    formData.email = document.getElementById('nux_config_email').value;
-    formData.password = document.getElementById('nux_config_password').value;
-    formData.provider = document.getElementById('nux_config_provider').value;
-    formData.isSender = document.getElementById('nux_config_is_sender').checked;
-    formData.isReceiver = document.getElementById('nux_config_is_receiver').checked;
-    formData.smtpAddress = document.getElementById('nux_config_smtp_address').value;
-    formData.smtpPort = document.getElementById('nux_config_smtp_port').value;
-    formData.smtpConType = document.querySelector('input[name="nux_config_smtp_tls"]:checked').value;
-    formData.imapAddress = document.getElementById('nux_config_imap_address').value;
-    formData.imapPort = document.getElementById('nux_config_imap_port').value;
-    formData.imapConType = document.querySelector('input[name="nux_config_imap_tls"]:checked').value;
-    formData.enableSieve = document.getElementById('nux_enable_sieve').checked;
-    formData.createProfile = document.getElementById('nux_create_profile').checked;
-    formData.isProfilDefault = document.getElementById('nux_profile_is_default').checked;
-    formData.profileSignatue = document.getElementById('nux_profile_signature').value;
+    Hm_Ajax.request(requestData, function(res) {
+        $('#nux_config_form_loader').addClass('hide');
+        $('.step_config-actions').removeClass('hide');
 
-    // Submit the form data via AJAX
-    Hm_Ajax.request(
-        [
-            {'name': 'hm_ajax_hook', 'value': 'ajax_quick_server_setup_nux'},
-            {'name': 'nux_config_profile_name', 'value': formData.profileName},
-            {'name': 'nux_config_email', 'value': formData.email},
-            {'name': 'nux_config_password', 'value': formData.password},
-            {'name': 'nux_config_provider', 'value': formData.provider},
-            {'name': 'nux_config_is_sender', 'value': formData.isSender},
-            {'name': 'nux_config_is_receiver', 'value': formData.isReceiver},
-            {'name': 'nux_config_smtp_address', 'value': formData.smtpAddress},
-            {'name': 'nux_config_smtp_port', 'value': formData.smtpPort},
-            {'name': 'nux_config_smtp_tls', 'value': formData.smtpConType},
-            {'name': 'nux_config_imap_address', 'value': formData.imapAddress},
-            {'name': 'nux_config_imap_port', 'value': formData.imapPort},
-            {'name': 'nux_config_imap_tls', 'value': formData.imapConType},
-            {'name': 'nux_enable_sieve', 'value': formData.enableSieve},
-            {'name': 'nux_create_profile', 'value': formData.createProfile},
-            {'name': 'nux_profile_is_default', 'value': formData.isProfilDefault},
-            {'name': 'nux_profile_signature', 'value': formData.profileSignatue},
-        ],
-        function (res) {
-            console.log("res", res);
-            // Handle the AJAX response here
-        }
-    );
+        $('#nux_config_stepper').find('form').trigger('reset');
+        display_config_step(0);
+
+        //Initialize the form
+        $("#nux_profile_reply_to").val('');
+        $("#nux_profile_signature").val('');
+        $("#nux_config_profile_name").val('');
+        $("#nux_config_email").val('');
+        $("#nux_config_password").val('');
+        $("#nux_profile_is_default").prop('checked', true);
+        $("#nux_config_is_sender").prop('checked', true);
+        $("#nux_config_is_receiver").prop('checked', true);
+        $("#nux_enable_sieve").prop('checked', true);
+        $('#step_config-imap_bloc').show();
+        $('#step_config-smtp_bloc').show();
+        $('#nux_profile_bloc').show();
+    });
 }
 
 function handleCreateProfileCheckboxChange(checkbox) {
     if(checkbox.checked) {
-        $('#nux_profile_signature_bloc').show();
-        $('#nux_profile_default_bloc').show();
+        $('#nux_profile_bloc').show();
     }else{
-        $('#nux_profile_signature_bloc').hide();
-        $('#nux_profile_default_bloc').hide();
+        $('#nux_profile_bloc').hide();
     }
 }
 function handleSmtpImapCheckboxChange(checkbox) {
@@ -71,14 +67,12 @@ function handleSmtpImapCheckboxChange(checkbox) {
         else $('#step_config-imap_bloc').hide();
     }
 
-    if($('#nux_config_is_sender').checked &&
-        $('#nux_config_is_receiver').checked){
-        $('#nux_profile_signature_bloc').show();
-        $('#nux_profile_default_bloc').show();
+    if($('#nux_config_is_sender').prop('checked') &&
+        $('#nux_config_is_receiver').prop('checked')){
+        $('#nux_profile_bloc').show();
         $('#nux_profile_checkbox_bloc').show();
     }else{
-        $('#nux_profile_signature_bloc').hide();
-        $('#nux_profile_default_bloc').hide();
+        $('#nux_profile_bloc').hide();
         $('#nux_profile_checkbox_bloc').hide();
     }
 }
@@ -87,7 +81,7 @@ function display_config_step(stepNumber) {
 
         var isValid = true;
 
-        [{key: 'nux_config_profile_name', value: $('#nux_config_profile_name').val()},
+        [   {key: 'nux_config_profile_name', value: $('#nux_config_profile_name').val()},
             {key: 'nux_config_email', value: $('#nux_config_email').val()},
             {key: 'nux_config_password', value: $('#nux_config_password').val()}].forEach((item) => {
                 if(!item.value) {
@@ -105,7 +99,8 @@ function display_config_step(stepNumber) {
         $("#nux_config_provider").val(providerKey);
 
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
                 {'name': 'nux_service', 'value': providerKey},],
             function(res) {
                 if(res.service_details){
