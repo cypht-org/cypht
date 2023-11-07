@@ -387,13 +387,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
                         'tls' => $tls));
-                     ob_start();
-                     var_dump(Hm_SMTP_List::dump());
-                     $output = ob_get_clean();
 
-                     error_log('=============');
-                     error_log($output);
-                     error_log('=============');
                     Hm_Msgs::add('Added SMTP server!');
                     $this->session->record_unsaved('SMTP server added');
                 }
@@ -448,11 +442,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                     return;
                 }
 
-               error_log("$form[smtp_server_id] ". $form['smtp_server_id']);
-               error_log("$form[smtp_server_id] ". $form['smtp_user']);
-               error_log("$form[smtp_server_id] ". $form['smtp_pass']);
-
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
+               $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
                 if (smtp_authed($smtp)) {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");

@@ -27,6 +27,7 @@ function submitSmtpImapServer() {
     ];
 
     Hm_Ajax.request(requestData, function(res) {
+        console.log(res)
         $('#nux_config_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
 
@@ -46,6 +47,9 @@ function submitSmtpImapServer() {
         $('#step_config-imap_bloc').show();
         $('#step_config-smtp_bloc').show();
         $('#nux_profile_bloc').show();
+
+        Hm_Utils.set_unsaved_changes(1);
+        Hm_Folders.reload_folders(true);
     });
 }
 

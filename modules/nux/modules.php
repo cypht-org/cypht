@@ -249,6 +249,12 @@ class Hm_Handler_setup_nux extends Hm_Handler_Module {
  * @subpackage nux/handler
  */
 class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
+    public $smtp_server_id = null;
+    public $imap_server_id = null;
+    public $just_saved_credentials = false;
+    public $imap = null;
+    public $smtp = null;
+
     public function process() {
         list($success, $form) = $this->process_form(array(
            'nux_config_profile_name',
@@ -271,110 +277,152 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
            ));
 
         if ($success) {
-             $smtp_server_id = null;
-             $imap_server_id = null;
              /*
              *  Connect to SMTP server if user wants to send emails
              */
              if($form['nux_config_is_sender']){
-                 if ($con = @fsockopen($form['nux_config_smtp_address'], $form['nux_config_smtp_port'], $errno, $errstr, 2)) {
-
-                     Hm_SMTP_List::add( array(
-                         'name' => $form['nux_config_profile_name'],
-                         'server' => $form['nux_config_smtp_address'],
-                         'port' => $form['nux_config_smtp_port'],
-                         'user' => $form['nux_config_email'],
-                         'pass' => $form['nux_config_password'],
-                         'tls' => $form['nux_config_smtp_tls']));
-
-                     $smtp_servers = Hm_SMTP_List::dump(false, true);
-                     $ids = array_keys($smtp_servers);
-                     $smtp_server_id = array_pop($ids);
-
-
-                      $smtp = Hm_SMTP_List::connect($smtp_server_id, false, $form['nux_config_email'], $form['nux_config_password'], true);
-                      if (is_object($smtp) && $smtp->state == 'authed') {
-                          $this->user_config->set('smtp_servers', $smtp_servers);
-                          $just_saved_credentials = true;
-                          $this->session->record_unsaved('SMTP server saved');
-                      }
-                      else {
-                          Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
-                          Hm_SMTP_List::forget_credentials($smtp_server_id);
-                          return;
-                      }
-                 } else {
-                     Hm_Msgs::add(sprintf('ERRCan not add connect to the SMTP server: %s', $errstr));
-                     return;
-                 }
+                 $this->connectToSMPT(
+                    $form['nux_config_smtp_address'],
+                    $form['nux_config_profile_name'],
+                    $form['nux_config_smtp_port'],
+                    $form['nux_config_email'],
+                    $form['nux_config_password'],
+                    $form['nux_config_smtp_tls']);
              }
 
              /*
               *  Connect to IMAP server if user wants to receive emails
               */
              if($form['nux_config_is_receiver']){
-                 if ($con = fsockopen($form['nux_config_imap_address'], $form['nux_config_imap_port'], $errno, $errstr, 5)) {
-                      $imap_list = array(
-                          'name' => $form['nux_config_profile_name'],
-                          'server' => $form['nux_config_imap_address'],
-                          'hide' => false,
-                          'port' => $form['nux_config_imap_port'],
-                          'user' => $form['nux_config_email'],
-                          'pass' => $form['nux_config_password'],
-                          'tls' => $form['nux_config_imap_tls']);
-
-
-                      Hm_IMAP_List::add($imap_list);
-                      $servers = Hm_IMAP_List::dump(false, true);
-                      $ids = array_keys($servers);
-                      $imap_server_id = array_pop($ids);
-                      Hm_IMAP_List::clean_up();
-
-
-                      $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-                      $imap = Hm_IMAP_List::connect($imap_server_id, $cache, $form['nux_config_email'], $form['nux_config_password'], true);
-                      if (imap_authed($imap)) {
-                          $this->user_config->set('imap_servers', $servers);
-                          $just_saved_credentials = true;
-                          $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
-                      }
-                      else {
-                          Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
-                          Hm_IMAP_List::forget_credentials($imap_server_id);
-                          return;
-                      }
-                  }else {
-                      Hm_Msgs::add(sprintf('ERRCan not add connect to the IMAP server: %s', $errstr));
-                      return;
-                 }
-
-                 Hm_Msgs::add("Server saved");
+                 $this->connectToIMAP(
+                   $form['nux_config_imap_address'],
+                   $form['nux_config_profile_name'],
+                   $form['nux_config_imap_port'],
+                   $form['nux_config_email'],
+                   $form['nux_config_password'],
+                   $form['nux_config_imap_tls']);
              }
 
-             if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile'] && isset(imap_server_id)) {
-                 $profile = array(
-                             'name' => $form['nux_config_profile_name'],
-                             'sig' => $form['nux_profile_signature'],
-                             'smtp_id' => $imap_server_id,
-                             'replyto' => $form['nux_profile_reply_to'],
-                             'default' => $form['nux_profile_is_default'],
-                             'address' => $form['nux_config_email'],
-                             'server' =>  $form['nux_config_imap_address'],
-                             'user' => $form['nux_config_email'],
-                             'type' => 'imap'
-                         );
+             Hm_Msgs::add("Server saved");
 
-                  $profiles = new Hm_Profiles($this);
-                  $profiles->add($profile);
-                  $this->session->record_unsaved('Profile added');
-
-                  $profiles->save($this->user_config);
-                  $user_data = $this->user_config->dump();
-                  $this->session->set('user_data', $user_data);
-
-                  Hm_Msgs::add('Profile Added');
+             if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile'] && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                 $this->saveProfile(
+                    $form['nux_config_profile_name'],
+                    $form['nux_profile_signature'],
+                    $form['nux_profile_reply_to'],
+                    $form['nux_profile_is_default'],
+                    $form['nux_config_email'],
+                    $form['nux_config_imap_address']
+                    );
              }
+
+
+             $this->out('just_saved_credentials', $this->just_saved_credentials);
+             $this->out('is_jmap_supported', $this->module_is_supported('jmap'));
         }
+    }
+
+    public function saveProfile($name, $signature, $replyTo, $isDefault, $email, $serverMail){
+        $profile = array(
+                         'name' => $name,
+                         'sig' => $signature,
+                         'smtp_id' => $this->imap_server_id,
+                         'replyto' => $replyTo,
+                         'default' => $isDefault,
+                         'address' => $email,
+                         'server' =>  $serverMail,
+                         'user' => $email,
+                         'type' => 'imap'
+                     );
+
+          $profiles = new Hm_Profiles($this);
+          $profiles->add($profile);
+          $this->session->record_unsaved('Profile added');
+
+          $profiles->save($this->user_config);
+          $user_data = $this->user_config->dump();
+          $this->session->set('user_data', $user_data);
+
+          Hm_Msgs::add('Profile Added');
+    }
+
+    public function connectToIMAP($address, $name, $port, $user, $pass, $tls, $errno = null, $errstr = null) {
+        if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
+              $imap_list = array(
+                  'name' => $name,
+                  'server' => $address,
+                  'hide' => false,
+                  'port' => $port,
+                  'user' => $user,
+                  'pass' => $pass,
+                  'tls' => $tls);
+
+
+              Hm_IMAP_List::add($imap_list);
+              $servers = Hm_IMAP_List::dump(false, true);
+              $ids = array_keys($servers);
+              $this->imap_server_id = array_pop($ids);
+
+              if (in_server_list('Hm_IMAP_List', $this->imap_server_id, $user)) {
+                  Hm_Msgs::add('ERRThis server and username are already configured');
+                  return;
+              }
+
+              Hm_IMAP_List::clean_up();
+              $cache = Hm_IMAP_List::get_cache($this->cache, $this->imap_server_id);
+              $imap = Hm_IMAP_List::connect($this->imap_server_id, $cache, $user, $pass, true);
+              if (imap_authed($imap)) {
+                  $this->user_config->set('imap_servers', $servers);
+                  $this->just_saved_credentials = true;
+                  $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
+              }
+              else {
+                  Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
+                  Hm_IMAP_List::forget_credentials($this->imap_server_id);
+                  return;
+              }
+          }else {
+              Hm_Msgs::add(sprintf('ERRCan not add connect to the IMAP server: %s', $errstr));
+              return;
+         }
+    }
+
+    public function connectToSMPT($address, $name, $port, $user, $pass, $tls, $errno = null, $errstr = null) {
+         if ($con = @fsockopen($address, $port, $errno, $errstr, 2)) {
+
+              Hm_SMTP_List::add( array(
+                  'name' => $name,
+                  'server' => $address,
+                  'port' => $port,
+                  'user' => $user,
+                  'pass' => $pass,
+                  'tls' => $tls));
+
+              $smtp_servers = Hm_SMTP_List::dump(false, true);
+              $ids = array_keys($smtp_servers);
+              $this->smtp_server_id = array_pop($ids);
+
+              if (in_server_list('Hm_SMTP_List', $this->smtp_server_id, $user)) {
+                  Hm_Msgs::add('ERRThis SMTP server and username are already configured');
+                  return;
+              }
+
+
+               $this->smtp = Hm_SMTP_List::connect($this->smtp_server_id, false, $user, $pass, true);
+               if (is_object($this->smtp) && $this->smtp->state == 'authed') {
+                   $this->user_config->set('smtp_servers', $smtp_servers);
+                   $this->just_saved_credentials = true;
+                   $this->session->record_unsaved('SMTP server saved');
+               }
+               else {
+                   Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
+                   Hm_SMTP_List::forget_credentials($this->smtp_server_id);
+                   return;
+               }
+          } else {
+              Hm_Msgs::add(sprintf('ERRCan not add connect to the SMTP server: %s', $errstr));
+              return;
+          }
     }
 }
 
