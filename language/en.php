@@ -575,7 +575,24 @@ return array(
     'Archive to the original folder' => false,
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
-    'Connection To Sieve Server Failed' => false
-); 
+    'Connection To Sieve Server Failed' => false,
+    'Step 1' => false,
+    'Step 2' => false,
+    'Authentication' => false,
+    'Profile name' => false,
+    'Email' => false,
+    'Password' => false,
+    'Mail server configuration' => false,
+    'Sender account' => false,
+    'Receiver account' => false,
+    'Address' => false,
+    'Enable Sieve' => false,
+    'Create Profile' => false,
+    'Sieve server' => false,
+    'Reply to' => false,
+    'Set this profile default' => false,
+    'Finish' => false,
+    'Add a new server' => false,
+);
 
 ?>

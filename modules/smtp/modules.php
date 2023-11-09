@@ -1279,7 +1279,12 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
             }
             $res .= '<div class="configured_server">';
-            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+            $res .= sprintf('
+                    <div>
+                        <div class="server_type_tag">SMTP</div>
+                        <div class="server_title">%s</div>
+                        <div class="server_subtitle">%s/%d %s</div>
+                    </div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
             $res .=
                 '<form class="smtp_connect" method="POST">'.
@@ -1305,7 +1310,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             }
             $res .= '</form></div>';
         }
-        $res .= '<br class="clear_float" /></div></div>';
+        $res .= '<br class="clear_float" />';
         return $res;
     }
 }

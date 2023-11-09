@@ -27,29 +27,31 @@ function submitSmtpImapServer() {
     ];
 
     Hm_Ajax.request(requestData, function(res) {
-        console.log(res)
         $('#nux_config_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
 
-        $('#nux_config_stepper').find('form').trigger('reset');
-        display_config_step(0);
+        if (res.just_saved_credentials) {
+            $('#nux_config_stepper').find('form').trigger('reset');
+            display_config_step(0);
 
-        //Initialize the form
-        $("#nux_profile_reply_to").val('');
-        $("#nux_profile_signature").val('');
-        $("#nux_config_profile_name").val('');
-        $("#nux_config_email").val('');
-        $("#nux_config_password").val('');
-        $("#nux_profile_is_default").prop('checked', true);
-        $("#nux_config_is_sender").prop('checked', true);
-        $("#nux_config_is_receiver").prop('checked', true);
-        $("#nux_enable_sieve").prop('checked', true);
-        $('#step_config-imap_bloc').show();
-        $('#step_config-smtp_bloc').show();
-        $('#nux_profile_bloc').show();
+            //Initialize the form
+            $("#nux_profile_reply_to").val('');
+            $("#nux_profile_signature").val('');
+            $("#nux_config_profile_name").val('');
+            $("#nux_config_email").val('');
+            $("#nux_config_password").val('');
+            $("#nux_profile_is_default").prop('checked', true);
+            $("#nux_config_is_sender").prop('checked', true);
+            $("#nux_config_is_receiver").prop('checked', true);
+            $("#nux_enable_sieve").prop('checked', true);
+            $('#step_config-imap_bloc').show();
+            $('#step_config-smtp_bloc').show();
+            $('#nux_profile_bloc').show();
 
-        Hm_Utils.set_unsaved_changes(1);
-        Hm_Folders.reload_folders(true);
+            Hm_Utils.set_unsaved_changes(1);
+            Hm_Folders.reload_folders(true);
+            location.reload();
+        }
     });
 }
 
@@ -62,13 +64,13 @@ function handleCreateProfileCheckboxChange(checkbox) {
 }
 function handleSmtpImapCheckboxChange(checkbox) {
     if (checkbox.id === 'nux_config_is_receiver') {
-        if(checkbox.checked) $('#step_config-smtp_bloc').show();
-        else $('#step_config-smtp_bloc').hide();
+        if(checkbox.checked) $('#step_config-imap_bloc').show();
+        else $('#step_config-imap_bloc').hide();
     }
 
     if (checkbox.id === 'nux_config_is_sender') {
-        if(checkbox.checked) $('#step_config-imap_bloc').show();
-        else $('#step_config-imap_bloc').hide();
+        if(checkbox.checked) $('#step_config-smtp_bloc').show();
+        else $('#step_config-smtp_bloc').hide();
     }
 
     if($('#nux_config_is_sender').prop('checked') &&
