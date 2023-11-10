@@ -25,6 +25,9 @@ define('CSS_HASH', '');
 if (DEBUG_MODE) {
     error_reporting(E_ALL | E_STRICT);
 }
+/* //load env files */
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* config file location */
 define('CONFIG_FILE', APP_PATH.'hm3.rc');

@@ -1,0 +1,105 @@
+<?php
+
+/**
+ * Environment objects
+ * @package framework
+ * @subpackage environment
+ */
+
+ use Symfony\Component\Dotenv\Dotenv;
+
+class Hm_Environment {
+
+    private static $instance;
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new static();
+        }
+        return self::$instance;
+    }
+
+    public function load() {
+        $this->set_required_environment_variables();
+
+        $dotenvLoader = new Dotenv();
+        if (method_exists($dotenvLoader, 'usePutenv')) {
+            $dotenvLoader->usePutenv(true);
+        }
+        $envDistFile = APP_PATH. '.env.dist';
+        if (!file_exists($envDistFile)) {
+            Hm_Msgs::add('ERR.env.dist file not found at: "' . $envDistFile . '"');
+            return;
+        }
+        
+        $envFile = static::get('TM_DOTENV');
+        $dotenvLoader->load($envDistFile);
+        if ($envFile) {
+            $dotenvLoader->loadEnv($envFile);
+        }
+    }
+
+    public static function get($key, $defaultValue = null)
+    {
+        $variables = self::getInstance()->get_environment_variables();
+
+        return array_key_exists($key, $variables) ? $variables[$key] : $defaultValue;
+    }
+
+    /**
+     * Sets required environment variables that are used within .env files
+     */
+    private function set_required_environment_variables()
+    {
+        $_ENV['TM_DOTENV'] = APP_PATH . '.env';
+    }
+
+      /**
+     * Get a merge of environment variables $_ENV and $_SERVER.
+     *
+     * @return array
+     */
+    protected function get_environment_variables()
+    {
+        return array_merge($_ENV, $_SERVER);
+    }
+}
+
+if (! function_exists('config_env_file')) {
+    /**
+     * Get / set the specified configuration value.
+     *
+     * If an array is passed as the key, we will assume you want to set an array of values.
+     *
+     * @param  array|string|null  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    function config_env_file($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            // TO DO
+        }
+
+        if (is_array($key)) {
+            // TO DO
+        }
+        // TO DO
+        // return ConfigClass->get($key, $default);
+    }
+}
+
+if (! function_exists('env')) {
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed   $default
+     * @return mixed
+     */
+    function env($key, $default = null)
+    {
+        return getenv($key) ?: $default;
+    }
+}
