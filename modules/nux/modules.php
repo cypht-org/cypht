@@ -273,7 +273,8 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
            'nux_create_profile',
            'nux_profile_is_default',
            'nux_profile_signature',
-           'nux_profile_reply_to'
+           'nux_profile_reply_to',
+           'nux_imap_sieve_host'
            ));
 
         if ($success) {
@@ -302,12 +303,25 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                    $form['nux_config_imap_port'],
                    $form['nux_config_email'],
                    $form['nux_config_password'],
-                   $form['nux_config_imap_tls']);
+                   $form['nux_config_imap_tls'],
+                   $form['nux_imap_sieve_host'],
+                   $form['nux_enable_sieve']);
 
-                 if(!isset($result)) return;
+                 if(!isset($result)) {
+                   /**
+                   * Delete the SMPT server created before
+                   **/
+                   if(!isset($result) && $form['nux_config_is_sender']){
+                       $res = Hm_SMTP_List::del($this->smtp_server_id);
+                       if ($res) {
+                           Hm_SMTP_List::forget_credentials($this->smtp_server_id);
+                           $smtp_servers = Hm_SMTP_List::dump(false, true);
+                           $this->user_config->set('smtp_servers', $smtp_servers);
+                       }
+                   }
+                    return;
+                 }
              }
-
-             Hm_Msgs::add("Server saved");
 
              if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile'] && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
                  $this->saveProfile(
@@ -320,7 +334,7 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                     );
              }
 
-
+             Hm_Msgs::add("Server saved");
              $this->out('just_saved_credentials', $this->just_saved_credentials);
         }
     }
@@ -345,11 +359,9 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
           $profiles->save($this->user_config);
           $user_data = $this->user_config->dump();
           $this->session->set('user_data', $user_data);
-
-          Hm_Msgs::add('Profile Added');
     }
 
-    public function connectToIMAP($address, $name, $port, $user, $pass, $tls, $enableSieve = false, $errno = null, $errstr = null) {
+    public function connectToIMAP($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve = false, $errno = null, $errstr = null) {
         if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
               $imap_list = array(
                   'name' => $name,
@@ -360,19 +372,19 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                   'pass' => $pass,
                   'tls' => $tls);
 
-//               if (isset($enableSieve) && $enableSieve) {
-//                   $imap_list['sieve_config_host'] = $enableSieve;
-//
-//                    require_once VENDOR_PATH . 'autoload.php';
-//                    try {
-//                        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
-//                        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-//                        $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
-//                    } catch (Exception $e) {
-//                        Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
-//                        return;
-//                    }
-//               }
+              if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true) && isset($enableSieve) && $enableSieve) {
+                  $imap_list['sieve_config_host'] = $enableSieve;
+
+                   require_once VENDOR_PATH . 'autoload.php';
+                   try {
+                       list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_sieve_host);
+                       $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                       $client->connect($user, $pass, $sieve_tls, "", "PLAIN");
+                   } catch (Exception $e) {
+                       Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                       return;
+                   }
+              }
 
 
               Hm_IMAP_List::add($imap_list);
@@ -764,22 +776,24 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                              <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
                                          </div>
                                       </div>
-                                   </div>
-                                   <div class="step_config-form_item">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" />
-                                        <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
-                                   </div>';
 
-         if ($this->get('sieve_filters_enabled')) {
+                                        <div class="step_config-form_item">
+                                            <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" onchange="handleSieveStatusChange(this)"/>
+                                            <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                        </div>
+                                   ';
+
+         if (!$this->get('sieve_filters_enabled')) {
              $default_value = '';
                  $res .=  '
-                           <div class="step_config-form_item nested">
+                           <div class="step_config-form_item nested hide" id="nux_imap_sieve_host_bloc">
                                <label class="screen_reader" for="nux_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px;" placeholder="'.$this->trans('Sieve Host').'" type="text" name="imap_sieve_host">
+                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="'.$this->trans('Sieve Host').'" type="text" name="imap_sieve_host">
                            </div>';
          }
 
-         $res .= '</div>
+         $res .= '      </div>
+                    </div>
                              <div class="step_config-form_item" id="nux_profile_checkbox_bloc">
                                   <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="nux_create_profile" checked />
                                   <label for="nux_create_profile">'.$this->trans('Create Profile').'</label>

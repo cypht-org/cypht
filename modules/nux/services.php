@@ -77,7 +77,7 @@ Nux_Quick_Services::add('yahoo', array(
     'auth' => 'login',
     'smtp' => array(
         'server' => 'smtp.mail.yahoo.com',
-        'port' => 587,
+        'port' => 465,
         'tls' => true
     )
 ));

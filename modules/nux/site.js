@@ -23,7 +23,8 @@ function submitSmtpImapServer() {
         { name: 'nux_create_profile', value: $('#nux_create_profile').prop('checked') },
         { name: 'nux_profile_is_default', value: $('#nux_profile_is_default').prop('checked') },
         { name: 'nux_profile_signature', value: $('#nux_profile_signature').val() },
-        { name: 'nux_profile_reply_to', value: $('#nux_profile_reply_to').val() }
+        { name: 'nux_profile_reply_to', value: $('#nux_profile_reply_to').val() },
+        { name: 'nux_imap_sieve_host', value: $('#nux_imap_sieve_host').val() },
     ];
 
     Hm_Ajax.request(requestData, function(res) {
@@ -60,6 +61,14 @@ function handleCreateProfileCheckboxChange(checkbox) {
         $('#nux_profile_bloc').show();
     }else{
         $('#nux_profile_bloc').hide();
+    }
+}
+
+function handleSieveStatusChange (checkbox) {
+    if(checkbox.checked) {
+        $('#nux_imap_sieve_host_bloc').show();
+    }else{
+        $('#nux_imap_sieve_host_bloc').hide();
     }
 }
 function handleSmtpImapCheckboxChange(checkbox) {
@@ -164,7 +173,7 @@ function getEmailProviderKey(email) {
         "office365": ["office365.com"],
         "outlook": ["outlook.com", "outlook.fr"],
         "postale": ["postale.io"],
-        "yahoo": ["yahoo.com"],
+        "yahoo": ["yahoo.com", "yahoo.fr"],
         "yandex": ["yandex.com", "yandex.ru"],
         "zoho": ["zoho.com"]
     };
