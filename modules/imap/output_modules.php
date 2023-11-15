@@ -543,18 +543,18 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div><table>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_name">'.$this->trans('Account name').'</label>'.
-            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">'.$this->trans('Server address').'</label>'.
-            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
+            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld form-control" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
             '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
-            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld form-control" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
              $sieve_extra.
-            '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="" value="1">'.
-            '<label for="new_imap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
+            '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="form-check-input" value="1">'.
+            '<label for="new_imap_hidden" class="form-check-label">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
              $sieve_extra2.
-            '<tr><td><input type="radio" name="tls" value="1" id="imap_tls" checked="checked" /> <label for="imap_tls">'.$this->trans('Use TLS').'</label>'.
-            '<br /><input type="radio" name="tls" value="0" id="imap_notls" /><label for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
-            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
+            '<tr><td><input type="radio" class="form-check-input" name="tls" value="1" id="imap_tls" checked="checked" /> <label class="form-check-label" for="imap_tls">'.$this->trans('Use TLS').'</label>'.
+            '<br /><input type="radio" class="form-check-input" name="tls" value="0" id="imap_notls" /><label class="form-check-label" for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
+            '</tr><tr><td><input class="btn btn-primary btn-sm" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
             '</table></form>';
     }
 }

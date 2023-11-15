@@ -137,7 +137,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         $name = '';
         $phone = '';
         $form_class = 'contact_form';
-        $button = '<input class="add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
+        $button = '<input class="btn btn-success add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
         $title = $this->trans('Add Local');
         $current = $this->get('current_contact', array());
         if (!empty($current)) {
@@ -153,23 +153,23 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $form_class = 'contact_update_form';
             $title = $this->trans('Update Local');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
-                '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
+                '<input class="btn btn-success edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
-            '<div class="server_title">'.$title.
+        return '<div class="add_contact"><form class="" method="POST">'.
+            '<div class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.
             '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>'.
             '<div class="'.$form_class.'">'.
             '<input type="hidden" name="contact_source" value="local" />'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<label class="screen_reader" for="contact_email">'.$this->trans('E-mail Address').'</label>'.
-            '<input required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
-            'value="'.$this->html_safe($email).'" /> *<br />'.
-            '<label class="screen_reader" for="contact_name">'.$this->trans('Full Name').'</label>'.
-            '<input required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" '.
-            'value="'.$this->html_safe($name).'" /> *<br />'.
-            '<label class="screen_reader" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
-            '<input placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
-            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="reset_contact" value="'.
+            '<label class="form-label" for="contact_email">'.$this->trans('E-mail Address').' *</label>'.
+            '<input class="form-control" required placeholder="'.$this->trans('E-mail Address').'" id="contact_email" type="email" name="contact_email" '.
+            'value="'.$this->html_safe($email).'" /><br />'.
+            '<label class="form-label" for="contact_name">'.$this->trans('Full Name').' *</label>'.
+            '<input class="form-control" required placeholder="'.$this->trans('Full Name').'" id="contact_name" type="text" name="contact_name" '.
+            'value="'.$this->html_safe($name).'" /><br />'.
+            '<label class="form-label" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
+            '<input class="form-control" placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
+            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
             $this->trans('Cancel').'" /></div></form></div>';
     }
 }

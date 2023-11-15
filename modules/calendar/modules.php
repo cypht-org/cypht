@@ -155,28 +155,63 @@ class Hm_Output_add_cal_event_form extends Hm_Output_Module {
             'year' => $this->trans('Yearly')
         );
         if ($this->get('cal_action') == 'add') {
-            $res = '<div class="calendar"><div class="content_title">'.$this->trans('Add an Event').'</div>'.
-                '<form method="post">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<table class="event_form">'.
-                '<tr><td class="cal_label">'.$this->trans('Title').'</td>'.
-                '<td><input required type="text" name="event_title" /></td></tr>'.
-                '<tr><td class="cal_label">'.$this->trans('Detail').'</td>'.
-                '<td><textarea name="event_detail"></textarea></td></tr>'.
-                '<tr><td class="cal_label">'.$this->trans('Date').'</td>'.
-                '<td><input required type="date" name="event_date" placeholder="MM/DD/YYYY" /></td></tr>'.
-                '<tr><td class="cal_label">'.$this->trans('Time').'</td>'.
-                '<td><input required type="time" name="event_time" placeholder="HH:MM" /></td></tr>'.
-                '<tr><td class="cal_label">'.$this->trans('Repeat').'</td>'.
-                '<td><select name="event_repeat">';
-            foreach ($repeat_opts as $val => $name) {
-                $res .= '<option value="'.$val.'">'.$name.'</option>';
-            }
-            $res .= '</select></td></tr>'.
-                '<tr><td></td><td class="event_submit"><input type="submit" value="'.$this->trans('Create').
-                '" /></td></tr></tbody></table></form></div>';
+            $res = '<div class="calendar p-0">
+                        <div class="content_title">'.$this->trans('Add an Event').'</div>
+                        <div class="px-4 mt-5">
+                            <form method="post">
+                                <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                                
+                                <div class="mb-3 row">
+                                    <label for="event_title" class="col-md-2 col-form-label">'.$this->trans('Title').'</label>
+                                    <div class="col-md-10">
+                                        <input required type="text" class="form-control" id="event_title" name="event_title">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <label for="event_detail" class="col-md-2 col-form-label">'.$this->trans('Detail').'</label>
+                                    <div class="col-md-10">
+                                        <textarea class="form-control" id="event_detail" name="event_detail"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <label for="event_date" class="col-md-2 col-form-label">'.$this->trans('Date').'</label>
+                                    <div class="col-md-5">
+                                        <input required type="date" class="form-control" id="event_date" name="event_date" placeholder="MM/DD/YYYY">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <label for="event_time" class="col-md-2 col-form-label">'.$this->trans('Time').'</label>
+                                    <div class="col-md-5">
+                                        <input required type="time" class="form-control" id="event_time" name="event_time" placeholder="HH:MM">
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <label for="event_repeat" class="col-md-2 col-form-label">'.$this->trans('Repeat').'</label>
+                                    <div class="col-md-5">
+                                        <select class="form-select" id="event_repeat" name="event_repeat">';
+                                        foreach ($repeat_opts as $val => $name) {
+                                            $res .= '<option value="'.$val.'">'.$name.'</option>';
+                                        }
+                                        $res .= '</select>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 row">
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-10">
+                                        <button type="submit" class="btn btn-primary">'.$this->trans('Create').'</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>';
 
             return $res;
+
         }
     }
 }
@@ -196,9 +231,9 @@ class Hm_Output_calendar_content extends Hm_Output_Module {
             $events = $cal_events->in_date_range($bounds[0], $bounds[1]);
             $out = new Hm_Cal_Output($this, $events);
             $out = $out->output($data, $date, $view);
-            return '<div class="calendar"><div class="content_title">'.$this->trans('Calendar').'</div>'.
-                '<div class="list_controls"><a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="refresh_list">'.
-                '<img src="'.Hm_Image_Sources::$plus.'" /></a></div>'.
+            return '<div class="calendar p-0"><div class="content_title d-flex justify-content-between">'.$this->trans('Calendar').
+                '<a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="btn btn-light btn-sm me-4">'.
+                '<i class="bi bi-plus-circle me-2"></i> '.$this->trans('Add Event').'</a></div>'.
                 $out.'</div>';
         }
     }

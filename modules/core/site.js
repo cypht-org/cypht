@@ -1265,7 +1265,7 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
+        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1387,6 +1387,8 @@ var Hm_Utils = {
             document.getElementById('logout_without_saving').click();
         }
         else {
+            var confirmLogoutModal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'), {keyboard: true})
+            confirmLogoutModal.show();
             $('.confirm_logout').show();
         }
         return false;

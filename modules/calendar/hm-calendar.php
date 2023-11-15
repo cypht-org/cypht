@@ -45,7 +45,7 @@ class Hm_Cal_Output {
     private function output_day($day) {
         $res = '<td class="';
         if ($day == $this->today) {
-            $res .= 'today ';
+            $res .= 'today bg-light';
         }
         if ($this->month != (int) date('n', strtotime($day))) {
             $res .= 'offmonth ';
@@ -66,7 +66,7 @@ class Hm_Cal_Output {
             });
             $res = '';
             foreach ($this->events[$day] as $event) {
-                $res .= '<div class="cal_event">'.
+                $res .= '<div class="cal_event text-secondary">'.
                     $this->output_event_details($event).
                     $this->output_mod->html_safe(date('H:i', $event['ts'])).
                     ' <a class="cal_title">'.$this->output_mod->html_safe($event['title']).
@@ -79,18 +79,18 @@ class Hm_Cal_Output {
 
     private function output_event_details($event) {
         $res = '<div class="event_details">'.
-            '<div class="event_title">'.$this->output_mod->html_safe($event['title']).
-            '<div class="event_date">'.$this->output_mod->html_safe(date('H:i A', $event['ts'])).'</div></div>';
+            '<div class="event_title d-flex flex-column border-bottom mb-2"><span class="fs-5">'.$this->output_mod->html_safe($event['title']).'</span>'.
+            '<small class="event_date fw-lighter">'.$this->output_mod->html_safe(date('H:i A', $event['ts'])).'</small></div>';
         if (strlen(trim($event['description']))) {
-            $res .= '<div class="event_detail">'.$this->output_mod->html_safe($event['description']).'</div>';
+            $res .= '<div class="event_detail mb-2">'.$this->output_mod->html_safe($event['description']).'</div>';
         }
         if (strlen(trim($event['repeat_interval']))) {
-            $res .= '<div class="event_repeat">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</div>';
+            $res .= '<div class="event_repeat"><small class="fw-lighter fst-italic">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</small></div>';
         }
             $res .= '<form method="post"><input type="hidden" name="delete_ts" value="'.$this->output_mod->html_safe($event['ts']).'" />'.
                 '<input type="hidden" name="delete_id" value="'.$this->output_mod->html_safe($event['id']).'" />'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->output_mod->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<div class="event_delete"><a>Delete</a></div></form>';
+                '<div class="event_delete"><a class="btn btn-danger btn-sm">Delete</a></div></form>';
         $res .= '</div>';
         return $res;
     }
@@ -115,12 +115,12 @@ class Hm_Cal_Output {
 
     private function output_month($month) {
         $res = $this->title();
-        $res .= '<table class="calendar_month">';
+        $res .= '<div class="m-4 border"><table class="calendar_month">';
         $res .= $this->output_heading();
         foreach ($month as $week) {
             $res .= $this->output_week($week);
         }
-        $res .= '</table>';
+        $res .= '</table></div>';
         return $res;
     }
 
@@ -162,13 +162,13 @@ class Hm_Cal_Output {
         $month = date('F', strtotime($this->year.'-'.$this->month));
         $title = sprintf('%s, %%s', $month);
         $title = sprintf($this->output_mod->trans($title), $this->output_mod->translate_number($year));
-        return '<div class="month_label">'.$prev.' '.$title.' '.$next.'</div>';
+        return '<div class="month_label p-4 h5">'.$prev.' '.$title.' '.$next.'</div>';
     }
 
     private function output_heading() {
         $days = array('Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
         return '<tr>'.implode('', array_map(function($v) {
-            return sprintf('<th>%s</th>', $this->output_mod->trans($v)); }, $days)).'</tr>';
+            return sprintf('<th class="p-2 fw-bold border-bottom border-end">%s</th>', $this->output_mod->trans($v)); }, $days)).'</tr>';
     }
 }
 

@@ -1,3 +1,8 @@
+.folder_cell { vertical-align: top; height: 100%; max-width: 15%; display: table-cell; padding: 0px; margin: 0px; }
+.content_cell { vertical-align: top; height: 100%;  width: 100%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 0px; }
+
+
+
 a { text-decoration: none; color: teal; }
 form { display: inline; padding: 0px; margin: 0px; }
 a:hover { color: #000 !important; }
@@ -31,7 +36,7 @@ td { vertical-align: top; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
 .mailbox_list_title { display: inline; }
-.sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; cursor: pointer; display: none; background-color: #fff; color: teal; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; }
+.sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; min-width: 300px; cursor: pointer; display: none; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; }
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
@@ -50,10 +55,10 @@ td { vertical-align: top; }
 .server_content, .profile_content, .user_settings { display: table; table-layout: fixed; width: 100%; min-height: 500px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
 .user_settings table { table-layout: fixed; width: 100%; }
 .user_settings table td { height: 34px; vertical-align: middle; padding: 5px; padding-left: 37px; padding-top: 10px; color: #666; }
-.settings_table .save_settings { cursor: pointer; color: #666; font-size: 125%; padding: 10px !important; float: left !important; }
+/* .settings_table .save_settings { cursor: pointer; color: #666; font-size: 125%; padding: 10px !important; float: left !important; } */
 .reset_factory_button { cursor: pointer; color: #666; font-size: 100%; padding: 10px !important; float: right !important; margin-right: 20px;}
 .disabled_link { color: #bbb; }
-.save_settings_password { float: left; margin-left: 0px; padding: 4px; }
+/* .save_settings_password { float: left; margin-left: 0px; padding: 4px; } */
 .disabled_input, input:disabled { color: #aaa !important; background-color: #ddd; }
 input, option, select, button { font-size: 100%; padding: 3px; }
 textarea, select, input, button { border: solid 1px #ddd; background-color: #fff; color: #333; border-radius: 3px; }
@@ -68,8 +73,7 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .inner_list { margin-bottom: 10px; } 
 .folders a, .unread_link { color: #555; text-decoration: none; line-height: 1.25em; }
 .folder_list { background-color: #fff; margin-right: 20px; padding-right: 15px; padding-bottom: 40px; min-width: 200px; padding-top: 0px; }
-.folder_cell { vertical-align: top; height: 100%; max-width: 15%; display: table-cell; padding: 0px; margin: 0px; }
-.content_cell { vertical-align: top; height: 100%;  width: 100%; padding: 0px; margin: 0px; display: table-cell; background-color: #fff; padding-top: 0px; }
+
 .folders, .inner_list { list-style-type: none; padding: 0px; margin-left: 10px; padding-right: 0px; }
 .folders li, .inner_list li { padding: 4px; padding-left: 10px; color: #555; padding-bottom: 0px; margin: 2px; white-space: nowrap; }
 .loading_folders { text-align: center; margin: 10px; margin-top: 20px; color: #666; }
@@ -81,9 +85,9 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .no_servers { text-align: center; padding: 50px; margin: auto; padding-bottom: 100px; }
 .selected_menu, .selected_menu a { color: teal !important; line-height: 1.25em;}
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
-.src_name { white-space: nowrap; overflow: hidden; max-height: 25px; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
+.src_name { white-space: nowrap; overflow: hidden; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .main_menu { padding-top: 20px; }
-.content_title { max-height: 25px; margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px;}
+.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px;}
 .header_subject .content_title { color: #555; }
 .header_subject th { white-space: normal !important; }
 .end_float { clear: both; }
@@ -94,7 +98,7 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .checkbox_cell input[type="checkbox"] { display: none; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: #aaa; }
 .confirm_logout { display: none; background-color: #eee; padding: 20px; position: absolute; left: 0px; top: 0px; border: solid 1px #ede8e6; z-index: 100; }
-.confirm_text {  padding-left: 10px; padding-bottom: 10px; }
+/* .confirm_text {  padding-left: 10px; padding-bottom: 10px; } */
 .folder_list .update_unread { float: right; margin-top: 20px; }
 .page_links a { text-decoration: none; color: #111; }
 .page_links a img { opacity: .6; width: 16px; height: 16px; vertical-align: -2px; }
@@ -133,7 +137,7 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .limit { width: 50px; margin-left: 20px; }
 .settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; }
 .server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
-.settings_subtitle, .server_section { cursor: pointer; max-height: 25px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; }
+.settings_subtitle, .server_section { cursor: pointer; max-height: 50px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; }
 .list_meta { float: right; margin-right: 20px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
@@ -209,8 +213,8 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile { font-size: 90%; min-width: 100%; background: none; }
 .mobile .sys_messages { z-index: 1002; }
 .mobile .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
-.mobile .save_settings { margin-left: 0px !important; }
-.mobile .save_settings_password { margin-right: 10px; }
+/* .mobile .save_settings { margin-left: 0px !important; } */
+/* .mobile .save_settings_password { margin-right: 10px; } */
 .mobile .list_meta { display: block; }
 .mobile .checkbox_cell { padding-right: 0px !important; padding-left: 3px !important; }
 .mobile .mailbox_list_title { font-size: 95%; }

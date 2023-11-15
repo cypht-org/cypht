@@ -249,8 +249,10 @@ class Hm_Output_login extends Hm_Output_Module {
     protected function output() {
         $stay_logged_in = '';
         if ($this->get('allow_long_session')) {
-            $stay_logged_in = '<div class="long_session"><input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" />'.
-            ' <label for="stay_logged_in">'.$this->trans('Stay logged in').'</label></div>';
+            $stay_logged_in = '<div class="form-check form-switch long-session">
+                <input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" class="form-check-input">
+                <label class="form-check-label" for="stay_logged_in">'.$this->trans('Stay logged in').'</label>
+            </div>';
         }
         if (!$this->get('router_login_state')) {
             $fancy_login =  $this->get('fancy_login_allowed');
@@ -281,18 +283,30 @@ class Hm_Output_login extends Hm_Output_Module {
             if (!$single && count($settings) > 0) {
                 $changed = 1;
             }
-            return '<input type="hidden" id="unsaved_changes" value="'.$changed.'" />'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<div class="confirm_logout"><div class="confirm_text">'.
-                $this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' &nbsp;'.
-                '<a href="?page=save">'.$this->trans('More info').'</a></div>'.
-                '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
-                '<label class="screen_reader" for="logout_password">'.$this->trans('Password').'</label>'.
-                '<input id="logout_password" autocomplete="current-password" name="password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
-                '<input class="save_settings" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />'.
-                '<input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
-                '<input class="cancel_logout save_settings" type="button" value="'.$this->trans('Cancel').'" />'.
-                '</div>';
+           
+        return '<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">'.$this->trans('Do you want to log out?').'</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="?page=save">'.$this->trans('More info').'</a></p>
+                        <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
+                        <div class="my-3 form-floating">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="'.$this->trans('Password').'">
+                            <label for="logout_password" class="form-label screen-reader">'.$this->trans('Password').'</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="'.$this->trans('Cancel').'" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
+                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
+                    </div>
+                </div>
+                </div>
+            </div>';
         }
     }
 }
@@ -392,7 +406,10 @@ class Hm_Output_header_start extends Hm_Output_Module {
             '<meta name="apple-mobile-web-app-capable" content="yes" />'.
             '<meta name="mobile-web-app-capable" content="yes" />'.
             '<meta name="apple-mobile-web-app-status-bar-style" content="black" />'.
-            '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />';
+            '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />'.
+            '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
+            '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
+            '<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
 
         if ($this->get('router_login_state')) {
             $res .= '<meta name="referrer" content="no-referrer" />';
@@ -494,6 +511,8 @@ class Hm_Output_header_css extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
+        $res .= '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
+        $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
         $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
             foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
@@ -530,7 +549,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="third_party/cash.min.js"></script>';
+            $js_lib = '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/tingle.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script>';
@@ -1588,7 +1608,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="content_cell"><div class="offline">'.$this->trans('Offline').'</div>';
+        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0">';
     }
 }
 
@@ -1601,7 +1621,7 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
      * Closes the main tag opened in Hm_Output_content_section_start
      */
     protected function output() {
-        return '</main>';
+        return '</div></main>';
     }
 }
 

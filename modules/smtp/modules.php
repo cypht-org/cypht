@@ -1220,14 +1220,14 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<div class="subtitle">'.$this->trans('Add an SMTP Server').'</div>'.
             '<table><tr><td colspan="2"><label for="new_smtp_name" class="screen_reader">'.$this->trans('SMTP account name').'</label>'.
-            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld" value="'.$name.'" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
+            '<input required type="text" id="new_smtp_name" name="new_smtp_name" class="txt_fld form-control" value="'.$name.'" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_address" class="screen_reader">'.$this->trans('SMTP server address').'</label>'.
-            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld" placeholder="'.$this->trans('SMTP server address').'" /></td></tr>'.
+            '<input required type="text" id="new_smtp_address" name="new_smtp_address" value="'.$address.'" class="txt_fld form-control" placeholder="'.$this->trans('SMTP server address').'" /></td></tr>'.
             '<tr><td colspan="2"><label for="new_smtp_port" class="screen_reader">'.$this->trans('SMTP port').'</label>'.
-            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
+            '<input required type="number" id="new_smtp_port" name="new_smtp_port" class="port_fld form-control" value="'.$port.'" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="radio" name="tls" value="1" id="smtp_tls" checked="checked" /> <label for="smtp_tls">'.$this->trans('Use TLS').'</label>'.
             '<br /><input type="radio" name="tls" id="smtp_notls" value="0" /><label for="smtp_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
-            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
+            '</tr><tr><td><input class="btn btn-primary btn-sm" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" /></td></tr>'.
             '</table></form>';
     }
 }

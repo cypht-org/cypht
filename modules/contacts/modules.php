@@ -158,7 +158,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         }
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);
-        $res = '<table class="contact_list">';
+        $res = '<div class="px-4"><table class="contact_list table">';
         $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
@@ -180,7 +180,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
                     '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
                     $this->html_safe($contact->value('phone_number')).'</a></td>'.
-                    '<td class="contact_controls">';
+                    '<td class="text-end">';
                 if (in_array($contact->value('type').':'.$contact->value('source'), $editable, true)) {
                     $res .= '<a data-id="'.$this->html_safe($id).'" data-type="'.$this->html_safe($contact->value('type')).'" data-source="'.$this->html_safe($contact->value('source')).
                         '" class="delete_contact" title="'.$this->trans('Delete').'"><img alt="'.$this->trans('Delete').
@@ -197,7 +197,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     Hm_Image_Sources::$doc.'" /></a>';
 
                 $res .= '</td></tr>';
-                $res .= '<tr><th></th><td id="contact_'.$this->html_safe($id).'_detail" class="contact_detail_row" colspan="6">';
+                $res .= '<tr><td id="contact_'.$this->html_safe($id).'_detail" class="contact_detail_row" colspan="6">';
                 $res .= build_contact_detail($this, $contact, $id).'</td>';
                 $res .= '</td></tr>';
             }
@@ -210,7 +210,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             }
             $res .= '</td></tr>';
         }
-        $res .= '</table>';
+        $res .= '</table></div>';
         return $res;
     }
 }
