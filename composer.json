@@ -40,7 +40,7 @@
         "zbateson/mail-mime-parser": "^2.4",
         "league/commonmark": "^2.4",
         "symfony/dotenv": "^4.3 || 5.4",
-        "twbs/bootstrap": "5.0.2",
+        "twbs/bootstrap": "^5.3",
         "twbs/bootstrap-icons": "^1.11"
     },
     "require-dev": {
