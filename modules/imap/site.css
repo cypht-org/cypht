@@ -79,7 +79,7 @@
 .msg_part_download { width: 10%; }
 
 .download_link, .remove_attachment { width: 100px; }
-.remove_attachment a, .disable_remove a { cursor: default; pointer-events: none; text-decoration: none; }
+/* .remove_attachment a, .disable_remove a { cursor: default; pointer-events: none; text-decoration: none; } */
 .disable_remove a { color: grey; }
 
 .mobile .msg_parts td { padding-bottom: 5px !important; width: 25%; padding-left: 3px !important;}

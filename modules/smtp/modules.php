@@ -933,8 +933,10 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_form_start extends Hm_Output_Module {
     protected function output() {
-        return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>' .
-    '<form class="compose_form" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        return'<div class="compose_page p-0"><div class="content_title">'.$this->trans('Compose').'</div>'.
+            '<div class="container"><div class="row justify-content-md-center">'.
+            '<div class="col col-lg-8">'.
+            '<form class="compose_form p-4" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
     }
 }
 
@@ -943,7 +945,7 @@ class Hm_Output_compose_form_start extends Hm_Output_Module {
  */
 class Hm_Output_compose_form_end extends Hm_Output_Module {
     protected function output() {
-        return '</form>';
+        return '</form></div></div></div>';
     }
 }
 
@@ -1098,25 +1100,42 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 ",basePath: '".WEB_ROOT."modules/smtp/assets/kindeditor/'".
                 '})});;</script>';
         }
+
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
-            '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
-            '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
-            '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
-            '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
-            '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
-            '<div class="to_outer"><div class="compose_container"><div class="bubbles bubble_dropdown"></div><input autocomplete="off" value="'.$this->html_safe($to).
-            '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" /></div>'.
-            '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
-            '<div class="recipient_fields"><div class="compose_container"><div class="bubbles bubble_dropdown"></div><input autocomplete="off" value="'.$this->html_safe($cc).
-            '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').
-            '" /><div id="cc_contacts"></div></div><div class="compose_container" ><div class="bubbles bubble_dropdown"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
-            '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
-            '<div id="bcc_contacts"></div></div></div><input value="'.$this->html_safe($subject).
-            '" name="compose_subject" class="compose_subject" type="text" placeholder="'.
-            $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
-            $this->html_safe($body).'</textarea>'.
-            '<div><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" /><label for="compose_delivery_receipt">'.$this->trans('Request a delivery receipt').'</label></div>';
+                '<input type="hidden" name="compose_msg_path" value="'.$this->html_safe($msg_path).'" />'.
+                '<input type="hidden" name="post_archive" class="compose_post_archive" value="0" />'.
+                '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
+                '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
+                '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
+                '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
+                
+                '<div class="form-floating mb-3 to_outer position-relative">'.
+                    '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to form-control" type="text" placeholder="'.$this->trans('To').' kiki" id="compose_to" />'.
+                    '<label for="compose_to">'.$this->trans('To').'</label>'.
+                    '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 mt-2 me-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
+                '</div>'.
+                '<div id="to_contacts"></div>'.
+                '<div class="recipient_fields">'.
+                    '<div class="form-floating mb-3 compose_container">'.
+                        '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc form-control" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
+                        '<label for="compose_cc">'.$this->trans('Cc').'</label>'.
+                    '</div>'.
+                    '<div id="cc_contacts"></div>'.
+                    '<div class="form-floating mb-3 compose_container">'.
+                        '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc form-control" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
+                        '<label for="compose_bcc">'.$this->trans('Bcc').'</label>'.
+                    '</div>'.
+                    '<div id="bcc_contacts"></div>'.
+                '</div>'.
+                '<div class="form-floating mb-3">'.
+                    '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
+                    '<label for="compose_subject">'.$this->trans('Subject').'</label>'.
+                '</div>'.
+                '<div class="form-floating">'.
+                    '<textarea id="compose_body" name="compose_body" class="compose_body form-control" placeholder="'.$this->trans('Message').'">'.$this->html_safe($body).'</textarea>'.
+                    '<label for="compose_body">'.$this->trans('Message').'</label>'.
+                '</div>'.
+                '<div><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" /><label for="compose_delivery_receipt">'.$this->trans('Request a delivery receipt').'</label></div>';
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
@@ -1176,17 +1195,17 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
-            '<input class="smtp_send" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
+            '<input class="smtp_send btn btn-success mt-3" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
 
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
-            $res .= '<input class="smtp_send_archive" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
+            $res .= '<input class="smtp_send_archive btn btn-success mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }
 
         $disabled_attachment = $this->get('attachment_dir_access') ? '' : 'disabled="disabled"';
-        $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" /><input class="smtp_save" type="button" value="'.$this->trans('Save').'" />'.
-            '<input class="smtp_reset" type="button" value="'.$this->trans('Reset').'" />'.
-            '<input class="compose_attach_button" value="'.$this->trans('Attach').
-            '" name="compose_attach_button" type="button" '.$disabled_attachment.' />';
+        $res .= '<input type="hidden" value="" id="send_uploaded_files" name="send_uploaded_files" />'.
+                '<input class="smtp_save btn btn-light float-end mt-3 border" type="button" value="'.$this->trans('Save').'" />'.
+                '<input class="smtp_reset btn btn-light float-end mt-3 me-2 border" type="button" value="'.$this->trans('Reset').'" />'.
+                '<input class="compose_attach_button btn btn-light float-end mt-3 me-2 border" value="'.$this->trans('Attach').'" name="compose_attach_button" type="button" '.$disabled_attachment.' />';
         return $res;
     }
 }
@@ -1380,7 +1399,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
  */
 if (!hm_exists('smtp_server_dropdown')) {
 function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
-    $res = '<select name="compose_smtp_id" class="compose_server">';
+    $res = '<div class="form-floating"><select id="compose_smtp_id" name="compose_smtp_id" class="compose_server form-select" aria-label="'.$output_mod->trans('Compose SMTP ID').'">';
     $profiles = array();
     if (array_key_exists('compose_profiles', $data)) {
         $profiles = $data['compose_profiles'];
@@ -1434,7 +1453,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             }
         }
     }
-    $res .= '</select>';
+    $res .= '</select><label for="compose_smtp_id">'.$output_mod->trans('Compose SMTP ID').'</label></div>';
     return $res;
 }}
 
@@ -1530,7 +1549,7 @@ function format_attachment_row($file, $output_mod) {
     return '<tr id="tr-'.$unique_identifier.'"><td>'.
             $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
-            '</td><td><a class="remove_attachment" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
+            '</td><td><a class="remove_attachment text-danger" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
             '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
             $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
             $unique_identifier.'"></span></span></div></td></tr>';

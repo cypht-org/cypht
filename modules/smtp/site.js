@@ -170,11 +170,11 @@ var save_compose_state = function(no_files, notice) {
 };
 
 var toggle_recip_flds = function() {
-    var symbol = '+';
-    if ($('.toggle_recipients').text() == '+') {
-        symbol = '-';
+    var symbol = '<i class="bi bi-plus-square-fill fs-3"></i>';
+    if ($('.toggle_recipients').html() == '<i class="bi bi-plus-square-fill fs-3"></i>') {
+        symbol = '<i class="bi bi-dash-square fs-3"></i>';
     }
-    $('.toggle_recipients').text(symbol);
+    $('.toggle_recipients').html(symbol);
     $('.recipient_fields').toggle();
     return false;
 }
@@ -220,7 +220,7 @@ var init_resumable_upload = function () {
     r.on('fileAdded', function(file, event){
         $('.uploaded_files').append('<tr id="tr-'+file.uniqueIdentifier+'"><td>'
                 +file.fileName+'</td><td>'+file.file.type+' ' + (Math.round((file.file.size/1024) * 100)/100) + 'KB '
-                +'</td><td><a class="remove_attachment" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
+                +'</td><td><a class="remove_attachment text-danger" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
                 +'<div class="meter" style="width:100%"><span id="progress-'
                 +file.uniqueIdentifier+'" style="width:0%;"><span class="progress" id="progress-bar-'
                 +file.uniqueIdentifier+'"></span></span></div></td></tr>');

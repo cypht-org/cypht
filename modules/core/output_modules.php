@@ -1321,7 +1321,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> ';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count"></span></li>';
+        $res .= $this->trans('Unread').' kokok</a><span class="total_unread_count badge bg-secondary"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> ';

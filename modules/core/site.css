@@ -199,7 +199,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .list_controls { left: 0px; padding-left: 10px; top: 0px; padding-top: 10px; right: auto; background-color: #fff; }
 .rtl_page .toggle_link { margin-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
-.rtl_page .smtp_save, .rtl_page .smtp_reset, .rtl_page .compose_attach_button, .rtl_page .compose_sign{ float: left; }
+.rtl_page .smtp_save, .rtl_page .smtp_reset, .rtl_page .compose_attach_button, .rtl_page { float: left; }
 .rtl_page .smtp_send { direction: rtl !important; }
 .rtl_page .sys_messages { left: 20px; right: auto; }
 .rtl_page .total_unread_count { margin-right: 10px; margin-left: 0px; }
