@@ -731,7 +731,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                <div class="step_config-form_item">
                                     <label for="nux_config_provider">'.$this->trans('Provider').'</label>
                                     <br />
-                                    <select id="nux_config_provider" class="stepper_input" name="nux_config_provider"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
+                                    <select id="nux_config_provider" class="stepper_input" name="nux_config_provider" onchange="handleProviderChange(this)"><option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
                                </div>
                                <div class="step_config-form_item">
                                     <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_sender" checked />
@@ -741,6 +741,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                     <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_receiver" checked />
                                     <label for="nux_config_is_receiver">'.$this->trans('Receiver account').'</label>
                                </div>
+                               <span id="nux_config_serve_type-error" class="error-message"></span>
 
                                <div class="step_config-smtp_imap_bloc">
                                     <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
@@ -749,6 +750,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                            <label for="nux_config_smtp_address">'.$this->trans('Address').'</label>
                                            <br />
                                            <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_smtp_address" placeholder="'.$this->trans('Address').'" />
+                                           <span id="nux_config_smtp_address-error" class="error-message"></span>
                                        </div>
                                        <div class="step_config-smtp_imap_port_bloc">
                                            <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_smtp_port"/>
@@ -758,6 +760,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                                <input type="radio" id="smtp_start_tls" name="nux_config_smtp_tls" value="false">
                                                <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
                                            </div>
+                                           <span id="nux_config_smtp_port-error" class="error-message"></span>
                                        </div>
                                    </div>
                                    <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
@@ -766,6 +769,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                           <label for="nux_config_imap_address">'.$this->trans('Address').'</label>
                                           <br />
                                           <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_imap_address" placeholder="'.$this->trans('Address').'" />
+                                           <span id="nux_config_imap_address-error" class="error-message"></span>
                                       </div>
                                       <div class="step_config-smtp_imap_port_bloc">
                                          <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_imap_port"/>
@@ -775,6 +779,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                              <input type="radio" id="imap_start_tls" name="nux_config_imap_tls" value="false">
                                              <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
                                          </div>
+                                         <span id="nux_config_imap_port-error" class="error-message"></span>
                                       </div>
 
                                         <div class="step_config-form_item">

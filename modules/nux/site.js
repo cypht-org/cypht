@@ -91,28 +91,10 @@ function handleSmtpImapCheckboxChange(checkbox) {
         $('#nux_profile_checkbox_bloc').hide();
     }
 }
-function display_config_step(stepNumber) {
-    if(stepNumber == 2) {
 
-        var isValid = true;
-
-        [   {key: 'nux_config_profile_name', value: $('#nux_config_profile_name').val()},
-            {key: 'nux_config_email', value: $('#nux_config_email').val()},
-            {key: 'nux_config_password', value: $('#nux_config_password').val()}].forEach((item) => {
-                if(!item.value) {
-                    $(`#${item.key}-error`).text('Required');
-                    isValid = false;
-                }
-                else $(`#${item.key}-error`).text('');
-        })
-
-        if (!isValid) {
-            return
-        }
-
-        let providerKey = getEmailProviderKey($('#nux_config_email').val());
-        $("#nux_config_provider").val(providerKey);
-
+function handleProviderChange(select) {
+    let providerKey = select.value;
+    if(providerKey) {
         Hm_Ajax.request(
             [
                 {'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
@@ -137,10 +119,97 @@ function display_config_step(stepNumber) {
             [],
             false
         );
+    }else{
+        $("#nux_config_smtp_address").val('');
+        $("#nux_config_smtp_port").val(465);
+        $("#nux_config_imap_address").val('');
+        $("#nux_config_imap_port").val(993);
+    }
+}
+function display_config_step(stepNumber) {
+    if(stepNumber == 2) {
+
+        var isValid = true;
+
+        [   {key: 'nux_config_profile_name', value: $('#nux_config_profile_name').val()},
+            {key: 'nux_config_email', value: $('#nux_config_email').val()},
+            {key: 'nux_config_password', value: $('#nux_config_password').val()}].forEach((item) => {
+                if(!item.value) {
+                    $(`#${item.key}-error`).text('Required');
+                    isValid = false;
+                }
+                else $(`#${item.key}-error`).text('');
+        })
+
+        if (!isValid) {
+            return
+        }
+
+        let providerKey = getEmailProviderKey($('#nux_config_email').val());
+        if(providerKey) {
+            $("#nux_config_provider").val(providerKey);
+
+            Hm_Ajax.request(
+                [
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
+                    {'name': 'nux_service', 'value': providerKey},],
+                function(res) {
+                    if(res.service_details){
+                        let serverConfig = JSON.parse(res.service_details)
+
+                        $("#nux_config_smtp_address").val(serverConfig.smtp.server);
+                        $("#nux_config_smtp_port").val(serverConfig.smtp.port);
+
+                        if(serverConfig.smtp.tls)$("input[name='nux_config_smtp_tls'][value='true']").prop("checked", true);
+                        else $("input[name='nux_config_smtp_tls'][value='false']").prop("checked", true);
+
+                        $("#nux_config_imap_address").val(serverConfig.server);
+                        $("#nux_config_imap_port").val(serverConfig.port);
+
+                        if(serverConfig.tls)$("input[name='nux_config_imap_tls'][value='true']").prop("checked", true);
+                        else $("input[name='nux_config_imap_tls'][value='false']").prop("checked", true);
+                    }
+                },
+                [],
+                false
+            );
+        }
     }
 
     if(stepNumber == 3) {
-        submitSmtpImapServer();
+        var requiredFields = [];
+        var isValid = true;
+
+        if(!$('#nux_config_is_sender').is(':checked') && !$('#nux_config_is_receiver').is(':checked')){
+            $('#nux_config_serve_type-error').text('Required');
+            return;
+        }
+
+        if($('#nux_config_is_sender').is(':checked')){
+            requiredFields.push(
+                {key: 'nux_config_smtp_address', value: $('#nux_config_smtp_address').val()},
+                {key: 'nux_config_smtp_port', value: $('#nux_config_smtp_port').val()},
+            )
+        }
+
+        if($('#nux_config_is_receiver').is(':checked')) {
+            requiredFields.push(
+                {key: 'nux_config_imap_address', value: $('#nux_config_imap_address').val()},
+                {key: 'nux_config_imap_port', value: $('#nux_config_imap_port').val()},
+            )
+        }
+
+        requiredFields.forEach((item) => {
+            if(!item.value) {
+                $(`#${item.key}-error`).text('Required');
+                isValid = false;
+            }
+            else $(`#${item.key}-error`).text('');
+        })
+
+        if(isValid) return
+
+        //submitSmtpImapServer();
         return
     }
     // Hide all step elements
@@ -179,6 +248,9 @@ function getEmailProviderKey(email) {
     };
 
     const emailParts = email.split("@");
+
+    if(emailParts.length !== 2) return "";
+
     const provider = emailParts[1].toLowerCase();
 
     for (const providerKey in emailProviderMap) {
