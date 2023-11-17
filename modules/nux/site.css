@@ -5,8 +5,8 @@
 /* .nux_step_one, .nux_step_two { padding-left: 40px; max-width: 600px; } */
 /* .enable_auth2 { float: left; padding: 20px; padding-left: 0px; padding-bottom: 40px; font-size: 110%; } */
 .nux_password, .app_password { margin: 10px; margin-left: 0px; margin-top: 0px; width: 280px; }
-.reset_nux_form { float: right; padding: 20px; padding-bottom: 40px; font-size: 110%; }
-.nux_submit { margin-bottom: 20px; }
+/* .reset_nux_form { float: right; padding: 20px; padding-bottom: 40px; font-size: 110%; } */
+/* .nux_submit { margin-bottom: 20px; } */
 /* .nux_account_name, .nux_username, #service_select, .nux_extra_fields { margin-bottom: 10px; width: 280px; padding: 3px; } */
 #nux_email { margin-bottom: 10px; }
 /* .nux_help, .nux_dev_news, .nux_welcome { padding: 20px; margin: 20px; margin-right: 0px; float: left; border: solid 1px #eee; } */

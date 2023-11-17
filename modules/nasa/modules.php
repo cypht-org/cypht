@@ -128,21 +128,27 @@ class Hm_Output_apod_content extends Hm_Output_Module {
  */
 class Hm_Output_nasa_connect_section extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="nasa_connect"><div data-target=".nasa_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
-            $this->trans('NASA APIs').'</div><div class="nasa_connect_section"><div class="nasa_connect_inner_1" ';
+        $res = '<div class="nasa_connect"><div data-target=".nasa_connect_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-key-fill me-3"></i>
+                        <b>'.$this->trans('NASA APIs').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="nasa_connect_section"><div class="nasa_connect_inner_1" ';
+
         if ($this->get('nasa_api_key')) {
             $res .= 'style="display: none;"';
         }
         $res .= '><div>Connect to NASA APIs</div>';
-        $res .= '<div><input type="text" size="50" class="nasa_api_key" placeholder="'.$this->trans('Enter your API key').'" />';
-        $res .= '<input type="button" class="nasa_api_connect" value="'.$this->trans('Connect').'" /></div></div>';
+        $res .= '<div><input type="text" size="50" class="nasa_api_key form-control" placeholder="'.$this->trans('Enter your API key').'" />';
+        $res .= '<input type="button" class="nasa_api_connect btn btn-secondary" value="'.$this->trans('Connect').'" /></div></div>';
         $res .= '<div class="nasa_connect_inner_2" ';
         if (!$this->get('nasa_api_key')) {
             $res .= 'style="display: none;"';
         }
         $res .= '><div>'.$this->trans('Already connected').'</div>';
-        $res .= '<div><input type="button" class="nasa_api_disconnect" value="'.$this->trans('Disconnect').'" /></div>';
+        $res .= '<div><input type="button" class="nasa_api_disconnect btn btn-danger" value="'.$this->trans('Disconnect').'" /></div>';
         $res .= '</div></div></div>';
         return $res;
     }

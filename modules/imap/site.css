@@ -7,9 +7,9 @@
 .dl { color: #888; }
 .empty_list { text-align: center; color: #ccc; font-size: 2em; font-style: italic; padding: 30px; padding-bottom: 100px; }
 .credentials { width: 205px; margin-bottom: 15px !important; }
-.add_server .txt_fld { width: 205px; }
-.add_server .port_fld { width: 50px; }
-.server_title { font-size: 110%; margin-bottom: 0px; color: #666; }
+/* .add_server .txt_fld { width: 205px; } */
+/* .add_server .port_fld { width: 50px; } */
+/* .server_title { font-size: 110%; margin-bottom: 0px; color: #666; } */
 .server_subtitle { margin-bottom: 20px; color: #666; overflow: hidden; text-overflow: ellipsis}
 .msg_text { min-height: 600px; background-color: #fff; height: 100%; }
 .msg_text_inner { min-height: 300px; font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; }

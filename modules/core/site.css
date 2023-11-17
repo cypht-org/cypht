@@ -36,7 +36,7 @@ td { vertical-align: top; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
 .mailbox_list_title { display: inline; }
-.sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; min-width: 300px; cursor: pointer; display: none; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; }
+/* .sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; min-width: 300px; cursor: pointer; display: none; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; } */
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
 .s_pre { color: #666}
@@ -136,21 +136,21 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .plink:hover, .nlink:hover { color: teal !important; }
 .limit { width: 50px; margin-left: 20px; }
 .settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; }
-.server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; }
-.settings_subtitle, .server_section { cursor: pointer; max-height: 50px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; }
+/* .server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; } */
+/* .settings_subtitle, .server_section { cursor: pointer; max-height: 50px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; } */
 .list_meta { float: right; margin-right: 20px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
 .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
 .hide_folders { font-size: 0px; float: left; clear: none; margin-top: 10px; margin-left: 23px; }
 .hide_folders img { opacity: .4; }
 .section_caret { opacity: .15; vertical-align: 4px; padding-right: 10px; }
-.server_count { float: right; margin-right: 120px; font-size: 90%; }
+.server_count { float: right; font-size: 90%; }
 .email_setting, .all_setting, .unread_setting, .flagged_setting, .general_setting, .junk_setting, .trash_setting, .drafts_setting { display: none; }
-.configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; }
+/* .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; } */
 .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
-.configured_server { float: left; margin-left: 25px; width: 230px; }
-.add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; }
-.configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
+/* .configured_server { float: left; margin-left: 25px; width: 230px; } */
+/* .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; } */
+/* .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; } */
 .list_sources, .update_search_label_field { z-index: 100; border-left: solid 1px #ede8e6; border-bottom: solid 1px #ede8e6; position: absolute; right: 0px; top: 54px; background-color: #fafafa; font-size: 85%; padding: 30px; padding-top: 10px; display: none;}
 .list_src, .old_search_terms_label, .search_terms_label { color: #666; margin-bottom: 10px; }
 .old_search_terms_label, .search_terms_label { display: block; width: 100%; }
@@ -201,7 +201,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .rtl_page .msg_controls { margin-right: 0px !important; padding-right: 5px !important; margin-left: 15px !important; }
 .rtl_page .smtp_save, .rtl_page .smtp_reset, .rtl_page .compose_attach_button, .rtl_page { float: left; }
 .rtl_page .smtp_send { direction: rtl !important; }
-.rtl_page .sys_messages { left: 20px; right: auto; }
+/* .rtl_page .sys_messages { left: 20px; right: auto; } */
 .rtl_page .total_unread_count { margin-right: 10px; margin-left: 0px; }
 .rtl_page .debug_title { right: auto; left: 0; }
 .rtl_page .combined_sort { margin-right: 15px; margin-left: 105px;}
@@ -211,7 +211,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 
 /* mobile */
 .mobile { font-size: 90%; min-width: 100%; background: none; }
-.mobile .sys_messages { z-index: 1002; }
+/* .mobile .sys_messages { z-index: 1002; } */
 .mobile .account_icon { width: 24px; height: 24px; padding-bottom: 4px; }
 /* .mobile .save_settings { margin-left: 0px !important; } */
 /* .mobile .save_settings_password { margin-right: 10px; } */

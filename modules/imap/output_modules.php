@@ -456,8 +456,8 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
-            $res .= '<div class="configured_server">';
-            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+            $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
+            $res .= sprintf('<div class="server_title"><b>%s</b></div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
             $res .= '<form class="imap_connect" method="POST">'.
@@ -480,14 +480,15 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 }
             }
 
+            $res .= '<div class="d-flex gap-2">';
             if (!isset($vals['user']) || !$vals['user']) {
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-outline-secondary btn-sm" />';
             }
             else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-secondary btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm" />';
             }
 
             $hidden = false;
@@ -498,16 +499,19 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             if ($hidden) {
                 $res .= 'style="display: none;" ';
             }
-            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
+            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm" />';
             $res .= '<input type="submit" ';
             if (!$hidden) {
                 $res .= 'style="display: none;" ';
             }
-            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
+            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm" />';
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</form></div>';
+
+            $res .= '</div>';
+
+            $res .= '</form></div></div>';
         }
-        $res .= '<br class="clear_float" /></div></div>';
+        $res .= '<br class="clear_float" /></div></div></div></div>';
         return $res;
     }
 }
@@ -537,25 +541,54 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
                 '<label for="enable_sieve_filter">'.$this->trans('Enable Sieve Filters').'</label></td></tr>';
         }
 
-        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' '.$this->trans('IMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="imap_section"><form class="add_server" method="POST">'.
-            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div><table>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_name">'.$this->trans('Account name').'</label>'.
-            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_address">'.$this->trans('Server address').'</label>'.
-            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld form-control" placeholder="'.$this->trans('IMAP server address').'" value=""/></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('IMAP port').'</label>'.
-            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld form-control" value="993" placeholder="'.$this->trans('Port').'"></td></tr>'.
-             $sieve_extra.
-            '<tr><td colspan="2"><input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="form-check-input" value="1">'.
-            '<label for="new_imap_hidden" class="form-check-label">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
-             $sieve_extra2.
-            '<tr><td><input type="radio" class="form-check-input" name="tls" value="1" id="imap_tls" checked="checked" /> <label class="form-check-label" for="imap_tls">'.$this->trans('Use TLS').'</label>'.
-            '<br /><input type="radio" class="form-check-input" name="tls" value="0" id="imap_notls" /><label class="form-check-label" for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
-            '</tr><tr><td><input class="btn btn-primary btn-sm" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" /></td></tr>'.
-            '</table></form>';
+        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4">'.
+            '<a href="#" class="pe-auto"><i class="bi bi-envelope-fill me-3"></i>'.
+            '<b> '.$this->trans('IMAP Servers').'</b></a>'.
+            '<div class="server_count">'.$count.'</div></div>
+            <div class="imap_section px-4 pt-3">
+                <div class="row">
+                    <div class="col-12 col-lg-4">
+                        <form class="add_server" method="POST">'.
+                            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+                            '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div>'.
+
+                            // Account Name Field
+                            '<div class="form-floating mb-3">'.
+                            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'">'.
+                            '<label for="new_imap_name" class="">'.$this->trans('Account name').'</label></div>'.
+
+                            // Server Address Field
+                            '<div class="form-floating mb-3">'.
+                            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld form-control" placeholder="'.$this->trans('IMAP server address').'" value="">'.
+                            '<label for="new_imap_address" class="">'.$this->trans('Server address').'</label></div>'.
+
+                            // IMAP Port Field
+                            '<div class="form-floating mb-3">'.
+                            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld form-control" value="993" placeholder="'.$this->trans('Port').'">'.
+                            '<label for="new_imap_port" class="">'.$this->trans('IMAP port').'</label></div>'.
+
+                            $sieve_extra.
+
+                            // Checkbox for Hide From Combined Pages
+                            '<div class="form-check mb-3">'.
+                            '<input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="form-check-input" value="1">'.
+                            '<label for="new_imap_hidden" class="form-check-label">'.$this->trans('Hide From Combined Pages').'</label></div>'.
+
+                            $sieve_extra2.
+
+                            // TLS Radio Button
+                            '<div class="form-check">'.
+                            '<input type="radio" class="form-check-input" name="tls" value="1" id="imap_tls" checked="checked">'.
+                            '<label class="form-check-label" for="imap_tls">'.$this->trans('Use TLS').'</label></div>'.
+
+                            '<div class="form-check mb-3">'.
+                            '<input type="radio" class="form-check-input" name="tls" value="0" id="imap_notls">'.
+                            '<label class="form-check-label" for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></div>'.
+
+                            '<input class="btn btn-primary px-5" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" />'.
+                        '</form>
+                    </div>';
+
     }
 }
 
@@ -571,27 +604,50 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-
+    
         if(!$this->get('is_jmap_supported')){
             return '<div class="jmap_server_setup"><div class="jmap_section" style="display: none;">';
-         }
-
+        }
+    
         $count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap';}));
         $count = sprintf($this->trans('%d configured'), $count);
-        return '<div class="jmap_server_setup"><div data-target=".jmap_section" class="server_section">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
-            ' '.$this->trans('JMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="jmap_section"><form class="add_server" method="POST">'.
-            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<div class="subtitle">'.$this->trans('Add a JMAP Server').'</div><table>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_name">'.$this->trans('Account name').'</label>'.
-            '<input id="new_jmap_name" required type="text" name="new_jmap_name" class="txt_fld" value="" placeholder="'.$this->trans('Account name').'" /></td></tr>'.
-            '<tr><td colspan="2"><label class="screen_reader" for="new_jmap_address">'.$this->trans('Server URL').'</label>'.
-            '<input required type="url" id="new_jmap_address" name="new_jmap_address" class="txt_fld" placeholder="'.$this->trans('Server URL').'" value=""/></td></tr>'.
-            '<tr><td colspan="2"><input type="checkbox" id="new_jmap_hidden" name="new_jmap_hidden" class="" value="1">'.
-            '<label for="new_jmap_hidden">'.$this->trans('Hide From Combined Pages').'</label></td></tr>'.
-            '</tr><tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_jmap_server" /></td></tr>'.
-            '</table></form>';
+    
+        return '
+        <div class="jmap_server_setup">
+            <div data-target=".jmap_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                <a href="#" class="pe-auto">
+                    <i class="bi bi-envelope-fill me-3"></i>
+                    <b>'.$this->trans('JMAP Servers').'</b>
+                </a> 
+                <div class="server_count">'.$count.'</div>
+            </div>
+            <div class="jmap_section px-4 pt-3">
+                <div class="row">
+                <div class="col-12 col-lg-4">
+                    <form class="add_server" method="POST">
+                        <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                        <div class="subtitle">'.$this->trans('Add a JMAP Server').'</div>
+        
+                        <div class="form-floating mb-3">
+                            <input id="new_jmap_name" required type="text" name="new_jmap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'">
+                            <label class="" for="new_jmap_name">'.$this->trans('Account name').'</label>
+                        </div>
+        
+                        <div class="form-floating mb-3">
+                            <input required type="url" id="new_jmap_address" name="new_jmap_address" class="txt_fld form-control" placeholder="'.$this->trans('Server URL').'" value="">
+                            <label class="" for="new_jmap_address">'.$this->trans('Server URL').'</label>
+                        </div>
+        
+                        <div class="mb-3">
+                            <input type="checkbox" id="new_jmap_hidden" name="new_jmap_hidden" class="form-check-input" value="1">
+                            <label for="new_jmap_hidden">'.$this->trans('Hide From Combined Pages').'</label>
+                        </div>
+        
+                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_jmap_server" />
+                    </form>
+                </div>';
     }
+    
 }
 
 /**
@@ -632,7 +688,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
             }
-            $res .= '<div class="configured_server">';
+            $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']));
             $res .= '<form class="imap_connect" method="POST">'.
@@ -644,6 +700,8 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
                 '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label>'.
                 '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
                 '" type="password" name="imap_pass"></span>';
+
+            $res .= '<div class="d-flex gap-2">';    
 
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
@@ -670,9 +728,10 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             }
             $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</form></div>';
+            $res .= '</div>';
+            $res .= '</form></div></div>';
         }
-        $res .= '<br class="clear_float" /></div></div>';
+        $res .= '<br class="clear_float" /></div></div></div>';
         return $res;
     }
 }

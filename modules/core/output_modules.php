@@ -292,6 +292,7 @@ class Hm_Output_login extends Hm_Output_Module {
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
                         <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="?page=save">'.$this->trans('More info').'</a></p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
@@ -367,16 +368,17 @@ class Hm_Output_msgs extends Hm_Output_Module {
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="sys_messages'.$logged_out_class.'">';
+        $res .= '<div class="z-3 position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
         if (!empty($msgs)) {
             $res .= implode(',', array_map(function($v) {
                 if (preg_match("/ERR/", $v)) {
-                    return sprintf('<span class="err">%s</span>', $this->trans(substr((string) $v, 3)));
+                    return sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="err">%s</span>', $this->trans(substr((string) $v, 3)));
                 }
                 else {
-                    return $this->trans($v);
+                    return sprintf('<div class="alert alert-info alert-dismissible fade show" role="alert"><i class="bi bi-info-circle me-2"></i><span>%s</span>', $this->trans($v));
                 }
             }, $msgs));
+            $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
         $res .= '</div>';
         return $res;
@@ -407,8 +409,8 @@ class Hm_Output_header_start extends Hm_Output_Module {
             '<meta name="mobile-web-app-capable" content="yes" />'.
             '<meta name="apple-mobile-web-app-status-bar-style" content="black" />'.
             '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />'.
-            '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
-            '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
+            '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />'.
+            '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />'.
             '<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
 
         if ($this->get('router_login_state')) {
@@ -1321,7 +1323,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> ';
         }
-        $res .= $this->trans('Unread').' kokok</a><span class="total_unread_count badge bg-secondary"></span></li>';
+        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge bg-secondary"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> ';

@@ -419,12 +419,19 @@ class Hm_Output_wordpress_since_setting extends Hm_Output_Module {
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
-        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
-            $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">';
+        
+        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-wordpress me-3"></i>
+                        <b>'.$this->trans('WordPress.com Connect').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="wordpress_connect_section">';
+        
         if (empty($details)) {
             $res .= 'Connect to WordPress.com to view notifications and posts.<br /><br />';
-            $res .= '<a href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
         }
         else {
             $res .= $this->trans('Already connected');
