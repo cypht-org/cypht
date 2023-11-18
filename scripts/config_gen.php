@@ -115,7 +115,7 @@ function build_config() {
     }
 
     /* get the site settings */
-    $settings = parse_ini_file(APP_PATH.'hm3.ini');
+    $settings = merge_config_files(APP_PATH.'config');
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
@@ -292,8 +292,8 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
 /**
  * Write the hm3.rc file to disk
  *
- * @param $settings array site settings list
- * @param $filters array combined list of filters from all modules
+ * @param $settings array site settings list (unsued with .env support)
+ * @param $filters array combined list of filters from all modules (unsued with .env support)
  * 
  * @return void
  */
@@ -304,11 +304,6 @@ function write_config_file($settings, $filters) {
     Hm_Output_Modules::try_queued_modules();
     Hm_Output_Modules::process_all_page_queue();
     Hm_Output_Modules::try_queued_modules();
-    $settings['handler_modules'] = Hm_Handler_Modules::dump();
-    $settings['output_modules'] = Hm_Output_Modules::dump();
-    $settings['input_filters'] = $filters;
-    file_put_contents('hm3.rc', json_encode($settings));
-    printf("hm3.rc file written\n");
 }
 
 /**

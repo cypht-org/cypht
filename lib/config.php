@@ -480,8 +480,8 @@ class Hm_Site_Config_File extends Hm_Config {
      * Load data based on source
      * @param string $source source location for site configuration
      */
-    public function __construct($source) {
-        $this->load($source, false);
+    public function __construct($all_configs) {
+        $this->load($all_configs, false);
     }
 
     /**
@@ -490,14 +490,9 @@ class Hm_Site_Config_File extends Hm_Config {
      * @param string $key encryption key (unsued in this class)
      * @return void
      */
-    public function load($source, $key) {
-        if (is_readable($source)) {
-            $data = $this->decode(file_get_contents($source));
-            if ($data) {
-                $this->config = array_merge($this->config, $data);
-                $this->get_user_defaults();
-            }
-        }
+    public function load($all_configs, $key) {
+        $this->config = array_merge($this->config, $all_configs);
+        $this->get_user_defaults();
     }
 
     /*

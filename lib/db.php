@@ -49,14 +49,13 @@ class Hm_DB {
      * @return string md5 of the DB settings
      */
     static private function db_key() {
-        return md5(
-            self::$config['db_driver'] .
-                self::$config['db_host'] .
-                self::$config['db_port'] .
-                self::$config['db_name'] .
-                self::$config['db_user'] .
-                self::$config['db_pass'] .
-                self::$config['db_conn_type'] .
+        return md5(self::$config['db_driver'].
+                self::$config['db_host'].
+                self::$config['db_port'].
+                self::$config['db_name'].
+                self::$config['db_user'].
+                self::$config['db_pass'].
+                self::$config['db_conn_type'].
                 self::$config['db_socket']
         );
     }
@@ -71,10 +70,12 @@ class Hm_DB {
         }
         if (self::$config['db_conn_type'] == 'socket') {
             return sprintf('%s:unix_socket=%s;dbname=%s', self::$config['db_driver'], self::$config['db_socket'], self::$config['db_name']);
-        } else {
+        }
+        else {
             if (self::$config['db_port']) {
                 return sprintf('%s:host=%s;port=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_port'], self::$config['db_name']);
-            } else {
+            }
+            else {
                 return sprintf('%s:host=%s;dbname=%s', self::$config['db_driver'], self::$config['db_host'], self::$config['db_name']);
             }
         }
@@ -88,7 +89,7 @@ class Hm_DB {
      * @param bool $all optional flag to return multiple rows
      * @return boolean|integer|array
      */
-    static public function execute($dbh, $sql, $args, $type = false, $all = false) {
+    static public function execute($dbh, $sql, $args, $type=false, $all=false) {
         if (!$dbh) {
             return false;
         }
@@ -113,7 +114,7 @@ class Hm_DB {
      * @return string
      */
     static private function execute_type($sql) {
-        switch (substr($sql, 0, 1)) {
+        switch(substr($sql, 0, 1)) {
             case 'd':
             case 'u':
             case 'i':
@@ -142,7 +143,8 @@ class Hm_DB {
             self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
             return self::$dbh[$key];
-        } catch (Exception $oops) {
+        }
+        catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());
             self::$dbh[$key] = false;
             return false;

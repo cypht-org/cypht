@@ -25,9 +25,6 @@ define('CSS_HASH', '');
 if (DEBUG_MODE) {
     error_reporting(E_ALL | E_STRICT);
 }
-/* //load env files */
-$environment = Hm_Environment::getInstance();
-$environment->load();
 
 /* config file location */
 define('CONFIG_FILE', APP_PATH.'hm3.rc');
@@ -41,8 +38,10 @@ date_default_timezone_set( 'UTC' );
 /* get includes */
 require APP_PATH.'lib/framework.php';
 
+//get all config array merged
+$all_configs = merge_config_files(APP_PATH.'config');
 /* get configuration */
-$config = new Hm_Site_Config_File(CONFIG_FILE);
+$config = new Hm_Site_Config_File($all_configs);
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {
