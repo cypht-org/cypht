@@ -171,7 +171,7 @@ class Hm_Dispatch {
      */
     public function __construct($config) {
 
-        /* get the site config defined in the hm3.rc file */
+        /* get the site config defined in the config/app.php file */
         $this->site_config = $config;
 
         /* check for the site module set override */

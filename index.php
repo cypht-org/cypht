@@ -26,9 +26,6 @@ if (DEBUG_MODE) {
     error_reporting(E_ALL | E_STRICT);
 }
 
-/* config file location */
-define('CONFIG_FILE', APP_PATH.'hm3.rc');
-
 /* don't let anything output content until we are ready */
 ob_start();
 

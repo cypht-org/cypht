@@ -26,8 +26,9 @@ define('WEB_ROOT', '');
 /* get the framework */
 require APP_PATH.'lib/framework.php';
 
+$all_configs = merge_config_files(APP_PATH.'config');
 /* get config object */
-$config = new Hm_Site_Config_File(APP_PATH.'hm3.rc');
+$config = new Hm_Site_Config_File($all_configs);
 
 /* check config for db auth */
 if ($config->get('auth_type') != 'DB') {

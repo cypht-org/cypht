@@ -7,7 +7,7 @@ class Hm_Test_Dispatch extends TestCase {
     public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
-        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
         $this->config = new Hm_Mock_Config();
     }
     /**
@@ -142,7 +142,7 @@ class Hm_Test_Debug_Page_Redirect extends TestCase {
     public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
-        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
     }
     /**
      * @preserveGlobalState disabled

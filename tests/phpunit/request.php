@@ -9,7 +9,7 @@ class Hm_Test_Request extends TestCase {
 
     public function setUp(): void {
         require 'bootstrap.php';
-        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
         $this->config = new Hm_Mock_Config();
     }
     /**

@@ -130,9 +130,6 @@ function build_config() {
         /* combine and compress page content */
         $hashes = combine_includes($js, $js_compress, $css, $css_compress, $settings);
 
-        /* write out the hm3.rc file */
-        write_config_file($settings, $filters);
-
         /* create the production version */
         create_production_site($assets, $settings, $hashes);
     }
