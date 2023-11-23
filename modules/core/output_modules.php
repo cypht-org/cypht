@@ -655,7 +655,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
         }
         $res = '<tr class="general_setting"><td><label for="default_sort_order">'.
             $this->trans('Default message sort order').'</label></td>'.
-            '<td><select id="start_page" name="default_sort_order">';
+            '<td><select id="default_sort_order" name="default_sort_order">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($default_sort_order == $val) {

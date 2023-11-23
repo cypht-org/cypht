@@ -278,7 +278,7 @@ return array(
         'server_pw_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'message_list_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'no_password_save' => FILTER_VALIDATE_BOOLEAN,
-        'start_page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'start_page' => FILTER_SANITIZE_URL,
         'default_sort_order' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'stay_logged_in' => FILTER_VALIDATE_BOOLEAN,
         'junk_per_source' => FILTER_VALIDATE_INT,
