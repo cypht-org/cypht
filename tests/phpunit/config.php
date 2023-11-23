@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
  */
 class Hm_Test_User_Config_File extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -161,6 +162,7 @@ class Hm_Test_User_Config_File extends TestCase {
  */
 class Hm_Test_Site_Config_File extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -202,6 +204,7 @@ class Hm_Test_Site_Config_File extends TestCase {
  */
 class Hm_Test_User_Config_DB extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -291,6 +294,7 @@ class Hm_Test_User_Config_DB extends TestCase {
 
 class Hm_Test_User_Config_Functions extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();

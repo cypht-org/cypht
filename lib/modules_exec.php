@@ -128,6 +128,7 @@ trait Hm_Handler_Module_Exec {
     public $handler_response = array();
     public $page = '';
     public $session;
+    public $cache;
 
     /**
      * Setup a default language translation
