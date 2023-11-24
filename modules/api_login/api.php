@@ -28,8 +28,7 @@ function cypht_login($user, $pass, $url, $lifetime=0) {
     $session->check($request, $user, $pass, false);
     if ($session->is_active()) {
         list($domain, $path, $secure) = url_parse($url);
-        $all_configs = merge_config_files(APP_PATH.'config');
-        $config = new Hm_Site_Config_File($all_configs);
+        $config = new Hm_Site_Config_File();
         $user_config = load_user_config_object($config);
         $user_config->load($user, $pass);
         module_init_functions($user_config, $session, $request, $config, $user, $pass);
@@ -93,8 +92,7 @@ function url_parse($url) {
  * @return array
  */
 function session_init() {
-    $all_configs = merge_config_files(APP_PATH.'config');
-    $config = new Hm_Site_Config_File($all_configs);
+    $config = new Hm_Site_Config_File();
     $module_exec = new Hm_Module_Exec($config);
     $module_exec->load_module_sets('functional_api');
     $request = new Hm_Request($module_exec->filters, $config);

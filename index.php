@@ -31,14 +31,11 @@ ob_start();
 
 /* set default TZ */
 date_default_timezone_set( 'UTC' );
-
 /* get includes */
 require APP_PATH.'lib/framework.php';
 
-//get all config array merged
-$all_configs = merge_config_files(APP_PATH.'config');
 /* get configuration */
-$config = new Hm_Site_Config_File($all_configs);
+$config = new Hm_Site_Config_File();
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {

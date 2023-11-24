@@ -9,7 +9,6 @@
 if (!defined('DEBUG_MODE')) { die(); }
 define('COMMITS_URL', 'https://github.com/cypht-org/cypht/commit/');
 
-require_once VENDOR_PATH.'autoload.php';
 use Webklex\ComposerInfo\ComposerInfo;
 
 /**

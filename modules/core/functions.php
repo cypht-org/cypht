@@ -251,7 +251,10 @@ function validate_local_full($val) {
  */
 if (!hm_exists('get_oauth2_data')) {
 function get_oauth2_data($config) {
-    return get_ini($config, 'oauth2.ini', true);
+    return [
+        'gmail' => $config->get('gmail',[]),
+        'outlook' => $config->get('outlook',[]),
+    ];
 }}
 
 /**

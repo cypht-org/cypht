@@ -203,7 +203,7 @@ function hm_theme_icons($color='white') {
  */
 if (!hm_exists('custom_themes')) {
 function custom_themes($config, $themes) {
-    $custom = get_ini($config, 'themes.ini');
+    $custom = $config->get('theme',[]);
     if (!is_array($custom)) {
         return $themes;
     }

@@ -110,3 +110,30 @@ if (!function_exists('merge_config_files')) {
         return $configArray;
     }
 }
+
+if (!function_exists('config')) {
+    /**
+     * Merge configuration arrays from PHP files in the specified folder.
+     *
+     * This function includes each PHP file in the specified folder and retrieves its array.
+     * It then merges these arrays into a single configuration array, applying boolean conversion
+     * for values that are represented as "true" or "false" strings.
+     *
+     * @param string $folder_path The path to the folder containing PHP configuration files.
+     *
+     * @return array The merged configuration array.
+     */
+    function config($file_name) {
+        // Use require to include the file
+        $fileArray = require $file_name.'.php';
+
+        // Check if values are boolean and convert if necessary
+        return array_map(function ($value) {
+            return is_array($value) ? $value : (
+                is_string($value) && strtolower($value) === 'true' ? true : (
+                    is_string($value) && strtolower($value) === 'false' ? false : $value
+                )
+            );
+        }, $fileArray);
+    }
+}

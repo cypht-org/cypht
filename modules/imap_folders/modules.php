@@ -210,7 +210,6 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
                         if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            require_once VENDOR_PATH.'autoload.php';
                             list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
                             try {
                                 $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
@@ -607,7 +606,6 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
         if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', true)) {
             return;
         }
-        require_once VENDOR_PATH.'autoload.php';
         list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
         try {

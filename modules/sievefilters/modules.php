@@ -7,7 +7,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require_once VENDOR_PATH.'autoload.php';
 use PhpSieveManager\ManageSieve\Client;
 use PhpSieveManager\Exceptions\SocketException;
 

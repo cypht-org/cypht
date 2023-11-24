@@ -8,6 +8,7 @@
 
 define('VERSION', .1);
 
+require_once VENDOR_PATH.'autoload.php';
 /* load the framework */
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
@@ -39,9 +40,7 @@ if (!function_exists('random_bytes')) {
     require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
 }
 
-
 /* load env files */
-require_once VENDOR_PATH.'symfony/dotenv/Dotenv.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 

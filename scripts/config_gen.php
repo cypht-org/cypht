@@ -119,8 +119,6 @@ function build_config() {
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
-        $settings = parse_module_ini_files($settings);
-
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);
 
@@ -129,6 +127,9 @@ function build_config() {
 
         /* combine and compress page content */
         $hashes = combine_includes($js, $js_compress, $css, $css_compress, $settings);
+
+        /* write out the dynamic.php file */
+        write_config_file($settings, $filters);
 
         /* create the production version */
         create_production_site($assets, $settings, $hashes);
@@ -301,6 +302,15 @@ function write_config_file($settings, $filters) {
     Hm_Output_Modules::try_queued_modules();
     Hm_Output_Modules::process_all_page_queue();
     Hm_Output_Modules::try_queued_modules();
+
+    $data = [
+        'handler_modules' => Hm_Handler_Modules::dump(),
+        'output_modules' => Hm_Output_Modules::dump(),
+        'input_filters' => $filters,
+    ];
+    $dynamicConfigPath = APP_PATH.'config/dynamic.php';
+    // Create or overwrite the PHP file
+    file_put_contents($dynamicConfigPath, '<?php return ' . var_export($data, true) . ';');
 }
 
 /**
