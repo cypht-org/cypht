@@ -663,10 +663,12 @@ function Message_List() {
 
     this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            $('.msg_controls').addClass('msg_controls_visible');
+            $('.msg_controls').addClass('d-flex');
+            $('.msg_controls').removeClass('d-none');
         }
         else {
-            $('.msg_controls').removeClass('msg_controls_visible');
+            $('.msg_controls').removeClass('d-flex');
+            $('.msg_controls').addClass('d-none');
         }
     };
 

@@ -302,7 +302,7 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="'.$this->trans('Cancel').'" />
-                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
+                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
                         <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
                     </div>
                 </div>
@@ -1463,12 +1463,12 @@ class Hm_Output_save_form extends Hm_Output_Module {
      */
     protected function output() {
         $changed = $this->get('changed_settings', array());
-        $res = '<div class="save_settings_page"><div class="content_title">'.$this->trans('Save Settings').'</div>';
-        $res .= '<div class="save_details">'.$this->trans('Settings are not saved permanently on the server unless you explicitly allow it. '.
+        $res = '<div class="save_settings_page p-0"><div class="content_title px-3">'.$this->trans('Save Settings').'</div>';
+        $res .= '<div class="save_details p-3">'.$this->trans('Settings are not saved permanently on the server unless you explicitly allow it. '.
             'If you don\'t save your settings, any changes made since you last logged in will be deleted when your '.
             'session expires or you logout. You must re-enter your password for security purposes to save your settings '.
             'permanently.');
-        $res .= '<div class="save_subtitle">'.$this->trans('Unsaved Changes').'</div>';
+        $res .= '<div class="save_subtitle mt-3"><b>'.$this->trans('Unsaved Changes').'</b></div>';
         $res .= '<ul class="unsaved_settings">';
         if (!empty($changed)) {
             $changed = array_count_values($changed);
@@ -1479,15 +1479,15 @@ class Hm_Output_save_form extends Hm_Output_Module {
         else {
             $res .= '<li>'.$this->trans('No changes need to be saved').'</li>';
         }
-        $res .= '</ul></div><div class="save_perm_form"><form method="post">'.
+        $res .= '</ul></div><div class="save_perm_form px-3"><form method="post">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
-            'name="password" autocomplete="current-password" class="save_settings_password" type="password" placeholder="'.$this->trans('Password').'" />'.
-            '<input class="save_settings" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
-            '<input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
+            'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="'.$this->trans('Password').'" />'.
+            '<input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
+            '<input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input class="save_settings" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
+            '<input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
             '</form></div>';
 
         $res .= '</div>';
@@ -1814,18 +1814,18 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         if ($this->get('custom_list_controls', '')) {
             $config_link = $this->get('custom_list_controls');
             $source_link = '';
-            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
         }
         elseif (!$this->get('no_list_controls', false)) {
-            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><img alt="Sources" class="refresh_list" src="'.Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
+            $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a>';
             if ($this->get('list_path') == 'combined_inbox') {
                 $path = 'all';
             }
             else {
                 $path = $this->get('list_path');
             }
-            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><img alt="Configure" class="refresh_list" src="'.Hm_Image_Sources::$cog.'" width="20" height="20" /></a>';
-            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="Refresh" class="refresh_list" src="'.Hm_Image_Sources::$refresh.'" width="20" height="20" /></a>';
+            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
+            $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
             //$search_field = '<form method="GET">
             //<input type="hidden" name="page" value="message_list" />
             //<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'"/>
@@ -1839,15 +1839,16 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             $search_field = '';
         }
         $res = '';
-        $res .= '<div class="message_list '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title">';
-        $res .= message_controls($this).'<div class="mailbox_list_title">'.
+        $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center">';
+        $res .= '<div class="d-flex gap-3">' . message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
         if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
+        $res .= '</div>';
+        $res .= message_list_meta($this->module_output(), $this);
         $res .= list_controls($refresh_link, $config_link, $source_link, $search_field);
-	    $res .= message_list_meta($this->module_output(), $this);
         $res .= list_sources($this->get('data_sources', array()), $this);
         $res .= '</div>';
         return $res;
@@ -1874,8 +1875,8 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
  */
 class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
     protected function output() {
-        $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-        $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
+        $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+        $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
         $res .= '<div class="move_to_location"></div>';
         $res .= '<input type="hidden" class="move_to_type" value="" />';
         $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';

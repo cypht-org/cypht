@@ -44,13 +44,13 @@
 .imap_server_setup { table-layout: fixed; width: 100%; display: table; background-color: #fff; }
 .checkbox_row { padding-right: 10px !important; }
 .checkbox_header img { padding-left: 3px; padding-right: 0px; }
-.toggle_link img { opacity: .6; vertical-align: -2px; }
+/* .toggle_link img { opacity: .6; vertical-align: -2px; } */
 .deleted a { text-decoration: line-through !important; color: #aaa !important; }
 .unread_controls { float: left; }
 .float_title { float: left; }
 .icon img { opacity: .5; vertical-align: -3px; padding-right: 5px; }
-.toggle_link img { vertical-align: 1px; opacity: .6 !important; }
-.toggle_link { padding: 2px; line-height: 10px; margin-top: 3px; margin-right: 12px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 3px; }
+/* .toggle_link img { vertical-align: 1px; opacity: .6 !important; } */
+/* .toggle_link { padding: 2px; line-height: 10px; margin-top: 3px; margin-right: 12px !important; width: 8px !important; display: inline; opacity: 1 !important; margin-left: 3px; } */
 .online { color: teal; }
 .sieve_extensions { font-size: 75%; white-space: normal; }
 .down { color: red; }
@@ -65,7 +65,7 @@
 .msg_move_to .move_to_location { font-size: 100%; left: auto; right: 0px; top: 33px; font-variant: normal; }
 .msg_move_to { width: auto !important; position: relative; display: inline-block; }
 .move_to_location .expand_link { float: left !important; width: auto !important; }
-.imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; }
+/* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword { width: 120px; }
 .msg_part_icon { opacity: .4; padding-right: 5px; }
 .msg_part_placeholder { visibility: hidden; }
@@ -93,7 +93,7 @@
 
 .attached_image { margin-right: 20px; margin-bottom: 20px; height: 200px; }
 .attached_image_box { display: flex; flex-wrap: wrap; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
-.list_meta { float: none; margin-left: 37%; }
+/* .list_meta { float: none; margin-left: 37%; } */
 .cypht-dropdown { display: none; position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
 .cypht-dropdown a { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; cursor: pointer; }
 .cypht-dropdown a:hover { background-color: #eee; }

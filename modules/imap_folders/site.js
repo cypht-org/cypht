@@ -246,7 +246,7 @@ var folder_page_create = function() {
 $(function() {
     if (hm_page_name() == 'folders') {
         $('#imap_server_folder').on("change", function() {
-            $(this).parent().submit();
+            $(this).parent().parent().submit();
         });
         $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }

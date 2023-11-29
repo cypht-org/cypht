@@ -104,7 +104,7 @@ function message_list_meta($input, $output_mod) {
     $date = sprintf('%s', strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
-    return '<div class="list_meta">'.
+    return '<div class="list_meta d-flex align-items-center fs-6">'.
         $date.
         '<b>-</b>'.
         '<span class="src_count"></span> '.$max.
@@ -127,7 +127,7 @@ function combined_sort_dialog($mod) {
         '3' => $mod->trans('Subject'),
     );
 
-    $res = '<select name="sort" class="combined_sort">';
+    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {
         $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
         $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
@@ -350,14 +350,14 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
-    $res = '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
-        '<div class="msg_controls">'.
-        '<a class="msg_read core_msg_control" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-        '<a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-        '<a class="msg_flag core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-        '<a class="msg_unflag core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-        '<a class="msg_archive core_msg_control" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+    $res = '<a class="toggle_link border px-1 m-0" href="#"><i class="bi bi-check"></i></a>'.
+        '<div class="msg_controls fs-6 d-none gap-2">'.
+        '<a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+        '<a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
+        '<a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+        '<a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+        '<a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
+        '<a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
@@ -492,7 +492,7 @@ function update_search_label_field($search_term, $output_mod) {
  */
 if (!hm_exists('list_controls')) {
 function list_controls($refresh_link, $config_link, $source_link=false, $search_field='') {
-    return '<div class="list_controls no_mobile">'.
+    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">'.
         $refresh_link.$source_link.$config_link.$search_field.'</div>
     <div class="list_controls on_mobile">'.$search_field.'
         <img alt="" src="'.Hm_Image_Sources::$three_dot.'" width="20" height="20" onclick="listControlsMenu()"/>

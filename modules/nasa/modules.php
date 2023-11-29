@@ -141,7 +141,7 @@ class Hm_Output_nasa_connect_section extends Hm_Output_Module {
             $res .= 'style="display: none;"';
         }
         $res .= '><div>Connect to NASA APIs</div>';
-        $res .= '<div><input type="text" size="50" class="nasa_api_key form-control" placeholder="'.$this->trans('Enter your API key').'" />';
+        $res .= '<div class="col-lg-4 col-sm-12"><input type="text" size="50" class="nasa_api_key form-control" placeholder="'.$this->trans('Enter your API key').'" /><br/>';
         $res .= '<input type="button" class="nasa_api_connect btn btn-secondary" value="'.$this->trans('Connect').'" /></div></div>';
         $res .= '<div class="nasa_connect_inner_2" ';
         if (!$this->get('nasa_api_key')) {

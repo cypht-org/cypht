@@ -1386,7 +1386,7 @@ if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
     $txt = '<div style="display: inline-block;">';
-    $txt .= '<a class="snooze_link hlink" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
+    $txt .= '<a class="snooze_link hlink btn btn-sm btn-outline-success" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
     $txt .= '<div class="snooze_dropdown" style="display:none;">';
     foreach ($values as $format) {
         $labels = get_snooze_date($format, true);

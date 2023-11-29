@@ -35,12 +35,12 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                     'to' => $this->trans('To'), 'subject' => $this->trans('Subject'), 'arrival' => $this->trans('Arrival Date'));
             }
 
-            $custom = '<form id="imap_filter_form" method="GET">';
+            $custom = '<form id="imap_filter_form" method="GET" class="d-flex align-content-center">';
             $custom .= '<input type="hidden" name="page" value="message_list" />';
             $custom .= '<input type="hidden" name="list_path" value="'.$this->html_safe($this->get('list_path')).'" />';
             $custom .= '<input type="search" placeholder="'.$this->trans('Search').
-                '" class="imap_keyword" name="keyword" value="'.$this->html_safe($keyword).'" />';
-            $custom .= '<select name="sort" class="imap_sort">';
+                '" class="imap_keyword form-control form-control-sm" name="keyword" value="'.$this->html_safe($keyword).'" />';
+            $custom .= '<select name="sort" class="imap_sort form-control form-control-sm">';
             foreach ($sorts as $name => $val) {
                 $custom .= '<option ';
                 if ($name == $sort) {
@@ -55,7 +55,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
             $custom .= '</select>';
 
-            $custom .= '<select name="filter" class="imap_filter">';
+            $custom .= '<select name="filter" class="imap_filter form-control form-control-sm">';
             foreach ($opts as $name => $val) {
                 $custom .= '<option ';
                 if ($name == $filter) {
@@ -69,15 +69,13 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                 $custom .= '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
                     '" alt="'.$this->trans('Remove').'"/></a><a style="display: none;" class="add_source" title="'.
-                    $this->trans('Add this folder to combined pages').'" href=""><img class="refresh_list" width="20" height="20" alt="'.
-                    $this->trans('Add').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+                    $this->trans('Add this folder to combined pages').'" href=""><i class="bi bi-check-circle-fill refresh_list"></i></a>';
             }
             else {
                 $custom .= '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
                     '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.
                     $this->trans('Remove').'"/></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
-                    '" href=""><img class="refresh_list" width="20" height="20" alt="'.$this->trans('Add').'" src="'.
-                    Hm_Image_Sources::$circle_check.'" /></a>';
+                    '" href=""><i class="bi bi-check-circle-fill refresh_list"></i></a>';
             }
             $this->out('custom_list_controls', $custom);
         }
@@ -585,7 +583,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
                             '<input type="radio" class="form-check-input" name="tls" value="0" id="imap_notls">'.
                             '<label class="form-check-label" for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></div>'.
 
-                            '<input class="btn btn-primary px-5" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" />'.
+                            '<input class="btn btn-success px-5" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" />'.
                         '</form>
                     </div>';
 
@@ -791,8 +789,8 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('move_copy_controls', false)) {
-            $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-            $res .= '<a class="imap_move disabled_input" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';

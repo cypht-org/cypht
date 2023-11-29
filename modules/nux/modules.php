@@ -291,7 +291,7 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
             '<input type="text" id="nux_account_name" class="form-control nux_account_name" placeholder="'.$this->trans('Account Name [optional]').'">'.
             '<label for="nux_account_name">'.$this->trans('Account name').'</label></div>'.
 
-            '<input type="button" class="nux_next_button btn btn-primary btn-md px-5" value="'.$this->trans('Next').'">'.
+            '<input type="button" class="nux_next_button btn btn-success btn-md px-5" value="'.$this->trans('Next').'">'.
             '</div></div></div><div class="nux_step_two px-4 pt-3"></div></div>';
     }
 }
@@ -479,7 +479,7 @@ if (!hm_exists('credentials_form')) {
         $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
     
         // Connect Button
-        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary me-3" value="'.$mod->trans('Connect').'">';
+        $res .= '<input type="button" class="nux_submit px-5 btn btn-success me-3" value="'.$mod->trans('Connect').'">';
     
         // Reset Link
         $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';

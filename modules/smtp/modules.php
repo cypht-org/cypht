@@ -1273,7 +1273,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
                                 </div>
 
                                 <div class="">
-                                    <input class="btn btn-primary px-5" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" />
+                                    <input class="btn btn-success px-5" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" />
                                 </div>
                             </form>
                         </div>';

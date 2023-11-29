@@ -747,7 +747,7 @@ class Hm_Output_add_pop3_server_dialog extends Hm_Output_Module {
             '<input required type="number" id="new_pop3_port" name="new_pop3_port" class="port_fld form-control" value="995" placeholder="'.$this->trans('Port').'"></td></tr>'.
             '<tr><td><input type="radio" name="tls" value="1" id="pop3_tls" checked="checked" class="form-check-input" /> <label for="pop3_tls">'.$this->trans('Use TLS').'</label>'.
             '<br /><input type="radio" name="tls" value="0" id="pop3_notls" class="form-check-input"><abel for="pop3_notls">'.$this->trans('STARTTLS or unencrypted').'</label></td>'.
-            '</tr><tr><td><input class="btn btn-primary  btn-sm" type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
+            '</tr><tr><td><input class="btn btn-success  btn-sm" type="submit" value="'.$this->trans('Add').'" name="submit_pop3_server" /></td></tr>'.
             '</table></form>';
     }
 }

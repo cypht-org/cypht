@@ -561,7 +561,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                                             <label for="new_feed_address" class="">'.$this->trans('Site address or feed URL').'</label>
                                         </div>
 
-                                        <input type="submit" class="btn btn-primary" value="'.$this->trans('Add').'" name="submit_feed" />
+                                        <input type="submit" class="btn btn-success" value="'.$this->trans('Add').'" name="submit_feed" />
                                     </form>
                                 </div>';
         }

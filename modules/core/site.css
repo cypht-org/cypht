@@ -12,8 +12,8 @@ html, body { max-width: 100%; min-height: 100%; background-color: #fff; }
 body { background: linear-gradient(180deg, #faf6f5, #faf6f5, #faf6f5, #faf6f5, #fff); font-size: 1em; height: 100%; color: #333; font-family: Arial; padding: 0px; margin: 0px; min-width: 700px; font-size: 100%; }
 table { width: 100%; border-spacing: 0px; }
 td { vertical-align: top; }
-.adv_controls .combined_sort, .message_list .combined_sort { font-size: 80%; margin-top: -2px; ; float: right; margin-right: 125px; }
-.adv_controls .combined_sort { margin-right: 20px; }
+/* .adv_controls .combined_sort, .message_list .combined_sort { font-size: 80%; margin-top: -2px; ; float: right; margin-right: 125px; } */
+/* .adv_controls .combined_sort { margin-right: 20px; } */
 .search_content .combined_sort { display: none; }
 .offline { display: none; cursor: pointer; position: absolute; right: 0px; top: 0px; z-index: 101; color: white; background-color: red; padding: 18px; padding-right: 25px; padding-left: 25px; font-weight: bold; }
 .subject div, .msg_date, .from, .source { overflow: hidden; color: #333; text-overflow: ellipsis; white-space: nowrap; }
@@ -35,7 +35,7 @@ td { vertical-align: top; }
 .subtitle { color: teal; padding-bottom: 5px; font-weight: normal; letter-spacing: 0px; font-size: 100%;  margin-left: 0px !important; }
 .title { font-weight: normal; padding: 0px; margin: 0px; margin-left: 20px; margin-bottom: 20px; letter-spacing: -1px; color: #999; }
 .date { display: none; position: absolute; top: 15px; right: 20px; color: #888; padding-right: 0px; padding-top: 6px;}
-.mailbox_list_title { display: inline; }
+
 /* .sys_messages { position: fixed; right: 20px; top: 15px; min-height: 30px; min-width: 300px; cursor: pointer; display: none; margin-top: 0px; padding: 15px; padding-bottom: 5px; white-space: nowrap; border: solid 1px #999; border-radius: 5px; filter: drop-shadow(4px 4px 4px #ccc); z-index: 101; } */
 .logged_out { display: block !important; }
 #theme_setting, #timezone_setting { max-width: 200px; }
@@ -87,7 +87,7 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .folder_list .update_message_list{ font-size: 80%; padding-top: 10px; float: right; }
 .src_name { white-space: nowrap; overflow: hidden; cursor: pointer; border-left: solid 1px #eee; padding-left: 25px; margin-top: 0px; margin-right: -15px; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; color: #777; padding-top: 10px; font-size: 125%; letter-spacing: -1px; padding-bottom: 10px; }
 .main_menu { padding-top: 20px; }
-.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%; padding-left: 27px;}
+.content_title { margin-top: 0px; color: #777; background: linear-gradient(180deg, #fff, #fff, #f7f2ef); border-bottom: solid 1px #ede8e6; padding-bottom: 10px; padding-top: 20px; letter-spacing: -1px; font-size: 125%;}
 .header_subject .content_title { color: #555; }
 .header_subject th { white-space: normal !important; }
 .end_float { clear: both; }
@@ -116,15 +116,14 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .news_cell .msg_date { clear: both; }
 .msg_img { max-width: 100%; }
 .wait { }
-.msg_controls { position: relative; display: none; padding-left: 0px; margin-right: 20px; }
-.msg_controls_visible { display: inline; }
-.msg_controls a, .toggle_link { font-size: .6em; letter-spacing: 0px; color: #666; background-color: #fff; border: solid 1px #ede8e6; padding: 3px; width: auto; border-radius: 3px; vertical-align: 3px; display: inline-block !important; }
-.msg_controls a { margin-right: 3px; }
-.toggle_link { padding-left: 4px !important; padding-right: 4px !important; padding-top: 4px !important;}
-.refresh_list, .list_settings_link { opacity: .4; padding: 5px; padding-bottom: 0px; cursor: pointer; padding-right: 0px; vertical-align: -13px; }
+/* .msg_controls { position: relative; display: none; padding-left: 0px; margin-right: 20px; } */
+/* .msg_controls_visible { display: inline; } */
+/* .msg_controls a { font-size: .6em; letter-spacing: 0px; color: #666; background-color: #fff; border: solid 1px #ede8e6; padding: 3px; width: auto; border-radius: 3px; vertical-align: 3px; display: inline-block !important; }
+.msg_controls a { margin-right: 3px; } */
+/* .toggle_link { padding-left: 4px !important; padding-right: 4px !important; padding-top: 4px !important;} */
 .list_settings_dialog { display: none; padding: 10px; position: absolute; top: 0px; right: 0px; width: 600px; background-color: #efefef; border: solid 1px #ede8e6; }
-.list_controls { position: absolute; right: 0px; padding-right: 10px; top: 0px; padding-top: 10px; background-color: #fff; }
-.list_controls a { padding-right: 5px; }
+/* .list_controls { position: absolute; right: 0px; padding-right: 10px; top: 0px; padding-top: 10px; background-color: #fff; } */
+/* .list_controls a { padding-right: 5px; } */
 .list_settings_dialog table { width: 1%; white-space: nowrap; }
 .list_settings_dialog table th { font-size: 90%; font-weight: normal; text-align: left; }
 .folder_toggle { font-size: 0px; float: left; margin: 15px; margin-top: 19px; display: none; }
@@ -135,11 +134,11 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .plink, .nlink { color: #666; }
 .plink:hover, .nlink:hover { color: teal !important; }
 .limit { width: 50px; margin-left: 20px; }
-.settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; }
+/* .settings_subtitle { font-size: 115%; color: #777 !important; letter-spacing: -1px; padding-bottom: 6px !important; padding-left: 30px !important; height: 25px !important; padding-top: 15px !important; } */
 /* .server_section img, .settings_subtitle img { opacity: .4; padding-right: 10px; vertical-align: -1px; } */
 /* .settings_subtitle, .server_section { cursor: pointer; max-height: 50px; margin-top: 0px; color: #777; padding-bottom: 10px; padding-top: 15px; letter-spacing: -1px; font-size: 115%; padding-left: 30px; border-bottom: solid 1px #ede8e6; } */
-.list_meta { float: right; margin-right: 20px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; }
-.list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; }
+/* .list_meta { float: right; margin-right: 20px; letter-spacing: 0px; display: inline; color: #666 !important; font-size: 70% !important; margin-top: 2px; font-style: normal; margin-left: 20px; } */
+/* .list_meta b { color: #333 !important; font-weight: normal; padding-left: 5px; padding-right: 5px; vertical-align: 1px; } */
 .noscript { position: absolute; z-index: 100; right: 0px; left: 0px; top: 0px; bottom: 0px; background-color: #ede8e6; opacity: 1; padding-top: 100px; text-align: center; }
 .hide_folders { font-size: 0px; float: left; clear: none; margin-top: 10px; margin-left: 23px; }
 .hide_folders img { opacity: .4; }
@@ -147,7 +146,7 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .server_count { float: right; font-size: 90%; }
 .email_setting, .all_setting, .unread_setting, .flagged_setting, .general_setting, .junk_setting, .trash_setting, .drafts_setting { display: none; }
 /* .configured_server, .add_server { margin-top: 10px; color: #666; background-color: #fff; margin-bottom: 20px; padding: 10px; width: 200px; } */
-.message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; }
+/* .message_list { min-height: 600px; background-color: #fff; height: 100%; padding-bottom: 20px; } */
 /* .configured_server { float: left; margin-left: 25px; width: 230px; } */
 /* .add_server { margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 230px; } */
 /* .configured_server input, .add_server input, .add_server select { margin-bottom: 10px; padding: 5px; margin-right: 5px; } */
@@ -161,9 +160,8 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .search_terms { padding-left: 5px; }
 .folder_list .search_terms { width: 80%; }
 .search_content { display: table; table-layout: fixed; width: 100%; min-height: 600px; background: #fff; height: 100%; margin-right: 20px; padding-bottom: 40px; }
-.save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; padding-right: 20px; color: #666; }
-.save_subtitle { font-size: 110%; padding-top: 20px; }
-.unsaved_settings { margin-bottom: 30px; }
+/* .save_perm_form, .save_details { max-width: 600px; margin-left: 30px; margin-top: 20px; padding-right: 20px; color: #666; } */
+/* .save_subtitle { font-size: 110%; padding-top: 20px; } */
 .msg_text_inner p { padding: 5px; }
 .save_reminder { clear: both; float: right; margin-right: 25px; }
 .save_reminder img { opacity: .4; }
