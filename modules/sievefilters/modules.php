@@ -1663,7 +1663,11 @@ class Hm_Sieve_Client_Factory {
             $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
             return $client;
         } else {
-            throw new Exception('Invalid config host');
+            $errorMsg = 'Invalid config host';
+            if (isset($imap_account['name'])) {
+                $errorMsg .= ' for ' . $imap_account['name'];
+            }
+            throw new Exception($errorMsg);
         }
     }
 }
