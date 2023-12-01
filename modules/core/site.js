@@ -1861,3 +1861,153 @@ function listControlsMenu() {
     $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
 }
+
+
+// Sortablejs
+const tableBody = document.querySelector('.message_table_body');
+if(tableBody) {
+    const allFoldersClassNames = [];
+    let targetFolder;
+    let movingElement;
+    let movingNumber;
+    Sortable.create(tableBody, {
+        sort: false,
+        group: 'messages',
+        ghostClass: 'drag_target',
+
+        onMove: (sortableEvent) => {
+            movingElement = sortableEvent.dragged;
+            targetFolder = sortableEvent.related?.className.split(' ')[0];
+            return false;
+        },
+
+        onEnd: () => {
+            // Remove the highlight class from the tr
+            document.querySelectorAll('.message_table_body > tr.drag_target').forEach((row) => {
+                row.classList.remove('drag_target');
+            });
+            return false;
+        }
+    });
+
+    const isValidFolderReference = (className='') => {
+        return className.startsWith('imap_') && allFoldersClassNames.includes(className)
+    }
+
+    Sortable.utils.on(tableBody, 'dragstart', (evt) => {
+        let movingElements = [];
+        // Is the target element checked
+        const isChecked = evt.target.querySelector('.checkbox_cell input[type=checkbox]:checked');
+        if (isChecked) {
+            movingElements = document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked');
+            // Add a highlight class to the tr
+            movingElements.forEach((checkbox) => {
+                checkbox.parentElement.parentElement.classList.add('drag_target');
+            });
+        } else {
+            // If not, uncheck all other checked elements so that they don't get moved
+            document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked').forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+        }
+        
+        movingNumber = movingElements.length || 1;
+        
+        const element = document.createElement('div');
+        element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
+        element.style.position = 'absolute';
+        element.className = 'dragged_element';
+        document.body.appendChild(element);
+
+        function moveElement() {
+            element.style.display = 'none';
+        }
+        
+        function removeElement() {
+            element.remove();
+        }
+        
+        document.addEventListener('drag', moveElement);
+        document.addEventListener('mouseover', removeElement);
+
+        evt.dataTransfer.setDragImage(element, 0, 0);
+    });
+
+    Sortable.utils.on(tableBody, 'dragend', () => {
+        // If the target is not a folder, do nothing
+        if (!isValidFolderReference(targetFolder ?? '')) {
+            return;
+        }
+
+        const page = hm_page_name();
+        const selectedRows = [];
+
+        if(movingNumber > 1) {
+            document.querySelectorAll('.message_table_body > tr').forEach(row => {
+                if (row.querySelector('.checkbox_cell input[type=checkbox]:checked')) {
+                    selectedRows.push(row);
+                }
+            });
+        }
+        
+        if (selectedRows.length == 0) {
+            selectedRows.push(movingElement);
+        }
+
+        const movingIds = selectedRows.map(row => row.className.split(' ')[0]);
+
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
+            {'name': 'imap_move_ids', 'value': movingIds.join(',')},
+            {'name': 'imap_move_to', 'value': targetFolder},
+            {'name': 'imap_move_page', 'value': page},
+            {'name': 'imap_move_action', 'value': 'move'}],
+            (res) =>{
+                for (const index in res.move_count) {
+                    $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
+                    select_imap_folder(hm_list_path());
+                }
+            }
+        );
+        
+        // Reset the target folder
+        targetFolder = null;
+    });
+
+    const folderList = document.querySelector('.folder_list');
+
+    const observer = new MutationObserver((mutations) => {
+        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
+        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
+
+        // Keep track of all folders class names
+        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
+
+        emailFoldersGroups.forEach((emailFolders) => {
+            Sortable.create(emailFolders, {
+                sort: false,
+                group: {
+                    put: 'messages'
+                }
+            });
+        });
+        
+        emailFoldersElements.forEach((emailFolder) => {
+            emailFolder.addEventListener('dragenter', () => {
+                emailFolder.classList.add('drop_target');
+            });
+            emailFolder.addEventListener('dragleave', () => {
+                emailFolder.classList.remove('drop_target');
+            });
+            emailFolder.addEventListener('drop', () => {
+                emailFolder.classList.remove('drop_target');
+            });
+        });
+    });
+
+    const config = {
+        childList: true
+    };
+
+    observer.observe(folderList, config);
+}
