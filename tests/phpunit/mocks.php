@@ -6,6 +6,7 @@ class Hm_Mock_Session {
     public $auth_state = true;
     public $cookie_set = false;
     public $data = array();
+    public $lifetime;
     public function get($id, $default=false) {
         if ($id == 'saved_pages') {
             return array('foo' => array('bar', false));
@@ -172,6 +173,7 @@ class Hm_Mock_Config {
 }
 class Hm_Mock_Request {
     public $invalid_input_detected;
+    public $invalid_input_fields;
     public $post = array('hm_page_key' => 'asdf', 'fld1' => '0', 'fld2' => '1', 'fld3' => 0, 'fld4' => NULL);
     public $get = array();
     public $cookie = array();

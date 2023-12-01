@@ -436,7 +436,7 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        $doc->loadHTML(htmlentities($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }

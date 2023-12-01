@@ -4,6 +4,7 @@ use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Dispatch extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
