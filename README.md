@@ -24,15 +24,15 @@ by the framework. Modules provide a flexible way to add new features or
 customize the program without hacking the code.
 
 
-Installation instructions [https://cypht.org/install.html](https://cypht.org/install.html)
+Installation instructions [https://www.cypht.org/install.html](https://www.cypht.org/install.html)
 
-Security details: [https://cypht.org/security.html](https://cypht.org/security.html)
+Security details: [https://www.cypht.org/security.html](https://www.cypht.org/security.html)
 
-Module info: [https://cypht.org/modules.html](https://cypht.org/modules.html)
+Module info: [https://www.cypht.org/modules.html](https://www.cypht.org/modules.html)
 
-Features: [https://cypht.org/features.html](https://cypht.org/features.html)
+Features: [https://www.cypht.org/features.html](https://www.cypht.org/features.html)
 
-License: [https://cypht.org/license.html](https://cypht.org/license.html)
+License: [https://www.cypht.org/license.html](https://www.cypht.org/license.html)
 
 Community chat room: [https://gitter.im/cypht-org/community](https://gitter.im/cypht-org/community)
 
