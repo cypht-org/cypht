@@ -165,7 +165,7 @@ class Hm_Output_login_end extends Hm_Output_Module {
      */
     protected function output() {
         $fancy_login=$this->get('fancy_login_allowed');
-        if($fancy_login=='n'){
+        if($fancy_login!='y'){
             return '</form>';
         }
         return '</form></div>';
@@ -182,7 +182,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
      */
     protected function output() {
         $fancy_login = $this->get('fancy_login_allowed');
-        if($fancy_login=='n'){
+        if($fancy_login!='y'){
             if (!$this->get('router_login_state')) {
                 $css = '<style type="text/css">.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;'.
                     'background-color:#fff;font-size:130%;height:auto;}.logged_out{display:block !important;}.sys_messages'.
@@ -254,7 +254,7 @@ class Hm_Output_login extends Hm_Output_Module {
         }
         if (!$this->get('router_login_state')) {
             $fancy_login = $this->get('fancy_login_allowed');
-            if($fancy_login=='n'){
+            if($fancy_login!='y'){
                 return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
             '       <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                     ' <label class="screen_reader" for="username">'.$this->trans('Username').'</label>'.
