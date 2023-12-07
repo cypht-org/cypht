@@ -164,7 +164,7 @@ class Hm_Output_login_end extends Hm_Output_Module {
      * Closes the login form
      */
     protected function output() {
-        $fancy_login=$this->get('fancy_login_allowed');
+        $fancy_login= $GLOBALS['fancy_login_allowed'] ?? $this->get('fancy_login_allowed');
         if($fancy_login!='y'){
             return '</form>';
         }
@@ -181,7 +181,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
      * Looks at the current login state and outputs the correct form
      */
     protected function output() {
-        $fancy_login = $this->get('fancy_login_allowed');
+        $fancy_login =  $GLOBALS['fancy_login_allowed'] ?? $this->get('fancy_login_allowed');
         if($fancy_login!='y'){
             if (!$this->get('router_login_state')) {
                 $css = '<style type="text/css">.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;'.
@@ -253,7 +253,7 @@ class Hm_Output_login extends Hm_Output_Module {
             ' <label for="stay_logged_in">'.$this->trans('Stay logged in').'</label></div>';
         }
         if (!$this->get('router_login_state')) {
-            $fancy_login = $this->get('fancy_login_allowed');
+            $fancy_login =  $GLOBALS['fancy_login_allowed'] ?? $this->get('fancy_login_allowed');
             if($fancy_login!='y'){
                 return '<h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1>'.
             '       <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
@@ -264,8 +264,8 @@ class Hm_Output_login extends Hm_Output_Module {
                     $stay_logged_in.' <input style="cursor:pointer;" type="submit" id="login" value="'.$this->trans('Login').'" />';
             }
 
-            return '<svg class="user-icon_signin" viewBox="0 0 20 20"><path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path></svg>
-                <img src="'.WEB_ROOT. 'modules/core/assets/images/logo.svg" style="height:90px;">'.
+            return '<svg class="user-icon_signin" viewBox="0 0 20 20"><path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path></svg>'.
+                '<img src="'.WEB_ROOT. 'modules/core/assets/images/logo.svg" style="height:90px;">'.
                 '<!--h1 class="title">'.$this->html_safe($this->get('router_app_name', '')).'</h1-->'.
                 ' <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />'.
                 ' <label class="label_signin" for="username">'.$this->trans('Username').'</label>'.
