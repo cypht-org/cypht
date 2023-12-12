@@ -138,15 +138,25 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
                 Hm_Msgs('ERRUnable to connect to the selected IMAP server');
                 return;
             }
-
             $specials = $this->user_config->get('special_imap_folders', array());
-            if ($exposed = $imap->get_special_use_mailboxes()) {
-                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '', 'junk' => '');
-            } else if ($form['imap_service_name'] == 'gandi') {
-                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive', 'junk' => 'Junk');
+            $exposed = $imap->get_special_use_mailboxes();
+            if ($form['imap_service_name'] == 'gandi') {
+                $specials[$form['imap_server_id']] = array(
+                    'sent' => 'Sent',
+                    'draft' => 'Drafts',
+                    'trash' => 'Trash',
+                    'archive' => 'Archive',
+                    'junk' => 'Junk'
+                );
             } else {
-                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
-            }     
+                $specials[$form['imap_server_id']] = array(
+                    'sent' => $exposed['sent'] ?? '',
+                    'draft' => $exposed['drafts'] ?? '',
+                    'trash' => $exposed['trash'] ?? '',
+                    'archive' => $exposed['archive'] ?? '',
+                    'junk' => $exposed['junk'] ?? ''
+                );
+            }
             $this->user_config->set('special_imap_folders', $specials);
 
             $user_data = $this->user_config->dump();
