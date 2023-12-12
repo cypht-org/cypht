@@ -222,7 +222,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .folder_list li { padding-top: 5px; padding-bottom: 5px; }
 .mobile .src_name { padding-top: 20px; padding-bottom: 20px; }
 .mobile .content_cell { padding-top: 60px; display: block; width: 100%; }
-.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; display: flex; flex-flow: row wrap; max-height: 35rem;}
+.mobile .content_title { z-index: 100; top: 0px; background-color: #fff; position: fixed; padding-left: 45px !important; padding-top: 20px; margin-bottom: 5px; left: 0px; right: 0px; padding-bottom: 17px; display: flex; flex-flow: row wrap; max-height: 35rem;}
 .mobile .account_icon { width: 16px; height: 16px; vertical-align: -5px; }
 .mobile .folder_toggle { display: block; top: 0px; left: -3px; }
 .mobile .folder_toggle img { width: 24px; height: 32px; margin-top: -7px; }
