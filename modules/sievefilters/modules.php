@@ -1191,12 +1191,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$book).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
         $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$circle_x).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-x-circle-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Block List').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1413,9 +1413,9 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="enable_sieve_filter">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
             $this->trans('Enable sieve filter').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
             ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" />'.$reset.'</td></tr>';
     }
 }
@@ -1757,18 +1757,18 @@ if (!hm_exists('block_filter_dropdown')) {
         .'<form id="block_sender_form">';
         if ($with_scope) {
             $ret .= '<div><label>'.$mod->trans('Who Is Blocked').'</label>'
-            .'<select name="scope">'
+            .'<select name="scope" class="form-select form-select-sm">'
             .'<option value="sender">'.$mod->trans('This Sender').'</option>'
             .'<option value="domain">'.$mod->trans('Whole domain').'</option></select></div>';
         }
         $ret .= '<div><label>'.$mod->trans('Action').'</label>'
-        .'<select name="block_action" id="block_action">'
+        .'<select class="form-select form-select-sm" name="block_action" id="block_action">'
         .'<option value="default">'.$mod->trans('Default action').'</option>'
         .'<option value="discard">'.$mod->trans('Discard').'</option>'
         .'<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
         .'<option value="reject_default">'.$mod->trans('Reject With Default Message').'</option>'
         .'<option value="reject_with_message">'.$mod->trans('Reject With Specific Message').'</option>'
-        .'</select></div><div><button type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
+        .'</select></div><div><button class="btn btn-danger btn-sm mt-2" type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
         .'</div></div>';
         return $ret;
     }

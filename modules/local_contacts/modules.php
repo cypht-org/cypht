@@ -150,14 +150,13 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             if (array_key_exists('phone_number', $current)) {
                 $phone = $current['phone_number'];
             }
-            $form_class = 'contact_update_form';
+            $form_class = 'contact_update_form mt-3';
             $title = $this->trans('Update Local');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="btn btn-success edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_contact"><form class="" method="POST">'.
-            '<div class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.
-            '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>'.
+        return '<div class="add_contact kokokoko"><form class="" method="POST">'.
+            '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
             '<input type="hidden" name="contact_source" value="local" />'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.

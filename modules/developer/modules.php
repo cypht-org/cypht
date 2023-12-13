@@ -127,7 +127,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-bug-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Dev').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -149,7 +149,7 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_info"><a class="unread_link" href="?page=info">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-info-circle fs-5 me-2"></i>';
         }
         $res .= $this->trans('Info').'</a></li>';
         if ($this->format == 'HTML5') {

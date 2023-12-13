@@ -13,7 +13,7 @@
 .server_subtitle { margin-bottom: 20px; color: #666; overflow: hidden; text-overflow: ellipsis}
 .msg_text { min-height: 600px; background-color: #fff; height: 100%; }
 .msg_text_inner { min-height: 300px; font-family: monospace; width: 90%; padding: 30px; padding-left: 40px; }
-.msg_headers { max-width: 100%; border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; padding-top: 10px; }
+/* .msg_headers { max-width: 100%; border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; padding-top: 10px; } */
 .imap_envelope { max-width: 100%; color: #777; padding: 0px; padding-bottom: 20px; padding-top: 0px; margin-top: -10px; }
 .imap_envelope th, .msg_headers th { vertical-align: top; padding: 3px; padding-top: 5px; padding-left: 35px; font-weight: normal; text-align: left; white-space: nowrap; padding-right: 13px; }
 .imap_envelope th { padding-left: 0px; }
@@ -23,7 +23,6 @@
 .header_links { padding-top: 10px !important; }
 .header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
-.current_page { font-weight: bold; }
 .account_row { cursor: pointer; }
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject th { font-size: 1.3em; padding-top: 10px; }
@@ -98,8 +97,7 @@
 .cypht-dropdown a { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; cursor: pointer; }
 .cypht-dropdown a:hover { background-color: #eee; }
 #block_sender_form { padding: 15px; display: block; }
-#block_sender_form label, #block_sender_form select, #block_sender_form textarea, #block_sender_form button { display: block; margin: 3px 0; width: 100%; }
-#block_sender_form button { color: #fff; background-color: brown; cursor: pointer; }
+#block_sender_form label, #block_sender_form select, #block_sender_form textarea { display: block; margin: 3px 0; width: 100%; }
 #block_sender_form label { text-transform: capitalize; }
 
 .snooze_date_picker, .snooze_helper { color: #333; text-transform: capitalize; }

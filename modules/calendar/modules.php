@@ -119,7 +119,7 @@ class Hm_Handler_get_calendar_date extends Hm_Handler_Module {
 class Hm_Output_vcalendar_add_output extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_calendar_struct')) {
-            $link = '<a class="add_vcal" href="">Add to calendar</a>';
+            $link = '<a class="add_vcal float-end mt-2 pe-4" href="">Add to calendar</a>';
             $this->concat('msg_headers', $link);
         }
     }
@@ -132,7 +132,7 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_calendar"><a class="unread_link" href="?page=calendar">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$calendar).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-calendar-week-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Calendar').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -156,7 +156,7 @@ class Hm_Output_add_cal_event_form extends Hm_Output_Module {
         );
         if ($this->get('cal_action') == 'add') {
             $res = '<div class="calendar p-0">
-                        <div class="content_title">'.$this->trans('Add an Event').'</div>
+                        <div class="content_title px-3">'.$this->trans('Add an Event').'</div>
                         <div class="px-4 mt-5">
                             <form method="post">
                                 <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
@@ -231,8 +231,8 @@ class Hm_Output_calendar_content extends Hm_Output_Module {
             $events = $cal_events->in_date_range($bounds[0], $bounds[1]);
             $out = new Hm_Cal_Output($this, $events);
             $out = $out->output($data, $date, $view);
-            return '<div class="calendar p-0"><div class="content_title d-flex justify-content-between">'.$this->trans('Calendar').
-                '<a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="btn btn-light btn-sm me-4">'.
+            return '<div class="calendar p-0"><div class="content_title d-flex justify-content-between px-3">'.$this->trans('Calendar').
+                '<a href="?page=calendar&amp;action=add" title="'.$this->trans('Add Event').'" class="btn btn-light btn-sm">'.
                 '<i class="bi bi-plus-circle me-2"></i> '.$this->trans('Add Event').'</a></div>'.
                 $out.'</div>';
         }

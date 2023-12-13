@@ -415,12 +415,6 @@ table.filter_actions_modal_table th {
     width: 100%;
 }
 
-#block_sender_form button {
-    color: #fff;
-    background-color: brown;
-    cursor: pointer;
-}
-
 #block_sender_form button:disabled {
     background-color: rgb(231, 121, 121);
     cursor: text;

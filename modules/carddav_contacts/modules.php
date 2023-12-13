@@ -313,7 +313,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             if (array_key_exists('phone_number', $current)) {
                 $phone = $current['phone_number'];
             }
-            $form_class = 'contact_update_form';
+            $form_class = 'contact_update_form mt-3';
             $title = sprintf($this->trans('Update Carddav - %s'), $this->html_safe($current['source']));
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';

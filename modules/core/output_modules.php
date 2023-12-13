@@ -672,9 +672,9 @@ class Hm_Output_start_settings_form extends Hm_Output_Module {
      * Opens a div, form and table
      */
     protected function output() {
-        return '<div class="user_settings"><div class="content_title">'.$this->trans('Site Settings').'</div>'.
+        return '<div class="user_settings px-0"><div class="content_title px-3">'.$this->trans('Site Settings').'</div>'.
             '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<table class="settings_table"><colgroup>'.
+            '<div class="px-3"><table class="settings_table table table-borderless"><colgroup>'.
             '<col class="label_col"><col class="setting_col"></colgroup>';
     }
 }
@@ -701,7 +701,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
         }
         $res = '<tr class="general_setting"><td><label for="start_page">'.
             $this->trans('First page after login').'</label></td>'.
-            '<td><select id="start_page" name="start_page">';
+            '<td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page">';
         foreach ($options as $label => $val) {
             $res .= '<option ';
             if ($start_page == $val) {
@@ -738,7 +738,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
         }
         $res = '<tr class="general_setting"><td><label for="default_sort_order">'.
             $this->trans('Default message sort order').'</label></td>'.
-            '<td><select id="default_sort_order" name="default_sort_order">';
+            '<td><select class="form-select form-select-sm w-auto" id="default_sort_order" name="default_sort_order">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($default_sort_order == $val) {
@@ -775,7 +775,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
         }
         $res = '<tr class="general_setting"><td><label for="list_style">'.
             $this->trans('Message list style').'</label></td>'.
-            '<td><select id="list_style" name="list_style">';
+            '<td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($list_style == $val) {
@@ -805,8 +805,8 @@ class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label for="mailto_handler">'.$this->trans('Allow handling of mailto links').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="mailto_handler" name="mailto_handler" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">'.$this->trans('Allow handling of mailto links').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="mailto_handler" name="mailto_handler" />'.$reset.'</td></tr>';
     }
 }
 
@@ -824,8 +824,8 @@ class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label for="no_folder_icons">'.$this->trans('Hide folder list icons').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="no_folder_icons" name="no_folder_icons" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">'.$this->trans('Hide folder list icons').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_folder_icons" name="no_folder_icons" />'.$reset.'</td></tr>';
     }
 }
 
@@ -843,8 +843,8 @@ class Hm_Output_no_password_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" />'.$reset.'</td></tr>';
     }
 }
 
@@ -862,8 +862,8 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" />'.$reset.'</td></tr>';
     }
 }
 
@@ -876,8 +876,8 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$star.'" width="16" height="16" />'.
+        return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-flag-fill fs-5 me-2"></i>'.
             $this->trans('Flagged').'</td></tr>';
     }
 }
@@ -894,8 +894,8 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$box.'" width="16" height="16" />'.
+        return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-box2-fill fs-5 me-2"></i>'.
             $this->trans('Everything').'</td></tr>';
     }
 }
@@ -909,8 +909,8 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
      * Settings in this section control the Unread view
      */
     protected function output() {
-        return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+        return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('Unread').'</td></tr>';
     }
 }
@@ -931,8 +931,8 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+        return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('All Email').'</td></tr>';
     }
 }
@@ -946,8 +946,8 @@ class Hm_Output_start_general_settings extends Hm_Output_Module {
      * General settings like langauge and timezone will go here
      */
     protected function output() {
-        return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$cog.'" width="16" height="16" />'.
+        return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>'.
             $this->trans('General').'</td></tr>';
     }
 }
@@ -972,7 +972,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="unread_setting"><td><label for="unread_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="unread_per_source" name="unread_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1016,7 +1016,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1063,7 +1063,7 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1087,7 +1087,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="all_per_source" name="all_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1153,7 +1153,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
         $mylang = $this->get('language', '');
         $res = '<tr class="general_setting"><td><label for="language">'.
             $this->trans('Language').'</label></td>'.
-            '<td><select id="language" name="language">';
+            '<td><select id="language" class="form-select form-select-sm w-auto" name="language">';
         foreach ($translated as $id => $lang) {
             $res .= '<option ';
             if ($id == $mylang) {
@@ -1188,7 +1188,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             $myzone = false;
         }
         $res = '<tr class="general_setting"><td><label for="timezone">'.
-            $this->trans('Timezone').'</label></td><td><select id="timezone" name="timezone">';
+            $this->trans('Timezone').'</label></td><td><select class="w-auto form-select form-select-sm" id="timezone" name="timezone">';
         foreach ($zones as $zone) {
             $res .= '<option ';
             if ($zone == $myzone) {
@@ -1217,9 +1217,9 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="show_list_icons">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">'.
             $this->trans('Show icons in message lists').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="show_list_icons" name="show_list_icons" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1233,10 +1233,10 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
      */
     protected function output() {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<input class="save_settings" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
-            '</td></tr></table></form>'.
-            '<form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<input class="reset_factory_button" type="submit" name="reset_factory" value="'.$this->trans('Restore Defaults').'" /></form>'.
+            '<input class="save_settings btn btn-success" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
+            '</td></tr></table></div></form>'.
+            '<div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+            '<input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="'.$this->trans('Restore Defaults').'" /></form></div>'.
             '</div>';
     }
 }
@@ -1315,33 +1315,33 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (!$single) {
             $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$box).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= '<li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread">';
+        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$env_closed).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge bg-secondary"></span></li>';
+        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$star).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
         $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$junk).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Junk').'</a></li>';
         $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$trash).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-trash3-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Trash').'</a></li>';
         $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$draft).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-pencil-square fs-5 me-2"></i>';
         }
         $res .= $this->trans('Drafts').'</a></li>';
 
@@ -1360,7 +1360,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
     protected function output() {
         $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$power).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-power fs-5 me-2"></i>';
         }
         $res .= $this->trans('Logout').'</a></li>';
 
@@ -1416,7 +1416,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             if ($name == 'Email' && !$single) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
                 }
                 $res .= $this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
@@ -1443,7 +1443,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
             '</div><ul style="display: none;" class="settings folders">';
         $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$home).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1506,7 +1506,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$monitor).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
         }
         $res .= $this->trans('Servers').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1524,7 +1524,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
         }
         $res .= $this->trans('Site').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1545,7 +1545,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$save).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-download fs-5 me-2"></i>';
         }
         $res .= $this->trans('Save').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1610,7 +1610,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0">';
+        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
     }
 }
 
@@ -1746,7 +1746,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $header_flds[] = '<th></th>';
             }
         }
-        $res = '<table class="message_table">';
+        $res = '<div class="p-3"><table class="message_table table pt-5">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
                 $res .= '<colgroup>'.implode('', $col_flds).'</colgroup>';
@@ -1864,7 +1864,7 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
      * Close the table opened in Hm_Output_message_list_start
      */
     protected function output() {
-        $res = '</tbody></table><div class="page_links"></div></div>';
+        $res = '</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>';
         return $res;
     }
 }
@@ -1896,8 +1896,8 @@ class Hm_Output_start_junk_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$junk.'" width="16" height="16" />'.
+        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.
             $this->trans('Junk').'</td></tr>';
     }
 }
@@ -1922,7 +1922,7 @@ class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="junk_setting"><td><label for="junk_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="junk_per_source" name="junk_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="junk_per_source" name="junk_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1955,8 +1955,8 @@ class Hm_Output_start_trash_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$trash.'" width="16" height="16" />'.
+        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-trash3-fill fs-5 me-2"></i>'.
             $this->trans('Trash').'</td></tr>';
     }
 }
@@ -1981,7 +1981,7 @@ class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="trash_setting"><td><label for="trash_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="trash_per_source" name="trash_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="trash_per_source" name="trash_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -2014,8 +2014,8 @@ class Hm_Output_start_drafts_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".drafts_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$draft.'" width="16" height="16" />'.
+        return '<tr><td data-target=".drafts_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-pencil-square fs-5 me-2"></i>'.
             $this->trans('Drafts').'</td></tr>';
     }
 }
@@ -2040,7 +2040,7 @@ class Hm_Output_drafts_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="drafts_setting"><td><label for="drafts_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="drafts_per_source" name="drafts_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="drafts_per_source" name="drafts_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -2077,8 +2077,8 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="warn_for_unsaved_changes">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="warn_for_unsaved_changes">'.
             $this->trans('Warn for unsaved changes').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" value="1" />'.$reset.'</td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" class="form-check-input" value="1" />'.$reset.'</td></tr>';
     }
 }

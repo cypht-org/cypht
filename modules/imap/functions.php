@@ -121,7 +121,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
         }
         else {
-            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
+            $results .= '<i class="bi bi-folder2-open"></i> ';
         }
         if (!$folder['noselect']) {
             if (strlen($output_mod->html_safe($folder['basename']))>15) {

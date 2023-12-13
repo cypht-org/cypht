@@ -534,9 +534,10 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
         if ($this->get('sieve_filters_enabled')) {
             $sieve_extra = '<tr class="sieve_config" style="display: none;"><td><div class="subtitle">'.$this->trans('Sieve Configuration').'</div></td></tr>'.
                 '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Host').'</label>'.
-                '<input type="text" id="sieve_config_host" name="sieve_config_host" class="txt_fld" placeholder="'.$this->trans('localhost:4190').'"></td></tr>';
-            $sieve_extra2 = '<tr><td colspan="2"><input type="checkbox" id="enable_sieve_filter" name="enable_sieve_filter" class="" value="0">'.
-                '<label for="enable_sieve_filter">'.$this->trans('Enable Sieve Filters').'</label></td></tr>';
+                '<input class="form-control" type="text" id="sieve_config_host" name="sieve_config_host" class="txt_fld" placeholder="'.$this->trans('localhost:4190').'"></td></tr>';
+            
+                $sieve_extra2 = '<tr><td colspan="2"><div class="form-check mb-3 mt-2"><input type="checkbox" id="enable_sieve_filter" name="enable_sieve_filter" class="form-check-input" value="0">'.
+                '<label for="enable_sieve_filter" class="form-check-label"> '.$this->trans('Enable Sieve Filters').'</label></div></td></tr>';
         }
 
         return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4">'.
@@ -545,7 +546,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             '<div class="server_count">'.$count.'</div></div>
             <div class="imap_section px-4 pt-3">
                 <div class="row">
-                    <div class="col-12 col-lg-4">
+                    <div class="col-12 col-lg-4 mb-4">
                         <form class="add_server" method="POST">'.
                             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                             '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div>'.
@@ -568,7 +569,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
                             $sieve_extra.
 
                             // Checkbox for Hide From Combined Pages
-                            '<div class="form-check mb-3">'.
+                            '<div class="form-check mb-3 mt-2">'.
                             '<input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="form-check-input" value="1">'.
                             '<label for="new_imap_hidden" class="form-check-label">'.$this->trans('Hide From Combined Pages').'</label></div>'.
 
@@ -842,7 +843,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
                 $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" alt="'.$this->trans('Toggle folder').'" src="'.Hm_Image_Sources::$folder.'" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
@@ -1001,8 +1002,8 @@ class Hm_Output_start_sent_settings extends Hm_Output_Module {
      * Settings in this section control the Sent E-mail view.
      */
     protected function output() {
-        return '<tr><td data-target=".sent_setting" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+        return '<tr><td data-target=".sent_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('Sent').'</td></tr>';
     }
 }
@@ -1061,9 +1062,9 @@ class Hm_Output_imap_unread_on_open extends Hm_Output_Module {
         if (array_key_exists('unread_on_open', $settings) && $settings['unread_on_open']) {
             $checked = ' checked="checked"';
         }
-        return '<tr class="general_setting"><td><label for="unread_on_open">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="unread_on_open">'.
             $this->trans('Don\'t flag a message as read on open').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" value="1" /></td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" value="1" /></td></tr>';
     }
 }
 
@@ -1081,9 +1082,9 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="simple_msg_parts">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1101,9 +1102,9 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        $res = '<tr class="general_setting"><td><label for="pagination_links">'.
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
             $this->trans('Show next & previous emails when reading a message').'</label></td>'.
-            '<td><input type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
         return $res;
     }
 }
@@ -1138,7 +1139,7 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
-            $this->trans('Messages per page for IMAP folder views').'</label></td><td><input type="text" id="imap_per_page" '.
+            $this->trans('Messages per page for IMAP folder views').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
             'name="imap_per_page" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
     }
 }
@@ -1159,7 +1160,7 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
-            $this->trans('Max google contacts number').'</label></td><td><input type="number" id="max_google_contacts_number" '.
+            $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
             'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
     }
 }
@@ -1177,9 +1178,9 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="msg_part_icons">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1196,9 +1197,9 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="text_only">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1219,7 +1220,7 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
         }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1236,9 +1237,9 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="original_folder">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1254,9 +1255,9 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="review_sent_email">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
     }
 }
 

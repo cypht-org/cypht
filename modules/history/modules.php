@@ -181,7 +181,7 @@ class Hm_Output_history_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_history"><a class="unread_link" href="?page=history">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$history).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-clock-history fs-5 me-2"></i>';
         }
         $res .= $this->trans('History').'</a></li>';
         if ($this->format == 'HTML5') {

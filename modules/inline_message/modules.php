@@ -66,11 +66,11 @@ class Hm_Output_inline_message_setting extends Hm_Output_Module {
         if (array_key_exists('inline_message', $settings)) {
             $inline = $settings['inline_message'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Show messages inline').'</td><td><input value="1" type="checkbox" name="inline_message"';
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="inline_message">'.$this->trans('Show messages inline').'</label></td><td><input value="1" type="checkbox" class="form-check-input" name="inline_message" id="inline_message"';
         $reset = '';
         if ($inline) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;
@@ -88,7 +88,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         if (array_key_exists('inline_message_style', $settings)) {
             $selected = $settings['inline_message_style'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Inline Message Style').'</td><td><select name="inline_message_style">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Inline Message Style').'</td><td><select class="form-select form-select-sm w-auto" name="inline_message_style">';
         $res .= '<option ';
         if ($selected == 'right') {
             $res .= 'selected="selected" ';

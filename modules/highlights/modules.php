@@ -333,7 +333,7 @@ class Hm_Output_highlight_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_highlights"><a class="unread_link" href="?page=highlights">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$tags).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-highlighter fs-5 me-2"></i>';
         }
         $res .= $this->trans('Highlights').'</a></li>';
         if ($this->format == 'HTML5') {

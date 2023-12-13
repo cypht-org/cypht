@@ -889,7 +889,7 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label>'.
             $this->trans('Attachment Chunks').'</label></td>'.
-            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" >Clear Chunks</button></td></tr>';
+            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></td></tr>';
     }
 }
 
@@ -921,7 +921,7 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$sent).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-send-check-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Sent').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -933,7 +933,7 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_form_start extends Hm_Output_Module {
     protected function output() {
-        return'<div class="compose_page p-0"><div class="content_title">'.$this->trans('Compose').'</div>'.
+        return'<div class="compose_page p-0"><div class="content_title px-3">'.$this->trans('Compose').'</div>'.
             '<div class="container"><div class="row justify-content-md-center">'.
             '<div class="col col-lg-8">'.
             '<form class="compose_form p-4" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
@@ -1244,7 +1244,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
                     </div>
                     <div class="smtp_section px-4 pt-3">
                         <div class="row">
-                        <div class="col-12 col-lg-4">
+                        <div class="col-12 col-lg-4 mb-4">
                             <form class="" method="POST">
                                 <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
                                 <div class="subtitle">'.$this->trans('Add an SMTP Server').'</div>
@@ -1292,7 +1292,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select name="smtp_compose_type">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -1323,7 +1323,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_auto_bcc', $settings)) {
             $auto = $settings['smtp_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Always BCC sending address').'</td><td><input value="1" type="checkbox" name="smtp_auto_bcc"';
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
@@ -1415,7 +1415,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$doc).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-file-earmark-text fs-5 me-2"></i>';
         }
         $res .= $this->trans('Compose').'</a></li>';
 
