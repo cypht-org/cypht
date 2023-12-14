@@ -383,6 +383,15 @@ $(function () {
         });
 
         // add another button
+        edit_filter_modal.addFooterBtn('Convert to code', 'tingle-btn tingle-btn--secondary', async function () {
+            let result = save_filter(current_account, true);
+            if (result) {
+                edit_filter_modal.close();
+            }
+        });
+
+
+        // add another button
         edit_filter_modal.addFooterBtn('Close', 'tingle-btn tingle-btn--default tingle-btn--pull-right', function () {
             // here goes some logic
             edit_filter_modal.close();
@@ -406,7 +415,7 @@ $(function () {
         /**************************************************************************************
          *                                    FUNCTIONS
          **************************************************************************************/
-        function save_filter(imap_account) {
+        function save_filter(imap_account, gen_script = false) {
             let validation_failed = false
             let conditions_parsed = []
             let actions_parsed = []
@@ -515,12 +524,22 @@ $(function () {
                     {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
                     {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
                     {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
-                    {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()}
-                    ],
+                    {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
+                    {'name': 'gen_script', 'value': gen_script},
+                ],
                 function(res) {
-                    window.location = window.location;
+                    if (Object.keys(res.script_details).length === 0) {
+                        window.location = window.location;
+                    } else {
+                        edit_script_modal.open();
+                        $('.modal_sieve_script_textarea').val(res.script_details.gen_script);
+                        $('.modal_sieve_script_name').val(res.script_details.filter_name);
+                        $('.modal_sieve_script_priority').val(res.script_details.filter_priority);
+                    }
                 }
             );
+
+            return true;
         }
 
         function save_script(imap_account) {
