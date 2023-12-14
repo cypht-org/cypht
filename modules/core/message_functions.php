@@ -16,7 +16,6 @@
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
-    require_once VENDOR_PATH.'autoload.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$images) {

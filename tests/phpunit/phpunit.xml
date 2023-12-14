@@ -23,6 +23,9 @@
     <testsuite name="config">
       <file>./config.php</file>
     </testsuite>
+    <testsuite name="environment">
+      <file>./environment.php</file>
+    </testsuite>
     <testsuite name="db">
       <file>./db.php</file>
     </testsuite>

@@ -2,13 +2,12 @@
 
 /**
  * To use these overrides, you must first enable the "site" module in your
- * hm3.ini file, then rebuild your configuration with the config_gen.php script
- * to activate the module. 
+ * config/app.php file to activate the module.
  */
 
 /**
  * Override the session class. These are the methods that must be overriden to
- * create a new session backend. The "session_type" value in your hm3.ini must
+ * create a new session backend. The "session_type" value in your config/app.php must
  * be set to "custom" to activate this class. There are several other
  * properties and methods that can be modified to create custom sessions:
  *
@@ -103,7 +102,7 @@ class Custom_Session extends Hm_PHP_Session {
 /**
  * Override the authentication class. This method needs to be overriden to
  * create a custom authentication backend. You must set the "auth_type" setting
- * in your hm3.ini file to "custom" to activate this class. More information
+ * in your config/app.php file to "custom" to activate this class. More information
  * about the base class for authentication is located here:
  *
  * https://cypht.org/docs/code_docs/class-Hm_Auth.html

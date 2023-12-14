@@ -8,7 +8,7 @@
  * This module set is intented to give developers an overview of
  * the module system. Most of what it does is silly and consists of printing "Hello
  * World" in different ways. You can enable this module by adding it to the modules
- * value in the hm3.ini file, and rebuilding the site config.
+ * value in the config/app.php file.
  */
 
 /**

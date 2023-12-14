@@ -154,7 +154,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
     protected function output() {
         if (count($this->get('contact_sources', array())) == 0) {
             return '<div class="no_contact_sources">'.$this->trans('No contact backends are enabled!').
-                '<br />'.$this->trans('At least one backend must be enabled in the hm3.ini file to use contacts.').'</div>';
+                '<br />'.$this->trans('At least one backend must be enabled in the config/app.php file to use contacts.').'</div>';
         }
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);

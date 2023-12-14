@@ -6,7 +6,7 @@
  * way to delay actions until page onload if you need to. Built in data sources like
  * hm_page_name() are defined before this is run so they are also available. When the
  * site build process is run this code will be combined with JS from other module sets,
- * and optionally minified based on the hm3.ini file settings.
+ * and optionally minified based on the config/app.php file settings.
  */
 
 /**
