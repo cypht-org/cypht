@@ -561,7 +561,7 @@ $(function () {
         });
         $('.add_script').on('click', function () {
             $('.script_modal_title').html('Add Script');
-            $('.modal_sieve_script_textarea').html('');
+            $('.modal_sieve_script_textarea').val('');
             $('.modal_sieve_script_name').val('');
             $('.modal_sieve_script_priority').val('');
             is_editing_script = false;
