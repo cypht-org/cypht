@@ -27,7 +27,7 @@
         "ezyang/htmlpurifier": "^4.13",
         "henrique-borba/php-sieve-manager": "^1.0.0",
         "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
-        "php": ">=7.3",
+        "php": ">=7.4",
         "ext-mbstring": "*",
         "ext-json": "*",
         "ext-curl": "*",
@@ -54,7 +54,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.3"
+            "php": "7.4"
         },
     	"optimize-autoloader": true,
         "allow-plugins": {
