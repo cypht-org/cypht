@@ -223,10 +223,11 @@ var folder_subscribe = function(name, state) {
         {'name': 'subscription_state', 'value': state},
         {'name': 'folder', 'value': name}],
         function(res) {
+            var el = $('#'+name);
             if (!res.imap_folder_subscription) {
-                var el = $('#'+name);
                 el.prop('checked', !el.prop('checked'));
             } else {
+                el.prev().toggleClass('folder-disabled');
                 Hm_Folders.reload_folders(true);
             }
         }

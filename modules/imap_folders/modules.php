@@ -725,8 +725,7 @@ class Hm_Output_folders_folder_subscription_button extends Hm_Output_Module {
             $server = $this->get('folder_server');
             $results = '<div class="folder_subscription_btn"><a href="?page=folders_subscription';
             $results .= !is_null($server)? '&imap_server_id='.$server: '';
-            // $results .= '.
-            $results .= '" title="'.$this->trans('Folders subscription').'"><img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$cog).'" alt="" width="20" height="20" /> ';
+            $results .= '" title="'.$this->trans('Folders subscription').'"><i class="bi bi-gear-fill account_icon float-end"></i> ';
             $results .= '</a></div>';
             return $results;
         }
@@ -813,13 +812,15 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
 class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
     protected function output() {
         $checked = '';
+        $reset = '';
         $settings = $this->get('user_settings', array());
         if (array_key_exists('only_subscribed_folders', $settings) && $settings['only_subscribed_folders']) {
             $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" value="1" /></td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" value="1" class="form-check-input" />'.$reset.'</td></tr>';
     }
 }
 

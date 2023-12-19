@@ -427,18 +427,19 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 $can_have_kids = true;
                 $has_kids = false;
                 $marked = false;
+                $special = false;
                 $folder_sort_by = 'ARRIVAL';
                 $check_for_new = false;
 
                 /* full folder name, includes an absolute path of parent folders */
-                if ($vals[(count($vals) - 1)] == ')' && $lsub) {
-                    $folder = $this->utf7_decode($vals[6]);
+                if ($lsub && in_array("\HasChildren", $vals)) {
+                    $folder = $this->utf7_decode($vals[array_search(".", $vals) + 1]);
                 } else {
                     $folder = $this->utf7_decode($vals[(count($vals) - 1)]);
                 }
 
                 /* sometimes LIST responses have dupes */
-                if (isset($folders[$folder]) || !$folder) {
+                if (isset($folders[$folder]) || !$folder || $folder === '*') {
                     continue;
                 }
 
@@ -490,7 +491,6 @@ class Hm_IMAP extends Hm_IMAP_Cache {
 
                 /* special use mailbox extension */
                 if ($this->is_supported('SPECIAL-USE')) {
-                    $special = false;
                     foreach ($this->special_use_mailboxes as $name => $value) {
                         if (stristr($flags, $name)) {
                             $special = $name;
@@ -522,12 +522,22 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 /* store the results in the big folder list struct */
                 if (strtolower($folder) == 'inbox') {
                     $inbox = true;
+                    $special = true;
                 }
-                $folders[$folder] = array('parent' => $parent, 'delim' => $delim, 'name' => $folder,
-                                        'name_parts' => $folder_parts, 'basename' => $base_name,
-                                        'realname' => $folder, 'namespace' => $namespace, 'marked' => $marked,
-                                        'noselect' => $no_select, 'can_have_kids' => $can_have_kids,
-                                        'has_kids' => $has_kids);
+                $folders[$folder] = array(
+                    'parent' => $parent,
+                    'delim' => $delim,
+                    'name' => $folder,
+                    'name_parts' => $folder_parts,
+                    'basename' => $base_name,
+                    'realname' => $folder,
+                    'namespace' => $namespace,
+                    'marked' => $marked,
+                    'noselect' => $no_select,
+                    'can_have_kids' => $can_have_kids,
+                    'has_kids' => $has_kids,
+                    'special' => (bool) $special
+                );
 
                 /* store a parent list used below */
                 if ($parent && !in_array($parent, $parents)) {
@@ -2144,7 +2154,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      * @param string $level mailbox name or empty string for the top level
      * @return array list of matching folders
      */
-    public function get_folder_list_by_level($level='', $only_subscribed=false, $with_subscription_state = false) {
+    public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false) {
         $result = array();
         $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
         foreach ($folders as $name => $folder) {
@@ -2156,12 +2166,19 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 'noselect' => $folder['noselect'],
                 'id' => bin2hex($folder['basename']),
                 'name_parts' => $folder['name_parts'],
+                'clickable' => !$with_input,
             );
+            if ($with_input) {
+                $result[$name]['special'] = $folder['special'];
+            }
         }
-        if ($with_subscription_state) {
+        if ($only_subscribed || $with_input) {
             $subscribed_folders = array_column($this->get_mailbox_list(true), 'name');
             foreach ($result as $key => $folder) {
                 $result[$key]['subscribed'] = in_array($folder['name'], $subscribed_folders);
+                if (!$with_input) {
+                    $result[$key]['clickable'] = $result[$key]['subscribed'];
+                }
             }
         }
         return $result;

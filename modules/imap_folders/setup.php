@@ -106,12 +106,12 @@ return array(
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'new_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'special_folder_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'imap_service_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'parent' => FILTER_DEFAULT,
+        'new_folder' => FILTER_DEFAULT,
+        'special_folder_type' => FILTER_DEFAULT,
+        'imap_service_name' => FILTER_DEFAULT,
         'subscription_state' => FILTER_VALIDATE_BOOLEAN,
-        'folder' => FILTER_VALIDATE_BOOLEAN,
+        'folder' => FILTER_DEFAULT,
         'only_subscribed_folders' => FILTER_VALIDATE_BOOLEAN,
     )
 );
