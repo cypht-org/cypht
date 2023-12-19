@@ -28,3 +28,4 @@ lib/hm3/users/
 carddav.ini
 recaptcha.ini
 .phpunit.result.cache
+.env
