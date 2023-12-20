@@ -125,6 +125,7 @@ return array(
         'test_type' => array(FILTER_UNSAFE_RAW, false),
         'mailboxes' => array(FILTER_UNSAFE_RAW, false),
         'sieve_detail_display' => array(FILTER_UNSAFE_RAW, false),
+        'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
@@ -148,6 +149,7 @@ return array(
         'scope' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'block_action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'reject_message' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'change_behavior' => FILTER_VALIDATE_BOOL
+        'change_behavior' => FILTER_VALIDATE_BOOL,
+        'gen_script' => FILTER_VALIDATE_BOOL,
     )
 );

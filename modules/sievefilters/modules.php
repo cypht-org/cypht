@@ -691,6 +691,16 @@ class Hm_Output_sieve_delete_output extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_sieve_save_filter_output extends Hm_Output_Module {
+    public function output() {
+        $script_details = $this->get('script_details', []);
+        $this->out('script_details', $script_details);
+    }
+}
+
+/**
  * @subpackage sievefilters/handler
  */
 class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
@@ -1031,6 +1041,15 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         }
         $filter->setCondition($custom_condition);
         $script_parsed = $filter->toScript();
+
+        if ($this->request->post['gen_script']) {
+            $this->out('script_details', [
+                'gen_script' => $script_parsed,
+                'filter_priority' => $priority,
+                'filter_name' => $this->request->post['sieve_filter_name']
+            ]);
+            return;
+        }
 
         $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
         $header_obj .= "\n# ".base64_encode($this->request->post['conditions_json']);
