@@ -207,9 +207,11 @@ function display_config_step(stepNumber) {
             else $(`#${item.key}-error`).text('');
         })
 
-        if(isValid) return
 
-        //submitSmtpImapServer();
+
+        if(!isValid) return
+
+        submitSmtpImapServer();
         return
     }
     // Hide all step elements
