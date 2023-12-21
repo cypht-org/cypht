@@ -17,7 +17,7 @@ return [
     | Connection type. Can be "host" to connect to a hostname, or "socket" to
     | connect to a unix socket.
     */
-    'db_conn_type' => env('DB_CONNECTION_TYPE', 'host'),
+    'db_connection_type' => env('DB_CONNECTION_TYPE', 'host'),
     
     /* 
     |
@@ -63,5 +63,5 @@ return [
     |
     | Database type. can be any supported PDO driver ; (http://php.net/manual/en/pdo.drivers.php)
     */
-    'db_driver' => env('DRIVER','mysql')
+    'db_driver' => env('DB_DRIVER','mysql')
 ];
