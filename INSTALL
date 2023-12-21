@@ -66,16 +66,15 @@ sudo rm -rf cypht-temp
 2. Configure the program
 ------------------------
 
-To configure Cypht for your environment, you must first edit the .env.dist file
-to your liking, then run the config_gen.php script to generate config/dynamic.php
-configuration file and assets used at run-time.
+To configure Cypht for your environment, make adjustments to the .env file file according to your preferences. The .env file serves as the primary configuration file, eliminating the need to edit the previously used hm3.ini file.
 
-First edit the .env.dist file to configure Cypht for your environment. If you
-choose to use a database for any of the 3 available purposes (authentication,
-sessions, or user settings), you will need to complete the "DB support" section
-and create the required tables. SQL to do so can be found in the config/app.php
-file, DB Sessions section. All configs files have lots of comments explaining what 
-each option does.
+First, copy the `.env.example` file to create a new `.env` file:
+cp .env.example .env
+
+Then edit the .env file to configure Cypht for your environment. If you choose to leverage a database for authentication, sessions, or user settings, ensure to complete the relevant sections within the .env file based on the information provided in the config/app.php file.
+
+The necessary SQL commands for creating tables can be found in the config/app.php file, specifically starting from line 617 in the "DB Sessions" section.
+
 
 Cypht needs read, and read-write access to a few directories on the server. For
 security reasons these should NOT be inside the web-server document root. A
@@ -99,13 +98,14 @@ values in the config file point to the right place.
 3. Generate the run-time configuration
 --------------------------------------
 
-Cypht now utilizes dotenv and configuration files in the config/ directory, 
-such as *.php files. To update the run-time configuration, follow these steps:
+Cypht utilizes a build process to create an optimized configuration and to combine and minimize page assets. Previously, after editing the hm3.ini file, the configuration and asset minimization were generated using the following steps:
 
 cd /usr/local/share/cypht  (or wherever you put the code in section 1)
 sudo php ./scripts/config_gen.php
 
-This command will dynamically generate config/dynamic.php configuration file based on the settings in your updated configuration files. With the transition to dynamic configuration dotenv, there's no need to run the config_gen.php script anymore. The configuration updates automatically based on changes in config/*.php files.
+Recent updates have streamlined the process, and running the command above will now specifically generate the config/dynamic.php file. This file incorporates dynamic configurations, including 'handler_modules,' 'output_modules,' and 'input_filters.' Furthermore, the command continues to optimize the configuration and combine/minimize page assets, ensuring efficient runtime operation.
+
+Additionally, executing this command will create a sub-directory called 'site' that contains the code and page assets required within the document root. If you ever relocate the source location, you'll need to re-run the config_gen script to update the program.
 
 
 4. Enable the program in your web-server
@@ -158,16 +158,14 @@ php.ini settings and web-server software.
 
 7. Other INI files
 ------------------
-Each Cypht module now has its own dedicated configuration file, conveniently located at the same directory of configs files and under `config/services.php`. These configiration files eliminate the need for scattered ini files and offer a more organized approach to managing module settings.
-
-To configure a module, navigate to the respective file in the `config/` directory or `config/services.php` and customize the settings according to your requirements. Whether it's a module-specific file or the unified `services.php`, any changes made here will seamlessly integrate into the main configuration without the necessity of manually running the `config_gen.php` script.
+Some Cypht modules necessitate additional configuration files for proper setup. It is crucial that these files are NOT located within the web-server document root. Certain modules may require configuration with a service provider, particularly those related to Oauth2 client setup (such as Github, WordPress, Oauth2 over IMAP for Gmail, and Outlook). After configuring related files, there is no need to rerun the config_gen script; the changes will be automatically merged into the main configuration settings.Alternatively, you can clear your app cache.
 
 Github
 Cypht can connect to github and aggregate notification data about repository
 activity.
 
-Example github.ini file:
-https://github.com/cypht-org/cypht/blob/master/config/services.php
+Example github.php file:
+https://github.com/cypht-org/cypht/blob/master/config/github.php
 
 Authorize an application for github:
 https://github.com/settings/developers
@@ -177,8 +175,8 @@ Gmail and Outlook.com support OAUTH2 authentication over IMAP. This is
 preferable to normal IMAP authentication because Cypht never has access to your
 account password.
 
-Example oauth2 ini file:
-https://github.com/cypht-org/cypht/blob/master/config/services.php
+Example oauth2.php file:
+https://github.com/cypht-org/cypht/blob/master/config/oauth2.php
 
 Authorize an application for gmail
 https://console.developers.google.com/project
@@ -189,14 +187,14 @@ https://account.live.com/developers/applications/
 LDAP contacts
 Cypht can use an LDAP server for contacts.
 
-Example ldap.ini file:
+Example ldap.php file:
 https://github.com/cypht-org/cypht/blob/master/config/ldap.php
 
 WordPress
 Cypht can aggregate WordPress.com notifications.
 
-Example wordpress.ini file:
-https://github.com/cypht-org/cypht/blob/master/config/services.php
+Example wordpress.php file:
+https://github.com/cypht-org/cypht/blob/master/config/wordpress.php
 
 Authorize an application for WordPress.com:
 https://developer.wordpress.com/apps/

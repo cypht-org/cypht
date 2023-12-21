@@ -24,9 +24,9 @@ class Hm_Environment {
         if (method_exists($dotenvLoader, 'usePutenv')) {
             $dotenvLoader->usePutenv(true);
         }
-        $envDistFile = APP_PATH . '.env.dist';
+        $envDistFile = APP_PATH . '.env';
         if (!file_exists($envDistFile)) {
-            Hm_Msgs::add('ERR.env.dist file not found at: "' . $envDistFile . '"');
+            Hm_Msgs::add('ERR.env file not found at: "' . $envDistFile . '"');
             return;
         }
 

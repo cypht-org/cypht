@@ -476,7 +476,7 @@ function merge_folder_list_details($folder_sources) {
 if (!hm_exists('get_ini')) {
 function get_ini($config, $name, $sections=false) {
     if (!DEBUG_MODE) {
-        $data = $config->get($name, array());
+        $data = $config->get(substr($name, 0, -4), array());
         if (is_array($data) && count($data) > 0) {
             return $data;
         }

@@ -1,5 +1,3 @@
-/hm3.rc
-/hm3.ini
 /config/dynamic.php
 /site.js
 /site.css
@@ -9,6 +7,7 @@
 /tests/selenium/local_creds.py
 /tests/selenium/remote_creds.py
 *.pyc
+.env
 apigen4.sh
 testuser.txt
 website/docs

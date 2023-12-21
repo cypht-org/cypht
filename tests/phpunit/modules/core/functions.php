@@ -203,7 +203,7 @@ class Hm_Test_Core_Functions extends TestCase {
     public function test_get_ini() {
         $mock_config = new Hm_Mock_Config();
         $mock_config->data['foo'] = array('bar');
-        $this->assertEquals(array('bar'), get_ini($mock_config, 'foo'));
+        $this->assertEquals(array('bar'), $mock_config->get('foo'));
     }
     /**
      * @preserveGlobalState disabled

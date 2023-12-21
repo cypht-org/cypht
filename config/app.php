@@ -730,7 +730,7 @@ return [
         |
         | JSON Meta Application Protocol for emails
         */
-        'jmap',
+        // 'jmap',
 
         /*
         | -----
@@ -951,7 +951,7 @@ return [
         |
         | Enables configurable Sieve based IMAP filters
         */
-        'sievefilters',
+        // 'sievefilters',
 
         /*
         | -----
