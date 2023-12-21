@@ -557,7 +557,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
-            'var hm_check_dirty_flag = function() { return '.json_encode($this->get('warn_for_unsaved_changes', false)).'; };'.
+            'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt')) {

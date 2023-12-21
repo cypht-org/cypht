@@ -639,7 +639,6 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('data_sources', array(), false);
         $this->out('encrypt_ajax_requests', $this->config->get('encrypt_ajax_requests', false));
         $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
-        $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -679,6 +678,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             }
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
+        $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
         if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);

@@ -141,7 +141,7 @@ $.fn.areYouSure = function(options) {
 
   if (!settings.silent && !window.aysUnloadSet) {
     window.aysUnloadSet = true;
-    $(window).on('beforeunload', function() {
+    window.onbeforeunload = () => {
       $dirtyForms = $("form").filter('.' + settings.dirtyClass);
       if ($dirtyForms.length == 0) {
         return;
@@ -155,7 +155,7 @@ $.fn.areYouSure = function(options) {
         window.setTimeout(function() {window.aysHasPrompted = false;}, 900);
       }
       return settings.message;
-    });
+    };
   }
 
   return this.each(function(elem) {
@@ -164,7 +164,7 @@ $.fn.areYouSure = function(options) {
     }
     var $form = $(this);
       
-    $form.submit(function() {
+    $form.on('submit', function() {
       $form.removeClass(settings.dirtyClass);
     });
     $form.on('reset', function() { setDirtyStatus($form, false); });

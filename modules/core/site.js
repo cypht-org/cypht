@@ -1804,7 +1804,7 @@ $(function() {
     }
 
     if (hm_check_dirty_flag()) {
-        $('.add_server, .change_pass form, .add_contact_form, .edit_profile form, .user_settings form, .add_hl_form form, .compose_form').areYouSure();
+        $('form:not(.search_terms)').areYouSure();
     }
 
     fixLtrInRtl()
