@@ -639,6 +639,7 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('data_sources', array(), false);
         $this->out('encrypt_ajax_requests', $this->config->get('encrypt_ajax_requests', false));
         $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
+        $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -943,5 +944,21 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('drafts_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process warn for unsaved changes in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Module {
+    /**
+     * valid values are true and false
+     */
+    public function process() {
+        function warn_for_unsaved_changes_callback($val) {
+            return $val;
+        }
+        process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback');
     }
 }

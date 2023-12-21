@@ -1803,23 +1803,9 @@ $(function() {
         $('.reset_default_value_input').on("click", reset_default_value_input);
     }
 
-    let is_dirty = false;
-    $(window).on('click', function (event) {
-        if (event.target && event.target.nodeName === 'BUTTON') {
-            // Process clicks..
-        }
+    if (hm_check_dirty_flag()) {
+        $('.add_server, .change_pass form, .add_contact_form, .edit_profile form, .user_settings form, .add_hl_form form, .compose_form').areYouSure();
     }
-
-    $(window).on('beforeunload', function (event) {
-        if (is_dirty) {
-            event.preventDefault();
-            return event.returnValue = 'Unsaved changes will be lost! Re-enter your password to save and exit';
-        }
-    });
-
-    $(document).on('click', 'a,[type=submit]', function() {
-        $(window).off('beforeunload');
-    });
 
     fixLtrInRtl()
 });
