@@ -485,6 +485,9 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $js_lib = '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/tingle.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script>';
+
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
             }
@@ -554,6 +557,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
             'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
+            'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt')) {
@@ -1977,5 +1981,24 @@ class Hm_Output_drafts_since_setting extends Hm_Output_Module {
         return '<tr class="drafts_setting"><td><label for="drafts_since">'.
             $this->trans('Show draft messages since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'drafts_since', $this).'</td></tr>';
+    }
+}
+
+/**
+ * Option to warn user when he has unsaved changes.
+ * @subpackage imap/output
+ */
+class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('warn_for_unsaved_changes', $settings) && $settings['warn_for_unsaved_changes']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        return '<tr class="general_setting"><td><label for="warn_for_unsaved_changes">'.
+            $this->trans('Warn for unsaved changes').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" value="1" />'.$reset.'</td></tr>';
     }
 }

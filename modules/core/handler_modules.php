@@ -678,6 +678,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             }
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
+        $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
         if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
@@ -943,5 +944,21 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('drafts_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process warn for unsaved changes in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Module {
+    /**
+     * valid values are true and false
+     */
+    public function process() {
+        function warn_for_unsaved_changes_callback($val) {
+            return $val;
+        }
+        process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback');
     }
 }
