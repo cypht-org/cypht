@@ -372,7 +372,7 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                   'pass' => $pass,
                   'tls' => $tls);
 
-              if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true) && isset($enableSieve) && $enableSieve) {
+              if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true) && $enableSieve) {
                   $imap_list['sieve_config_host'] = $enableSieve;
 
                    require_once VENDOR_PATH . 'autoload.php';
@@ -782,18 +782,19 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                          <span id="nux_config_imap_port-error" class="error-message"></span>
                                       </div>
 
-                                        <div class="step_config-form_item">
-                                            <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" onchange="handleSieveStatusChange(this)"/>
-                                            <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
-                                        </div>
                                    ';
 
-         if (!$this->get('sieve_filters_enabled')) {
+         if ($this->get('sieve_filters_enabled')) {
              $default_value = '';
                  $res .=  '
+                            <div class="step_config-form_item">
+                                <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" onchange="handleSieveStatusChange(this)"/>
+                                <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                            </div>
                            <div class="step_config-form_item nested hide" id="nux_imap_sieve_host_bloc">
                                <label class="screen_reader" for="nux_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="'.$this->trans('Sieve Host').'" type="text" name="imap_sieve_host">
+                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
+                                <span id="nux_imap_sieve_host-error" class="error-message"></span>
                            </div>';
          }
 

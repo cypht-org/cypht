@@ -101,7 +101,7 @@ return array(
         'nux_config_imap_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_config_imap_port' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_config_imap_tls' => FILTER_VALIDATE_BOOLEAN,
-        'nux_enable_sieve' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_enable_sieve' => FILTER_VALIDATE_BOOLEAN,
         'nux_create_profile' => FILTER_VALIDATE_BOOLEAN,
         'nux_profile_is_default' => FILTER_VALIDATE_BOOLEAN,
         'nux_profile_signature' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

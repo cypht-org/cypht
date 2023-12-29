@@ -44,7 +44,7 @@ function submitSmtpImapServer() {
             $("#nux_profile_is_default").prop('checked', true);
             $("#nux_config_is_sender").prop('checked', true);
             $("#nux_config_is_receiver").prop('checked', true);
-            $("#nux_enable_sieve").prop('checked', true);
+            $("#nux_enable_sieve").prop('checked', false);
             $('#step_config-imap_bloc').show();
             $('#step_config-smtp_bloc').show();
             $('#nux_profile_bloc').show();
@@ -196,6 +196,12 @@ function display_config_step(stepNumber) {
             requiredFields.push(
                 {key: 'nux_config_imap_address', value: $('#nux_config_imap_address').val()},
                 {key: 'nux_config_imap_port', value: $('#nux_config_imap_port').val()},
+            )
+        }
+
+        if($('#nux_enable_sieve').is(':checked')) {
+            requiredFields.push(
+                {key: 'nux_imap_sieve_host', value: $('#nux_imap_sieve_host').val()},
             )
         }
 
