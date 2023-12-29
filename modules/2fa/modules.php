@@ -221,15 +221,8 @@ function check_2fa_pin($pin, $secret, $pass_len=6) {
  */
 if (!hm_exists('get_2fa_key')) {
 function get_2fa_key($config) {
-    $settings = get_ini($config, '2fa.ini');
-    $secret = false;
-    $simple = false;
-    if (array_key_exists('2fa_secret', $settings)) {
-        $secret = $settings['2fa_secret'];
-    }
-    if (array_key_exists('2fa_simple', $settings)) {
-        $simple = $settings['2fa_simple'];
-    }
+    $secret = $config->get('2fa_secret', false);
+    $simple = $config->get('2fa_simple', false);
     return array($secret, $simple);
 }}
 
@@ -238,7 +231,6 @@ function get_2fa_key($config) {
  */
 if (!hm_exists('base32_encode_str')) {
 function base32_encode_str($str) {
-    require_once VENDOR_PATH.'christian-riesen/base32/src/Base32.php';
     return Base32\Base32::encode($str);
 }}
 
@@ -247,7 +239,6 @@ function base32_encode_str($str) {
  */
 if (!hm_exists('generate_qr_code')) {
 function generate_qr_code($config, $username, $str) {
-    require_once VENDOR_PATH.'autoload.php';
     $renderer = new ImageRenderer(
         new RendererStyle(200),
         new SvgImageBackEnd()

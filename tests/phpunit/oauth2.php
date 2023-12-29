@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Oauth2 extends TestCase {
 
+    public $oauth2;
     public function setUp(): void {
         require 'bootstrap.php';
         $this->oauth2 = new Hm_Oauth2('client_id', 'secret', 'uri');

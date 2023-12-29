@@ -84,7 +84,7 @@ class Hm_Test_Core_Functions extends TestCase {
      */
     public function test_get_oauth2_data() {
         $mock_config = new Hm_Mock_Config();
-        $this->assertEquals(array(), (get_oauth2_data($mock_config)));
+        $this->assertEquals(array('gmail' => [],'outlook' => []), (get_oauth2_data($mock_config)));
     }
     /**
      * @preserveGlobalState disabled

@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
  */
 class Hm_Test_PHP_Session extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
@@ -273,6 +274,7 @@ class Hm_Test_PHP_Session extends TestCase {
  */
 class Hm_Test_Redis_Session extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
@@ -298,6 +300,7 @@ class Hm_Test_Redis_Session extends TestCase {
  */
 class Hm_Test_Memcached_Session extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
@@ -400,6 +403,7 @@ class Hm_Test_Memcached_Session extends TestCase {
  */
 class Hm_Test_DB_Session extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         ini_set('session.use_cookies', '0');
@@ -557,6 +561,7 @@ class Hm_Test_DB_Session extends TestCase {
 
 class Hm_Test_Session_Functions extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $this->config = new Hm_Mock_Config();

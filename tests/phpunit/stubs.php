@@ -52,6 +52,7 @@ class Hm_Test_Module_List_Functions {
 }
 
 class Hm_Test_Server {
+    public $state;
     public function disconnect() {
         return true;
     }

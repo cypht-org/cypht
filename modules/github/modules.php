@@ -696,7 +696,8 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
  */
 if (!hm_exists('github_connect_details')) {
 function github_connect_details($config) {
-    return get_ini($config, 'github.ini');
+    $confs = $config->dump();
+    return $confs['github'];
 }}
 
 /**

@@ -231,7 +231,7 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .mobile .update_message_list { margin-right: 20px; }
 .mobile .msg_text { width: 100%; max-width: 480px !important; word-break: break-all; word-wrap: break-word; font-size: 100%; }
 .mobile .msg_controls { background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important; z-index: 100; position: fixed; right: -10px; height: 54px; font-size: 115%; padding-left: 5px; padding-top: 5px; top: 1px; left: 65px !important; }
-@media (orientation: landscape) {
+@media (orientation: landscape) { 
     .mobile .msg_controls { top: 12px; height: 26px; }
     .mobile .toggle_link { height: 17px !important; }
     .mobile .search_form { margin-left: -18px !important; }
@@ -309,12 +309,14 @@ div.unseen, .unseen .subject { font-weight: 700; }
 }
 
 #list_controls_menu {
+    flex-direction: column;
+    align-items: flex-end;
     position: absolute;
-    width: 50px;
     right: 0px;
     display: none;
-    padding-left: 14px;
-    padding-bottom: 5px;
+    padding: 0px 5px 5px 10px;
     background-color: #fff;
 }
+.mobile #list_controls_menu.show { display: flex; }
+.mobile .imap_sort { width: 100%; }
 .snoozed_date { color: teal !important; }

@@ -36,6 +36,7 @@ setup_base_page('settings');
 add_handler('settings', 'process_language_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_list_style_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_timezone_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_warn_for_unsaved_changes_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_unread_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_flagged_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_flagged_source_max_setting', true, 'core', 'date', 'after');
@@ -65,7 +66,8 @@ add_output('settings', 'start_settings_form', true, 'core', 'content_section_sta
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
-add_output('settings', 'no_folder_icon_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'warn_for_unsaved_changes_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'no_folder_icon_setting', true, 'core', 'warn_for_unsaved_changes_setting', 'after');
 add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
@@ -278,7 +280,7 @@ return array(
         'server_pw_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'message_list_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'no_password_save' => FILTER_VALIDATE_BOOLEAN,
-        'start_page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'start_page' => FILTER_SANITIZE_URL,
         'default_sort_order' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'stay_logged_in' => FILTER_VALIDATE_BOOLEAN,
         'junk_per_source' => FILTER_VALIDATE_INT,
@@ -287,6 +289,7 @@ return array(
         'trash_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'drafts_per_source' => FILTER_VALIDATE_INT,
         'drafts_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN
     )
 );
 

@@ -138,15 +138,25 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
                 Hm_Msgs('ERRUnable to connect to the selected IMAP server');
                 return;
             }
-
             $specials = $this->user_config->get('special_imap_folders', array());
-            if ($exposed = $imap->get_special_use_mailboxes()) {
-                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '', 'junk' => '');
-            } else if ($form['imap_service_name'] == 'gandi') {
-                $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive', 'junk' => 'Junk');
+            $exposed = $imap->get_special_use_mailboxes();
+            if ($form['imap_service_name'] == 'gandi') {
+                $specials[$form['imap_server_id']] = array(
+                    'sent' => 'Sent',
+                    'draft' => 'Drafts',
+                    'trash' => 'Trash',
+                    'archive' => 'Archive',
+                    'junk' => 'Junk'
+                );
             } else {
-                $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
-            }     
+                $specials[$form['imap_server_id']] = array(
+                    'sent' => $exposed['sent'] ?? '',
+                    'draft' => $exposed['drafts'] ?? '',
+                    'trash' => $exposed['trash'] ?? '',
+                    'archive' => $exposed['archive'] ?? '',
+                    'junk' => $exposed['junk'] ?? ''
+                );
+            }
             $this->user_config->set('special_imap_folders', $specials);
 
             $user_data = $this->user_config->dump();
@@ -210,7 +220,6 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
                         if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            require_once VENDOR_PATH.'autoload.php';
                             list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
                             try {
                                 $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
@@ -607,7 +616,6 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
         if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', true)) {
             return;
         }
-        require_once VENDOR_PATH.'autoload.php';
         list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
         try {

@@ -819,7 +819,7 @@ function ldap_add_user_auth($ldap_config, $auths) {
  */
 if (!hm_exists('ldap_config')) {
 function ldap_config($config, $key=false) {
-    $details = get_ini($config, 'ldap.ini', true);
+    $details = $config->dump()['ldap'];
     if ($key && array_key_exists($key, $details)) {
         return $details[$key];
     }

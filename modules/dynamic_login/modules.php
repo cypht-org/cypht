@@ -142,7 +142,7 @@ function dynamic_login_config($config) {
         'mail_pre' => '',
         'smtp_pre' => ''
     );
-    $res = get_ini($config, 'dynamic_login.ini');
+    $res = $config->dump();
     if (array_key_exists('dynamic_host', $res) && $res['dynamic_host']) {
         $settings['host'] = $res['dynamic_host'];
     }

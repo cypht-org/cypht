@@ -135,6 +135,7 @@ class Hm_Test_Modules extends TestCase {
  */
 class Hm_Test_Module_Exec extends TestCase {
 
+    public $module_exec;
     public function setUp(): void {
         require 'bootstrap.php';
         $config = new Hm_Mock_Config();
@@ -294,6 +295,7 @@ class Hm_Test_Module_Exec extends TestCase {
 
 class Hm_Test_Module_Exec_Debug extends TestCase {
 
+    public $module_exec;
     public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';

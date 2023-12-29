@@ -1802,7 +1802,11 @@ $(function() {
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
     }
-    
+
+    if (hm_check_dirty_flag()) {
+        $('form:not(.search_terms)').areYouSure();
+    }
+
     fixLtrInRtl()
 });
 
@@ -1854,6 +1858,6 @@ function fixLtrInRtl() {
 }
 
 function listControlsMenu() {
-    $('#list_controls_menu').toggle();
+    $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
 }

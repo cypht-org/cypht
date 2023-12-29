@@ -171,7 +171,7 @@ class Hm_Dispatch {
      */
     public function __construct($config) {
 
-        /* get the site config defined in the hm3.rc file */
+        /* get the site config defined in the config/app.php file */
         $this->site_config = $config;
 
         /* check for the site module set override */
@@ -358,7 +358,7 @@ class Hm_Dispatch {
      */
     static public function is_php_setup() {
         return
-            version_compare(PHP_VERSION, '5.4', '>=') &&
+            version_compare(PHP_VERSION, '7.4', '>=') &&
             Hm_Functions::function_exists('mb_strpos') &&
             Hm_Functions::function_exists('curl_exec') &&
             Hm_Functions::function_exists('openssl_random_pseudo_bytes') &&

@@ -8,6 +8,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+use League\CommonMark\GithubFlavoredMarkdownConverter;
+
 define('MAX_RECIPIENT_WARNING', 20);
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
@@ -132,13 +134,17 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                 $attached_files = [];
                 $this->session->set('uploaded_files', array());
                 if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
+                    $file_dir = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . md5($this->session->get('username', false)) . DIRECTORY_SEPARATOR;
+                    if (!is_dir($file_dir)) {
+                        mkdir($file_dir);
+                    }
                     foreach ($msg_struct[0]['subs'] as $ind => $sub) {
                         if ($ind != '0.1') {
                             $new_attachment['basename'] = $sub['description'];
-                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['name'] = $sub['attributes']['name'];
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
-                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . $new_attachment['name'];
+                            $file_path = $file_dir . $new_attachment['name'];
                             $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
@@ -666,9 +672,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         );
 
         /* parse attachments */
-        $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
-        foreach($uploaded_files as $key => $file) {
-            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+        $uploaded_files = [];
+        if (!empty($this->request->post['send_uploaded_files'])) {
+            $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
+            foreach($uploaded_files as $key => $file) {
+                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+            }
         }
 
         $uploaded_files = get_uploaded_files_from_array(
@@ -1800,10 +1809,11 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
         $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
     }
     if ($body_type == 2) {
-        require_once VENDOR_PATH.'erusev/parsedown/Parsedown.php';
-        $parsedown = new Parsedown();
-        $parsedown->setSafeMode(true);
-        $body = $parsedown->text($body);
+        $converter = new GithubFlavoredMarkdownConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+        $body = $converter->convert($body);
     }
     return array($body, $cc, $bcc, $in_reply_to, $draft);
 }}

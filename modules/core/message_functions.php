@@ -16,7 +16,6 @@
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
-    require_once VENDOR_PATH.'autoload.php';
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
     if (!$images) {
@@ -436,7 +435,7 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        $doc->loadHTML(htmlentities($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }

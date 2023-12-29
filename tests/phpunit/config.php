@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
  */
 class Hm_Test_User_Config_File extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -161,6 +162,7 @@ class Hm_Test_User_Config_File extends TestCase {
  */
 class Hm_Test_Site_Config_File extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -171,7 +173,7 @@ class Hm_Test_Site_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_modules() {
-        $config = new Hm_Site_Config_File('./data/siteconfig.rc');
+        $config = new Hm_Site_Config_File(merge_config_files(APP_PATH.'tests/phpunit/data'));
         $this->assertFalse($config->get_modules());
         $config->set('modules', 'asdf');
         $this->assertEquals(array('asdf'), $config->get_modules());
@@ -181,7 +183,7 @@ class Hm_Test_Site_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_site_load() {
-        $config = new Hm_Site_Config_File(APP_PATH.'tests/phpunit/data/siteconfig.rc');
+        $config = new Hm_Site_Config_File(merge_config_files(APP_PATH.'tests/phpunit/data'));
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
     /**
@@ -189,7 +191,7 @@ class Hm_Test_Site_Config_File extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_user_defaults() {
-        $config = new Hm_Site_Config_File(APP_PATH.'tests/phpunit/data/siteconfig.rc');
+        $config = new Hm_Site_Config_File(merge_config_files(APP_PATH.'tests/phpunit/data'));
         $this->assertEquals(array('version' => VERSION, 'foo' => 'bar', 'default_setting_foo' => 'bar'), $config->dump());
     }
     public function tearDown(): void {
@@ -202,6 +204,7 @@ class Hm_Test_Site_Config_File extends TestCase {
  */
 class Hm_Test_User_Config_DB extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();
@@ -291,6 +294,7 @@ class Hm_Test_User_Config_DB extends TestCase {
 
 class Hm_Test_User_Config_Functions extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php'; 
         $mock_config = new Hm_Mock_Config();

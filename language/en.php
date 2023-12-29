@@ -576,6 +576,8 @@ return array(
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
     'Connection To Sieve Server Failed' => false,
+    'Warn for unsaved changes' => false,
+    'Connection To Sieve Server Failed' => false,
     'Step 1' => false,
     'Step 2' => false,
     'Authentication' => false,

@@ -1692,7 +1692,6 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     $sieve_hostname = $this->request->post['imap_sieve_host'];
                 }
                 if ($sieve_enabled) {
-                    require_once VENDOR_PATH.'autoload.php';
                     try {
                         list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($sieve_hostname);
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
@@ -1768,7 +1767,6 @@ class Hm_Handler_imap_save extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
 
             if (isset($this->request->post['imap_sieve_host'])) {
-                require_once VENDOR_PATH . 'autoload.php';
                 try {
                     list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
                     $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);

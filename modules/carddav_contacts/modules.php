@@ -19,7 +19,7 @@ class Hm_Handler_process_add_carddav_contact_from_msg extends Hm_Handler_Module 
         if (!$success) {
             return;
         }
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
         list($type, $source) = explode(':', $form['contact_source']);
         if ($type != 'carddav' || !array_key_exists($source, $details)) {
             return;
@@ -59,7 +59,7 @@ class Hm_Handler_process_add_carddav_contact_from_msg extends Hm_Handler_Module 
  */
 class Hm_Handler_process_delete_carddav_contact extends Hm_Handler_Module {
     public function process() {
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
         list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
         if (!$success || $form['contact_type'] != 'carddav' || !array_key_exists($form['contact_source'], $details)) {
             return;
@@ -92,7 +92,7 @@ class Hm_Handler_process_delete_carddav_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_process_add_carddav_contact extends Hm_Handler_Module {
     public function process() {
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
         list($success, $form) = $this->process_form(array('contact_source', 'carddav_email', 'carddav_fn', 'add_contact'));
         if (!$success || !array_key_exists($form['contact_source'], $details)) {
             return;
@@ -120,7 +120,7 @@ class Hm_Handler_process_add_carddav_contact extends Hm_Handler_Module {
 class Hm_Handler_process_edit_carddav_contact extends Hm_Handler_Module {
     public function process() {
         $contacts = $this->get('contact_store');
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
         list($success, $form) = $this->process_form(array('contact_source', 'contact_id', 'carddav_email',
             'carddav_fn', 'edit_contact'));
         if (!$success || !array_key_exists($form['contact_source'], $details)) {
@@ -149,7 +149,7 @@ class Hm_Handler_process_edit_carddav_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_load_edit_carddav_contact extends Hm_Handler_Module {
     public function process() {
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
         if (array_key_exists('contact_source', $this->request->get) &&
             array_key_exists('contact_type', $this->request->get) &&
             $this->request->get['contact_type'] == 'carddav' &&
@@ -175,7 +175,7 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
 
         $contacts = $this->get('contact_store');
         $auths = $this->user_config->get('carddav_contacts_auth_setting', array());
-        $details = get_ini($this->config, 'carddav.ini', true);
+        $details = $this->config->dump();
 
         foreach ($details as $name => $vals) {
             /* TODO: enable when edit/add is working */
@@ -202,7 +202,7 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
  */
 class Hm_Handler_load_carddav_settings extends Hm_Handler_Module {
     public function process() {
-        $this->out('carddav_settings', get_ini($this->config, 'carddav.ini', true));
+        $this->out('carddav_settings', config(APP_PATH.'config/carddav'));
         $this->out('carddav_auth', $this->user_config->get('carddav_contacts_auth_setting', array()));
     }
 }
