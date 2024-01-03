@@ -107,6 +107,9 @@ return array(
         'nux_profile_signature' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_profile_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'nux_imap_sieve_host' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_config_only_jmap' => FILTER_VALIDATE_BOOLEAN,
+        'nux_config_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
+        'nux_config_jmap_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );
 

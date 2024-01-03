@@ -426,9 +426,10 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            $type = 'IMAP';
 
             if (array_key_exists('type', $vals) && $vals['type'] == 'jmap') {
-                continue;
+                $type = 'JMAP';
             }
 
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
@@ -454,7 +455,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<div class="configured_server">';
             $res .= sprintf('
                     <div>
-                        <div class="server_type_tag">IMAP</div>
+                        <div class="server_type_tag">'.$type.'</div>
                         <div class="server_title">%s</div>
                         <div class="server_subtitle">%s/%d %s</div>
                     </div>',

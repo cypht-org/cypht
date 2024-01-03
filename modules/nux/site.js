@@ -25,6 +25,9 @@ function submitSmtpImapServer() {
         { name: 'nux_profile_signature', value: $('#nux_profile_signature').val() },
         { name: 'nux_profile_reply_to', value: $('#nux_profile_reply_to').val() },
         { name: 'nux_imap_sieve_host', value: $('#nux_imap_sieve_host').val() },
+        { name: 'nux_config_only_jmap', value: $('input[name="nux_config_only_jmap"]:checked').val() },
+        { name: 'nux_config_jmap_hide_from_c_page', value: $('input[name="nux_config_jmap_hide_from_c_page"]:checked').val() },
+        { name: 'nux_config_jmap_address', value: $('#nux_config_jmap_address').val() },
     ];
 
     Hm_Ajax.request(requestData, function(res) {
@@ -45,6 +48,7 @@ function submitSmtpImapServer() {
             $("#nux_config_is_sender").prop('checked', true);
             $("#nux_config_is_receiver").prop('checked', true);
             $("#nux_enable_sieve").prop('checked', false);
+            $("#nux_config_only_jmap").prop('checked', false);
             $('#step_config-imap_bloc').show();
             $('#step_config-smtp_bloc').show();
             $('#nux_profile_bloc').show();
@@ -72,6 +76,8 @@ function handleSieveStatusChange (checkbox) {
     }
 }
 function handleSmtpImapCheckboxChange(checkbox) {
+    $(".step_config-smtp_imap_bloc").show();
+    
     if (checkbox.id === 'nux_config_is_receiver') {
         if(checkbox.checked) $('#step_config-imap_bloc').show();
         else $('#step_config-imap_bloc').hide();
@@ -86,9 +92,36 @@ function handleSmtpImapCheckboxChange(checkbox) {
         $('#nux_config_is_receiver').prop('checked')){
         $('#nux_profile_bloc').show();
         $('#nux_profile_checkbox_bloc').show();
+        $('#nux_config_jmap_select_box').show();
+        $("#nux_config_only_jmap").show();
     }else{
+        $("#nux_config_only_jmap").prop('checked', false);
+        
         $('#nux_profile_bloc').hide();
         $('#nux_profile_checkbox_bloc').hide();
+        $('#nux_config_jmap_select_box').hide();
+        $("#nux_config_only_jmap").hide();
+
+        if(!$('#nux_config_is_sender').prop('checked') &&
+            !$('#nux_config_is_receiver').prop('checked')){
+            $(".step_config-smtp_imap_bloc").hide();
+        }
+    }
+}
+
+function handleJmapCheckboxChange(checkbox) {
+    if(checkbox.checked){
+        $('#step_config-jmap_bloc').show();
+        $('#step_config-smtp_bloc').hide();
+        $('#step_config-imap_bloc').hide();
+        $('#nux_profile_bloc').hide();
+        $('#nux_profile_checkbox_bloc').hide();
+    }else {
+        $('#step_config-jmap_bloc').hide();
+        $('#step_config-smtp_bloc').show();
+        $('#step_config-imap_bloc').show();
+        $('#nux_profile_bloc').show();
+        $('#nux_profile_checkbox_bloc').show();
     }
 }
 
@@ -184,19 +217,27 @@ function display_config_step(stepNumber) {
             $('#nux_config_serve_type-error').text('Required');
             return;
         }
-
-        if($('#nux_config_is_sender').is(':checked')){
+        
+        if($('#nux_config_is_sender').is(':checked') && 
+            $('#nux_config_is_receiver').is(':checked') && 
+            $('#nux_config_only_jmap').is(':checked')){
             requiredFields.push(
-                {key: 'nux_config_smtp_address', value: $('#nux_config_smtp_address').val()},
-                {key: 'nux_config_smtp_port', value: $('#nux_config_smtp_port').val()},
+                {key: 'nux_config_jmap_address', value: $('#nux_config_jmap_address').val()},
             )
-        }
+        }else {
+            if($('#nux_config_is_sender').is(':checked')){
+                requiredFields.push(
+                    {key: 'nux_config_smtp_address', value: $('#nux_config_smtp_address').val()},
+                    {key: 'nux_config_smtp_port', value: $('#nux_config_smtp_port').val()},
+                )
+            }
 
-        if($('#nux_config_is_receiver').is(':checked')) {
-            requiredFields.push(
-                {key: 'nux_config_imap_address', value: $('#nux_config_imap_address').val()},
-                {key: 'nux_config_imap_port', value: $('#nux_config_imap_port').val()},
-            )
+            if($('#nux_config_is_receiver').is(':checked')) {
+                requiredFields.push(
+                    {key: 'nux_config_imap_address', value: $('#nux_config_imap_address').val()},
+                    {key: 'nux_config_imap_port', value: $('#nux_config_imap_port').val()},
+                )
+            }
         }
 
         if($('#nux_enable_sieve').is(':checked')) {
