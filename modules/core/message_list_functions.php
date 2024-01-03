@@ -360,7 +360,7 @@ function message_controls($output_mod) {
               <ul class="dynamic_dropdown-menu" aria-hidden="true" aria-labelledby="dropdownMenuButton">
                 '.
                 '<li><a class="msg_read core_msg_control" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
-                '<li><a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unreade').'</a></li>'.
+                '<li><a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
                 '<li><a class="msg_flag core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
                 '<li><a class="msg_unflag core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
                 '<li><a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
@@ -369,7 +369,7 @@ function message_controls($output_mod) {
             </div>';
 
      $res .= '<a class="msg_read core_msg_control no_mobile" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-            '<a class="msg_unread core_msg_control no_mobile" href="#" data-action="unread">'.$output_mod->trans('Unreade').'</a>'.
+            '<a class="msg_unread core_msg_control no_mobile" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
             '<a class="msg_flag core_msg_control no_mobile" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
             '<a class="msg_unflag core_msg_control no_mobile" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
             '<a class="msg_delete core_msg_control no_mobile" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
