@@ -24,3 +24,4 @@ scripts/test.php
 *.sublime-workspace
 composer.phar
 lib/hm3/users/
+.env
