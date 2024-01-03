@@ -269,8 +269,10 @@ function display_config_step(stepNumber) {
 
     // Show the selected step
     var selectedStep = document.getElementById('step_config_' + stepNumber);
+
     if (selectedStep) {
         selectedStep.style.display = 'block';
+        if(stepNumber == 0) $('.nux_stepper_btn').show();
     }
 }
 
