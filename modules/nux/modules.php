@@ -490,10 +490,10 @@ class Nux_Quick_Services {
         self::$services[$id] = $details;
     }
     static public function oauth2_setup($config) {
-        $settings = array();
-        $settings = get_ini($config, 'oauth2.ini', true);
-        if (!empty($settings)) {
-            foreach ($settings as $service => $vals) {
+        $services = array_keys(config('oauth2'));
+        foreach ($services as $service) {
+            $vals = $config->get($service, []);
+            if (!empty($vals)) {
                 self::$services[$service]['auth'] = 'oauth2';
                 self::$services[$service]['client_id'] = $vals['client_id'];
                 self::$services[$service]['client_secret'] = $vals['client_secret'];
@@ -503,7 +503,7 @@ class Nux_Quick_Services {
                 self::$services[$service]['refresh_uri'] = $vals['refresh_uri'];
             }
         }
-        self::$oauth2 = $settings;
+        self::$oauth2 = config('oauth2');
     }
 
     static public function option_list($current, $mod) {

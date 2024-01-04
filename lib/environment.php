@@ -125,7 +125,7 @@ if (!function_exists('config')) {
      */
     function config($file_name) {
         // Use require to include the file
-        $fileArray = require $file_name.'.php';
+        $fileArray = require CONFIG_PATH.$file_name.'.php';
 
         // Check if values are boolean and convert if necessary
         return array_map(function ($value) {

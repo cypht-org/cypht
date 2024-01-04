@@ -738,7 +738,7 @@ return [
         | -----
         |
         | IMAP email account support. If you want to use OAuth2 over IMAP (currently
-        | only supported by Gmail and Outlook.com), you will need to edit the oauth2.ini
+        | only supported by Gmail and Outlook.com), you will need to edit the oauth2.php
         | ffile in modules/imap/, and move it to your app_data_dir location.
         */
         'imap',

@@ -18,8 +18,8 @@ re-running the configuration script. Do NOT put the source in the document root
 as this could create a security risk. On Debian, it's common to use the
 /usr/local/share/ sub-directory for a situation like this. Here is short bash
 script that will download the latest code, setup the correct permissions and
-ownership, put the source in /usr/local/share/cypht, and create a default
-hm3.ini file. It requires sudo access:
+ownership, put the source in /usr/local/share/cypht
+It requires sudo access:
 
 
 #!/bin/bash
@@ -200,7 +200,7 @@ Authorize an application for WordPress.com:
 https://developer.wordpress.com/apps/
 
 Custom themes
-You can create your own themes for Cypht. Edit the themes.ini file to include
+You can create your own themes for Cypht. Edit the themes.php file to include
 your theme, and put the css file in modules/themes/assets.
 
 https://github.com/cypht-org/cypht/blob/master/config/themes.php

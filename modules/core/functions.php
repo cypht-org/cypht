@@ -470,28 +470,6 @@ function merge_folder_list_details($folder_sources) {
 }}
 
 /**
- * Get the contents of an ini file, first check the config
- * @subpackage core/functions
- */
-if (!hm_exists('get_ini')) {
-function get_ini($config, $name, $sections=false) {
-    if (!DEBUG_MODE) {
-        $data = $config->get(substr($name, 0, -4), array());
-        if (is_array($data) && count($data) > 0) {
-            return $data;
-        }
-    }
-    $ini_file = rtrim($config->get('app_data_dir', ''), '/').'/'.$name;
-    if (is_readable($ini_file)) {
-        $data = parse_ini_file($ini_file, $sections);
-        if (is_array($data) && count($data) > 0) {
-            return $data;
-        }
-    }
-    return array();
-}}
-
-/**
  * Determine the correct TLS connection type to use based
  * on what this version of PHP supports
  * @return const

@@ -442,7 +442,7 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
  */
 if (!hm_exists('wp_connect_details')) {
 function wp_connect_details($config) {
-    return get_ini($config, 'wordpress.ini');
+    return $config->get('wordpress', array());
 }}
 
 /**
