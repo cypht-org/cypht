@@ -202,7 +202,7 @@ class Hm_Handler_load_carddav_contacts extends Hm_Handler_Module {
  */
 class Hm_Handler_load_carddav_settings extends Hm_Handler_Module {
     public function process() {
-        $this->out('carddav_settings', config(APP_PATH.'config/carddav'));
+        $this->out('carddav_settings', config('carddav'));
         $this->out('carddav_auth', $this->user_config->get('carddav_contacts_auth_setting', array()));
     }
 }

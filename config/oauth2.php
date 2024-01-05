@@ -2,26 +2,6 @@
 
 return [
     /* 
-    | [github.com]
-    | -------------------------------------------------------
-    | Constants used for oauth2 communication with github.com
-    | -------------------------------------------------------
-    |
-    | Once you edit this file, you must move it to the directory defined by
-    | app_data_dir in your config/app.php file. No need to re-run the
-    | config_gen.php script.
-    | 
-    | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER !
-    */
-    'github' => [
-        'client_id'     => env('GITHUB_CLIENT_ID', ''),
-        'client_secret' => env('GITHUB_CLIENT_SECRET', ''),
-        'redirect_uri'  => env('GITHUB_REDIRECT_URI', ''),
-        'auth_url'      => env('GITHUB_AUTH_URL', 'https://github.com/login/oauth/authorize'),
-        'token_url'     => env('GITHUB_TOKEN_URL', 'https://github.com/login/oauth/access_token'),
-    ],
-    
-    /* 
     | -------------------------------------------------
     | Constants used for oauth2 authentication over IMAP
     | -------------------------------------------------
@@ -29,6 +9,9 @@ return [
     | Once you edit this file, you must move it to the directory defined by
     | app_data_dir in your config/app.php file. No need to re-run the
     | config_gen.php script.
+    |
+    | Do not forget to add the service to $services = ['gmail', 'outlook']; in 
+    | oauth2_setup function from modules/nux/modules.php
     | 
     | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER !
     | 
@@ -60,25 +43,5 @@ return [
         'auth_uri'       => env('OUTLOOK_AUTH_URI', 'https://login.live.com/oauth20_authorize.srf'),
         'token_uri'      => env('OUTLOOK_TOKEN_URI', 'https://login.live.com/oauth20_token.srf'),
         'refresh_uri'    => env('OUTLOOK_REFRESH_URI', 'https://login.live.com/oauth20_token.srf')
-    ],
-
-    /* 
-    | [wordpress.com]
-    | ----------------------------------------------------------
-    | Constants used for oauth2 communication with WordPress.com
-    | ----------------------------------------------------------
-    |
-    | Once you edit this file, you must move it to the directory defined by
-    | app_data_dir in your config/app.php file. No need to re-run the
-    | config_gen.php script.
-    | 
-    | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER ! 
-    */
-
-    //[wordpress]
-    'wordpress' => [
-        'client_id'      => env('WORDPRESS_CLIENT_ID', ''),
-        'client_secret'  => env('WORDPRESS_CLIENT_SECRET', ''),
-        'client_uri'     => env('WORDPRESS_CLIENT_URI', '')
     ],
 ];

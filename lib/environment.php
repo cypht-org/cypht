@@ -24,9 +24,9 @@ class Hm_Environment {
         if (method_exists($dotenvLoader, 'usePutenv')) {
             $dotenvLoader->usePutenv(true);
         }
-        $envDistFile = APP_PATH . '.env.dist';
+        $envDistFile = APP_PATH . '.env';
         if (!file_exists($envDistFile)) {
-            Hm_Msgs::add('ERR.env.dist file not found at: "' . $envDistFile . '"');
+            Hm_Msgs::add('ERR.env file not found at: "' . $envDistFile . '"');
             return;
         }
 
@@ -125,7 +125,7 @@ if (!function_exists('config')) {
      */
     function config($file_name) {
         // Use require to include the file
-        $fileArray = require $file_name.'.php';
+        $fileArray = require CONFIG_PATH.$file_name.'.php';
 
         // Check if values are boolean and convert if necessary
         return array_map(function ($value) {
