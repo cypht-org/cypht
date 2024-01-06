@@ -95,17 +95,19 @@ if (!function_exists('merge_config_files')) {
             // Use require to include the file
             $fileArray = require $file;
 
-            // Check if values are boolean and convert if necessary
-            $fileArray = array_map(function ($value) {
-                return is_array($value) ? $value : (
-                    is_string($value) && strtolower($value) === 'true' ? true : (
-                        is_string($value) && strtolower($value) === 'false' ? false : $value
-                    )
-                );
-            }, $fileArray);
+            if(is_array($fileArray)) {
+                // Check if values are boolean and convert if necessary
+                $fileArray = array_map(function ($value) {
+                    return is_array($value) ? $value : (
+                        is_string($value) && strtolower($value) === 'true' ? true : (
+                            is_string($value) && strtolower($value) === 'false' ? false : $value
+                        )
+                    );
+                }, $fileArray);
 
-            // Merge the arrays
-            $configArray = array_merge($configArray, $fileArray);
+                // Merge the arrays
+                $configArray = array_merge($configArray, $fileArray);
+            }
         }
         return $configArray;
     }

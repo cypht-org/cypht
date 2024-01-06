@@ -314,6 +314,7 @@ function write_config_file($settings, $filters) {
     $dynamicConfigPath = APP_PATH.'config/dynamic.php';
     // Create or overwrite the PHP file
     file_put_contents($dynamicConfigPath, '<?php return ' . var_export($data, true) . ';');
+    printf("dynamic.php file written\n");
 }
 
 /**

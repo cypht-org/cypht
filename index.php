@@ -31,6 +31,14 @@ ob_start();
 
 /* set default TZ */
 date_default_timezone_set( 'UTC' );
+
+require VENDOR_PATH.'autoload.php';
+
+/* load env files */
+require APP_PATH.'lib/environment.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
 /* get includes */
 require APP_PATH.'lib/framework.php';
 
