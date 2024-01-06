@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/profiles/hm-profiles.php';
+require APP_PATH.'modules/profiles/functions.php';
 
 /**
  * @subpackage profile/handler

@@ -11,6 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 define('MAX_RECIPIENT_WARNING', 20);
+require_once APP_PATH.'modules/smtp/functions.php';
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
 

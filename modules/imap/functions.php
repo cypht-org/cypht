@@ -1416,3 +1416,137 @@ function parse_sieve_config_host($host) {
     // $host = '$scheme://'.$host;
     return [$host, $port, $tls];
 }}
+
+if (!hm_exists('connect_to_imap_serve')) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $context, $errno = null, $errstr = null) {
+        if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
+              $imap_list = array(
+                  'name' => $name,
+                  'server' => $address,
+                  'hide' => false,
+                  'port' => $port,
+                  'user' => $user,
+                  'pass' => $pass,
+                  'tls' => $tls);
+                  
+              Hm_IMAP_List::add($imap_list);
+              $servers = Hm_IMAP_List::dump(false, true);
+              $ids = array_keys($servers);
+              $imap_server_id = array_pop($ids);
+              
+             return $imap_server_id;
+        }
+    }
+}
+
+
+if (!hm_exists('connect_to_jmap_serve')) {
+    function connect_to_jmap_server($jmap_address, $hide_from_c_page, $name, $user, $pass) {
+       $hidden = false;
+                       
+       if($hide_from_c_page) {
+           $hidden = true;
+       }
+       
+       $parsed = parse_url($jmap_address);
+       
+       if (array_key_exists('host', $parsed) && @get_headers($jmap_address)) {
+           Hm_IMAP_List::add(array(
+               'name' => $name,
+               'server' => $jmap_address,
+               'hide' => $hidden,
+               'type' => 'jmap',
+               'port' => false,
+               'tls' => false));
+           $servers = Hm_IMAP_List::dump(false, true);
+           $ids = array_keys($servers);
+           $jmap_server_id = array_pop($ids);
+           
+           return $jmap_server_id;
+       }
+    }
+}
+
+if (!hm_exists('authenticate_to_imap_server')) {
+    function authenticate_to_imap_server($user, $pass, $imap_server_id, $context) {
+        if (in_server_list('Hm_IMAP_List', $imap_server_id, $user)) {
+              Hm_Msgs::add('ERRThis server and username are already configured');
+              return;
+        } else{
+            Hm_IMAP_List::clean_up();
+            $cache = Hm_IMAP_List::get_cache($context->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache, $user, $pass, true);
+            
+            if (imap_authed($imap)) {
+                  $servers = Hm_IMAP_List::dump(false, true);
+                  $context->user_config->set('imap_servers', $servers);
+                  $context->just_saved_credentials = true;
+                  $context->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
+                  return true;
+            }
+            else {
+                  Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
+                  Hm_IMAP_List::forget_credentials($context->imap_server_id);
+                  return;
+            }
+        }
+    }
+}
+
+if (!hm_exists('test_function')) {
+    function connectToIMAP($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve = false, $errno = null, $errstr = null) {
+            if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
+                  $imap_list = array(
+                      'name' => $name,
+                      'server' => $address,
+                      'hide' => false,
+                      'port' => $port,
+                      'user' => $user,
+                      'pass' => $pass,
+                      'tls' => $tls);
+    
+                  if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true) && $enableSieve) {
+                      $imap_list['sieve_config_host'] = $imap_sieve_host;
+    
+                       require_once VENDOR_PATH . 'autoload.php';
+                       try {
+                           list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_sieve_host);
+                           $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                           $client->connect($user, $pass, $sieve_tls, "", "PLAIN");
+                       } catch (Exception $e) {
+                           Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                           return;
+                       }
+                  }
+    
+    
+                  Hm_IMAP_List::add($imap_list);
+                  $servers = Hm_IMAP_List::dump(false, true);
+                  $ids = array_keys($servers);
+                  $this->imap_server_id = array_pop($ids);
+    
+                  if (in_server_list('Hm_IMAP_List', $this->imap_server_id, $user)) {
+                      Hm_Msgs::add('ERRThis server and username are already configured');
+                      return;
+                  }
+    
+                  Hm_IMAP_List::clean_up();
+                  $cache = Hm_IMAP_List::get_cache($this->cache, $this->imap_server_id);
+                  $imap = Hm_IMAP_List::connect($this->imap_server_id, $cache, $user, $pass, true);
+                  if (imap_authed($imap)) {
+                      $this->user_config->set('imap_servers', $servers);
+                      $this->just_saved_credentials = true;
+                      $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
+                      return true;
+                  }
+                  else {
+                      Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
+                      Hm_IMAP_List::forget_credentials($this->imap_server_id);
+                      return;
+                  }
+              }else {
+                  Hm_Msgs::add(sprintf('ERRCan not add connect to the IMAP server: %s', $errstr));
+                  return;
+             }
+        }
+}

@@ -15,6 +15,7 @@ output_source('core');
 setup_base_page('home');
 add_handler('home', 'check_missing_passwords', true, 'core', 'load_user_data', 'after');
 add_output('home', 'home_heading', true, 'core', 'content_section_start', 'after');
+add_output('servers', 'server_config_stepper', true, 'core', 'server_content_start', 'after');
 add_output('home', 'home_password_dialogs', true, 'core', 'home_heading', 'after');
 
 /* servers page */

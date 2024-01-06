@@ -253,8 +253,6 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
     public $imap_server_id = null;
     public $jmap_server_id = null;
     public $just_saved_credentials = false;
-    public $imap = null;
-    public $smtp = null;
 
     public function process() {
         list($success, $form) = $this->process_form(array(
@@ -282,18 +280,37 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
            ));
 
         if ($success) {
+            // Destructure form array into variables
+            [
+                'nux_config_profile_name' => $profileName,
+                'nux_config_email' => $email,
+                'nux_config_password' => $password,
+                'nux_config_provider' => $provider,
+                'nux_config_is_sender' => $isSender,
+                'nux_config_is_receiver' => $isReceiver,
+                'nux_config_smtp_address' => $smtpAddress,
+                'nux_config_smtp_port' => $smtpPort,
+                'nux_config_smtp_tls' => $smtpTls,
+                'nux_config_imap_address' => $imapAddress,
+                'nux_config_imap_port' => $imapPort,
+                'nux_config_imap_tls' => $imapTls,
+                'nux_enable_sieve' => $enableSieve,
+                'nux_create_profile' => $createProfile,
+                'nux_profile_is_default' => $profileIsDefault,
+                'nux_profile_signature' => $profileSignature,
+                'nux_profile_reply_to' => $profileReplyTo,
+                'nux_imap_sieve_host' => $imapSieveHost,
+                'nux_config_only_jmap' => $onlyJmap,
+                'nux_config_jmap_hide_from_c_page' => $jmapHideFromCPage,
+                'nux_config_jmap_address' => $jmapAddress,
+            ] = $form;
+                
             /*
             * When JMAP selected only configure JMAP
             */
              if($form['nux_config_only_jmap']) {
-                $result = $this->connectToJMAP(
-                            $form['nux_config_jmap_address'], 
-                            $form['nux_config_jmap_hide_from_c_page'], 
-                            $form['nux_config_profile_name'], 
-                            $form['nux_config_email'],
-                            $form['nux_config_password']);
-                
-                if(!isset($result)) return;
+                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password);
+                $is_jmap_server_authenticated = authenticate_to_imap_server($email, $password, $this->jmap_server_id, $this);
                 
                 Hm_Msgs::add("JMAP Server saved");
                 $this->out('just_saved_credentials', $this->just_saved_credentials);
@@ -302,232 +319,41 @@ class Hm_Handler_quick_server_setup_nux extends Hm_Handler_Module {
                  /*
                  *  Connect to SMTP server if user wants to send emails
                  */
-                 if($form['nux_config_is_sender']){
-                     $result = $this->connectToSMPT(
-                        $form['nux_config_smtp_address'],
-                        $form['nux_config_profile_name'],
-                        $form['nux_config_smtp_port'],
-                        $form['nux_config_email'],
-                        $form['nux_config_password'],
-                        $form['nux_config_smtp_tls']);
-    
-                     if(!isset($result)) return;
+                 if($isSender){
+                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this, $errno = null, $errstr = null);
+                    $is_smtp_server_authenticated = authenticate_to_smtp_server($email, $password, $this->smtp_server_id, $this);
+                    
+                    Hm_Msgs::add("is_smtp_server_authenticated => ".!$is_smtp_server_authenticated);
+                    Hm_Msgs::add("$this->smtp_server_id => ".!$this->smtp_server_id);
+                        
+                    if(!isset($this->smtp_server_id) || !$is_smtp_server_authenticated) return;
                  }
     
                  /*
                   *  Connect to IMAP server if user wants to receive emails
                   */
-                 if($form['nux_config_is_receiver']){
-                     $result = $this->connectToIMAP(
-                       $form['nux_config_imap_address'],
-                       $form['nux_config_profile_name'],
-                       $form['nux_config_imap_port'],
-                       $form['nux_config_email'],
-                       $form['nux_config_password'],
-                       $form['nux_config_imap_tls'],
-                       $form['nux_imap_sieve_host'],
-                       $form['nux_enable_sieve']);
-    
-                     if(!isset($result)) {
-                       /**
-                       * Delete the SMPT server created before
-                       **/
-                       if(!isset($result) && $form['nux_config_is_sender']){
-                           $res = Hm_SMTP_List::del($this->smtp_server_id);
-                           if ($res) {
-                               Hm_SMTP_List::forget_credentials($this->smtp_server_id);
-                               $smtp_servers = Hm_SMTP_List::dump(false, true);
-                               $this->user_config->set('smtp_servers', $smtp_servers);
-                           }
-                       }
-                        return;
-                     }
+                 if($isReceiver){
+                      $this->imap_server_id = connect_to_imap_server($imapAddress, $profileName, $imapPort, $email, $password, $imapTls, $imapSieveHost, $enableSieve, $this, $errno = null, $errstr = null);
+                      $is_imap_server_authenticated = authenticate_to_imap_server($email, $password, $this->imap_server_id, $this);
+                      
+                      
+                      if(!isset($this->imap_server_id) || !$is_imap_server_authenticated) {
+                          if($isSender && isset($this->smtp_server_id)){
+                                delete_smtp_server($this->smtp_server_id, $this);
+                          }
+                          return;
+                      };
                  }
+                 
+                 
     
-                 if($form['nux_config_is_sender'] && $form['nux_config_is_receiver'] && $form['nux_create_profile'] && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
-                     $this->saveProfile(
-                        $form['nux_config_profile_name'],
-                        $form['nux_profile_signature'],
-                        $form['nux_profile_reply_to'],
-                        $form['nux_profile_is_default'],
-                        $form['nux_config_email'],
-                        $form['nux_config_imap_address']
-                        );
+                 if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                     add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $context);
                  }
     
                  Hm_Msgs::add("Server saved");
                  $this->out('just_saved_credentials', $this->just_saved_credentials);
             }
-        }
-    }
-
-    public function saveProfile($name, $signature, $replyTo, $isDefault, $email, $serverMail){
-        $profile = array(
-                         'name' => $name,
-                         'sig' => $signature,
-                         'smtp_id' => $this->imap_server_id,
-                         'replyto' => $replyTo,
-                         'default' => $isDefault,
-                         'address' => $email,
-                         'server' =>  $serverMail,
-                         'user' => $email,
-                         'type' => 'imap'
-                     );
-
-          $profiles = new Hm_Profiles($this);
-          $profiles->add($profile);
-          $this->session->record_unsaved('Profile added');
-
-          $profiles->save($this->user_config);
-          $user_data = $this->user_config->dump();
-          $this->session->set('user_data', $user_data);
-    }
-
-    public function connectToIMAP($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve = false, $errno = null, $errstr = null) {
-        if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
-              $imap_list = array(
-                  'name' => $name,
-                  'server' => $address,
-                  'hide' => false,
-                  'port' => $port,
-                  'user' => $user,
-                  'pass' => $pass,
-                  'tls' => $tls);
-
-              if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true) && $enableSieve) {
-                  $imap_list['sieve_config_host'] = $imap_sieve_host;
-
-                   require_once VENDOR_PATH . 'autoload.php';
-                   try {
-                       list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_sieve_host);
-                       $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                       $client->connect($user, $pass, $sieve_tls, "", "PLAIN");
-                   } catch (Exception $e) {
-                       Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
-                       return;
-                   }
-              }
-
-
-              Hm_IMAP_List::add($imap_list);
-              $servers = Hm_IMAP_List::dump(false, true);
-              $ids = array_keys($servers);
-              $this->imap_server_id = array_pop($ids);
-
-              if (in_server_list('Hm_IMAP_List', $this->imap_server_id, $user)) {
-                  Hm_Msgs::add('ERRThis server and username are already configured');
-                  return;
-              }
-
-              Hm_IMAP_List::clean_up();
-              $cache = Hm_IMAP_List::get_cache($this->cache, $this->imap_server_id);
-              $imap = Hm_IMAP_List::connect($this->imap_server_id, $cache, $user, $pass, true);
-              if (imap_authed($imap)) {
-                  $this->user_config->set('imap_servers', $servers);
-                  $this->just_saved_credentials = true;
-                  $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
-                  return true;
-              }
-              else {
-                  Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
-                  Hm_IMAP_List::forget_credentials($this->imap_server_id);
-                  return;
-              }
-          }else {
-              Hm_Msgs::add(sprintf('ERRCan not add connect to the IMAP server: %s', $errstr));
-              return;
-         }
-    }
-    
-    public function connectToJMAP($jmap_address, $hide_from_c_page, $name, $user, $pass) {
-        $hidden = false;
-                        
-        if($hide_from_c_page) {
-            $hidden = true;
-        }
-        
-        $parsed = parse_url($jmap_address);
-        
-        if (array_key_exists('host', $parsed) && @get_headers($jmap_address)) {
-            try{
-                Hm_IMAP_List::add(array(
-                    'name' => $name,
-                    'server' => $jmap_address,
-                    'hide' => $hidden,
-                    'type' => 'jmap',
-                    'port' => false,
-                    'tls' => false));
-                $servers = Hm_IMAP_List::dump(false, true);
-                $ids = array_keys($servers);
-                $this->jmap_server_id = array_pop($ids);
-    
-                if (in_server_list('Hm_IMAP_List', $this->jmap_server_id, $user)) {
-                  Hm_Msgs::add('ERRThis server and username are already configured');
-                  return;
-                } else{
-                    Hm_IMAP_List::clean_up();
-                    $cache = Hm_IMAP_List::get_cache($this->cache, $this->jmap_server_id);
-                    $imap = Hm_IMAP_List::connect($this->jmap_server_id, $cache, $user, $pass, true);
-                    
-                    if (imap_authed($imap)) {
-                         $this->user_config->set('imap_servers', $servers);
-                         $this->just_saved_credentials = true;
-                         $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
-                    
-                         return true;
-                    }
-                    else {
-                      Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
-                      Hm_IMAP_List::forget_credentials($this->jmap_server_id);
-                      return;
-                    }
-                }
-            }catch(Exception $e){
-                Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
-                return;
-            }
-        }
-    }
-
-    public function connectToSMPT($address, $name, $port, $user, $pass, $tls, $errno = null, $errstr = null) {
-        try {
-            if ($con = @fsockopen($address, $port, $errno, $errstr, 2)) {
-                  Hm_SMTP_List::add( array(
-                      'name' => $name,
-                      'server' => $address,
-                      'port' => $port,
-                      'user' => $user,
-                      'pass' => $pass,
-                      'tls' => $tls));
-    
-                  $smtp_servers = Hm_SMTP_List::dump(false, true);
-                  $ids = array_keys($smtp_servers);
-                  $this->smtp_server_id = array_pop($ids);
-    
-                  if (in_server_list('Hm_SMTP_List', $this->smtp_server_id, $user)) {
-                      Hm_Msgs::add('ERRThis SMTP server and username are already configured');
-                      return;
-                  }
-    
-                   $this->smtp = Hm_SMTP_List::connect($this->smtp_server_id, false, $user, $pass, true);
-                   if (is_object($this->smtp) && $this->smtp->state == 'authed') {
-                       $this->user_config->set('smtp_servers', $smtp_servers);
-                       $this->just_saved_credentials = true;
-                       $this->session->record_unsaved('SMTP server saved');
-                       return true;
-                   }
-                   else {
-                       Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
-                       Hm_SMTP_List::forget_credentials($this->smtp_server_id);
-                       return;
-                   }
-            } else {
-                Hm_Msgs::add(sprintf('ERRCan not add connect to the SMTP server: %s', $errstr));
-                return;
-            }
-        }catch(Exception $e){
-            Hm_Msgs::add("ERRCan not add connect to the server");
-            return;
         }
     }
 }
@@ -744,191 +570,6 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
         return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
             '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
             $this->trans('Add an E-mail Account').'</div>';
-    }
-}
-
-
-
-class Hm_Output_server_config_stepper extends Hm_Output_Module {
-    protected function output() {
-    $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
-    $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
-    $smtp_servers_count = count($this->get('smtp_servers', array()));
-
-    $res = '<div class="smtp_imap_server_setup">
-         <div data-target=".server_config_section" class="server_section">'.
-                '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'. $this->trans('IMAP - SMTP - JMAP Servers').'
-                 <div class="server_count">'. $this->trans('Configured') .' '. $imap_servers_count .' IMAP / '. $smtp_servers_count .' SMTP/ '. $jmap_servers_count .' JMAP</div>
-         </div>
-         <div class="server_config_section">
-            <div class="stepper" id="nux_config_stepper">
-                <div class="step-container">
-                    <div id="step_config_1" class="step step_config">
-                        <div class="step_config-title">
-                            <h2>'.$this->trans('Step 1').'</h2>
-                            <span>('.$this->trans('Authentication').')</span>
-                        </div>
-                        <div>
-                            <form>
-                               <div class="step_config-form_item">
-                                    <label for="nux_config_profile_name">'.$this->trans('Name').'</label>
-                                    <br />
-                                    <input type="text" class="stepper_input" id="nux_config_profile_name" placeholder="'.$this->trans('Name').'" />
-                                    <span id="nux_config_profile_name-error" class="error-message"></span>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <label for="nux_config_email">'.$this->trans('Email or Username').'</label>
-                                    <br />
-                                    <input type="text"  class="stepper_input" id="nux_config_email" placeholder="email" />
-                                    <span id="nux_config_email-error" class="error-message"></span>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <label for="nux_config_password">'.$this->trans('Password').'</label>
-                                    <br />
-                                    <input type="password"  class="stepper_input" id="nux_config_password" placeholder="'.$this->trans('Password').'" />
-                                    <span id="nux_config_password-error" class="error-message"></span>
-                               </div>
-                            </form>
-                        </div>
-                        <div class="step_config-actions">
-                            <button class="nux_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                            <button class="nux_stepper_btn" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
-                        </div>
-                    </div>
-                    <div id="step_config_2" class="step step_config">
-                        <div class="step_config-title">
-                            <h2>'.$this->trans('Step 2').'</h2>
-                            <span>('.$this->trans('Mail server configuration').')</span>
-                        </div>
-                        <div>
-                            <form>
-                               <div class="step_config-form_item">
-                                    <label for="nux_config_provider">'.$this->trans('Provider').'</label>
-                                    <br />
-                                    <select id="nux_config_provider" class="stepper_input" name="nux_config_provider" onchange="handleProviderChange(this)"><option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_sender" checked />
-                                    <label for="nux_config_is_sender">'.$this->trans('Sender account').'</label>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_receiver" checked />
-                                    <label for="nux_config_is_receiver">'.$this->trans('Receiver account').'</label>
-                               </div>
-                               <span id="nux_config_serve_type-error" class="error-message"></span>
-
-                               <div class="step_config-smtp_imap_bloc">
-                                    <div class="step_config-form_item" id="nux_config_jmap_select_box">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="nux_config_only_jmap" id="nux_config_only_jmap"/>
-                                        <label for="nux_config_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
-                                    </div>
-                                    <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
-                                      <label><strong>JMAP</strong></label>
-                                      <div class="step_config-form_item">
-                                          <label for="nux_config_jmap_address">'.$this->trans('Address').'</label>
-                                          <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_jmap_address" placeholder="'.$this->trans('Address').'" />
-                                          <span id="nux_config_jmap_address-error" class="error-message"></span>
-                                      </div>
-                                      <div class="step_config-form_item">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" name="nux_config_jmap_hide_from_c_page" />
-                                        <label for="nux_config_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
-                                      </div>
-                                    </div>
-                                    <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
-                                       <label><strong>SMTP</strong></label>
-                                       <div class="step_config-form_item">
-                                           <label for="nux_config_smtp_address">'.$this->trans('Address').'</label>
-                                           <br />
-                                           <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_smtp_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="nux_config_smtp_address-error" class="error-message"></span>
-                                       </div>
-                                       <div class="step_config-smtp_imap_port_bloc">
-                                           <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_smtp_port"/>
-                                           <div>
-                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_tls" value="true">
-                                               <label for="smtp_tls">'.$this->trans('Use TLS').'</label><br>
-                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_tls" value="false">
-                                               <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
-                                           </div>
-                                           <span id="nux_config_smtp_port-error" class="error-message"></span>
-                                       </div>
-                                   </div>
-                                   <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
-                                      <label><strong>IMAP</strong></label>
-                                      <div class="step_config-form_item">
-                                          <label for="nux_config_imap_address">'.$this->trans('Address').'</label>
-                                          <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_imap_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="nux_config_imap_address-error" class="error-message"></span>
-                                      </div>
-                                      <div class="step_config-smtp_imap_port_bloc">
-                                         <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_imap_port"/>
-                                         <div>
-                                             <input type="radio" id="imap_tls" name="nux_config_imap_tls" value="true">
-                                             <label for="imap_tls">'.$this->trans('Use TLS').'</label><br>
-                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_tls" value="false">
-                                             <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
-                                         </div>
-                                         <span id="nux_config_imap_port-error" class="error-message"></span>
-                                      </div>
-
-                                   ';
-
-         if ($this->get('sieve_filters_enabled')) {
-             $default_value = '';
-                 $res .=  '
-                            <div class="step_config-form_item">
-                                <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" onchange="handleSieveStatusChange(this)"/>
-                                <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
-                            </div>
-                           <div class="step_config-form_item nested hide" id="nux_imap_sieve_host_bloc">
-                               <label class="screen_reader" for="nux_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
-                                <span id="nux_imap_sieve_host-error" class="error-message"></span>
-                           </div>';
-         }
-
-         $res .= '      </div>
-                    </div>
-                             <div class="step_config-form_item" id="nux_profile_checkbox_bloc">
-                                  <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="nux_create_profile" checked />
-                                  <label for="nux_create_profile">'.$this->trans('Create Profile').'</label>
-                             </div>
-                             <div class="nested" id="nux_profile_bloc">
-                                 <div class="step_config-form_item nested">
-                                     <label for="nux_profile_reply_to">'.$this->trans('Reply to').'</label>
-                                     <br />
-                                      <input type="email"  class="stepper_input"  style="height: 20px;" id="nux_profile_reply_to" />
-                                </div>
-                                 <div class="step_config-form_item nested">
-                                     <label for="nux_profile_signature">'.$this->trans('Signature').'</label>
-                                     <textarea id="nux_profile_signature" name="nux_profile_signature" checked ></textarea>
-                                 </div>
-                                 <div class="step_config-form_item nested">
-                                     <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_profile_is_default" checked />
-                                     <label for="nux_profile_is_default">'.$this->trans('Set this profile default').'</label>
-                                 </div>
-                             </div>
-                          </form>
-                      </div>
-                      <div class="nux_config_form_loader hide" id="nux_config_form_loader">
-                          <img width="24" height="24" src="'.Hm_Image_Sources::$spinner.'" alt="loader" />
-                      </div>
-                      <div class="step_config-actions">
-                          <button class="nux_stepper_btn" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
-                          <button class="nux_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                          <button class="nux_stepper_btn" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
-                      </div>
-                  </div>
-                  <div id="step_config_0">
-                      <button class="nux_stepper_btn step_config current_config_step" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
-                  </div>
-                </div>
-         </div>';
-
-         return $res;
-
     }
 }
 
