@@ -192,8 +192,7 @@ class Hm_Output_save_search_icon extends Hm_Output_Module {
     protected function output() {
         $name = $this->get('search_name', '');
         if (!$name) {
-            return '<a style="display: none;" href="" class="save_search" title="'.$this->trans('Save search').'"><img width="20" height="20" alt="'.
-                $this->trans('Save search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+            return '<a style="display: none;" href="" class="save_search" title="'.$this->trans('Save search').'"><i class="bi bi-check-circle-fill"></i></a>';
         }
     }
 }

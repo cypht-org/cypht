@@ -16,15 +16,14 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<li class="menu_search"><form method="get">';
+        $res .= '<div class="d-flex align-items-center">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<a class="unread_link" href="?page=search">';
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search);
-            $res .= '" alt="'.$this->trans('Search').'" width="16" height="16" /></a>';
+            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
+            $res .= '<i class="bi bi-search"></i></a></div>';
         }
-        $res .= '<input type="hidden" name="page" value="search" />'.
-            '<label class="screen_reader" for="search_terms">'.$this->trans('Search').
-            '</label><input type="search" class="search_terms" '.
-            'name="search_terms" placeholder="'.$this->trans('Search').'" /></form></li>';
+        $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
+            '<input type="search" class="search_terms form-control form-control-sm" '.
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></div></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -41,7 +40,7 @@ class Hm_Output_search_content_start extends Hm_Output_Module {
      * Leaves two open div tags that are closed in Hm_Output_search_content_end and Hm_Output_search_form
      */
     protected function output() {
-        return '<div class="search_content"><div class="content_title">'.
+        return '<div class="search_content px-0"><div class="content_title px-3 d-flex align-items-center">'.
             message_controls($this).$this->trans('Search');
     }
 }
@@ -84,7 +83,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
  */
 class Hm_Output_search_form_start extends Hm_Output_Module {
     protected function output() {
-        return '<div class="search_form"><form method="get">';
+        return '<div class="search_form"><form class="d-flex align-items-center" method="get">';
     }
 }
 
@@ -98,15 +97,14 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
 
         return '<input type="hidden" name="page" value="search" />'.
             ' <label class="screen_reader" for="search_terms">'.$this->trans('Search Terms').'</label>'.
-            '<input required placeholder="'.$this->trans('Search Terms').
-            '" id="search_terms" type="search" class="search_terms" name="search_terms" value="'.$this->html_safe($terms).'" />'.
+            '<input required placeholder="'.$this->trans('Search Terms').'" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="'.$this->html_safe($terms).'" />'.
             ' <label class="screen_reader" for="search_fld">'.$this->trans('Search Field').'</label>'.
             search_field_selection($this->get('search_fld', DEFAULT_SEARCH_FLD), $this).
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
             message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
             combined_sort_dialog($this).
-            ' | <input type="submit" class="search_update" value="'.$this->trans('Update').'" />'.
-            ' <input type="button" class="search_reset" value="'.$this->trans('Reset').'" />';
+            ' | <input type="submit" class="search_update btn btn-success btn-sm" value="'.$this->trans('Update').'" />'.
+            ' <input type="button" class="search_reset btn btn-light border btn-sm" value="'.$this->trans('Reset').'" />';
     }
 }
 
@@ -116,12 +114,8 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
  */
 class Hm_Output_search_form_end extends Hm_Output_Module {
     protected function output() {
-        $source_link = '<a href="#" title="'.$this->trans('Sources').
-            '" class="source_link"><img alt="Sources" class="refresh_list" src="'.
-            Hm_Image_Sources::$folder.'" width="20" height="20" /></a>';
-        $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><img alt="'.
-            $this->trans('Refresh').'" class="refresh_list" src="'.Hm_Image_Sources::$refresh.
-            '" width="20" height="20" /></a>';
+        $source_link = '<a href="#" title="'.$this->trans('Sources').'" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a>';
+        $refresh_link = '<a class="refresh_link ms-3" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
         return '</form></div>'.
             list_controls($refresh_link, false, $source_link).list_sources($this->get('data_sources', array()), $this).'</div>';
     }

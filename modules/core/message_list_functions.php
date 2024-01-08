@@ -546,7 +546,7 @@ function search_field_selection($current, $output_mod) {
         'TO' => 'To',
         'CC' => 'Cc',
     );
-    $res = '<select id="search_fld" name="search_fld">';
+    $res = '<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {
         $res .= '<option ';
         if ($current == $val) {
