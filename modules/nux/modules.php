@@ -312,7 +312,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
-            $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s">%s</a>'.
+            $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
                 $this->html_safe($vals['hash']),
                 $this->html_safe($vals['shash']),
