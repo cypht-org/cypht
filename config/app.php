@@ -495,14 +495,14 @@ return [
     |   includes the client's IP. With this option enabled a client IP can change
     |   mid-session and it won't log them out
     */
-    'allow_long_session' => env('ALLOW_LAND_SESSION', false),
+    'allow_long_session' => env('ALLOW_LONG_SESSION', false),
 
     /*
     |
     | Set the session lifetime in days. Only applies if allow_long_session is set to
     | true, and a user checks the box to "stay logged in" during login.
     */
-    'long_session_lifetime' => env('LAND_SESSION_LIFETIME', 30),
+    'long_session_lifetime' => env('LONG_SESSION_LIFETIME', 30),
 
     /*
     | --------------------------
