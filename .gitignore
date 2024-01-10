@@ -8,7 +8,7 @@
 /tests/selenium/local_creds.py
 /tests/selenium/remote_creds.py
 *.pyc
-.env
+/.env
 apigen4.sh
 testuser.txt
 website/docs
