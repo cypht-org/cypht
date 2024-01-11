@@ -8,7 +8,6 @@
 
 define('VERSION', .1);
 
-require_once VENDOR_PATH.'autoload.php';
 /* load the framework */
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
@@ -39,10 +38,6 @@ require APP_PATH.'lib/webdav_formats.php';
 if (!function_exists('random_bytes')) {
     require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
 }
-
-/* load env files */
-$environment = Hm_Environment::getInstance();
-$environment->load();
 
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {

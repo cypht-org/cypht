@@ -57,13 +57,13 @@ selenium_config() {
 
 # Configure Cypht
 setup_cypht() {
-    mv .travis/hm3.ini .
+    mv .travis/.env .
     if [ "$DB" = "postgresql" ]; then
-        sed -i 's/db_driver=mysql/db_driver=pgsql/' hm3.ini
+        sed -i 's/db_driver=mysql/db_driver=pgsql/' .env
         sed -i 's/mysql/pgsql/' tests/phpunit/mocks.php
     fi
     if [ "$DB" = "sqlite" ]; then
-        sed -i 's/db_driver=mysql/db_driver=sqlite/' hm3.ini
+        sed -i 's/db_driver=mysql/db_driver=sqlite/' .env
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
     fi

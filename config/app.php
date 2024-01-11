@@ -495,14 +495,14 @@ return [
     |   includes the client's IP. With this option enabled a client IP can change
     |   mid-session and it won't log them out
     */
-    'allow_long_session' => env('ALLOW_LAND_SESSION', false),
+    'allow_long_session' => env('ALLOW_LONG_SESSION', false),
 
     /*
     |
     | Set the session lifetime in days. Only applies if allow_long_session is set to
     | true, and a user checks the box to "stay logged in" during login.
     */
-    'long_session_lifetime' => env('LAND_SESSION_LIFETIME', 30),
+    'long_session_lifetime' => env('LONG_SESSION_LIFETIME', 30),
 
     /*
     | --------------------------
@@ -678,338 +678,348 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => [
-        /*
-        |  ----
-        | Core
-        | ----
-        | Handles page layout, login/logout, and the default settings pages. This set
-        | is required.
-        */
-        'core',
-        /*
-        |  --------
-        | Contacts
-        | --------
-        | Contact support. This module requires that at least one "backend" contacts
-        | module be enabled (ldap_contacts, gmail_contacts, or local_contacts). You
-        | can enable all the backends you want to support.
-        */
-        'contacts',
-        /*
-        | Local contact support. Simple, locally stored contacts backend
-        */
-        'local_contacts',
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,ldap_contacts,gmail_contacts,feeds,jmap,imap,smtp,account,idle_timer,desktop_notifications,calendar,themes,nux,developer')),
+    // 'modules' => [
+    //     /*
+    //     |  ----
+    //     | Core
+    //     | ----
+    //     | Handles page layout, login/logout, and the default settings pages. This set
+    //     | is required.
+    //     */
+    //     'core',
+    //     /*
+    //     |  --------
+    //     | Contacts
+    //     | --------
+    //     | Contact support. This module requires that at least one "backend" contacts
+    //     | module be enabled (ldap_contacts, gmail_contacts, or local_contacts). You
+    //     | can enable all the backends you want to support.
+    //     */
+    //     'contacts',
+    //     /*
+    //     | Local contact support. Simple, locally stored contacts backend
+    //     */
+    //     'local_contacts',
 
-        /*
-        | LDAP contact support. Use an LDAP server to store contacts. This module
-        | uses its own ini file in modules/ldap_contacts/. This file must be edited
-        | and moved to your app_data_dir to configure LDAP access.
-        */
-        'ldap_contacts',
+    //     /*
+    //     | LDAP contact support. Use an LDAP server to store contacts. This module
+    //     | uses its own ini file in modules/ldap_contacts/. This file must be edited
+    //     | and moved to your app_data_dir to configure LDAP access.
+    //     */
+    //     'ldap_contacts',
 
-        /*
-        | Gmail contact support. Read-only support for Gmail contacts. Only available
-        | if you have a Gmail account enabled that uses OAuth2 authentication
-        */
-        'gmail_contacts',
+    //     /*
+    //     | Gmail contact support. Read-only support for Gmail contacts. Only available
+    //     | if you have a Gmail account enabled that uses OAuth2 authentication
+    //     */
+    //     'gmail_contacts',
 
-        /*
-        | -----
-        | Feeds
-        | -----
-        |
-        | RSS/ATOM feed support
-        */
-        'feeds',
+    //     /*
+    //     | -----
+    //     | Feeds
+    //     | -----
+    //     |
+    //     | RSS/ATOM feed support
+    //     */
+    //     'feeds',
 
-        /*
-        | -----
-        | JMAP
-        | -----
-        |
-        | JSON Meta Application Protocol for emails
-        */
-        'jmap',
+    //     /*
+    //     | ----
+    //     | POP3
+    //     | ----
+    //     |
+    //     | POP3 E-mail account support
+    //     */
+    //     'pop3',
 
-        /*
-        | -----
-        | IMAP
-        | -----
-        |
-        | IMAP email account support. If you want to use OAuth2 over IMAP (currently
-        | only supported by Gmail and Outlook.com), you will need to edit the oauth2.ini
-        | ffile in modules/imap/, and move it to your app_data_dir location.
-        */
-        'imap',
+    //     /*
+    //     | -----
+    //     | JMAP
+    //     | -----
+    //     |
+    //     | JSON Meta Application Protocol for emails
+    //     */
+    //     // 'jmap',
 
-        /*
-        | -----------------------
-        | 2 factor authentication
-        | -----------------------
-        |
-        | This module enables 2 factor authentication using TOTP (compatible with
-        | Google Authenticator). You must edit the ini file in modules/2fa/ to
-        | configure a shared secret, then move that file to your app_data_dir.
-        */
-        // '2fa',
+    //     /*
+    //     | -----
+    //     | IMAP
+    //     | -----
+    //     |
+    //     | IMAP email account support. If you want to use OAuth2 over IMAP (currently
+    //     | only supported by Gmail and Outlook.com), you will need to edit the oauth2.php
+    //     | ffile in modules/imap/, and move it to your app_data_dir location.
+    //     */
+    //     'imap',
 
-        /*
-        | -----
-        | SMTP
-        | -----
-        |
-        | Send outbound email using SMTP servers
-        */
-        'smtp',
+    //     /*
+    //     | -----------------------
+    //     | 2 factor authentication
+    //     | -----------------------
+    //     |
+    //     | This module enables 2 factor authentication using TOTP (compatible with
+    //     | Google Authenticator). You must edit the ini file in modules/2fa/ to
+    //     | configure a shared secret, then move that file to your app_data_dir.
+    //     */
+    //     // '2fa',
 
-        /*
-        | -------
-        | Account
-        | -------
-        |
-        | UI features for admins to create accounts, and for users to update passwords
-        | (when using the built-in DB authentication)
-        */
-        'account',
+    //     /*
+    //     | -----
+    //     | SMTP
+    //     | -----
+    //     |
+    //     | Send outbound email using SMTP servers
+    //     */
+    //     'smtp',
 
-        /*
-        | ----------
-        | Idle timer
-        | ----------
-        |
-        | Controls idle time and automatic logout
-        */
-        'idle_timer',
+    //     /*
+    //     | -------
+    //     | Account
+    //     | -------
+    //     |
+    //     | UI features for admins to create accounts, and for users to update passwords
+    //     | (when using the built-in DB authentication)
+    //     */
+    //     'account',
 
-        /*
-        | ---------------------
-        | Desktop notifications
-        | ---------------------
-        |
-        | Enable desktop notifications for new messages
-        */
-        // 'desktop_notifications',
-        /*
+    //     /*
+    //     | ----------
+    //     | Idle timer
+    //     | ----------
+    //     |
+    //     | Controls idle time and automatic logout
+    //     */
+    //     'idle_timer',
 
-        /*
-        | --------
-        | Calendar
-        | --------
-        |
-        | Basic calendar
-        */
-        'calendar',
+    //     /*
+    //     | ---------------------
+    //     | Desktop notifications
+    //     | ---------------------
+    //     |
+    //     | Enable desktop notifications for new messages
+    //     */
+    //     // 'desktop_notifications',
+    //     /*
 
-        /*
-        | ------
-        | Themes
-        | ------
-        |
-        | Change the UI using CSS
-        */
-        'themes',
+    //     /*
+    //     | --------
+    //     | Calendar
+    //     | --------
+    //     |
+    //     | Basic calendar
+    //     */
+    //     'calendar',
 
-        /*
-        | ----
-        | NUX
-        | ----
-        |
-        | Friendly new user experience. Quickly add common email services, and view
-        | development updates
-        */
-        'nux',
+    //     /*
+    //     | ------
+    //     | Themes
+    //     | ------
+    //     |
+    //     | Change the UI using CSS
+    //     */
+    //     'themes',
 
-        /*
-        | ---------
-        | Developer
-        | ---------
-        |
-        | For development, provides resources and installation details. Only available
-        | in "debug mode"
-        */
-        'developer',
+    //     /*
+    //     | ----
+    //     | NUX
+    //     | ----
+    //     |
+    //     | Friendly new user experience. Quickly add common email services, and view
+    //     | development updates
+    //     */
+    //     'nux',
 
-        /*
-        | -------
-        | Github
-        | -------
-        |
-        | Github repository tracking. This module has its own ini file located in
-        | modules/github/. You must edit this file, and move it to your app_data_dir
-        | to establish communication with github.
-        */
-        // 'github',
+    //     /*
+    //     | ---------
+    //     | Developer
+    //     | ---------
+    //     |
+    //     | For development, provides resources and installation details. Only available
+    //     | in "debug mode"
+    //     */
+    //     'developer',
 
-        /*
-        | ---------
-        | reCAPTCHA
-        | ---------
-        |
-        | Use the reCAPTCHA server on login. This module has its own ini file in
-        | modules/recaptcha/. You must edit this file, and move it to the location
-        | defined in app_data_dir to gain access to the WordPress notification API.
-        */
-        // 'recaptcha',
+    //     /*
+    //     | -------
+    //     | Github
+    //     | -------
+    //     |
+    //     | Github repository tracking. This module has its own ini file located in
+    //     | modules/github/. You must edit this file, and move it to your app_data_dir
+    //     | to establish communication with github.
+    //     */
+    //     // 'github',
 
-        /*
-        | ---------
-        | WordPress
-        | ---------
-        |
-        | WordPress.com notifications. This module has its own ini file in
-        | modules/wordpress/. You must edit this file, and move it to the location
-        | defined in app_data_dir to gain access to the WordPress notification API.
-        */
-        // 'wordpress',
+    //     /*
+    //     | ---------
+    //     | reCAPTCHA
+    //     | ---------
+    //     |
+    //     | Use the reCAPTCHA server on login. This module has its own ini file in
+    //     | modules/recaptcha/. You must edit this file, and move it to the location
+    //     | defined in app_data_dir to gain access to the WordPress notification API.
+    //     */
+    //     // 'recaptcha',
 
-        /*
-        | -------
-        | History
-        | -------
-        |
-        | Simple list of messages read since login
-        */
-        'history',
+    //     /*
+    //     | ---------
+    //     | WordPress
+    //     | ---------
+    //     |
+    //     | WordPress.com notifications. This module has its own ini file in
+    //     | modules/wordpress/. You must edit this file, and move it to the location
+    //     | defined in app_data_dir to gain access to the WordPress notification API.
+    //     */
+    //     // 'wordpress',
 
-        /*
-        | --------------
-        | Saved searches
-        | --------------
-        |
-        | Save and re-run searches easily
-        */
-        'saved_searches',
+    //     /*
+    //     | -------
+    //     | History
+    //     | -------
+    //     |
+    //     | Simple list of messages read since login
+    //     */
+    //     'history',
 
-        /*
-        | ---------------
-        | Advanced search
-        | ---------------
-        |
-        | Enable the advanced search form
-        */
-        'advanced_search',
+    //     /*
+    //     | --------------
+    //     | Saved searches
+    //     | --------------
+    //     |
+    //     | Save and re-run searches easily
+    //     */
+    //     'saved_searches',
 
-        /*
-        | --------------------
-        | Message highlighting
-        | --------------------
-        |
-        | Create custom rules to highlight messages in lists with different colors
-        */
-        'highlights',
+    //     /*
+    //     | ---------------
+    //     | Advanced search
+    //     | ---------------
+    //     |
+    //     | Enable the advanced search form
+    //     */
+    //     'advanced_search',
 
-        /*
-        | -----
-        | NASA
-        | -----
-        |
-        | Access the NASA APOD API content
-        */
-        // 'nasa',
+    //     /*
+    //     | --------------------
+    //     | Message highlighting
+    //     | --------------------
+    //     |
+    //     | Create custom rules to highlight messages in lists with different colors
+    //     */
+    //     'highlights',
 
-        /*
-        | --------
-        | Profiles
-        | --------
-        |
-        | Profiles to set reply-to, name, and signature to associated email accounts
-        */
-        'profiles',
+    //     /*
+    //     | -----
+    //     | NASA
+    //     | -----
+    //     |
+    //     | Access the NASA APOD API content
+    //     */
+    //     // 'nasa',
 
-        /*
-        | --------------
-        | Inline message
-        | --------------
-        |
-        | View messages inline in a reading pane instead of on a new page
-        */
-        'inline_message',
+    //     /*
+    //     | --------
+    //     | Profiles
+    //     | --------
+    //     |
+    //     | Profiles to set reply-to, name, and signature to associated email accounts
+    //     */
+    //     'profiles',
 
-        /*
-        | ------------
-        | IMAP folders
-        | ------------
-        |
-        | Support for adding/renaming/deleting folders in IMAP accounts
-        */
-        'imap_folders',
+    //     /*
+    //     | --------------
+    //     | Inline message
+    //     | --------------
+    //     |
+    //     | View messages inline in a reading pane instead of on a new page
+    //     */
+    //     'inline_message',
 
-        /*
-        | ------------------
-        | Keyboard Shortcuts
-        | ------------------
-        |
-        | Enables configurable keyboard shortcuts for navigations and actions
-        */
-        'keyboard_shortcuts',
+    //     /*
+    //     | ------------
+    //     | IMAP folders
+    //     | ------------
+    //     |
+    //     | Support for adding/renaming/deleting folders in IMAP accounts
+    //     */
+    //     'imap_folders',
 
-        /*
-        | -------------
-        | Sieve Filters
-        | -------------
-        |
-        | Enables configurable Sieve based IMAP filters
-        */
-        'sievefilters',
+    //     /*
+    //     | ------------------
+    //     | Keyboard Shortcuts
+    //     | ------------------
+    //     |
+    //     | Enables configurable keyboard shortcuts for navigations and actions
+    //     */
+    //     'keyboard_shortcuts',
 
-        /*
-        | -----
-        | Site
-        | -----
-        |
-        | Site specific overrides. Used to control other module sets without hacking
-        | the code.
-        */
-        // 'site',
+    //     /*
+    //     | -------------
+    //     | Sieve Filters
+    //     | -------------
+    //     |
+    //     | Enables configurable Sieve based IMAP filters
+    //     */
+    //     // 'sievefilters',
 
-        /*
-        | -------------
-        | Dynamic login
-        | -------------
-        |
-        | Allows user to authenticate against a list of popular mail services, or to
-        | auto-discover the services for the specified email address. The auth_type
-        | setting must be set to "dynamic", otherwise this module set does not do
-        | anything
-        */
-        // 'dynamic_login',
+    //     /*
+    //     | -----
+    //     | Site
+    //     | -----
+    //     |
+    //     | Site specific overrides. Used to control other module sets without hacking
+    //     | the code.
+    //     */
+    //     // 'site',
 
-        /*
-        | ----------
-        | API login
-        | ----------
-        |
-        | Allows an API based login that returns a JSON response containing the session
-        | and hm_id values needed to create a login session. You will need to set the
-        | api_login_key value to something unique and include that in the POST request.
-        | 
-        */
-        // 'api_login',
+    //     /*
+    //     | -------------
+    //     | Dynamic login
+    //     | -------------
+    //     |
+    //     | Allows user to authenticate against a list of popular mail services, or to
+    //     | auto-discover the services for the specified email address. The auth_type
+    //     | setting must be set to "dynamic", otherwise this module set does not do
+    //     | anything
+    //     */
+    //     // 'dynamic_login',
 
-        /*
-        | ----------------
-        | Recover settings
-        | ----------------
-        |
-        | When using IMAP, if a user's password is changed, we
-        | can't decrypt the existing user settings. This module detects that situation
-        | and provides a page where a user can enter their old and new passwords to
-        | recover their previous settings.
-        | 
-        */
-        'recover_settings',
+    //     /*
+    //     | ----------
+    //     | API login
+    //     | ----------
+    //     |
+    //     | Allows an API based login that returns a JSON response containing the session
+    //     | and hm_id values needed to create a login session. You will need to set the
+    //     | api_login_key value to something unique and include that in the POST request.
+    //     | 
+    //     */
+    //     // 'api_login',
 
-        /*
-        | ------------
-        | Hello World
-        | ------------
-        |
-        | Example module set with lots of comments
-        | 
-        */
-        // 'hello_world',
-    ],
+    //     /*
+    //     | ----------------
+    //     | Recover settings
+    //     | ----------------
+    //     |
+    //     | When using IMAP, if a user's password is changed, we
+    //     | can't decrypt the existing user settings. This module detects that situation
+    //     | and provides a page where a user can enter their old and new passwords to
+    //     | recover their previous settings.
+    //     | 
+    //     */
+    //     'recover_settings',
+
+    //     /*
+    //     | ------------
+    //     | Hello World
+    //     | ------------
+    //     |
+    //     | Example module set with lots of comments
+    //     | 
+    //     */
+    //     // 'hello_world',
+    // ],
 
     /*
     | ----------

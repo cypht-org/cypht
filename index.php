@@ -14,6 +14,7 @@
  */
 define('APP_PATH', '');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('CONFIG_PATH', APP_PATH.'config/');
 define('WEB_ROOT', '');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
@@ -31,8 +32,12 @@ ob_start();
 
 /* set default TZ */
 date_default_timezone_set( 'UTC' );
+
+require VENDOR_PATH.'autoload.php';
 /* get includes */
 require APP_PATH.'lib/framework.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* get configuration */
 $config = new Hm_Site_Config_File();

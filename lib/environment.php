@@ -24,9 +24,9 @@ class Hm_Environment {
         if (method_exists($dotenvLoader, 'usePutenv')) {
             $dotenvLoader->usePutenv(true);
         }
-        $envDistFile = APP_PATH . '.env.dist';
+        $envDistFile = APP_PATH . '.env';
         if (!file_exists($envDistFile)) {
-            Hm_Msgs::add('ERR.env.dist file not found at: "' . $envDistFile . '"');
+            Hm_Msgs::add('ERR.env file not found at: "' . $envDistFile . '"');
             return;
         }
 
@@ -95,17 +95,19 @@ if (!function_exists('merge_config_files')) {
             // Use require to include the file
             $fileArray = require $file;
 
-            // Check if values are boolean and convert if necessary
-            $fileArray = array_map(function ($value) {
-                return is_array($value) ? $value : (
-                    is_string($value) && strtolower($value) === 'true' ? true : (
-                        is_string($value) && strtolower($value) === 'false' ? false : $value
-                    )
-                );
-            }, $fileArray);
+            if(is_array($fileArray)) {
+                // Check if values are boolean and convert if necessary
+                $fileArray = array_map(function ($value) {
+                    return is_array($value) ? $value : (
+                        is_string($value) && strtolower($value) === 'true' ? true : (
+                            is_string($value) && strtolower($value) === 'false' ? false : $value
+                        )
+                    );
+                }, $fileArray);
 
-            // Merge the arrays
-            $configArray = array_merge($configArray, $fileArray);
+                // Merge the arrays
+                $configArray = array_merge($configArray, $fileArray);
+            }
         }
         return $configArray;
     }
@@ -125,7 +127,7 @@ if (!function_exists('config')) {
      */
     function config($file_name) {
         // Use require to include the file
-        $fileArray = require $file_name.'.php';
+        $fileArray = require CONFIG_PATH.$file_name.'.php';
 
         // Check if values are boolean and convert if necessary
         return array_map(function ($value) {

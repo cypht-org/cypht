@@ -69,38 +69,6 @@ function build_integrity_hash($data) {
 }
 
 /**
- * include module ini files in the main config
- */
-function parse_module_ini_files($settings) {
-    $files = array(
-        array('2fa.ini', false),
-        array('github.ini', false),
-        array('ldap.ini', true),
-        array('oauth2.ini', true),
-        array('carddav.ini', true),
-        array('wordpress.ini', false),
-        array('recaptcha.ini', false),
-        array('dynamic_login.ini', false)
-    );
-    if (!array_key_exists('app_data_dir', $settings)) {
-        return $settings;
-    }
-    foreach ($files as $vals) {
-        $file = $vals[0];
-        $sections = $vals[1];
-        $ini_file = rtrim($settings['app_data_dir'], '/').'/'.$file;
-        if (is_readable($ini_file)) {
-            $data = parse_ini_file($ini_file, $sections);
-            if (is_array($data) && count($data) > 0) {
-                echo 'Found module set ini file: '.$ini_file."\n";
-                $settings[$file] = $data;
-            }
-        }
-    }
-    return $settings;
-}
-
-/**
  * Entry point into the configuration process
  *
  * @return void
@@ -314,6 +282,7 @@ function write_config_file($settings, $filters) {
     $dynamicConfigPath = APP_PATH.'config/dynamic.php';
     // Create or overwrite the PHP file
     file_put_contents($dynamicConfigPath, '<?php return ' . var_export($data, true) . ';');
+    printf("dynamic.php file written\n");
 }
 
 /**
