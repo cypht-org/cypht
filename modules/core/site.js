@@ -1861,3 +1861,300 @@ function listControlsMenu() {
     $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
 }
+
+
+function submitSmtpImapServer() {
+    $('#srv_setup_stepper_form_loader').removeClass('hide');
+    $('.step_config-actions').addClass('hide');
+
+    var requestData = [
+        { name: 'hm_ajax_hook', value: 'ajax_quick_servers_setup' },
+        { name: 'srv_setup_stepper_profile_name', value: $('#srv_setup_stepper_profile_name').val() },
+        { name: 'srv_setup_stepper_email', value: $('#srv_setup_stepper_email').val() },
+        { name: 'srv_setup_stepper_password', value: $('#srv_setup_stepper_password').val() },
+        { name: 'srv_setup_stepper_provider', value: $('#srv_setup_stepper_provider').val() },
+        { name: 'srv_setup_stepper_is_sender', value: $('#srv_setup_stepper_is_sender').prop('checked') },
+        { name: 'srv_setup_stepper_is_receiver', value: $('#srv_setup_stepper_is_receiver').prop('checked') },
+        { name: 'srv_setup_stepper_smtp_address', value: $('#srv_setup_stepper_smtp_address').val() },
+        { name: 'srv_setup_stepper_smtp_port', value: $('#srv_setup_stepper_smtp_port').val() },
+        { name: 'srv_setup_stepper_smtp_tls', value: $('input[name="srv_setup_stepper_smtp_tls"]:checked').val() },
+        { name: 'srv_setup_stepper_imap_address', value: $('#srv_setup_stepper_imap_address').val() },
+        { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
+        { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
+        { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
+        { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
+        { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
+        { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
+        { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
+        { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
+        { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
+        { name: 'srv_setup_stepper_jmap_hide_from_c_page', value: $('input[name="srv_setup_stepper_jmap_hide_from_c_page"]:checked').val() },
+        { name: 'srv_setup_stepper_jmap_address', value: $('#srv_setup_stepper_jmap_address').val() },
+    ];
+
+    console.log("HERE")
+
+    Hm_Ajax.request(requestData, function(res) {
+        $('#srv_setup_stepper_form_loader').addClass('hide');
+        $('.step_config-actions').removeClass('hide');
+
+        if (res.just_saved_credentials) {
+            $('#srv_setup_stepper_stepper').find('form').trigger('reset');
+            display_config_step(0);
+
+            //Initialize the form
+            $("#srv_setup_stepper_profile_reply_to").val('');
+            $("#srv_setup_stepper_profile_signature").val('');
+            $("#srv_setup_stepper_profile_name").val('');
+            $("#srv_setup_stepper_email").val('');
+            $("#srv_setup_stepper_password").val('');
+            $("#srv_setup_stepper_profile_is_default").prop('checked', true);
+            $("#srv_setup_stepper_is_sender").prop('checked', true);
+            $("#srv_setup_stepper_is_receiver").prop('checked', true);
+            $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+            $("#srv_setup_stepper_only_jmap").prop('checked', false);
+            $('#step_config-imap_bloc').show();
+            $('#step_config-smtp_bloc').show();
+            $('#srv_setup_stepper_profile_bloc').show();
+
+            Hm_Utils.set_unsaved_changes(1);
+            Hm_Folders.reload_folders(true);
+            location.reload();
+        }
+    });
+}
+
+function handleCreateProfileCheckboxChange(checkbox) {
+    if(checkbox.checked) {
+        $('#srv_setup_stepper_profile_bloc').show();
+    }else{
+        $('#srv_setup_stepper_profile_bloc').hide();
+    }
+}
+
+function handleSieveStatusChange (checkbox) {
+    if(checkbox.checked) {
+        $('#srv_setup_stepper_imap_sieve_host_bloc').show();
+    }else{
+        $('#srv_setup_stepper_imap_sieve_host_bloc').hide();
+    }
+}
+function handleSmtpImapCheckboxChange(checkbox) {
+    $(".step_config-smtp_imap_bloc").show();
+
+    if (checkbox.id === 'srv_setup_stepper_is_receiver') {
+        if(checkbox.checked) $('#step_config-imap_bloc').show();
+        else $('#step_config-imap_bloc').hide();
+    }
+
+    if (checkbox.id === 'srv_setup_stepper_is_sender') {
+        if(checkbox.checked) $('#step_config-smtp_bloc').show();
+        else $('#step_config-smtp_bloc').hide();
+    }
+
+    if($('#srv_setup_stepper_is_sender').prop('checked') &&
+        $('#srv_setup_stepper_is_receiver').prop('checked')){
+        $('#srv_setup_stepper_profile_bloc').show();
+        $('#srv_setup_stepper_profile_checkbox_bloc').show();
+        $('#srv_setup_stepper_jmap_select_box').show();
+        $("#srv_setup_stepper_only_jmap").show();
+    }else{
+        $("#srv_setup_stepper_only_jmap").prop('checked', false);
+
+        $('#srv_setup_stepper_profile_bloc').hide();
+        $('#srv_setup_stepper_profile_checkbox_bloc').hide();
+        $('#srv_setup_stepper_jmap_select_box').hide();
+        $("#srv_setup_stepper_only_jmap").hide();
+
+        if(!$('#srv_setup_stepper_is_sender').prop('checked') &&
+            !$('#srv_setup_stepper_is_receiver').prop('checked')){
+            $(".step_config-smtp_imap_bloc").hide();
+        }
+    }
+}
+
+function handleJmapCheckboxChange(checkbox) {
+    if(checkbox.checked){
+        $('#step_config-jmap_bloc').show();
+        $('#step_config-smtp_bloc').hide();
+        $('#step_config-imap_bloc').hide();
+        $('#srv_setup_stepper_profile_bloc').hide();
+        $('#srv_setup_stepper_profile_checkbox_bloc').hide();
+    }else {
+        $('#step_config-jmap_bloc').hide();
+        $('#step_config-smtp_bloc').show();
+        $('#step_config-imap_bloc').show();
+        $('#srv_setup_stepper_profile_bloc').show();
+        $('#srv_setup_stepper_profile_checkbox_bloc').show();
+    }
+}
+
+function handleProviderChange(select) {
+    let providerKey = select.value;
+    if(providerKey) {
+        getServiceDetails(providerKey);
+    }else{
+        $("#srv_setup_stepper_smtp_address").val('');
+        $("#srv_setup_stepper_smtp_port").val(465);
+        $("#srv_setup_stepper_imap_address").val('');
+        $("#srv_setup_stepper_imap_port").val(993);
+    }
+}
+function display_config_step(stepNumber) {
+    if(stepNumber == 2) {
+
+        var isValid = true;
+
+        [   {key: 'srv_setup_stepper_profile_name', value: $('#srv_setup_stepper_profile_name').val()},
+            {key: 'srv_setup_stepper_email', value: $('#srv_setup_stepper_email').val()},
+            {key: 'srv_setup_stepper_password', value: $('#srv_setup_stepper_password').val()}].forEach((item) => {
+            if(!item.value) {
+                $(`#${item.key}-error`).text('Required');
+                isValid = false;
+            }
+            else $(`#${item.key}-error`).text('');
+        })
+
+        if (!isValid) {
+            return
+        }
+
+        let providerKey = getEmailProviderKey($('#srv_setup_stepper_email').val());
+        getServiceDetails(providerKey);
+    }
+
+    if(stepNumber == 3) {
+        var requiredFields = [];
+        var isValid = true;
+
+        if(!$('#srv_setup_stepper_is_sender').is(':checked') && !$('#srv_setup_stepper_is_receiver').is(':checked')){
+            $('#srv_setup_stepper_serve_type-error').text('Required');
+            return;
+        }
+
+        if($('#srv_setup_stepper_is_sender').is(':checked') &&
+            $('#srv_setup_stepper_is_receiver').is(':checked') &&
+            $('#srv_setup_stepper_only_jmap').is(':checked')){
+            requiredFields.push(
+                {key: 'srv_setup_stepper_jmap_address', value: $('#srv_setup_stepper_jmap_address').val()},
+            )
+        }else {
+            if($('#srv_setup_stepper_is_sender').is(':checked')){
+                requiredFields.push(
+                    {key: 'srv_setup_stepper_smtp_address', value: $('#srv_setup_stepper_smtp_address').val()},
+                    {key: 'srv_setup_stepper_smtp_port', value: $('#srv_setup_stepper_smtp_port').val()},
+                )
+            }
+
+            if($('#srv_setup_stepper_is_receiver').is(':checked')) {
+                requiredFields.push(
+                    {key: 'srv_setup_stepper_imap_address', value: $('#srv_setup_stepper_imap_address').val()},
+                    {key: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val()},
+                )
+            }
+        }
+
+        if($('#srv_setup_stepper_enable_sieve').is(':checked')) {
+            requiredFields.push(
+                {key: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val()},
+            )
+        }
+
+        requiredFields.forEach((item) => {
+            if(!item.value) {
+                $(`#${item.key}-error`).text('Required');
+                isValid = false;
+            }
+            else $(`#${item.key}-error`).text('');
+        })
+
+
+        if(!isValid) return
+
+        submitSmtpImapServer();
+        return
+    }
+    // Hide all step elements
+    var steps = document.querySelectorAll('.step_config');
+    for (var i = 0; i < steps.length; i++) {
+        steps[i].style.display = 'none';
+    }
+
+    // Show the selected step
+    var selectedStep = document.getElementById('step_config_' + stepNumber);
+
+    if (selectedStep) {
+        selectedStep.style.display = 'block';
+        if(stepNumber == 0) $('.srv_setup_stepper_btn').show();
+    }
+}
+
+function getServiceDetails(providerKey){
+    if(providerKey) {
+        $("#srv_setup_stepper_provider").val(providerKey);
+
+        Hm_Ajax.request(
+            [
+                {'name': 'hm_ajax_hook', 'value': 'ajax_get_nux_service_details'},
+                {'name': 'nux_service', 'value': providerKey},],
+            function(res) {
+                if(res.service_details){
+                    let serverConfig = JSON.parse(res.service_details)
+
+                    $("#srv_setup_stepper_smtp_address").val(serverConfig.smtp.server);
+                    $("#srv_setup_stepper_smtp_port").val(serverConfig.smtp.port);
+
+                    if(serverConfig.smtp.tls)$("input[name='srv_setup_stepper_smtp_tls'][value='true']").prop("checked", true);
+                    else $("input[name='srv_setup_stepper_smtp_tls'][value='false']").prop("checked", true);
+
+                    $("#srv_setup_stepper_imap_address").val(serverConfig.server);
+                    $("#srv_setup_stepper_imap_port").val(serverConfig.port);
+
+                    if(serverConfig.tls)$("input[name='srv_setup_stepper_imap_tls'][value='true']").prop("checked", true);
+                    else $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
+                }
+            },
+            [],
+            false
+        );
+    }
+}
+
+function getEmailProviderKey(email) {
+    const emailProviderMap = {
+        "all-inkl": ["all-inkl.de", "all-inkl.com"],
+        "aol": ["aol.com"],
+        "fastmail": ["fastmail.com"],
+        "gandi": ["gandi.net"],
+        "gmail": ["gmail.com"],
+        "gmx": ["gmx.com", "gmx.de"],
+        "icloud": ["icloud.com"],
+        "inbox": ["inbox.com"],
+        "kolabnow": ["kolabnow.com"],
+        "mailcom": ["mail.com"],
+        "mailbox": ["mailbox.org"],
+        "migadu": ["migadu.com"],
+        "office365": ["office365.com"],
+        "outlook": ["outlook.com", "outlook.fr"],
+        "postale": ["postale.io"],
+        "yahoo": ["yahoo.com", "yahoo.fr"],
+        "yandex": ["yandex.com", "yandex.ru"],
+        "zoho": ["zoho.com"]
+    };
+
+    const emailParts = email.split("@");
+
+    if(emailParts.length !== 2) return "";
+
+    const provider = emailParts[1].toLowerCase();
+
+    for (const providerKey in emailProviderMap) {
+        if (emailProviderMap[providerKey].some(p => p.includes(provider))) {
+            return providerKey;
+        }
+    }
+
+    return "";
+}
+
+

@@ -167,6 +167,18 @@ add_handler('ajax_test', 'load_user_data', true, 'core');
 add_handler('ajax_test', 'date', true, 'core');
 add_handler('ajax_test', 'http_headers', true, 'core');
 
+/* Server setup */
+add_handler('ajax_quick_servers_setup', 'login', false, 'core');
+add_handler('ajax_quick_servers_setup', 'load_user_data', true, 'core');
+add_handler('ajax_quick_servers_setup', 'quick_servers_setup', true);
+add_handler('ajax_quick_servers_setup', 'load_smtp_servers_from_config',  true, 'smtp');
+add_handler('ajax_quick_servers_setup', 'load_imap_servers_from_config',  true, 'imap');
+add_handler('ajax_quick_servers_setup', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_quick_servers_setup', 'save_user_data',  true, 'core');
+add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
+add_handler('ajax_quick_servers_setup', 'date', true, 'core');
+add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -184,7 +196,8 @@ return array(
         'ajax_update_server_pw',
         'ajax_no_op',
         'notfound',
-        'search'
+        'search',
+        'ajax_quick_servers_setup',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
@@ -290,7 +303,28 @@ return array(
         'trash_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'drafts_per_source' => FILTER_VALIDATE_INT,
         'drafts_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN
+        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_name'  => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_password' => FILTER_UNSAFE_RAW,
+        'srv_setup_stepper_provider' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_is_sender' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_is_receiver' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_smtp_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_smtp_port' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_smtp_tls' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_imap_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_imap_port' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_imap_tls' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_enable_sieve' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_create_profile' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_is_default' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_signature' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_profile_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_imap_sieve_host' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'srv_setup_stepper_only_jmap' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_jmap_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );
 

@@ -2015,7 +2015,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                  <div class="server_count">'. $this->trans('Configured') .' '. $imap_servers_count .' IMAP / '. $smtp_servers_count .' SMTP/ '. $jmap_servers_count .' JMAP</div>
          </div>
          <div class="server_config_section">
-            <div class="stepper" id="nux_config_stepper">
+            <div class="stepper" id="srv_setup_stepper_stepper">
                 <div class="step-container">
                     <div id="step_config_1" class="step step_config">
                         <div class="step_config-title">
@@ -2025,28 +2025,28 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                         <div>
                             <form>
                                <div class="step_config-form_item">
-                                    <label for="nux_config_profile_name">'.$this->trans('Name').'</label>
+                                    <label for="srv_setup_stepper_profile_name">'.$this->trans('Name').'</label>
                                     <br />
-                                    <input type="text" class="stepper_input" id="nux_config_profile_name" placeholder="'.$this->trans('Name').'" />
-                                    <span id="nux_config_profile_name-error" class="error-message"></span>
+                                    <input type="text" class="stepper_input" id="srv_setup_stepper_profile_name" placeholder="'.$this->trans('Name').'" />
+                                    <span id="srv_setup_stepper_profile_name-error" class="error-message"></span>
                                </div>
                                <div class="step_config-form_item">
-                                    <label for="nux_config_email">'.$this->trans('Email or Username').'</label>
+                                    <label for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                     <br />
-                                    <input type="text"  class="stepper_input" id="nux_config_email" placeholder="email" />
-                                    <span id="nux_config_email-error" class="error-message"></span>
+                                    <input type="text"  class="stepper_input" id="srv_setup_stepper_email" placeholder="email" />
+                                    <span id="srv_setup_stepper_email-error" class="error-message"></span>
                                </div>
                                <div class="step_config-form_item">
-                                    <label for="nux_config_password">'.$this->trans('Password').'</label>
+                                    <label for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                     <br />
-                                    <input type="password"  class="stepper_input" id="nux_config_password" placeholder="'.$this->trans('Password').'" />
-                                    <span id="nux_config_password-error" class="error-message"></span>
+                                    <input type="password"  class="stepper_input" id="srv_setup_stepper_password" placeholder="'.$this->trans('Password').'" />
+                                    <span id="srv_setup_stepper_password-error" class="error-message"></span>
                                </div>
                             </form>
                         </div>
                         <div class="step_config-actions">
-                            <button class="nux_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                            <button class="nux_stepper_btn" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
+                            <button class="srv_setup_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                            <button class="srv_setup_stepper_btn" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
                         </div>
                     </div>
                     <div id="step_config_2" class="step step_config">
@@ -2057,74 +2057,74 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                         <div>
                             <form>
                                <div class="step_config-form_item">
-                                    <label for="nux_config_provider">'.$this->trans('Provider').'</label>
+                                    <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
                                     <br />
-                                    <select id="nux_config_provider" class="stepper_input" name="nux_config_provider" onchange="handleProviderChange(this)"><option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
+                                    <select id="srv_setup_stepper_provider" class="stepper_input" name="srv_setup_stepper_provider" onchange="handleProviderChange(this)"><option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
                                </div>
                                <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_sender" checked />
-                                    <label for="nux_config_is_sender">'.$this->trans('Sender account').'</label>
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_sender" checked />
+                                    <label for="srv_setup_stepper_is_sender">'.$this->trans('Sender account').'</label>
                                </div>
                                <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="nux_config_is_receiver" checked />
-                                    <label for="nux_config_is_receiver">'.$this->trans('Receiver account').'</label>
+                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_receiver" checked />
+                                    <label for="srv_setup_stepper_is_receiver">'.$this->trans('Receiver account').'</label>
                                </div>
-                               <span id="nux_config_serve_type-error" class="error-message"></span>
+                               <span id="srv_setup_stepper_serve_type-error" class="error-message"></span>
 
                                <div class="step_config-smtp_imap_bloc">
-                                    <div class="step_config-form_item" id="nux_config_jmap_select_box">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="nux_config_only_jmap" id="nux_config_only_jmap"/>
-                                        <label for="nux_config_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
+                                    <div class="step_config-form_item" id="srv_setup_stepper_jmap_select_box">
+                                        <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="srv_setup_stepper_only_jmap" id="srv_setup_stepper_only_jmap"/>
+                                        <label for="srv_setup_stepper_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
                                     </div>
                                     <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
                                       <label><strong>JMAP</strong></label>
                                       <div class="step_config-form_item">
-                                          <label for="nux_config_jmap_address">'.$this->trans('Address').'</label>
+                                          <label for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
                                           <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_jmap_address" placeholder="'.$this->trans('Address').'" />
-                                          <span id="nux_config_jmap_address-error" class="error-message"></span>
+                                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_jmap_address" placeholder="'.$this->trans('Address').'" />
+                                          <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
                                       </div>
                                       <div class="step_config-form_item">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" name="nux_config_jmap_hide_from_c_page" />
-                                        <label for="nux_config_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
+                                        <input type="checkbox"  class="step_config-form_item-checkbox" name="srv_setup_stepper_jmap_hide_from_c_page" />
+                                        <label for="srv_setup_stepper_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
                                       </div>
                                     </div>
                                     <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
                                        <label><strong>SMTP</strong></label>
                                        <div class="step_config-form_item">
-                                           <label for="nux_config_smtp_address">'.$this->trans('Address').'</label>
+                                           <label for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
                                            <br />
-                                           <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_smtp_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="nux_config_smtp_address-error" class="error-message"></span>
+                                           <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_smtp_address" placeholder="'.$this->trans('Address').'" />
+                                           <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
                                        </div>
                                        <div class="step_config-smtp_imap_port_bloc">
-                                           <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_smtp_port"/>
+                                           <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_smtp_port"/>
                                            <div>
-                                               <input type="radio" id="smtp_tls" name="nux_config_smtp_tls" value="true">
+                                               <input type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true">
                                                <label for="smtp_tls">'.$this->trans('Use TLS').'</label><br>
-                                               <input type="radio" id="smtp_start_tls" name="nux_config_smtp_tls" value="false">
+                                               <input type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" value="false">
                                                <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
                                            </div>
-                                           <span id="nux_config_smtp_port-error" class="error-message"></span>
+                                           <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
                                        </div>
                                    </div>
                                    <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
                                       <label><strong>IMAP</strong></label>
                                       <div class="step_config-form_item">
-                                          <label for="nux_config_imap_address">'.$this->trans('Address').'</label>
+                                          <label for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
                                           <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="nux_config_imap_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="nux_config_imap_address-error" class="error-message"></span>
+                                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_imap_address" placeholder="'.$this->trans('Address').'" />
+                                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
                                       </div>
                                       <div class="step_config-smtp_imap_port_bloc">
-                                         <input type="number" style="height: 20px;" class="stepper_input" id="nux_config_imap_port"/>
+                                         <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_imap_port"/>
                                          <div>
-                                             <input type="radio" id="imap_tls" name="nux_config_imap_tls" value="true">
+                                             <input type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls" value="true">
                                              <label for="imap_tls">'.$this->trans('Use TLS').'</label><br>
-                                             <input type="radio" id="imap_start_tls" name="nux_config_imap_tls" value="false">
+                                             <input type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" value="false">
                                              <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
                                          </div>
-                                         <span id="nux_config_imap_port-error" class="error-message"></span>
+                                         <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
                                       </div>
 
                                    ';
@@ -2133,50 +2133,50 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
              $default_value = '';
                  $res .=  '
                             <div class="step_config-form_item">
-                                <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_enable_sieve" onchange="handleSieveStatusChange(this)"/>
-                                <label for="nux_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_enable_sieve" onchange="handleSieveStatusChange(this)"/>
+                                <label for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
                             </div>
-                           <div class="step_config-form_item nested hide" id="nux_imap_sieve_host_bloc">
-                               <label class="screen_reader" for="nux_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                               <input id="nux_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
-                                <span id="nux_imap_sieve_host-error" class="error-message"></span>
+                           <div class="step_config-form_item nested hide" id="srv_setup_stepper_imap_sieve_host_bloc">
+                               <label class="screen_reader" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
+                               <input id="srv_setup_stepper_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
+                                <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
                            </div>';
          }
 
          $res .= '      </div>
                     </div>
-                             <div class="step_config-form_item" id="nux_profile_checkbox_bloc">
-                                  <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="nux_create_profile" checked />
-                                  <label for="nux_create_profile">'.$this->trans('Create Profile').'</label>
+                             <div class="step_config-form_item" id="srv_setup_stepper_profile_checkbox_bloc">
+                                  <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="srv_setup_stepper_create_profile" checked />
+                                  <label for="srv_setup_stepper_create_profile">'.$this->trans('Create Profile').'</label>
                              </div>
-                             <div class="nested" id="nux_profile_bloc">
+                             <div class="nested" id="srv_setup_stepper_profile_bloc">
                                  <div class="step_config-form_item nested">
-                                     <label for="nux_profile_reply_to">'.$this->trans('Reply to').'</label>
+                                     <label for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
                                      <br />
-                                      <input type="email"  class="stepper_input"  style="height: 20px;" id="nux_profile_reply_to" />
+                                      <input type="email"  class="stepper_input"  style="height: 20px;" id="srv_setup_stepper_profile_reply_to" />
                                 </div>
                                  <div class="step_config-form_item nested">
-                                     <label for="nux_profile_signature">'.$this->trans('Signature').'</label>
-                                     <textarea id="nux_profile_signature" name="nux_profile_signature" checked ></textarea>
+                                     <label for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
+                                     <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" checked ></textarea>
                                  </div>
                                  <div class="step_config-form_item nested">
-                                     <input type="checkbox"  class="step_config-form_item-checkbox" id="nux_profile_is_default" checked />
-                                     <label for="nux_profile_is_default">'.$this->trans('Set this profile default').'</label>
+                                     <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_profile_is_default" checked />
+                                     <label for="srv_setup_stepper_profile_is_default">'.$this->trans('Set this profile default').'</label>
                                  </div>
                              </div>
                           </form>
                       </div>
-                      <div class="nux_config_form_loader hide" id="nux_config_form_loader">
+                      <div class="srv_setup_stepper_form_loader hide" id="srv_setup_stepper_form_loader">
                           <img width="24" height="24" src="'.Hm_Image_Sources::$spinner.'" alt="loader" />
                       </div>
                       <div class="step_config-actions">
-                          <button class="nux_stepper_btn" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
-                          <button class="nux_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                          <button class="nux_stepper_btn" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
+                          <button class="srv_setup_stepper_btn" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
+                          <button class="srv_setup_stepper_btn" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                          <button class="srv_setup_stepper_btn" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
                       </div>
                   </div>
                   <div id="step_config_0">
-                      <button class="nux_stepper_btn step_config current_config_step" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
+                      <button class="srv_setup_stepper_btn step_config current_config_step" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
                   </div>
                 </div>
          </div>';

@@ -962,3 +962,111 @@ class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Mod
         process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback');
     }
 }
+
+/**
+ * @subpackage core/handler
+ */
+class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
+    public $smtp_server_id = null;
+    public $imap_server_id = null;
+    public $jmap_server_id = null;
+    public $just_saved_credentials = false;
+
+    public function process() {
+        list($success, $form) = $this->process_form(array(
+           'srv_setup_stepper_profile_name',
+           'srv_setup_stepper_email',
+           'srv_setup_stepper_password',
+           'srv_setup_stepper_provider',
+           'srv_setup_stepper_is_sender',
+           'srv_setup_stepper_is_receiver',
+           'srv_setup_stepper_smtp_address',
+           'srv_setup_stepper_smtp_port',
+           'srv_setup_stepper_smtp_tls',
+           'srv_setup_stepper_imap_address',
+           'srv_setup_stepper_imap_port',
+           'srv_setup_stepper_imap_tls',
+           'srv_setup_stepper_enable_sieve',
+           'srv_setup_stepper_create_profile',
+           'srv_setup_stepper_profile_is_default',
+           'srv_setup_stepper_profile_signature',
+           'srv_setup_stepper_profile_reply_to',
+           'srv_setup_stepper_imap_sieve_host',
+           'srv_setup_stepper_only_jmap',
+           'srv_setup_stepper_jmap_hide_from_c_page',
+           'srv_setup_stepper_jmap_address',
+           ));
+
+        if ($success) {
+            // Destructure form array into variables
+            [
+                'srv_setup_stepper_profile_name' => $profileName,
+                'srv_setup_stepper_email' => $email,
+                'srv_setup_stepper_password' => $password,
+                'srv_setup_stepper_provider' => $provider,
+                'srv_setup_stepper_is_sender' => $isSender,
+                'srv_setup_stepper_is_receiver' => $isReceiver,
+                'srv_setup_stepper_smtp_address' => $smtpAddress,
+                'srv_setup_stepper_smtp_port' => $smtpPort,
+                'srv_setup_stepper_smtp_tls' => $smtpTls,
+                'srv_setup_stepper_imap_address' => $imapAddress,
+                'srv_setup_stepper_imap_port' => $imapPort,
+                'srv_setup_stepper_imap_tls' => $imapTls,
+                'srv_setup_stepper_enable_sieve' => $enableSieve,
+                'srv_setup_stepper_create_profile' => $createProfile,
+                'srv_setup_stepper_profile_is_default' => $profileIsDefault,
+                'srv_setup_stepper_profile_signature' => $profileSignature,
+                'srv_setup_stepper_profile_reply_to' => $profileReplyTo,
+                'srv_setup_stepper_imap_sieve_host' => $imapSieveHost,
+                'srv_setup_stepper_only_jmap' => $onlyJmap,
+                'srv_setup_stepper_jmap_hide_from_c_page' => $jmapHideFromCPage,
+                'srv_setup_stepper_jmap_address' => $jmapAddress,
+            ] = $form;
+            
+            /*
+            * When JMAP selected only configure JMAP
+            */
+             if(isset($onlyJmap) && $onlyJmap) {
+                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password);
+                $is_jmap_server_authenticated = authenticate_to_imap_server($email, $password, $this->jmap_server_id, $this);
+                
+                Hm_Msgs::add("JMAP Server saved");
+                $this->out('just_saved_credentials', $this->just_saved_credentials);
+                          
+             } else {
+                 /*
+                 *  Connect to SMTP server if user wants to send emails
+                 */
+                 if($isSender){
+                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this, $errno = null, $errstr = null);
+                    $is_smtp_server_authenticated = authenticate_to_smtp_server($email, $password, $this->smtp_server_id, $this);
+                    
+                     if(!isset($this->smtp_server_id) || !$is_smtp_server_authenticated) return;
+                 }
+    
+                 /*
+                  *  Connect to IMAP server if user wants to receive emails
+                  */
+                 if($isReceiver){
+                      $this->imap_server_id = connect_to_imap_server($imapAddress, $profileName, $imapPort, $email, $password, $imapTls, $imapSieveHost, $enableSieve, $this, $errno = null, $errstr = null);
+                      $is_imap_server_authenticated = authenticate_to_imap_server($email, $password, $this->imap_server_id, $this);
+                      
+                      
+                      if(!isset($this->imap_server_id) || !$is_imap_server_authenticated) {
+                          if($isSender && isset($this->smtp_server_id)){
+                                delete_smtp_server($this->smtp_server_id, $this);
+                          }
+                          return;
+                      };
+                 }
+    
+                 if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                     add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
+                 }
+    
+                 Hm_Msgs::add("Server saved");
+                 $this->out('just_saved_credentials', $this->just_saved_credentials);
+            }
+        }
+    }
+}
