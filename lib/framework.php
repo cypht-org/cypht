@@ -28,6 +28,7 @@ require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/crypt_sodium.php';
 require APP_PATH.'lib/sodium_compat.php';
+require APP_PATH.'lib/environment.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
@@ -37,10 +38,6 @@ require APP_PATH.'lib/webdav_formats.php';
 if (!function_exists('random_bytes')) {
     require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
 }
-
-/* load env files */
-$environment = Hm_Environment::getInstance();
-$environment->load();
 
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {

@@ -34,14 +34,10 @@ ob_start();
 date_default_timezone_set( 'UTC' );
 
 require VENDOR_PATH.'autoload.php';
-
-/* load env files */
-require APP_PATH.'lib/environment.php';
-$environment = Hm_Environment::getInstance();
-$environment->load();
-
 /* get includes */
 require APP_PATH.'lib/framework.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* get configuration */
 $config = new Hm_Site_Config_File();
