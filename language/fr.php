@@ -577,6 +577,8 @@ return array(
     'Sieve server capabilities' => 'Capacités du serveur Sieve',
     'Connection To Sieve Server Failed' => 'Échec de la connexion au serveur Sieve',
     'Warn for unsaved changes' => false,
+    'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => 'pièce jointe,fichier joint,fichier,joindre,joins,joint,attaché,inclus,ci-inclus,CV,lettre d’accompagnement,PJ,P.J'
 ); 
 
 ?>

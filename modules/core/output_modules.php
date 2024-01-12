@@ -592,6 +592,15 @@ class Hm_Output_js_data extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">'.
             'var globals = {};'.
+            'window.hm_current_lang = ' . json_encode($this->lang) . ';' .
+            'window.hm_translations = ' . json_encode($this->all_trans()) . ';' .
+            'var hm_trans = function(key, lang = window.hm_current_lang) {' .
+            '    const translation = window.translations[lang][key];' .
+            '    if (translation !== undefined && translation !== false) {' .
+            '        return translation;' .
+            '    }' .
+            '    return key;' .
+            '};' .
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.

@@ -388,14 +388,52 @@ var is_valid_recipient = function(recipient) {
     return recipient.match(valid_regex);
 };
 
-$(function() {    
+var process_compose_form = function(){
+    var msg_uid = hm_msg_uid();
+    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    var class_name = 'imap_' + detail.server_id + '_' + msg_uid + '_' + detail.folder;
+    var key = 'imap_' + Hm_Utils.get_url_page_number() + '_' + hm_list_path();
+    var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
+
+    if (next_message) {
+        $('.compose_next_email_data').val(next_message);
+    }
+
+    var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+    $('#send_uploaded_files').val(uploaded_files);
+    Hm_Ajax.show_loading_icon();
+    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_archive').addClass('disabled_input');
+    $('.smtp_send').on("click", function () { return false; });
+}
+var force_send_message = function(){
+    // Check if the force_send input already exists
+    var forceSendInput = document.getElementById('force_send');
+    if (!forceSendInput) {
+        // Create a hidden input element
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'force_send';
+        hiddenInput.value = '1';
+        hiddenInput.id = 'force_send';
+        hiddenInput.classList.add('force_send');
+        // Append the hidden input to the form
+        var form = document.querySelector('.compose_form');
+        form.appendChild(hiddenInput);
+
+    }
+    // Trigger the click event for the "Send" button
+    document.querySelector('.smtp_send').click()
+}
+
+$(function () {
     if (hm_page_name() === 'settings') {
         $('#clear_chunks_button').on('click', function(e) {
             e.preventDefault();
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_clear_attachment_chunks'}],
                 function(res) {
-                    
+
                 },
                 []
             );
@@ -468,7 +506,7 @@ $(function() {
             }
 
             function handleSendAnyway() {
-                e.target.submit();
+                // e.target.submit();
                 handleFiles();
             };
 
@@ -491,6 +529,36 @@ $(function() {
                 Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
                 $('.smtp_send_archive').addClass('disabled_input');
                 $('.smtp_send').on("click", function () { return false; });
+            const compose_body_value = document.getElementById('compose_body').value;
+            const force_send = document.getElementById('force_send')?.value;
+            var reminder_value = $('.compose_form').data('reminder');
+            if (reminder_value === 1) {
+                const uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+                let all_translated_keywords = [];
+                for (let lang in window.hm_translations) {
+                    if (window.hm_translations.hasOwnProperty(lang)) {
+                        // Get translated keywords for the current language
+                        const translated_keywords = hm_trans('attachment,file,attach,attached,attaching,enclosed,CV,cover letter', lang).split(',');
+                        // Concatenate translated keywords with the array
+                        all_translated_keywords = all_translated_keywords.concat(translated_keywords);
+                    }
+                }
+                const additional_keywords = ['.doc', '.pdf'];
+                // Split the translated keywords into an array && Add additional keywords or file extensions
+                const combined_keywords = all_translated_keywords.concat(additional_keywords);
+                // Build the regex pattern
+                const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
+                // Check if the pattern is found in the message
+                if (pattern.test(compose_body_value) && uploaded_files.length === 0 && force_send !== '1') {
+                    if (confirm(trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
+                        force_send_message();
+                    }
+                    e.preventDefault();
+                } else {
+                    process_compose_form();
+                }
+            } else {
+                process_compose_form();
             }
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
