@@ -646,12 +646,12 @@ if (!hm_exists('get_mime_type')) {
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {       
         /* not sending */
-        if (!array_key_exists('smtp_send', $this->request->post)) {
+        if (!array_key_exists("compose_smtp_id", $this->request->post)) {
             return;
         }
 
         /* missing field */
-        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
+        list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
             Hm_Msgs::add('ERRRequired field missing');
             return;
@@ -1074,7 +1074,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             '" /><div id="cc_contacts"></div></div><div class="compose_container" ><div class="bubbles bubble_dropdown"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
             '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
             '<div id="bcc_contacts"></div></div></div><input value="'.$this->html_safe($subject).
-            '" required name="compose_subject" class="compose_subject" type="text" placeholder="'.
+            '" name="compose_subject" class="compose_subject" type="text" placeholder="'.
             $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
             $this->html_safe($body).'</textarea>';
         if ($html == 2) {
