@@ -2,7 +2,7 @@
 
 return [
     /* 
-    | [Personal]
+    | 
     | ----------------------------------------
     | Constants used for CardDav communication
     | ----------------------------------------
@@ -18,5 +18,7 @@ return [
     | 
     | 
     */
-    'server' => env('CARD_DAV_SERVER', 'http://localhost:5232'),
+    'Personal' => [
+        'server' => env('CARD_DAV_SERVER', 'http://localhost:5232'),
+    ]
 ];
