@@ -665,7 +665,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @runInSeparateProcess
      */
     public function test_fancy_login_end() {
-        $GLOBALS['fancy_login_allowed'] = 'y';
+        $GLOBALS['fancy_login_allowed'] = true;
         $test = new Output_Test('login_end', 'core');
         $res = $test->run();
         $this->assertEquals(array('</form></div>'), $res->output_response);
@@ -688,7 +688,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @runInSeparateProcess
      */
     public function test_fancy_login_start() {
-        $GLOBALS['fancy_login_allowed'] = 'y';
+        $GLOBALS['fancy_login_allowed'] = true;
         $test = new Output_Test('login_start', 'core');
         $res = $test->run();
         $this->assertEquals(array('<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url(modules/core/assets/images/cloud.png);background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin:0px 10px 10px 10px;}.mobile .g-recaptcha{margin:0px 10px 5px 10px;}.title{font-weight:normal;padding:0px;margin:0px;margin-left:20px;margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{min-width:100px !important;background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,#fff);font-size:1em;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid 1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute;top:auto;width:1px;height:1px;overflow:hidden;}.login_form{display:flex; justify-content:space-evenly; align-items:center; flex-direction:column;font-size:90%;padding-top:60px;height:360px;border-radius:20px 20px 20px 20px;margin:0px;background-color:rgba(0,0,0,.6);min-width:300px;}.login_form input{clear:both;float:left;padding:4px;margin-top:10px;margin-bottom:10px;}#username,#password{width:200px; height:25px;} .err{color:red !important;}.long_session{float:left;}.long_session input{padding:0px;float:none;font-size:18px;}.mobile .long_session{float:left;clear:both;} @media screen and (min-width:400px){.login_form{min-width:400px;}}.user-icon_signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-120px; box-shadow: #6eb549 .4px 2.4px 6.2px; }.label_signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;} @media (max-height : 500px){ .user-icon_signin{display:none;}}
@@ -719,7 +719,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @runInSeparateProcess
      */
     public function test_fancy_login() {
-        $GLOBALS['fancy_login_allowed'] = 'y';
+        $GLOBALS['fancy_login_allowed'] = true;
         $test = new Output_Test('login', 'core');
         $test->handler_response = array('allow_long_session' => true, 'router_login_state' => true);
         $res = $test->run();

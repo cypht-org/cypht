@@ -1311,5 +1311,5 @@ return [
     | Fancy Login page
     | Use this setting switch between the legacy login page and the fancy one
     */
-    'fancy_login' => env('FANCY_LOGIN', 'n'),
+    'fancy_login' => env('FANCY_LOGIN', false),
 ];

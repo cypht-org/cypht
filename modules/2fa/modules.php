@@ -183,7 +183,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 $error = '';
             }
 
-            if($this->get('fancy_login_allowed') == "n"){
+            if(!$this->get('fancy_login_allowed')){
                 echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
                 '" dir="'.$this->html_safe($dir).'"><head><meta charset="utf-8" />'.
                 '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
