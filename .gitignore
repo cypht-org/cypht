@@ -24,8 +24,3 @@ scripts/test.php
 *.sublime-workspace
 composer.phar
 lib/hm3/users/
-2fa.ini
-carddav.ini
-recaptcha.ini
-.phpunit.result.cache
-.env
