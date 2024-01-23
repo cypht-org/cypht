@@ -1234,7 +1234,7 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
  */
 class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
     protected function output() {
-       $res .= '
+       $res = '
                    <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
                       <label><strong>IMAP</strong></label>
                       <div class="step_config-form_item">

@@ -1027,6 +1027,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             * When JMAP selected only configure JMAP
             */
              if(isset($onlyJmap) && $onlyJmap) {
+                if (!$this->module_is_supported('jmap')) {
+                    Hm_Msgs::add("ERRJMAP module is not enabled");
+                    return;
+                }
+                
                 $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password);
                 $is_jmap_server_authenticated = authenticate_to_imap_server($email, $password, $this->jmap_server_id, $this);
                 
@@ -1038,6 +1043,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                  *  Connect to SMTP server if user wants to send emails
                  */
                  if($isSender){
+                    if (!$this->module_is_supported('smtp')) {
+                        Hm_Msgs::add("ERRSMTP module is not enabled");
+                        return;
+                    }
+                    
                     $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this, $errno = null, $errstr = null);
                     $is_smtp_server_authenticated = authenticate_to_smtp_server($email, $password, $this->smtp_server_id, $this);
                     
@@ -1048,6 +1058,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                   *  Connect to IMAP server if user wants to receive emails
                   */
                  if($isReceiver){
+                     if (!$this->module_is_supported('imap')) {
+                        Hm_Msgs::add("ERRIMAP module is not enabled");
+                        return;
+                     }
+                    
                       $this->imap_server_id = connect_to_imap_server($imapAddress, $profileName, $imapPort, $email, $password, $imapTls, $imapSieveHost, $enableSieve, $this, $errno = null, $errstr = null);
                       $is_imap_server_authenticated = authenticate_to_imap_server($email, $password, $this->imap_server_id, $this);
                       
@@ -1061,6 +1076,11 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                  }
     
                  if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                      if (!$this->module_is_supported('profiles')) {
+                         Hm_Msgs::add("ERRProfiles module is not enabled");
+                         return;
+                      }
+                                          
                      add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
                  }
     
