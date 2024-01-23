@@ -1306,4 +1306,10 @@ return [
     | Defaults to false
     */
     // 'default_setting_enable_sieve_filter' => env('DEFAULT_SETTING_ENABLE_SIEVE_FILTER', false),
+
+    /*
+    | Fancy Login page
+    | Use this setting switch between the legacy login page and the fancy one
+    */
+    'fancy_login' => env('FANCY_LOGIN', false),
 ];

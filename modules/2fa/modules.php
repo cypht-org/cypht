@@ -183,7 +183,8 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 $error = '';
             }
 
-            echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
+            if(!$this->get('fancy_login_allowed')){
+                echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
                 '" dir="'.$this->html_safe($dir).'"><head><meta charset="utf-8" />'.
                 '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
                 '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
@@ -194,6 +195,46 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 '<input autofocus required id="2fa_code" type="number" name="2fa_code" value="" placeholder="'.
                 $this->trans('Login code').'" /><input type="submit" value="'.$this->trans('Submit').
                 '" /></form></body></html>';
+            }
+            else{
+                $style = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;'.
+                    'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url('.WEB_ROOT.'modules/core/assets/images/cloud.jpg);'.
+                    'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
+                    'display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages'.
+                    '{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;'.
+                    'margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:'.
+                    '5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin:0px 10px 10px 10px;}.mobile .g-recaptcha{'.
+                    'margin:0px 10px 5px 10px;}.title{font-weight:normal;padding:0px;margin:0px;margin-left:20px;'.
+                    'margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{min-width:100px !important;'.
+                    'background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,'.
+                    '#fff);font-size:1em;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;'.
+                    'font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:outset '.
+                    '1px #ddd;background-color:#fff;color:#333;border-radius:6px;}.screen_reader{position:absolute'.
+                    ';top:auto;width:1px;height:1px;overflow:hidden;}.login_form{display:flex; justify-content:space-evenly; align-items:center; flex-direction:column;font-size:90%;'.
+                    'padding-top:60px;height:360px;border-radius:20px 20px 20px 20px;margin:0px;background-color:rgba(0,0,0,.6);'.
+                    'min-width:300px;}.login_form input{clear:both;float:left;padding:4px;'.
+                    'margin-top:10px;margin-bottom:10px;} .err{color:red !important;}.long_session'.
+                    '{float:left;}.long_session input{padding:0px;float:none;font-size:18px;}.mobile .long_session{float:left;clear:both;} @media screen and (min-width:400px){.login_form{min-width:400px;}}'.
+                    '.user-icon_signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-75px; box-shadow: #6eb549 .4px 2.4px 6.2px; }'.
+                    '.label_signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;}'.
+                    '.login_form {float : none; padding-left : 0px; padding : 8px; }@media (max-height : 500px){ .user-icon_signin{display:none;}}'.
+                    '.tfa_error{margin-left:0 !important; margin-right:0 !important; color:#f93838 !important;} .tfa_input{margin-left:0px;}'.
+                    '</style>';
+                echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
+                '" dir="'.$this->html_safe($dir).'"><head><meta charset="utf-8" />'.
+                '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
+                '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.$style.
+                '</head><body><div class="form-container">
+                <form class="login_form" method="POST">
+                <svg class="user-icon_signin" viewBox="0 0 20 20"><path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path></svg>
+                <img src="modules/core/assets/images/logo.svg" style="height:90px;"><!--h1 class="title">'.
+                $this->html_safe($this->get('router_app_name')).'</h1-->'. $error.'<div class="tfa_input">'.
+                '<label class="label_signin" for="2fa_code">'.$this->trans('Enter the 6 digit code from your Authenticator application').
+                '</label></div><input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
+                '<input autofocus required id="2fa_code" style="width:200px; height:25px;" type="number" name="2fa_code" value="" placeholder="'.
+                $this->trans('Login code').'" /><input style="cursor:pointer; display:block; width: 210px; background-color:#6eb549; color:white; height:40px;" type="submit" value="'.$this->trans('Submit').
+                '" /></form></div></body></html>';
+            }
             Hm_Functions::cease();
         }
     }
