@@ -317,7 +317,7 @@ class Hm_Handler_load_ldap_settings extends Hm_Handler_Module {
     public function process() {
         $connections = array();
         foreach (ldap_config($this->config) as $name => $vals) {
-            if (array_key_exists('auth', $vals) && $vals['auth']) {
+            if (is_array($vals) && array_key_exists('auth', $vals) && $vals['auth']) {
                 if ((!array_key_exists('user', $vals) || !$vals['user']) &&
                     (!array_key_exists('pass', $vals) || !$vals['pass'])) {
                     $connections[$name] = $vals;
