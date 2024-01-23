@@ -2005,15 +2005,54 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
 
 class Hm_Output_server_config_stepper extends Hm_Output_Module {
     protected function output() {
-    $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
-    $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
-    $smtp_servers_count = count($this->get('smtp_servers', array()));
-
+    $accordionTitle = '';
+    $configuredText = $this->trans('Configured') .' ';
+    $hasEssentialModuleActivated = false;
+    
+    $hasImapActivated = in_array('imap', $this->get('router_module_list'), true);
+    $hasSmtpActivated = in_array('smtp', $this->get('router_module_list'), true);
+    $hasJmapActivated = in_array('jmap', $this->get('router_module_list'), true);
+    
+    if($hasImapActivated){
+        $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
+        $accordionTitle .= 'IMAP';
+        $configuredText .= $imap_servers_count .' IMAP';
+        $hasEssentialModuleActivated = true;
+    }
+    
+    if($hasJmapActivated){
+        $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
+        if($accordionTitle != ''){
+            $accordionTitle .= ' - ';
+            $configuredText .= ' / ';
+        }
+        $accordionTitle .= 'JMAP';
+        $configuredText .= $jmap_servers_count .' JMAP';
+        $hasEssentialModuleActivated = true;
+    }
+    
+    if($hasSmtpActivated){        
+        $smtp_servers_count = count($this->get('smtp_servers', array()));
+        if($accordionTitle != ''){
+            $accordionTitle .= ' - ';
+            $configuredText .= ' / ';
+        }
+        $accordionTitle .= 'SMTP';
+        $configuredText .= $smtp_servers_count .' SMTP';
+        $hasEssentialModuleActivated = true;
+    }
+    
+    $accordionTitle .= ' Servers';
+    
+    // When essential module is not activated, we don't display the accordion
+    if(!$hasEssentialModuleActivated) return '';
+    
+    
     $res = '<div class="smtp_imap_server_setup">
-         <div data-target=".server_config_section" class="server_section">'.
-                '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'. $this->trans('IMAP - SMTP - JMAP Servers').'
-                 <div class="server_count">'. $this->trans('Configured') .' '. $imap_servers_count .' IMAP / '. $smtp_servers_count .' SMTP/ '. $jmap_servers_count .' JMAP</div>
-         </div>
+              <div data-target=".server_config_section" class="server_section">'.
+                     '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'. $accordionTitle.'
+                      <div class="server_count">'. $configuredText .' </div>
+              </div>
          <div class="server_config_section">
             <div class="stepper" id="srv_setup_stepper_stepper">
                 <div class="step-container">
@@ -2060,111 +2099,58 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                     <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
                                     <br />
                                     <select id="srv_setup_stepper_provider" class="stepper_input" name="srv_setup_stepper_provider" onchange="handleProviderChange(this)"><option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_sender" checked />
-                                    <label for="srv_setup_stepper_is_sender">'.$this->trans('Sender account').'</label>
-                               </div>
-                               <div class="step_config-form_item">
-                                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_receiver" checked />
-                                    <label for="srv_setup_stepper_is_receiver">'.$this->trans('Receiver account').'</label>
-                               </div>
-                               <span id="srv_setup_stepper_serve_type-error" class="error-message"></span>
+                               </div>';
+                               
+   if($hasSmtpActivated && $hasImapActivated) {
+        $res .= '
+             <div class="step_config-form_item">
+                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_sender" checked />
+                    <label for="srv_setup_stepper_is_sender">'.$this->trans('Sender account').'</label>
+               </div>
+               <div class="step_config-form_item">
+                    <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_receiver" checked />
+                    <label for="srv_setup_stepper_is_receiver">'.$this->trans('Receiver account').'</label>
+               </div>
+               <span id="srv_setup_stepper_serve_type-error" class="error-message"></span>
+        ';
+   }
+                               
+   $res .= '<div class="step_config-smtp_imap_bloc">';
 
-                               <div class="step_config-smtp_imap_bloc">
-                                    <div class="step_config-form_item" id="srv_setup_stepper_jmap_select_box">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="srv_setup_stepper_only_jmap" id="srv_setup_stepper_only_jmap"/>
-                                        <label for="srv_setup_stepper_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
-                                    </div>
-                                    <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
-                                      <label><strong>JMAP</strong></label>
-                                      <div class="step_config-form_item">
-                                          <label for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
-                                          <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_jmap_address" placeholder="'.$this->trans('Address').'" />
-                                          <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
-                                      </div>
-                                      <div class="step_config-form_item">
-                                        <input type="checkbox"  class="step_config-form_item-checkbox" name="srv_setup_stepper_jmap_hide_from_c_page" />
-                                        <label for="srv_setup_stepper_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
-                                      </div>
-                                    </div>
-                                    <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
-                                       <label><strong>SMTP</strong></label>
-                                       <div class="step_config-form_item">
-                                           <label for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
-                                           <br />
-                                           <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_smtp_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
-                                       </div>
-                                       <div class="step_config-smtp_imap_port_bloc">
-                                           <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_smtp_port"/>
-                                           <div>
-                                               <input type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true">
-                                               <label for="smtp_tls">'.$this->trans('Use TLS').'</label><br>
-                                               <input type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" value="false">
-                                               <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
-                                           </div>
-                                           <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
-                                       </div>
-                                   </div>
-                                   <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
-                                      <label><strong>IMAP</strong></label>
-                                      <div class="step_config-form_item">
-                                          <label for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
-                                          <br />
-                                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_imap_address" placeholder="'.$this->trans('Address').'" />
-                                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
-                                      </div>
-                                      <div class="step_config-smtp_imap_port_bloc">
-                                         <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_imap_port"/>
-                                         <div>
-                                             <input type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls" value="true">
-                                             <label for="imap_tls">'.$this->trans('Use TLS').'</label><br>
-                                             <input type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" value="false">
-                                             <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
-                                         </div>
-                                         <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
-                                      </div>
+         return $res;
 
-                                   ';
+    }
+}
 
-         if ($this->get('sieve_filters_enabled')) {
-             $default_value = '';
-                 $res .=  '
-                            <div class="step_config-form_item">
-                                <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_enable_sieve" onchange="handleSieveStatusChange(this)"/>
-                                <label for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
-                            </div>
-                           <div class="step_config-form_item nested hide" id="srv_setup_stepper_imap_sieve_host_bloc">
-                               <label class="screen_reader" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                               <input id="srv_setup_stepper_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
-                                <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
-                           </div>';
-         }
-
-         $res .= '      </div>
+class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
+    protected function output() {
+        $res = '</div></div>';
+        
+        if(in_array('profiles', $this->get('router_module_list'), true)) {
+            $res .= '
+                 <div class="step_config-form_item" id="srv_setup_stepper_profile_checkbox_bloc">
+                      <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="srv_setup_stepper_create_profile" checked />
+                      <label for="srv_setup_stepper_create_profile">'.$this->trans('Create Profile').'</label>
+                 </div>
+                 <div class="nested" id="srv_setup_stepper_profile_bloc">
+                     <div class="step_config-form_item nested">
+                         <label for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
+                         <br />
+                          <input type="email"  class="stepper_input"  style="height: 20px;" id="srv_setup_stepper_profile_reply_to" />
                     </div>
-                             <div class="step_config-form_item" id="srv_setup_stepper_profile_checkbox_bloc">
-                                  <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleCreateProfileCheckboxChange(this)" id="srv_setup_stepper_create_profile" checked />
-                                  <label for="srv_setup_stepper_create_profile">'.$this->trans('Create Profile').'</label>
-                             </div>
-                             <div class="nested" id="srv_setup_stepper_profile_bloc">
-                                 <div class="step_config-form_item nested">
-                                     <label for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
-                                     <br />
-                                      <input type="email"  class="stepper_input"  style="height: 20px;" id="srv_setup_stepper_profile_reply_to" />
-                                </div>
-                                 <div class="step_config-form_item nested">
-                                     <label for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
-                                     <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" checked ></textarea>
-                                 </div>
-                                 <div class="step_config-form_item nested">
-                                     <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_profile_is_default" checked />
-                                     <label for="srv_setup_stepper_profile_is_default">'.$this->trans('Set this profile default').'</label>
-                                 </div>
-                             </div>
-                          </form>
+                     <div class="step_config-form_item nested">
+                         <label for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
+                         <textarea id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" checked ></textarea>
+                     </div>
+                     <div class="step_config-form_item nested">
+                         <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_profile_is_default" checked />
+                         <label for="srv_setup_stepper_profile_is_default">'.$this->trans('Set this profile default').'</label>
+                     </div>
+                 </div>
+            ';
+        }
+        
+        $res .= '</form>
                       </div>
                       <div class="srv_setup_stepper_form_loader hide" id="srv_setup_stepper_form_loader">
                           <img width="24" height="24" src="'.Hm_Image_Sources::$spinner.'" alt="loader" />
@@ -2182,6 +2168,5 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
          </div>';
 
          return $res;
-
     }
 }

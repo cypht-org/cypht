@@ -30,7 +30,8 @@ add_handler('servers', 'process_add_smtp_server', true, 'smtp', 'load_smtp_serve
 add_handler('servers', 'add_smtp_servers_to_page_data', true, 'smtp', 'process_add_smtp_server', 'after');
 add_handler('servers', 'save_smtp_servers', true, 'smtp', 'add_smtp_servers_to_page_data', 'after');
 add_output('servers', 'add_smtp_server_dialog', true, 'smtp', 'quick_add_dialog', 'after');
-add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'server_config_stepper', 'after');
+add_output('servers', 'stepper_setup_server_smtp', true, 'smtp', 'stepper_setup_server_jmap', 'after');
+add_output('servers', 'display_configured_smtp_servers', true, 'smtp', 'server_config_stepper_end_part', 'after');
 
 add_handler('settings', 'process_compose_type', true, 'smtp', 'save_user_settings', 'before');
 add_handler('settings', 'process_auto_bcc', true, 'smtp', 'save_user_settings', 'before');

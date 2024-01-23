@@ -1200,3 +1200,74 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
         $this->concat('msg_controls_extra', $res);
     }
 }
+
+/**
+ * @subpackage jmap/output
+ */
+class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
+    protected function output() {
+        if(!in_array('jmap', $this->get('router_module_list'), true)) return '';
+        return '
+            <div class="step_config-form_item" id="srv_setup_stepper_jmap_select_box">
+                <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="srv_setup_stepper_only_jmap" id="srv_setup_stepper_only_jmap"/>
+                <label for="srv_setup_stepper_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
+            </div>
+            <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
+              <label><strong>JMAP</strong></label>
+              <div class="step_config-form_item">
+                  <label for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
+                  <br />
+                  <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_jmap_address" placeholder="'.$this->trans('Address').'" />
+                  <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
+              </div>
+              <div class="step_config-form_item">
+                <input type="checkbox"  class="step_config-form_item-checkbox" name="srv_setup_stepper_jmap_hide_from_c_page" />
+                <label for="srv_setup_stepper_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
+              </div>
+            </div>
+        ';
+    }
+}
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
+    protected function output() {
+       $res .= '
+                   <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
+                      <label><strong>IMAP</strong></label>
+                      <div class="step_config-form_item">
+                          <label for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
+                          <br />
+                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_imap_address" placeholder="'.$this->trans('Address').'" />
+                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                      </div>
+                      <div class="step_config-smtp_imap_port_bloc">
+                         <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_imap_port"/>
+                         <div>
+                             <input type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls" value="true">
+                             <label for="imap_tls">'.$this->trans('Use TLS').'</label><br>
+                             <input type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" value="false">
+                             <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
+                         </div>
+                         <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
+                      </div>
+                   ';
+            
+                     if ($this->get('sieve_filters_enabled')) {
+                         $default_value = '';
+                             $res .=  '
+                                        <div class="step_config-form_item">
+                                            <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_enable_sieve" onchange="handleSieveStatusChange(this)"/>
+                                            <label for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                        </div>
+                                       <div class="step_config-form_item nested hide" id="srv_setup_stepper_imap_sieve_host_bloc">
+                                           <label class="screen_reader" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
+                                           <input id="srv_setup_stepper_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
+                                            <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
+                                       </div>';
+                     }
+       return $res;
+    }
+}

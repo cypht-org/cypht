@@ -1344,6 +1344,35 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage
+ */
+class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
+    protected function output() {
+        return '
+            <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
+               <label><strong>SMTP</strong></label>
+               <div class="step_config-form_item">
+                   <label for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
+                   <br />
+                   <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_smtp_address" placeholder="'.$this->trans('Address').'" />
+                   <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
+               </div>
+               <div class="step_config-smtp_imap_port_bloc">
+                   <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_smtp_port"/>
+                   <div>
+                       <input type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true">
+                       <label for="smtp_tls">'.$this->trans('Use TLS').'</label><br>
+                       <input type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" value="false">
+                       <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
+                   </div>
+                   <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
+               </div>
+           </div>
+        ';
+    }
+}
+
+/**
  * @subpackage smtp/functions
  */
 if (!hm_exists('smtp_server_dropdown')) {
