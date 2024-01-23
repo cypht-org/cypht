@@ -209,7 +209,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
         }
         if (!$this->get('router_login_state')) {
             $css = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;'.
-                'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url('.WEB_ROOT.'modules/core/assets/images/cloud.png);'.
+                'background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url('.WEB_ROOT.'modules/core/assets/images/cloud.jpg);'.
                 'background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;'.
                 'display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages'.
                 '{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;'.
