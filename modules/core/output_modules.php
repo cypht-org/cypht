@@ -506,7 +506,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
             $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
             foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
-                $mod = str_replace(array('modules/', '/'), '', $rel_name);
+                $mod = str_replace(array('modules/', '/', '\\'), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
@@ -556,7 +556,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     $core = $rel_name;
                     continue;
                 }
-                $mod = str_replace(array('modules/', '/'), '', $rel_name);
+                $mod = str_replace(array('modules/', '/','\\'), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $rel_name).'"></script>';
                 }
