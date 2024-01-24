@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 :root {
     --tfa-form-valid-color: #198754;
     --tfa-form-valid-border-color: #198754;
@@ -217,3 +218,6 @@
 /**
 	**		Shake Annimation Ends Here.
 	**/
+=======
+.tfa_setting { display: none; }
+>>>>>>> ba2058f0 (2fa Module)
