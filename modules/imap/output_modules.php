@@ -438,6 +438,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+                $pass_value = '*************';
             }
             elseif (array_key_exists('nopass', $vals)) {
                 if (array_key_exists('user', $vals)) {
@@ -448,66 +449,61 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 }
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
             else {
                 $user_pc = '';
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
-            $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
+            $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
             $res .= sprintf('<div class="server_title"><b>%s</b></div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
-            $res .= '<form class="imap_connect" method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label>'.
-                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').
-                '" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'"></span>'.
-                '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label>'.
-                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
-                '" type="password" name="imap_pass"></span>';
 
-            if ($this->get('sieve_filters_enabled')) {
-                $default_value = '';
-                if (isset($vals['sieve_config_host'])) {
-                    $default_value = $vals['sieve_config_host'];
-
-                    $res .=  '<span><label class="screen_reader" for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label>'.
-                            '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="credentials imap_sieve_host_input" placeholder="Sieve Host" type="text" name="imap_sieve_host" value="'.$default_value.'"></span>';
-                }
+            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
+            
+            // IMAP Username
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label></div>';
+            
+            // IMAP Password
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label></div>';
+            
+            // Sieve Host (Conditional)
+            if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
+                $default_value = $vals['sieve_config_host'];
+                $res .= '<div class="form-floating mb-3">';
+                $res .= '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
+                $res .= '<label for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label></div>';
             }
-
-            $res .= '<div class="d-flex gap-2">';
+            
+            // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-outline-secondary btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+            } else {
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-secondary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />';
             }
-            else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-secondary btn-sm" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm" />';
-            }
-
-            $hidden = false;
-            if (array_key_exists('hide', $vals) && $vals['hide']) {
-                $hidden = true;
-            }
-            $res .= '<input type="submit" ';
-            if ($hidden) {
-                $res .= 'style="display: none;" ';
-            }
-            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm" />';
-            $res .= '<input type="submit" ';
-            if (!$hidden) {
-                $res .= 'style="display: none;" ';
-            }
-            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm" />';
+            
+            // Hide/Unhide Buttons
+            $hidden = array_key_exists('hide', $vals) && $vals['hide'];
+            $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+            $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+            
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
+            $res .= '</form>';
+                
 
-            $res .= '</div>';
-
-            $res .= '</form></div></div>';
+            $res .= '</div></div>';
         }
         $res .= '<br class="clear_float" /></div></div></div></div>';
         return $res;
@@ -671,6 +667,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+                $pass_value = '*************';
             }
             elseif (array_key_exists('nopass', $vals)) {
                 if (array_key_exists('user', $vals)) {
@@ -681,54 +678,52 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
                 }
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
             else {
                 $user_pc = '';
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
-            $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
+            $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
-                $this->html_safe($vals['name']), $this->html_safe($vals['server']));
-            $res .= '<form class="imap_connect" method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="imap_user_'.$index.'">'.$this->trans('JMAP username').'</label>'.
-                '<input '.$disabled.' id="imap_user_'.$index.'" class="credentials" placeholder="'.$this->trans('Username').
-                '" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'"></span>'.
-                '<span><label class="screen_reader" for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label>'.
-                '<input '.$disabled.' id="imap_pass_'.$index.'" class="credentials imap_password" placeholder="'.$pass_pc.
-                '" type="password" name="imap_pass"></span>';
+            $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+            
+            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
 
-            $res .= '<div class="d-flex gap-2">';    
+            // JMAP Username
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('JMAP username').'</label></div>';
 
+            // JMAP Password
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label></div>';
+
+            // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection" />';
-            }
-            else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection" />';
-            }
-            $hidden = false;
-            if (array_key_exists('hide', $vals) && $vals['hide']) {
-                $hidden = true;
-            }
-            $res .= '<input type="submit" ';
-            if ($hidden) {
-                $res .= 'style="display: none;" ';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-outline-danger btn-sm imap_delete me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="btn btn-outline-success btn-sm save_imap_connection me-2" />';
+            } else {
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="btn btn-outline-secondary btn-sm test_imap_connect me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-danger btn-sm imap_delete me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="btn btn-outline-warning btn-sm forget_imap_connection me-2" />';
             }
 
-            $res .= 'value="'.$this->trans('Hide').'" class="hide_imap_connection" />';
-            $res .= '<input type="submit" ';
-            if (!$hidden) {
-                $res .= 'style="display: none;" ';
-            }
-            $res .= 'value="'.$this->trans('Unhide').'" class="unhide_imap_connection" />';
+            // Hide/Unhide Button Logic
+            $hidden = array_key_exists('hide', $vals) && $vals['hide'];
+            $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="btn btn-outline-secondary btn-sm hide_imap_connection me-2" />';
+            $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="btn btn-outline-secondary btn-sm unhide_imap_connection me-2" />';
+
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div>';
-            $res .= '</form></div></div>';
+            $res .= '</form>';
+
+
+            $res .= '</div></div>';
         }
         $res .= '<br class="clear_float" /></div></div></div>';
         return $res;

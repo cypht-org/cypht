@@ -561,7 +561,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                                             <label for="new_feed_address" class="">'.$this->trans('Site address or feed URL').'</label>
                                         </div>
 
-                                        <input type="submit" class="btn btn-success" value="'.$this->trans('Add').'" name="submit_feed" />
+                                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_feed" />
                                     </form>
                                 </div>';
         }
@@ -577,7 +577,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
         $res = '';
         if ($this->format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
-                $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
+                $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
                 $res .= sprintf('<div class="server_title"><b>%s</b></div><div title="%s" class="server_subtitle">%s</div>',
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
                 $res .= '<form class="feed_connect d-flex gap-2" method="POST">';

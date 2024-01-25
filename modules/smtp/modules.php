@@ -1363,45 +1363,54 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('[saved]');
+                $pass_value = '************';
             }
             elseif (array_key_exists('user', $vals) && array_key_exists('nopass', $vals)) {
                 $user_pc = $vals['user'];
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
             else {
                 $user_pc = '';
                 $pass_pc = $this->trans('Password');
                 $disabled = '';
+                $pass_value = '';
             }
-            $res .= '<div class="configured_server col-12 col-lg-4"><div class="card card-body">';
+            $res .= '<div class="configured_server col-12 col-lg-4 mb-3"><div class="card card-body">';
             $res .= sprintf('<div class="server_title"><b>%s</b></div><div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-            $res .=
-                '<form class="smtp_connect" method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" /><span> '.
-                '<label class="screen_reader" for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label>'.
-                '<input '.$disabled.' class="credentials" id="smtp_user_'.$index.'" placeholder="'.$this->trans('Username').
-                '" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'"></span><br/><span> <label class="screen_reader" for="smtp_pass_'.
-                $index.'">'.$this->trans('SMTP password').'</label><input '.$disabled.' class="credentials smtp_password" placeholder="'.
-                $pass_pc.'" type="password" id="smtp_pass_'.$index.'" name="smtp_pass"></span>';
-
-            $res .= '<div class="d-flex gap-2">';
+            
+            $res .= '<form class="smtp_connect" method="POST">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
+            
+            // SMTP Username
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' class="form-control credentials" id="smtp_user_'.$index.'" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label></div>';
+            
+            // SMTP Password
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' class="form-control credentials smtp_password" type="password" id="smtp_pass_'.$index.'" name="smtp_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label></div>';
+            
+            // Buttons
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
-                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-light border btn-sm" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-light border btn-sm me-2" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm me-2" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-secondary btn-sm" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-warning btn-sm" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-secondary btn-sm me-2" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm me-2" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-secondary btn-sm me-2" />';
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-            $res .= '</div>';
-            $res .= '</form></div></div>';
+            $res .= '</form>';
+
+            $res .= '</div></div>';
         }
         $res .= '<br class="clear_float" /></div></div></div>';
         return $res;

@@ -44,7 +44,7 @@ var smtp_save_action = function(event) {
                 form.find('.save_smtp_connection').hide();
                 form.find('.smtp_password').val('');
                 form.find('.smtp_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_smtp_connection" />');
+                form.append('<input type="submit" value="Forget" class="forget_smtp_connection btn btn-outline-secondary btn-sm" />');
                 $('.forget_smtp_connection').on('click', smtp_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);

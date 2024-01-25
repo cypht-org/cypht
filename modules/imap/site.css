@@ -6,7 +6,7 @@
 .hl { padding-right: 5px; color: #666; }
 .dl { color: #888; }
 .empty_list { text-align: center; color: #ccc; font-size: 2em; font-style: italic; padding: 30px; padding-bottom: 100px; }
-.credentials { width: 205px; margin-bottom: 15px !important; }
+/* .credentials { width: 205px; margin-bottom: 15px !important; } */
 /* .add_server .txt_fld { width: 205px; } */
 /* .add_server .port_fld { width: 50px; } */
 /* .server_title { font-size: 110%; margin-bottom: 0px; color: #666; } */
@@ -21,7 +21,6 @@
 .imap_update a { color: teal; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 10px; letter-spacing: 0px; }
 .close_link { float: right; padding-right: 20px; text-decoration: none; color: teal; font-size: 90%; margin-bottom: 10px;}
 .header_links { padding-top: 10px !important; }
-.header_links a { float: none !important; padding-left: 3px !important; padding-right: 3px !important; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
 .account_row { cursor: pointer; }
 .expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
@@ -99,17 +98,6 @@
 #block_sender_form { padding: 15px; display: block; }
 #block_sender_form label, #block_sender_form select, #block_sender_form textarea { display: block; margin: 3px 0; width: 100%; }
 #block_sender_form label { text-transform: capitalize; }
-
-.snooze_date_picker, .snooze_helper { color: #333; text-transform: capitalize; }
-.snooze_date_picker { border-top: 1px solid #ddd; }
-.snooze_dropdown { position: absolute; margin-top: 15px; background-color: #fff; border: 1px solid #ddd; box-shadow: 3px 3px 3px #ddd; font-variant: none;     min-width: 250px; }
-.snooze_date_picker:hover, .snooze_helper:hover { background-color: #eee; }
-.header_links a.snooze_date_picker, .header_links a.snooze_helper, .msg_controls a.snooze_date_picker, .msg_controls a.snooze_helper { padding: 8px; padding-left: 15px !important; padding-right: 15px !important; white-space: nowrap; font-size: 1rem; display: block !important; margin-right: 0; border: 0; }
-.snooze_helper span { float: right; }
-.snooze_date_picker { display: block; padding: 8px 15px; color: #333; font-size: 1rem; cursor: pointer; }
-.unsnooze { color: teal; }
-.header_x-snoozed .unsnooze { margin-left: 20px; }
-
 
 /* Popup container - can be anything you want */
 .popup {
