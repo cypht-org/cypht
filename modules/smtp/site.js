@@ -406,20 +406,86 @@ $(function() {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_form').on('submit', function() {
-            var msg_uid = hm_msg_uid();
-            var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-            var class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
-            var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
-            var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
-            if (next_message) {
-                $('.compose_next_email_data').val(next_message);
+        $('.compose_form').on('submit', function(e) {
+            e.preventDefault();
+            const body = $('.compose_body').val().trim();
+            const subject = $('.compose_subject').val().trim();
+
+            let modalContentHeadline = '';
+            let dontWanValueInStorage = '';
+
+            // If the subject is empty, we should warn the user
+            if (!subject) {
+                dontWanValueInStorage = 'dont_warn_empty_subject';
+                modalContentHeadline = "<p>Your subject is empty</p>";
             }
-            var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
-            $('#send_uploaded_files').val(uploaded_files);
-            Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
-            $('.smtp_send_archive').addClass('disabled_input'); 
-            $('.smtp_send').on("click", function() { return false; }); 
+
+            // If the body is empty, we should warn the user
+            if (!body) {
+                dontWanValueInStorage = 'dont_warn_empty_body';
+                modalContentHeadline = "<p>Your body is empty!</p>";
+            }
+
+            // if both the subject and the body are empty, we should warn the user
+            if (!body && !subject) {
+                dontWanValueInStorage = 'dont_warn_empty_subject_body';
+                modalContentHeadline = "<p>Your subject and body are empty!</p>";
+            }
+
+            // If the user has disabled the warning, we should send the message
+            if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
+                return handleSendAnyway();
+            }
+            // Otherwise, we should show the modal if we have a headline
+            if (modalContentHeadline) {
+                return showModal();
+            }
+
+            // Subject and body are not empty, we can send the message
+            handleSendAnyway();
+
+            /*
+            ========================================
+            Functions declarations
+            ========================================
+            */
+            function showModal() {
+                const modalContent = modalContentHeadline + `
+                <p>Are you sure you want to send this message?</p>
+                `;
+                const modalButtons = [
+                    "Cancel sending",
+                    "Send anyway",
+                    "Send anyway and don't warn me in the future",
+                ];
+                Hm_Modals.show('Warning', modalContent, modalButtons, [Hm_Modals.hide, handleSendAnyway, handleSendAnywayAndDontWarnMe]);
+            }
+
+            function handleSendAnyway() {
+                e.target.submit();
+                handleFiles();
+            };
+
+            function handleSendAnywayAndDontWarnMe() {
+                Hm_Utils.save_to_local_storage(dontWanValueInStorage, true);
+                handleSendAnyway();
+            };
+
+            function handleFiles() {
+                var msg_uid = hm_msg_uid();
+                var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+                var class_name = 'imap_' + detail.server_id + '_' + msg_uid + '_' + detail.folder;
+                var key = 'imap_' + Hm_Utils.get_url_page_number() + '_' + hm_list_path();
+                var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
+                if (next_message) {
+                    $('.compose_next_email_data').val(next_message);
+                }
+                var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+                $('#send_uploaded_files').val(uploaded_files);
+                Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
+                $('.smtp_send_archive').addClass('disabled_input');
+                $('.smtp_send').on("click", function () { return false; });
+            }
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();

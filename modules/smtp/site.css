@@ -44,4 +44,3 @@
 .bubble_dropdown-content ul li span, .bubble_dropdown-content ul li a {display: flex; align-items: center; padding: 8px 4px;text-decoration: none;color: #333;}
 .bubble_dropdown-content ul li span:hover, .bubble_dropdown-content ul li a:hover { background-color: #f1f1f1;cursor: pointer;}
 .bubble_dropdown-content ul li img { width: 16px;height: 16px;margin-right: 8px;}
-
