@@ -1865,7 +1865,7 @@ function listControlsMenu() {
 
 // Sortablejs
 const tableBody = document.querySelector('.message_table_body');
-if(tableBody) {
+if(tableBody && !hm_mobile()) {
     const allFoldersClassNames = [];
     let targetFolder;
     let movingElement;
