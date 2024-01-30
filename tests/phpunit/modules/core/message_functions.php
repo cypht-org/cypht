@@ -44,8 +44,8 @@ class Hm_Test_Core_Message_Functions extends TestCase {
     public function test_format_msg_text() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals("foo<br />\nbar<br />", format_msg_text("foo\nbar", $mod));
-        $this->assertEquals('<a href="http://foo.com">http://foo.com</a><br />', format_msg_text('http://foo.com', $mod));
-        $this->assertEquals('<a href="http://foo.com">http://foo.com</a>]<br />', format_msg_text('http://foo.com]', $mod));
+        $this->assertEquals('<a href="http://foo.com" target="_blank" rel="noopener">http://foo.com</a><br />', format_msg_text('http://foo.com', $mod));
+        $this->assertEquals('<a href="http://foo.com" target="_blank" rel="noopener">http://foo.com</a>]<br />', format_msg_text('http://foo.com]', $mod));
     }
     /**
      * @preserveGlobalState disabled

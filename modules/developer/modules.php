@@ -94,12 +94,12 @@ class Hm_Output_dev_content extends Hm_Output_Module {
         return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
             '<div class="long_text">'.
             'There is not a lot of documentation yet, but there are a few resources available online. First is the module overview page at our website intended for developers interested in creating module sets.'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/modules.html">http://cypht.org/modules.html</a>'.
-            '<br /><br />Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/">Apigen</a> and while '.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/modules.html" target="_blank" rel="noopener">http://cypht.org/modules.html</a>'.
+            '<br /><br />Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/" target="_blank" rel="noopener">Apigen</a> and while '.
             'not yet complete, has a lot of useful information'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html">http://cypht.org/docs/code_docs/index.html</a>'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html" target="_blank" rel="noopener">http://cypht.org/docs/code_docs/index.html</a>'.
             '<br /><br />Finally there is a "hello world" module with lots of comments included in the project download and browsable at github'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
+            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world" target="_blank" rel="noopener">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
             '</div></div>';
     }
 }
@@ -180,7 +180,7 @@ class Hm_Output_server_information extends Hm_Output_Module {
                 '<tr><th>Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
                 '<tr><th>SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
                 '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
-                '<tr><th>Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
+                '<tr><th>Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'" target="_blank" rel="noopener">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
                 '</table></div>';
         }
         return '';

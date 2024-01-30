@@ -108,7 +108,7 @@ class Hm_Output_apod_content extends Hm_Output_Module {
                         '" alt="'.$this->trans('Picture of the day').'" /></div>';
                 }
                 elseif ($data['media_type'] == 'video' && array_key_exists('url', $data)) {
-                    $res .= '<div class="apod_video"><a href="'.$this->html_safe($data['url']).'">YouTube</a></div>';
+                    $res .= '<div class="apod_video"><a href="'.$this->html_safe($data['url']).'" target="_blank" rel="noopener">YouTube</a></div>';
                 }
             }
             elseif (array_key_exists('url', $data) && preg_match("/jpg$/i", $data['url'])) {

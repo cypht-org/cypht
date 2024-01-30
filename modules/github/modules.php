@@ -782,14 +782,14 @@ function github_parse_headers($data, $output_mod) {
 
     if (array_key_exists('actor', $data) && array_key_exists('login', $data['actor'])) {
         $from = $data['actor']['login'];
-        $from_link = sprintf(' - <a href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($from), $output_mod->html_safe($from));
+        $from_link = sprintf(' - <a href="https://github.com/%s" target="_blank" rel="noopener">https://github.com/%s</a>', $output_mod->html_safe($from), $output_mod->html_safe($from));
     }
     else {
         $from = '[No From]';
     }
     if (array_key_exists('repo', $data) && array_key_exists('name', $data['repo'])) {
         $name = $data['repo']['name'];
-        $repo_link = sprintf(' - <a href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($name), $output_mod->html_safe($name));
+        $repo_link = sprintf(' - <a href="https://github.com/%s" target="_blank" rel="noopener">https://github.com/%s</a>', $output_mod->html_safe($name), $output_mod->html_safe($name));
     }
     else {
         $name = '[No Repo]';
@@ -837,7 +837,7 @@ function github_parse_payload($data, $output_mod) {
         }
         if (array_key_exists('url', $vals) && array_key_exists('sha', $vals)) {
             $url = str_replace(array('commits', 'https://api.github.com/repos'), array('commit', 'https://github.com'), $vals['url']);
-            $res .= sprintf('<div class="github_link"><a href="%s">%s</a></div>',
+            $res .= sprintf('<div class="github_link"><a href="%s" target="_blank" rel="noopener">%s</a></div>',
                 $output_mod->html_safe($url), $output_mod->html_safe($vals['sha']));
         }
         $res .= '</div>';
