@@ -384,13 +384,18 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
+                    $user_config = $this->get('user_config');
+                    $contact_list = $user_config->get('contacts', []);
+                    $existing_emails = array_column($contact_list, 'email_address');
                     $sender = addr_parse($headers['From'])['email'];
                     $domain = '*@'.get_domain($sender);
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
-                    $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
-                    $txt .= block_filter_dropdown($this);
+                    if(!in_array($sender, $existing_emails)){
+                        $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                        $txt .= block_filter_dropdown($this);
+                    }
                 } else {
                     $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
