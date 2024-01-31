@@ -938,6 +938,7 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
+                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
