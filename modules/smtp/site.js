@@ -327,13 +327,14 @@ var text_to_bubbles = function(input) {
     var contact_type = input.getAttribute("data-type");
     var contact_source = input.getAttribute("data-source");
 
-    if ($(input).val() && contact_id) {
+    if ($(input).val()) {
         var recipients = $(input).val().split(/,|;/);
         var invalid_recipients = '';
 
         for (var i = 0; i < recipients.length; i++) {
             if (is_valid_recipient(recipients[i])) {
-                append_bubble(recipients[i].trim(), input, contact_id, contact_type, contact_source);
+                const value = recipients[i].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                append_bubble(value, input, contact_id, contact_type, contact_source);
             } else {
                 if (invalid_recipients) {
                     invalid_recipients = invalid_recipients + ', ';
@@ -353,22 +354,27 @@ var append_bubble = function(value, to, id, type, source) {
     bubble_index++;
 };
 
-var toggle_bubble_dropdown = function(element) {
+var toggle_bubble_dropdown = function (element) {
     var dropdownContent = element.nextElementSibling;
-  
+
     if (!dropdownContent) {
-      var textValue = element.dataset.value;
-      var contact_id = element.getAttribute('data-id');
-      var contact_type = element.getAttribute('data-type');
-      var contact_source = element.getAttribute('data-source');
-      var editIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAcQAAAHEBHD+AdwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEESURBVDiNldO/LuxRFMXxz5KJRqFSKCU6IUIp0XoGkXgBDUFHoldQ6XQ6iUqlcm8iOh5AoUGp9C83dysQMn4zmVnJKU72/q61T7KPqtLPwRL+4BAjqSpJJjHrWw9VdaZNSVaxginMYznYwRguf/TeVdVpAzyHexTWcQFXPYy9imO0Pu97uMbmAAbaR+2QvFhV/36Uzqtqt284yR5U1Zpu6b3AHQ2SrPQCNxokCTYwhFY32FdDm2bw18eynCS5wf8muNMTFvCECUzjuQlOspVktGmCJ7zgDFtV9dyUjHEM/zKoqv0OQKO67kGvBo9JRvqBkgz6+D+3LWzjKMlwHx5vOKiq13cd46KPLEvGfQAAAABJRU5ErkJggg==';
-      var copyIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADUSURBVDiN7ZI9SgNBAIW/F0JECwubQAr7gIUgVjZ2Ymed2lzB2tIjeAEPIFh4ASsbTxGIlXaCwmeRXZxdzGpi64OB4c37KyYqJZIcAjfAgOV4BU7VGWrjACfAuM23NJfAuUq/aN4BdoE5sJFkv9X6rM6q+xssvP3KvAfcAU8ds8dJLtTbkqwXHAHX6tUyd5Iz4BhoBPTq947mRk6b6H2nWgX/AX8LcK2AJENgCjzA10f6fa3OkxyoL+WCD2DzB+9WpaM2A0QlyQi4B7Y7At6BifpYkp8XA1pTMGl6mgAAAABJRU5ErkJggg==';
-      dropdownContent = document.createElement('div');
-      dropdownContent.classList.add('bubble_dropdown-content');
-      dropdownContent.innerHTML = '<ul><li><span data-value="'+textValue+'" onclick="copy_text_to_clipboard(this)"><img src="'+copyIcon+'"> Copy</span></li><li><a href="?page=contacts&contact_id='+contact_id+'&contact_source='+contact_source+'&contact_type='+contact_type+'"><img src="'+editIcon+'"> Edit</a></li></ul>';
-      element.parentNode.appendChild(dropdownContent);
+        var textValue = element.dataset.value;
+        var contact_id = element.getAttribute('data-id');
+        var contact_type = element.getAttribute('data-type');
+        var contact_source = element.getAttribute('data-source');
+        var editIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAcQAAAHEBHD+AdwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEESURBVDiNldO/LuxRFMXxz5KJRqFSKCU6IUIp0XoGkXgBDUFHoldQ6XQ6iUqlcm8iOh5AoUGp9C83dysQMn4zmVnJKU72/q61T7KPqtLPwRL+4BAjqSpJJjHrWw9VdaZNSVaxginMYznYwRguf/TeVdVpAzyHexTWcQFXPYy9imO0Pu97uMbmAAbaR+2QvFhV/36Uzqtqt284yR5U1Zpu6b3AHQ2SrPQCNxokCTYwhFY32FdDm2bw18eynCS5wf8muNMTFvCECUzjuQlOspVktGmCJ7zgDFtV9dyUjHEM/zKoqv0OQKO67kGvBo9JRvqBkgz6+D+3LWzjKMlwHx5vOKiq13cd46KPLEvGfQAAAABJRU5ErkJggg==';
+        var copyIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADUSURBVDiN7ZI9SgNBAIW/F0JECwubQAr7gIUgVjZ2Ymed2lzB2tIjeAEPIFh4ASsbTxGIlXaCwmeRXZxdzGpi64OB4c37KyYqJZIcAjfAgOV4BU7VGWrjACfAuM23NJfAuUq/aN4BdoE5sJFkv9X6rM6q+xssvP3KvAfcAU8ds8dJLtTbkqwXHAHX6tUyd5Iz4BhoBPTq947mRk6b6H2nWgX/AX8LcK2AJENgCjzA10f6fa3OkxyoL+WCD2DzB+9WpaM2A0QlyQi4B7Y7At6BifpYkp8XA1pTMGl6mgAAAABJRU5ErkJggg==';
+        dropdownContent = document.createElement('div');
+        dropdownContent.classList.add('bubble_dropdown-content');
+        let html = '<ul><li><span data-value="' + textValue + '" onclick="copy_text_to_clipboard(this)"><img src="' + copyIcon + '"> Copy</span></li>';
+        if (contact_id !== "null") {
+            html += '<li><a href="?page=contacts&contact_id=' + contact_id + '&contact_source=' + contact_source + '&contact_type=' + contact_type + '"><img src="' + editIcon + '"> Edit</a></li>';
+        }
+        html += '</ul>';
+        dropdownContent.innerHTML = html;
+        element.parentNode.appendChild(dropdownContent);
     }
-  
+
     dropdownContent.classList.toggle('show');
 }
 
@@ -378,7 +384,7 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    var valid_regex = /^[\w ]*[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    var valid_regex = /^[\w ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/;
     return recipient.match(valid_regex);
 };
 
@@ -512,10 +518,12 @@ $(function() {
         $('.compose_to, .compose_cc, .compose_bcc').on('keypress', function(e) {
             if(e.which == 13) {
                 e.preventDefault();
-                if (is_valid_recipient($(this).val())) {
-                    text_to_bubbles(this);
-                }
+                text_to_bubbles(this);
             }
+        });
+        $('.compose_to, .compose_cc, .compose_bcc').on('blur', function(e) {
+            e.preventDefault();
+            text_to_bubbles(this);
         });
         $('.compose_subject, .compose_body, .compose_server, .smtp_send, .smtp_send_archive').on('focus', function(e) {
             $('.compose_to, .compose_cc, .compose_bcc').each(function() {
@@ -529,7 +537,7 @@ $(function() {
             $(this).find('input').focus();
         });
         $(document).on('click', '.bubble_close', function(e) {
-            e.stopPropagation();   
+            e.stopPropagation();
             $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });
