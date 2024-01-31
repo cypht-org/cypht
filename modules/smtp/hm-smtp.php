@@ -522,17 +522,24 @@ class Hm_SMTP {
     }
 
     /* Send a message */
-    function send_message($from, $recipients, $message) {
+    function send_message($from, $recipients, $message, $from_params = '', $recipients_params = '') {
         $this->clean($from);
-        $command = 'MAIL FROM:<'.$from.'>';
+        if ($from_params) {
+            $from_params = ' ' . $from_params;
+        }
+        $from_params = $from_params ? ' ' . $from_params : '';
+        $command = 'MAIL FROM:<'.$from.'>' . $from_params;
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
         $result = 'An error occurred sending the message';
         if(is_array($recipients)) {
+            if ($recipients_params) {
+                $recipients_params = ' ' . $recipients_params;
+            }
             foreach($recipients as $rcpt) {
                 $this->clean($rcpt);
-                $command = 'RCPT TO:<'.$rcpt.'>';
+                $command = 'RCPT TO:<'.$rcpt.'>'.$recipients_params;
                 $this->send_command($command);
                 $res = $this->get_response();
                 if ($this->compare_response($res, '250') != 0) {

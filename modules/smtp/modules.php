@@ -668,6 +668,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
+        $from_params = '';
+        $recipients_params = '';
 
         /* parse attachments */
         $uploaded_files = [];
@@ -684,6 +686,11 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
+
+        if ($this->request->post['compose_delivery_receipt']) {
+            $from_params      = 'RET=HDRS';
+            $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
+        }
 
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
@@ -727,7 +734,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg());
+        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg(), $from_params, $recipients_params);
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
             repopulate_compose_form($draft, $this);
@@ -1076,7 +1083,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             '<div id="bcc_contacts"></div></div></div><input value="'.$this->html_safe($subject).
             '" name="compose_subject" class="compose_subject" type="text" placeholder="'.
             $this->trans('Subject').'" /><textarea id="compose_body" name="compose_body" class="compose_body">'.
-            $this->html_safe($body).'</textarea>';
+            $this->html_safe($body).'</textarea>'.
+            '<div><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" /><label for="compose_delivery_receipt">'.$this->trans('Request a delivery receipt').'</label></div>';
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
