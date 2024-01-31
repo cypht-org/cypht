@@ -646,8 +646,11 @@ if (!hm_exists('get_mime_type')) {
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {       
         /* not sending */
-        if (!array_key_exists('compose_smtp_id', $this->request->post)) {
+        if (!array_key_exists('smtp_send', $this->request->post)) {
             $this->out('enable_attachment_reminder', $this->user_config->get('enable_attachment_reminder_setting', false));
+            return;
+        }
+        if (!array_key_exists('compose_smtp_id', $this->request->post)) {
             return;
         }
 

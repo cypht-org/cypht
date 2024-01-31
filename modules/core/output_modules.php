@@ -595,9 +595,9 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'window.hm_current_lang = ' . json_encode($this->lang) . ';' .
             'window.hm_translations = ' . json_encode($this->all_trans()) . ';' .
             'var hm_trans = function(key, lang = window.hm_current_lang) {' .
-            '    const translation = window.translations[lang][key];' .
-            '    if (translation !== undefined && translation !== false) {' .
-            '        return translation;' .
+            '    const langTranslations = window.translations && window.translations[lang];' .
+            '    if (langTranslations && langTranslations[key] !== undefined && langTranslations[key] !== false) {' .
+            '        return langTranslations[key];' .
             '    }' .
             '    return key;' .
             '};' .
