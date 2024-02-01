@@ -162,6 +162,7 @@ return array(
         'compose_cc' => FILTER_UNSAFE_RAW,
         'compose_bcc' => FILTER_UNSAFE_RAW,
         'compose_smtp_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'compose_delivery_receipt' => FILTER_VALIDATE_BOOLEAN,
         'draft_id' => FILTER_VALIDATE_INT,
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_UNSAFE_RAW,
