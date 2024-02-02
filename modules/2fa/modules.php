@@ -110,6 +110,33 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
 }
 
 /**
+ * Verify 2fa code is paired with Authenticator app before enabling 2fa
+ * @subpackage 2fa/handler
+ */
+class Hm_Handler_2fa_setup_check extends Hm_Handler_Module {
+    public function process() {
+
+        list($secret, $simple) = get_2fa_key($this->config);
+        if (!$secret) {
+            Hm_Debug::add('2FA module set enabled, but no shared secret configured');
+            return;
+        }
+
+        $verified = false;
+        $len = $simple ? 15 : 64;
+
+        $username = $this->session->get('username', false);
+        $secret = create_secret($secret, $username, $len);
+
+        if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
+            $verified = true;
+        }
+        
+        $this->out('ajax_2fa_verified', $verified);
+    }
+}
+
+/**
  * @subpackage 2fa/output
  */
 class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
@@ -120,40 +147,63 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         if (array_key_exists('2fa_enable', $settings)) {
             $enabled = $settings['2fa_enable'];
         }
-        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$unlocked.'" width="16" height="16" />'.$this->trans('2 Factor Authentication').'</td></tr>';
+        $res = '<tr>
+                    <td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
+                        '<img alt="" src="'.Hm_Image_Sources::$unlocked.'" width="16" height="16" />'.$this->trans('2 Factor Authentication').'
+                    </td>
+                </tr>';
 
-        $res .= '<tr class="tfa_setting"><td>'.$this->trans('Enable 2 factor authentication').
-            '</td><td><input value="1" type="checkbox" name="2fa_enable"';
-        if ($enabled) {
-            $res .= ' checked="checked"';
-        }
-        $res .= '></td></tr>';
+        $res .= '<tr class="tfa_setting">
+                    <td>
+                        '.$this->trans('Enable 2 factor authentication').'
+                        <input value="1" type="checkbox" name="2fa_enable" '.($enabled ? 'checked="checked"' : '').' />';
+
         $svg = $this->get('2fa_svg');
+
         if ($svg) {
-            $qr_code = '<tr class="tfa_setting"><td></td><td>';
+            $qr_code = '';
             if (!$enabled) {
-                $qr_code .= '<div class="err settings_wrap_text">'.
-                    $this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'</div>';
+                $qr_code .= '<div class="err settings_wrap_text tfa_mt_1">'.$this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'</div>';
             }
             else {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
             $qr_code .= $svg;
-            $qr_code .= '</td></tr>';
-            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
-            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
+            $qr_code .= '<div class="tfa_mb_1">'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</div>';
+            $qr_code .= wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true);
         }
         else {
-            $qr_code = '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code = '<div class="tfa_mt_1">'.$this->trans('Unable to generate 2 factor authentication QR code').'</div>';
         }
-        $res .= $qr_code;
-        $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device').'<br /><br />';
+        $res .= $qr_code . '</td>';
+
+        $res .= '<td><div class="tfa_mb_1">'.$this->trans('The following backup codes can be used to access your account if you lose your device'). '</div>';
+
         foreach ($backup_codes as $val) {
             $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
         }
-        $res .= '</td></tr>';
+        $res .= '<div class="tfa_mt_1">
+                    <fieldset class="tfa_confirmation_fieldset">
+                        <legend>Enter the confirmation code</legend>
+                        <div class="tfa_confirmation_wrapper">
+                            <div class="tfa_confirmation_form">
+                                <div class="tfa_confirmation_input_digits">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 0" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 1" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 2" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 3" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 4" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 5" aria-required="true">
+                                </div>
+                                <button id="tfaConfirmationBtn" type="submit" class="tfa_confirmation_input_button">'.$this->trans('Verify code').'</button>
+                            </div>
+                            <div class="tfa_confirmation_hint"> '.$this->trans('Enter the 6 digit code from your Authenticator application').'</div>
+                        </div>
+                    </fieldset>
+                </div>
+            </td>
+        </tr>';
         return $res;
     }
 }
