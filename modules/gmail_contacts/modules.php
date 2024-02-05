@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/gmail_contacts/hm-gmail-contacts.php';
+require_once APP_PATH.'modules/imap/hm-imap.php';
 
 /**
  * @subpackage gmail_contacts/handler
