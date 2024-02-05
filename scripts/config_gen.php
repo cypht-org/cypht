@@ -252,6 +252,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
         $js_lib .= file_get_contents("third_party/resumable.min.js");
         $js_lib .= file_get_contents("third_party/ays-beforeunload-shim.js");
         $js_lib .= file_get_contents("third_party/jquery.are-you-sure.js");
+        $js_lib .= file_get_contents("third_party/sortable.min.js");
         file_put_contents('tmp.js', $js);
         $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
         $js_hash = build_integrity_hash($js_out);
