@@ -501,6 +501,29 @@ abstract class Hm_Output_Module {
         return str_replace('\n', '<br />', strip_tags($string));
     }
 
+    /**
+     * Return all translations for earch supported language
+     * @return array translations
+     */
+    public function all_trans() {
+        // Get all files in the language directory
+        $language_files = glob(APP_PATH.'language/'. '*.php');
+        $translations = [];
+
+        foreach ($language_files as $file) {
+            // Extract the language code from the file name
+            $language_code = pathinfo($file, PATHINFO_FILENAME);
+
+            // Read the content of the file
+            $content = include $file;
+
+            // Store the content in the translations array
+            $translations[$language_code] = $content;
+        }
+
+        return $translations;
+    }
+
 
     /**
      * Return a translated string of numbers if possible and if language is farsi

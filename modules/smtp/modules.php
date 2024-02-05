@@ -646,7 +646,11 @@ if (!hm_exists('get_mime_type')) {
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
     public function process() {       
         /* not sending */
-        if (!array_key_exists("compose_smtp_id", $this->request->post)) {
+        if (!array_key_exists('smtp_send', $this->request->post)) {
+            $this->out('enable_attachment_reminder', $this->user_config->get('enable_attachment_reminder_setting', false));
+            return;
+        }
+        if (!array_key_exists('compose_smtp_id', $this->request->post)) {
             return;
         }
 
@@ -820,6 +824,13 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_enable_attachment_reminder_setting extends Hm_Handler_Module {
+    public function process() {
+        function enable_attachment_reminder_callback($val) { return $val; }
+        process_site_setting('enable_attachment_reminder', $this, 'enable_attachment_reminder_callback', false, true);
+    }
+}
+
 /**
  * @subpackage smtp/handler
  */
@@ -885,6 +896,27 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
 /**
  * @subpackage smtp/output
  */
+class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        else {
+            $checked = '';
+            $reset='';
+        }
+        return '<tr class="general_setting"><td><label for="enable_attachment_reminder">'.
+            $this->trans('Enable Attachment Reminder').'</label></td>'.
+            '<td><input type="checkbox" '.$checked.
+            ' value="1" id="enable_attachment_reminder" name="enable_attachment_reminder" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
@@ -901,8 +933,8 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_form_start extends Hm_Output_Module {
     protected function output() {
-        return'<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>'.
-            '<form class="compose_form" method="post" action="?page=compose">';
+        return '<div class="compose_page"><div class="content_title">'.$this->trans('Compose').'</div>' .
+    '<form class="compose_form" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
     }
 }
 

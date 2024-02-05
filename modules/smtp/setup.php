@@ -39,6 +39,8 @@ add_output('settings', 'auto_bcc_setting', true, 'smtp', 'compose_type_setting',
 add_handler('settings', 'attachment_dir', true, 'smtp', 'save_user_settings', 'after');
 add_output('settings', 'attachment_setting', true, 'smtp', 'compose_type_setting', 'after');
 
+add_output('settings', 'enable_attachment_reminder_setting', true, 'smtp', 'attachment_setting', 'after');
+add_handler('settings', 'process_enable_attachment_reminder_setting', true, 'smtp', 'save_user_settings', 'before');
 
 /* ajax server setup callback data */
 add_handler('ajax_smtp_debug', 'login', false, 'core');
@@ -104,6 +106,7 @@ return array(
         'ajax_smtp_save_draft',
         'ajax_smtp_delete_draft',
         'ajax_profiles_status',
+        'ajax_attachment_reminder_check',
         'ajax_get_test_chunk',
         'ajax_upload_chunk'
     ),
@@ -135,6 +138,7 @@ return array(
         'profile_value' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'enable_attachment_reminder' => array(FILTER_VALIDATE_BOOLEAN, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
@@ -176,7 +180,8 @@ return array(
         'profile_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'send_uploaded_files' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'next_email_post' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'next_email_post' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'enable_attachment_reminder' => FILTER_VALIDATE_INT
     )
 );
 

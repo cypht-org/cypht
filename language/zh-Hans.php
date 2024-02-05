@@ -576,4 +576,6 @@ return array(
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
     'Warn for unsaved changes' => false,
+    'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => false
 ); 
