@@ -1131,11 +1131,11 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
                     '<label for="compose_subject">'.$this->trans('Subject').'</label>'.
                 '</div>'.
-                '<div class="form-floating">'.
+                '<div class="form-floating mb-3">'.
                     '<textarea id="compose_body" name="compose_body" class="compose_body form-control" placeholder="'.$this->trans('Message').'">'.$this->html_safe($body).'</textarea>'.
                     '<label for="compose_body">'.$this->trans('Message').'</label>'.
                 '</div>'.
-                '<div><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" /><label for="compose_delivery_receipt">'.$this->trans('Request a delivery receipt').'</label></div>';
+                '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.

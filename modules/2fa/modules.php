@@ -147,19 +147,6 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         if (array_key_exists('2fa_enable', $settings)) {
             $enabled = $settings['2fa_enable'];
         }
-<<<<<<< HEAD
-        $res = '<tr>
-                    <td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
-                        '<img alt="" src="'.Hm_Image_Sources::$unlocked.'" width="16" height="16" />'.$this->trans('2 Factor Authentication').'
-                    </td>
-                </tr>';
-
-        $res .= '<tr class="tfa_setting">
-                    <td>
-                        '.$this->trans('Enable 2 factor authentication').'
-                        <input value="1" type="checkbox" name="2fa_enable" '.($enabled ? 'checked="checked"' : '').' />';
-
-=======
         $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
             '<i class="bi bi-unlock-fill fs-5 me-2"></i>'.$this->trans('2 Factor Authentication').'</td></tr>';
 
@@ -169,7 +156,6 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $res .= ' checked="checked"';
         }
         $res .= '></td></tr>';
->>>>>>> ba2058f0 (2fa Module)
         $svg = $this->get('2fa_svg');
 
         if ($svg) {
@@ -196,7 +182,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
         }
         $res .= '<div class="tfa_mt_1">
-                    <fieldset class="tfa_confirmation_fieldset">
+                    <fieldset class="tfa_confirmation_fieldset p-3">
                         <legend>Enter the confirmation code</legend>
                         <div class="tfa_confirmation_wrapper">
                             <div class="tfa_confirmation_form">
@@ -208,7 +194,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
                                     <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 4" aria-required="true">
                                     <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 5" aria-required="true">
                                 </div>
-                                <button id="tfaConfirmationBtn" type="submit" class="tfa_confirmation_input_button">'.$this->trans('Verify code').'</button>
+                                <button id="tfaConfirmationBtn" type="submit" class="tfa_confirmation_input_button btn btn-light border-1">'.$this->trans('Verify code').'</button>
                             </div>
                             <div class="tfa_confirmation_hint"> '.$this->trans('Enter the 6 digit code from your Authenticator application').'</div>
                         </div>
