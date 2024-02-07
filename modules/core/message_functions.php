@@ -18,6 +18,9 @@ function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.DefinitionImpl', null);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('HTML.TargetNoopener', true);
+    $config->set('HTML.Allowed', 'a[href|target]');
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
     }
