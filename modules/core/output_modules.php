@@ -1833,7 +1833,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         }
         $res = '';
         $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center">';
-        $res .= '<div class="d-flex gap-3">' . message_controls($this).'<div class="mailbox_list_title">'.
+        $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
             implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
         if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
