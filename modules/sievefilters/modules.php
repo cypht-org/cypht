@@ -1191,12 +1191,12 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$book).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Filters').'</a></li>';
         $res .= '<li class="menu_block_list"><a class="unread_link" href="?page=block_list">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$circle_x).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-x-circle-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Block List').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1212,8 +1212,9 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
 class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
-        $res = '<div class="sievefilters_settings"><div class="content_title">'.$this->trans('Filters').'</div>';
+        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
+        $res .= '<div class="p-3">';
         return $res;
     }
 }
@@ -1224,7 +1225,7 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
 class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
-        $res = '<div class="sievefilters_settings"><div class="content_title">'.$this->trans('Block List').'</div>';
+        $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
         $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         return $res;
     }
@@ -1294,6 +1295,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $mailboxes = $this->get('imap_accounts', array());
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
+        $res .= '<div class="p-3">';
         foreach($mailboxes as $idx => $mailbox) {
             $behaviours = $this->get('sieve_block_default_behaviour');
             $reject_messages = $this->get('sieve_block_default_reject_message');
@@ -1316,9 +1318,9 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
             $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
             $res .= '<div class="sievefilters_accounts_item">';
-            $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
+            $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between">' . $mailbox['name'];
             $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
+            $res .= '<div class="sievefilters_accounts filter_block px-5 py-3" style="display: none;"><div class="filter_subblock">';
             $res .=  $default_behaviour_html;
             $res .= '<table class="filter_details"><tbody>';
             $res .= '<tr><th style="width: 20px;">Sender</th><th style="width: 40%;">Behavior</th><th style="width: 15%;">Actions</th></tr>';
@@ -1327,6 +1329,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $res .= '</div></div></div>';
         }
         $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
+        $res .= '</div></div>';
         return $res;
     }
 }
@@ -1347,12 +1350,12 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
             $sieve_supported++;
             $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
             $res .= '<div class="sievefilters_accounts_item">';
-            $res .= '<div class="sievefilters_accounts_title settings_subtitle">' . $mailbox['name'];
+            $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
             $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block" style="display: none;"><div class="filter_subblock">';
-            $res .= '<button class="add_filter" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script">Add Script</button>';
-            $res .= '<table class="filter_details"><tbody>';
-            $res .= '<tr><th style="width: 80px;">Priority</th><th>Name</th><th style="width: 15%;">Actions</th></tr>';
+            $res .= '<div class="sievefilters_accounts filter_block p-3" style="display: none;"><div class="filter_subblock">';
+            $res .= '<button class="add_filter btn btn-success" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
+            $res .= '<table class="filter_details table my-3"><tbody>';
+            $res .= '<tr><th class="text-secondary fw-light" style="width: 80px;">Priority</th><th class="text-secondary fw-light">Name</th><th class="text-secondary fw-light" style="width: 15%;">Actions</th></tr>';
             $res .= get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), true);
             $res .= '</tbody></table>';
             $res .= '<div style="height: 40px; margin-bottom: 10px; display: none;">
@@ -1410,9 +1413,9 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
             $checked = '';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
-        return '<tr class="general_setting"><td><label for="enable_sieve_filter">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
             $this->trans('Enable sieve filter').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
             ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" />'.$reset.'</td></tr>';
     }
 }
@@ -1590,10 +1593,10 @@ if (!hm_exists('get_mailbox_filters')) {
                 <td>' . str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2))) . '</td>
                 <td>
                     <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
-                        <img width="16" height="16" src="' . Hm_Image_Sources::$edit . '" />
+                        <i class="bi bi-pencil-fill"></i>
                     </a>
                     <a href="#" script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" style="padding-left: 5px;" script_name="'.$script_name.'" class="delete_'.$base_class.'">
-                        <img width="16" height="16" src="' . Hm_Image_Sources::close('#d80f0f') . '" />
+                        <i class="bi bi-trash3 text-danger"></i>
                     </a>
                 </td>
             </tr>
@@ -1754,18 +1757,18 @@ if (!hm_exists('block_filter_dropdown')) {
         .'<form id="block_sender_form">';
         if ($with_scope) {
             $ret .= '<div><label>'.$mod->trans('Who Is Blocked').'</label>'
-            .'<select name="scope">'
+            .'<select name="scope" class="form-select form-select-sm">'
             .'<option value="sender">'.$mod->trans('This Sender').'</option>'
             .'<option value="domain">'.$mod->trans('Whole domain').'</option></select></div>';
         }
         $ret .= '<div><label>'.$mod->trans('Action').'</label>'
-        .'<select name="block_action" id="block_action">'
+        .'<select class="form-select form-select-sm" name="block_action" id="block_action">'
         .'<option value="default">'.$mod->trans('Default action').'</option>'
         .'<option value="discard">'.$mod->trans('Discard').'</option>'
         .'<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
         .'<option value="reject_default">'.$mod->trans('Reject With Default Message').'</option>'
         .'<option value="reject_with_message">'.$mod->trans('Reject With Specific Message').'</option>'
-        .'</select></div><div><button type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
+        .'</select></div><div><button class="btn btn-danger btn-sm mt-2" type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
         .'</div></div>';
         return $ret;
     }

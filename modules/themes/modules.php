@@ -80,7 +80,7 @@ class Hm_Output_theme_setting extends Hm_Output_Module {
         $current = $this->get('theme', '');
         $res = '<tr class="general_setting"><td><label for="theme_setting">'.
             $this->trans('Theme').'</label></td>'.
-            '<td><select id="theme_setting" name="theme_setting">';
+            '<td><select class="form-select form-select-sm" id="theme_setting" name="theme_setting">';
         $reset = '';
         foreach ($this->get('themes', array()) as $name => $label) {
             $res .= '<option ';

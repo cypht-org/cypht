@@ -1,21 +1,3 @@
-.filter_details {
-    margin-top: 20px;
-}
-
-.filter_details th {
-    color: #666;
-    padding: 5px;
-    padding-bottom: 5px;
-    padding-bottom: 2px;
-    border-bottom: solid 1px #eee;
-    font-weight: normal;
-    text-align: left;
-}
-
-.filter_details td {
-    padding: 10px;
-}
-
 .tingle-modal * {
     box-sizing: border-box
 }
@@ -258,22 +240,16 @@
     }
 }
 
-.filters_count,
-.key_count {
-    float: right;
-    margin-right: 120px;
-    font-size: 90%;
-}
 
 .filter_subblock {
     margin-bottom: 40px;
 }
 
-.filter_block {
+/* .filter_block {
     margin-bottom: 30px;
     margin-left: 40px;
     padding-top: 20px;
-}
+} */
 
 .unblock_button {
     width: 16px;
@@ -437,12 +413,6 @@ table.filter_actions_modal_table th {
     display: block;
     margin: 3px 0;
     width: 100%;
-}
-
-#block_sender_form button {
-    color: #fff;
-    background-color: brown;
-    cursor: pointer;
 }
 
 #block_sender_form button:disabled {

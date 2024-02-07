@@ -533,20 +533,41 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
         if ($this->format == 'HTML5') {
             $count = count($this->get('feeds', array()));
             $count = sprintf($this->trans('%d configured'), $count);
-            return '<div class="feed_server_setup"><div data-target=".feeds_section" class="server_section">'.
-                '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
-                ' '.$this->trans('Feeds').' <div class="server_count">'.$count.'</div></div><div class="feeds_section"><form class="add_server" method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<div class="subtitle">'.$this->trans('Add an RSS/ATOM Feed').'</div><table>'.
-                '<tr><td><label class="screen_reader" for="new_feed_name">'.$this->trans('Feed name').'</label>'.
-                '<input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld" value="" placeholder="'.$this->trans('Feed name').'" /></td></tr>'.
-                '<tr><td><label for="new_feed_address" class="screen_reader">'.$this->trans('Site address or feed URL').'</label>'.
-                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="'.$this->trans('Site address or feed URL').'" value="" /></td></tr>'.
-                '<tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_feed" /></td></tr>'.
-                '</table></form>';
+
+            return '<div class="feed_server_setup">
+                        <div data-target=".feeds_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                            <a href="#" class="pe-auto">
+                                <i class="bi bi-rss-fill me-3"></i>
+                                <b> '.$this->trans('Feeds').'</b>
+                            </a> 
+                            <div class="server_count">'.$count.'</div>
+                        </div>
+
+                        <div class="feeds_section px-4 pt-3 me-0">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 mb-4">
+                                    <form class="add_server me-0" method="POST">
+                                        <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+
+                                        <div class="subtitle mt-4">'.$this->trans('Add an RSS/ATOM Feed').'</div>
+
+                                        <div class="form-floating mb-3">
+                                            <input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Feed name').'">
+                                            <label class="" for="new_feed_name">'.$this->trans('Feed name').'</label>
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            <input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld form-control" placeholder="'.$this->trans('Site address or feed URL').'" value="">
+                                            <label for="new_feed_address" class="">'.$this->trans('Site address or feed URL').'</label>
+                                        </div>
+
+                                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_feed" />
+                                    </form>
+                                </div>';
         }
     }
 }
+
 
 /**
  * @subpackage feeds/output
@@ -556,15 +577,15 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
         $res = '';
         if ($this->format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
-                $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>',
+                $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
+                $res .= sprintf('<div class="server_title"><b>%s</b></div><div title="%s" class="server_subtitle">%s</div>',
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
-                $res .= '<form class="feed_connect" method="POST">';
+                $res .= '<form class="feed_connect d-flex gap-2" method="POST">';
                 $res .= '<input type="hidden" name="feed_id" value="'.$this->html_safe($index).'" />';
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect btn btn-outline-secondary btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete btn btn-outline-danger btn-sm" />';
                 $res .= '<input type="hidden" value="ajax_feed_debug" name="hm_ajax_hook" />';
-                $res .= '</form></div>';
+                $res .= '</form></div></div>';
             }
             $res .= '<br class="clear_float" /></div></div>';
         }
@@ -773,21 +794,21 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         if (is_array($folders) && !empty($folders)) {
             $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$rss_alt).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('All').'</a> <span class="unread_feed_count"></span></li>';
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" alt="'.$this->trans('Load Feed').'" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-rss fs-5 me-2"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
         }
         $res .= '<li class="feeds_add_new"><a href="?page=servers#feeds_section">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$plus).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-plus-square fs-5 me-2"></i>';
         }
         $res .= $this->trans('Add a feed').'</a></li>';
         if ($res) {
@@ -825,8 +846,8 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="unread_setting"><td><label for="unread_exclude_feeds">'.$this->trans('Exclude unread feed items').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_feeds" name="unread_exclude_feeds" />'.$reset.'</td></tr>';
+        return '<tr class="unread_setting"><td><label class="form-check-label" for="unread_exclude_feeds">'.$this->trans('Exclude unread feed items').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="unread_exclude_feeds" name="unread_exclude_feeds" />'.$reset.'</td></tr>';
     }
 }
 
@@ -850,8 +871,8 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
  */
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.$this->trans('Feed Settings').'</td></tr>';
+        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-rss-fill fs-5 me-2"></i>'.$this->trans('Feed Settings').'</td></tr>';
     }
 }
 
@@ -885,7 +906,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
-            '<td><input type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
     }
 }
 

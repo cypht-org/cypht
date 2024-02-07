@@ -275,16 +275,24 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
             return '';
         }
         return '<div class="quick_add_section">'.
-            '<div class="nux_step_one">'.
-            $this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP sections below.').
-            '<br /><br /><label class="screen_reader" for="service_select">'.$this->trans('Select an E-mail provider').'</label>'.
-            ' <select id="service_select" name="service_select"><option value="">'.$this->trans('Select an E-mail provider').'</option>'.Nux_Quick_Services::option_list(false, $this).'</select>'.
-            '<label class="screen_reader" for="nux_username">'.$this->trans('Username').'</label>'.
-            '<br /><input type="email" id="nux_username" class="nux_username" placeholder="'.$this->trans('Your E-mail address').'" />'.
-            '<label class="screen_reader" for="nux_account_name">'.$this->trans('Account name').'</label>'.
-            '<br /><input type="text" id="nux_account_name" class="nux_account_name" placeholder="'.$this->trans('Account Name [optional]').'" />'.
-            '<br /><input type="button" class="nux_next_button" value="'.$this->trans('Next').'" />'.
-            '</div><div class="nux_step_two"></div></div></div>';
+            '<div class="nux_step_one px-4 pt-">'.
+            '<p class="py-3">'.$this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP sections below.').'</p>'.
+            '<div class="row"><div class="col col-lg-4"><div class="form-floating mb-3">'.
+            ' <select id="service_select" name="service_select" class="form-select">'.
+            '<option value="">'.$this->trans('Select an E-mail provider').'</option>'.
+            Nux_Quick_Services::option_list(false, $this).'</select>'.
+            '<label for="service_select">'.$this->trans('Select an E-mail provider').'</label></div>'.
+
+            '<div class="form-floating mb-3">'.
+            '<input type="email" id="nux_username" class="form-control nux_username" placeholder="'.$this->trans('Your E-mail address').'">'.
+            '<label for="nux_username">'.$this->trans('Username').'</label></div>'.
+
+            '<div class="form-floating mb-3">'.
+            '<input type="text" id="nux_account_name" class="form-control nux_account_name" placeholder="'.$this->trans('Account Name [optional]').'">'.
+            '<label for="nux_account_name">'.$this->trans('Account name').'</label></div>'.
+
+            '<input type="button" class="nux_next_button btn btn-success btn-md px-5" value="'.$this->trans('Next').'">'.
+            '</div></div></div><div class="nux_step_two px-4 pt-3"></div></div>';
     }
 }
 
@@ -310,7 +318,7 @@ class Hm_Output_filter_service_select extends Hm_Output_Module {
  */
 class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="nux_dev_news"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
+        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
@@ -321,7 +329,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
                 $this->html_safe($vals['note'])
             );
         }
-        $res .= '</table></div>';
+        $res .= '</table></div></div></div>';
         return $res;
     }
 }
@@ -331,9 +339,9 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
  */
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
-        return '<div class="nux_help"><div class="nux_title">'.$this->trans('Help').'</div>'.
+        return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Help').'</div>'.
             $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
-        '</div>';
+        '</div></div></div>';
     }
 }
 
@@ -349,17 +357,17 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $tz = $this->get('tzone');
         $protos = array('imap', 'smtp', 'feeds', 'profiles');
 
-        $res = '<div class="nux_welcome"><div class="nux_title">'.$this->trans('Welcome to Cypht').'</div>';
-        $res .= '<div class="nux_qa">'.$this->trans('Add a popular E-mail source quickly and easily');
-        $res .= ' <a class="nux_try_out" href="?page=servers#quick_add_section">'.$this->trans('Add an E-mail Account').'</a>';
-        $res .= '</div><ul>';
+        $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
+        $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
+        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
+        $res .= '</div><ul class="mt-4">';
         
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
             if ($proto == 'feeds') {
                 $proto_dsp = 'RSS/ATOM';
             }
-            $res .= '<li class="nux_'.$proto.'">';
+            $res .= '<li class="nux_'.$proto.' mt-3">';
 
             // Check if user have profiles configured
             if ($proto == 'profiles') {
@@ -401,7 +409,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         else {
             $res .= sprintf($this->trans('Your timezone is set to %s'), $this->html_safe($tz));
         }
-        $res .= ' <a href="?page=settings#general_setting">'.$this->trans('Update').'</a></div></div>';
+        $res .= ' <a href="?page=settings#general_setting">'.$this->trans('Update').'</a></div></div></div></div>';
         return $res;
     }
 }
@@ -427,9 +435,9 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$circle_check.'" alt="" width="16" height="16" /> '.
-            $this->trans('Add an E-mail Account').'</div>';
+        return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-2 pe-auto"><a href="#" class="pe-auto">'.
+            '<i class="bi bi-check-circle-fill me-3"></i>'.
+            '<b>'.$this->trans('Add an E-mail Account').'</b></a></div>';
     }
 }
 
@@ -453,19 +461,34 @@ function oauth2_form($details, $mod) {
  * @subpackage nux/functions
  */
 if (!hm_exists('credentials_form')) {
-function credentials_form($details, $mod) {
-    $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
-    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div>';
-    $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
-    $res .= '<br /><br /><label class="screen_reader" for="nux_email">';
-    $res .= $mod->trans('E-mail Address').'</label><input type="email" id="nux_email" name="nux_email" value="'.$mod->html_safe($details['email']).'" />';
-    $res .= '<br /><label class="screen_reader" for="nux_password">'.$mod->trans('E-mail Password').'</label>';
-    $res .= '<input type="password" id="nux_password" placeholder="'.$mod->trans('E-Mail Password').'" name="nux_password" class="nux_password" />';
-    $res .= '<br /><input type="button" class="nux_submit" value="'.$mod->trans('Connect').'" /><br />';
-    $res .= '<a href="" class="reset_nux_form">Reset</a>';
-    return $res;
-}}
+    function credentials_form($details, $mod) {
+        $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
+        $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
+        $res .= '<div class="nux_step_two_title"><b>'.$mod->html_safe($details['name']).'</b></div>';
+        $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
+    
+        $res .= '<div class="row"><div class="col col-lg-4">';
+        // E-mail Address Field
+        $res .= '<div class="form-floating mb-3 mt-3">';
+        $res .= '<input type="email" class="form-control" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
+        $res .= '<label for="nux_email">'.$mod->trans('E-mail Address').'</label></div>';
+    
+        // E-mail Password Field
+        $res .= '<div class="form-floating mb-3">';
+        $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
+        $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
+    
+        // Connect Button
+        $res .= '<input type="button" class="nux_submit px-5 btn btn-success me-3" value="'.$mod->trans('Connect').'">';
+    
+        // Reset Link
+        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';
+
+        $res .= '</div></div>';
+    
+        return $res;
+    }
+}
 
 /**
  * @subpackage nux/functions

@@ -121,7 +121,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
         }
         else {
-            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
+            $results .= '<i class="bi bi-folder2-open"></i> ';
         }
         if (!$folder['noselect']) {
             if (strlen($output_mod->html_safe($folder['basename']))>15) {
@@ -1385,18 +1385,20 @@ function snooze_formats() {
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
-    $txt = '<div style="display: inline-block;">';
-    $txt .= '<a class="snooze_link hlink" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
-    $txt .= '<div class="snooze_dropdown" style="display:none;">';
+
+    $txt = '<div class="btn-group">
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <div class="dropdown-menu mt-4" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_snooze_date($format, true);
-        $txt .= '<a href="#" class="snooze_helper" data-value="'.$format.'">'.$output->trans($labels[0]).' <span>'.$labels[1].'</span></a>';
+        $txt .= '<a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5 py-2" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a>';
     }
-    $txt .= '<label for="snooze_input_date" class="snooze_date_picker">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<div class="dropdown-divider"></div>';
+    $txt .= '<label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
     $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
     $txt .= '<input class="snooze_input" style="display:none;">';
     if ($unsnooze) {
-        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper">'.$output->trans('Unsnooze').'</a>';
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
     $txt .= '</div></div>';
 

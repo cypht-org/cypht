@@ -5,10 +5,10 @@ $(function() {
         return hm_delete_prompt();
     });
     $('.hl_source_type').on('change', function() {
-        $('.imap_row').hide();
-        $('.github_row').hide();
-        $('.feeds_row').hide();
+        $('.imap_row').addClass('d-none');
+        $('.github_row').addClass('d-none');
+        $('.feeds_row').addClass('d-none');
         var selected = $(this).val();
-        $('.'+selected+'_row').toggle();
+        $('.'+selected+'_row').removeClass('d-none');
     });
 });

@@ -1,13 +1,3 @@
-.add_contact_form input { margin: 5px; margin-left: 0px; }
-.add_contact_form { padding-top: 10px; display: block; }
-.contact_list { margin-left: 35px; margin-right: 10px; margin-top: 20px; width: 50%; }
-.contact_list td { white-space: nowrap; padding-right: 20px; padding-bottom: 5px; vertical-align: -5px; padding-top: 5px; border-bottom: solid 1px #ddd; }
-.gmail_contacts { margin-top: 50px; }
-.contact_list_title { padding-top: 0px !important; padding-bottom: 10px; }
-.show_contact img, .edit_contact img, .send_to_contact img, .delete_contact img { opacity: .5; margin-left: 10px; cursor: pointer; }
-.contact_controls { text-align: right; }
-.add_contact_row { position: absolute; top: 22px; right: 10px; font-size: 90%; z-index: 100}
-.add_contact_row img { opacity: .4; margin-right: 10px; }
 .add_contact_controls { display: none; }
 .contact_suggestion { display: block; }
 .close_autocomplete { float: right; }
@@ -15,15 +5,7 @@
 .contact_pages { text-align: center; border-bottom: none !important; }
 .no_contact_sources { text-align: center; color: #999; font-size: 110%; margin-top: 60px; }
 .add_contact { margin-bottom: 30px; margin-top: 10px; color: #666; margin-right: 25px; float: left; clear: left; margin-left: 25px; width: 300px; }
-.add_contact input, .add_contact select { margin-bottom: 10px; padding: 5px; margin-right: 5px; }
-.add_contact .server_title { cursor: pointer; }
 .contact_form { margin-top: 10px; display: none; }
-.add_contact .menu_caret { opacity: .7; }
-.contact_update_form { margin-top: 10px; }
-.contact_update_form, .contact_form { white-space: nowrap; }
-.contact_detail { margin: 20px; margin-bottom: 30px; }
-.contact_detail_row table { width: auto; }
-.contact_detail td { border: none; }
 .contact_detail_row { border: none; display: none;}
 .display_name, .email_address, .phone_number { font-weight: bold; }
 .show_contact { margin-right: 15px; }

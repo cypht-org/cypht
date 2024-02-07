@@ -616,12 +616,18 @@ class Hm_Output_display_github_status extends Hm_Output_Module {
 class Hm_Output_github_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('github_connect_details', array());
-        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$code.'" alt="" width="16" height="16" /> '.
-            $this->trans('Github Connect').'</div><div class="github_connect_section"><div class="add_server">';
+        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-github me-3"></i>
+                        <b>'.$this->trans('Github Connect').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="github_connect_section"><div class="add_server">';
+        
         if (empty($details)) {
             $res .= 'Connect to Github<br /><br />';
-            $res .= '<a href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
         }
         else {
             $res .= $this->trans('Already connected');
@@ -656,8 +662,8 @@ class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
  */
 class Hm_Output_start_github_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$code.'" width="16" height="16" />'.$this->trans('Github Settings').'</td></tr>';
+        return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-github fs-5 me-2"></i>'.$this->trans('Github Settings').'</td></tr>';
     }
 }
 

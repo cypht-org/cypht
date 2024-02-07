@@ -357,22 +357,22 @@ var Hm_Notices = {
         var msg_list = [];
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
-                msg_list.push('<span class="err">'+msgs[i].substring(3)+'</span>');
+                msg_list.push(msgs[i].substring(3));
             }
             else {
                 msg_list.push(msgs[i]);
             }
         }
         if (!keep) {
-            $('.sys_messages').html(msg_list.join(', '));
+            $('.err').html(msg_list.join(', '));
         }
         else {
-            var existing = $('.sys_messages').html();
+            var existing = $('.err').html();
             if (existing) {
-                $('.sys_messages').append('<br />'+msg_list.join(', '));
+                $('.err').append('<br />'+msg_list.join(', '));
             }
             else {
-                $('.sys_messages').html(msg_list.join(', '));
+                $('.err').html(msg_list.join(', '));
             }
         }
         $('.sys_messages').show();
@@ -663,10 +663,12 @@ function Message_List() {
 
     this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            $('.msg_controls').addClass('msg_controls_visible');
+            $('.msg_controls').addClass('d-flex');
+            $('.msg_controls').removeClass('d-none');
         }
         else {
-            $('.msg_controls').removeClass('msg_controls_visible');
+            $('.msg_controls').removeClass('d-flex');
+            $('.msg_controls').addClass('d-none');
         }
     };
 
@@ -1265,7 +1267,7 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
+        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1387,6 +1389,8 @@ var Hm_Utils = {
             document.getElementById('logout_without_saving').click();
         }
         else {
+            var confirmLogoutModal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'), {keyboard: true})
+            confirmLogoutModal.show();
             $('.confirm_logout').show();
         }
         return false;

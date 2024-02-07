@@ -91,15 +91,14 @@ class Hm_Output_dev_content extends Hm_Output_Module {
      * Dev resources
      */
     protected function output() {
-        return '<div class="dev_content"><div class="content_title">'.$this->trans('Developer Documentation').'</div>'.
-            '<div class="long_text">'.
-            'There is not a lot of documentation yet, but there are a few resources available online. First is the module overview page at our website intended for developers interested in creating module sets.'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/modules.html" target="_blank" rel="noopener">http://cypht.org/modules.html</a>'.
-            '<br /><br />Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/" target="_blank" rel="noopener">Apigen</a> and while '.
-            'not yet complete, has a lot of useful information'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="http://cypht.org/docs/code_docs/index.html" target="_blank" rel="noopener">http://cypht.org/docs/code_docs/index.html</a>'.
-            '<br /><br />Finally there is a "hello world" module with lots of comments included in the project download and browsable at github'.
-            '<br /><br />&nbsp;&nbsp;&nbsp;<a href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world" target="_blank" rel="noopener">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
+        return '<div class="dev_content p-0"><div class="content_title px-3">'.$this->trans('Developer Documentation').'</div>'.
+            '<div class="p-3">'.
+            '<p class="mb-2">There is not a lot of documentation yet, but there are a few resources available online. First is the module overview page at our website intended for developers interested in creating module sets.</p>'.
+            '<a class="ms-5" href="http://cypht.org/modules.html">http://cypht.org/modules.html</a>'.
+            '<p class="mt-4 mb-2">Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/">Apigen</a> and while not yet complete, has a lot of useful information</p>'.
+            '<a class="ms-5" href="http://cypht.org/docs/code_docs/index.html">http://cypht.org/docs/code_docs/index.html</a>'.
+            '<p class="mt-4 mb-2">Finally there is a "hello world" module with lots of comments included in the project download and browsable at github</p>'.
+            '<a class="ms-5" href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
             '</div></div>';
     }
 }
@@ -113,7 +112,7 @@ class Hm_Output_info_heading extends Hm_Output_Module {
      * Leaves an open div
      */
     protected function output() {
-        return '<div class="info_content"><div class="content_title">'.$this->trans('Info').'</div>';
+        return '<div class="info_content px-0"><div class="content_title p-3">'.$this->trans('Info').'</div>';
     }
 }
 
@@ -128,7 +127,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$bug).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-bug-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Dev').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -150,7 +149,7 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_info"><a class="unread_link" href="?page=info">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$info).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-info-circle fs-5 me-2"></i>';
         }
         $res .= $this->trans('Info').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -171,16 +170,16 @@ class Hm_Output_server_information extends Hm_Output_Module {
     protected function output() {
         $server_info = $this->get('server_info', array());
         if (!empty($server_info)) {
-            return '<div class="server_info"><table class="info">'.
-                '<tr><th>Server Name</th><td>'.$server_info['HTTP_HOST'].'</td></tr>'.
-                '<tr><th>Server Scheme</th><td>'.$server_info['REQUEST_SCHEME'].'</td></tr>'.
-                '<tr><th>Server Address</th><td>'.$server_info['SERVER_ADDR'].'</td></tr>'.
-                '<tr><th>Client Address</th><td>'.$server_info['REMOTE_ADDR'].'</td></tr>'.
-                '<tr><th>PHP version</th><td>'.$server_info['phpversion'].'</td></tr>'.
-                '<tr><th>Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
-                '<tr><th>SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
-                '<tr><th>Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
-                '<tr><th>Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'" target="_blank" rel="noopener">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
+            return '<div class="server_info p-3"><table class="info table table-borderless">'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Server Name</th><td>'.$server_info['HTTP_HOST'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Server Scheme</th><td>'.$server_info['REQUEST_SCHEME'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Server Address</th><td>'.$server_info['SERVER_ADDR'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Client Address</th><td>'.$server_info['REMOTE_ADDR'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">PHP version</th><td>'.$server_info['phpversion'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
                 '</table></div>';
         }
         return '';
@@ -196,7 +195,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
      * Show pages, module assignments, and input filters
      */
     protected function output() {
-    $res = '<div class="content_title">'.$this->trans('Configuration Map').'</div><table class="config_map">';
+    $res = '<div class="content_title px-3">'.$this->trans('Configuration Map').'</div><table class="config_map">';
     $handlers = array();
     $outputs = array();
     $ajax = array();
@@ -207,7 +206,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
         ksort($handlers);
         $outputs = $server_info['output'];
     }
-    $res .= '<tr><td colspan="3"><div class="settings_subtitle">Pages</div></td></tr>';
+    $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">Pages</div></td></tr>';
     foreach ($handlers as $page => $mods) {
         if (substr($page, 0, 4) == 'ajax') {
             continue;
@@ -226,7 +225,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
             }
         }
     }
-    $res .= '<tr><td colspan="3"><div class="settings_subtitle">AJAX Requests</div></td></tr>';
+    $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">AJAX Requests</div></td></tr>';
     foreach ($handlers as $page => $mods) {
         if (substr($page, 0, 4) != 'ajax') {
             continue;
@@ -259,8 +258,8 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
      * Modules populate this table to run a status check from the info page
      */
     protected function output() {
-        $res = '<div class="content_title">Status</div><table><thead><tr><th>'.$this->trans('Type').'</th><th>'.$this->trans('Name').'</th><th>'.
-                $this->trans('Status').'</th><th>'.
+        $res = '<div class="content_title px-3">'.$this->trans('Status').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
+                $this->trans('Status').'</th><th class="text-secondary fw-light">'.
                 $this->trans('Sieve server capabilities').'</th></tr></thead><tbody>';
         return $res;
     }
@@ -275,7 +274,7 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
      * Close the table opened in Hm_Output_server_status_start
      */
     protected function output() {
-        return '</tbody></table></div>';
+        return '</tbody></table></div></div>';
     }
 }
 

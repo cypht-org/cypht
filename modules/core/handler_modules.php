@@ -738,8 +738,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
                     $this->session->destroy($this->request);
-                    Hm_Msgs::add('Saved user data on logout');
-                    Hm_Msgs::add('Session destroyed on logout');
+                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout');
                 }
             }
             else {

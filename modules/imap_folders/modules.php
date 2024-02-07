@@ -340,9 +340,9 @@ class Hm_Handler_imap_folder_check extends Hm_Handler_Module {
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', -1);
-        $res = '<div class="folders_page"><form method="get">';
+        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-lg-5 col-sm-12"><form id="form_folder_imap" method="get">';
         $res .= '<input type="hidden" name="page" value="folders" />';
-        $res .= '<select id="imap_server_folder" name="imap_server_id">';
+        $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
         if ($server_id == -1) {
             $res .= 'selected="selected" ';
@@ -356,7 +356,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($id).'">';
             $res .= $this->html_safe($server['name']);
         }
-        $res .= '</select></form></div>';
+        $res .= '</select><label for="imap_server_folder">'.$this->trans('IMAP Server').'</label></div></form></div></div>';
         $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select an IMAP server first').'" />';
         $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
@@ -372,15 +372,24 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
 class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {
-            $res = '<div data-target=".delete_dialog" class="settings_subtitle">'.$this->trans('Delete a Folder').'</div>';
-            $res .= '<div class="delete_dialog folder_dialog">';
-            $res .= '<div class="folder_row"><a href="#" class="select_delete_folder">';
-            $res .= $this->trans('Select Folder').'</a>: <span class="selected_delete"></span></div>';
-            $res .= '<ul class="folders delete_folder_select"><li class="delete_title"><a href="#" class="close">';
-            $res .= $this->trans('Cancel').'</a></li></ul>';
-            $res .= '<input type="hidden" value="" id="delete_source" />';
-            $res .= ' <input type="button" id="delete_folder" value="'.$this->trans('Delete').'" />';
-            $res .= '</div>';
+            $res = '<div class="row m-0 px-3 mt-3">';
+            $res .= '<div data-target=".delete_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                        <a href="#" class="pe-auto">'.$this->trans('Delete a Folder').'</a>
+                    </div>';
+            $res .= '<div class="delete_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-1 px-0">
+                        <div class="folder_row">
+                            <a href="#" class="select_delete_folder">'.$this->trans('Select Folder').'</a>: 
+                            <span class="selected_delete"></span>
+                        </div>
+                        <ul class="folders delete_folder_select">
+                            <li class="delete_title">
+                                <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                            </li>
+                        </ul>
+                        <input type="hidden" value="" id="delete_source" />
+                        <input type="button" id="delete_folder" class="btn btn-danger" value="'.$this->trans('Delete').'">
+                     </div></div>';
+
             return $res;
         }
     }
@@ -392,23 +401,39 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
 class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {
-            $res = '<div data-target=".rename_dialog" class="settings_subtitle">'.$this->trans('Rename a Folder').'</div>';
-            $res .= '<div class="rename_dialog folder_dialog">';
-            $res .= '<div class="folder_row"><a href="#" class="select_rename_folder">'.$this->trans('Select Folder');
-            $res .= '</a>: <span class="selected_rename"></span></div>';
-            $res .= '<ul class="folders rename_folder_select"><li class="rename_title"><a href="#" class="close">';
-            $res .= $this->trans('Cancel').'</a></li></ul>';
-            $res .= ' <input id="rename_value" type="text" value="" placeholder="'.$this->trans('New Folder Name').'" /><br />';
+            $res = '<div class="row m-0 px-3 mt-3">
+                        <div data-target=".rename_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                            <a href="#" class="pe-auto">'.$this->trans('Rename a Folder').'</a>
+                        </div>
+                        <div class="rename_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
+                            <div class="folder_row">
+                                <a href="#" class="select_rename_folder">'.$this->trans('Select Folder').'</a>: 
+                                <span class="selected_rename"></span>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input id="rename_value" type="text" class="form-control" value="" placeholder="'.$this->trans('New Folder Name').'">
+                                <label for="rename_value">'.$this->trans('New Folder Name').'</label>
+                            </div>
+                            <ul class="folders rename_folder_select">
+                                <li class="rename_title">
+                                    <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                                </li>
+                            </ul>
+                            <div class="folder_row">
+                                <a href="#" class="select_rename_parent_folder">'.$this->trans('Select Parent Folder (optional)').'</a>: 
+                                <span class="selected_rename_parent"></span>
+                            </div>
+                            <ul class="folders rename_parent_folder_select">
+                                <li class="rename_parent_title">
+                                    <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                                </li>
+                            </ul>
+                            <input type="hidden" value="" id="rename_parent_source" />
+                            <input type="hidden" value="" id="rename_source" />
+                            <input type="button" id="rename_folder" class="btn btn-success" value="'.$this->trans('Rename').'">
+                        </div>
+                    </div>';
 
-            $res .= '<div class="folder_row"><a href="#" class="select_rename_parent_folder">'.$this->trans('Select Parent Folder (optional)');
-            $res .= '</a>: <span class="selected_rename_parent"></span></div>';
-            $res .= '<ul class="folders rename_parent_folder_select"><li class="rename_parent_title"><a href="#" class="close">';
-            $res .= $this->trans('Cancel').'</a></li></ul>';
-            $res .= '<input type="hidden" value="" id="rename_parent_source" />';
-
-            $res .= '<input type="hidden" value="" id="rename_source" />';
-            $res .= ' <input type="button" id="rename_folder" value="'.$this->trans('Rename').'" />';
-            $res .= '</div>';
             return $res;
         }
     }
@@ -422,24 +447,38 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') === NULL) {
             return;
         }
+
         $sent_folder = $this->get('sent_folder', $this->trans('Not set'));
         if (!$sent_folder) {
             $sent_folder = $this->trans('Not set');
         }
-        $res = '<div data-target=".sent_folder_dialog" class="settings_subtitle">'.$this->trans('Sent Folder');
-        $res .= ':<span id="sent_val">'.$sent_folder.'</span></div>';
-        $res .= '<div class="folder_dialog sent_folder_dialog">';
-        $res .= '<div class="folder_row">';
-        $res .= '<div class="sp_description">'.$this->trans('If set, a copy of outbound mail sent with a profile '.
-            'tied to this IMAP account, will be saved in this folder').'</div>';
-        $res .= '</div><div class="folder_row"><a href="#" class="select_sent_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_sent"></span></div>';
-        $res .= '<ul class="folders sent_folder_select"><li class="sent_title"><a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></li></ul>';
-        $res .= '<input type="hidden" value="" id="sent_source" />';
-        $res .= ' <input type="button" id="set_sent_folder" value="'.$this->trans('Update').'" /> ';
-        $res .= ' <input type="button" id="clear_sent_folder" value="'.$this->trans('Remove').'" /><br /><br />';
-        $res .= '</div>';
+
+        $res = '<div class="row m-0 px-3 mt-3">';
+        $res .= '<div data-target=".sent_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                    <a href="#" class="pe-auto">'.$this->trans('Sent Folder').':<span id="sent_val">'.$sent_folder.'</span></a>
+                </div>';
+        $res .= '<div class="folder_dialog sent_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
+                    <div class="folder_row">
+                        <div class="sp_description">'.$this->trans('If set, a copy of outbound mail sent with a profile tied to this IMAP account, will be saved in this folder').'</div>
+                    </div>
+                    <div class="folder_row">
+                        <a href="#" class="select_sent_folder">'.$this->trans('Select Folder').'</a>: 
+                        <span class="selected_sent"></span>
+                    </div>
+                    <ul class="folders sent_folder_select" style="z-index: 10">
+                        <li class="sent_title">
+                            <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="" id="sent_source" />
+                    <div class="btn-group mt-3" role="group" aria-label="Sent Folder Actions">
+                        <input type="button" id="set_sent_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="clear_sent_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
+                    </div>
+                    <br /><br />
+                </div>
+            </div>';
+
         return $res;
     }
 }
@@ -452,23 +491,38 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') === NULL) {
             return;
         }
+
         $archive_folder = $this->get('archive_folder', $this->trans('Not set'));
         if (!$archive_folder) {
             $archive_folder = $this->trans('Not set');
         }
-        $res = '<div data-target=".archive_folder_dialog" class="settings_subtitle">'.$this->trans('Archive Folder');
-        $res .= ':<span id="archive_val">'.$archive_folder.'</span></div>';
-        $res .= '<div class="folder_dialog archive_folder_dialog">';
-        $res .= '<div class="folder_row">';
-        $res .= '<div class="sp_description">'.$this->trans('If set, archived messages for this account will be moved to this folder').'</div>';
-        $res .= '</div><div class="folder_row"><a href="#" class="select_archive_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_archive"></span></div>';
-        $res .= '<ul class="folders archive_folder_select"><li class="archive_title"><a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></li></ul>';
-        $res .= '<input type="hidden" value="" id="archive_source" />';
-        $res .= ' <input type="button" id="set_archive_folder" value="'.$this->trans('Update').'" /> ';
-        $res .= ' <input type="button" id="clear_archive_folder" value="'.$this->trans('Remove').'" /><br /><br />';
-        $res .= '</div>';
+
+        $res = '<div class="row m-0 px-3 mt-3">';
+        $res .= '<div data-target=".archive_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                    <a href="#" class="pe-auto">'.$this->trans('Archive Folder').':<span id="archive_val">'.$archive_folder.'</span></a>
+                </div>';
+        $res .= '<div class="folder_dialog archive_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
+                    <div class="folder_row">
+                        <div class="sp_description">'.$this->trans('If set, archived messages for this account will be moved to this folder').'</div>
+                    </div>
+                    <div class="folder_row">
+                        <a href="#" class="select_archive_folder">'.$this->trans('Select Folder').'</a>: 
+                        <span class="selected_archive"></span>
+                    </div>
+                    <ul class="folders archive_folder_select" style="z-index : 10">
+                        <li class="archive_title">
+                            <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="" id="archive_source" />
+                    <div class="btn-group mt-3" role="group" aria-label="Archive Folder Actions">
+                        <input type="button" id="set_archive_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="clear_archive_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
+                    </div>
+                    <br /><br />
+                </div>
+            </div>';
+
         return $res;
     }
 }
@@ -481,23 +535,38 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') === NULL) {
             return;
         }
+
         $draft_folder = $this->get('draft_folder', $this->trans('Not set'));
         if (!$draft_folder) {
             $draft_folder = $this->trans('Not set');
         }
-        $res = '<div data-target=".draft_folder_dialog" class="settings_subtitle">'.$this->trans('Draft Folder');
-        $res .= ':<span id="draft_val">'.$draft_folder.'</span></div>';
-        $res .= '<div class="folder_dialog draft_folder_dialog">';
-        $res .= '<div class="folder_row">';
-        $res .= '<div class="sp_description">'.$this->trans('If set, drafts will be saved in this folder').'</div>';
-        $res .= '</div><div class="folder_row"><a href="#" class="select_draft_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_draft"></span></div>';
-        $res .= '<ul class="folders draft_folder_select"><li class="draft_title"><a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></li></ul>';
-        $res .= '<input type="hidden" value="" id="draft_source" />';
-        $res .= ' <input type="button" id="set_draft_folder" value="'.$this->trans('Update').'" /> ';
-        $res .= ' <input type="button" id="clear_draft_folder" value="'.$this->trans('Remove').'" /><br /><br />';
-        $res .= '</div>';
+
+        $res = '<div class="row m-0 px-3 mt-3">';
+        $res .= '<div data-target=".draft_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                    <a href="#" class="pe-auto">'.$this->trans('Draft Folder').':<span id="draft_val">'.$draft_folder.'</span></a>
+                </div>';
+        $res .= '<div class="folder_dialog draft_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
+                    <div class="folder_row">
+                        <div class="sp_description">'.$this->trans('If set, drafts will be saved in this folder').'</div>
+                    </div>
+                    <div class="folder_row">
+                        <a href="#" class="select_draft_folder">'.$this->trans('Select Folder').'</a>: 
+                        <span class="selected_draft"></span>
+                    </div>
+                    <ul class="folders draft_folder_select">
+                        <li class="draft_title">
+                            <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="" id="draft_source" />
+                    <div class="btn-group mt-3" role="group" aria-label="Draft Folder Actions">
+                        <input type="button" id="set_draft_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="clear_draft_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
+                    </div>
+                    <br /><br />
+                </div>
+            </div>';
+
         return $res;
     }
 }
@@ -510,24 +579,35 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') === NULL) {
             return;
         }
+
         $trash_folder = $this->get('trash_folder', $this->trans('Not set'));
         if (!$trash_folder) {
             $trash_folder = $this->trans('Not set');
         }
-        $res = '<div data-target=".trash_folder_dialog" class="settings_subtitle">'.$this->trans('Trash Folder');
-        $res .= ':<span id="trash_val">'.$trash_folder.'</span></div>';
+
+        $res = '<div class="row m-0 px-3 mt-3">';
+        $res .= '<div data-target=".trash_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                    <a href="#" class="pe-auto">'.$this->trans('Trash Folder').':<span id="trash_val">'.$trash_folder.'</span></a>
+                </div>';
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
-        $res .= '<div class="folder_dialog trash_folder_dialog">';
-        $res .= '<div class="sp_description">'.$this->trans('If set, deleted messages for this account '.
-            'will be moved to this folder').'</div>';
-        $res .= '<div class="folder_row"><a href="#" class="select_trash_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_trash"></span></div>';
-        $res .= '<ul class="folders trash_folder_select"><li class="trash_title"><a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></li></ul>';
-        $res .= '<input type="hidden" value="" id="trash_source" />';
-        $res .= ' <input type="button" id="set_trash_folder" value="'.$this->trans('Update').'" /> ';
-        $res .= ' <input type="button" id="clear_trash_folder" value="'.$this->trans('Remove').'" /><br /><br />';
-        $res .= '</div>';
+        $res .= '<div class="folder_dialog trash_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
+                    <div class="sp_description">'.$this->trans('If set, deleted messages for this account will be moved to this folder').'</div>
+                    <div class="folder_row">
+                        <a href="#" class="select_trash_folder">'.$this->trans('Select Folder').'</a>: 
+                        <span class="selected_trash"></span>
+                    </div>
+                    <ul class="folders trash_folder_select" style="z-index : 10">
+                        <li class="trash_title">
+                            <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="" id="trash_source" />
+                    <div class="btn-group mt-1" role="group" aria-label="Trash Folder Actions">
+                        <input type="button" id="set_trash_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="clear_trash_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
+                    </div>
+                </div></div>';
+
         return $res;
     }
 }
@@ -540,23 +620,38 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') === NULL) {
             return;
         }
+
         $junk_folder = $this->get('junk_folder', $this->trans('Not set'));
         if (!$junk_folder) {
             $junk_folder = $this->trans('Not set');
         }
-        $res = '<div data-target=".junk_folder_dialog" class="settings_subtitle">'.$this->trans('Junk Folder');
-        $res .= ':<span id="junk_val">'.$junk_folder.'</span></div>';
+
+        $res = '<div class="row m-0 px-3 mt-3">';
+        $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                    <a href="#" class="pe-auto">'.$this->trans('Junk Folder').':<span id="junk_val">'.$junk_folder.'</span></a>
+                </div>';
+
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
-        $res .= '<div class="folder_dialog junk_folder_dialog">';
-        $res .= '<div class="sp_description">'.$this->trans('If set, spams will be saved in this folder').'</div>';
-        $res .= '<div class="folder_row"><a href="#" class="select_junk_folder">';
-        $res .= $this->trans('Select Folder').'</a>: <span class="selected_junk"></span></div>';
-        $res .= '<ul class="folders junk_folder_select"><li class="junk_title"><a href="#" class="close">';
-        $res .= $this->trans('Cancel').'</a></li></ul>';
-        $res .= '<input type="hidden" value="" id="junk_source" />';
-        $res .= ' <input type="button" id="set_junk_folder" value="'.$this->trans('Update').'" /> ';
-        $res .= ' <input type="button" id="clear_junk_folder" value="'.$this->trans('Remove').'" /><br /><br />';
-        $res .= '</div>';
+        $res .= '<div class="folder_dialog junk_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
+                    <div class="sp_description">'.$this->trans('If set, spams will be saved in this folder').'</div>
+                    <div class="folder_row">
+                        <a href="#" class="select_junk_folder">'.$this->trans('Select Folder').'</a>: 
+                        <span class="selected_junk"></span>
+                    </div>
+                    <ul class="folders junk_folder_select" style="z-index: 10">
+                        <li class="junk_title">
+                            <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                        </li>
+                    </ul>
+                    <input type="hidden" value="" id="junk_source" />
+                    <div class="btn-group mt-3" role="group" aria-label="Junk Folder Actions">
+                        <input type="button" id="set_junk_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="clear_junk_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
+                    </div>
+                    <br /><br />
+                </div>
+            </div>';
+
         return $res;
     }
 }
@@ -567,16 +662,29 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
 class Hm_Output_folders_create_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('folder_server') !== NULL) {
-            $res = '<div data-target=".create_dialog" class="settings_subtitle">'.$this->trans('Create a New Folder').'</div>';
-            $res .= '<div class="create_dialog folder_dialog">';
-            $res .= '<input class="create_folder_name" id="create_value" type="text" value="" placeholder="';
-            $res .= $this->trans('New Folder Name').'" /><br /><div class="folder_row"><a href="#" class="select_parent_folder">';
-            $res .= $this->trans('Select Parent Folder (optional)').'</a>: <span class="selected_parent"></span></div>';
-            $res .= '<ul class="folders parent_folder_select"><li class="parent_title"><a href="#" class="close">';
-            $res .= $this->trans('Cancel').'</a></li></ul>';
-            $res .= '<input type="hidden" value="" id="create_parent" />';
-            $res .= ' <input type="button" id="create_folder" value="'.$this->trans('Create').'" />';
-            $res .= '</div>';
+            $res = '<div class="row m-0 px-3 mt-3">
+                        <div data-target=".create_dialog" class="settings_subtitle col-12 border-bottom px-0">
+                            <a href="#" class="pe-auto">'.$this->trans('Create a New Folder').'</a>
+                        </div>
+                        <div class="create_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
+                            <div class="form-floating mb-3">
+                                <input class="form-control create_folder_name" id="create_value" type="text" value="" placeholder="'.$this->trans('New Folder Name').'">
+                                <label for="create_value">'.$this->trans('New Folder Name').'</label>
+                            </div>
+                            <div class="folder_row">
+                                <a href="#" class="select_parent_folder">'.$this->trans('Select Parent Folder (optional)').'</a>: 
+                                <span class="selected_parent"></span>
+                            </div>
+                            <ul class="folders parent_folder_select">
+                                <li class="parent_title">
+                                    <a href="#" class="close">'.$this->trans('Cancel').'</a>
+                                </li>
+                            </ul>
+                            <input type="hidden" value="" id="create_parent" />
+                            <input type="button" id="create_folder" class="btn btn-success mt-3" value="'.$this->trans('Create').'">
+                        </div>
+                    </div>';
+
             return $res;
         }
     }
@@ -600,7 +708,7 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
         if ($this->get('imap_support')) {
             $res = '<li class="menu_folders"><a class="unread_link" href="?page=folders">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$folder).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-folder-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('Folders').'</a></li>';
             if ($this->format == 'HTML5') {

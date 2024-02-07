@@ -457,7 +457,7 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
         $current = $this->get('current_ldap_contact');
         $current_source = false;
         if ($current) {
-            $form_class = 'contact_update_form';
+            $form_class = 'contact_update_form mt-3';
             $current_source = $current['source'];
             $title = sprintf($this->trans('Update LDAP - %s'), $this->html_safe($current_source));
         }
