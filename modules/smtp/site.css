@@ -31,14 +31,14 @@
 .progress {background-color: #4323f5; animation: progressBar 1s ease-in-out; animation-fill-mode:both; }
 @keyframes progressBar { 0% { width: 0; } 100% { width: 100%; }}
 /* .compose_container { padding: 0 10px 0 0; border: 1px solid #ddd; margin-left: 5px; width: 100%; border-radius: 5px; margin-bottom: 10px; } */
-.bubbles { display: inline-block; margin-left: 5px; background-color: #fff; cursor: pointer; padding: 5px 0; }
-.bubble { font-size: .9rem; border: 1px solid #ddd; border-radius: 4px; padding: 7px 14px; display: inline-block; }
+.bubbles { display: inline-block; margin-left: 37px; background-color: #fff; cursor: pointer; z-index: 10; top: 0;  }
+.bubble { font-size: .9rem; border: 1px solid #ddd; border-radius: 25px; padding: 1px 7px; display: inline-block; }
 .bubble:hover { background-color: #eee; }
 .bubble:not(:first-child) { margin-left: 5px; }
-.bubble_close { font-size: 1.7em; float: right; margin-top: 9px; line-height: 0; margin-left: 7px; }
-.bubble_dropdown {position: relative;display: inline-block;}
+.bubble_close { font-size: 1.7em; float: right; margin-top: 12px; line-height: 0; margin-left: 7px; }
+.bubble_dropdown {position: absolute; display: inline-block; }
 .bubble_dropdown-toggle {cursor: pointer;}
-.bubble_dropdown-content {display: none;position: absolute;background-color: #f9f9f9;padding: 10px;border: 1px solid #ddd; min-width: 160px; z-index: 1;}
+.bubble_dropdown-content {display: none; position: absolute; background-color: #f9f9f9; padding: 10px;border: 1px solid #ddd; min-width: 160px; z-index: 1;}
 .bubble_dropdown-content.show {display: block;}
 .bubble_dropdown-content ul {list-style-type: none;padding: 0;margin: 0;}
 .bubble_dropdown-content ul li span, .bubble_dropdown-content ul li a {display: flex; align-items: center; padding: 8px 4px;text-decoration: none;color: #333;}

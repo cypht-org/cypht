@@ -420,7 +420,7 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
         
-        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                     <a href="#" class="pe-auto">
                         <i class="bi bi-wordpress me-3"></i>
                         <b>'.$this->trans('WordPress.com Connect').'</b>

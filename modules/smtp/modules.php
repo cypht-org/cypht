@@ -398,7 +398,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 }
                 else {
                     $this->session->set('add_form_vals', $form);
-                    Hm_Msgs::add(sprintf('ERRCound not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCould not add server: %s', $errstr));
                 }
             }
         }
@@ -1109,7 +1109,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
                 
-                '<div class="form-floating mb-3 to_outer position-relative">'.
+                '<div class="form-floating mb-3 to_outer compose_container position-relative">'.
+                    '<div class="bubbles bubble_dropdown"></div>'.
                     '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to form-control" type="text" placeholder="'.$this->trans('To').' kiki" id="compose_to" />'.
                     '<label for="compose_to">'.$this->trans('To').'</label>'.
                     '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 mt-2 me-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
@@ -1117,11 +1118,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<div id="to_contacts"></div>'.
                 '<div class="recipient_fields">'.
                     '<div class="form-floating mb-3 compose_container">'.
+                        '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc form-control" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
                         '<label for="compose_cc">'.$this->trans('Cc').'</label>'.
                     '</div>'.
                     '<div id="cc_contacts"></div>'.
                     '<div class="form-floating mb-3 compose_container">'.
+                        '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc form-control" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
                         '<label for="compose_bcc">'.$this->trans('Bcc').'</label>'.
                     '</div>'.
@@ -1235,7 +1238,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
         }
         
         return '<div class="smtp_server_setup">
-                    <div data-target=".smtp_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                    <div data-target=".smtp_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                         <a href="#" class="pe-auto">
                             <i class="bi bi-file-earmark-text-fill me-3"></i>
                             <b>'.$this->trans('SMTP Servers').'</b>

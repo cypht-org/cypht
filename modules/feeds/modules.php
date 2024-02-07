@@ -373,7 +373,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                             }
                         }
                         else {
-                            Hm_Msgs::add('ERRCound not find a feed at that address');
+                            Hm_Msgs::add('ERRCould not find a feed at that address');
                         }
                     }
                     else {
@@ -389,7 +389,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                     }
                 }
                 else {
-                    Hm_Msgs::add(sprintf('ERRCound not add feed: %s', $errstr));
+                    Hm_Msgs::add(sprintf('ERRCould not add feed: %s', $errstr));
                 }
             }
             else {
@@ -535,7 +535,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
             $count = sprintf($this->trans('%d configured'), $count);
 
             return '<div class="feed_server_setup">
-                        <div data-target=".feeds_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+                        <div data-target=".feeds_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                             <a href="#" class="pe-auto">
                                 <i class="bi bi-rss-fill me-3"></i>
                                 <b> '.$this->trans('Feeds').'</b>

@@ -616,7 +616,7 @@ class Hm_Output_display_github_status extends Hm_Output_Module {
 class Hm_Output_github_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('github_connect_details', array());
-        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                     <a href="#" class="pe-auto">
                         <i class="bi bi-github me-3"></i>
                         <b>'.$this->trans('Github Connect').'</b>

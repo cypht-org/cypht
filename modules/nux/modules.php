@@ -435,7 +435,7 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-2 pe-auto"><a href="#" class="pe-auto">'.
+        return '<div class="nux_add_account"><div data-target=".quick_add_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto"><a href="#" class="pe-auto">'.
             '<i class="bi bi-check-circle-fill me-3"></i>'.
             '<b>'.$this->trans('Add an E-mail Account').'</b></a></div>';
     }
