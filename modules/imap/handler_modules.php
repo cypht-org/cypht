@@ -1319,7 +1319,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
-                Hm_Msgs::add('ERRCound not access supplied URL');
+                Hm_Msgs::add('ERRCould not access supplied URL');
             }
         }
     }

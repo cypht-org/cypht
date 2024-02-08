@@ -349,7 +349,7 @@ var text_to_bubbles = function(input) {
 
 var bubble_index = 0;
 var append_bubble = function(value, to, id, type, source) {
-    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" draggable="true" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
+    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" ondragstart="drag(event)" draggable="true" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
     $(to).prev().append(bubble);
     bubble_index++;
 };

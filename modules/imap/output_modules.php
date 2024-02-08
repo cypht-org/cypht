@@ -536,7 +536,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
                 '<label for="enable_sieve_filter" class="form-check-label"> '.$this->trans('Enable Sieve Filters').'</label></div></td></tr>';
         }
 
-        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4">'.
+        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section border-bottom cursor-pointer px-1 py-3">'.
             '<a href="#" class="pe-auto"><i class="bi bi-envelope-fill me-3"></i>'.
             '<b> '.$this->trans('IMAP Servers').'</b></a>'.
             '<div class="server_count">'.$count.'</div></div>
@@ -609,7 +609,7 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
     
         return '
         <div class="jmap_server_setup">
-            <div data-target=".jmap_section" class="server_section border-bottom cursor-pointer px-1 py-2 mt-4 pe-auto">
+            <div data-target=".jmap_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                 <a href="#" class="pe-auto">
                     <i class="bi bi-envelope-fill me-3"></i>
                     <b>'.$this->trans('JMAP Servers').'</b>
