@@ -535,7 +535,7 @@ var expand_imap_folders = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -549,7 +549,7 @@ var expand_imap_folders = function(path) {
         }
     }
     else {
-        $('.expand_link', list).html('+');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill">');
         $('ul', list).remove();
         Hm_Folders.save_folder_list();
     }
@@ -887,7 +887,7 @@ var unselect_non_imap_messages = function() {
 
 var imap_move_copy = function(e, action, context) {
     var move_to;
-    if (!e.target || e.target.className == 'imap_move') {
+    if (!e.target || e.target.classList.contains('imap_move')) {
         move_to = $('.msg_controls .move_to_location');
     }
     else {
@@ -907,7 +907,7 @@ var imap_move_copy = function(e, action, context) {
     else {
         label = $('.move_to_string2').val();
     }
-    folders.prepend('<div class="move_to_title">'+label+'<span><a class="close_move_to" href="#">X</a></span></div>');
+    folders.prepend('<div class="move_to_title">'+label+'<a class="close_move_to close" href="#" aria-label="Close"><span aria-hidden="true">&times;</span></a></div>');
     move_to.html(folders.html());
     $('.imap_move_folder_link', move_to).on("click", function() { return expand_imap_move_to_folders($(this).data('target'), context); });
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').off('click');

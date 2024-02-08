@@ -118,7 +118,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
+            $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
         }
         else {
             $results .= '<i class="bi bi-folder2-open"></i> ';
@@ -144,7 +144,7 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }
     if ($manage) {
-        $results .= '<li class="manage_folders_li"><a class="manage_folder_link" href="'.$manage.'"><img class="folder_icon manage_folder_icon" src="'.Hm_Image_Sources::$cog.'" alt="" width="16" height="16" />'.$output_mod->trans('Manage Folders').'</a>';
+        $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a>';
     }
     $results .= '</ul>';
     return $results;
@@ -1386,21 +1386,21 @@ if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
 
-    $txt = '<div class="btn-group">
+    $txt = '<div class="dropdown">
                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
-                <div class="dropdown-menu mt-4" aria-labelledby="dropdownMenuSnooze">';
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_snooze_date($format, true);
-        $txt .= '<a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5 py-2" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a>';
+        $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
-    $txt .= '<div class="dropdown-divider"></div>';
-    $txt .= '<label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<li><hr class="dropdown-divider"></li>';
+    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
     $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="snooze_input" style="display:none;">';
+    $txt .= '<input class="snooze_input" style="display:none;"></li>';
     if ($unsnooze) {
         $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
-    $txt .= '</div></div>';
+    $txt .= '</ul></div>';
 
     return $txt;
 }}

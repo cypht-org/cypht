@@ -785,13 +785,13 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('move_copy_controls', false)) {
-            $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res = '<span class="ctr_divider"></span> <div class="d-flex gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
-            $res .= '<div class="move_to_location"></div>';
+            $res .= '<div class="move_to_location dropdown-menu"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
-            $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+            $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" /></div>';
             $this->concat('msg_controls_extra', $res);
         }
     }

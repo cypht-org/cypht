@@ -23,7 +23,7 @@
 .header_links { padding-top: 10px !important; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
 .account_row { cursor: pointer; }
-.expand_link { display: block; width: 16px; height: 16px; float: left; margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
+.expand_link { margin-right: 0px; margin-left: 0px; font-size: 16px; text-align: left; }
 .header_subject th { font-size: 1.3em; padding-top: 10px; }
 .header_subject th div img { margin-right: 10px; margin-left: 11px; }
 .msg_parts { table-layout: fixed; border-top: solid 1px #ddd; padding-top: 20px; padding-left: 20px; width: 100%; padding-bottom: 40px; }
@@ -56,9 +56,9 @@
 .jmap_section, .sent_setting, .imap_section { display: none; }
 .imap_server_setup .content_title { cursor: pointer; }
 .ctr_divider { padding-left: 5px; padding-right: 5px; color: #eee; vertical-align: 2px; font-weight: normal; font-size: 90%; }
-.move_to_location { text-transform: none; z-index: 50; position: absolute; display: none; background-color: #fff; padding: 10px; border: solid 1px #ede8e6; font-weight: normal; padding-right: 25px; padding-left: 0px; font-size: 80%; top: 34px; min-width: 55px; right: 2px; border-top: none; padding-top: 0px; }
+.move_to_location { top: 35px; }
 .move_to_location a { border: none; font-size: 100%; }
-.move_to_title { padding: 5px; padding-top: 10px; padding-left: 10px; background-color: #fff; border-bottom: solid 1px #ede8e6; margin-right: -25px; }
+.move_to_title { padding: 5px 10px; background-color: #fff; border-bottom: solid 1px #ede8e6; }
 .move_to_title span { float: right; font-size: 90%; }
 .msg_move_to .move_to_location { font-size: 100%; left: auto; right: 0px; top: 33px; font-variant: normal; }
 .msg_move_to { width: auto !important; position: relative; display: inline-block; }

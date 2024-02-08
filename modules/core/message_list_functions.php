@@ -350,8 +350,8 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
-    $res = '<a class="toggle_link border px-1 m-0" href="#"><i class="bi bi-check"></i></a>'.
-        '<div class="msg_controls fs-6 d-none gap-2">'.
+    $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
+        '<div class="msg_controls fs-6 d-none gap-1">'.
         '<a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
         '<a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
         '<a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
