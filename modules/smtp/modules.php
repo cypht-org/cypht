@@ -1101,24 +1101,24 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
                 
-                '<div class="form-floating mb-3 to_outer compose_container position-relative">'.
-                    '<div class="bubbles bubble_dropdown"></div>'.
-                    '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to form-control" type="text" placeholder="'.$this->trans('To').' kiki" id="compose_to" />'.
-                    '<label for="compose_to">'.$this->trans('To').'</label>'.
-                    '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 mt-2 me-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
-                '</div>'.
-                '<div id="to_contacts"></div>'.
-                '<div class="recipient_fields">'.
-                    '<div class="form-floating mb-3 compose_container">'.
+                '<div class="to_outer">'.
+                    '<div class="mb-3 position-relative compose_container p-1 w-100">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc form-control" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
-                        '<label for="compose_cc">'.$this->trans('Cc').'</label>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
+                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
+                        '<div id="to_contacts"></div>'.
+                    '</div>'.
+                '</div>'.
+
+                '<div class="recipient_fields">'.
+                    '<div class="mb-3 compose_container">'.
+                        '<div class="bubbles bubble_dropdown"></div>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
                     '</div>'.
                     '<div id="cc_contacts"></div>'.
-                    '<div class="form-floating mb-3 compose_container">'.
+                    '<div class="mb-3 compose_container">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc form-control" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
-                        '<label for="compose_bcc">'.$this->trans('Bcc').'</label>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
                     '</div>'.
                     '<div id="bcc_contacts"></div>'.
                 '</div>'.
