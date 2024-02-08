@@ -184,7 +184,7 @@ $(function () {
                     .find('.select_default_reject_message')
                     .remove();
             } else {
-                $('<input type="text" class="select_default_reject_message" placeholder="Reject message" />').insertAfter($(this));
+                $('<input type="text" class="select_default_reject_message form-control" placeholder="Reject message" />').insertAfter($(this));
             }
         });
         $(document).on('click', '.submit_default_behavior', function(e) {
@@ -300,7 +300,7 @@ $(function () {
         });
 
         $('.sievefilters_accounts_title').on("click", function () {
-            $(this).parent().find('.sievefilters_accounts').toggle();
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
         });
     }
 
@@ -569,7 +569,7 @@ $(function () {
          *                                      MODAL EVENTS
          **************************************************************************************/
         $('.sievefilters_accounts_title').on("click", function () {
-            $(this).parent().find('.sievefilters_accounts').toggle();
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
         });
         $('.add_filter').on('click', function () {
             $('.filter_modal_title').html('Add Filter');
@@ -635,11 +635,11 @@ $(function () {
                     header_fields += '<option value="'+value.name+'">' + value.description + '</option>';
                 }
             });
-            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_value" name="sieve_selected_extra_option_value[]" /></td>';
+            let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
-                '                                <td>' +
-                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions_field[]" style="width: 200px;">' +
+                '                                <td class="col-sm-2">' +
+                '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
                 '                                        <optgroup label="Message">' +
                 message_fields +
                 '                                        </optgroup>' +
@@ -649,8 +649,8 @@ $(function () {
                 '                                    </select>' +
                 '                                </td>' +
                 extra_options +
-                '                                <td>' +
-                '                                    <select class="condition_options" name="sieve_selected_conditions_options[]">' +
+                '                                <td class="col-sm-3">' +
+                '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
                 '                                        <option value="Contains">' +
                 '                                            Contains' +
                 '                                        </option>' +
@@ -671,10 +671,10 @@ $(function () {
                 '                                        </option>' +
                 '                                    </select>' +
                 '                                </td>' +
-                '                                <td style="width: 43%;">' +
-                '                                    <input type="text" name="sieve_selected_option_value[]" />' +
+                '                                <td class="col-sm-3">' +
+                '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
                 '                                </td>' +
-                '                                <td style="vertical-align: middle; width: 70px;">' +
+                '                                <td class="col-sm-1 text-end align-middle">' +
                 '                                    <a href="#" class="delete_condition_modal_button">Delete</a>' +
                 '                                </td>' +
                 '                            </tr>'
@@ -699,20 +699,24 @@ $(function () {
                 possible_actions_html += '<option value="'+value.name+'">' + value.description + '</option>';
             });
 
-            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_action_value" name="sieve_selected_extra_action_value[]" /></td>';
+            let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
             $('.filter_actions_modal_table').append(
-                '<tr style="border-bottom-color: black;" default_value="'+default_value+'">' +
-                '   <td>' +
-                '       <select class="sieve_actions_select" name="sieve_selected_actions[]" style="width: 200px;">' +
+                '<tr class="border" default_value="'+default_value+'">' +
+                '   <td class="col-sm-3">' +
+                '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
                 extra_options +
-                '    <td style="width: 43%;">' +
-                '    <img style="display: none" src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />' +
+                '    <td class="col-sm-5">' +
+                '    <div class="d-flex justify-content-center spinner d-none">' + 
+                '       <div class="spinner-border text-dark role="status">' +
+                '           <span class="visually-hidden">Loading...</span>' +
+                '       </div>' +
+                '    </div>' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
-                '    <td style="vertical-align: middle; width: 70px;">' +
+                '    <td class="col-sm-1 text-end align-middle">' +
                 '           <a href="#" class="delete_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'
@@ -741,15 +745,15 @@ $(function () {
             });
 
             $('.filter_else_actions_modal_table').append(
-                '<tr style="border-bottom-color: black;">' +
-                '   <td>' +
-                '       <select class="sieve_actions_select">' +
+                '<tr class="border">' +
+                '   <td class="col-sm-4">' +
+                '       <select class="sieve_actions_select form-control form-control-sm">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
                 '    <td>' +
                 '    </td>' +
-                '    <td style="vertical-align: middle; width: 70px;">' +
+                '    <td class="col-sm-1 text-end align-middle">' +
                 '           <a href="#" class="delete_else_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'
@@ -779,19 +783,19 @@ $(function () {
                     elem_extra.attr('placeholder', selected_action.extra_field_placeholder)
                 }
                 if (selected_action.type === 'none') {
-                    elem.html('<input name="sieve_selected_action_value[]" type="hidden" value="" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" type="hidden" value="" />');
                 }
                 if (selected_action.type === 'string') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="text" value="" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="text" value="" />');
                 }
                 if (selected_action.type === 'int') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'number') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'text') {
-                    elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" style="width: 235px;"></textarea>');
+                    elem.html('<textarea name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'"></textarea>');
                 }
                 if (selected_action.type === 'select') {
                     options = '';
@@ -802,11 +806,11 @@ $(function () {
                             options = options + '<option value="' + val + '">'+ val +'</option>'
                         }
                     });
-                    elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                    elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
                 }
                 if (selected_action.type === 'mailbox') {
                     let mailboxes = null;
-                    tr_elem.children().find('img').attr('style', '');
+                    tr_elem.children().find('.spinner').removeClass('d-none');
                     Hm_Ajax.request(
                         [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
                             {'name': 'imap_account', 'value': current_account} ],
@@ -820,7 +824,7 @@ $(function () {
                                     options = options + '<option value="' + val + '">'+ val +'</option>'
                                 }
                             });
-                            elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                            elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
                             $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
                         }
                     );
@@ -863,10 +867,10 @@ $(function () {
                 elem.html(options_html);
 
                 if (condition.type === 'string') {
-                    elem_type.html('<input name="sieve_selected_option_value[]" type="text" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="text" class="form-control form-control-sm" />')
                 }
                 if (condition.type === 'int') {
-                    elem_type.html('<input name="sieve_selected_option_value[]" type="number" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="number" class="form-control form-control-sm" />')
                 }
                 if (condition.type === 'none') {
                     elem_type.html('<input name="sieve_selected_option_value[]" type="hidden" value="none" />')
