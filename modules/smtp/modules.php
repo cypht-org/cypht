@@ -1122,7 +1122,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     '<div id="bcc_contacts"></div>'.
                 '</div>'.
                 '<div class="form-floating mb-3">'.
-                    '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
+                    '<input value="'.$this->html_safe($subject).'" name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
                     '<label for="compose_subject">'.$this->trans('Subject').'</label>'.
                 '</div>'.
                 '<div class="form-floating mb-3">'.

@@ -450,6 +450,13 @@ $(function () {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
+
+        const modal = new Hm_Modal({
+            modalId: 'emptySubjectBodyModal',
+            title: 'Warning',
+            btnSize: 'sm'
+        });
+
         $('.compose_form').on('submit', function(e) {
             e.preventDefault();
             const body = $('.compose_body').val().trim();
@@ -494,15 +501,12 @@ $(function () {
             ========================================
             */
             function showModal() {
-                const modalContent = modalContentHeadline + `
-                <p>Are you sure you want to send this message?</p>
-                `;
-                const modalButtons = [
-                    "Cancel sending",
-                    "Send anyway",
-                    "Send anyway and don't warn me in the future",
-                ];
-                Hm_Modals.show('Warning', modalContent, modalButtons, [Hm_Modals.hide, handleSendAnyway, handleSendAnywayAndDontWarnMe]);
+                if (! modal.modalContent.html()) {
+                    modal.addFooterBtn('Send anyway', 'btn-warning', handleSendAnyway);
+                    modal.addFooterBtn("Send anyway and don't warn in the future", 'btn-warning', handleSendAnywayAndDontWarnMe);
+                }
+                modal.setContent(modalContentHeadline + `<p>Are you sure you want to send this message?</p>`);
+                modal.open();
             }
 
             function handleSendAnyway() {

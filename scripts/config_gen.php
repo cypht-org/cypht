@@ -241,9 +241,6 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
         $js_lib = file_get_contents("vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js") . "\n\n";
         $js_lib .= file_get_contents("vendor/twbs/bootstrap/dist/js/bootstrap.min.js") . "\n\n";
         $js_lib .= file_get_contents("third_party/cash.min.js");
-        if (in_array('sievefilters', $mods, true)) {
-            $js_lib .= file_get_contents("third_party/tingle.min.js");
-        }
         if (in_array('desktop_notifications', $mods, true)) {
             $js_lib .= file_get_contents("third_party/push.min.js");
         }
