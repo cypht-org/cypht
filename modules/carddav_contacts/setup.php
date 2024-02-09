@@ -24,13 +24,13 @@ add_output('settings', 'carddav_auth_settings', true, 'carddav_contacts', 'end_s
 
 return array(
     'allowed_post' => array(
-        'carddav_usernames' => array('filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags'  => FILTER_FORCE_ARRAY),
+        'carddav_usernames' => array('filter' => FILTER_DEFAULT, 'flags'  => FILTER_FORCE_ARRAY),
         'carddav_passwords' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY),
-        'carddav_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'carddav_fn' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'carddav_phone' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'carddav_phone_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'carddav_fn_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'carddav_email_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'carddav_email' => FILTER_DEFAULT,
+        'carddav_fn' => FILTER_DEFAULT,
+        'carddav_phone' => FILTER_DEFAULT,
+        'carddav_phone_id' => FILTER_DEFAULT,
+        'carddav_fn_id' => FILTER_DEFAULT,
+        'carddav_email_id' => FILTER_DEFAULT
     )
 );

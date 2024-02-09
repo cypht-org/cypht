@@ -23,7 +23,7 @@ return array(
         'ajax_2fa_setup_check',
     ),
     'allowed_post' => array(
-        '2fa_code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        '2fa_code' => FILTER_DEFAULT,
         '2fa_enable' => FILTER_VALIDATE_INT,
         '2fa_backup_codes' => array('filter' => FILTER_VALIDATE_INT, 'flags'  => FILTER_FORCE_ARRAY)
     ),

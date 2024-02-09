@@ -13,9 +13,9 @@ add_handler('process_api_login', 'api_login_step_two', false, 'api_login', 'proc
 return array(
     'allowed_pages' => array('process_api_login'),
     'allowed_post' => array(
-        'hm_session' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'api_login_key' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'hm_session' => FILTER_DEFAULT,
+        'hm_id' => FILTER_DEFAULT,
+        'api_login_key' => FILTER_DEFAULT
     )
 );
 

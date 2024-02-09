@@ -31,13 +31,13 @@ return array(
         'ajax_adv_search'
     ),
     'allowed_post' => array(
-        'adv_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'adv_start' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'adv_source' => FILTER_DEFAULT,
+        'adv_start' => FILTER_DEFAULT,
         'adv_source_limit' => FILTER_VALIDATE_INT,
-        'adv_end' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'adv_charset' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'adv_flags' => array('filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_REQUIRE_ARRAY),
-        'adv_terms' => array('filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_REQUIRE_ARRAY),
-        'adv_targets' => array('filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_end' => FILTER_DEFAULT,
+        'adv_charset' => FILTER_DEFAULT,
+        'adv_flags' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_terms' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_targets' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
     )
 );

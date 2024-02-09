@@ -341,9 +341,9 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('REQUEST_METHOD' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'REQUEST_SCHEME' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'HTTP_USER_AGENT' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'HTTPS' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'REQUEST_URI' => FILTER_SANITIZE_FULL_SPECIAL_CHARS),
+        'allowed_server' => array('REQUEST_METHOD' => FILTER_DEFAULT, 'REQUEST_SCHEME' => FILTER_DEFAULT,
+            'HTTP_USER_AGENT' => FILTER_DEFAULT, 'HTTPS' => FILTER_DEFAULT,
+            'HTTP_X_REQUESTED_WITH' => FILTER_DEFAULT, 'REQUEST_URI' => FILTER_DEFAULT),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );

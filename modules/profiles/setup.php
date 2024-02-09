@@ -27,15 +27,15 @@ return array(
         'profiles'
     ),
     'allowed_post' => array(
-        'profile_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_id' => FILTER_UNSAFE_RAW,
-        'profile_replyto' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_smtp' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_imap' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_default' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'profile_name' => FILTER_DEFAULT,
+        'profile_id' => FILTER_VALIDATE_INT,
+        'profile_replyto' => FILTER_DEFAULT,
+        'profile_smtp' => FILTER_DEFAULT,
+        'profile_imap' => FILTER_DEFAULT,
+        'profile_default' => FILTER_VALIDATE_INT,
+        'profile_address' => FILTER_DEFAULT,
         'profile_sig' => FILTER_UNSAFE_RAW,
-        'profile_delete' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'profile_delete' => FILTER_DEFAULT
     ),
     'allowed_get' => array(
         'profile_id' => FILTER_UNSAFE_RAW,
