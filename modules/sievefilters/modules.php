@@ -1753,23 +1753,33 @@ if (!hm_exists('block_filter')) {
 
 if (!hm_exists('block_filter_dropdown')) {
     function block_filter_dropdown($mod, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block') {
-        $ret = '<div class="cypht-dropdown">'
+        $ret = '<div class="dropdown-menu p-3" id="dropdownMenuBlockSender">'
         .'<form id="block_sender_form">';
         if ($with_scope) {
-            $ret .= '<div><label>'.$mod->trans('Who Is Blocked').'</label>'
-            .'<select name="scope" class="form-select form-select-sm">'
-            .'<option value="sender">'.$mod->trans('This Sender').'</option>'
-            .'<option value="domain">'.$mod->trans('Whole domain').'</option></select></div>';
+            $ret .= '<div class="mb-2">'
+            .   '<label for="blockSenderScope" class="form-label">'.$mod->trans('Who Is Blocked').'</label>'
+            .   '<select name="scope" class="form-select form-select-sm" id="blockSenderScope">'
+            .   '<option value="sender">'.$mod->trans('This Sender').'</option>'
+            .   '<option value="domain">'.$mod->trans('Whole domain').'</option></select>'
+            .'</div>';
         }
-        $ret .= '<div><label>'.$mod->trans('Action').'</label>'
-        .'<select class="form-select form-select-sm" name="block_action" id="block_action">'
-        .'<option value="default">'.$mod->trans('Default action').'</option>'
-        .'<option value="discard">'.$mod->trans('Discard').'</option>'
-        .'<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
-        .'<option value="reject_default">'.$mod->trans('Reject With Default Message').'</option>'
-        .'<option value="reject_with_message">'.$mod->trans('Reject With Specific Message').'</option>'
-        .'</select></div><div><button class="btn btn-danger btn-sm mt-2" type="submit" id="'.$submit_id.'">'.$mod->trans($submit_title).'</button></div></form>'
-        .'</div></div>';
+        $ret .= '<div class="mb-2">'
+        .   '<label for="block_action" class="form-label">'.$mod->trans('Action').'</label>'
+        .   '<select class="form-select form-select-sm" name="block_action" id="block_action">'
+        .       '<option value="default">'.$mod->trans('Default action').'</option>'
+        .       '<option value="discard">'.$mod->trans('Discard').'</option>'
+        .       '<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
+        .       '<option value="reject_default">'.$mod->trans('Reject With Default Message').'</option>'
+        .       '<option value="reject_with_message">'.$mod->trans('Reject With Specific Message').'</option>'
+        .   '</select>'
+        .'</div>'
+        .'<div class="d-grid gap-1">'
+        .   '<button class="btn btn-danger btn-sm mt-2" type="submit" id="'.$submit_id.'">'
+        .       $mod->trans($submit_title)
+        .   '</button>'
+        .'</div>'
+        .'</form>'
+        .'</div>';
         return $ret;
     }
 }

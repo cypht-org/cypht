@@ -223,15 +223,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
                                         </th>
                                             <td>
-                                                <div class="popup" onclick="imap_show_add_contact_popup(event)">
-                                                    <span id="contact_info">' . $this->html_safe($value) . '
-                                                    </span>
-                                                    <img alt="" class="icon_arrow_up" src="'.Hm_Image_Sources::$arrow_drop_up.'" width="20" height="20" />
-                                                    <img alt="" class="icon_arrow_down" src="'.Hm_Image_Sources::$arrow_drop_down.'" width="20" height="20" />
-                                                    <div class="popup-container"  id="contact_popup">
-                                                        <div class="popup-container_header">
-                                                            <a onclick="imap_show_add_contact_popup()">x</a>
-                                                        </div>
+                                                <div class="dropdown">
+                                                    <a id="contact_info" data-bs-toggle="dropdown" id="dropdownMenuContact" class="dropdown-toggle" href="#">' . $this->html_safe($value) . '
+                                                    </a>
+                                                    <div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">
                                                         <div id="contact_popup_body">';
 
                             if($contact_exists){
@@ -266,7 +261,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                         </div>';
                             } else {
                                 $txt .= '<div class="popup-container_footer">
-                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn" type="button" value="">'.$this->trans('Add local contacts').'
+                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn btn btn-success" type="button" value="">'.$this->trans('Add local contacts').'
                                             </button>
                                         </div>';
                             }
@@ -391,11 +386,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
                     if(!in_array($sender, $existing_emails)){
-                        $txt .= ' | <div style="display: inline-block;"><a class="block_sender_link hlink'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : ' dropdown-toggle"').' href="#"><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                        $txt .= ' | <div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= ' | <span title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><img src="'.Hm_Image_Sources::$lock.'" width="10px"></img> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
 
