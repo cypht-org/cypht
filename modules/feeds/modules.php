@@ -840,7 +840,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('unread_exclude_feeds', $settings) && $settings['unread_exclude_feeds']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -903,7 +903,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $limit = $settings['feed_limit'];
         }
         if ($limit != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
             '<td><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
@@ -916,7 +916,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
 if (!hm_exists('feed_source_callback')) {
 function feed_source_callback($vals, $style, $output_mod) {
     if ($vals[2]) {
-        $img = '<img alt="'.$output_mod->trans('feed item').'" src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+        $img = '<i class="bi bi-rss-fill"></i>';
     }
     else {
         $img = '';

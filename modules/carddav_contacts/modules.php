@@ -255,8 +255,8 @@ class Hm_Output_carddav_auth_settings extends Hm_Output_Module {
         if (count($settings) == 0) {
             return;
         }
-        $res = '<tr><td data-target=".carddav_settings" colspan="2" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$people.'" width="16" height="16" />'.
+        $res = '<tr><td data-target=".carddav_settings" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-people-fill fs-5 me-2"></i>'.
             $this->trans('CardDav Addressbooks').'</td></tr>';
         foreach ($settings as $name => $vals) {
             $user = '';

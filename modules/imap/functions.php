@@ -433,10 +433,10 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         $icon = $icons[strtolower($vals['type'])];
     }
     if ($icon) {
-        $res .= '<img class="msg_part_icon" src="'.Hm_Image_Sources::$$icon.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon"></i> ';
     }
     else {
-        $res .= '<img class="msg_part_icon msg_part_placeholder" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon msg_part_placeholder"></i> ';
     }
     if (in_array($lc_type, $allowed, true)) {
         $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
