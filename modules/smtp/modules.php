@@ -907,10 +907,10 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label for="enable_attachment_reminder">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_attachment_reminder">'.
             $this->trans('Enable Attachment Reminder').'</label></td>'.
             '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_attachment_reminder" name="enable_attachment_reminder" />'.$reset.'</td></tr>';
+            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" />'.$reset.'</td></tr>';
     }
 }
 

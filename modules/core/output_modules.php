@@ -1272,13 +1272,13 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      * Opens a div and unordered list tag
      */
     protected function output() {
-        $res = '<div class="src_name main_menu" data-source=".main">'.$this->trans('Main');
+        $res = '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">'.$this->trans('Main');
         if (DEBUG_MODE) {
             $res .= ' <span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" />'.
+        $res .= '<i class="bi bi-chevron-down"></i>'.
         '</div><div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
@@ -1393,8 +1393,8 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
             if (!$single) {
-                $res .= '<div class="src_name" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
-                    '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" /></div>';
+                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
+                    '<i class="bi bi-chevron-down"></i></div>';
             }
 
             if ($single) {
@@ -1429,8 +1429,8 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
      * Opens an unordered list
      */
     protected function output() {
-        $res = '<div class="src_name" data-source=".settings">'.$this->trans('Settings').
-            '<img class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" alt="" width="8" height="8" />'.
+        $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
+            '<i class="bi bi-chevron-down"></i></div>'.
             '</div><ul style="display: none;" class="settings folders">';
         $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
