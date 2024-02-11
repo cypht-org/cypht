@@ -104,7 +104,6 @@ textarea, select, input, button { border: solid 1px #ddd; background-color: #fff
 .page_links a img { opacity: .6; width: 16px; height: 16px; vertical-align: -2px; }
 .page_links { text-align: center; padding-top: 20px; }
 .checkbox_cell { width: 20px; padding-right: 10px !important; }
-.menu_caret { padding: 7px; float: right; margin-right: 10px; opacity: .15; }
 .news_cell { border: none !important; padding-bottom: 10px !important; padding-top: 10px !important; }
 .news_cell .subject div img {width: 16px; height: 16px; opacity: .5; padding-right: 10px; }
 .news_cell .subject, .news_cell .subject div{ padding-bottom: 5px !important; overflow: visible; white-space: normal; }
