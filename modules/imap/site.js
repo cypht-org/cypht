@@ -1214,11 +1214,6 @@ $(function() {
     var prefetch_interval = Hm_Utils.get_from_global('imap_prefetch_msg_interval', 43);
     Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
-
-    $(document).on('click', '.dropdown-toggle', function(e) {
-        e.preventDefault();
-        $(this).next().toggle();
-    });
 });
 
 
@@ -1261,13 +1256,3 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
-var imap_show_add_contact_popup = function() {
-    var popup = document.getElementById("contact_popup");
-    popup.classList.toggle("show");
-};
-
-var imap_hide_add_contact_popup = function(event) {
-    event.stopPropagation()
-    var popup = document.getElementById("contact_popup");
-    popup.classList.toggle("show");
-};

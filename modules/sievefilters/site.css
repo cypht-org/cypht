@@ -404,22 +404,3 @@ table.filter_actions_modal_table th {
 .select_default_reject_message {
     margin-left: 5px;
 }
-
-#block_sender_form {
-    padding: 15px; display: block;
-}
-
-#block_sender_form label, #block_sender_form select, #block_sender_form textarea, #block_sender_form button {
-    display: block;
-    margin: 3px 0;
-    width: 100%;
-}
-
-#block_sender_form button:disabled {
-    background-color: rgb(231, 121, 121);
-    cursor: text;
-}
-
-#block_sender_form label {
-    text-transform: capitalize;
-}
