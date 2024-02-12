@@ -424,9 +424,9 @@ function setup_base_page($name, $source=false) {
     add_handler($name, 'http_headers', true, $source);
 
     add_output($name, 'header_start', false, $source);
-    add_output($name, 'header_css', true, $source);
+    add_output($name, 'header_css', false, $source);
     add_output($name, 'header_content', false, $source);
-    add_output($name, 'js_data', true, $source);
+    add_output($name, 'js_data', false, $source);
     add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_end', false, $source);
     add_output($name, 'content_start', false, $source);
@@ -441,7 +441,7 @@ function setup_base_page($name, $source=false) {
     add_output($name, 'content_section_start', true, $source);
     add_output($name, 'content_section_end', true, $source);
     add_output($name, 'save_reminder', true, $source);
-    add_output($name, 'page_js', true, $source);
+    add_output($name, 'page_js', false, $source);
     add_output($name, 'content_end', false, $source);
 }}
 

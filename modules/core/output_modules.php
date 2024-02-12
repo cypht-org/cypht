@@ -236,7 +236,7 @@ class Hm_Output_login extends Hm_Output_Module {
             $fancy_login = $this->get('fancy_login_allowed');
             if(!$fancy_login){
                 return '<div class="bg-light"><div class="d-flex align-items-center justify-content-center vh-100 p-3">
-                    <div class="card col-12 col-md-6 col-lg-4 py-3">
+                    <div class="card col-12 col-md-6 col-lg-4 p-3">
                         <div class="card-body">
                             <p class="text-center"><img class="w-50" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg"></p>
                             <div class="mt-5">
@@ -248,9 +248,9 @@ class Hm_Output_login extends Hm_Output_Module {
                                     <input required type="password" id="password" placeholder="'.$this->trans('Password').'" name="password" class="form-control">
                                     <label for="password" class="form-label screen-reader">'.$this->trans('Password').'</label>
                                 </div>'.
-                                '<div class="d-flex justify-content-between align-items-center">'.$stay_logged_in.
+                                '<div class="d-grid">'.$stay_logged_in.
                                     '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                                    <input type="submit" id="login" class="btn btn-success btn-block px-5" value="'.$this->trans('Login').'">
+                                    <input type="submit" id="login" class="btn btn-success btn-lg" value="'.$this->trans('Login').'">
                                 </div>
                             </div>
                         </div>
@@ -401,10 +401,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
             '<meta name="apple-mobile-web-app-capable" content="yes" />'.
             '<meta name="mobile-web-app-capable" content="yes" />'.
             '<meta name="apple-mobile-web-app-status-bar-style" content="black" />'.
-            '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />'.
-            '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />'.
-            '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />'.
-            '<script src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
+            '<meta name="theme-color" content="#888888" /><meta charset="utf-8" />';
 
         if ($this->get('router_login_state')) {
             $res .= '<meta name="referrer" content="no-referrer" />';
@@ -506,10 +503,10 @@ class Hm_Output_header_css extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $res .= '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
-        $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
         $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
+            $res .= '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
+            $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
             foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules/', '/'), '', $rel_name);
@@ -544,7 +541,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>';
+            $js_lib = '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/tingle.min.js"></script>';
