@@ -1259,7 +1259,7 @@ var Hm_Folders = {
         $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
-            e.target.innerHTML = '<img src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />';
+            e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
             Hm_Folders.update_folder_list();
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;

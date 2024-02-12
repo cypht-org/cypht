@@ -285,7 +285,6 @@ table.sieve_list_conditions_modal tr {
 table.sieve_list_conditions_modal th,
 table.sieve_list_conditions_modal td {
     padding: .625em;
-    text-align: left !important;
 }
 
 table.sieve_list_conditions_modal th {
@@ -341,7 +340,6 @@ table.filter_actions_modal_table tr {
 table.filter_actions_modal_table th,
 table.filter_actions_modal_table td {
     padding: .625em;
-    text-align: left !important;
 }
 
 table.filter_actions_modal_table th {
@@ -391,16 +389,4 @@ table.filter_actions_modal_table th {
 
 .mobile table.filter_actions_modal_table td:last-child {
     border-bottom: 0;
-}
-
-.submit_default_behavior {
-    background-color: teal;
-    color: #fff;
-    margin-left: 5px;
-    padding-inline: 10px;
-    cursor: pointer;
-}
-
-.select_default_reject_message {
-    margin-left: 5px;
 }
