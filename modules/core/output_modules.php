@@ -1875,6 +1875,7 @@ class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
         $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
         $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
         $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+        $res .= '<input type="hidden" class="auto_advance_email" name="auto_advance_email" value="1" />';
         // $res = "<strong>COPY/MOVE</strong>";
         $this->concat('msg_controls_extra', $res);
     }
