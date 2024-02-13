@@ -635,7 +635,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '        return langTranslations[key];'.
             '    }'.
             '    return key;'.
-            '};'.
+            '};';
         $res .= '</script>';
         return $res;
     }
