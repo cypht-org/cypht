@@ -244,7 +244,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                 <body>
                     <div class="container bg-light">
                         <div class="row align-items-center justify-content-center vh-100 p-3">
-                                <div class="card col-12 col-md-6 col-lg-4 py-3">
+                                <div class="card col-12 col-md-6 col-lg-4 p-3">
                                     <div class="card-body">
                                         <form class="mt-5" method="POST">
                                             <p class="text-center"><img class="w-50" src="modules/core/assets/images/logo_dark.svg"></p>
@@ -255,7 +255,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                                                 <label for="2fa_code">'.$this->trans('Login code').'</label>
                                             </div>
                                             <div class="d-grid">
-                                                <input type="submit" class="btn btn-success" value="'.$this->trans('Submit').'">
+                                                <input type="submit" class="btn btn-success btn-lg" value="'.$this->trans('Submit').'">
                                             </div>
                                             <input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'">
                                         </form>
