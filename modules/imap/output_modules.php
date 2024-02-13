@@ -402,6 +402,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+            $txt .= '<input type="hidden" class="auto_advance_email" name="auto_advance_email" value="1" />';
             $txt .= '</th></tr>';
             $txt .= '</table>';
 
@@ -787,6 +788,7 @@ class Hm_Output_move_copy_controls extends Hm_Output_Module {
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" /></div>';
+            $res .= '<input type="hidden" class="auto_advance_email" name="auto_advance_email" value="1" />';
             $this->concat('msg_controls_extra', $res);
         }
     }
@@ -1093,8 +1095,29 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
-            $this->trans('Show next & previous emails when reading a message').'</label></td>'.
+            $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
+        return $res;
+    }
+}
+
+/**
+ * Option to enable/disable loading the next email instead of returning to your inbox after performing a message action (delete, archive, move, etc.)
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $reset = '';
+        $settings = $this->get('user_settings', array());
+        if (!array_key_exists('auto_advance_email', $settings) || (array_key_exists('auto_advance_email', $settings) && $settings['auto_advance_email'])) {
+            $checked = ' checked="checked"';
+        } else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+        }
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
+            $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc) (delete, archive, move, etc)').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" value="1" />'.$reset.'</td></tr>';
         return $res;
     }
 }
