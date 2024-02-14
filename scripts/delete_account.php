@@ -23,7 +23,11 @@ define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
 
 /* get the framework */
+require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+
+$environment = Hm_Environment::getInstance();
+$environment->load();
 /* get config object */
 $config = new Hm_Site_Config_File();
 
