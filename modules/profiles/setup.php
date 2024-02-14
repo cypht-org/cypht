@@ -32,7 +32,7 @@ return array(
         'profile_replyto' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_smtp' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_imap' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'profile_default' => FILTER_VALIDATE_INT,
+        'profile_default' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'profile_sig' => FILTER_UNSAFE_RAW,
         'profile_delete' => FILTER_SANITIZE_FULL_SPECIAL_CHARS

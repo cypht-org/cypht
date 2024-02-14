@@ -23,11 +23,7 @@ trait Hm_Server_Connect {
         if (!array_key_exists($id, self::$server_list)) {
             return false;
         }
-        foreach (self::$server_list as $server_l) {
-            if ($server['id'] == $id) {
-                $server = $server_l;
-            }
-        }
+        $server = self::$server_list[$id];
 
         if ($server['object']) {
             return $server['object'];
@@ -179,6 +175,14 @@ trait Hm_Server_Modify {
 trait Hm_Server_List {
 
     use Hm_Server_Modify;
+    use Hm_Repository {
+        Hm_Repository::add as repo_add;
+        Hm_Repository::get as repo_get;
+    }
+
+    public static function init($name, $user_config) {
+        self::initRepo($name, $user_config, self::$server_list);
+    }
 
     /**
      * Add a server definition
@@ -189,22 +193,7 @@ trait Hm_Server_List {
     public static function add($atts) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        self::$server_list[] = $atts;
-    }
-
-    /**
-     * Remove a server
-     * @param int $id server id
-     * @return bool true on success
-     */
-    public static function del($id) {
-        foreach (self::$server_list as $idx => $srv) {
-            if ($srv['id'] == $id) {
-                unset(self::$server_list[$idx]);
-                return true;
-            }
-        }
-        return false;
+        self::repo_add($atts);
     }
 
     /**
@@ -233,16 +222,11 @@ trait Hm_Server_List {
      * @return array
      */
     public static function get($id, $full) {
-        foreach (self::$server_list as $srv) {
-            if ($srv['id'] == $id) {
-                $server = $srv;
-            }
-            if (!$full) {
-                return self::clean($server);
-            }
-            return $server;
+        $server = self::repo_get($id);
+        if ($server && ! $full) {
+            return self::clean($server);
         }
-        return array();
+        return $server;
     }
 
     /*
@@ -250,7 +234,7 @@ trait Hm_Server_List {
      * @return array
      */
     public static function clean($server) {
-        if (!array_key_exists('pass', $server) || !$server['pass']) {
+        if (! array_key_exists('pass', $server) || ! $server['pass']) {
             $server['nopass'] = true;
         }
         unset($server['pass']);

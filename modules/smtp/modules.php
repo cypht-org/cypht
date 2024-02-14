@@ -303,13 +303,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
  */
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
-        $servers = $this->user_config->get('smtp_servers', array());
-        $index = 0;
-        foreach ($servers as $server) {
-            Hm_SMTP_List::add( $server, $index );
-            $index++;
-        }
-        if (count($servers) == 0 && $this->page == 'compose') {
+        Hm_SMTP_List::init($this->user_config, $this->session);
+        if (Hm_SMTP_List::count() == 0 && $this->page == 'compose') {
             Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
         }
         $draft = array();
@@ -388,8 +383,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                     $tls = true;
                 }
                 if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
-                    Hm_SMTP_List::add( array(
-                        'id' => uniqid(),
+                    Hm_SMTP_List::add(array(
                         'name' => $form['new_smtp_name'],
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
@@ -414,24 +408,8 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
-
-    private function generateId($servers) {
-        $changed = false;
-        foreach ($servers as $index => $server) {
-            if (!array_key_exists('id', $server)) {
-                $servers[$index]['id'] = uniqid();
-                $changed = true;
-            }
-        }
-        if ($changed) {
-            $this->session->record_unsaved('SMTP server ID updated');
-        }
-        return $servers;
-    }
-
     public function process() {
         $servers = Hm_SMTP_List::dump();
-        $servers = $this->generateId($servers);
         $this->out('smtp_servers', $servers);
         $this->out('compose_drafts', $this->session->get('compose_drafts', array()));
     }
@@ -441,25 +419,8 @@ class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
-
-    private function generateId($servers) {
-        $changed = false;
-        foreach ($servers as $index => $server) {
-            if (!array_key_exists('id', $server)) {
-                $servers[$index]['id'] = uniqid();
-                $changed = true;
-            }
-        }
-        if ($changed) {
-            $this->session->record_unsaved('SMTP server ID updated');
-        }
-        return $servers;
-    }
-
     public function process() {
-        $servers = Hm_SMTP_List::dump(false, true);
-        $servers = $this->generateId($servers);
-        $this->user_config->set('smtp_servers', $servers);
+        Hm_SMTP_List::save();
     }
 }
 
@@ -527,7 +488,6 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
                 if ($res) {
                     $this->out('deleted_server_id', $form['smtp_server_id']);
                     Hm_Msgs::add('Server deleted');
-                    $this->session->record_unsaved('SMTP server deleted');
                 }
             }
         }
@@ -548,10 +508,8 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
                         if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
-                            $servers = Hm_SMTP_List::dump(false, true);
-                            $this->user_config->set('smtp_servers', $servers);
-                            $this->session->set('user_data', $this->user_config->dump());
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']));
+                            Hm_SMTP_List::save();
                         }
                     }
                 }
@@ -1988,10 +1946,8 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
             if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $smtp_id));
-                $servers = Hm_SMTP_List::dump(false, true);
-                $mod->user_config->set('smtp_servers', $servers);
-                $mod->session->set('user_data', $mod->user_config->dump());
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id));
+                Hm_SMTP_List::save();
             }
         }
     }
@@ -2046,9 +2002,9 @@ if (!hm_exists('server_from_compose_smtp_id')) {
 function server_from_compose_smtp_id($id) {
     $pos = strpos($id, '.');
     if ($pos === false) {
-        return intval($id);
+        return $id;
     }
-    return intval(substr($id, 0, $pos));
+    return substr($id, 0, $pos);
 }}
 
 /**
@@ -2115,10 +2071,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     }
     $smtp_port = $config->get('default_smtp_port', 465);
     $smtp_tls = $config->get('default_smtp_tls', true);
-    $servers = $user_config->get('smtp_servers', array());
-    foreach ($servers as $index => $server) {
-        Hm_SMTP_List::add($server, $server['id']);
-    }
+    Hm_SMTP_List::init($user_config, $session);
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
@@ -2132,10 +2085,6 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
         $attributes['no_auth'] = true;
     }
     Hm_SMTP_List::add($attributes);
-    $smtp_servers = Hm_SMTP_List::dump(false, true);
-    $user_config->set('smtp_servers', $smtp_servers);
-    $user_data = $user_config->dump();
-    $session->set('user_data', $user_data);
     Hm_Debug::add('Default SMTP server added');
 }}
 

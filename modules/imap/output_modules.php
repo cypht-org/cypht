@@ -831,7 +831,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
+                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
                 }

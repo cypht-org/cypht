@@ -53,9 +53,9 @@ add_handler('message_list', 'feed_list_type', true, 'feeds', 'message_list_type'
 add_handler('ajax_feed_combined', 'login', false, 'core');
 add_handler('ajax_feed_combined', 'load_user_data', true, 'core');
 add_handler('ajax_feed_combined', 'language', true, 'core');
+add_handler('ajax_feed_combined', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined', 'message_list_type', true, 'core');
 add_handler('ajax_feed_combined', 'feed_list_type', true);
-add_handler('ajax_feed_combined', 'load_feeds_from_config',  true);
 add_handler('ajax_feed_combined', 'close_session_early',  true, 'core');
 add_handler('ajax_feed_combined', 'feed_list_content',  true);
 add_handler('ajax_feed_combined', 'date', true, 'core');
@@ -113,7 +113,7 @@ return array(
         'feed_connect_time' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'feed_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'feed_status_display' => array(FILTER_UNSAFE_RAW, false),
-        'feed_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'feed_status_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'feed_server_ids' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'feed_msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'feed_msg_text' => array(FILTER_UNSAFE_RAW, false),

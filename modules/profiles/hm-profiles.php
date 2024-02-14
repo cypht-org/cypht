@@ -13,100 +13,87 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Profiles {
 
-    private $data = array();
+    use Hm_Repository;
 
-    public function __construct($hmod) {
-        $this->load($hmod);
-    }
+    private static $data = array();
 
-    public function load($hmod) {
-        $this->load_new($hmod);
-        if (count($this->data) == 0) {
+    public static function init($hmod) {
+        self::initRepo('profiles', $hmod->user_config, $hmod->session, self::$data);
+        if (self::count() == 0) {
             if (PHP_VERSION_ID < 70000) {
                 try {
-                    $this->load_legacy($hmod);
+                    self::loadLegacy($hmod);
                 } catch (Exception $e) {
-                    $this->data = array();
+                    self::$data = array();
                 }
             }
             if (PHP_VERSION_ID >= 70000) {
                 try {
-                    $this->load_legacy($hmod);
+                    self::loadLegacy($hmod);
                 } catch (Throwable $e) {
-                    $this->data = array();
+                    self::$data = array();
                 }
             }
         }
-        if (count($this->data) == 0) {
-            $this->create_default($hmod);
+        if (self::count() == 0) {
+            self::createDefault($hmod);
         }
     }
 
-    public function load_new($hmod) {
-        $profiles = $hmod->user_config->get('profiles', array());
-        foreach ($profiles as $profile) {
-            $this->data[] = $profile;
-        }
-    }
-
-    public function save($user_config) {
-        $user_config->set('profiles', $this->data);
-    }
-
-    public function add($data) {
-        $this->data[] = $data;
-    }
-
-    public function set_default($id) {
-        if (!array_key_exists($id, $this->data)) {
+    public static function setDefault($id) {
+        if (! array_key_exists($id, self::$data)) {
             return false;
         }
-        foreach ($this->data as $p_id => $vals) {
+        foreach (self::$data as $p_id => $vals) {
             if ($vals['default']) {
-                $this->data[$p_id]['default'] = false;
+                $vals['default'] = false;
+                self::edit($p_id, $vals);
             }
         }
-        $this->data[$id]['default'] = true;
+        $vals = self::get($id);
+        $vals['default'] = true;
+        self::edit($id, $vals);
         return true;
     }
 
-    public function create_default($hmod) {
-        if (!$hmod->module_is_supported('imap') || !$hmod->module_is_supported('smtp')) {
+    public static function createDefault($hmod) {
+        if (! $hmod->module_is_supported('imap') || ! $hmod->module_is_supported('smtp')) {
             return;
         }
-        if (!$hmod->config->get('autocreate_profile')) {
+        if (! $hmod->config->get('autocreate_profile')) {
             return;
         }
         $imap_servers = Hm_IMAP_List::dump();
         $smtp_servers = Hm_SMTP_List::dump();
-        list($address, $reply_to) = outbound_address_check($hmod, $imap_servers[0]['user'], '');
         if (count($imap_servers) == 1 && count($smtp_servers) == 1) {
-            $this->data[] = array(
+            $imap_server = reset($imap_servers);
+            $smtp_server = reset($smtp_servers);
+            list($address, $reply_to) = outbound_address_check($hmod, $imap_server['user'], '');
+            self::add(array(
                 'default' => true,
                 'name' => 'Default',
                 'address' => $address,
                 'replyto' => $reply_to,
-                'smtp_id' => 0,
+                'smtp_id' => $smtp_server['id'],
                 'sig' => '',
                 'type' => 'imap',
                 'autocreate' => true,
-                'user' => $imap_servers[0]['user'],
-                'server' => $imap_servers[0]['server'],
-            );
+                'user' => $imap_server['user'],
+                'server' => $imap_server['server'],
+            ));
         }
     }
 
-    public function load_legacy($hmod) {
-        $profiles = array();
+    public static function loadLegacy($hmod) {
         if ($hmod->module_is_supported('imap')) {
             foreach (Hm_IMAP_List::dump() as $id => $server) {
                 $profile = $hmod->user_config->get('profile_imap_'.$server['server'].'_'.$server['user'], array(
                     'profile_default' => false, 'profile_name' => '', 'profile_address' => '',
                     'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
-                if (!$profile['profile_name']) {
+                if (! $profile['profile_name']) {
                     continue;
                 }
-                $profiles[] = array(
+                self::add(array(
                     'default' => $profile['profile_default'],
                     'name' => $profile['profile_name'],
                     'address' => array_key_exists('profile_address', $profile) ? $profile['profile_address'] : '',
@@ -116,37 +103,8 @@ class Hm_Profiles {
                     'type' => 'imap',
                     'user' => $server['user'],
                     'server' => $server['server'],
-                );
+                ));
             }
         }
-        $this->data = $profiles;
-    }
-
-    public function edit($id, $data) {
-        if (array_key_exists($id, $this->data)) {
-            $this->data[$id] = $data;
-            return true;
-        }
-        return false;
-    }
-
-    public function del($id) {
-        if (array_key_exists($id, $this->data)) {
-            unset($this->data[$id]);
-            return true;
-        }
-        return false;
-
-    }
-
-    public function get($id) {
-        if (array_key_exists($id, $this->data)) {
-            return $this->data[$id];
-        }
-        return false;
-    }
-
-    public function list_all() {
-        return $this->data;
     }
 }

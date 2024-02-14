@@ -283,151 +283,6 @@ trait Hm_Handler_Validate {
     }
 }
 
-abstract class Hm_Repository {
-
-    private $name;
-
-    private $entities;
-
-    private $default_entity_id;
-
-    private $session;
-
-    private $user_config;
-
-    public function __construct($name, $session, $user_config) {
-        $this->session = $session;
-        $this->name = $name;
-        $this->user_config = $user_config;
-        $this->load();
-    }
-
-    private function load() {
-        $this->entities = $this->user_config->get($this->name.'_entities');
-        $this->default_entity_id = $this->user_config->get($this->name.'_entity_default_id');
-    }
-
-    public function __call(string $name, array $arguments) {
-        if (preg_match('/findBy([A-Z])\w+/', $name)) {
-            return '';
-        }
-        throw new Exception("Argument " . $name . ' not found in ' . get_class($this));
-    }
-
-    public function setDefault($default) {
-        if (is_scalar($default)) {
-            $this->default_entity_id = $default;
-        }
-        if (is_array($default)) {
-            $this->default_entity_id = $default['id'];
-        }
-        if (is_object($default)) {
-            $this->default_entity_id = $default->id;
-        }
-        $this->commit();
-    }
-
-    public function count() {
-        return count($this->entities);
-    }
-
-    public function getAll() {
-        return $this->entities;
-    }
-
-    public function findById($id) {
-        if (array_key_exists($id, $this->entities)) {
-            return $this->entities[$id];
-        }
-        return false;
-    }
-
-    private function generateId() {
-        return uniqid();
-    }
-
-    private function commit() {
-        $this->user_config->set($this->name.'_entities', $this->entities);
-        $this->user_config->set($this->name.'_entity_default_id', $this->default_entity_id);
-        $this->session->set('user_data', $this->user_config->dump());
-    }
-
-    private function saveArrayEntity($entity) {
-        $created = false;
-        if (!array_key_exists('id', $entity)) {
-            $created = true;
-            $entity['id'] = $this->generateId();
-        }
-        $this->entities[$entity['id']] = $entity;
-        $this->commit();
-        if ($created) {
-            $this->session->record_unsaved(ucfirst($this->name).' added');
-        } else {
-            $this->session->record_unsaved(ucfirst($this->name).' updated');
-        }
-    }
-
-    public function save($entity) {
-        if (is_array($entity)) {
-            return $this->saveArrayEntity($entity);
-        }
-        throw new Exception("Entity must be an array or object");
-    }
-
-    public function deleteById($id) {
-        unset($this->entities[$id]);
-        $this->commit();
-        return true;
-    }
-
-    public function delete($id_or_entity) {
-        if (is_scalar($id_or_entity)) {
-            return $this->deleteById($id_or_entity);
-        }
-    }
-}
-
-class Hm_ModulesRepositoryRegistry {
-
-    private $modules;
-
-    private $repositories = array();
-
-    private $session;
-
-    private $user_config;
-
-    public function add_repository($name, $object) {
-        $this->repositories[$name] = $object;
-    }
-
-    public function __construct($modules, $session, $user_config) {
-        $this->modules = $modules;
-        $this->session = $session;
-        $this->user_config = $user_config;
-        $this->load_default_repositories();
-        #$this->repositories = array();
-        #$modules_path = getcwd() . '../modules';
-        #foreach (glob($modules_path . '/*' , GLOB_ONLYDIR) as $dir) {
-        #
-        #}
-    }
-
-    private function load_default_repositories() {
-        require_once getcwd() . '/lib/repository.php';
-        foreach ($this->modules as $module) {
-            $this->add_repository($module, new Hm_BaseRepository($module, $this->session, $this->user_config));
-        }
-    }
-
-    public function __get(string $name) {
-        if (array_key_exists($name, $this->repositories)) {
-            return $this->repositories[$name];
-        }
-        throw new Exception("Repository not registered");
-    }
-}
-
 /**
  * Base class for data input processing modules, called "handler modules"
  *
@@ -466,8 +321,6 @@ abstract class Hm_Handler_Module {
 
     public $cache;
 
-    public $repositories;
-
     /**
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
@@ -484,7 +337,6 @@ abstract class Hm_Handler_Module {
         $this->user_config = $parent->user_config;
         $this->output = $output;
         $this->protected = $protected;
-        $this->repositories = new Hm_ModulesRepositoryRegistry($parent->site_config->get_modules(), $this->session, $this->user_config);
     }
 
     /**

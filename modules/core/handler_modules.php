@@ -42,7 +42,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current = Hm_SMTP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
-                Hm_SMTP_List::add($current, $server['id']);
+                Hm_SMTP_List::edit($server['id'], $current);
                 $smtp = Hm_SMTP_List::connect($server['id'], false);
                 if ($smtp->state == 'authed') {
                     Hm_Msgs::add('Password Updated');
@@ -50,7 +50,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 }
                 else {
                     unset($current['pass']);
-                    Hm_SMTP_List::add($current, $server['id']);
+                    Hm_SMTP_List::edit($server['id'], $current);
                     Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
                     $this->out('connect_status', false);
                 }
@@ -59,7 +59,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current = Hm_IMAP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
-                Hm_IMAP_List::add($current, $server['id']);
+                Hm_IMAP_List::edit($server['id'], $current);
                 $imap = Hm_IMAP_List::connect($server['id'], false);
                 if ($imap->get_state() == 'authenticated') {
                     Hm_Msgs::add('Password Updated');
@@ -67,7 +67,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 }
                 else {
                     unset($current['pass']);
-                    Hm_IMAP_List::add($current, $server['id']);
+                    Hm_IMAP_List::edit($server['id'], $current);
                     Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
                     $this->out('connect_status', false);
                 }
@@ -92,7 +92,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
         if ($this->module_is_supported('imap')) {
             foreach (Hm_IMAP_List::dump() as $index => $vals) {
                 if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
                     $vals['type'] = 'IMAP';
                     $key = 'imap_'.$index;
                     $missing[$key] = $vals;
@@ -102,7 +101,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
         if ($this->module_is_supported('smtp')) {
             foreach (Hm_SMTP_List::dump() as $index => $vals) {
                 if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
                     $vals['type'] = 'SMTP';
                     $key = 'smtp_'.$index;
                     $missing[$key] = $vals;

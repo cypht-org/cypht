@@ -75,8 +75,8 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
             $smtp_servers = count(Hm_SMTP_List::dump(false));
         }
         if (data_source_available($modules, 'profiles')) {
-            $profiles = new Hm_Profiles($this);
-            $profiles = count($profiles->list_all());
+            Hm_Profiles::init($this);
+            $profiles = Hm_Profiles::count();
         }
 
         $this->out('nux_server_setup', array(
@@ -123,17 +123,9 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'refresh_token' => $result['refresh_token']
                         ));
                         $this->session->record_unsaved('SMTP server added');
-                        $smtp_servers = Hm_SMTP_List::dump(false, true);
-                        $this->user_config->set('smtp_servers', $smtp_servers);
                     }
                     Hm_Msgs::add('E-mail account successfully added');
-                    $servers = Hm_IMAP_List::dump(false, true);
-                    $this->user_config->set('imap_servers', $servers);
                     Hm_IMAP_List::clean_up();
-                    $user_data = $this->user_config->dump();
-                    if (!empty($user_data)) {
-                        $this->session->set('user_data', $user_data);
-                    }
                     $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
@@ -207,16 +199,9 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                         if (in_server_list('Hm_SMTP_List', $new_smtp_id, $form['nux_email'])) {
                             Hm_SMTP_List::del($new_smtp_id);
                             Hm_Msgs::add('ERRThis SMTP server and username are already configured');
-                        } else {
-                            $this->user_config->set('smtp_servers', $smtp_servers);
                         }
                     }
-                    $this->user_config->set('imap_servers', $servers);
                     Hm_IMAP_List::clean_up();
-                    $user_data = $this->user_config->dump();
-                    if (!empty($user_data)) {
-                        $this->session->set('user_data', $user_data);
-                    }
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');

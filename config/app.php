@@ -725,15 +725,6 @@ return [
     //     'feeds',
 
     //     /*
-    //     | ----
-    //     | POP3
-    //     | ----
-    //     |
-    //     | POP3 E-mail account support
-    //     */
-    //     'pop3',
-
-    //     /*
     //     | -----
     //     | JMAP
     //     | -----

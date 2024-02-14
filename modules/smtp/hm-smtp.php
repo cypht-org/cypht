@@ -14,6 +14,10 @@ class Hm_SMTP_List {
     
     use Hm_Server_List;
 
+    public static function init($user_config, $session) {
+        self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+    }
+
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         $config = array(
             'id'        => $id,
