@@ -627,7 +627,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
         }
-        $res .= 'window.hm_current_lang = '.$this->lang.';'.
+        $res .= 'window.hm_current_lang = "'.$this->lang.'";'.
             'window.hm_translations = '.json_encode($this->all_trans()).';'.
             'var hm_trans = function(key, lang = window.hm_current_lang) {'.
             '    const langTranslations = window.translations && window.translations[lang];'.
