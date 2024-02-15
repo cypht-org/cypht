@@ -72,6 +72,7 @@ class Handler_Test {
         }
         Hm_Handler_Modules::add('test', $this->mod, false, false, false, true, $this->set);
         $this->module_exec->handler_response = $this->input;
+        Hm_Server_Wrapper::init($this->module_exec->user_config, $this->ses_obj);
     }
     public function run_only() {
         $this->module_exec->run_handler_modules($this->req_obj, $this->ses_obj, 'test');

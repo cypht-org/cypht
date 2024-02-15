@@ -35,6 +35,7 @@ trait Hm_Repository {
         if ($save) {
             self::save();
         }
+        return $entity['id'];
     }
 
     public static function edit($id, $entity) {

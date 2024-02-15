@@ -193,7 +193,7 @@ trait Hm_Server_List {
     public static function add($atts) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        self::repo_add($atts);
+        return self::repo_add($atts);
     }
 
     /**

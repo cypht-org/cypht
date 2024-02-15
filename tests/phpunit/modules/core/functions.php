@@ -201,11 +201,11 @@ class Hm_Test_Core_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_in_server_list() {
-        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 0);
-        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 0, 'foo'));
-        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 1, 'foo'));
-        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
-        $this->assertTrue(in_server_list('Hm_Server_Wrapper', 1, 'testuser'));
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1, 'id' => 'a0'));
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 'a0', 'foo'));
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 'a1', 'foo'));
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
+        $this->assertTrue(in_server_list('Hm_Server_Wrapper', 'a1', 'testuser'));
     }
     /**
      * @preserveGlobalState disabled
