@@ -1212,7 +1212,6 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         $res .= '<div class="p-3">';
         return $res;
     }
@@ -1225,7 +1224,6 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         return $res;
     }
 }
@@ -1455,8 +1453,6 @@ if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
         return '<div id="edit_script_modal" class="d-none">
-            <h1 class="script_modal_title"></h1>  
-            <hr/>
             <div class="mb-2">
                 <h3 class="mb-1">General</h3>
                 <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
@@ -1485,8 +1481,6 @@ if (!hm_exists('get_classic_filter_modal_content')) {
     function get_classic_filter_modal_content()
     {
             return '<div id="edit_filter_modal" class="d-none">
-            <h1 class="filter_modal_title"></h1>  
-            <hr/>
             <div class="mb-2">
                 <h3 class="mb-1">General</h3>
                 <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>

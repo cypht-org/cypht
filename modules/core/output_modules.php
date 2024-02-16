@@ -542,7 +542,6 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $js_lib .= '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/tingle.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/sortable.min.js"></script>';
