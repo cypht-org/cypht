@@ -112,7 +112,7 @@ var smtp_delete_draft = function(id) {
 
 var send_archive = function() {
     $('.compose_post_archive').val(1);
-    document.getElementsByClassName("smtp_send")[0].click();
+    document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
 var save_compose_state = function(no_files, notice) {
@@ -139,8 +139,8 @@ var save_compose_state = function(no_files, notice) {
         return;
     }
 
-    $('.smtp_send').prop('disabled', true);
-    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_placeholder').prop('disabled', true);
+    $('.smtp_send_placeholder').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
@@ -155,8 +155,8 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_to', 'value': to},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
-            $('.smtp_send').prop('disabled', false);
-            $('.smtp_send').removeClass('disabled_input');
+            $('.smtp_send_placeholder').prop('disabled', false);
+            $('.smtp_send_placeholder').removeClass('disabled_input');
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
@@ -402,7 +402,7 @@ var process_compose_form = function(){
     var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
     $('#send_uploaded_files').val(uploaded_files);
     Hm_Ajax.show_loading_icon();
-    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_placeholder').addClass('disabled_input');
     $('.smtp_send_archive').addClass('disabled_input');
     $('.smtp_send').on("click", function () { return false; });
 }
@@ -457,8 +457,7 @@ $(function () {
             btnSize: 'sm'
         });
 
-        $('.compose_form').on('submit', function(e) {
-            e.preventDefault();
+        $('.smtp_send_placeholder').on("click", function () {
             const body = $('.compose_body').val().trim();
             const subject = $('.compose_subject').val().trim();
 
@@ -485,15 +484,16 @@ $(function () {
 
             // If the user has disabled the warning, we should send the message
             if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
-                return handleSendAnyway();
+                handleSendAnyway();
             }
             // Otherwise, we should show the modal if we have a headline
-            if (modalContentHeadline) {
-                return showModal();
+            else if (modalContentHeadline) {
+                return showModal(modalContentHeadline);
             }
-
             // Subject and body are not empty, we can send the message
-            handleSendAnyway();
+            else {
+                handleSendAnyway();
+            }
 
             /*
             ========================================
@@ -510,47 +510,45 @@ $(function () {
             }
 
             function handleSendAnyway() {
-                // e.target.submit();
-                handleFiles();
+                document.getElementsByClassName("smtp_send")[0].click();
             };
 
             function handleSendAnywayAndDontWarnMe() {
                 Hm_Utils.save_to_local_storage(dontWanValueInStorage, true);
                 handleSendAnyway();
-            };
-
-            function handleFiles() {
-                var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
-                const compose_body_value = document.getElementById('compose_body').value;
-                const force_send = document.getElementById('force_send')?.value;
-                var reminder_value = $('.compose_form').data('reminder');
-                if (reminder_value === 1) {
-                    let all_translated_keywords = [];
-                    for (let lang in window.hm_translations) {
-                        if (window.hm_translations.hasOwnProperty(lang)) {
-                            // Get translated keywords for the current language
-                            const translated_keywords = hm_trans('attachment,file,attach,attached,attaching,enclosed,CV,cover letter', lang).split(',');
-                            // Concatenate translated keywords with the array
-                            all_translated_keywords = all_translated_keywords.concat(translated_keywords);
-                        }
+            }; 
+        });
+        $('.compose_form').on('submit', function() {
+            var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+            const compose_body_value = document.getElementById('compose_body').value;
+            const force_send = document.getElementById('force_send')?.value;
+            var reminder_value = $('.compose_form').data('reminder');
+            if (reminder_value === 1) {
+                let all_translated_keywords = [];
+                for (let lang in window.hm_translations) {
+                    if (window.hm_translations.hasOwnProperty(lang)) {
+                        // Get translated keywords for the current language
+                        const translated_keywords = hm_trans('attachment,file,attach,attached,attaching,enclosed,CV,cover letter', lang).split(',');
+                        // Concatenate translated keywords with the array
+                        all_translated_keywords = all_translated_keywords.concat(translated_keywords);
                     }
-                    const additional_keywords = ['.doc', '.pdf'];
-                    // Split the translated keywords into an array && Add additional keywords or file extensions
-                    const combined_keywords = all_translated_keywords.concat(additional_keywords);
-                    // Build the regex pattern
-                    const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
-                    // Check if the pattern is found in the message
-                    if (pattern.test(compose_body_value) && uploaded_files.length === 0 && force_send !== '1') {
-                        if (confirm(hm_trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
-                            force_send_message();
-                        }
-                        e.preventDefault();
-                    } else {
-                        process_compose_form();
+                }
+                const additional_keywords = ['.doc', '.pdf'];
+                // Split the translated keywords into an array && Add additional keywords or file extensions
+                const combined_keywords = all_translated_keywords.concat(additional_keywords);
+                // Build the regex pattern
+                const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
+                // Check if the pattern is found in the message
+                if (pattern.test(compose_body_value) && uploaded_files.length === 0 && force_send !== '1') {
+                    if (confirm(hm_trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
+                        force_send_message();
                     }
+                    e.preventDefault();
                 } else {
                     process_compose_form();
                 }
+            } else {
+                process_compose_form();
             }
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
@@ -585,7 +583,7 @@ $(function () {
             e.preventDefault();
             text_to_bubbles(this);
         });
-        $('.compose_subject, .compose_body, .compose_server, .smtp_send, .smtp_send_archive').on('focus', function(e) {
+        $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
             $('.compose_to, .compose_cc, .compose_bcc').each(function() {
                 bubbles_to_text(this);
             });

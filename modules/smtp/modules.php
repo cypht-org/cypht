@@ -1189,7 +1189,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
-            '<input class="smtp_send btn btn-success mt-3" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
+            '<button class="smtp_send_placeholder btn btn-success mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>';
 
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
             $res .= '<input class="smtp_send_archive btn btn-success mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
