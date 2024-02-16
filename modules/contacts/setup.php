@@ -48,7 +48,7 @@ return array(
         'contact_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_phone' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_id' => FILTER_VALIDATE_INT,
+        'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'edit_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'add_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -56,7 +56,7 @@ return array(
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_get' => array(
-        'contact_id' => FILTER_VALIDATE_INT,
+        'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_page' => FILTER_VALIDATE_INT,
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

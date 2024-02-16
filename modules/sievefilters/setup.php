@@ -141,7 +141,7 @@ return array(
         'actions_json' => FILTER_UNSAFE_RAW,
         'filter_test_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
-        'imap_server_id' => FILTER_VALIDATE_INT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'sender' => FILTER_UNSAFE_RAW,
         'selected_behaviour' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

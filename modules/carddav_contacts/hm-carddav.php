@@ -247,13 +247,8 @@ class Hm_Carddav {
     }
 
     private function url_concat($path) {
-        if (substr($this->url, -1) == '/' && substr($path, -1) == '/') {
-            return sprintf('%s%s', substr($this->url, 0, -1), $path);
-        }
-        if (substr($this->url, -1) != '/' && substr($path, -1) != '/') {
-            return sprintf('%s/%s', $this->url, $path);
-        }
-        return sprintf('%s%s', $this->url, $path);
+        $parsed = parse_url($this->url);
+        return sprintf('%s://%s/%s', $parsed['scheme'], $parsed['host'], preg_replace('#^/#', '', $path));
     }
 
     private function auth_headers() {
@@ -282,10 +277,12 @@ class Hm_Carddav {
     }
 
     private function report($url) {
+        $headers = $this->auth_headers();
+        $headers[] = 'Depth: 1';
         $req_xml = '<card:addressbook-query xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav">'.
             '<d:prop><d:getetag /><card:address-data /></d:prop></card:addressbook-query>';
         Hm_Debug::add(sprintf('CARDDAV: Sending contacts XML: %s', $req_xml));
-        return $this->api->command($url, $this->auth_headers(), array(), $req_xml, 'REPORT');
+        return $this->api->command($url, $headers, array(), $req_xml, 'REPORT');
     }
 
     private function delete_server_contact($url) {

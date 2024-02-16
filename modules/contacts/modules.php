@@ -75,6 +75,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
 class Hm_Handler_load_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = new Hm_Contact_Store();
+        $contacts->init($this->user_config, $this->session);
         $page = 1;
         if (array_key_exists('contact_page', $this->request->get)) {
             $page = $this->request->get['contact_page'];

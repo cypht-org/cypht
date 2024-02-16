@@ -13,26 +13,51 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Contact_Store {
 
-    private $contacts = array();
+    use Hm_Repository {
+        Hm_Repository::save as repo_save;
+        Hm_Repository::get as repo_get;
+    }
+
+    private $data = array();
     private $sort_fld = false;
+
+    public function init($user_config, $session) {
+        self::initRepo('contacts', $user_config, $session, $this->data, function($initial) {
+            foreach ($initial as $contact) {
+                $this->add_contact($contact);
+            }
+        });
+    }
+
+    public static function save() {
+        $local_contacts = array_map(function($c) {
+            $c->update('type', 'local');
+            return $c->export();
+        }, array_filter(self::$entities, function($c) {
+            return ! $c->value('external');
+        }));
+        self::$user_config->set(self::$name, $local_contacts);
+        self::$session->set('user_data', self::$user_config->dump());
+    }
 
     public function __construct() {
     }
 
     public function add_contact($data) {
         $contact = new Hm_Contact($data);
-        $this->contacts[] = $contact;
+        self::add($contact);
         return true;
     }
 
     public function get($id, $default=false, $email_address=""){
-        if(array_key_exists($id, $this->contacts)) {
-            return $this->contacts[$id];
+        $contact = self::repo_get($id);
+        if ($contact) {
+            return $contact;
         }
 
         if(!empty($email_address)){
             $res = false;
-            foreach ($this->contacts as $id => $contact) {
+            foreach (self::getAll() as $id => $contact) {
                 if ($contact->value('email_address') == $email_address) {
                     $res = $contact;
                     break;
@@ -49,7 +74,7 @@ class Hm_Contact_Store {
         $res = array();
         $found = array();
         foreach ($flds as $fld => $term) {
-            foreach ($this->contacts as $id => $contact) {
+            foreach (self::getAll() as $id => $contact) {
                 if (array_key_exists($contact->value('email_address'), $found)) {
                     continue;
                 }
@@ -69,13 +94,6 @@ class Hm_Contact_Store {
         return false;
     }
 
-    public function update($id, $contact) {
-        if (!array_key_exists($id, $this->contacts)) {
-            return false;
-        }
-        $this->contacts[$id] = $contact;
-    }
-
     public function update_contact_fld($contact, $name, $value)  {
         return $contact->update($name, $value);
     }
@@ -89,49 +107,51 @@ class Hm_Contact_Store {
             $failures += (int) !$this->update_contact_fld($contact, $name, $value);
         }
         if ($failures == 0) {
-            $this->update($id, $contact);
+            $this->edit($id, $contact);
         }
         return $failures > 0 ? false : true;
     }
 
     public function delete($id) {
-        if (!array_key_exists($id, $this->contacts)) {
-            return false;
-        }
-        unset($this->contacts[$id]);
-        return true;
+        return self::del($id);
     }
 
+
     public function dump() {
-        return $this->contacts;
+        return $this->data;
     }
 
     public function export($source = 'local') {
         return array_map(function($contact) { return $contact->export(); },
-            array_filter($this->contacts, function($contact) use ($source) { return $contact->value('source') == $source; })
+            array_filter($this->data, function($contact) use ($source) { return $contact->value('source') == $source; })
         );
     }
 
     public function import($data) {
         foreach ($data as $contact) {
-            $this->add_contact($contact);
+            if (! isset($contact['id'])) {
+                $contact['id'] = self::count();
+            }
+            $contact['external'] = true;
+            $contact = new Hm_Contact($contact);
+            self::add($contact, false);
         }
     }
 
     public function reset() {
-        $this->contacts = array();
+        $this->data = array();
     }
 
     public function page($page, $size) {
         if ($page < 1) {
             return array();
         }
-        return array_slice( $this->contacts, (($page - 1)*$size), $size, true);
+        return array_slice($this->data, (($page - 1)*$size), $size, true);
     }
 
     public function sort($fld) {
         $this->sort_fld = $fld;
-        uasort($this->contacts, array($this, 'sort_callback'));
+        uasort($this->data, array($this, 'sort_callback'));
     }
 
     public function sort_callback($a, $b) {

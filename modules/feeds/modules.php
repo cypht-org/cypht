@@ -23,13 +23,13 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
             }
-            elseif (preg_match("/^feeds_\d+$/", $path)) {
+            elseif (preg_match("/^feeds_.+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
-                $details = Hm_Feed_List::dump(intval($parts[1]));
+                $details = Hm_Feed_List::dump($parts[1]);
                 if (!empty($details)) {
                     $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
@@ -414,12 +414,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
  */
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     public function process() {
-        $feeds = $this->user_config->get('feeds', array());
-        $index = 0;
-        foreach ($feeds as $index => $feed) {
-            Hm_Feed_List::add($feed, $index);
-            $index++;
-        }
+        Hm_Feed_List::init($this->user_config, $this->session);
         Hm_Feed_Uid_Cache::load($this->cache->get('feed_read_uids', array(), true));
     }
 }
@@ -449,7 +444,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
-            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
         
     }
@@ -481,7 +476,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 $callback = 'feeds_combined_content';
                 break;
             default:
-                if (preg_match("/^feeds_(\d+)$/", $path, $matches)) {
+                if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
                     $server_id = $matches[1];
                     $callback = 'load_feed_list';
                 }
@@ -492,7 +487,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 if ($server_id !== false && $index != $server_id) {
                     continue;
                 }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
             }
         }
     }
@@ -503,8 +498,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
  */
 class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
-        $feeds = Hm_Feed_List::dump();
-        $this->user_config->set('feeds', $feeds);
+        Hm_Feed_List::save();
         $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0, true);
     }
 }

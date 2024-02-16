@@ -24,6 +24,7 @@ trait Hm_Server_Connect {
             return false;
         }
         $server = self::$server_list[$id];
+
         if ($server['object']) {
             return $server['object'];
         }
@@ -31,6 +32,7 @@ trait Hm_Server_Connect {
         if ($user === false || $pass === false) {
             return false;
         }
+
         if (self::service_connect($id, $server, $user, $pass, $cache)) {
             return self::enable_server($id, $user, $pass, $save_credentials);
         }
@@ -173,6 +175,14 @@ trait Hm_Server_Modify {
 trait Hm_Server_List {
 
     use Hm_Server_Modify;
+    use Hm_Repository {
+        Hm_Repository::add as repo_add;
+        Hm_Repository::get as repo_get;
+    }
+
+    public static function init($name, $user_config) {
+        self::initRepo($name, $user_config, self::$server_list);
+    }
 
     /**
      * Add a server definition
@@ -180,28 +190,10 @@ trait Hm_Server_List {
      * @param int $id server id
      * @return void
      */
-    public static function add($atts, $id=false) {
+    public static function add($atts) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        if ($id !== false) {
-            self::$server_list[$id] = $atts;
-        }
-        else {
-            self::$server_list[] = $atts;
-        }
-    }
-
-    /**
-     * Remove a server
-     * @param int $id server id
-     * @return bool true on success
-     */
-    public static function del($id) {
-        if (array_key_exists($id, self::$server_list)) {
-            unset(self::$server_list[$id]);
-            return true;
-        }
-        return false;
+        return self::repo_add($atts);
     }
 
     /**
@@ -230,14 +222,11 @@ trait Hm_Server_List {
      * @return array
      */
     public static function get($id, $full) {
-        if (array_key_exists($id, self::$server_list)) {
-            $server = self::$server_list[$id];
-            if (!$full) {
-                return self::clean($server);
-            }
-            return $server;
+        $server = self::repo_get($id);
+        if ($server && ! $full) {
+            return self::clean($server);
         }
-        return array();
+        return $server;
     }
 
     /*
@@ -245,7 +234,7 @@ trait Hm_Server_List {
      * @return array
      */
     public static function clean($server) {
-        if (!array_key_exists('pass', $server) || !$server['pass']) {
+        if (! array_key_exists('pass', $server) || ! $server['pass']) {
             $server['nopass'] = true;
         }
         unset($server['pass']);

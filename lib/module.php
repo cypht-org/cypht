@@ -320,6 +320,7 @@ abstract class Hm_Handler_Module {
     public $user_config;
 
     public $cache;
+
     /**
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
