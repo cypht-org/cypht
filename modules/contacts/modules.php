@@ -86,6 +86,33 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_process_export_contacts extends Hm_Handler_Module {
+    public function process() {
+        if (array_key_exists('contact_source', $this->request->get)) {
+            $source = $this->request->get['contact_source'];
+            $contacts = $this->get('contact_store');
+            $contact_list = $contacts->getAll();
+            if ($source != 'all') {
+                $contact_list = $contacts->export($source);
+            }
+
+            Hm_Functions::header('Content-Type: text/csv');
+            Hm_Functions::header('Content-Disposition: attachment; filename="'.$source.'_contacts.csv"');
+            $output = fopen('php://output', 'w');
+            fputcsv($output, array('display_name', 'email_address', 'phone_number'));
+            foreach ($contact_list as $contact) {
+                $contact_data = is_array($contact) ? $contact : $contact->export();
+                fputcsv($output, array($contact_data['display_name'], $contact_data['email_address'], $contact_data['phone_number']));
+            }
+            fclose($output);
+            exit;
+        }
+    }
+}
+
+/**
  * @subpackage contacts/output
  */
 class Hm_Output_contacts_page_link extends Hm_Output_Module {
@@ -107,7 +134,16 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
  */
 class Hm_Output_contacts_content_start extends Hm_Output_Module {
     protected function output() {
-        return '<div class="contacts_content px-0"><div class="content_title px-3">'.$this->trans('Contacts').'</div>';
+        $contact_source_list = $this->get('contact_sources', array());
+        $actions = '<div class="src_title">'.$this->trans('Export Contacts as CSV').'</div>';
+        $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source=all">'.$this->trans('All Contacts').'</a></div>';
+        foreach ($contact_source_list as $value) {
+            $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source='.$this->html_safe($value).'">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
+        }
+
+        return '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
+            '<i class="bi bi-download" width="16" height="16" onclick="listControlsMenu()"></i></a></div></div>'.
+            '<div class="list_actions">'.$actions.'</div>';
     }
 }
 
@@ -149,10 +185,24 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_check_imported_contacts extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $imported_contact = $this->session->get('imported_contact', array());
+        $this->session->del('imported_contact');
+        $this->out('imported_contact', $imported_contact);
+    }
+}
+
+/**
  * @subpackage contacts/output
  */
 class Hm_Output_contacts_list extends Hm_Output_Module {
     protected function output() {
+        $imported_contact = $this->get('imported_contact', array());
         if (count($this->get('contact_sources', array())) == 0) {
             return '<div class="no_contact_sources">'.$this->trans('No contact backends are enabled!').
                 '<br />'.$this->trans('At least one backend must be enabled in the config/app.php file to use contacts.').'</div>';
@@ -160,6 +210,13 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);
         $res = '<div class="px-3 mt-3"><table class="contact_list table">';
+        $modal = '';
+        if ($imported_contact) {
+            $res .=
+            '<tr class="contact_import_detail"><td colspan="7"><a href="#" class="show_import_detail text-danger" data-bs-toggle="modal" data-bs-target="#importDetailModal">'.$this->trans('More info about import operation').'</a></td></tr>';
+            $modal .=  get_import_detail_modal_content($this, $imported_contact);
+        }
+
         $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
@@ -208,7 +265,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             }
             $res .= '</td></tr>';
         }
-        $res .= '</table></div>';
+        $res .= '</table>'.$modal.'</div>';
         return $res;
     }
 }
@@ -333,4 +390,80 @@ function name_map($val) {
         return $names[$val];
     }
     return $val;
+}}
+
+
+/**
+ * @subpackage contacts/functions
+ */
+if (!hm_exists('get_import_detail_modal_content')) {
+function get_import_detail_modal_content($output_mod, $imported_contacts) {
+    $per_page = 10;
+    $page = 1;
+    $total_contacts = count($imported_contacts);
+    $total_pages = ceil($total_contacts / $per_page);
+    $res = '<table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Display Name</th>
+                <th scope="col">E-mail Address</th>
+                <th scope="col">Telephone Number</th>
+                <th scope="col">Status</th>
+            </tr>
+        </thead>
+        <tbody class="import_body">';
+
+    for ($i = 0; $i < $total_contacts; $i++) {
+        $contact = $imported_contacts[$i];
+        $status = $contact['status'] == "invalid email" ? "danger" : "success";
+        $res .= '<tr class="page_'.ceil(($i + 1) / $per_page).'">
+            <td>'.($i + 1).'</td>
+            <td>'.$output_mod->html_safe($contact['display_name']).'</td>
+            <td>'.$output_mod->html_safe($contact['email_address']).'</td>
+            <td>'.$output_mod->html_safe($contact['phone_number']).'</td>
+            <td class="text-'.$status.'">'.$output_mod->html_safe($contact['status']).'</td>
+        </tr>';
+    }
+
+    $res .= '</tbody></table>';
+
+    if ($total_pages > 1) {
+        $res .= '<nav aria-label="Pagination">
+            <ul class="pagination justify-content-center">
+                <li class="prev_page '.($page == 1 ? "disabled" : "").'">
+                    <span role="button" class="page-link" tabindex="-1" aria-disabled="true">Previous</span>
+                </li>';
+
+        for ($i = 1; $i <= $total_pages; $i++) {
+            $res .= '<li class="page_item_'.$i.' '.($page == $i ? "active" : "").' page_link_selector" data-page="'. $i .'"><span role="button" class="page-link">'.$i.'</span></li>';
+        }
+
+        $res .= '<li class="next_page '.($page == $total_pages ? "disabled" : "").'">
+                    <span role="button" class="page-link">Next</span>
+                </li>
+            </ul>
+        </nav>';
+    }
+
+    $res .= '<input type="hidden" id="totalPages" value="'.$total_pages.'">';
+
+    return '<div class="modal fade" id="importDetailModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="importDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importDetailModalLabel">'.$output_mod->trans('Import details').'</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        '.$res.'
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <input class="btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                </div>
+            </div>
+        </div>
+    </div>';
 }}
