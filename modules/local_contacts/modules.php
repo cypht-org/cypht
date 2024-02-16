@@ -109,10 +109,7 @@ class Hm_Handler_load_edit_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
     public function process() {
-        $contacts = $this->get('contact_store');
-        $contacts->init($this->user_config, $this->session);
         $this->append('contact_sources', 'local');
-        $this->out('contact_store', $contacts, false);
         $this->append('contact_edit', 'local:local');
     }
 }
