@@ -165,7 +165,7 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     var msg_cache_key = 'imap_'+detail.server_id+'_'+hm_msg_uid()+'_'+detail.folder;
                     remove_from_cached_imap_pages(msg_cache_key);
                     var nlink = $('.nlink');
-                    if (nlink.length && parseInt($('input[name="auto_advance_email"]').val())) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -203,7 +203,7 @@ var imap_unread_message = function(supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length && parseInt($('input[name="auto_advance_email"]').val())) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -596,7 +596,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                 if (!res.show_pagination_links) {
                     $('.prev, .next').hide();
                 }
-                $('input[name="auto_advance_email"]').val(res.auto_advance_email_enabled ? 1 : 0);
+                globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
             },
             [],
             false,
@@ -975,7 +975,7 @@ var imap_perform_move_copy = function(dest_id, context) {
                 else {
                     if (action == 'move') {
                         var nlink = $('.nlink');
-                        if (nlink.length && parseInt($('input[name="auto_advance_email"]').val())) {
+                        if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                             window.location.href = nlink.attr('href');
                         }
                         else {
@@ -1239,7 +1239,7 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length && parseInt($('input[name="auto_advance_email"]').val())) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
