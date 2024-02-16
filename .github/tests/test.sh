@@ -1,7 +1,7 @@
 #!/bin/bash
 
 phpunit_tests() {
-    phpunit --configuration tests/phpunit/phpunit.xml --testdox
+    phpunit --bootstrap vendor/autoload.php --configuration tests/phpunit/phpunit.xml --testdox
 }
 
 selenium_tests() {

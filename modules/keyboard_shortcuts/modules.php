@@ -99,15 +99,15 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_keyboard_shortcuts', $settings) && $settings['enable_keyboard_shortcuts']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label for="enable_keyboard_shortcuts">'.
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_keyboard_shortcuts">'.
             $this->trans('Enable keyboard shortcuts').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
             ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" />'.$reset.'</td></tr>';
     }
 }
@@ -117,7 +117,7 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
  */
 class Hm_Output_start_shortcuts_page extends Hm_Output_Module {
     protected function output() {
-        return '<div class="shortcut_content"><div class="content_title">'.$this->trans('Shortcuts').'</div>';
+        return '<div class="shortcut_content px-0"><div class="content_title px-3">'.$this->trans('Shortcuts').'</div>';
     }
 }
 
@@ -132,15 +132,15 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         }
         $codes = keycodes();
         $meta = array('none', 'shift', 'control', 'alt', 'meta');
-        $res = '<div class="settings_subtitle">'.$this->trans('Edit Shortcut').'</div>';
-        $res .= '<div class="edit_shortcut_form"><form method="POST" action="?page=shortcuts&edit_id='.$this->html_safe($details['id']).'">';
+        $res = '<div class="settings_subtitle p-3">'.$this->trans('Edit Shortcut').'</div>';
+        $res .= '<div class="edit_shortcut_form px-5"><form method="POST" action="?page=shortcuts&edit_id='.$this->html_safe($details['id']).'">';
         $res .= '<input type="hidden" name="shortcut_id" value="'.$this->html_safe($details['id']).'" />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<table>';
         $res .= '<tr><th colspan="2">'.$this->trans(ucfirst($details['group'])).' : '.
             $this->trans($details['label']).'</th></tr>';
         $res .= '<tr><td>'.$this->trans('Modifier Key(s)').'</td>';
-        $res .= '<td><select required multiple size="5" name="shortcut_meta[]">';
+        $res .= '<td><select class="form-select form-select-sm" required multiple size="5" name="shortcut_meta[]">';
         foreach ($meta as $v) {
             $res .= '<option ';
             if (in_array($v, $details['control_chars'], true)) {
@@ -153,7 +153,7 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         }
         $res .= '</select></td></tr>';
         $res .= '<tr><td>'.$this->trans('Character').'</td>';
-        $res .= '<td><select required " name="shortcut_key">';
+        $res .= '<td><select class="form-select form-select-sm" required " name="shortcut_key">';
         foreach ($codes as $name => $val) {
             $res .= '<option ';
             if ($val == $details['char']) {
@@ -162,9 +162,11 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($val).'">'.$this->html_safe($name).'</option>';
         }
         $res .= '</select></td></tr>';
-        $res .= '<tr><td colspan="2"><input type="submit" value="'.
-            $this->trans('Update').'" /> <input type="button" value="'.
-            $this->trans('Cancel').'" class="reset_shortcut" /></td></tr>';
+        $res .= '<tr><td colspan="2">
+                        <input type="submit" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" class="btn btn-light border reset_shortcut" value="'.$this->trans('Cancel').'" />
+                </td></tr>';
+        
         $res .= '</table></form></div>';
         return $res;
     }
@@ -177,11 +179,11 @@ class Hm_Output_shortcuts_content extends Hm_Output_Module {
     protected function output() {
         $shortcuts = $this->get('keyboard_shortcut_data');
         $res = '<table class="shortcut_table">';
-        $res .= '<tr><td colspan="3" class="settings_subtitle">'.$this->trans('General').'</th></tr>';
+        $res .= '<tr><td colspan="3" class="settings_subtitle px-3">'.$this->trans('General').'</th></tr>';
         $res .= format_shortcut_section($shortcuts, 'general', $this);
-        $res .= '<tr><td colspan="3" class="settings_subtitle">'.$this->trans('Message List').'</td></tr>';
+        $res .= '<tr><td colspan="3" class="settings_subtitle px-3">'.$this->trans('Message List').'</td></tr>';
         $res .= format_shortcut_section($shortcuts, 'message_list', $this);
-        $res .= '<tr><td colspan="3" class="settings_subtitle">'.$this->trans('Message View').'</td></tr>';
+        $res .= '<tr><td colspan="3" class="settings_subtitle px-3">'.$this->trans('Message View').'</td></tr>';
         $res .= format_shortcut_section($shortcuts, 'message', $this);
         $res .= '</table>';
         $res .= '</div>';
@@ -208,7 +210,7 @@ class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
         if ($this->get('shortcuts_enabled')) {
             $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-code-slash fs-5 me-2"></i>';
             }
             $res .= $this->trans('Shortcuts').'</a></li>';
             if ($this->format == 'HTML5') {
@@ -234,10 +236,9 @@ function format_shortcut_section($data, $type, $output_mod) {
             }
             $char = array_search($vals['char'], $codes);
             $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
-                '<td><a href="?page=shortcuts&edit_id=%s"><img width="16" height="16" alt="'.
-                $output_mod->trans('Update').'" class="kbd_config" src="%s" /><a></td></tr>',
+                '<td><a href="?page=shortcuts&edit_id=%s"><i class="kbd_config cursor-pointer bi bi-gear-wide-connected text-secondary fs-5"></i><a></td></tr>',
                 $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
-                $output_mod->trans($vals['label']), $index, Hm_Image_Sources::$cog);
+                $output_mod->trans($vals['label']), $index);
         }
     }
     return $res;

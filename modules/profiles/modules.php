@@ -166,7 +166,7 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
 class Hm_Output_profile_edit_form extends Hm_Output_Module {
     protected function output() {
         $new_id = $this->get('new_profile_id', -1);
-        $res = '<div class="profile_content"><div class="content_title">'.$this->trans('Profiles');
+        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span>'.$this->trans('Profiles').'</span>';
         $smtp_servers = $this->get('smtp_servers', array());
         $imap_servers = $this->get('imap_servers', array());
         if ($this->get('edit_profile')) {
@@ -191,7 +191,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_profiles"><a class="unread_link" href="?page=profiles">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$person).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-person-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Profiles').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -207,7 +207,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
 class Hm_Output_compose_signature_button extends Hm_Output_Module {
     protected function output() {
         return '<input type="hidden" value="'.$this->trans('You need at least one configured profile to sign messages').'" id="sign_msg" />'.
-            '<input class="compose_sign" type="button" value="'.$this->trans('Sign').'" />';
+            '<input class="compose_sign btn btn-light float-end mt-3 me-2 border" type="button" value="'.$this->trans('Sign').'" />';
     }
 }
 
@@ -257,15 +257,15 @@ class Hm_Output_profile_content extends Hm_Output_Module {
         $res = '';
         if (count($profiles) > 0) {
             $smtp_servers = $this->get('smtp_servers', array());
-            $res .= '<table class="profile_details" style="display: block;overflow-x: auto;white-space: nowrap;"><tr>'.
+            $res .= '<div class="p-3"><table class="table table-striped"><tr>'.
                 '<th>'.$this->trans('Display Name').'</th>'.
-                '<th class="profile_fld">'.$this->trans('IMAP Server').'</th>'.
-                '<th class="profile_fld">'.$this->trans('Username').'</th>'.
-                '<th class="profile_fld">'.$this->trans('E-mail Address').'</th>'.
-                '<th class="profile_fld">'.$this->trans('Reply-to').'</th>'.
-                '<th class="profile_fld">'.$this->trans('SMTP Server').'</th>'.
-                '<th class="profile_fld">'.$this->trans('Signature').'</th>'.
-                '<th class="profile_fld">'.$this->trans('Default').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('IMAP Server').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('Username').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('E-mail Address').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('Reply-to').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('SMTP Server').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('Signature').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('Default').'</th>'.
                 '<th></th></tr>';
 
             foreach ($profiles as $id => $profile) {
@@ -275,21 +275,21 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     }
                 $res .= '<tr>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
-                    '<td class="profile_fld">'.$this->html_safe($profile['server']).'</td>'.
-                    '<td class="profile_fld">'.$this->html_safe($profile['user']).'</td>'.
-                    '<td class="profile_fld">'.$this->html_safe($profile['address']).'</td>'.
-                    '<td class="profile_fld">'.$this->html_safe($profile['replyto']).'</td>'.
-                    '<td class="profile_fld">'.$this->html_safe($smtp).'</td>'.
-                    '<td class="profile_fld">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="profile_fld">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
-                    '<img alt="'.$this->trans('Edit').'" width="16" height="16" src="'.Hm_Image_Sources::$cog.'" /></a></td>'.
+                    '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['server']).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['user']).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['address']).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['replyto']).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.$this->html_safe($smtp).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
+                    '<i class="bi bi-gear-fill"></i></a></td>'.
                     '</tr>';
             }
-            $res .= '</table>';
+            $res .= '</table></div>';
         }
         else {
-            $res .= '<div class="profiles_empty">'.$this->trans('No Profiles Found').'</div>';
+            $res .= '<div class="d-flex flex-column align-items-center justify-content-center p-5 mt-5"><i class="bi bi-folder2-open fs-4"></i><span>'.$this->trans('No Profiles Found').'</span></div>';
         }
         $res .= '</div>';
         return $res;
@@ -303,53 +303,78 @@ if (!hm_exists('profile_form')) {
 function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res = '';
     if ($form_vals['name']) {
-        $res .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />';
+        $res .= '<span>';
+        $res .= '<i class="bi bi-caret-right-fill"></i>';
         $res .= $out_mod->html_safe($form_vals['name']);
+        $res .= '</span>';
     }
     else {
-        $res .= '<img class="refresh_list add_profile" width="24" height="24" src="'.
-            Hm_Image_Sources::$plus.'" title="'.$out_mod->trans('Add a profile').'" alt="'.$out_mod->trans('Add a profile').'" />';
+        $res .= '<button class="refresh_list add_profile btn btn-light btn-sm d-flex" title="'.$out_mod->trans('Add a profile').'"><i class="bi bi-plus"></i><span class="d-none d-sm-table-cell">'.$out_mod->trans('Add a profile').'</span></button>';
     }
-    $res .= '</div><div class="edit_profile" '.($form_vals['name'] ? '' : 'style="display: none;"').'><form method="post" action="?page=profiles">';
+    $res .= '</div>';
+
+    $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-5">';
+
+    $res .= '<form method="post" action="?page=profiles">';
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
     $res .= '<input type="hidden" name="hm_page_key" value="'.$out_mod->html_safe(Hm_Request_Key::generate()).'" />';
-    $res .= '<table><tr><th>'.$out_mod->trans('Display Name').' *</th><td><input type="text" required name="profile_name" value="'.$out_mod->html_safe($form_vals['name']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('E-mail Address').' *</th><td><input type="email" required name="profile_address" value="'.$out_mod->html_safe($form_vals['address']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('Reply-to').' *</th><td><input type="email" required name="profile_replyto" value="'.$out_mod->html_safe($form_vals['replyto']).'" /></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('IMAP Server').' *</th><td><select required name="profile_imap">';
+
+    // Display Name
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<input type="text" required name="profile_name" class="form-control" value="'.$out_mod->html_safe($form_vals['name']).'" placeholder="'.$out_mod->trans('Display Name').' *">';
+    $res .= '<label>'.$out_mod->trans('Display Name').' *</label></div>';
+
+    // Email Address
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<input type="email" required name="profile_address" class="form-control" value="'.$out_mod->html_safe($form_vals['address']).'" placeholder="'.$out_mod->trans('E-mail Address').' *">';
+    $res .= '<label>'.$out_mod->trans('E-mail Address').' *</label></div>';
+
+    // Reply-to
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<input type="email" required name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
+    $res .= '<label>'.$out_mod->trans('Reply-to').' *</label></div>';
+
+    // IMAP Server
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<select required name="profile_imap" class="form-select">';
     foreach ($imap_servers as $id => $server) {
-        $res .= '<option ';
-        if ($server['user'] == $form_vals['user'] && $server['server'] == $form_vals['server']) {
-            $res .= 'selected="selected"';
-        }
-        $res .= 'value="'.$out_mod->html_safe($server['server'].'|'.$server['user']).'">'.$out_mod->html_safe($server['name']).'</option>';
+        $res .= '<option '.(($server['user'] == $form_vals['user'] && $server['server'] == $form_vals['server']) ? 'selected="selected"' : '').' value="'.$out_mod->html_safe($server['server'].'|'.$server['user']).'">'.$out_mod->html_safe($server['name']).'</option>';
     }
-    $res .= '</select></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('SMTP Server').' *</th><td><select required name="profile_smtp">';
+    $res .= '</select>';
+    $res .= '<label>'.$out_mod->trans('IMAP Server').' *</label></div>';
+
+    // SMTP Server
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<select required name="profile_smtp" class="form-select">';
     foreach ($smtp_servers as $id => $server) {
-        $res .= '<option ';
-        if ($id == $form_vals['smtp_id']) {
-            $res .= 'selected="selected"';
-        }
-        $res .= 'value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
+        $res .= '<option '.(($id == $form_vals['smtp_id']) ? 'selected="selected"' : '').' value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
     }
-    $res .= '</select></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('Signature').'</th><td><textarea cols="80" rows="4" name="profile_sig">';
-    $res .= $out_mod->html_safe($form_vals['sig']).'</textarea></td></tr>';
-    $res .= '<tr><th>'.$out_mod->trans('Set as default').'</th><td><input type="checkbox" ';
-    if ($form_vals['default']) {
-        $res .= 'checked="checked"';
-    }
-    $res .= 'name="profile_default" /></td></tr><tr><td></td><td>';
+    $res .= '</select>';
+    $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
+
+    // Signature
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
+    $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+
+    // Set as default
+    $res .= '<div class="form-check mb-3">';
+    $res .= '<input type="checkbox" class="form-check-input" '.($form_vals['default'] ? 'checked="checked"' : '').' name="profile_default">';
+    $res .= '<label class="form-check-label">'.$out_mod->trans('Set as default').'</label></div>';
+
+    // Submit buttons
+    $res .= '<div>';
     if ($form_vals['name']) {
-        $res .= '<input type="submit" class="profile_update" value="'.$out_mod->trans('Update').'" /> ';
-        $res .= '<input type="submit" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
-        $res .= '<a href="?page=profiles"><input type="button" value="'.$out_mod->trans('Cancel').'" /></a>';
+        $res .= '<input type="submit" class="btn btn-success profile_update" value="'.$out_mod->trans('Update').'" /> ';
+        $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
+        $res .= '<a href="?page=profiles" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {
-        $res .= '<input type="submit" class="submit_profile" value="'.$out_mod->trans('Create').'" />';
+        $res .= '<input type="submit" class="btn btn-success submit_profile" value="'.$out_mod->trans('Create').'" />';
     }
-    $res .= '</td></tr></table></form>';
+    $res .= '</div></form></div>';
+
     return $res;
+
 }}
 

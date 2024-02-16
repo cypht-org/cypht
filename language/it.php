@@ -571,12 +571,15 @@ return array(
     'feed item' => 'elemento del feed',
     'Allow handling of mailto links' => 'Consenti la gestione dei collegamenti mailto',
     'Show folders' => 'Mostra cartelle',
-    'Show next & previous emails when reading a message' => 'Mostra email successive e precedenti durante la lettura di un messaggio',
+    'Show next & previous emails links when reading a message' => 'Mostra email successive e precedenti durante la lettura di un messaggio',
+    'Show next email instead of your inbox after performing action (delete, archive, move, etc)' => false,
     'Archive to the original folder' => 'Archivia nella cartella originale',
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
     'Connection To Sieve Server Failed' => false,
     'Warn for unsaved changes' => false,
+    'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => 'allegato,allegati,allegata,allegate,allega,allego,alleghi,attaccato,file,attachment,attach'
 ); 
 
 ?>

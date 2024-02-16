@@ -184,6 +184,22 @@ class Hm_Handler_process_pagination_links extends Hm_Handler_Module {
 }
 
 /**
+ * Process "auto_advance_email" setting for loading the next email instead of returning to inbox in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_auto_advance_email_setting extends Hm_Handler_Module {
+    /**
+     * valid values are true or false
+     */
+    public function process() {
+        function auto_advance_email_callback($val) {
+            return $val;
+        }
+        process_site_setting('auto_advance_email', $this, 'auto_advance_email_callback', true, true);
+    }
+}
+
+/**
  * Process "message part icons" setting for the message view page in the settings page
  * @subpackage imap/handler
  */
@@ -1319,7 +1335,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
-                Hm_Msgs::add('ERRCound not access supplied URL');
+                Hm_Msgs::add('ERRCould not access supplied URL');
             }
         }
     }
@@ -1821,6 +1837,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('user_config', $this->user_config);
             $this->out('imap_accounts', $this->user_config->get('imap_servers'), array());
             $this->out('show_pagination_links', $this->user_config->get('pagination_links_setting', true));
+            $this->out('auto_advance_email_enabled', $this->user_config->get('auto_advance_email_setting', true));
             $part = false;
             $prefetch = false;
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {

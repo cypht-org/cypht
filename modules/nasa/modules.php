@@ -108,7 +108,7 @@ class Hm_Output_apod_content extends Hm_Output_Module {
                         '" alt="'.$this->trans('Picture of the day').'" /></div>';
                 }
                 elseif ($data['media_type'] == 'video' && array_key_exists('url', $data)) {
-                    $res .= '<div class="apod_video"><a href="'.$this->html_safe($data['url']).'">YouTube</a></div>';
+                    $res .= '<div class="apod_video"><a href="'.$this->html_safe($data['url']).'" target="_blank" rel="noopener">YouTube</a></div>';
                 }
             }
             elseif (array_key_exists('url', $data) && preg_match("/jpg$/i", $data['url'])) {
@@ -128,21 +128,27 @@ class Hm_Output_apod_content extends Hm_Output_Module {
  */
 class Hm_Output_nasa_connect_section extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="nasa_connect"><div data-target=".nasa_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
-            $this->trans('NASA APIs').'</div><div class="nasa_connect_section"><div class="nasa_connect_inner_1" ';
+        $res = '<div class="nasa_connect"><div data-target=".nasa_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-key-fill me-3"></i>
+                        <b>'.$this->trans('NASA APIs').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="nasa_connect_section"><div class="nasa_connect_inner_1" ';
+
         if ($this->get('nasa_api_key')) {
             $res .= 'style="display: none;"';
         }
         $res .= '><div>Connect to NASA APIs</div>';
-        $res .= '<div><input type="text" size="50" class="nasa_api_key" placeholder="'.$this->trans('Enter your API key').'" />';
-        $res .= '<input type="button" class="nasa_api_connect" value="'.$this->trans('Connect').'" /></div></div>';
+        $res .= '<div class="col-lg-4 col-sm-12"><input type="text" size="50" class="nasa_api_key form-control" placeholder="'.$this->trans('Enter your API key').'" /><br/>';
+        $res .= '<input type="button" class="nasa_api_connect btn btn-secondary" value="'.$this->trans('Connect').'" /></div></div>';
         $res .= '<div class="nasa_connect_inner_2" ';
         if (!$this->get('nasa_api_key')) {
             $res .= 'style="display: none;"';
         }
         $res .= '><div>'.$this->trans('Already connected').'</div>';
-        $res .= '<div><input type="button" class="nasa_api_disconnect" value="'.$this->trans('Disconnect').'" /></div>';
+        $res .= '<div><input type="button" class="nasa_api_disconnect btn btn-danger" value="'.$this->trans('Disconnect').'" /></div>';
         $res .= '</div></div></div>';
         return $res;
     }

@@ -110,6 +110,33 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
 }
 
 /**
+ * Verify 2fa code is paired with Authenticator app before enabling 2fa
+ * @subpackage 2fa/handler
+ */
+class Hm_Handler_2fa_setup_check extends Hm_Handler_Module {
+    public function process() {
+
+        list($secret, $simple) = get_2fa_key($this->config);
+        if (!$secret) {
+            Hm_Debug::add('2FA module set enabled, but no shared secret configured');
+            return;
+        }
+
+        $verified = false;
+        $len = $simple ? 15 : 64;
+
+        $username = $this->session->get('username', false);
+        $secret = create_secret($secret, $username, $len);
+
+        if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
+            $verified = true;
+        }
+        
+        $this->out('ajax_2fa_verified', $verified);
+    }
+}
+
+/**
  * @subpackage 2fa/output
  */
 class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
@@ -120,40 +147,61 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         if (array_key_exists('2fa_enable', $settings)) {
             $enabled = $settings['2fa_enable'];
         }
-        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$unlocked.'" width="16" height="16" />'.$this->trans('2 Factor Authentication').'</td></tr>';
+        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-unlock-fill fs-5 me-2"></i>'.$this->trans('2 Factor Authentication').'</td></tr>';
 
-        $res .= '<tr class="tfa_setting"><td>'.$this->trans('Enable 2 factor authentication').
-            '</td><td><input value="1" type="checkbox" name="2fa_enable"';
+        $res .= '<tr class="tfa_setting"><td><label class="form-check-label">'.$this->trans('Enable 2 factor authentication').'</label>'.
+            '</td><td><input class="form-check-input" value="1" type="checkbox" name="2fa_enable"';
         if ($enabled) {
             $res .= ' checked="checked"';
         }
         $res .= '></td></tr>';
         $svg = $this->get('2fa_svg');
+
         if ($svg) {
-            $qr_code = '<tr class="tfa_setting"><td></td><td>';
+            $qr_code = '';
             if (!$enabled) {
-                $qr_code .= '<div class="err settings_wrap_text">'.
-                    $this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'</div>';
+                $qr_code .= '<div class="err settings_wrap_text tfa_mt_1">'.$this->trans('Configure your authentication app using the barcode below BEFORE enabling 2 factor authentication.').'</div>';
             }
             else {
                 $qr_code .= '<div>'.$this->trans('Update your settings with the code below').'</div>';
             }
 
             $qr_code .= $svg;
-            $qr_code .= '</td></tr>';
-            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</td></tr>';
-            $qr_code .= '<tr class="tfa_setting"><td></td><td>'.wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true).'</td></tr>';
+            $qr_code .= '<div class="tfa_mb_1">'.$this->trans('If you can\'t use the QR code, you can enter the code below manually (no line breaks)').'</div>';
+            $qr_code .= wordwrap($this->html_safe($this->get('2fa_secret', '')), 60, '<br />', true);
         }
         else {
-            $qr_code = '<tr class="tfa_setting"><td></td><td class="err">'.$this->trans('Unable to generate 2 factor authentication QR code').'</td></tr>';
+            $qr_code = '<div class="tfa_mt_1">'.$this->trans('Unable to generate 2 factor authentication QR code').'</div>';
         }
-        $res .= $qr_code;
-        $res .= '<tr class="tfa_setting"><td></td><td>'.$this->trans('The following backup codes can be used to access your account if you lose your device').'<br /><br />';
+        $res .= $qr_code . '</td>';
+
+        $res .= '<td><div class="tfa_mb_1">'.$this->trans('The following backup codes can be used to access your account if you lose your device'). '</div>';
+
         foreach ($backup_codes as $val) {
             $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
         }
-        $res .= '</td></tr>';
+        $res .= '<div class="tfa_mt_1">
+                    <fieldset class="tfa_confirmation_fieldset p-3">
+                        <legend>Enter the confirmation code</legend>
+                        <div class="tfa_confirmation_wrapper">
+                            <div class="tfa_confirmation_form">
+                                <div class="tfa_confirmation_input_digits">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 0" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 1" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 2" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 3" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 4" aria-required="true">
+                                    <input class="tfa_confirmation_input_digit" type="number" aria-label="Digit 5" aria-required="true">
+                                </div>
+                                <button id="tfaConfirmationBtn" type="submit" class="tfa_confirmation_input_button btn btn-light border-1">'.$this->trans('Verify code').'</button>
+                            </div>
+                            <div class="tfa_confirmation_hint"> '.$this->trans('Enter the 6 digit code from your Authenticator application').'</div>
+                        </div>
+                    </fieldset>
+                </div>
+            </td>
+        </tr>';
         return $res;
     }
 }
@@ -177,24 +225,46 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
             $class = $dir."_page";
 
             if ($this->get('2fa_error')) {
-                $error = '<div class="tfa_error">'.$this->trans($this->get('2fa_error')).'</div>';
+                $error = '<div class="tfa_error"><div class="alert alert-danger alert-dismissible fade show" role="alert">'.$this->trans($this->get('2fa_error')).'</div></div>';
             }
             else {
                 $error = '';
             }
 
             if(!$this->get('fancy_login_allowed')){
-                echo '<!DOCTYPE html><html lang='.$this->html_safe($lang).' class="'.$this->html_safe($class).
-                '" dir="'.$this->html_safe($dir).'"><head><meta charset="utf-8" />'.
-                '<link href="site.css" media="all" rel="stylesheet" type="text/css" />'.
-                '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">'.
-                '</head><body><form class="login_form" method="POST"><h1 class="title">'.
-                $this->html_safe($this->get('router_app_name')).'</h1>'. $error.'<div class="tfa_input">'.
-                '<label for="2fa_code">'.$this->trans('Enter the 6 digit code from your Authenticator application').
-                '</label></div><input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'" />'.
-                '<input autofocus required id="2fa_code" type="number" name="2fa_code" value="" placeholder="'.
-                $this->trans('Login code').'" /><input type="submit" value="'.$this->trans('Submit').
-                '" /></form></body></html>';
+                echo '<!DOCTYPE html>
+                <html lang="'.$this->html_safe($lang).'" class="'.$this->html_safe($class).'" dir="'.$this->html_safe($dir).'">
+                <head>
+                    <meta charset="utf-8" />
+                    <link href="site.css" media="all" rel="stylesheet" type="text/css" />
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+                    <link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+                    <link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
+                </head>
+                <body>
+                    <div class="container bg-light">
+                        <div class="row align-items-center justify-content-center vh-100 p-3">
+                                <div class="card col-12 col-md-6 col-lg-4 p-3">
+                                    <div class="card-body">
+                                        <form class="mt-5" method="POST">
+                                            <p class="text-center"><img class="w-50" src="modules/core/assets/images/logo_dark.svg"></p>
+                                            <p class="text-center">'.$this->trans('Enter the 6 digit code from your Authenticator application').'</p>
+                                            '.$error.'
+                                            <div class="form-floating mb-3">
+                                                <input autofocus required id="2fa_code" type="number" name="2fa_code" class="form-control" value="" placeholder="'.$this->trans('Login code').'">
+                                                <label for="2fa_code">'.$this->trans('Login code').'</label>
+                                            </div>
+                                            <div class="d-grid">
+                                                <input type="submit" class="btn btn-success btn-lg" value="'.$this->trans('Submit').'">
+                                            </div>
+                                            <input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'">
+                                        </form>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </body>
+                </html>';
             }
             else{
                 $style = '<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;'.

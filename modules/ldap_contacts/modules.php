@@ -351,11 +351,11 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
                 }
                 $res .= '<tr class="ldap_settings"><td>'.$this->html_safe($name).'</td><td>';
                 $res .= '<input autocomplete="username" type="text" value="'.$user.'" name="ldap_usernames['.$this->html_safe($name).']" ';
-                $res .= 'placeholder="'.$this->trans('Username').'" /> <input type="password" ';
+                $res .= 'placeholder="'.$this->trans('Username').'" class="form-control" /> <input type="password"  class="form-control"';
                 if ($pass) {
                     $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
                     $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /> <input type="button" ';
-                    $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change" /></td></tr>';
+                    $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change btn btn-success" /></td></tr>';
                 }
                 else {
                     $res .= 'autocomplete="new-password" placeholder="'.$this->trans('Password').'" ';
@@ -388,9 +388,10 @@ class Hm_Output_ldap_form_first_name extends Hm_Output_Module {
             return;
         }
         $name = get_ldap_value('givenname', $this);
-        return '<label class="screen_reader" for="ldap_first_name">'.$this->trans('First Name').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input required placeholder="'.$this->trans('First Name').'" id="ldap_first_name" '.
-            'type="text" name="ldap_first_name" value="'.$this->html_safe($name).'" /> *<br />';
+            'type="text" name="ldap_first_name" value="'.$this->html_safe($name).'" class="form-control" />'.
+            '<label for="ldap_first_name">'.$this->trans('First Name').' *</label></div>';
     }
 }
 
@@ -408,8 +409,8 @@ class Hm_Output_ldap_form_submit extends Hm_Output_Module {
             $label = 'Update';
             $name = 'update_ldap_contact';
         }
-        return '<input name="'.$name.'" type="submit" value="'.$this->trans($label).'" />'.
-            '<input type="button" class="reset_contact" value="'.$this->trans('Cancel').'" />';
+        return '<br /><input name="'.$name.'" type="submit" value="'.$this->trans($label).'" class="btn btn-success me-1" />'.
+            '<input type="button" class="reset_contact btn btn-secondary" value="'.$this->trans('Cancel').'" />';
     }
 }
 
@@ -422,9 +423,10 @@ class Hm_Output_ldap_form_last_name extends Hm_Output_Module {
             return;
         }
         $name = get_ldap_value('sn', $this);
-        return '<label class="screen_reader" for="ldap_last_name">'.$this->trans('Last Name').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input required placeholder="'.$this->trans('Last Name').'" id="ldap_last_name" type="text" '.
-            'name="ldap_last_name" value="'.$this->html_safe($name).'" /> *<br />';
+            'name="ldap_last_name" value="'.$this->html_safe($name).'" class="form-control" />'.
+            '<label for="ldap_last_name">'.$this->trans('Last Name').' *</label></div>';
     }
 }
 
@@ -437,9 +439,10 @@ class Hm_Output_ldap_form_title extends Hm_Output_Module {
             return;
         }
         $title = get_ldap_value('title', $this);
-        return '<label class="screen_reader" for="ldap_title">'.$this->trans('Title').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Title').'" id="ldap_title" type="text" name="ldap_title" '.
-            'value="'.$this->html_safe($title).'" /><br />';
+            'value="'.$this->html_safe($title).'" class="form-control"  />'.
+            '<label for="ldap_title">'.$this->trans('Title').'</label></div>';
     }
 }
 
@@ -457,7 +460,7 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
         $current = $this->get('current_ldap_contact');
         $current_source = false;
         if ($current) {
-            $form_class = 'contact_update_form';
+            $form_class = 'contact_update_form mt-3';
             $current_source = $current['source'];
             $title = sprintf($this->trans('Update LDAP - %s'), $this->html_safe($current_source));
         }
@@ -465,17 +468,16 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             $source = '<input type="hidden" name="ldap_source" value="'.$this->html_safe($current_source).'" />';
         }
         else {
-            $source = '<select name="ldap_source">';
+            $source = '<select name="ldap_source" class="form-select">';
             foreach ($sources as $name) {
                 $source .= '<option value="'.$this->html_safe($name).'">'.$this->html_safe($name).'</option>';
             }
-            $source .= '</select><br />';
+            $source .= '</select>';
         }
         return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-            '<div class="server_title">'.$title.
-            '<img alt="" class="menu_caret" src="'.Hm_Image_Sources::$chevron.'" width="8" height="8" /></div>'.
-            '<div class="'.$form_class.'"><input type="hidden" name="contact_source" value="ldap" />'.$source;
+            '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
+            '<div class="'.$form_class.'"><div class="form-floating mb-2"><input type="hidden" name="contact_source" value="ldap" />'.$source.'<label for="ldap_displayname">'.$this->trans('Source').'</label></div>';
     }
 }
 
@@ -488,9 +490,10 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('displayname', $this);
-        return '<label class="screen_reader" for="ldap_displayname">'.$this->trans('Display Name').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Display Name').'" id="ldap_displayname" type="text" name="ldap_displayname" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_displayname">'.$this->trans('Display Name').'</label></div>';
     }
 }
 
@@ -503,9 +506,10 @@ class Hm_Output_ldap_form_mail extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('email_address', $this);
-        return '<label class="screen_reader" for="ldap_mail">'.$this->trans('E-mail Address').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input required placeholder="'.$this->trans('E-mail Address').'" id="ldap_mail" type="email" name="ldap_mail" '.
-            'value="'.$this->html_safe($val).'" /> *<br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_mail">'.$this->trans('E-mail Address').' *</label></div>';
     }
 }
 
@@ -518,9 +522,10 @@ class Hm_Output_ldap_form_phone extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('phone_number', $this);
-        return '<label class="screen_reader" for="ldap_phone">'.$this->trans('Telephone Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Telephone Number').'" id="ldap_phone" type="text" name="ldap_phone" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_phone">'.$this->trans('Telephone Number').'</label></div>';
     }
 }
 
@@ -533,9 +538,10 @@ class Hm_Output_ldap_form_fax extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('facsimiletelephonenumber', $this);
-        return '<label class="screen_reader" for="ldap_fax">'.$this->trans('Fax Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Fax Number').'" id="ldap_fax" type="text" name="ldap_fax" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_fax">'.$this->trans('Fax Number').'</label></div>';
     }
 }
 
@@ -548,9 +554,10 @@ class Hm_Output_ldap_form_mobile extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('mobile', $this);
-        return '<label class="screen_reader" for="ldap_mobile">'.$this->trans('Mobile Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Mobile Number').'" id="ldap_mobile" type="text" name="ldap_mobile" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_mobile">'.$this->trans('Mobile Number').'</label></div>';
     }
 }
 
@@ -563,9 +570,10 @@ class Hm_Output_ldap_form_room extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('roomnumber', $this);
-        return '<label class="screen_reader" for="ldap_room">'.$this->trans('Room Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Room Number').'" id="ldap_room" type="text" name="ldap_room" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_room">'.$this->trans('Room Number').'</label></div>';
     }
 }
 
@@ -578,9 +586,10 @@ class Hm_Output_ldap_form_car extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('carlicense', $this);
-        return '<label class="screen_reader" for="ldap_car">'.$this->trans('License Plate Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('License Plate Number').'" id="ldap_car" type="text" name="ldap_car" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_car">'.$this->trans('License Plate Number').'</label></div>';
     }
 }
 
@@ -593,9 +602,10 @@ class Hm_Output_ldap_form_org extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('o', $this);
-        return '<label class="screen_reader" for="ldap_org">'.$this->trans('Organization').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Organization').'" id="ldap_org" type="text" name="ldap_org" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_org">'.$this->trans('Organization').'</label></div>';
     }
 }
 
@@ -608,9 +618,10 @@ class Hm_Output_ldap_form_org_unit extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('ou', $this);
-        return '<label class="screen_reader" for="ldap_org_unit">'.$this->trans('Organization Unit').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Organization Unit').'" id="ldap_org_unit" type="text" name="ldap_org_unit" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_org_unit">'.$this->trans('Organization Unit').'</label></div>';
     }
 }
 
@@ -623,9 +634,10 @@ class Hm_Output_ldap_form_org_dpt extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('departmentnumber', $this);
-        return '<label class="screen_reader" for="ldap_org_dpt">'.$this->trans('Department Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Department Number').'" id="ldap_org_dpt" type="text" name="ldap_org_dpt" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_org_dpt">'.$this->trans('Department Number').'</label></div>';
     }
 }
 
@@ -638,9 +650,10 @@ class Hm_Output_ldap_form_emp_num extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('employeenumber', $this);
-        return '<label class="screen_reader" for="ldap_emp_num">'.$this->trans('Employee Number').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Employee Number').'" id="ldap_emp_num" type="text" name="ldap_emp_num" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control"  />'.
+            '<label for="ldap_emp_num">'.$this->trans('Employee Number').'</label></div>';
     }
 }
 
@@ -653,9 +666,10 @@ class Hm_Output_ldap_form_emp_type extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('employeetype', $this);
-        return '<label class="screen_reader" for="ldap_emp_type">'.$this->trans('Employment Type').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Employment Type').'" id="ldap_emp_type" type="text" name="ldap_emp_type" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_emp_type">'.$this->trans('Employment Type').'</label></div>';
     }
 }
 
@@ -668,9 +682,10 @@ class Hm_Output_ldap_form_lang extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('preferredlanguage', $this);
-        return '<label class="screen_reader" for="ldap_lang">'.$this->trans('Language').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Language').'" id="ldap_lang" type="text" name="ldap_lang" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_lang">'.$this->trans('Language').'</label></div>';
     }
 }
 
@@ -683,9 +698,10 @@ class Hm_Output_ldap_form_uri extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('labeleduri', $this);
-        return '<label class="screen_reader" for="ldap_uri">'.$this->trans('Website').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Website').'" id="ldap_uri" type="text" name="ldap_uri" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_uri">'.$this->trans('Website').'</label></div>';
     }
 }
 
@@ -698,9 +714,10 @@ class Hm_Output_ldap_form_locality extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('l', $this);
-        return '<label class="screen_reader" for="ldap_locality">'.$this->trans('Locality').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Locality').'" id="ldap_locality" type="text" name="ldap_locality" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_locality">'.$this->trans('Locality').'</label></div>';
     }
 }
 
@@ -713,9 +730,10 @@ class Hm_Output_ldap_form_street extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('street', $this);
-        return '<label class="screen_reader" for="ldap_street">'.$this->trans('Street').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Street').'" id="ldap_street" type="text" name="ldap_street" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_street">'.$this->trans('Street').'</label></div>';
     }
 }
 
@@ -728,9 +746,10 @@ class Hm_Output_ldap_form_state extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('st', $this);
-        return '<label class="screen_reader" for="ldap_state">'.$this->trans('State').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('State').'" id="ldap_state" type="text" name="ldap_state" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_state">'.$this->trans('State').'</label></div>';
     }
 }
 
@@ -743,9 +762,10 @@ class Hm_Output_ldap_form_postalcode extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('postalcode', $this);
-        return '<label class="screen_reader" for="ldap_postalcode">'.$this->trans('Postal Code').'</label>'.
+        return '<div class="form-floating mb-2">'.
             '<input placeholder="'.$this->trans('Postal Code').'" id="ldap_postalcode" type="text" name="ldap_postalcode" '.
-            'value="'.$this->html_safe($val).'" /><br />';
+            'value="'.$this->html_safe($val).'" class="form-control" />'.
+            '<label for="ldap_postalcode">'.$this->trans('Postal Code').'</label></div>';
     }
 }
 

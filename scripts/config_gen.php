@@ -18,7 +18,11 @@ define('WEB_ROOT', '');
 chdir(APP_PATH);
 
 /* get the framework */
+require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* check for proper php support */
 check_php();
@@ -225,14 +229,18 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $js_hash = '';
     $css_hash = '';
     if ($css) {
-        $css_out = compress($css, $css_compress);
+        $css_out = file_get_contents("vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
+        $css_out .= file_get_contents("vendor/twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);
         printf("site.css file created\n");
     }
     if ($js) {
         $mods = get_modules($settings);
-        $js_lib = file_get_contents("third_party/cash.min.js");
+        $js_lib = file_get_contents("vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js") . "\n\n";
+        $js_lib .= file_get_contents("vendor/twbs/bootstrap/dist/js/bootstrap.min.js") . "\n\n";
+        $js_lib .= file_get_contents("third_party/cash.min.js");
         if (in_array('sievefilters', $mods, true)) {
             $js_lib .= file_get_contents("third_party/tingle.min.js");
         }
@@ -248,6 +256,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
         $js_lib .= file_get_contents("third_party/resumable.min.js");
         $js_lib .= file_get_contents("third_party/ays-beforeunload-shim.js");
         $js_lib .= file_get_contents("third_party/jquery.are-you-sure.js");
+        $js_lib .= file_get_contents("third_party/sortable.min.js");
         file_put_contents('tmp.js', $js);
         $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
         $js_hash = build_integrity_hash($js_out);
@@ -286,6 +295,24 @@ function write_config_file($settings, $filters) {
 }
 
 /**
+ * Copies bootstrap icons fonts folder as it is
+ * referenced and needed by bootstrap icons css file
+ *
+ * @return void
+ */
+function append_bootstrap_icons_files() {
+    if (!is_dir("site/fonts")) {
+        mkdir('site/fonts', 0755);
+    }
+    $source_folder = 'vendor/twbs/bootstrap-icons/font/fonts/';
+    $files = glob("$source_folder*.*");
+    foreach($files as $file){
+        $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
+        copy($file, $dest_forlder);
+    }
+}
+
+/**
  * Copies the site.js and site.css files to the site/ directory, and creates
  * a production version of the index.php file.
  *
@@ -298,6 +325,8 @@ function create_production_site($assets, $settings, $hashes) {
     printf("creating production site\n");
     copy('site.css', 'site/site.css');
     copy('site.js', 'site/site.js');
+    append_bootstrap_icons_files();
+
     $index_file = file_get_contents('index.php');
     $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);

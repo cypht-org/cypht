@@ -303,6 +303,52 @@ var Hm_Ajax_Request = function() { return {
     }
 }};
 
+/**
+ * Show a modal dialog with a title, content and buttons.
+ */
+const Hm_Modals = {
+    /**
+     * show the modal
+     * @param {string | HTMLElement} title title of the modal
+     * @param {string | HTMLElement} content content of the modal
+     * @param {Array<string>} btnsTexts buttons texts
+     * @param {Array<Function>} btnsCbs array of callbacks for each button @default Hm_Modals.hide()
+     */
+    show: function (title = '', content = '', btnsTexts = [], btnsCbs = []) {
+        const modal = `
+            <div id="cypht-modal" class="cypht-modal">
+                <div class="cypht-modal-bg"></div>
+                <div class="cypht-modal-content">
+                    <span class="cypht-modal-content-close">&times;</span>
+                    <div class="cypht-modal-header">
+                        ${title}
+                    </div>
+
+                    <div class="cypht-modal-body">
+                        ${content}
+                    </div>
+
+                    <div class="cypht-modal-footer">
+                        ${btnsTexts.map((text, index) => `<button class="cypht-modal-btn-${index + 1}">${text}</button>`).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+        document.querySelector('body').insertAdjacentHTML('beforeend', modal);
+
+        btnsTexts.forEach((_, index) => {
+            document.querySelector(`.cypht-modal-btn-${index + 1}`).addEventListener('click', btnsCbs[index] || this.hide);
+        });
+
+        document.querySelector('.cypht-modal-content-close').addEventListener('click', this.hide);
+        document.querySelector('.cypht-modal-bg').addEventListener('click', this.hide);
+    },
+
+    hide: () => {
+        document.querySelector('#cypht-modal').remove();
+    }
+}
+
 /* user notification manager */
 var Hm_Notices = {
     hide_id: false,
@@ -311,22 +357,22 @@ var Hm_Notices = {
         var msg_list = [];
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
-                msg_list.push('<span class="err">'+msgs[i].substring(3)+'</span>');
+                msg_list.push(msgs[i].substring(3));
             }
             else {
                 msg_list.push(msgs[i]);
             }
         }
         if (!keep) {
-            $('.sys_messages').html(msg_list.join(', '));
+            $('.err').html(msg_list.join(', '));
         }
         else {
-            var existing = $('.sys_messages').html();
+            var existing = $('.err').html();
             if (existing) {
-                $('.sys_messages').append('<br />'+msg_list.join(', '));
+                $('.err').append('<br />'+msg_list.join(', '));
             }
             else {
-                $('.sys_messages').html(msg_list.join(', '));
+                $('.err').html(msg_list.join(', '));
             }
         }
         $('.sys_messages').show();
@@ -617,10 +663,12 @@ function Message_List() {
 
     this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            $('.msg_controls').addClass('msg_controls_visible');
+            $('.msg_controls').addClass('d-flex');
+            $('.msg_controls').removeClass('d-none');
         }
         else {
-            $('.msg_controls').removeClass('msg_controls_visible');
+            $('.msg_controls').removeClass('d-flex');
+            $('.msg_controls').addClass('d-none');
         }
     };
 
@@ -892,6 +940,7 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
+                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
@@ -1207,10 +1256,23 @@ var Hm_Folders = {
 
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
-        $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
+        $('.src_name').on("click", function() {
+            var class_name = $(this).data('source');
+            var icon_element = $(this).find('.bi');
+            Hm_Utils.toggle_section(class_name);
+            setTimeout(() => {
+                var target_element = document.querySelector(class_name);
+                var is_visible = Hm_Utils.is_element_visible(target_element);
+                if (is_visible) {
+                    icon_element.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+                } else {
+                    icon_element.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+                }
+            }, 0);
+        });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
-            e.target.innerHTML = '<img src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />';
+            e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
             Hm_Folders.update_folder_list();
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
@@ -1218,7 +1280,7 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
+        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1340,6 +1402,8 @@ var Hm_Utils = {
             document.getElementById('logout_without_saving').click();
         }
         else {
+            var confirmLogoutModal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'), {keyboard: true})
+            confirmLogoutModal.show();
             $('.confirm_logout').show();
         }
         return false;
@@ -1559,7 +1623,13 @@ var Hm_Utils = {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_test'}],
             false, [], false, false, false);
-    }
+    },
+
+    is_element_visible: function (elem) {
+        if (!elem) return false;
+        var style = window.getComputedStyle(elem);
+        return style.display !== 'none' && style.visibility !== 'hidden' && elem.offsetWidth > 0 && elem.offsetHeight > 0;
+    },
 };
 
 var Hm_Crypt = {
@@ -1865,7 +1935,7 @@ function listControlsMenu() {
 
 // Sortablejs
 const tableBody = document.querySelector('.message_table_body');
-if(tableBody) {
+if(tableBody && !hm_mobile()) {
     const allFoldersClassNames = [];
     let targetFolder;
     let movingElement;

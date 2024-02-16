@@ -249,7 +249,7 @@ return array(
     "Github Connect"=>"Github Connect",
     "Hide From Combined Pages"=>"پنهان کردن از صفحات ترکیبی",
     "Save Settings"=>"تنظیمات را ذخیره کن",
-    "Settings are not saved permanently on the server unless you explicitly allow it. If you don't save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently."=>"تنظیمات برای همیشه در سرور ذخیره نمی شوند ، مگر اینکه صریحاً اجازه آن را بدهید. اگر تنظیمات خود را ذخیره نکنید ، با اتمام جلسه یا خارج شدن از سیستم ، هر تغییری که از آخرین ورود به سیستم انجام داده اید ، حذف خواهد شد. برای ذخیره تنظیمات خود باید دوباره رمز ورود خود را برای اهداف امنیتی وارد کنید.",
+    "Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently."=>"تنظیمات برای همیشه در سرور ذخیره نمی شوند ، مگر اینکه صریحاً اجازه آن را بدهید. اگر تنظیمات خود را ذخیره نکنید ، با اتمام جلسه یا خارج شدن از سیستم ، هر تغییری که از آخرین ورود به سیستم انجام داده اید ، حذف خواهد شد. برای ذخیره تنظیمات خود باید دوباره رمز ورود خود را برای اهداف امنیتی وارد کنید.",
     "Add a Repository"=>"مخزن اضافه کنید",
     "Disconnect"=>"قطع شدن",
     "Already connected"=>"قبلاً متصل شده اید",
@@ -623,12 +623,15 @@ return array(
     "Page Not Found!"=>"صفحه پیدا نشد!",
     "Nothingness"=>"هیچ",
     "Nope"=>"نه خیر",
-    'Show next & previous emails when reading a message' => false,
+    'Show next & previous emails links when reading a message' => false,
+    'Show next email instead of your inbox after performing action (delete, archive, move, etc)' => false,
     'Archive to the original folder' => false,
     'Move To Blocked Folder' => false,
     'Sieve server capabilities' => false,
     'Connection To Sieve Server Failed' => false,
     'Warn for unsaved changes' => false,
+    'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => 'ضمیمه،فایل،ضمیمه کردن،ضمیمه شده،در حال ضمیمه کردن، الصاق شده،CV،عنوان نامه'
 );
 
 ?>

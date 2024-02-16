@@ -65,7 +65,7 @@ var imap_forget_action = function(event) {
             if (res.just_forgot_credentials) {
                 form.find('.credentials').prop('disabled', false);
                 form.find('.credentials').val('');
-                form.append('<input type="submit" value="Save" class="save_imap_connection" />');
+                form.append('<input type="submit" value="Save" class="save_imap_connection btn btn-success-warning btn-sm" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).hide();
                 Hm_Utils.set_unsaved_changes(1);
@@ -88,7 +88,7 @@ var imap_save_action = function(event) {
                 form.find('.save_imap_connection').hide();
                 form.find('.imap_password').val('');
                 form.find('.imap_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
+                form.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -165,7 +165,7 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     var msg_cache_key = 'imap_'+detail.server_id+'_'+hm_msg_uid()+'_'+detail.folder;
                     remove_from_cached_imap_pages(msg_cache_key);
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -203,7 +203,7 @@ var imap_unread_message = function(supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -535,7 +535,7 @@ var expand_imap_folders = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -549,7 +549,7 @@ var expand_imap_folders = function(path) {
         }
     }
     else {
-        $('.expand_link', list).html('+');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill">');
         $('ul', list).remove();
         Hm_Folders.save_folder_list();
     }
@@ -596,6 +596,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                 if (!res.show_pagination_links) {
                     $('.prev, .next').hide();
                 }
+                globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
             },
             [],
             false,
@@ -887,7 +888,7 @@ var unselect_non_imap_messages = function() {
 
 var imap_move_copy = function(e, action, context) {
     var move_to;
-    if (!e.target || e.target.className == 'imap_move') {
+    if (!e.target || e.target.classList.contains('imap_move')) {
         move_to = $('.msg_controls .move_to_location');
     }
     else {
@@ -907,7 +908,7 @@ var imap_move_copy = function(e, action, context) {
     else {
         label = $('.move_to_string2').val();
     }
-    folders.prepend('<div class="move_to_title">'+label+'<span><a class="close_move_to" href="#">X</a></span></div>');
+    folders.prepend('<div class="move_to_title">'+label+'<a class="close_move_to close" href="#" aria-label="Close"><span aria-hidden="true">&times;</span></a></div>');
     move_to.html(folders.html());
     $('.imap_move_folder_link', move_to).on("click", function() { return expand_imap_move_to_folders($(this).data('target'), context); });
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').off('click');
@@ -974,7 +975,7 @@ var imap_perform_move_copy = function(dest_id, context) {
                 else {
                     if (action == 'move') {
                         var nlink = $('.nlink');
-                        if (nlink.length) {
+                        if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                             window.location.href = nlink.attr('href');
                         }
                         else {
@@ -1214,11 +1215,6 @@ $(function() {
     var prefetch_interval = Hm_Utils.get_from_global('imap_prefetch_msg_interval', 43);
     Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
-
-    $(document).on('click', '.dropdown-toggle', function(e) {
-        e.preventDefault();
-        $(this).next().toggle();
-    });
 });
 
 
@@ -1243,7 +1239,7 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -1261,13 +1257,3 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
-var imap_show_add_contact_popup = function() {
-    var popup = document.getElementById("contact_popup");
-    popup.classList.toggle("show");
-};
-
-var imap_hide_add_contact_popup = function(event) {
-    event.stopPropagation()
-    var popup = document.getElementById("contact_popup");
-    popup.classList.toggle("show");
-};

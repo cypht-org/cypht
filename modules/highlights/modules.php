@@ -183,12 +183,12 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
             'Background' => 'background'
         );
         $res = '<div class="content_title">'.$this->trans('Message highlighting').'</div>';
-        $res .= '<div class="settings_subtitle">'.$this->trans('Existing rules').'</div>';
+        $res .= '<div class="settings_subtitle mt-3 mb-2"><b>'.$this->trans('Existing rules').'</b></div>';
         if (!$rules) {
             $res .= '<div class="empty_list">'.$this->trans('No rules').'</div>';
         }
         else {
-            $res .= '<table class="hl_rules">'.
+            $res .= '<div class="px-3"><table class="hl_rules table table-striped">'.
                 '<th>'.$this->trans('Type').'</th>'.
                 '<th>'.$this->trans('Target').'</th>'.
                 '<th>'.$this->trans('Color').'</th>'.
@@ -226,59 +226,103 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
                     '</tr>';
             }
         }
-        $res .= '</table><div class="settings_subtitle">'.$this->trans('Add a new rule').'</div>';
-        $res .= '<div class="add_hl_form"><form method="POST"><table>';
-        $res .= '<tr><td>'.$this->trans('Source type').'</td>';
-        $res .= '<td><select name="hl_source_type" required class="hl_source_type"><option selected="selected"></option>';
+        $res .= '</table></div>';
+        
+        $res .= '<div class="settings_subtitle mt-3 px-3"><b>'.$this->trans('Add a new rule').'</b></div>';
+        $res .= '<div class="col-12 col-lg-5 mt-2 px-3">';
+        $res .= '<form method="POST">';
+
+        // Source Type
+        $res .= '<div class="form-floating mb-3">';
+        $res .= '<select name="hl_source_type" required class="form-select hl_source_type">';
+        $res .= '<option selected="selected">'.$this->trans('Select source type').'</option>';
         foreach ($source_types as $name => $val) {
             $res .= '<option value="'.$this->html_safe($val).'">'.$this->trans($name).'</option>';
         }
-        $res .= '</select></td></tr>';
+        $res .= '</select>';
+        $res .= '<label>'.$this->trans('Source type').'</label></div>';
 
+        // IMAP Flags
         if ($sources['imap']) {
-            $res .= '<tr class="imap_row"><td>'.$this->trans('Flags').
-                '</td><td><select name="hl_imap_flags[]" size="4" multiple="multiple" class="imap_flags">';
+            $res .= '<div class="form-floating mb-3 imap_row d-none">';
+            $res .= '<select style="min-height: 8rem" name="hl_imap_flags[]" size="4" multiple="multiple" class="form-select imap_flags">';
             foreach ($email_types as $index => $value) {
                 $res .= '<option value="'.$this->html_safe($value).'">'.$this->trans($index).'</option>';
             }
-            $res .= '</select></td></tr>';
-            $res .= '<tr class="imap_row"><td>'.$this->trans('Accounts').
-                '</td><td><select name="hl_imap_sources[]" size="4" multiple="multiple" class="imap_source">';
+            $res .= '</select>';
+            $res .= '<label>'.$this->trans('Flags').'</label></div>';
+
+            // IMAP Accounts
+            $res .= '<div class="form-floating mb-3 imap_row d-none">';
+            $res .= '<select style="min-height: 8rem" name="hl_imap_sources[]" size="4" multiple="multiple" class="form-select imap_source">';
             foreach ($sources['imap'] as $index => $vals) {
                 $res .= '<option value="'.$this->html_safe($index).'">'.$this->trans($vals['name']).'</option>';
             }
-            $res .= '</select></td></tr>';
+            $res .= '</select>';
+            $res .= '<label>'.$this->trans('Accounts').'</label></div>';
         }
+
+        // Feeds
         if ($sources['feeds']) {
-            $res .= '<tr class="feeds_row"><td>'.$this->trans('Feeds').
-                '</td><td><select name="hl_feeds_sources[]" size="4" multiple="multiple" class="feeds_source">';
+            // Feeds Sources
+            $res .= '<div class="form-floating mb-3 feeds_row d-none">';
+            $res .= '<select style="min-height: 8rem" name="hl_feeds_sources[]" size="4" multiple="multiple" class="form-select feeds_source">';
             foreach ($sources['feeds'] as $index => $vals) {
                 $res .= '<option value="'.$this->html_safe($index).'">'.$this->trans($vals['name']).'</option>';
             }
-            $res .= '</select></td></tr>';
-            $res .= '<tr class="feeds_row"><td>'.$this->trans('Unseen').'</td><td><input name="hl_feeds_unseen" type="checkbox" value="true" /></td></tr>';
+            $res .= '</select>';
+            $res .= '<label>'.$this->trans('Feeds').'</label></div>';
+
+            // Unseen Feeds
+            $res .= '<div class="form-check mb-3 feeds_row d-none">';
+            $res .= '<input name="hl_feeds_unseen" type="checkbox" value="true" class="form-check-input" />';
+            $res .= '<label class="form-check-label">'.$this->trans('Unseen').'</label></div>';
         }
+
+        // GitHub
         if ($sources['github']) {
-            $res .= '<tr class="github_row"><td>'.$this->trans('Repos').
-                '</td><td><select name="hl_github_sources[]" size="4" multiple="multiple" class="github_source">';
+            // GitHub Repos
+            $res .= '<div class="form-floating mb-3 github_row d-none">';
+            $res .= '<select style="min-height: 8rem" name="hl_github_sources[]" size="4" multiple="multiple" class="form-select github_source">';
             foreach ($sources['github'] as $repo) {
                 $res .= '<option value="'.$this->html_safe($repo).'">'.$this->trans($repo).'</option>';
             }
-            $res .= '</select></td></tr>';
-            $res .= '<tr class="github_row"><td>'.$this->trans('Unseen').'</td><td><input name="hl_github_unseen" type="checkbox" value="true" /></td></tr>';
+            $res .= '</select>';
+            $res .= '<label>'.$this->trans('Repos').'</label></div>';
+
+            // Unseen GitHub
+            $res .= '<div class="form-check mb-3 github_row d-none">';
+            $res .= '<input name="hl_github_unseen" type="checkbox" value="true" class="form-check-input" />';
+            $res .= '<label class="form-check-label">'.$this->trans('Unseen').'</label></div>';
         }
-        $res .= '<tr><td>'.$this->trans('Highlight target').'</td>';
-        $res .= '<td><select name="hl_target">';
+
+        // Highlight Target
+        $res .= '<div class="form-floating mb-3">';
+        $res .= '<select name="hl_target" class="form-select">';
         foreach ($targets as $name => $val) {
             $res .= '<option value="'.$this->html_safe($val).'">'.$this->trans($name).'</option>';
         }
-        $res .= '</select></td></tr>';
-        $res .= '<tr><td>'.$this->trans('Highlight color').'</td><td><input name="hl_color" type="color" /></td></tr>';
-        $res .= '<tr><td>'.$this->trans('CSS override').'</td><td><input value="true" type="checkbox" name="hl_important" /></td></tr>';
-        $res .= '<tr><td></td><td class="submit_row"><input type="submit" value="'.$this->trans('Add').'" />';
+        $res .= '</select>';
+        $res .= '<label>'.$this->trans('Highlight target').'</label></div>';
+
+        // Highlight Color
+        $res .= '<div class="mb-3">';
+        $res .= '<label>'.$this->trans('Highlight color').'</label>';
+        $res .= '<input style="min-height: 3rem" name="hl_color" type="color" class="form-control p-1" /></div>';
+
+        // CSS Override
+        $res .= '<div class="form-check mb-3">';
+        $res .= '<input value="true" type="checkbox" name="hl_important" class="form-check-input" />';
+        $res .= '<label class="form-check-label">'.$this->trans('CSS override').'</label></div>';
+
+        // Submit Button
+        $res .= '<div class="submit_row">';
+        $res .= '<input type="submit" value="'.$this->trans('Add').'" class="btn btn-success px-5" />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-        $res .= '</td></tr></table></form></div>';
+        $res .= '</div></form></div>';
+
         return $res;
+
     }
 }
 
@@ -289,7 +333,7 @@ class Hm_Output_highlight_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_highlights"><a class="unread_link" href="?page=highlights">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$tags).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-highlighter fs-5 me-2"></i>';
         }
         $res .= $this->trans('Highlights').'</a></li>';
         if ($this->format == 'HTML5') {
