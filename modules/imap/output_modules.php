@@ -1280,38 +1280,52 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
 class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
     protected function output() {
        $res = '
-                   <div class="step_config-smtp_bloc" id="step_config-imap_bloc">
+                   <div class="step_config-smtp_bloc mb-6" id="step_config-imap_bloc">
                       <label><strong>IMAP</strong></label>
-                      <div class="step_config-form_item">
-                          <label for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
-                          <br />
-                          <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_imap_address" placeholder="'.$this->trans('Address').'" />
-                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                      <div class="form-floating">
+                        <input required type="text" id="srv_setup_stepper_imap_address" name="srv_setup_stepper_imap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                        <label class="" for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
+                        <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
                       </div>
-                      <div class="step_config-smtp_imap_port_bloc">
-                         <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_imap_port"/>
-                         <div>
-                             <input type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls" value="true">
-                             <label for="imap_tls">'.$this->trans('Use TLS').'</label><br>
-                             <input type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" value="false">
-                             <label for="imap_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
-                         </div>
-                         <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
+                      <div class="d-flex">
+                        <div class="flex-fill">
+                              <div class="form-floating">
+                                <input required type="number" id="srv_setup_stepper_imap_address" name="srv_setup_stepper_imap_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
+                                <label class="" for="srv_setup_stepper_imap_address">'.$this->trans('Port').'</label>
+                                <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                              </div>
+                              <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
+                        </div>
+                        <div class="p-2 flex-fill">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls">
+                                <label class="form-check-label" style="font-size: 12px;" for="imap_tls">
+                                  '.$this->trans('Use TLS').'
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" checked>
+                                <label class="form-check-label" style="font-size: 12px;" for="imap_start_tls">
+                                  '.$this->trans('STARTTLS or unencrypted').'
+                                </label>
+                            </div>
+                        </div>
                       </div>
                    ';
             
-                     if ($this->get('sieve_filters_enabled')) {
+                     if (!$this->get('sieve_filters_enabled')) {
                          $default_value = '';
                              $res .=  '
-                                        <div class="step_config-form_item">
-                                            <input type="checkbox"  class="step_config-form_item-checkbox" id="srv_setup_stepper_enable_sieve" onchange="handleSieveStatusChange(this)"/>
-                                            <label for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                        
+                                        <div class="form-check">
+                                           <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
+                                           <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
                                         </div>
-                                       <div class="step_config-form_item nested hide" id="srv_setup_stepper_imap_sieve_host_bloc">
-                                           <label class="screen_reader" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                                           <input id="srv_setup_stepper_imap_sieve_host" class="credentials stepper_input" style="height: 20px; width: 200px;" placeholder="localhost:4190" type="text" name="imap_sieve_host">
+                                        <div class="form-floating hide" id="srv_setup_stepper_imap_sieve_host_bloc">
+                                            <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
+                                            <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
                                             <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
-                                       </div>';
+                                        </div>';
                      }
        return $res;
     }

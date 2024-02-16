@@ -1447,24 +1447,37 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
 class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
     protected function output() {
         return '
-            <div class="step_config-smtp_bloc" id="step_config-smtp_bloc">
+            <div class="step_config-smtp_bloc mb-3" id="step_config-smtp_bloc">
                <label><strong>SMTP</strong></label>
-               <div class="step_config-form_item">
-                   <label for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
-                   <br />
-                   <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_smtp_address" placeholder="'.$this->trans('Address').'" />
+                 <div class="form-floating">
+                   <input required type="text" id="srv_setup_stepper_smtp_address" name="srv_setup_stepper_smtp_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                   <label class="" for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
                    <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
-               </div>
-               <div class="step_config-smtp_imap_port_bloc">
-                   <input type="number" style="height: 20px;" class="stepper_input" id="srv_setup_stepper_smtp_port"/>
-                   <div>
-                       <input type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true">
-                       <label for="smtp_tls">'.$this->trans('Use TLS').'</label><br>
-                       <input type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" value="false">
-                       <label for="smtp_start_tls">'.$this->trans('STARTTLS or unencrypted').'</label><br>
+                 </div>
+                 <div class="d-flex">
+                   <div class="flex-fill">
+                         <div class="form-floating">
+                           <input required type="number" id="srv_setup_stepper_smtp_port" name="srv_setup_stepper_smtp_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
+                           <label class="" for="srv_setup_stepper_smtp_port">'.$this->trans('Port').'</label>
+                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                         </div>
+                         <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
                    </div>
-                   <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
-               </div>
+                   <div class="p-2 flex-fill">
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls">
+                           <label class="form-check-label" style="font-size: 12px;" for="smtp_tls">
+                             '.$this->trans('Use TLS').'
+                           </label>
+                       </div>
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" checked>
+                           <label class="form-check-label" style="font-size: 12px;" for="smtp_start_tls">
+                             '.$this->trans('STARTTLS or unencrypted').'
+                           </label>
+                       </div>
+                   </div>
+                 </div>
            </div>
         ';
     }
