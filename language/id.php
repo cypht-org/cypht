@@ -266,6 +266,7 @@ return array(
     'Reply-to' => 'Balas-ke',
     'SMTP Server' => 'Server SMTP',
     'Signature' => 'Tanda tangan (sig)',
+    'Remark' => 'Komentar',
     'Edit' => 'Sunting',
     'No' => 'Tidak',
     'Yes' => 'Ya',

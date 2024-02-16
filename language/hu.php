@@ -259,6 +259,7 @@ return array(
     'Reply-to' => 'Válaszcím',
     'SMTP Server' => 'SMTP kiszolgáló',
     'Signature' => 'Aláírás',
+    'Remark' => 'Megjegyzés',
     'Edit' => 'Szerkeszt',
     'No' => 'Nem',
     'Yes' => 'Igen',

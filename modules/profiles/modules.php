@@ -87,12 +87,13 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             return;
         }
         list($success, $form) = $this->process_form(array('profile_id', 'profile_address',
-            'profile_smtp', 'profile_replyto', 'profile_name', 'profile_imap'));
+            'profile_smtp', 'profile_replyto', 'profile_name', 'profile_imap', 'profile_rmk'));
         if (!$success) {
             return;
         }
         $default = false;
         $sig = '';
+        $rmk = '';
         $user = false;
         $server = false;
 
@@ -108,6 +109,9 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
         if (array_key_exists('profile_sig', $this->request->post)) {
             $sig = $this->request->post['profile_sig'];
         }
+        if (array_key_exists('profile_rmk', $this->request->post)) {
+            $rmk = $this->request->post['profile_rmk'];
+        }
         if (array_key_exists('profile_default', $this->request->post)) {
             $default = true;
         }
@@ -115,6 +119,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
         $profile = array(
             'name' => html_entity_decode($form['profile_name'], ENT_QUOTES),
             'sig' => $sig,
+            'rmk' => $rmk,
             'smtp_id' => $form['profile_smtp'],
             'replyto' => $form['profile_replyto'],
             'default' => $default,
@@ -162,7 +167,7 @@ class Hm_Output_profile_edit_form extends Hm_Output_Module {
         }
         if ($new_id !== -1) {
             $res .= profile_form(array('default' => '', 'name' => '', 'address' => '', 'replyto' => '',
-                'smtp_id' => '', 'sig' => '', 'user' => '', 'server' => ''), $new_id, $smtp_servers,
+                'smtp_id' => '', 'sig' => '', 'user' => '', 'server' => '', 'rmk' => ''), $new_id, $smtp_servers,
                 $imap_servers, $this);
         }
         $res .= '</div>';
@@ -251,6 +256,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Reply-to').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('SMTP Server').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Signature').'</th>'.
+                '<th class="d-none d-sm-table-cell">'.$this->trans('Remark').'</th>'.
                 '<th class="d-none d-sm-table-cell">'.$this->trans('Default').'</th>'.
                 '<th></th></tr>';
 
@@ -267,6 +273,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['replyto']).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($smtp).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.(strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-gear-fill"></i></a></td>'.
@@ -346,6 +353,11 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div class="form-floating mb-3">';
     $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
     $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
+
+    // Remark
+    $res .= '<div class="form-floating mb-3">';
+    $res .= '<textarea cols="80" rows="4" name="profile_rmk" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Remark').'">'.$out_mod->html_safe($form_vals['rmk']).'</textarea>';
+    $res .= '<label>'.$out_mod->trans('Remark').'</label></div>';
 
     // Set as default
     $res .= '<div class="form-check mb-3">';

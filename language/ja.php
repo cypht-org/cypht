@@ -259,6 +259,7 @@ return array(
     'Reply-to' => '返信先',
     'SMTP Server' => 'SMTPサーバー',
     'Signature' => '署名',
+    'Remark' => '述べる',
     'Edit' => '編集する',
     'No' => 'いいえ',
     'Yes' => 'はい',
