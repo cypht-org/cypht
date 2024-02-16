@@ -96,7 +96,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         $res .= 'value="right">'.$this->trans('Right').'</option><option ';
         if ($selected == 'inline') {
             $res .= 'selected="selected" ';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="inline">'.$this->trans('Inline').'</option></select>'.$reset.'</td></tr>';
         return $res;

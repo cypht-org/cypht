@@ -893,7 +893,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -962,14 +962,13 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
         if (!count($drafts)) {
             return;
         }
-        $res = '<img class="draft_title refresh_list" width="24" height="24" src="'.
-            Hm_Image_Sources::$doc.'" title="'.$this->trans('Drafts').'" alt="'.$this->trans('Drafts').'" />';
+        $res = '<i class="bi bi-pencil-square draft_title refresh_list" title="'.$this->trans('Drafts').'"></i>';
         $res .= '<div class="draft_list">';
         foreach ($drafts as $id => $draft) {
             $subject = trim($draft['draft_subject']) ? trim($draft['draft_subject']) : 'Draft '.($id+1);
             $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
                 $this->html_safe($id).'">'.$this->html_safe($subject).'</a> '.
-                '<img class="delete_draft" width="16" height="16" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
+                '<i class="bi bi-x-circle-fill delete_draft" data-id="'.$this->html_safe($id).'"></i></div>';
         }
         $res .= '</div>';
         return $res;
@@ -1301,7 +1300,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if ($selected != 0) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
@@ -1322,7 +1321,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;

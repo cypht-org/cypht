@@ -162,7 +162,7 @@ class Hm_Output_nasa_folders extends Hm_Output_Module {
         if ($this->get('nasa_api_key')) {
             $res = '<li class="menu_nasa_apod"><a class="unread_link" href="?page=nasa_apod">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$globe).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-globe-europe-africa account_icon"></i> ';
             }
             $res .= $this->trans('APOD').'</a></li>';
             $this->append('folder_sources', array('nASA_folders', $res));

@@ -107,7 +107,7 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
             if ($idle_time == $val) {
                 $res .= 'selected="selected" ';
                 if ($idle_time != '0') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';

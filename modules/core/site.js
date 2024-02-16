@@ -750,7 +750,7 @@ function Message_List() {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'flag') {
-                $('.icon', row).html('<img width="16" height="16" src="'+hm_flag_image_src()+'" />');
+                $('.icon', row).html(hm_flag_image_src());
             }
             else {
                 $('.icon', row).empty();
@@ -918,13 +918,13 @@ function Message_List() {
         if (prev.length) {
             phref = prev.find('.subject').find('a').prop('href');
             subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+phref+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
+            plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
             nhref = next.find('.subject').find('a').prop('href');
             subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+nhref+'"><div class="prevnext next_img"></div> '+subject+'</a>';
+            nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
         return [phref, nhref];
