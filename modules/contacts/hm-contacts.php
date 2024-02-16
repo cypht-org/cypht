@@ -30,7 +30,12 @@ class Hm_Contact_Store {
     }
 
     public static function save() {
-        $local_contacts = array_map(function($c) { $c->update('type', 'local'); return $c->export(); }, self::$entities);
+        $local_contacts = array_map(function($c) {
+            $c->update('type', 'local');
+            return $c->export();
+        }, array_filter(self::$entities, function($c) {
+            return ! $c->value('external');
+        }));
         self::$user_config->set(self::$name, $local_contacts);
         self::$session->set('user_data', self::$user_config->dump());
     }
@@ -124,6 +129,10 @@ class Hm_Contact_Store {
 
     public function import($data) {
         foreach ($data as $contact) {
+            if (! isset($contact['id'])) {
+                $contact['id'] = self::count();
+            }
+            $contact['external'] = true;
             $contact = new Hm_Contact($contact);
             self::add($contact, false);
         }
