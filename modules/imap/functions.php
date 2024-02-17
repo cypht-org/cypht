@@ -1245,7 +1245,7 @@ function get_request_params($request) {
     if (array_key_exists('uid', $request) && $request['uid']) {
         $uid = $request['uid'];
     }
-    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\d+)_(.+)/", $request['list_path'], $matches)) {
+    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\w+)_(.+)/", $request['list_path'], $matches)) {
         $server_id = $matches[1];
         $folder = hex2bin($matches[2]);
     }
@@ -1385,7 +1385,7 @@ if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
 
-    $txt = '<div class="dropdown">
+    $txt = '<div class="dropdown d-inline-block">
                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
