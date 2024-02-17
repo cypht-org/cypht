@@ -599,7 +599,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-            if (preg_match("/^imap_\d+_.+$/", $path)) {
+            if (preg_match("/^imap_\w+_.+$/", $path)) {
                 $this->out('list_meta', false, false);
                 $this->out('list_path', $path, false);
                 $this->out('move_copy_controls', true);
