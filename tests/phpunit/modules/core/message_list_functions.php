@@ -63,7 +63,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_safe_output_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<td class="foo" data-title="">bar</td>', safe_output_callback(array('foo', 'bar'), 'email', $mod));
-        $this->assertEquals('<div class="foo" data-title="bar"><img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M5%201l-3%206h1l3-6h-1zm-4%201l-1%202%201%202h1l-1-2%201-2h-1zm5%200l1%202-1%202h1l1-2-1-2h-1z%22%20%2F%3E%0A%3C%2Fsvg%3E" />bar</div>', safe_output_callback(array('foo', 'bar', 'code'), 'news', $mod));
+        $this->assertEquals('<div class="foo" data-title="bar"><i class="bi bi-filetype-code"></i>bar</div>', safe_output_callback(array('foo', 'bar', 'code'), 'news', $mod));
     }
     /**
      * @preserveGlobalState disabled
@@ -81,7 +81,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_subject_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<td class="subject"><div class=""><a title="foo" href="bar">foo</a></div></td>', subject_callback(array('foo', 'bar', array()), 'email', $mod));
-        $this->assertEquals('<div class="subject"><div class="" title="foo"><img alt="list item" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M5%201l-3%206h1l3-6h-1zm-4%201l-1%202%201%202h1l-1-2%201-2h-1zm5%200l1%202-1%202h1l1-2-1-2h-1z%22%20%2F%3E%0A%3C%2Fsvg%3E" /> <a href="bar">foo</a></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
+        $this->assertEquals('<div class="subject"><div class="" title="foo"><i class="bi bi-filetype-code"></i> <a href="bar">foo</a></div></div>', subject_callback(array('foo', 'bar', array(), 'code'), 'news', $mod));
     }
     /**
      * @preserveGlobalState disabled
@@ -98,8 +98,8 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_icon_callback() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<td class="icon" title="Flagged, Answered, Attachment"> F A +</td>', icon_callback(array(array('flagged', 'answered', 'attachment')), 'email', $mod));
-        $this->assertEquals('<div class="icon" title="Flagged, Answered, Attachment"> F A +</div>', icon_callback(array(array('flagged', 'answered', 'attachment')), 'news', $mod));
+        $this->assertEquals('<td class="icon" title="Flagged, Answered, Attachment"> F A <i class="bi bi-plus-circle"></i></td>', icon_callback(array(array('flagged', 'answered', 'attachment')), 'email', $mod));
+        $this->assertEquals('<div class="icon" title="Flagged, Answered, Attachment"> F A <i class="bi bi-plus-circle"></i></div>', icon_callback(array(array('flagged', 'answered', 'attachment')), 'news', $mod));
     }
     /**
      * @preserveGlobalState disabled
@@ -134,7 +134,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_list_controls() {
         $this->assertEquals('<div class="list_controls no_mobile d-flex gap-3 align-items-center">foobazbar</div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml;base64,PCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4KDTwhLS0gVXBsb2FkZWQgdG86IFNWRyBSZXBvLCB3d3cuc3ZncmVwby5jb20sIFRyYW5zZm9ybWVkIGJ5OiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyBmaWxsPSIjN0Y3RjdGIiBoZWlnaHQ9IjI1NnB4IiB3aWR0aD0iMjU2cHgiIHZlcnNpb249IjEuMSIgaWQ9IkNhcGFfMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgdmlld0JveD0iMCAwIDMyLjA1NSAzMi4wNTUiIHhtbDpzcGFjZT0icHJlc2VydmUiPgoNPGcgaWQ9IlNWR1JlcG9fYmdDYXJyaWVyIiBzdHJva2Utd2lkdGg9IjAiLz4KDTxnIGlkPSJTVkdSZXBvX3RyYWNlckNhcnJpZXIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlPSIjQ0NDQ0NDIiBzdHJva2Utd2lkdGg9IjEuNjY2ODYwMDAwMDAwMDAwMiI+IDxnPiA8cGF0aCBkPSJNMy45NjgsMTIuMDYxQzEuNzc1LDEyLjA2MSwwLDEzLjgzNSwwLDE2LjAyN2MwLDIuMTkyLDEuNzczLDMuOTY3LDMuOTY4LDMuOTY3YzIuMTg5LDAsMy45NjYtMS43NzIsMy45NjYtMy45NjcgQzcuOTM0LDEzLjgzNSw2LjE1NywxMi4wNjEsMy45NjgsMTIuMDYxeiBNMTYuMjMzLDEyLjA2MWMtMi4xODgsMC0zLjk2OCwxLjc3My0zLjk2OCwzLjk2NWMwLDIuMTkyLDEuNzc4LDMuOTY3LDMuOTY4LDMuOTY3IHMzLjk3LTEuNzcyLDMuOTctMy45NjdDMjAuMjAxLDEzLjgzNSwxOC40MjMsMTIuMDYxLDE2LjIzMywxMi4wNjF6IE0yOC4wOSwxMi4wNjFjLTIuMTkyLDAtMy45NjksMS43NzQtMy45NjksMy45NjcgYzAsMi4xOSwxLjc3NCwzLjk2NSwzLjk2OSwzLjk2NWMyLjE4OCwwLDMuOTY1LTEuNzcyLDMuOTY1LTMuOTY1UzMwLjI3OCwxMi4wNjEsMjguMDksMTIuMDYxeiIvPiA8L2c+IDwvZz4KDTxnIGlkPSJTVkdSZXBvX2ljb25DYXJyaWVyIj4gPGc+IDxwYXRoIGQ9Ik0zLjk2OCwxMi4wNjFDMS43NzUsMTIuMDYxLDAsMTMuODM1LDAsMTYuMDI3YzAsMi4xOTIsMS43NzMsMy45NjcsMy45NjgsMy45NjdjMi4xODksMCwzLjk2Ni0xLjc3MiwzLjk2Ni0zLjk2NyBDNy45MzQsMTMuODM1LDYuMTU3LDEyLjA2MSwzLjk2OCwxMi4wNjF6IE0xNi4yMzMsMTIuMDYxYy0yLjE4OCwwLTMuOTY4LDEuNzczLTMuOTY4LDMuOTY1YzAsMi4xOTIsMS43NzgsMy45NjcsMy45NjgsMy45NjcgczMuOTctMS43NzIsMy45Ny0zLjk2N0MyMC4yMDEsMTMuODM1LDE4LjQyMywxMi4wNjEsMTYuMjMzLDEyLjA2MXogTTI4LjA5LDEyLjA2MWMtMi4xOTIsMC0zLjk2OSwxLjc3NC0zLjk2OSwzLjk2NyBjMCwyLjE5LDEuNzc0LDMuOTY1LDMuOTY5LDMuOTY1YzIuMTg4LDAsMy45NjUtMS43NzIsMy45NjUtMy45NjVTMzAuMjc4LDEyLjA2MSwyOC4wOSwxMi4wNjF6Ii8+IDwvZz4gPC9nPgoNPC9zdmc+" width="20" height="20" onclick="listControlsMenu()"/>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
         <div id="list_controls_menu" classs="list_controls_menu">foobazbar</div>
     </div>', list_controls('foo', 'bar', 'baz'));
     }
