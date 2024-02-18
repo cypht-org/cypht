@@ -1253,22 +1253,25 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
     protected function output() {
         if(!in_array('jmap', $this->get('router_module_list'), true)) return '';
         return '
-            <div class="step_config-form_item" id="srv_setup_stepper_jmap_select_box">
-                <input type="checkbox"  class="step_config-form_item-checkbox" onchange="handleJmapCheckboxChange(this)" name="srv_setup_stepper_only_jmap" id="srv_setup_stepper_only_jmap"/>
-                <label for="srv_setup_stepper_only_jmap">'.$this->trans('Setup JMAP Server').'</label>
+            <div class="form-check"  id="srv_setup_stepper_jmap_select_box">
+                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
+                <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_only_jmap">
+                  '.$this->trans('Setup JMAP Server').'
+                </label>
             </div>
             <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
               <label><strong>JMAP</strong></label>
-              <div class="step_config-form_item">
-                  <label for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
-                  <br />
-                  <input type="text" style="height: 20px;"  class="stepper_input" id="srv_setup_stepper_jmap_address" placeholder="'.$this->trans('Address').'" />
+              <div class="form-floating">
+                  <input required type="text" id="srv_setup_stepper_jmap_address" name="srv_setup_stepper_jmap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                  <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
                   <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
               </div>
-              <div class="step_config-form_item">
-                <input type="checkbox"  class="step_config-form_item-checkbox" name="srv_setup_stepper_jmap_hide_from_c_page" />
-                <label for="srv_setup_stepper_jmap_hide_from_c_page">'.$this->trans('Hide From Combined Pages').'</label>
-              </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
+                <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
+                  '.$this->trans('Hide From Combined Pages').'
+                </label>
+            </div>
             </div>
         ';
     }
@@ -1290,9 +1293,9 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                       <div class="d-flex">
                         <div class="flex-fill">
                               <div class="form-floating">
-                                <input required type="number" id="srv_setup_stepper_imap_address" name="srv_setup_stepper_imap_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
-                                <label class="" for="srv_setup_stepper_imap_address">'.$this->trans('Port').'</label>
-                                <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                                <input required type="number" id="srv_setup_stepper_imap_port" name="srv_setup_stepper_imap_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
+                                <label class="" for="srv_setup_stepper_imap_port">'.$this->trans('Port').'</label>
+                                <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
                               </div>
                               <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
                         </div>
