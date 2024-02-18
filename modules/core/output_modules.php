@@ -2197,7 +2197,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
 
 class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
     protected function output() {
-        $res = '</div></div>';
+        $res = '</div>';
         
         if(in_array('profiles', $this->get('router_module_list'), true)) {
             $res .= '

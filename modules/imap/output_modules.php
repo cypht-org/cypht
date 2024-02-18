@@ -453,37 +453,39 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="configured_server">';
+            $res .= '<div class="d-flex justify-content-between align-content-center p-3 border-top border-bottom border-success">';
             $res .= sprintf('
                     <div>
-                        <div class="server_type_tag">'.$type.'</div>
+                        <div><span class="badge text-bg-success">'.$type.'</span></div>
                         <div class="server_title">%s</div>
                         <div class="server_subtitle">%s/%d %s</div>
                     </div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
 
-            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<form class="imap_connect d-flex gap-3" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
             
             // IMAP Username
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label></div>';
             
             // IMAP Password
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label></div>';
             
             // Sieve Host (Conditional)
             if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
                 $default_value = $vals['sieve_config_host'];
-                $res .= '<div class="form-floating mb-3">';
+                $res .= '<div class="form-floating">';
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label></div>';
             }
+            
+            $res .= '<div class="d-flex align-item-center p-4">';
             
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
@@ -500,6 +502,8 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
             
+            
+            $res .= '</div>';
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             $res .= '</form>';
                 
@@ -1253,26 +1257,26 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
     protected function output() {
         if(!in_array('jmap', $this->get('router_module_list'), true)) return '';
         return '
-            <div class="form-check"  id="srv_setup_stepper_jmap_select_box">
-                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
-                <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_only_jmap">
-                  '.$this->trans('Setup JMAP Server').'
-                </label>
-            </div>
-            <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
-              <label><strong>JMAP</strong></label>
-              <div class="form-floating">
-                  <input required type="text" id="srv_setup_stepper_jmap_address" name="srv_setup_stepper_jmap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
-                  <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
-                  <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
-              </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
-                <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
-                  '.$this->trans('Hide From Combined Pages').'
-                </label>
-            </div>
-            </div>
+                <div class="form-check"  id="srv_setup_stepper_jmap_select_box">
+                    <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
+                    <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_only_jmap">
+                      '.$this->trans('Setup JMAP Server').'
+                    </label>
+                </div>
+                <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
+                      <label><strong>JMAP</strong></label>
+                      <div class="form-floating">
+                          <input required type="text" id="srv_setup_stepper_jmap_address" name="srv_setup_stepper_jmap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                          <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
+                          <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
+                      </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
+                        <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
+                          '.$this->trans('Hide From Combined Pages').'
+                        </label>
+                    </div>
+                </div>
         ';
     }
 }
@@ -1283,7 +1287,7 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
 class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
     protected function output() {
        $res = '
-                   <div class="step_config-smtp_bloc mb-6" id="step_config-imap_bloc">
+                   <div class="step_config-imap_bloc mb-6" id="step_config-imap_bloc">
                       <label><strong>IMAP</strong></label>
                       <div class="form-floating">
                         <input required type="text" id="srv_setup_stepper_imap_address" name="srv_setup_stepper_imap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
@@ -1330,6 +1334,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
                                         </div>';
                      }
+               $res .= '</div>';
        return $res;
     }
 }

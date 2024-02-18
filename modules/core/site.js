@@ -2111,8 +2111,6 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_jmap_address', value: $('#srv_setup_stepper_jmap_address').val() },
     ];
 
-    console.log("HERE")
-
     Hm_Ajax.request(requestData, function(res) {
         $('#srv_setup_stepper_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
@@ -2167,6 +2165,7 @@ function handleSmtpImapCheckboxChange(checkbox) {
     }
 
     if (checkbox.id === 'srv_setup_stepper_is_sender') {
+        console.log("checkbox.checked", checkbox.checked)
         if(checkbox.checked) $('#step_config-smtp_bloc').show();
         else $('#step_config-smtp_bloc').hide();
     }

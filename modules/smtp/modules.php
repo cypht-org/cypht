@@ -1383,23 +1383,29 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="configured_server">';
-            $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s/%d %s</div>',
+            $res .= '<div class="d-flex justify-content-between align-content-center p-3 border-top border-bottom border-success">';
+            $res .= sprintf('<div>
+                               <div><span class="badge text-bg-success">SMTP</span></div>
+                               <div class="server_title">%s</div>
+                               <div class="server_subtitle">%s/%d %s</div>
+                            </div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
             
-            $res .= '<form class="smtp_connect" method="POST">';
+            $res .= '<form class="smtp_connect d-flex gap-3" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
             
             // SMTP Username
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials" id="smtp_user_'.$index.'" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label></div>';
             
             // SMTP Password
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials smtp_password" type="password" id="smtp_pass_'.$index.'" name="smtp_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label></div>';
+            
+            $res .= '<div class="d-flex align-item-center p-4">';
             
             // Buttons
             if (!$no_edit) {
@@ -1414,6 +1420,8 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
+            
+            $res .= '</div>';
             $res .= '</form>';
 
             $res .= '</div></div>';
@@ -1465,13 +1473,13 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                    </div>
                    <div class="p-2 flex-fill">
                        <div class="form-check">
-                           <input class="form-check-input" type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls">
+                           <input class="form-check-input" type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true" checked>
                            <label class="form-check-label" style="font-size: 12px;" for="smtp_tls">
                              '.$this->trans('Use TLS').'
                            </label>
                        </div>
                        <div class="form-check">
-                           <input class="form-check-input" type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls" checked>
+                           <input class="form-check-input" type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls"  value="false" >
                            <label class="form-check-label" style="font-size: 12px;" for="smtp_start_tls">
                              '.$this->trans('STARTTLS or unencrypted').'
                            </label>
