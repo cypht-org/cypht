@@ -33,7 +33,7 @@ class Hm_SMTP_List {
         if (array_key_exists('no_auth', $server)) {
             $config['no_auth'] = true;
         }
-        self::$server_list[]['object'] = new Hm_SMTP($config);
+        self::$server_list[$id]['object'] = new Hm_SMTP($config);
 
         if (!end(self::$server_list)['object']->connect()) {
             return end(self::$server_list)['object'];
