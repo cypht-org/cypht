@@ -21,7 +21,7 @@
 .imap_update a { color: teal; font-size: 75%; vertical-align: 1px; text-decoration: none; padding-left: 10px; letter-spacing: 0px; }
 .close_link { float: right; padding-right: 20px; text-decoration: none; color: teal; font-size: 90%; margin-bottom: 10px;}
 .header_links { padding-top: 10px !important; }
-.header_links #dropdownMenuSnooze { padding: 0; border: unset; }
+.header_links #dropdownMenuSnooze { padding: 0; border: unset; font-variant: inherit; text-transform: inherit; font-size: inherit; vertical-align: baseline; }
 .header_links #dropdownMenuSnooze:hover { background-color: inherit; color: inherit; }
 .overlay {position: fixed; height: 100%; width: 100%; z-index: 100; background-color: #ccc; opacity: .7; }
 .account_row { cursor: pointer; }

@@ -1073,11 +1073,6 @@ var imap_folder_status = function() {
 };
 
 var imap_setup_snooze = function() {
-    $(document).on('click', '#snooze_message', function(e) {
-        e.preventDefault();
-        $('.snooze_dropdown').toggle();
-        $('.snooze_input').hide();
-    });
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
     });
