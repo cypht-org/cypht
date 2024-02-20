@@ -600,6 +600,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">'.
             'var globals = {};'.
+            'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
