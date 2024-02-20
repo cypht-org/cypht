@@ -119,7 +119,7 @@ return array(
         'feed_msg_text' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_post' => array(
-        'feed_id' => FILTER_VALIDATE_INT,
+        'feed_id' => FILTER_DEFAULT,
         'delete_feed' => FILTER_VALIDATE_INT,
         'feed_connect' => FILTER_VALIDATE_INT,
         'feed_server_ids' => FILTER_DEFAULT,

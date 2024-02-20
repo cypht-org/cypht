@@ -1832,6 +1832,13 @@ var reset_default_value_input = function() {
     }
 };
 
+var decrease_servers = function(section) {
+    const element = document.querySelector(`.${section}_server_setup .server_count`);
+    const parts = element.innerHTML.split(' ');
+    parts[0] = Number(parts[0]) - 1;
+    element.innerHTML = parts.join(' ');
+};
+
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 

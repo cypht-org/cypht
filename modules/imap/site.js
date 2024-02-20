@@ -10,8 +10,11 @@ var imap_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                const configured_server = form.closest('.configured_server');
+                const section = configured_server.parent().parent()[0].classList.contains('imap_section') ? 'imap': 'jmap';
+                decrease_servers(section);
+                configured_server.remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
             }
