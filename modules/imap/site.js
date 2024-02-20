@@ -1192,8 +1192,10 @@ $(function() {
         imap_setup_snooze();
     }
 
-    imap_unsnooze_messages();
-    setInterval(imap_unsnooze_messages, 60000);
+    if (hm_is_logged()) {
+        imap_unsnooze_messages();
+        setInterval(imap_unsnooze_messages, 60000);
+    }
 
     if ($('.imap_move').length > 0) {
         check_select_for_imap();

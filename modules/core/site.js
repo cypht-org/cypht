@@ -1869,7 +1869,7 @@ $(function() {
     Hm_Timer.fire();
 
     /* load folder list */
-    if (!reloaded && !Hm_Folders.load_from_local_storage()) {
+    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
         Hm_Folders.update_folder_list();
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
