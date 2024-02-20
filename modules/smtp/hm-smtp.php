@@ -35,8 +35,8 @@ class Hm_SMTP_List {
         }
         self::$server_list[$id]['object'] = new Hm_SMTP($config);
 
-        if (!end(self::$server_list)['object']->connect()) {
-            return end(self::$server_list)['object'];
+        if (!self::$server_list[$id]['object']->connect()) {
+            return self::$server_list[$id]['object'];
         }
         return false;
     }
