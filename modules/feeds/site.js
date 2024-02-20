@@ -21,10 +21,11 @@ var feed_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (res.deleted_server_id > -1 ) {
+            if (res.deleted_server_id) {
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
-                form.parent().remove();
+                form.parent().parent().remove();
+                decrease_servers('feed');
             }
         },
         {'delete_feed': 1}

@@ -87,10 +87,11 @@ var smtp_delete_action = function(event) {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                form.parent().parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
+                decrease_servers('smtp');
             }
         },
         {'smtp_delete': 1}
