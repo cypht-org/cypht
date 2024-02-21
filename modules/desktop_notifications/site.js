@@ -25,7 +25,7 @@ $(function() {
         if (!content) {
             return;
         }
-        Push.create("New Message", {
+        Push.create(hm_trans("New Message"), {
             body: content,
             timeout: 10000,
             icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAIBJREFUWIXtlkEOgCAMBEdfpj/Hl+FB8GBiWoqEg7sJt7YzTXoAlL9nAfJMgXUmXAJVYAeOCeyjsO9sQOI6ypEvFdZrRomY4FEiJtgqiIp45zY3fAWu9d0Devu6N4mCTYHw9TrBboFWES+4WcASaQWHBZ4iUXAGsv4DEpCABBTlBOkR5VdJRFCfAAAAAElFTkSuQmCC',

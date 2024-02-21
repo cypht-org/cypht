@@ -28,7 +28,7 @@ return array(
     ),
     'allowed_post' => array(
         'profile_name' => FILTER_DEFAULT,
-        'profile_id' => FILTER_VALIDATE_INT,
+        'profile_id' => FILTER_DEFAULT,
         'profile_replyto' => FILTER_DEFAULT,
         'profile_smtp' => FILTER_DEFAULT,
         'profile_imap' => FILTER_DEFAULT,

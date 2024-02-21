@@ -31,7 +31,7 @@ var Hm_Pgp = {
             var decrypted = await key.decrypt(pass);
         }
         catch (e) {
-            Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
+            Hm_Pgp.error_msg = hm_trans('Could not unlock key with supplied passphrase');
             Hm_Pgp.show_result();
             return;
         }
@@ -69,7 +69,7 @@ var Hm_Pgp = {
                 var decrypted = await key.decrypt(pass);
             }
             catch (e) {
-                Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
+                Hm_Pgp.error_msg = hm_trans('Could not unlock key with supplied passphrase');
                 Hm_Pgp.show_result();
                 return;
             }
@@ -87,7 +87,7 @@ var Hm_Pgp = {
     decrypt_text: async function(pass) {
         var index = $('.pgp_private_keys').val();
         if (!index) {
-            Hm_Pgp.error_msg = 'Could not access private key';
+            Hm_Pgp.error_msg = hm_trans('Could not access private key');
             Hm_Pgp.show_result();
             return;
         }
@@ -98,7 +98,7 @@ var Hm_Pgp = {
             var decrypted = await key.decrypt(pass);
         }
         catch (e) {
-            Hm_Pgp.error_msg = 'Could not unlock key with supplied passphrase';
+            Hm_Pgp.error_msg = hm_trans('Could not unlock key with supplied passphrase');
             Hm_Pgp.show_result();
             return;
         }
@@ -209,7 +209,7 @@ var Hm_Pgp = {
 
     update_private_keys: function(key) {
         if (!Hm_Pgp.validate_private_key(key)) {
-            $('.sys_messages').html('<span class="err">Unable to import private key</span>');
+            $('.sys_messages').html('<span class="err">'+hm_trans('Unable to import private key')+'</span>'));
             Hm_Utils.show_sys_messages();
             return;
         }
@@ -244,7 +244,7 @@ var Hm_Pgp = {
 
     read_private_key: function(evt) {
         if (!evt.target.files.length) {
-            $('.sys_messages').html('<span class="err">Unable to import private key</span>');
+            $('.sys_messages').html('<span class="err">'+hm_trans('Unable to import private key')+'</span>');
             Hm_Utils.show_sys_messages();
             return;
         }
@@ -281,7 +281,7 @@ var Hm_Pgp = {
                 }
             }
             Hm_Utils.save_to_local_storage('pgp_keys', JSON.stringify(newkeys));
-            $('.sys_messages').html('Private key removed');
+            $('.sys_messages').html(hm_trans('Private key removed'));
             Hm_Utils.show_sys_messages();
             Hm_Pgp.list_private_keys();
         }
@@ -307,7 +307,7 @@ var Hm_Pgp = {
         else {
             msg = 'Encrypting message...';
         }
-        $('.sys_messages').html(msg);
+        $('.sys_messages').html(hm_trans(msg));
         $('.sys_messages').show();
     }
 }

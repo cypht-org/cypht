@@ -79,7 +79,7 @@ $(function () {
 
                 if (checked && !verified) {
                     $(this).prop("checked", false);
-                    tFaToast("ERRYou need to verify your 2 factor authentication code before processing");
+                    tFaToast(err_msg('You need to verify your 2 factor authentication code before processing'));
                     return;
                 }
             });
@@ -138,7 +138,7 @@ $(function () {
             var code = getInputCode();
 
             if (!code) {
-                tFaToast("ERRYou need to enter the verification code");
+                tFaToast(err_msg("You need to enter the verification code"));
                 var tm = setTimeout(function () {
                     Hm_Notices.hide(true);
                     clearTimeout(tm);

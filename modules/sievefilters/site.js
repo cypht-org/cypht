@@ -171,7 +171,7 @@ $(function () {
 
     $(document).on('change', '#block_action', function(e) {
         if ($(this).val() == 'reject_with_message') {
-            $('<div id="reject_message"><label>Message</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
+            $('<div id="reject_message"><label>'+hm_trans('Message')+'</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
         } else {
             $('#reject_message').remove();
         }
@@ -184,7 +184,7 @@ $(function () {
                     .find('.select_default_reject_message')
                     .remove();
             } else {
-                $('<input type="text" class="select_default_reject_message form-control" placeholder="Reject message" />').insertAfter($(this));
+                $('<input type="text" class="select_default_reject_message form-control" placeholder="'+hm_trans('Reject message')+'" />').insertAfter($(this));
             }
         });
         $(document).on('click', '.submit_default_behavior', function(e) {
@@ -213,7 +213,7 @@ $(function () {
 
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
-           if (!confirm('Do you want to unblock sender?')) {
+           if (!confirm(hm_trans('Do you want to unblock sender?'))) {
                 return;
             }
            let sender = $(this).parent().parent().children().html();
@@ -394,7 +394,7 @@ $(function () {
 
             let idx = 0;
             if (conditions.length === 0) {
-                $('.sys_messages').html('<span class="err">You must provide at least one condition</span>');
+                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide at least one condition')+'</span>');
                 Hm_Utils.show_sys_messages();
                 return false;
             }
@@ -435,7 +435,7 @@ $(function () {
             }).get();
 
             if (actions_type.length === 0) {
-                $('.sys_messages').html('<span class="err">You must provide at least one action</span>');
+                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide at least one action')+'</span>');
                 Hm_Utils.show_sys_messages();
                 return false;
             }
@@ -463,7 +463,7 @@ $(function () {
             });
 
             if ($('.modal_sieve_filter_name').val() == "") {
-                $('.sys_messages').html('<span class="err">Filter name is required</span>');
+                $('.sys_messages').html('<span class="err">'+hm_trans('Filter name is required')+'</span>');
                 Hm_Utils.show_sys_messages();
                 return false;
             }
@@ -501,12 +501,12 @@ $(function () {
 
         function save_script(imap_account) {
             if ($('.modal_sieve_script_name').val() === "") {
-                $('.sys_messages').html('<span class="err">You must provide a name for your script</span>');
+                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide a name for your script')+'</span>');
                 Hm_Utils.show_sys_messages();
                 return false;
             }
             if ($('.modal_sieve_script_textarea').val() === "") {
-                $('.sys_messages').html('<span class="err">Empty script</span>');
+                $('.sys_messages').html('<span class="err">'+hm_trans('Empty script')+'</span>');
                 Hm_Utils.show_sys_messages();
                 return false;
             }
