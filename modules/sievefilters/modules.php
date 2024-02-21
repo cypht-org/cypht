@@ -256,9 +256,9 @@ function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domai
                 $ret .= 'Default';
             }
             $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <i class="bi bi-pencil-fill ms-3"></i></a>';
-            $ret .= '</td><td><img class="unblock_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_svg.'" />';
+            $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'"></i>';
             if (!strstr($sender, '*')) {
-                $ret .= ' <img class="block_domain_button" mailbox_id="'.$mailbox_id.'" src="'.$icon_block_domain_svg.'" />';
+                $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'"></i>';
             }
             $ret .= '</td></tr>';
         }
@@ -1212,7 +1212,6 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         $res .= '<div class="p-3">';
         return $res;
     }
@@ -1225,7 +1224,6 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
-        $res .= '<script type="text/css" src="'.WEB_ROOT.'modules/sievefilters/assets/tingle.min.css"></script>';
         return $res;
     }
 }
@@ -1324,7 +1322,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $res .=  $default_behaviour_html;
             $res .= '<table class="filter_details table"><tbody>';
             $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
-            $res .= get_blocked_senders($mailbox, $idx, $this->html_safe(Hm_Image_Sources::close('#d80f0f')), $this->html_safe(Hm_Image_Sources::$globe), $this->get('site_config'), $this->get('user_config'), $this);
+            $res .= get_blocked_senders($mailbox, $idx, 'x-circle-fill', 'globe-europe-africa', $this->get('site_config'), $this->get('user_config'), $this);
             $res .= '</tbody></table>';
             $res .= '</div></div></div>';
         }
@@ -1409,7 +1407,7 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
         }
         else {
             $checked = '';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
             $this->trans('Enable sieve filter').'</label></td>'.
@@ -1455,8 +1453,6 @@ if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
         return '<div id="edit_script_modal" class="d-none">
-            <h1 class="script_modal_title"></h1>  
-            <hr/>
             <div class="mb-2">
                 <h3 class="mb-1">General</h3>
                 <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>
@@ -1485,8 +1481,6 @@ if (!hm_exists('get_classic_filter_modal_content')) {
     function get_classic_filter_modal_content()
     {
             return '<div id="edit_filter_modal" class="d-none">
-            <h1 class="filter_modal_title"></h1>  
-            <hr/>
             <div class="mb-2">
                 <h3 class="mb-1">General</h3>
                 <small>Input a name and order for your filter. In filters, the order of execution is important. You can define an order value (or priority value) for your filter. Filters will run from lowest to highest priority value.</small>

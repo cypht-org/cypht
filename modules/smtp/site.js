@@ -87,10 +87,11 @@ var smtp_delete_action = function(event) {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                form.parent().parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
+                decrease_servers('smtp');
             }
         },
         {'smtp_delete': 1}
@@ -112,7 +113,7 @@ var smtp_delete_draft = function(id) {
 
 var send_archive = function() {
     $('.compose_post_archive').val(1);
-    document.getElementsByClassName("smtp_send")[0].click();
+    document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
 var save_compose_state = function(no_files, notice) {
@@ -139,8 +140,8 @@ var save_compose_state = function(no_files, notice) {
         return;
     }
 
-    $('.smtp_send').prop('disabled', true);
-    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_placeholder').prop('disabled', true);
+    $('.smtp_send_placeholder').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
@@ -155,8 +156,8 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_to', 'value': to},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
-            $('.smtp_send').prop('disabled', false);
-            $('.smtp_send').removeClass('disabled_input');
+            $('.smtp_send_placeholder').prop('disabled', false);
+            $('.smtp_send_placeholder').removeClass('disabled_input');
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
@@ -349,7 +350,7 @@ var text_to_bubbles = function(input) {
 
 var bubble_index = 0;
 var append_bubble = function(value, to, id, type, source) {
-    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" ondragstart="drag(event)" draggable="true" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
+    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" draggable="true"  ondragstart="drag(event)" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
     $(to).prev().append(bubble);
     bubble_index++;
 };
@@ -384,7 +385,7 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    var valid_regex = /^[\w ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/;
+    var valid_regex = /^[\p{L}|\d' ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/u;
     return recipient.match(valid_regex);
 };
 
@@ -402,14 +403,14 @@ var process_compose_form = function(){
     var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
     $('#send_uploaded_files').val(uploaded_files);
     Hm_Ajax.show_loading_icon();
-    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_placeholder').addClass('disabled_input');
     $('.smtp_send_archive').addClass('disabled_input');
     $('.smtp_send').on("click", function () { return false; });
 }
-var force_send_message = function(){
+var force_send_message = function() {
     // Check if the force_send input already exists
     var forceSendInput = document.getElementById('force_send');
-    if (!forceSendInput) {
+    if (! forceSendInput) {
         // Create a hidden input element
         var hiddenInput = document.createElement('input');
         hiddenInput.type = 'hidden';
@@ -420,10 +421,7 @@ var force_send_message = function(){
         // Append the hidden input to the form
         var form = document.querySelector('.compose_form');
         form.appendChild(hiddenInput);
-
     }
-    // Trigger the click event for the "Send" button
-    document.querySelector('.smtp_send').click()
 }
 
 $(function () {
@@ -450,8 +448,14 @@ $(function () {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_form').on('submit', function(e) {
-            e.preventDefault();
+
+        const modal = new Hm_Modal({
+            modalId: 'emptySubjectBodyModal',
+            title: 'Warning',
+            btnSize: 'sm'
+        });
+
+        $('.smtp_send_placeholder').on("click", function (e) {
             const body = $('.compose_body').val().trim();
             const subject = $('.compose_subject').val().trim();
 
@@ -478,15 +482,16 @@ $(function () {
 
             // If the user has disabled the warning, we should send the message
             if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
-                return handleSendAnyway();
+                handleSendAnyway();
             }
             // Otherwise, we should show the modal if we have a headline
-            if (modalContentHeadline) {
-                return showModal();
+            else if (modalContentHeadline) {
+                return showModal(modalContentHeadline);
             }
-
             // Subject and body are not empty, we can send the message
-            handleSendAnyway();
+            else {
+                handleSendAnyway();
+            }
 
             /*
             ========================================
@@ -494,20 +499,20 @@ $(function () {
             ========================================
             */
             function showModal() {
-                const modalContent = modalContentHeadline + `
-                <p>Are you sure you want to send this message?</p>
-                `;
-                const modalButtons = [
-                    "Cancel sending",
-                    "Send anyway",
-                    "Send anyway and don't warn me in the future",
-                ];
-                Hm_Modals.show('Warning', modalContent, modalButtons, [Hm_Modals.hide, handleSendAnyway, handleSendAnywayAndDontWarnMe]);
+                if (! modal.modalContent.html()) {
+                    modal.addFooterBtn('Send anyway', 'btn-warning', handleSendAnyway);
+                    modal.addFooterBtn("Send anyway and don't warn in the future", 'btn-warning', handleSendAnywayAndDontWarnMe);
+                }
+                modal.setContent(modalContentHeadline + `<p>Are you sure you want to send this message?</p>`);
+                modal.open();
             }
 
             function handleSendAnyway() {
-                // e.target.submit();
-                handleFiles();
+                if (handleMissingAttachment()) {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                } else {
+                    e.preventDefault();
+                }
             };
 
             function handleSendAnywayAndDontWarnMe() {
@@ -515,12 +520,12 @@ $(function () {
                 handleSendAnyway();
             };
 
-            function handleFiles() {
+            function handleMissingAttachment() {
                 var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
                 const compose_body_value = document.getElementById('compose_body').value;
                 const force_send = document.getElementById('force_send')?.value;
                 var reminder_value = $('.compose_form').data('reminder');
-                if (reminder_value === 1) {
+                if (reminder_value === 1 && force_send !== '1') {
                     let all_translated_keywords = [];
                     for (let lang in window.hm_translations) {
                         if (window.hm_translations.hasOwnProperty(lang)) {
@@ -536,18 +541,20 @@ $(function () {
                     // Build the regex pattern
                     const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
                     // Check if the pattern is found in the message
-                    if (pattern.test(compose_body_value) && uploaded_files.length === 0 && force_send !== '1') {
+                    if (pattern.test(compose_body_value) && uploaded_files.length === 0) {
+                        
                         if (confirm(hm_trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
                             force_send_message();
+                        } else {
+                            return false;
                         }
-                        e.preventDefault();
-                    } else {
-                        process_compose_form();
                     }
-                } else {
-                    process_compose_form();
                 }
+                return true;
             }
+        });
+        $('.compose_form').on('submit', function() {
+            process_compose_form();
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
@@ -581,7 +588,7 @@ $(function () {
             e.preventDefault();
             text_to_bubbles(this);
         });
-        $('.compose_subject, .compose_body, .compose_server, .smtp_send, .smtp_send_archive').on('focus', function(e) {
+        $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
             $('.compose_to, .compose_cc, .compose_bcc').each(function() {
                 bubbles_to_text(this);
             });

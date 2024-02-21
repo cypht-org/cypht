@@ -306,24 +306,12 @@ $(function () {
 
     if (hm_page_name() === 'sieve_filters') {
         /**************************************************************************************
-         *                             TINGLE SCRIPT MODAL
+         *                             BOOTSTRAP SCRIPT MODAL
          **************************************************************************************/
-        var edit_script_modal = new tingle.modal({
-            footer: true,
-            stickyFooter: false,
-            closeMethods: ['overlay', 'button', 'escape'],
-            closeLabel: "Close",
-            cssClass: ['custom-class-1', 'custom-class-2'],
-            onOpen: function () {
-            },
-            onClose: function () {
-            },
-            beforeClose: function () {
-                // here's goes some logic
-                // e.g. save content before closing the modal
-                return true; // close the modal
-                return false; // nothing happens
-            }
+        var edit_script_modal = new Hm_Modal({
+            size: 'xl',
+            modalId: 'myEditScriptModal',
+            btnSize: 'lg'
         });
 
         // set content
@@ -331,41 +319,18 @@ $(function () {
         $('#edit_script_modal').remove();
 
         // add a button
-        edit_script_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
+        edit_script_modal.addFooterBtn('Save', 'btn-success', async function () {
             save_script(current_account);
-        });
-
-        // add another button
-        edit_script_modal.addFooterBtn('Close', 'tingle-btn tingle-btn--default tingle-btn--pull-right', function () {
-            // here goes some logic
-            edit_script_modal.close();
         });
 
 
         /**************************************************************************************
-         *                             TINGLE SIEVE FILTER MODAL
+         *                             BOOTSTRAP SIEVE FILTER MODAL
          **************************************************************************************/
-        var edit_filter_modal = new tingle.modal({
-            footer: true,
-            stickyFooter: false,
-            closeMethods: ['overlay', 'button', 'escape'],
-            closeLabel: "Close",
-            cssClass: ['custom-class-1', 'custom-class-2'],
-            onOpen: function () {
-            },
-            onClose: function () {
-                $(".sieve_list_conditions_modal").html("");
-                $(".filter_actions_modal_table").html("");
-                $(".modal_sieve_filter_name").val("");
-                $(".modal_sieve_filter_priority").val("0");
-                $(".modal_sieve_filter_test").val("ALLOF");
-            },
-            beforeClose: function () {
-                // here's goes some logic
-                // e.g. save content before closing the modal
-                return true; // close the modal
-                return false; // nothing happens
-            }
+        var edit_filter_modal = new Hm_Modal({
+            size: 'xl',
+            modalId: 'myEditFilterModal',
+            btnSize: 'lg'
         });
 
         // set content
@@ -373,7 +338,7 @@ $(function () {
         $('#edit_filter_modal').remove();
 
         // add a button
-        edit_filter_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
+        edit_filter_modal.addFooterBtn('Save', 'btn-success ms-auto', async function () {
             let result = save_filter(current_account);
             if (result) {
                 edit_filter_modal.close();
@@ -381,19 +346,13 @@ $(function () {
         });
 
         // add another button
-        edit_filter_modal.addFooterBtn('Convert to code', 'tingle-btn tingle-btn--secondary', async function () {
+        edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
             let result = save_filter(current_account, true);
             if (result) {
                 edit_filter_modal.close();
             }
         });
 
-
-        // add another button
-        edit_filter_modal.addFooterBtn('Close', 'tingle-btn tingle-btn--default tingle-btn--pull-right', function () {
-            // here goes some logic
-            edit_filter_modal.close();
-        });
 
         function ordinal_number(n)
         {
@@ -572,12 +531,12 @@ $(function () {
             $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
         });
         $('.add_filter').on('click', function () {
-            $('.filter_modal_title').html('Add Filter');
+            edit_filter_modal.setTitle('Add Filter');
             current_account = $(this).attr('account');
             edit_filter_modal.open();
         });
         $('.add_script').on('click', function () {
-            $('.script_modal_title').html('Add Script');
+            edit_script_modal.setTitle('Add Script');
             $('.modal_sieve_script_textarea').val('');
             $('.modal_sieve_script_name').val('');
             $('.modal_sieve_script_priority').val('');
@@ -589,7 +548,7 @@ $(function () {
         $('.edit_filter').on('click', function (e) {
             e.preventDefault();
             let script_name = $(this).parent().parent().children().next().html();
-            $('.filter_modal_title').html(script_name);
+            edit_filter_modal.setTitle(script_name);
             edit_filter_modal.open();
         });
 
@@ -927,7 +886,7 @@ $(function () {
         $(document).on('click', '.edit_script', function (e) {
             e.preventDefault();
             let obj = $(this);
-            $('.script_modal_title').html('Edit Script');
+            edit_script_modal.setTitle('Edit Script');
             current_account = $(this).attr('account');
             is_editing_script = true;
             current_editing_script_name = $(this).attr('script_name');

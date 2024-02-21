@@ -75,6 +75,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
 class Hm_Handler_load_contacts extends Hm_Handler_Module {
     public function process() {
         $contacts = new Hm_Contact_Store();
+        $contacts->init($this->user_config, $this->session);
         $page = 1;
         if (array_key_exists('contact_page', $this->request->get)) {
             $page = $this->request->get['contact_page'];
@@ -176,7 +177,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     '<i class="bi bi-person-fill"></i> '.
                     '</d><td>'.$this->html_safe($contact->value('type')).'<td><span class="contact_src">'.
                     ($contact->value('source') == 'local' ? '' : $this->html_safe($contact->value('source'))).'</span>'.
-                    '</td><td>'.$this->html_safe($name).'</td>'.
+                    '</td><td>' . $this->html_safe($name) . '</td>' .
                     '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
                     '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
                     $this->html_safe($contact->value('phone_number')).'</a></td>'.
@@ -219,18 +220,23 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
     protected function output() {
         $suggestions = array();
         foreach ($this->get('contact_suggestions', array()) as $item) {
-            if(is_array($item)){
+            if (is_array($item)) {
                 $contact = $item[1];
                 $contact_id = $item[0];
 
                 if (trim($contact->value('display_name'))) {
                     $suggestions[] = $this->html_safe(sprintf(
-                        '{"contact_id":%s, "contact": "%s %s", "type": "%s", "source": "%s"}', $contact_id, $contact->value('display_name'), $contact->value('email_address'), $contact->value('type'), $contact->value('source')
+                        '{"contact_id":%s, "contact": "%s %s", "type": "%s", "source": "%s"}',
+                        $contact_id,
+                        $contact->value('display_name'),
+                        $contact->value('email_address'),
+                        $contact->value('type'),
+                        $contact->value('source')
                     ));
-                }
-                else {
+                } else {
                     $suggestions[] = $this->html_safe(sprintf(
-                        '%s', $contact->value('email_address')
+                        '%s',
+                        $contact->value('email_address')
                     ));
                 }
             }

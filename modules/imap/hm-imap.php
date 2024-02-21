@@ -22,6 +22,10 @@ class Hm_IMAP_List {
 
     public static $use_cache = true;
 
+    public static function init($user_config, $session) {
+        self::initRepo('imap_servers', $user_config, $session, self::$server_list);
+    }
+
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
             self::$server_list[$id]['object'] = new Hm_JMAP();

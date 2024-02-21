@@ -1,15 +1,6 @@
-.pgp_section { width: 80%; margin-left: 50px; text-align: right; }
-.pgp_section input, .pgp_section label, .pgp_section select { margin-right: 10px; }
-.pgp_section select { overflow-y: auto; }
 .pgp_block { margin-bottom: 30px; margin-left: 40px; padding-top: 20px; }
-.pgp_keys { width: 50%; padding-left: 30px; margin-top: 20px; }
-.pgp_keys th { color: #666; padding: 5px; padding-bottom: 2px; border-bottom: solid 1px #eee; font-weight: normal; text-align: left; }
-.pgp_keys td { padding: 10px; }
-.pgp_keys td img { opacity: .6; }
-.pgp_subblock { margin-bottom: 40px; }
 .priv_keys, .public_keys { display: none; }
 .private_key_count, .key_count { float: right; margin-right: 120px; font-size: 90%; }
 .pgp_msg_controls { display: none; position: absolute; right: 20px; top: 70px; }
 .pgp_sign { display: none; }
-.delete_pgp_key { border: none !important; width: 16px; height: 16px; cursor: pointer; opacity: .7}
 .passphrase_prompt { display: none; text-align: center; top: 0px; padding: 20px; background-color: #fff; position: absolute; z-index: 101; left: 0; right: 0; margin: auto; width: 300px; border: solid 1px #ccc; border-top: none; }

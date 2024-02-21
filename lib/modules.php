@@ -406,6 +406,19 @@ function add_handler($page, $mod, $logged_in, $source=false, $marker=false, $pla
 }
 
 /**
+ * Add a repository to the module
+ *
+ * Repository name for ProfileRepository class is 'profile'
+ * Filename for ProfileRepository class is 'profile'
+ *
+ * @param $class_name
+ * @return void
+ */
+function add_repository($repository_name) {
+
+}
+
+/**
  * Add an output module to a specific page
  * @param string $mod name of the module to add
  * @param bool $logged_in true if the module should only fire when logged in

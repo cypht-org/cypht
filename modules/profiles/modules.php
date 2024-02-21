@@ -8,7 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require APP_PATH.'modules/profiles/hm-profiles.php';
+require_once APP_PATH.'modules/profiles/hm-profiles.php';
 require APP_PATH.'modules/profiles/functions.php';
 
 /**
@@ -21,12 +21,17 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
             $id = $this->request->get['profile_id'];
         }
         $accounts = $this->get('profiles');
-        if ($id !== false) {
-            if (count($accounts) > $id) {
-                $this->out('edit_profile', $accounts[$id]);
-                $this->out('default_email_domain', $this->config->get('default_email_domain'));
-                $this->out('edit_profile_id', $id);
+
+        foreach ($accounts as $acc) {
+            if ($acc['id'] == $id) {
+                $account = $acc;
             }
+        }
+
+        if ($id !== false) {
+            $this->out('edit_profile', $account);
+            $this->out('default_email_domain', $this->config->get('default_email_domain'));
+            $this->out('edit_profile_id', $id);
         }
         else {
             $this->out('new_profile_id', count($accounts));
@@ -39,18 +44,15 @@ class Hm_Handler_profile_edit_data extends Hm_Handler_Module {
  */
 class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
     public function process() {
-        $profiles = new Hm_Profiles($this);
+        Hm_Profiles::init($this);
         $compose_profiles = array();
-        $all_profiles = array();
-        foreach ($profiles->list_all() as $id => $vals) {
-            $vals['id'] = $id;
-            if ($vals['smtp_id'] !== false && $vals['smtp_id'] !== '') {
+        foreach (Hm_Profiles::getAll() as $id => $vals) {
+            if (! empty($vals['smtp_id'])) {
                 $compose_profiles[] = $vals;
             }
-            $all_profiles[] = $vals;
         }
         $this->out('compose_profiles', $compose_profiles);
-        $this->out('profiles', $all_profiles);
+        $this->out('profiles', Hm_Profiles::getAll());
     }
 }
 
@@ -63,21 +65,17 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-        $data = $this->get('profiles');
-        if (count($data) > $form['profile_id']) {
-            $profiles = new Hm_Profiles($this);
-            $del_profile = $profiles->get($form['profile_id']);
-            if ($del_profile && array_key_exists('autocreate', $del_profile)) {
+
+        if (($profile = Hm_Profiles::get($form['profile_id']))) {
+            if (array_key_exists('autocreate', $profile)) {
                 Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
                 return;
             }
-            if ($profiles->del($form['profile_id'])) {
-                $this->session->record_unsaved('Profile deleted');
-                Hm_Msgs::add('Profile Deleted');
-                $profiles->save($this->user_config);
-                $user_data = $this->user_config->dump();
-                $this->session->set('user_data', $user_data);
-            }
+            Hm_Profiles::del($form['profile_id']);
+            Hm_Msgs::add('Profile Deleted');
+        } else {
+            Hm_Msgs::add('ERRProfile ID not found');
+            return;
         }
     }
 }
@@ -115,7 +113,6 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $default = true;
         }
 
-        $data = $this->get('profiles');
         $profile = array(
             'name' => html_entity_decode($form['profile_name'], ENT_QUOTES),
             'sig' => $sig,
@@ -127,25 +124,16 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             'user' => $user,
             'type' => 'imap'
         );
-        $profiles = new Hm_Profiles($this);
-        if (count($data) > $form['profile_id']) {
-            if ($profiles->edit($form['profile_id'], $profile)) {
-                $this->session->record_unsaved('Profile updated');
-                Hm_Msgs::add('Profile Updated');
-            }
+        if (Hm_Profiles::get($form['profile_id'])) {
+            $profile['id'] = $form['profile_id'];
+            Hm_Profiles::edit($form['profile_id'], $profile);
+        } else {
+            Hm_Profiles::add($profile);
         }
-        else {
-            if ($profiles->add($profile)) {
-                $this->session->record_unsaved('Profile added');
-                Hm_Msgs::add('Profile Added');
-            }
-        }
+
         if ($default) {
-            $profiles->set_default($form['profile_id']);
+            Hm_Profiles::setDefault($form['profile_id']);
         }
-        $profiles->save($this->user_config);
-        $user_data = $this->user_config->dump();
-        $this->session->set('user_data', $user_data);
     }
 }
 
@@ -154,9 +142,8 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
  */
 class Hm_Handler_profile_data extends Hm_Handler_Module {
     public function process() {
-        $accounts = array();
-        $profiles = new Hm_Profiles($this);
-        $this->out('profiles', $profiles->list_all());
+        Hm_Profiles::init($this);
+        $this->out('profiles', Hm_Profiles::getAll());
     }
 }
 
@@ -282,7 +269,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($smtp).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($id).'" title="'.$this->trans('Edit').'">'.
+                    '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-gear-fill"></i></a></td>'.
                     '</tr>';
             }
@@ -347,7 +334,11 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div class="form-floating mb-3">';
     $res .= '<select required name="profile_smtp" class="form-select">';
     foreach ($smtp_servers as $id => $server) {
-        $res .= '<option '.(($id == $form_vals['smtp_id']) ? 'selected="selected"' : '').' value="'.$out_mod->html_safe($id).'">'.$out_mod->html_safe($server['name']).'</option>';
+        $res .= '<option ';
+        if ($server['id'] == $form_vals['smtp_id']) {
+            $res .= 'selected="selected"';
+        }
+        $res .= 'value="'.$out_mod->html_safe($server['id']).'">'.$out_mod->html_safe($server['name']).'</option>';
     }
     $res .= '</select>';
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';

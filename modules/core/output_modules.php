@@ -70,8 +70,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><img alt="'.$this->trans('Save').'" src="'.
-                Hm_Image_Sources::$save.'" width="20" height="20" /></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
         }
         return '';
     }
@@ -444,9 +443,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
         }
         if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
             $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
-                '"><img src="'.Hm_Image_Sources::$save_reminder.
-                '" alt="'.$this->trans('Unsaved changes').
-                '" class="unsaved_reminder" /></a>';
+                '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
         return $res;
     }
@@ -507,9 +504,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
         if (DEBUG_MODE) {
             $res .= '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
             $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
-            foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
-                $mod = str_replace(array('modules/', '/'), '', $rel_name);
+                $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
                     $res .= '<link href="'.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
@@ -542,10 +539,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
         if (DEBUG_MODE) {
             $res = '';
             $js_lib = '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/cash.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/tingle.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script>';
             $js_lib .= '<script type="text/javascript" src="third_party/sortable.min.js"></script>';
@@ -554,13 +549,13 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
             $core = false;
             $mods = $this->get('router_module_list');
-            foreach (glob(APP_PATH.'modules/**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
+            foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
-                if ($rel_name == 'modules/core/') {
+                if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
                     $core = $rel_name;
                     continue;
                 }
-                $mod = str_replace(array('modules/', '/'), '', $rel_name);
+                $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
                     $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $rel_name).'"></script>';
                 }
@@ -605,6 +600,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
     protected function output() {
         $res = '<script type="text/javascript">'.
             'var globals = {};'.
+            'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
             'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
@@ -617,7 +613,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_encrypt_ajax_requests = function() { return "'.$this->html_safe($this->get('encrypt_ajax_requests', '')).'"; };'.
             'var hm_encrypt_local_storage = function() { return "'.$this->html_safe($this->get('encrypt_local_storage', '')).'"; };'.
             'var hm_web_root_path = function() { return "'.WEB_ROOT.'"; };'.
-            'var hm_flag_image_src = function() { return "'.Hm_Image_Sources::$star.'"; };'.
+            'var hm_flag_image_src = function() { return "<i class=\"bi bi-star-half\"></i>"; };'.
             'var hm_check_dirty_flag = function() { return '.($this->get('warn_for_unsaved_changes', '') ? '1' : '0').'; };'.
             format_data_sources($this->get('data_sources', array()), $this);
 
@@ -630,7 +626,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
         $res .= 'window.hm_current_lang = "'.$this->lang.'";'.
             'window.hm_translations = '.json_encode($this->all_trans()).';'.
             'var hm_trans = function(key, lang = window.hm_current_lang) {'.
-            '    const langTranslations = window.translations && window.translations[lang];'.
+            '    const langTranslations = window.hm_translations && window.hm_translations[lang];'.
             '    if (langTranslations && langTranslations[key] !== undefined && langTranslations[key] !== false) {'.
             '        return langTranslations[key];'.
             '    }'.
@@ -698,7 +694,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
             if ($start_page == $val) {
                 $res .= 'selected="selected" ';
                 if ($start_page != 'none') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -735,7 +731,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
             if ($default_sort_order == $val) {
                 $res .= 'selected="selected" ';
                 if ($default_sort_order != 'arrival') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -772,7 +768,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             if ($list_style == $val) {
                 $res .= 'selected="selected" ';
                 if ($list_style != 'email_style') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -790,7 +786,7 @@ class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('mailto_handler', $settings) && $settings['mailto_handler']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -809,7 +805,7 @@ class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('no_folder_icons', $settings) && $settings['no_folder_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -828,7 +824,7 @@ class Hm_Output_no_password_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('no_password_save', $settings) && $settings['no_password_save']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -847,7 +843,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('disable_delete_prompt', $settings) && $settings['disable_delete_prompt']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -959,7 +955,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
             $sources = $settings['unread_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="unread_setting"><td><label for="unread_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1003,7 +999,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
             $sources = $settings['flagged_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1050,7 +1046,7 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_email_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1074,7 +1070,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1150,7 +1146,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             if ($id == $mylang) {
                 $res .= 'selected="selected" ';
                 if ($id != 'en') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$id.'">'.$lang.'</option>';
@@ -1185,7 +1181,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             if ($zone == $myzone) {
                 $res .= 'selected="selected" ';
                 if ($zone != 'Africa/Abidjan') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';
@@ -1206,7 +1202,7 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('show_list_icons', $settings) && $settings['show_list_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">'.
             $this->trans('Show icons in message lists').'</label></td>'.
@@ -1241,7 +1237,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<img alt="" src="'.Hm_Image_Sources::$menu.'" width="16" height="20" /></a>'.
+        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-menu-up"></i></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -1570,8 +1566,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<img src="'.Hm_Image_Sources::$big_caret_left.
-            '" alt="'.$this->trans('Collapse').'" width="16" height="16" /></a>';
+        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-down-fill"'.'" alt="'.$this->trans('Collapse').'></i></a>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1652,9 +1647,9 @@ class Hm_Output_message_start extends Hm_Output_Module {
                 if (($key = array_search($list_name, $mb_title)) !== false) {
                     unset($mb_title[$key]);
                 }
-                $title .= '<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />'.
+                $title .= '<i class="bi bi-caret-right-fill path_delim"></i>'.
                     '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
-                    implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
+                    implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                     array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
         }
@@ -1670,7 +1665,7 @@ class Hm_Output_message_start extends Hm_Output_Module {
                 $url .= '&sort='.$this->html_safe($this->get('list_sort'));
             }
             $title = '<a href="'.$url.'">'.
-                implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" />',
+                implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                 array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()))).'</a>';
         }
         else {
@@ -1832,7 +1827,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res = '';
         $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center">';
         $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
-            implode('<img class="path_delim" src="'.Hm_Image_Sources::$caret.'" alt="&gt;" width="8" height="8" />', array_map( function($v) { return $this->trans($v); },
+            implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
         if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
@@ -1909,7 +1904,7 @@ class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
             $sources = $settings['junk_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="junk_setting"><td><label for="junk_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1968,7 +1963,7 @@ class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
             $sources = $settings['trash_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="trash_setting"><td><label for="trash_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2027,7 +2022,7 @@ class Hm_Output_drafts_source_max_setting extends Hm_Output_Module {
             $sources = $settings['drafts_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="drafts_setting"><td><label for="drafts_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2066,7 +2061,7 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('warn_for_unsaved_changes', $settings) && $settings['warn_for_unsaved_changes']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="warn_for_unsaved_changes">'.
             $this->trans('Warn for unsaved changes').'</label></td>'.

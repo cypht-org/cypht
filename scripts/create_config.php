@@ -37,7 +37,7 @@ function check_php() {
     $pdo = class_exists('PDO');
     $ssl = function_exists('openssl_random_pseudo_bytes');
 
-    return '<div class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$caret.'" /> PHP Support '.
+    return '<div class="settings_subtitle"><i class="bi bi-caret-down-fill"></i> PHP Support '.
         (Hm_Dispatch::is_php_setup() ? '<span class="yes">&#10003;</span>' : '<span class="no">X</span>' ).
         '</div><div class="config_settings_container">'.
         '<table class="settings_table config_settings">'.
@@ -189,7 +189,7 @@ function db_driver_setting($current) {
 }
 
 function output_settings($settings) {
-    echo '<div class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$caret.'" /> Settings</div>'.
+    echo '<div class="settings_subtitle"><i class="bi bi-caret-down-fill"></i> Settings</div>'.
         '<div class="config_settings_container">'.
         '<table class="settings_table settings config_settings">';
     foreach (setting_defaults() as $title => $vals) {
@@ -255,8 +255,7 @@ function setting_defaults() {
 }
 
 function output_modules($settings) {
-    echo '<div class="settings_subtitle"><img alt="" src="'.Hm_Image_Sources::$caret.
-        '" /> Module Sets</div><div class="config_settings_container">'.
+    echo '<div class="settings_subtitle"><i class="bi bi-caret-down-fill"></i> Module Sets</div><div class="config_settings_container">'.
         '<table class="settings_table config_settings">';
     $mod_str = 'core,contacts,feeds,imap,smtp,site,account,idle_timer,calendar,'.
         'themes,nux,developer,github,wordpress,history,saved_searches,nasa';

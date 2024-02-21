@@ -304,13 +304,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
  */
 class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
-        $servers = $this->user_config->get('smtp_servers', array());
-        $index = 0;
-        foreach ($servers as $server) {
-            Hm_SMTP_List::add( $server, $index );
-            $index++;
-        }
-        if (count($servers) == 0 && $this->page == 'compose') {
+        Hm_SMTP_List::init($this->user_config, $this->session);
+        if (Hm_SMTP_List::count() == 0 && $this->page == 'compose') {
             Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
         }
         $draft = array();
@@ -389,7 +384,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                     $tls = true;
                 }
                 if ($con = @fsockopen($form['new_smtp_address'], $form['new_smtp_port'], $errno, $errstr, 2)) {
-                    Hm_SMTP_List::add( array(
+                    Hm_SMTP_List::add(array(
                         'name' => $form['new_smtp_name'],
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
@@ -427,8 +422,7 @@ class Hm_Handler_add_smtp_servers_to_page_data extends Hm_Handler_Module {
  */
 class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
     public function process() {
-        $servers = Hm_SMTP_List::dump(false, true);
-        $this->user_config->set('smtp_servers', $servers);
+        Hm_SMTP_List::save();
     }
 }
 
@@ -496,7 +490,6 @@ class Hm_Handler_smtp_delete extends Hm_Handler_Module {
                 if ($res) {
                     $this->out('deleted_server_id', $form['smtp_server_id']);
                     Hm_Msgs::add('Server deleted');
-                    $this->session->record_unsaved('SMTP server deleted');
                 }
             }
         }
@@ -517,10 +510,8 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
                         if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $form['smtp_server_id']));
-                            $servers = Hm_SMTP_List::dump(false, true);
-                            $this->user_config->set('smtp_servers', $servers);
-                            $this->session->set('user_data', $this->user_config->dump());
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']));
+                            Hm_SMTP_List::save();
                         }
                     }
                 }
@@ -904,7 +895,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -973,14 +964,13 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
         if (!count($drafts)) {
             return;
         }
-        $res = '<img class="draft_title refresh_list" width="24" height="24" src="'.
-            Hm_Image_Sources::$doc.'" title="'.$this->trans('Drafts').'" alt="'.$this->trans('Drafts').'" />';
+        $res = '<i class="bi bi-pencil-square draft_title refresh_list" title="'.$this->trans('Drafts').'"></i>';
         $res .= '<div class="draft_list">';
         foreach ($drafts as $id => $draft) {
             $subject = trim($draft['draft_subject']) ? trim($draft['draft_subject']) : 'Draft '.($id+1);
             $res .= '<div class="draft_'.$this->html_safe($id).'"><a class="draft_link" href="?page=compose&draft_id='.
                 $this->html_safe($id).'">'.$this->html_safe($subject).'</a> '.
-                '<img class="delete_draft" width="16" height="16" data-id="'.$this->html_safe($id).'" src="'.Hm_Image_Sources::$circle_x.'" /></div>';
+                '<i class="bi bi-x-circle-fill delete_draft" data-id="'.$this->html_safe($id).'"></i></div>';
         }
         $res .= '</div>';
         return $res;
@@ -1112,29 +1102,29 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
                 
-                '<div class="form-floating mb-3 to_outer compose_container position-relative">'.
-                    '<div class="bubbles bubble_dropdown"></div>'.
-                    '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to form-control" type="text" placeholder="'.$this->trans('To').' kiki" id="compose_to" />'.
-                    '<label for="compose_to">'.$this->trans('To').'</label>'.
-                    '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 mt-2 me-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
-                '</div>'.
-                '<div id="to_contacts"></div>'.
-                '<div class="recipient_fields">'.
-                    '<div class="form-floating mb-3 compose_container">'.
+                '<div class="to_outer">'.
+                    '<div class="mb-3 position-relative compose_container p-1 w-100">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc form-control" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
-                        '<label for="compose_cc">'.$this->trans('Cc').'</label>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
+                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
+                        '<div id="to_contacts"></div>'.
+                    '</div>'.
+                '</div>'.
+
+                '<div class="recipient_fields">'.
+                    '<div class="mb-3 compose_container">'.
+                        '<div class="bubbles bubble_dropdown"></div>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
                     '</div>'.
                     '<div id="cc_contacts"></div>'.
-                    '<div class="form-floating mb-3 compose_container">'.
+                    '<div class="mb-3 compose_container">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
-                        '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc form-control" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
-                        '<label for="compose_bcc">'.$this->trans('Bcc').'</label>'.
+                        '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
                     '</div>'.
                     '<div id="bcc_contacts"></div>'.
                 '</div>'.
                 '<div class="form-floating mb-3">'.
-                    '<input value="'.$this->html_safe($subject).'" required name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
+                    '<input value="'.$this->html_safe($subject).'" name="compose_subject" class="compose_subject form-control" type="text" placeholder="'.$this->trans('Subject').'" id="compose_subject" />'.
                     '<label for="compose_subject">'.$this->trans('Subject').'</label>'.
                 '</div>'.
                 '<div class="form-floating mb-3">'.
@@ -1201,7 +1191,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
-            '<input class="smtp_send btn btn-success mt-3" type="submit" value="'.$this->trans('Send').'" name="smtp_send" '.$send_disabled.'/>';
+            '<button class="smtp_send_placeholder btn btn-success mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>';
 
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
             $res .= '<input class="smtp_send_archive btn btn-success mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
@@ -1312,7 +1302,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if ($selected != 0) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
@@ -1333,7 +1323,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;
@@ -1505,36 +1495,36 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
         $selected = false;
         $default = false;
         foreach ($data['smtp_servers'] as $id => $vals) {
-            foreach (profiles_by_smtp_id($profiles, $id) as $index => $profile) {
+            foreach (profiles_by_smtp_id($profiles, $vals['id']) as $index => $profile) {
                 if ($profile['default']) {
-                    $default = $id.'.'.($index + 1);
+                    $default = $vals['id'].'.'.($index + 1);
                 }
-                if ((string) $selected_id === sprintf('%s.%s', $id, ($index + 1))) {
-                    $selected = $id.'.'.($index + 1);
+                if ((string) $selected_id === sprintf('%s.%s', $vals['id'], ($index + 1))) {
+                    $selected = $vals['id'].'.'.($index + 1);
                 }
                 elseif ($recip && trim($recip) == $profile['address']) {
-                    $selected = $id.'.'.($index + 1);
+                    $selected = $vals['id'].'.'.($index + 1);
                 }
             }
-            if (!$selected && $selected_id !== false && $id == $selected_id) {
-                $selected = $id;
+            if (!$selected && $selected_id !== false && $vals['id'] == $selected_id) {
+                $selected = $vals['id'];
             }
             if (!$selected && $recip && trim($recip) == trim($vals['user'])) {
-                $selected = $id;
+                $selected = $vals['id'];
             }
         }
         if ($selected === false && $default !== false) {
             $selected = $default;
         }
         foreach ($data['smtp_servers'] as $id => $vals) {
-            $smtp_profiles = profiles_by_smtp_id($profiles, $id);
+            $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
                     $res .= '<option ';
-                    if ((string) $selected === sprintf('%s.%s', $id, ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($id))) {
+                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
                         $res .= 'selected="selected" ';
                     }
-                    $res .= 'value="'.$output_mod->html_safe($id.'.'.($index+1)).'">';
+                    $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
                     $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $profile['address'], $vals['name']));
                     $res .= '</option>';
                 }
@@ -1544,7 +1534,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                 if ($selected === $id) {
                     $res .= 'selected="selected" ';
                 }
-                $res .= 'value="'.$output_mod->html_safe($id).'">';
+                $res .= 'value="'.$output_mod->html_safe($vals['id']).'">';
                 $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
                 $res .= '</option>';
             }
@@ -1673,7 +1663,7 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
     $addresses = array_unique($addresses);
     foreach ($addresses as $address) {
         foreach ($smtp_servers as $id => $vals) {
-            foreach (profiles_by_smtp_id($profiles, $id) as $profile) {
+            foreach (profiles_by_smtp_id($profiles, $vals['id']) as $profile) {
                 if ($profile['address'] == $address) {
                     return $address;
                 }
@@ -2007,10 +1997,8 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
             if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %d', $smtp_id));
-                $servers = Hm_SMTP_List::dump(false, true);
-                $mod->user_config->set('smtp_servers', $servers);
-                $mod->session->set('user_data', $mod->user_config->dump());
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id));
+                Hm_SMTP_List::save();
             }
         }
     }
@@ -2065,9 +2053,9 @@ if (!hm_exists('server_from_compose_smtp_id')) {
 function server_from_compose_smtp_id($id) {
     $pos = strpos($id, '.');
     if ($pos === false) {
-        return intval($id);
+        return $id;
     }
-    return intval(substr($id, 0, $pos));
+    return substr($id, 0, $pos);
 }}
 
 /**
@@ -2134,10 +2122,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     }
     $smtp_port = $config->get('default_smtp_port', 465);
     $smtp_tls = $config->get('default_smtp_tls', true);
-    $servers = $user_config->get('smtp_servers', array());
-    foreach ($servers as $index => $server) {
-        Hm_SMTP_List::add($server, $index);
-    }
+    Hm_SMTP_List::init($user_config, $session);
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
@@ -2151,10 +2136,6 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
         $attributes['no_auth'] = true;
     }
     Hm_SMTP_List::add($attributes);
-    $smtp_servers = Hm_SMTP_List::dump(false, true);
-    $user_config->set('smtp_servers', $smtp_servers);
-    $user_data = $user_config->dump();
-    $session->set('user_data', $user_data);
     Hm_Debug::add('Default SMTP server added');
 }}
 

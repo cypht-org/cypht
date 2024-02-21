@@ -10,8 +10,11 @@ var imap_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                const configured_server = form.closest('.configured_server');
+                const section = configured_server.parent().parent()[0].classList.contains('imap_section') ? 'imap': 'jmap';
+                decrease_servers(section);
+                configured_server.remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
             }
@@ -1073,11 +1076,6 @@ var imap_folder_status = function() {
 };
 
 var imap_setup_snooze = function() {
-    $(document).on('click', '#snooze_message', function(e) {
-        e.preventDefault();
-        $('.snooze_dropdown').toggle();
-        $('.snooze_input').hide();
-    });
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
     });
@@ -1192,8 +1190,10 @@ $(function() {
         imap_setup_snooze();
     }
 
-    imap_unsnooze_messages();
-    setInterval(imap_unsnooze_messages, 60000);
+    if (hm_is_logged()) {
+        imap_unsnooze_messages();
+        setInterval(imap_unsnooze_messages, 60000);
+    }
 
     if ($('.imap_move').length > 0) {
         check_select_for_imap();

@@ -67,14 +67,12 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
 
             if ($this->get('custom_list_controls_type') == 'remove') {
                 $custom .= '<a class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
-                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.
-                    '" alt="'.$this->trans('Remove').'"/></a><a style="display: none;" class="add_source" title="'.
+                    '" href=""><i class="bi bi-x-circle-fill refresh_list"></i></a><a style="display: none;" class="add_source" title="'.
                     $this->trans('Add this folder to combined pages').'" href=""><i class="bi bi-check-circle-fill refresh_list"></i></a>';
             }
             else {
                 $custom .= '<a style="display: none;" class="remove_source" title="'.$this->trans('Remove this folder from combined pages').
-                    '" href=""><img width="20" height="20" class="refresh_list" src="'.Hm_Image_Sources::$circle_x.'" alt="'.
-                    $this->trans('Remove').'"/></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
+                    '" href=""><i class="bi bi-x-circle-fill refresh_list"></i></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
                     '" href=""><i class="bi bi-check-circle-fill refresh_list"></i></a>';
             }
             $this->out('custom_list_controls', $custom);
@@ -184,7 +182,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <img alt="" class="account_icon" src="'.Hm_Image_Sources::$star.'" width="16" height="16" /> ';
+                                $txt .= ' <i class="bi bi-star-half account_icon"></i> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
@@ -424,6 +422,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            $server_id = $vals['id'];
             $type = 'IMAP';
 
             if (array_key_exists('type', $vals) && $vals['type'] == 'jmap') {
@@ -465,28 +464,28 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
 
             $res .= '<form class="imap_connect d-flex gap-3" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             
             // IMAP Username
-            $res .= '<div class="form-floating">';
-            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
-            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('IMAP username').'</label></div>';
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('IMAP username').'</label></div>';
             
             // IMAP Password
-            $res .= '<div class="form-floating">';
-            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
-            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('IMAP password').'</label></div>';
+            $res .= '<div class="form-floating mb-3">';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('IMAP password').'</label></div>';
             
             // Sieve Host (Conditional)
             if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
                 $default_value = $vals['sieve_config_host'];
-                $res .= '<div class="form-floating">';
-                $res .= '<input '.$disabled.' id="imap_sieve_host_'.$index.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
-                $res .= '<label for="imap_sieve_host_'.$index.'">'.$this->trans('Sieve Host').'</label></div>';
+                $res .= '<div class="form-floating mb-3">';
+                $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
+                $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
             
             $res .= '<div class="d-flex align-item-center p-4">';
-            
+
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
@@ -502,7 +501,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
             
-            
+
             $res .= '</div>';
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             $res .= '</form>';
@@ -619,7 +618,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
         }
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-
+            $server_id = $vals['id'];
             if (!array_key_exists('type', $vals) || $vals['type'] != 'jmap') {
                 continue;
             }
@@ -648,21 +647,21 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             }
             $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
-            $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']));
             
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
 
             // JMAP Username
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_user_'.$index.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
-            $res .= '<label for="imap_user_'.$index.'">'.$this->trans('JMAP username').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('JMAP username').'</label></div>';
 
             // JMAP Password
             $res .= '<div class="form-floating mb-3">';
-            $res .= '<input '.$disabled.' id="imap_pass_'.$index.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
-            $res .= '<label for="imap_pass_'.$index.'">'.$this->trans('JMAP password').'</label></div>';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('JMAP password').'</label></div>';
 
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
@@ -700,8 +699,8 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$index.'"></td>'.
-                '<td class="imap_detail_'.$index.'"></td></tr>';
+            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
+                '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
         }
         return $res;
     }
@@ -796,7 +795,7 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
         $res = '';
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                $res .= '<li class="imap_'.intval($id).'_"><a href="#" class="imap_folder_link" data-target="imap_'.intval($id).'_">';
+                $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
                 }
@@ -1035,7 +1034,7 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
@@ -1055,7 +1054,7 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
         if (!array_key_exists('pagination_links', $settings) || (array_key_exists('pagination_links', $settings) && $settings['pagination_links'])) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
             $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
@@ -1112,7 +1111,7 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
             $per_page = $settings['imap_per_page'];
         }
         if ($per_page != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
             $this->trans('Messages per page for IMAP folder views').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
@@ -1133,7 +1132,7 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
             $max_google_contacts_number = $settings['max_google_contacts_number'];
         }
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
             $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
@@ -1152,7 +1151,7 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('msg_part_icons', $settings) && $settings['msg_part_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
@@ -1171,7 +1170,7 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('text_only', $settings) && $settings['text_only']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
@@ -1192,7 +1191,7 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
             $sources = $settings['sent_per_source'];
         }
         if ($sources != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1211,7 +1210,7 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
@@ -1229,7 +1228,7 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('review_sent_email', $settings) && $settings['review_sent_email']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
@@ -1319,7 +1318,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                         </div>
                       </div>
                    ';
-            
+
                      if (!$this->get('sieve_filters_enabled')) {
                          $default_value = '';
                              $res .=  '

@@ -23,13 +23,13 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
             }
-            elseif (preg_match("/^feeds_\d+$/", $path)) {
+            elseif (preg_match("/^feeds_.+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
-                $details = Hm_Feed_List::dump(intval($parts[1]));
+                $details = Hm_Feed_List::dump($parts[1]);
                 if (!empty($details)) {
                     $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
@@ -414,12 +414,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
  */
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     public function process() {
-        $feeds = $this->user_config->get('feeds', array());
-        $index = 0;
-        foreach ($feeds as $index => $feed) {
-            Hm_Feed_List::add($feed, $index);
-            $index++;
-        }
+        Hm_Feed_List::init($this->user_config, $this->session);
         Hm_Feed_Uid_Cache::load($this->cache->get('feed_read_uids', array(), true));
     }
 }
@@ -449,7 +444,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
-            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
         
     }
@@ -481,7 +476,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 $callback = 'feeds_combined_content';
                 break;
             default:
-                if (preg_match("/^feeds_(\d+)$/", $path, $matches)) {
+                if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
                     $server_id = $matches[1];
                     $callback = 'load_feed_list';
                 }
@@ -492,7 +487,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 if ($server_id !== false && $index != $server_id) {
                     continue;
                 }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
             }
         }
     }
@@ -503,8 +498,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
  */
 class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
-        $feeds = Hm_Feed_List::dump();
-        $this->user_config->set('feeds', $feeds);
+        Hm_Feed_List::save();
         $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0, true);
     }
 }
@@ -840,7 +834,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('unread_exclude_feeds', $settings) && $settings['unread_exclude_feeds']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -903,7 +897,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $limit = $settings['feed_limit'];
         }
         if ($limit != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
             '<td><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
@@ -916,7 +910,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
 if (!hm_exists('feed_source_callback')) {
 function feed_source_callback($vals, $style, $output_mod) {
     if ($vals[2]) {
-        $img = '<img alt="'.$output_mod->trans('feed item').'" src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+        $img = '<i class="bi bi-rss-fill"></i>';
     }
     else {
         $img = '';

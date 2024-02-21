@@ -57,25 +57,25 @@ return array(
         'ajax_nux_add_service'
     ),
     'allowed_get' => array(
-        'code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'state' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'error' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'security_token' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'code' => FILTER_DEFAULT,
+        'state' => FILTER_DEFAULT,
+        'error' => FILTER_DEFAULT,
+        'security_token' => FILTER_DEFAULT
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
         'service_details' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
         'nux_server_id' => array(FILTER_VALIDATE_INT, false),
-        'nux_service_name' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
+        'nux_service_name' => array(FILTER_DEFAULT, false)
     ),
     'allowed_post' => array(
-        'nux_service' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'nux_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'nux_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'nux_service' => FILTER_DEFAULT,
+        'nux_email' => FILTER_DEFAULT,
+        'nux_name' => FILTER_DEFAULT,
         'nux_pass' => FILTER_UNSAFE_RAW,
-        'nux_account_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'nux_all_inkl_login' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'nux_account_name' => FILTER_DEFAULT,
+        'nux_all_inkl_login' => FILTER_DEFAULT
     )
 );
 

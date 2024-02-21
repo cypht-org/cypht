@@ -306,47 +306,81 @@ var Hm_Ajax_Request = function() { return {
 /**
  * Show a modal dialog with a title, content and buttons.
  */
-const Hm_Modals = {
-    /**
-     * show the modal
-     * @param {string | HTMLElement} title title of the modal
-     * @param {string | HTMLElement} content content of the modal
-     * @param {Array<string>} btnsTexts buttons texts
-     * @param {Array<Function>} btnsCbs array of callbacks for each button @default Hm_Modals.hide()
-     */
-    show: function (title = '', content = '', btnsTexts = [], btnsCbs = []) {
+function Hm_Modal(options) {
+    var defaults = {
+        title: 'Cypht',
+        size: '',
+        btnSize: '',
+        modalId: 'myModal',
+    };
+  
+    this.opts = { ...defaults, ...options };
+
+    this.init = function () {
+        if (this.modal) {
+            return;
+        }
+
         const modal = `
-            <div id="cypht-modal" class="cypht-modal">
-                <div class="cypht-modal-bg"></div>
-                <div class="cypht-modal-content">
-                    <span class="cypht-modal-content-close">&times;</span>
-                    <div class="cypht-modal-header">
-                        ${title}
-                    </div>
+            <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${this.opts.title}</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
 
-                    <div class="cypht-modal-body">
-                        ${content}
-                    </div>
+                        <div class="modal-body"></div>
 
-                    <div class="cypht-modal-footer">
-                        ${btnsTexts.map((text, index) => `<button class="cypht-modal-btn-${index + 1}">${text}</button>`).join('')}
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
-        document.querySelector('body').insertAdjacentHTML('beforeend', modal);
+        $('body').append(modal);
 
-        btnsTexts.forEach((_, index) => {
-            document.querySelector(`.cypht-modal-btn-${index + 1}`).addEventListener('click', btnsCbs[index] || this.hide);
-        });
+        this.modal = $(`#${this.opts.modalId}`);
+        this.modalContent = this.modal.find('.modal-body');
+        this.modalTitle = this.modal.find('.modal-title');
+        this.modalFooter = this.modal.find('.modal-footer');
 
-        document.querySelector('.cypht-modal-content-close').addEventListener('click', this.hide);
-        document.querySelector('.cypht-modal-bg').addEventListener('click', this.hide);
-    },
+        this.bsModal = new bootstrap.Modal(document.getElementById(this.opts.modalId));
+    };
 
-    hide: () => {
-        document.querySelector('#cypht-modal').remove();
-    }
+    this.open = () => {
+        this.bsModal.show();
+    };
+
+    this.hide = () => {
+        this.bsModal.hide();
+    };
+
+    this.addFooterBtn = (label, classes, callback) => {
+        const btn = document.createElement('button');
+        btn.innerHTML = label;
+
+        btn.classList.add('btn', ...classes.split(' '));
+        if (this.opts.btnSize) {
+            btn.classList.add(`btn-${this.opts.btnSize}`);
+        }
+
+        btn.addEventListener('click', callback);
+        btn.addEventListener('click', this.hide);
+
+        this.modalFooter.append(btn);
+    };
+
+    this.setContent = (content) => {
+        this.modalContent.html(content);
+    };
+
+    this.setTitle = (title) => {
+        this.modalTitle.html(title);
+    };
+
+    this.init();
 }
 
 /* user notification manager */
@@ -750,7 +784,7 @@ function Message_List() {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'flag') {
-                $('.icon', row).html('<img width="16" height="16" src="'+hm_flag_image_src()+'" />');
+                $('.icon', row).html(hm_flag_image_src());
             }
             else {
                 $('.icon', row).empty();
@@ -918,13 +952,13 @@ function Message_List() {
         if (prev.length) {
             phref = prev.find('.subject').find('a').prop('href');
             subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+phref+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
+            plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
             nhref = next.find('.subject').find('a').prop('href');
             subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+nhref+'"><div class="prevnext next_img"></div> '+subject+'</a>';
+            nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
         return [phref, nhref];
@@ -1798,6 +1832,13 @@ var reset_default_value_input = function() {
     }
 };
 
+var decrease_servers = function(section) {
+    const element = document.querySelector(`.${section}_server_setup .server_count`);
+    const parts = element.innerHTML.split(' ');
+    parts[0] = Number(parts[0]) - 1;
+    element.innerHTML = parts.join(' ');
+};
+
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
@@ -1835,7 +1876,7 @@ $(function() {
     Hm_Timer.fire();
 
     /* load folder list */
-    if (!reloaded && !Hm_Folders.load_from_local_storage()) {
+    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
         Hm_Folders.update_folder_list();
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {

@@ -118,23 +118,23 @@ function format_imap_folder_section($folders, $id, $output_mod) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
+            $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
         }
         else {
             $results .= '<i class="bi bi-folder2-open"></i> ';
         }
         if (!$folder['noselect']) {
             if (strlen($output_mod->html_safe($folder['basename']))>15) {
-                $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
+                $results .= '<a data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
                     '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
+                    urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).
                     '"title="'.$output_mod->html_safe($folder['basename']).
                     '">'.substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
             }
             else{
-                $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
+                $results .= '<a data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
                     '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
+                    urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).
                     '">'.$output_mod->html_safe($folder['basename']).'</a>';
             }
         }
@@ -193,7 +193,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $row_class = 'email';
         $icon = 'env_open';
         if (!$parent_list) {
-            $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
+            $parent_value = sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']);
         }
         else {
             $parent_value = $parent_list;
@@ -256,7 +256,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
-        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
         if ($list_page) {
             $url .= '&list_page='.$output_module->html_safe($list_page);
         }
@@ -433,10 +433,10 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         $icon = $icons[strtolower($vals['type'])];
     }
     if ($icon) {
-        $res .= '<img class="msg_part_icon" src="'.Hm_Image_Sources::$$icon.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon"></i> ';
     }
     else {
-        $res .= '<img class="msg_part_icon msg_part_placeholder" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon msg_part_placeholder"></i> ';
     }
     if (in_array($lc_type, $allowed, true)) {
         $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
@@ -716,7 +716,6 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     $sent_results = array();
     $status = array();
     foreach($ids as $index => $id) {
-        $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($hm_cache, $id);
         $imap = Hm_IMAP_List::connect($id, $cache);
         if (imap_authed($imap)) {
@@ -1246,7 +1245,7 @@ function get_request_params($request) {
     if (array_key_exists('uid', $request) && $request['uid']) {
         $uid = $request['uid'];
     }
-    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\d+)_(.+)/", $request['list_path'], $matches)) {
+    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\w+)_(.+)/", $request['list_path'], $matches)) {
         $server_id = $matches[1];
         $folder = hex2bin($matches[2]);
     }
@@ -1386,7 +1385,7 @@ if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
 
-    $txt = '<div class="dropdown">
+    $txt = '<div class="dropdown d-inline-block">
                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {

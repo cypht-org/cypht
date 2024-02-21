@@ -9,6 +9,7 @@
 define('VERSION', .1);
 
 /* load the framework */
+require APP_PATH.'lib/repository.php';
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
 require APP_PATH.'lib/modules_exec.php';

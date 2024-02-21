@@ -25,8 +25,6 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
                 foreach ($addresses as $vals) {
                     $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name']));
                 }
-                $this->user_config->set('contacts', $contacts->export());
-                $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
         }
@@ -42,8 +40,6 @@ class Hm_Handler_process_delete_contact extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
         if ($success && $form['contact_type'] == 'local' && $form['contact_source'] == 'local') {
             if ($contacts->delete($form['contact_id'])) {
-                $this->user_config->set('contacts', $contacts->export());
-                $this->session->record_unsaved('Contact deleted');
                 $this->out('contact_deleted', 1);
                 Hm_Msgs::add('Contact Deleted');
             }
@@ -64,8 +60,6 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
                 $details['phone_number'] = $this->request->post['contact_phone'];
             }
             $contacts->add_contact($details);
-            $this->user_config->set('contacts', $contacts->export());
-            $this->session->record_unsaved('Contact Added');
             Hm_Msgs::add('Contact Added');
         }
     }
@@ -84,8 +78,6 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
                 $details['phone_number'] = $this->request->post['contact_phone'];
             }
             if ($contacts->update_contact($form['contact_id'], $details)) {
-                $this->user_config->set('contacts', $contacts->export());
-                $this->session->record_unsaved('Contact updated');
                 Hm_Msgs::add('Contact Updated');
             }
         }
@@ -117,12 +109,7 @@ class Hm_Handler_load_edit_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_load_local_contacts extends Hm_Handler_Module {
     public function process() {
-        $contacts = $this->get('contact_store');
-        $contact_list = $this->user_config->get('contacts', array());
-        $contact_list = array_map(function($v) { $v['type'] = 'local'; return $v; }, $contact_list);
-        $contacts->import($contact_list);
         $this->append('contact_sources', 'local');
-        $this->out('contact_store', $contacts, false);
         $this->append('contact_edit', 'local:local');
     }
 }

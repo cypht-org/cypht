@@ -14,8 +14,13 @@ class Hm_SMTP_List {
     
     use Hm_Server_List;
 
+    public static function init($user_config, $session) {
+        self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+    }
+
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         $config = array(
+            'id'        => $id,
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
@@ -29,6 +34,7 @@ class Hm_SMTP_List {
             $config['no_auth'] = true;
         }
         self::$server_list[$id]['object'] = new Hm_SMTP($config);
+
         if (!self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }

@@ -81,13 +81,13 @@ return array(
     ),
     'allowed_output' => array(
         'imap_folders_success' => array(FILTER_VALIDATE_INT, false),
-        'imap_special_name' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
+        'imap_special_name' => array(FILTER_DEFAULT, false)
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'new_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'special_folder_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'imap_service_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'parent' => FILTER_DEFAULT,
+        'new_folder' => FILTER_DEFAULT,
+        'special_folder_type' => FILTER_DEFAULT,
+        'imap_service_name' => FILTER_DEFAULT
     )
 );
