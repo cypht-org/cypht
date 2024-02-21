@@ -21,10 +21,10 @@ add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'message_list_type', 'after');
 add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
-add_output('servers', 'display_configured_imap_servers', true, 'imap', 'display_configured_smtp_servers', 'after');
+add_output('servers', 'display_configured_imap_servers', true, 'imap', 'server_config_stepper_end_part', 'after');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
-add_output('servers', 'stepper_setup_server_jmap', true, 'imap', 'server_config_stepper', 'after');
-add_output('servers', 'stepper_setup_server_imap', true, 'imap', 'stepper_setup_server_smtp', 'before');
+add_output('servers', 'stepper_setup_server_jmap', true, 'imap', 'server_config_stepper_end_part', 'before');
+add_output('servers', 'stepper_setup_server_imap', true, 'imap', 'server_config_stepper_end_part', 'before');
 
 /* settings page data */
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');

@@ -22,7 +22,7 @@ setup_base_page('servers');
 add_handler('servers', 'reload_folder_cookie', true, 'core', 'save_user_data', 'after');
 add_output('servers', 'server_content_start', true, 'core', 'content_section_start', 'after');
 add_output('servers', 'server_config_stepper', true, 'core', 'server_content_start', 'after');
-add_output('servers', 'server_config_stepper_end_part', true, 'core', 'stepper_setup_server_smtp', 'after');
+add_output('servers', 'server_config_stepper_end_part', true, 'core', 'server_config_stepper', 'after');
 add_output('servers', 'server_content_end', true, 'core', 'content_section_end', 'before');
 
 /* compose */

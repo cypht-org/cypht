@@ -2117,6 +2117,13 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
     
     // When essential module is not activated, we don't display the accordion
     if(!$hasEssentialModuleActivated) return '';
+
+    $serverList = null;
+
+
+    if(class_exists('Nux_Quick_Services')){
+        $serverList = Nux_Quick_Services::option_list(false, $this);
+    }
     
     
     $res = '<div class="smtp_imap_server_setup">
@@ -2169,7 +2176,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                             <form>
                                 <div class="form-floating mb-3">
                                   <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) aria-label="'.$this->trans('Provider').'">
-                                    <option value="">'.$this->trans('Other').'</option>'.Nux_Quick_Services::option_list(false, $this).'
+                                    <option value="">'.$this->trans('Other').'</option>'.$serverList.'
                                   </select>
                                   <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
                                 </div>';
