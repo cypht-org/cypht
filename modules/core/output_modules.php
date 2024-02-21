@@ -2227,7 +2227,9 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
         $res .= '</form>
                       </div>
                       <div class="srv_setup_stepper_form_loader hide" id="srv_setup_stepper_form_loader">
-                          <img width="24" height="24" src="'.Hm_Image_Sources::$spinner.'" alt="loader" />
+                          <div class="spinner-border text-dark" role="status">
+                              <span class="visually-hidden">Loading...</span>
+                          </div>
                       </div>
                       <div class="step_config-actions">
                           <button class="btn btn-danger px-3" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
