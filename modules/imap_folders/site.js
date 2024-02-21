@@ -26,7 +26,7 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.'+container));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill"></i>');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -273,9 +273,14 @@ $(function() {
         $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     }
     if (hm_page_name() == 'folders_subscription') {
-        $('.subscribe_parent_folder').on("click", function() { return folder_page_folder_list('subscribe_parent_folder_select', 'suscribe_title', 'imap_parent_folder_link', '', 'subscribe_parent', true); });
+        $('.subscribe_parent_folder').on("click", function() { return folder_page_folder_list('subscribe_parent_folder_select', 'subscribe_title', 'imap_parent_folder_link', '', 'subscribe_parent', true); });
         $('.subscribe_parent_folder').trigger('click');
-        $('.imap_parent_folder_link').trigger('click');
+        $($('.subscribe_parent_folder_select .imap_parent_folder_link')[0]).trigger('click');
+        const selected_imap_server = $('#imap_server_folder').val();
+        const email_folder_server = $(`.email_folders .imap_${selected_imap_server}_ .inner_list`);
+        if (email_folder_server && $(email_folder_server[0]).children().length) {
+            $($('.subscribe_parent_folder_select .imap_parent_folder_link')[0]).trigger('click');
+        }
     }
     $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
     $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });

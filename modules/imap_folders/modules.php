@@ -322,6 +322,7 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             var_dump($this->request->get['imap_server_id']);
             $this->out('folder_server', $this->request->get['imap_server_id']);
+            $this->out('page', $this->request->get['page']);
         }
     }
 }
@@ -345,7 +346,7 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
             $imap_server_id = $this->request->get['imap_server_id'];
             $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
             $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
+            if (imap_authed($imap)) {
                 $folder = hex2bin($form['folder']);
                 $success = $imap->mailbox_subscription($folder, $form['subscription_state']);
                 if ($success) {
@@ -380,7 +381,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', '');
         $res = '<div class="folders_page mt-4 row mb-4"><div class="col-lg-5 col-sm-12"><form id="form_folder_imap" method="get">';
-        $res .= '<input type="hidden" name="page" value="folders" />';
+        $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
         if (empty($server_id)) {
@@ -700,7 +701,7 @@ class Hm_Output_folders_folder_subscription extends Hm_Output_Module {
         if ($this->get('only_subscribed_folders_setting', 0) && ($server = $this->get('folder_server')) !== NULL) {
             $res = '<div class="folder_row"><a href="#" class="subscribe_parent_folder" style="display:none;">';
             $res .= $this->trans('Select Folder').'</a><span class="subscribe_parent"></span></div>';
-            $res .= '<ul class="folders subscribe_parent_folder_select"><li class="suscribe_title"></li></ul>';
+            $res .= '<ul class="folders subscribe_parent_folder_select"><li class="subscribe_title"></li></ul>';
             $res .= '<input type="hidden" value="" id="subscribe_parent" />';
             return $res;
         }

@@ -102,7 +102,8 @@ return array(
     ),
     'allowed_output' => array(
         'imap_folders_success' => array(FILTER_VALIDATE_INT, false),
-        'imap_special_name' => array(FILTER_DEFAULT, false)
+        'imap_special_name' => array(FILTER_DEFAULT, false),
+        'imap_folder_subscription' => array(FILTER_DEFAULT, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
