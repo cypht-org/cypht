@@ -229,8 +229,8 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $js_hash = '';
     $css_hash = '';
     if ($css) {
-        $css_out = file_get_contents("vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
-        $css_out .= file_get_contents("vendor/twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/css/bootstrap.min.css");
+        $css_out .= file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
         $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);
@@ -238,7 +238,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     }
     if ($js) {
         $mods = get_modules($settings);
-        $js_lib = file_get_contents("vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js");
+        $js_lib = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/js/bootstrap.bundle.min.js");
         $js_lib .= file_get_contents("third_party/cash.min.js");
         if (in_array('desktop_notifications', $mods, true)) {
             $js_lib .= file_get_contents("third_party/push.min.js");
