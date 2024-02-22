@@ -88,6 +88,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     /**
      * Format html, text, or image content
      */
+
     protected function output() {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
@@ -97,17 +98,17 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             }
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
-                $images = $this->get('imap_allow_images', false);
-                if ($allowed && stripos($this->get('msg_text'), 'img')) {
-                    if (!$images) {
-                        $id = $this->get('imap_msg_part');
-                        $txt .= '<div class="allow_image_link">'.
-                            '<a href="#" class="msg_part_link" data-allow-images="1" '.
-                            'data-message-part="'.$this->html_safe($id).'">'.
-                            $this->trans('Allow Images').'</a></div>';
-                    }
+                $msgText = $this->get('msg_text');
+                // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
+                $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
+
+                if ($allowed) {
+                    $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
+                        return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
+                    }, $msgText);
                 }
-                $txt .= format_msg_html($this->get('msg_text'), $images);
+
+                $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
