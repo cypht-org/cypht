@@ -1921,6 +1921,25 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 }
 
 /**
+ * Get message source from an IMAP server
+ */
+class Hm_Handler_imap_message_source extends Hm_Handler_Module {
+    public function process() {
+        $imap_server_id = $this->request->get['imap_server_id'];
+        $imap_msg_uid = $this->request->get['imap_msg_uid'];
+        $folder = $this->request->get['imap_folder'];
+        if ($imap_server_id && $imap_msg_uid && $folder) {
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if ($imap->select_mailbox(hex2bin($folder))) {
+                $msg_source = $imap->get_message_content($imap_msg_uid, 0, false);
+                $this->out('msg_source', $msg_source);
+            }
+        }
+    }
+}
+
+/**
  * Hide or unhide an IMAP server
  * @subpackage imap/handler
  */

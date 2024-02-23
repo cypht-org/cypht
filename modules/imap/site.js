@@ -736,6 +736,11 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
 
         return block_unblock_sender(msg_uid, detail, scope, action, sender, reject_message);
     });
+    $('#show_message_source').on("click", function(e) {
+        e.preventDefault();
+        const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+        window.open(`?page=message_source&imap_msg_uid=${hm_msg_uid()}&imap_server_id=${detail.server_id}&imap_folder=${detail.folder}`);
+    });
     $(document).on('click', '#unblock_sender', function(e) {
         e.preventDefault();
         var sender = '';
@@ -1374,4 +1379,24 @@ if (message) {
     mutation.observe(document.querySelector('.msg_text'), {
         childList: true
     });
+}
+
+const handleDownloadMsgSource = function() {
+    const messageSource = document.querySelector('pre.msg_source');
+    const blob = new Blob([messageSource.textContent], { type: "message/rfc822" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const subject = messageSource.textContent.match(/Subject: (.*)/)?.[1] || hm_msg_uid(); // Let's use the message UID if the subject is empty
+    a.download = subject + '.eml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+const handleCopyMsgSource = function(e) {
+    e.preventDefault();
+    const messageSource = document.querySelector('pre.msg_source');
+    navigator.clipboard.writeText(messageSource.textContent);
+    Hm_Notices.show(['Copied to clipboard']);
 }

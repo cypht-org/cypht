@@ -371,6 +371,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
+            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             if ($this->get('sieve_filters_enabled')) {
                 $server_id = $this->get('msg_server_id');
@@ -1281,5 +1282,29 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
         $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
         $res = snooze_dropdown($this, $unsnooze);
         $this->concat('msg_controls_extra', $res);
+    }
+}
+
+/**
+ * Output imap message source
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_message_source extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div class="w-auto mx-auto p-5">';
+        $res .= '
+        <div class="d-flex flex-column gap-2 mb-4">
+        <h1>Message source</h1>
+        <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-success" onclick="handleDownloadMsgSource()">Download</button>
+            <a href="#" class="hlink" onClick="handleCopyMsgSource(event)">Copy to clipboard</a>
+        </div>
+        </div>
+        ';
+        if($this->get('msg_source')){
+            $res .= '<div><pre class="msg_source">'.$this->html_safe($this->get('msg_source')).'</pre></div>';
+        }
+        $res .= '</div>';
+        return $res;
     }
 }

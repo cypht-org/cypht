@@ -196,6 +196,7 @@ return array(
         'deleted_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
+        'msg_source' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
