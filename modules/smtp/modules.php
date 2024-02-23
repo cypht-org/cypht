@@ -1350,7 +1350,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $res = '';
+        $res = '<div class="subtitle mt-4">SMTP Serves</div>';
         foreach ($this->get('smtp_servers', array()) as $index => $vals) {
 
             $no_edit = false;
@@ -1373,30 +1373,34 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="d-flex justify-content-between align-content-center p-3 border-top border-bottom border-success">';
+            $res .= '<div>';
+
+            $res .= '<form class="smtp_connect" method="POST">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<table class="table">
+                      <tbody>
+                        <tr>
+                          <td style="width: 250px;">';
             $res .= sprintf('<div>
-                               <div><span class="badge text-bg-success">SMTP</span></div>
-                               <div class="server_title">%s</div>
+                               <div class="text-muted"><strong>%s</strong></div>
                                <div class="server_subtitle">%s/%d %s</div>
                             </div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-            
-            $res .= '<form class="smtp_connect d-flex gap-3" method="POST">';
-            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
-            
+            $res .= '</td><td>';
+
             // SMTP Username
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials" id="smtp_user_'.$index.'" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label></div>';
-            
+            $res .= '</td><td>';
+
             // SMTP Password
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials smtp_password" type="password" id="smtp_pass_'.$index.'" name="smtp_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label></div>';
-            
-            $res .= '<div class="d-flex align-item-center p-4">';
-            
+            $res .= '</td><td>';
+
             // Buttons
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
@@ -1410,11 +1414,14 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-            
-            $res .= '</div>';
-            $res .= '</form>';
 
-            $res .= '</div></div>';
+            $res .= '</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </form>';
+
+            $res .= '</div>';
         }
         $res .= '<br class="clear_float" />';
         return $res;

@@ -2119,9 +2119,16 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
     if(class_exists('Nux_Quick_Services')){
         $serverList = Nux_Quick_Services::option_list(false, $this);
     }
+
+    $hideClass = 'd-none';
+
+    // Don't hide this section if at least one of the essential module is activated
+    if($hasImapActivated || $hasSmtpActivated || $hasJmapActivated){
+        $hideClass = '';
+    }
     
     
-    $res = '<div class="smtp_imap_server_setup">
+    $res = '<div class="smtp_imap_server_setup '. $hideClass .'">
               <div data-target=".server_config_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                   <a href="#" class="pe-auto">
                       <i class="bi bi-envelope-fill me-3"></i>
@@ -2241,8 +2248,15 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                       <button class="step_config current_config_step btn btn-success px-5" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
                   </div>
                 </div>
-         </div>';
+         </div>
+         <div class="px-5">';
 
          return $res;
+    }
+}
+
+class Hm_Output_server_config_stepper_accordion_end_part extends Hm_Output_Module {
+    protected function output() {
+        return '</div></div></div>';
     }
 }
