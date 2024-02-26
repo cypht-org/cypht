@@ -721,16 +721,22 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $prefetched[] = $form['imap_server_id'];
                 $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_NUMERIC));
             }
+            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             if ($page_cache) {
                 $this->out('imap_expanded_folder_data', $page_cache);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
                 return;
             }
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
-                $msgs = $imap->get_folder_list_by_level(hex2bin($folder));
+                $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
+                if ($with_subscription) {
+                    $only_subscribed = false;
+                }
+                $msgs = $imap->get_folder_list_by_level(hex2bin($folder), $only_subscribed, $with_subscription);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
@@ -738,6 +744,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
             }
             else {
                 Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));

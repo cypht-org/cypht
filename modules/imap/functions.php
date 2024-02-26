@@ -111,7 +111,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
  * @return string
  */
 if (!hm_exists('format_imap_folder_section')) {
-function format_imap_folder_section($folders, $id, $output_mod) {
+function format_imap_folder_section($folders, $id, $output_mod, $with_input = false) {
     $results = '<ul class="inner_list">';
     $manage = $output_mod->get('imap_folder_manage_link');
     foreach ($folders as $folder_name => $folder) {
@@ -124,22 +124,30 @@ function format_imap_folder_section($folders, $id, $output_mod) {
             $results .= '<i class="bi bi-folder2-open"></i> ';
         }
         if (!$folder['noselect']) {
+            if (!$folder['clickable']) {
+                $attrs = 'tabindex="0"';
+                if (!$with_input && isset($folder['subscribed']) && !$folder['subscribed']) {
+                    $attrs .= ' class="folder-disabled"';
+                }
+            } else {
+                $attrs = 'data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
+                '" href="?page=message_list&amp;list_path='.
+                urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
+            }
             if (strlen($output_mod->html_safe($folder['basename']))>15) {
-                $results .= '<a data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
-                    '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).
-                    '"title="'.$output_mod->html_safe($folder['basename']).
+                $results .= '<a ' . $attrs .
+                    ' title="'.$output_mod->html_safe($folder['basename']).
                     '">'.substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
             }
-            else{
-                $results .= '<a data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
-                    '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).
-                    '">'.$output_mod->html_safe($folder['basename']).'</a>';
+            else {
+                $results .= '<a ' . $attrs. '>'.$output_mod->html_safe($folder['basename']).'</a>';
             }
         }
         else {
             $results .= $output_mod->html_safe($folder['basename']);
+        }
+        if ($with_input) {
+            $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$output_mod->html_safe($folder_name).'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').($folder['special']? ' disabled="disabled"': '').' />';
         }
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }

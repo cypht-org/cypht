@@ -765,8 +765,9 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
+        $with_input = $this->get('with_input', false);
         if (!empty($folder_data)) {
-            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
+            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input);
             $this->out('imap_expanded_folder_formatted', $res);
         }
     }
@@ -1110,7 +1111,7 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         if (!array_key_exists('auto_advance_email', $settings) || (array_key_exists('auto_advance_email', $settings) && $settings['auto_advance_email'])) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
             $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
