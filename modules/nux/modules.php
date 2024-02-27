@@ -434,11 +434,11 @@ function oauth2_form($details, $mod) {
     $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
     $url = $oauth2->request_authorization_url($details['auth_uri'], $details['scope'], 'nux_authorization', $details['email']);
     $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<div class="nux_step_two_title">'.$mod->html_safe($details['name']).'</div><div>';
+    $res .= '<div class="nux_step_two_title fw-bold">'.$mod->html_safe($details['name']).'</div><div class="mb-3">';
     $res .= $mod->trans('This provider supports Oauth2 access to your account.');
     $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
-    $res .= '</div><a class="enable_auth2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
-    $res .= '<a href="" class="reset_nux_form">Reset</a>';
+    $res .= '</div><div class="mb-3"><a class="enable_auth2 btn btn-sm btn-success me-2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
+    $res .= '<a href="" class="reset_nux_form btn btn-sm btn-secondary">Reset</a></div>';
     return $res;
 }}
 
