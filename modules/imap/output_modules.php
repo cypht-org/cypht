@@ -420,8 +420,14 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
+        $list = $this->get('imap_servers', array());
+
+        if (empty($list)) {
+            return '';
+        }
+
         $res = '<div class="subtitle mt-4">Imap & JMAP Serves</div>';
-        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+        foreach ($list as $index => $vals) {
             $server_id = $vals['id'];
             $type = 'IMAP';
 

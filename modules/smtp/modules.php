@@ -1350,8 +1350,15 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $res = '<div class="subtitle mt-4">SMTP Serves</div>';
-        foreach ($this->get('smtp_servers', array()) as $index => $vals) {
+
+        $list = $this->get('smtp_servers', array());
+
+        if (empty($list)) {
+            return '';
+        }
+
+        $res = '<div class="subtitle mt-4">SMTP Servers</div>';
+        foreach ($list as $index => $vals) {
 
             $no_edit = false;
 
