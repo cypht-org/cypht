@@ -327,7 +327,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
     background-color: #888 !important;
 }
 
-.srv_setup_stepper_btn {width: 120px;height: 32px;padding: 0px 10px 0px 10px;background: #EBEBEB;color: #232323;border-color: #232323; border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: center;}
 .step_config-title {display: flex;align-items: center;gap: 10px;}
 .step_config-title > span {font-size: small;}
 .step_config-title > h2 {color: #777}
@@ -340,7 +339,6 @@ div.unseen, .unseen .subject { font-weight: 700; }
 .step_config-form_item > textarea {width: 350px;height: 32px;padding: 4px 8px 4px 8px;background: #FFFFFF; border-color: #232323;border-width: 1px;border-style: solid;border-radius: 3px 3px 3px 3px;font-family: "Helvetica";font-weight: 400;font-size: 14px;text-align: left;}
 .step_config-form_item > select {height: 32px;}
 .step_config-actions {display: flex;justify-content: space-between;margin-top: 15px;}
-.srv_setup_stepper_btn:hover {cursor: pointer;}
 .stepper {display: flex;overflow: hidden;padding: 10px 30px 100px 30px;}
 .step_config {width: 100%;transition: transform 0.5s;display: none;}
 .current_config_step {display: block;}
