@@ -258,7 +258,7 @@ class Hm_Output_add_message_contacts extends Hm_Output_Module {
             foreach ($backends as $val) {
                 $res .= '<option value="'.$this->html_safe($val).'">'.$this->html_safe($val).'</option>';
             }
-            $res .= '</select></div> <div class="col"><input onclick="return add_contact_from_message_view()" class="add_contact_button w-100 btn btn-success btn-sm" '.
+            $res .= '</select></div> <div class="col"><input onclick="return add_contact_from_message_view()" class="add_contact_button w-100 btn btn-primary btn-sm" '.
                 'type="button" value="'.$this->trans('Add Contact').'"></div></div></div></div>';
             $headers = $headers.$res;
         }

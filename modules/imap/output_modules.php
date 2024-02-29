@@ -260,7 +260,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                         </div>';
                             } else {
                                 $txt .= '<div class="popup-container_footer">
-                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn btn btn-success" type="button" value="">'.$this->trans('Add local contacts').'
+                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn btn btn-primary" type="button" value="">'.$this->trans('Add local contacts').'
                                             </button>
                                         </div>';
                             }
@@ -612,7 +612,7 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
                             <label for="new_jmap_hidden">'.$this->trans('Hide From Combined Pages').'</label>
                         </div>
         
-                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_jmap_server" />
+                        <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_jmap_server" />
                     </form>
                 </div>';
     }
@@ -972,7 +972,7 @@ class Hm_Output_start_sent_settings extends Hm_Output_Module {
      * Settings in this section control the Sent E-mail view.
      */
     protected function output() {
-        return '<tr><td data-target=".sent_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".sent_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('Sent').'</td></tr>';
     }

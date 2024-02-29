@@ -559,7 +559,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                                             <label for="new_feed_address" class="">'.$this->trans('Site address or feed URL').'</label>
                                         </div>
 
-                                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_feed" />
+                                        <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_feed" />
                                     </form>
                                 </div>';
         }
@@ -872,7 +872,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
  */
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-rss-fill fs-5 me-2"></i>'.$this->trans('Feed Settings').'</td></tr>';
     }
 }

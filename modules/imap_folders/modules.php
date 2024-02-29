@@ -469,7 +469,7 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
                             </ul>
                             <input type="hidden" value="" id="rename_parent_source" />
                             <input type="hidden" value="" id="rename_source" />
-                            <input type="button" id="rename_folder" class="btn btn-success" value="'.$this->trans('Rename').'">
+                            <input type="button" id="rename_folder" class="btn btn-primary" value="'.$this->trans('Rename').'">
                         </div>
                     </div>';
 
@@ -511,7 +511,7 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
                     </ul>
                     <input type="hidden" value="" id="sent_source" />
                     <div class="btn-group mt-3" role="group" aria-label="Sent Folder Actions">
-                        <input type="button" id="set_sent_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="set_sent_folder" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" id="clear_sent_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
                     </div>
                     <br /><br />
@@ -555,7 +555,7 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
                     </ul>
                     <input type="hidden" value="" id="archive_source" />
                     <div class="btn-group mt-3" role="group" aria-label="Archive Folder Actions">
-                        <input type="button" id="set_archive_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="set_archive_folder" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" id="clear_archive_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
                     </div>
                     <br /><br />
@@ -599,7 +599,7 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
                     </ul>
                     <input type="hidden" value="" id="draft_source" />
                     <div class="btn-group mt-3" role="group" aria-label="Draft Folder Actions">
-                        <input type="button" id="set_draft_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="set_draft_folder" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" id="clear_draft_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
                     </div>
                     <br /><br />
@@ -642,7 +642,7 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
                     </ul>
                     <input type="hidden" value="" id="trash_source" />
                     <div class="btn-group mt-1" role="group" aria-label="Trash Folder Actions">
-                        <input type="button" id="set_trash_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="set_trash_folder" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" id="clear_trash_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
                     </div>
                 </div></div>';
@@ -684,7 +684,7 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
                     </ul>
                     <input type="hidden" value="" id="junk_source" />
                     <div class="btn-group mt-3" role="group" aria-label="Junk Folder Actions">
-                        <input type="button" id="set_junk_folder" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="button" id="set_junk_folder" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" id="clear_junk_folder" class="btn btn-secondary" value="'.$this->trans('Remove').'" />
                     </div>
                     <br /><br />
@@ -758,7 +758,7 @@ class Hm_Output_folders_create_dialog extends Hm_Output_Module {
                                 </li>
                             </ul>
                             <input type="hidden" value="" id="create_parent" />
-                            <input type="button" id="create_folder" class="btn btn-success mt-3" value="'.$this->trans('Create').'">
+                            <input type="button" id="create_folder" class="btn btn-primary mt-3" value="'.$this->trans('Create').'">
                         </div>
                     </div>';
 

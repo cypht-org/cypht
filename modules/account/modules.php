@@ -246,7 +246,7 @@ class Hm_Output_change_password extends Hm_Output_Module {
                                         <label for="new_pass2">'.$this->trans('New password again').'</label>
                                     </div>
 
-                                    <input type="submit" name="change_password" class="btn btn-success" value="'.$this->trans('Update').'">
+                                    <input type="submit" name="change_password" class="btn btn-primary" value="'.$this->trans('Update').'">
                                 </form>
                             </div>
                         </div>

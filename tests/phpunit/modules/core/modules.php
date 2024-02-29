@@ -622,7 +622,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_form_content() {
         $test = new Output_Test('search_form_content', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update btn btn-success btn-sm" value="Update" /> <input type="button" class="search_reset btn btn-light border btn-sm" value="Reset" />'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update btn btn-primary btn-sm" value="Update" /> <input type="button" class="search_reset btn btn-light border btn-sm" value="Reset" />'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -726,8 +726,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
-                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -750,7 +750,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                 <input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" class="form-check-input">
                 <label class="form-check-label" for="stay_logged_in">Stay logged in</label>
             </div><input type="hidden" name="hm_page_key" value="" />
-                                    <input type="submit" id="login" class="btn btn-success btn-lg" value="Login">
+                                    <input type="submit" id="login" class="btn btn-primary btn-lg" value="Login">
                                 </div>
                             </div>
                         </div>
@@ -776,8 +776,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
-                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -809,8 +809,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
-                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -841,8 +841,8 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
-                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
-                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="Save and Logout" />
                     </div>
                 </div>
                 </div>
@@ -1103,7 +1103,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_flagged_settings() {
         $test = new Output_Test('start_flagged_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1112,7 +1112,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_everything_settings() {
         $test = new Output_Test('start_everything_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-box2-fill fs-5 me-2"></i>Everything</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-box2-fill fs-5 me-2"></i>Everything</td></tr>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('single_server_mode' => true), $res->output_response);
@@ -1124,7 +1124,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_junk_settings() {
         $test = new Output_Test('start_junk_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1133,7 +1133,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_unread_settings() {
         $test = new Output_Test('start_unread_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1146,7 +1146,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('router_module_list' => array()), $res->output_response);
         $test->handler_response = array('router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-fill fs-5 me-2"></i>All Email</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-envelope-fill fs-5 me-2"></i>All Email</td></tr>'), $res->output_response);
         $test->handler_response = array('router_module_list' => array('imap'), 'single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('router_module_list' => array('imap'), 'single_server_mode' => true), $res->output_response);
@@ -1158,7 +1158,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_general_settings() {
         $test = new Output_Test('start_general_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-gear-wide-connected fs-5 me-2"></i>General</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2"><i class="bi bi-gear-wide-connected fs-5 me-2"></i>General</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1299,10 +1299,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_end_settings_form() {
         $test = new Output_Test('end_settings_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-success" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-primary" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-success" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-primary" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1409,10 +1409,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_save_form() {
         $test = new Output_Test('save_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

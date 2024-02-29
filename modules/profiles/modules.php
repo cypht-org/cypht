@@ -368,12 +368,12 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     // Submit buttons
     $res .= '<div>';
     if ($form_vals['name']) {
-        $res .= '<input type="submit" class="btn btn-success profile_update" value="'.$out_mod->trans('Update').'" /> ';
+        $res .= '<input type="submit" class="btn btn-primary profile_update" value="'.$out_mod->trans('Update').'" /> ';
         $res .= '<input type="submit" class="btn btn-danger" name="profile_delete" value="'.$out_mod->trans('Delete').'" /> ';
         $res .= '<a href="?page=profiles" class="btn btn-secondary">'.$out_mod->trans('Cancel').'</a>';
     }
     else {
-        $res .= '<input type="submit" class="btn btn-success submit_profile" value="'.$out_mod->trans('Create').'" />';
+        $res .= '<input type="submit" class="btn btn-primary submit_profile" value="'.$out_mod->trans('Create').'" />';
     }
     $res .= '</div></form></div>';
 

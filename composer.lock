@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f0317cf08c00727723e842c7c83a2187",
+    "content-hash": "ed14880d5eac7afa668086b0badb2f45",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1553,6 +1553,51 @@
                 }
             ],
             "time": "2023-01-26T09:26:14+00:00"
+        },
+        {
+            "name": "thomaspark/bootswatch",
+            "version": "v5.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thomaspark/bootswatch.git",
+                "reference": "cd608c8bc53b0d3e32a515bb847ecfa27e4a3723"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thomaspark/bootswatch/zipball/cd608c8bc53b0d3e32a515bb847ecfa27e4a3723",
+                "reference": "cd608c8bc53b0d3e32a515bb847ecfa27e4a3723",
+                "shasum": ""
+            },
+            "suggest": {
+                "robloach/component-installer": "Allows installation of Components via Composer"
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "name": "bootswatch",
+                    "files": [
+                        "README.md",
+                        "LICENSE",
+                        "dist/**/*"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "thomaspark",
+                    "email": "thomas@bootswatch.com"
+                }
+            ],
+            "description": "Themes for Bootstrap",
+            "support": {
+                "issues": "https://github.com/thomaspark/bootswatch/issues",
+                "source": "https://github.com/thomaspark/bootswatch/tree/v5.3.1"
+            },
+            "time": "2023-07-28T04:37:08+00:00"
         },
         {
             "name": "twbs/bootstrap",

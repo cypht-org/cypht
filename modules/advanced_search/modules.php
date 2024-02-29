@@ -221,7 +221,7 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
             $this->targets().
             $this->times().
             $this->other().
-            '<div class="submit_section px-5"><input type="button" class="btn btn-success" id="adv_search" value="'.$this->trans('Search').'" />'.
+            '<div class="submit_section px-5"><input type="button" class="btn btn-primary" id="adv_search" value="'.$this->trans('Search').'" />'.
             ' <input class="btn btn-light border" type="button" class="adv_reset" value="'.$this->trans('Reset').'" />';
     }
 

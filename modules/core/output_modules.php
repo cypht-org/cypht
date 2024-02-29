@@ -102,7 +102,7 @@ class Hm_Output_search_form_content extends Hm_Output_Module {
             ' <label class="screen_reader" for="search_since">'.$this->trans('Search Since').'</label>'.
             message_since_dropdown($this->get('search_since', DEFAULT_SINCE), 'search_since', $this).
             combined_sort_dialog($this).
-            ' | <input type="submit" class="search_update btn btn-success btn-sm" value="'.$this->trans('Update').'" />'.
+            ' | <input type="submit" class="search_update btn btn-primary btn-sm" value="'.$this->trans('Update').'" />'.
             ' <input type="button" class="search_reset btn btn-light border btn-sm" value="'.$this->trans('Reset').'" />';
     }
 }
@@ -249,7 +249,7 @@ class Hm_Output_login extends Hm_Output_Module {
                                 </div>'.
                                 '<div class="d-grid">'.$stay_logged_in.
                                     '<input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                                    <input type="submit" id="login" class="btn btn-success btn-lg" value="'.$this->trans('Login').'">
+                                    <input type="submit" id="login" class="btn btn-primary btn-lg" value="'.$this->trans('Login').'">
                                 </div>
                             </div>
                         </div>
@@ -294,8 +294,8 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-footer">
                         <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="'.$this->trans('Cancel').'" />
-                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
-                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
+                        <input class="save_settings btn btn-primary" id="logout_without_saving" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />
+                        <input class="save_settings btn btn-primary" type="submit" name="save_and_logout" value="'.$this->trans('Save and Logout').'" />
                     </div>
                 </div>
                 </div>
@@ -502,7 +502,9 @@ class Hm_Output_header_css extends Hm_Output_Module {
         $res = '';
         $mods = $this->get('router_module_list');
         if (DEBUG_MODE) {
-            $res .= '<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />';
+            if ($this->get('theme') == '') {
+                $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+            }
             $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
@@ -867,7 +869,7 @@ class Hm_Output_start_flagged_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-flag-fill fs-5 me-2"></i>'.
             $this->trans('Flagged').'</td></tr>';
     }
@@ -885,7 +887,7 @@ class Hm_Output_start_everything_settings extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-box2-fill fs-5 me-2"></i>'.
             $this->trans('Everything').'</td></tr>';
     }
@@ -900,7 +902,7 @@ class Hm_Output_start_unread_settings extends Hm_Output_Module {
      * Settings in this section control the Unread view
      */
     protected function output() {
-        return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('Unread').'</td></tr>';
     }
@@ -922,7 +924,7 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-envelope-fill fs-5 me-2"></i>'.
             $this->trans('All Email').'</td></tr>';
     }
@@ -937,7 +939,7 @@ class Hm_Output_start_general_settings extends Hm_Output_Module {
      * General settings like langauge and timezone will go here
      */
     protected function output() {
-        return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>'.
             $this->trans('General').'</td></tr>';
     }
@@ -1224,7 +1226,7 @@ class Hm_Output_end_settings_form extends Hm_Output_Module {
      */
     protected function output() {
         return '<tr><td class="submit_cell" colspan="2">'.
-            '<input class="save_settings btn btn-success" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
+            '<input class="save_settings btn btn-primary" type="submit" name="save_settings" value="'.$this->trans('Save').'" />'.
             '</td></tr></table></div></form>'.
             '<div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="'.$this->trans('Restore Defaults').'" /></form></div>'.
@@ -1475,7 +1477,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
             'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="'.$this->trans('Password').'" />'.
-            '<input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
+            '<input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
             '<input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="'.$this->trans('Just Logout').'" />'.
@@ -1886,7 +1888,7 @@ class Hm_Output_start_junk_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.
             $this->trans('Junk').'</td></tr>';
     }
@@ -1945,7 +1947,7 @@ class Hm_Output_start_trash_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".trash_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-trash3-fill fs-5 me-2"></i>'.
             $this->trans('Trash').'</td></tr>';
     }
@@ -2004,7 +2006,7 @@ class Hm_Output_start_drafts_settings extends Hm_Output_Module {
      * Settings in this section control the flagged messages view
      */
     protected function output() {
-        return '<tr><td data-target=".drafts_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        return '<tr><td data-target=".drafts_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-pencil-square fs-5 me-2"></i>'.
             $this->trans('Drafts').'</td></tr>';
     }

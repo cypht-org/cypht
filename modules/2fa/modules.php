@@ -147,7 +147,7 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         if (array_key_exists('2fa_enable', $settings)) {
             $enabled = $settings['2fa_enable'];
         }
-        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        $res = '<tr><td colspan="2" data-target=".tfa_setting" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-unlock-fill fs-5 me-2"></i>'.$this->trans('2 Factor Authentication').'</td></tr>';
 
         $res .= '<tr class="tfa_setting"><td><label class="form-check-label">'.$this->trans('Enable 2 factor authentication').'</label>'.
@@ -255,7 +255,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                                                 <label for="2fa_code">'.$this->trans('Login code').'</label>
                                             </div>
                                             <div class="d-grid">
-                                                <input type="submit" class="btn btn-success btn-lg" value="'.$this->trans('Submit').'">
+                                                <input type="submit" class="btn btn-primary btn-lg" value="'.$this->trans('Submit').'">
                                             </div>
                                             <input type="hidden" name="hm_page_key" value="'.$this->get('2fa_key').'">
                                         </form>

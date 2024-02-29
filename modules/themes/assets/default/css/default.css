@@ -1,0 +1,31 @@
+@charset "UTF-8";
+/* The Bootstrap default theme, for Cypht */
+/*!
+ * Bootstrap  v5.3.2 (https://getbootstrap.com/)
+ * Copyright 2011-2023 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+@import url("../../../../../vendor/twbs/bootstrap/dist/css/bootstrap.min.css");
+
+:root {
+  --bs-primary: teal;
+  --bs-link-color: teal;
+  --bs-link-hover-color: #006363;
+}
+
+.btn-primary {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: teal;
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: #006363;
+  --bs-btn-hover-border-color: #005555;
+  --bs-btn-focus-shadow-rgb: 0, 128, 128;
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: #005555;
+  --bs-btn-active-border-color: #005555;
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: teal;
+  --bs-btn-disabled-border-color: teal;
+}
