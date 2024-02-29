@@ -1418,31 +1418,31 @@ function parse_sieve_config_host($host) {
     return [$host, $port, $tls];
 }}
 
-if (!hm_exists('connect_to_imap_serve')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $context, $errno = null, $errstr = null) {
-        if ($con = fsockopen($address, $port, $errno, $errstr, 5)) {
-              $imap_list = array(
-                  'name' => $name,
-                  'server' => $address,
-                  'hide' => false,
-                  'port' => $port,
-                  'user' => $user,
-                  'pass' => $pass,
-                  'tls' => $tls);
-                  
-              Hm_IMAP_List::add($imap_list);
-              $servers = Hm_IMAP_List::dump(false, true);
-              $ids = array_keys($servers);
-              $imap_server_id = array_pop($ids);
-              
-             return $imap_server_id;
-        }
+if (!hm_exists('connect_to_imap_server')) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $context) {
+        Hm_IMAP_List::init($context->user_config, $context->session);
+        $imap_list = array(
+            'name' => $name,
+            'server' => $address,
+            'hide' => false,
+            'port' => $port,
+            'user' => $user,
+            'pass' => $pass,
+            'tls' => $tls);
+
+        Hm_IMAP_List::add($imap_list);
+        $servers = Hm_IMAP_List::dump(false, true);
+        $ids = array_keys($servers);
+        $imap_server_id = array_pop($ids);
+        $server = Hm_IMAP_List::get($imap_server_id, false);
+
+        return Hm_IMAP_List::service_connect($imap_server_id, $server, $user, $pass, false);
     }
 }
 
 
-if (!hm_exists('connect_to_jmap_serve')) {
-    function connect_to_jmap_server($jmap_address, $hide_from_c_page, $name, $user, $pass) {
+if (!hm_exists('connect_to_jmap_server')) {
+    function connect_to_jmap_server($jmap_address, $hide_from_c_page, $name, $user, $pass, $context) {
        $hidden = false;
                        
        if($hide_from_c_page) {
@@ -1452,6 +1452,7 @@ if (!hm_exists('connect_to_jmap_serve')) {
        $parsed = parse_url($jmap_address);
        
        if (array_key_exists('host', $parsed) && @get_headers($jmap_address)) {
+           Hm_IMAP_List::init($context->user_config, $context->session);
            Hm_IMAP_List::add(array(
                'name' => $name,
                'server' => $jmap_address,
@@ -1462,34 +1463,9 @@ if (!hm_exists('connect_to_jmap_serve')) {
            $servers = Hm_IMAP_List::dump(false, true);
            $ids = array_keys($servers);
            $jmap_server_id = array_pop($ids);
-           
-           return $jmap_server_id;
-       }
-    }
-}
+           $server = Hm_IMAP_List::get($jmap_server_id, false);
 
-if (!hm_exists('authenticate_to_imap_server')) {
-    function authenticate_to_imap_server($user, $pass, $imap_server_id, $context) {
-        if (in_server_list('Hm_IMAP_List', $imap_server_id, $user)) {
-              Hm_Msgs::add('ERRThis server and username are already configured');
-              return;
-        } else{
-            Hm_IMAP_List::clean_up();
-            $cache = Hm_IMAP_List::get_cache($context->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache, $user, $pass, true);
-            
-            if (imap_authed($imap)) {
-                  $servers = Hm_IMAP_List::dump(false, true);
-                  $context->user_config->set('imap_servers', $servers);
-                  $context->just_saved_credentials = true;
-                  $context->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
-                  return true;
-            }
-            else {
-                  Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? ");
-                  Hm_IMAP_List::forget_credentials($context->imap_server_id);
-                  return;
-            }
-        }
+           return Hm_IMAP_List::service_connect($jmap_server_id, $server, $user, $pass, false);
+       }
     }
 }

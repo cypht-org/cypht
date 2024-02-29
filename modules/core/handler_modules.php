@@ -1031,8 +1031,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     return;
                 }
                 
-                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password);
-                $is_jmap_server_authenticated = authenticate_to_imap_server($email, $password, $this->jmap_server_id, $this);
+                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password, $this);
                 
                 Hm_Msgs::add("JMAP Server saved");
                 $this->out('just_saved_credentials', $this->just_saved_credentials);
@@ -1047,10 +1046,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         return;
                     }
                     
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this, $errno = null, $errstr = null);
-                    $is_smtp_server_authenticated = authenticate_to_smtp_server($email, $password, $this->smtp_server_id, $this);
-                    
-                     if(!isset($this->smtp_server_id) || !$is_smtp_server_authenticated) return;
+                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this);
+                    if(!isset($this->smtp_server_id)){
+                        return;
+                    }
                  }
     
                  /*
@@ -1061,12 +1060,19 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         Hm_Msgs::add("ERRIMAP module is not enabled");
                         return;
                      }
-                    
-                      $this->imap_server_id = connect_to_imap_server($imapAddress, $profileName, $imapPort, $email, $password, $imapTls, $imapSieveHost, $enableSieve, $this, $errno = null, $errstr = null);
-                      $is_imap_server_authenticated = authenticate_to_imap_server($email, $password, $this->imap_server_id, $this);
+
+                     $this->imap_server_id = connect_to_imap_server(
+                          $imapAddress,
+                          $profileName,
+                          $imapPort,
+                          $email,
+                          $password,
+                          $email,
+                          $imapSieveHost,
+                          $enableSieve,
+                          $this);
                       
-                      
-                      if(!isset($this->imap_server_id) || !$is_imap_server_authenticated) {
+                      if(!isset($this->imap_server_id)) {
                           if($isSender && isset($this->smtp_server_id)){
                                 delete_smtp_server($this->smtp_server_id, $this);
                           }

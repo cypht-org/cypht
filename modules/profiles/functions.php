@@ -15,13 +15,8 @@ if (!hm_exists('add_profile')) {
             'user' => $email,
             'type' => 'imap'
         );
-       
-         $profiles = new Hm_Profiles($context);
-         $profiles->add($profile);
-         $context->session->record_unsaved('Profile added');
 
-         $profiles->save($context->user_config);
-         $user_data = $context->user_config->dump();
-         $context->session->set('user_data', $user_data);
+        Hm_Profiles::init($context);
+        Hm_Profiles::add($profile);
     }
 }
