@@ -66,7 +66,7 @@ class Hm_Cal_Output {
             });
             $res = '';
             foreach ($this->events[$day] as $event) {
-                $res .= '<div class="cal_event text-secondary">'.
+                $res .= '<div class="cal_event">'.
                     $this->output_event_details($event).
                     $this->output_mod->html_safe(date('H:i', $event['ts'])).
                     ' <a class="cal_title cursor-pointer">'.$this->output_mod->html_safe($event['title']).

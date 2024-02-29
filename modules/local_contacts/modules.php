@@ -219,7 +219,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
         $name = '';
         $phone = '';
         $form_class = 'contact_form';
-        $button = '<input class="btn btn-success add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
+        $button = '<input class="btn btn-primary add_contact_submit" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
         $title = $this->trans('Add Local');
         $current = $this->get('current_contact', array());
         if (!empty($current)) {
@@ -238,7 +238,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $form_class = 'contact_update_form  mt-3';
             $title = $this->trans('Update Local');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
-                '<input class="btn btn-success edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
+                '<input class="btn btn-primary edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
         // var_dump($group);die();
         return '<div class="add_contact kokokoko"><form class="" method="POST">'.
@@ -272,7 +272,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
 class Hm_Output_import_contacts_form extends Hm_Output_Module {
     protected function output() {
         $form_class = 'contact_form';
-        $button = '<input class="btn btn-success add_contact_submit" type="submit" name="import_contact" id="import_contact" value="'.$this->trans('Add').'" />';
+        $button = '<input class="btn btn-primary add_contact_submit" type="submit" name="import_contact" id="import_contact" value="'.$this->trans('Add').'" />';
         $notice = 'Please ensure your CSV header file follows the format: display_name,email_address,phone_number';
         $title = $this->trans('Import from CSV file');
         $csv_sample_path = WEB_ROOT.'modules/local_contacts/assets/data/contact_sample.csv';

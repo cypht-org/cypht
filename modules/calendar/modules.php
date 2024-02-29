@@ -203,7 +203,7 @@ class Hm_Output_add_cal_event_form extends Hm_Output_Module {
                                 <div class="mb-3 row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-10">
-                                        <button type="submit" class="btn btn-success">'.$this->trans('Create').'</button>
+                                        <button type="submit" class="btn btn-primary">'.$this->trans('Create').'</button>
                                     </div>
                                 </div>
                             </form>

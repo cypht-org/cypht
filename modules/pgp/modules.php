@@ -121,7 +121,7 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
             }
             $res .= '</select>';
         }
-        $res .= '<input type="button" class="pgp_apply" value="'.$this->trans('Apply').'" class="btn btn-success" /></div>'.prompt_for_passhrase($this);
+        $res .= '<input type="button" class="pgp_apply" value="'.$this->trans('Apply').'" class="btn btn-primary" /></div>'.prompt_for_passhrase($this);
         return $res;
     }
 }
@@ -149,7 +149,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res .= '<div class="mb-2"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<label class="form-label" for="public_email">For</label>';
         $res .= '<input required id="public_email" name="public_key_email" placeholder="'.$this->trans('E-mail Address');
-        $res .= '" type="email" class="form-control"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-success">';
+        $res .= '" type="email" class="form-control"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-primary">';
         $res .= '</form>';
         $res .= '<table class="pgp_keys table mt-3"><thead><tr><th>'.$this->trans('Fingerprint').'</th>';
         $res .= '<th>'.$this->trans('E-mail').'</th><th></th></tr>';
@@ -200,7 +200,7 @@ class Hm_Output_pgp_settings_end extends Hm_Output_Module {
 class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
     protected function output() {
         return '<script type="text/javascript" src="'.WEB_ROOT.'modules/pgp/assets/openpgp.min.js"></script>'.
-        '<div class="pgp_msg_controls input-group"><select class="pgp_private_keys form-control"></select> <input type="button" class="pgp_btn btn-success" value="Decrypt" /></div>'.prompt_for_passhrase($this);
+        '<div class="pgp_msg_controls input-group"><select class="pgp_private_keys form-control"></select> <input type="button" class="pgp_btn btn-primary" value="Decrypt" /></div>'.prompt_for_passhrase($this);
     }
 }
 
@@ -254,5 +254,5 @@ function validate_public_key($file_location) {
  */
 if (!hm_exists('prompt_for_passhrase')) {
 function prompt_for_passhrase($mod) {
-    return '<div class="passphrase_prompt"><div class="title">'.$mod->trans('Please enter your passphrase').'</div><div class="input-group"><input type="password" value="" id="pgp_pass" class="form-control" /> <input id="submit_pgp_pass" type="button" value="'.$mod->trans('Submit').'" class="btn btn-success" /></div></div>';
+    return '<div class="passphrase_prompt"><div class="title">'.$mod->trans('Please enter your passphrase').'</div><div class="input-group"><input type="password" value="" id="pgp_pass" class="form-control" /> <input id="submit_pgp_pass" type="button" value="'.$mod->trans('Submit').'" class="btn btn-primary" /></div></div>';
 }}

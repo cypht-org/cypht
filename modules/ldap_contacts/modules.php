@@ -355,7 +355,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
                 if ($pass) {
                     $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
                     $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /> <input type="button" ';
-                    $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change btn btn-success" /></td></tr>';
+                    $res .= 'value="'.$this->trans('Unlock').'" class="ldap_password_change btn btn-primary" /></td></tr>';
                 }
                 else {
                     $res .= 'autocomplete="new-password" placeholder="'.$this->trans('Password').'" ';
@@ -409,7 +409,7 @@ class Hm_Output_ldap_form_submit extends Hm_Output_Module {
             $label = 'Update';
             $name = 'update_ldap_contact';
         }
-        return '<br /><input name="'.$name.'" type="submit" value="'.$this->trans($label).'" class="btn btn-success me-1" />'.
+        return '<br /><input name="'.$name.'" type="submit" value="'.$this->trans($label).'" class="btn btn-primary me-1" />'.
             '<input type="button" class="reset_contact btn btn-secondary" value="'.$this->trans('Cancel').'" />';
     }
 }

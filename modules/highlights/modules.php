@@ -317,7 +317,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
 
         // Submit Button
         $res .= '<div class="submit_row">';
-        $res .= '<input type="submit" value="'.$this->trans('Add').'" class="btn btn-success px-5" />';
+        $res .= '<input type="submit" value="'.$this->trans('Add').'" class="btn btn-primary px-5" />';
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '</div></form></div>';
 

@@ -255,7 +255,7 @@ class Hm_Output_carddav_auth_settings extends Hm_Output_Module {
         if (count($settings) == 0) {
             return;
         }
-        $res = '<tr><td data-target=".carddav_settings" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+        $res = '<tr><td data-target=".carddav_settings" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
             '<i class="bi bi-people-fill fs-5 me-2"></i>'.
             $this->trans('CardDav Addressbooks').'</td></tr>';
         foreach ($settings as $name => $vals) {
@@ -273,7 +273,7 @@ class Hm_Output_carddav_auth_settings extends Hm_Output_Module {
             if ($pass) {
                 $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
                 $res .= 'name="carddav_passwords['.$this->html_safe($name).']" /> <input type="button" ';
-                $res .= 'value="'.$this->trans('Unlock').'" class="carddav_password_change btn btn-success" /></td></tr>';
+                $res .= 'value="'.$this->trans('Unlock').'" class="carddav_password_change btn btn-primary" /></td></tr>';
             }
             else {
                 $res .= 'autocomplete="new-password" placeholder="'.$this->trans('Password').'" ';
@@ -298,7 +298,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             return '';
         }
         $form_class = 'contact_form';
-        $button = '<input class="add_contact_submit btn btn-success" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
+        $button = '<input class="add_contact_submit btn btn-primary" type="submit" name="add_contact" value="'.$this->trans('Add').'" />';
         $title = $this->trans('Add Carddav');
         $current = $this->get('current_carddav_contact', array());
         $current_source = false;
@@ -316,7 +316,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             $form_class = 'contact_update_form mt-3';
             $title = sprintf($this->trans('Update Carddav - %s'), $this->html_safe($current['source']));
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
-                '<input class="edit_contact_submit btn btn-success" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
+                '<input class="edit_contact_submit btn btn-primary" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
         if ($current_source) {
             $target = '<input type="hidden" name="carddav_email_id" value="'.$this->html_safe($current['carddav_email_id']).'" />'.

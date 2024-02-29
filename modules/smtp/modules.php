@@ -1193,10 +1193,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
-            '<button class="smtp_send_placeholder btn btn-success mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>';
+            '<button class="smtp_send_placeholder btn btn-primary mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>';
 
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
-            $res .= '<input class="smtp_send_archive btn btn-success mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
+            $res .= '<input class="smtp_send_archive btn btn-primary mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }
 
         $disabled_attachment = $this->get('attachment_dir_access') ? '' : 'disabled="disabled"';
@@ -1271,7 +1271,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
                                 </div>
 
                                 <div class="">
-                                    <input class="btn btn-success px-5" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" />
+                                    <input class="btn btn-primary px-5" type="submit" value="'.$this->trans('Add').'" name="submit_smtp_server" />
                                 </div>
                             </form>
                         </div>';

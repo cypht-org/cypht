@@ -163,7 +163,7 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         }
         $res .= '</select></td></tr>';
         $res .= '<tr><td colspan="2">
-                        <input type="submit" class="btn btn-success" value="'.$this->trans('Update').'" /> 
+                        <input type="submit" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
                         <input type="button" class="btn btn-light border reset_shortcut" value="'.$this->trans('Cancel').'" />
                 </td></tr>';
         
@@ -236,7 +236,7 @@ function format_shortcut_section($data, $type, $output_mod) {
             }
             $char = array_search($vals['char'], $codes);
             $res .= sprintf('<tr><th class="keys">%s %s</th><th>%s</th>'.
-                '<td><a href="?page=shortcuts&edit_id=%s"><i class="kbd_config cursor-pointer bi bi-gear-wide-connected text-secondary fs-5"></i><a></td></tr>',
+                '<td><a href="?page=shortcuts&edit_id=%s"><i class="kbd_config cursor-pointer bi bi-gear-wide-connected fs-5"></i><a></td></tr>',
                 $output_mod->html_safe($c_keys), $output_mod->html_safe($char),
                 $output_mod->trans($vals['label']), $index);
         }

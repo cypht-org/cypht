@@ -319,7 +319,7 @@ $(function () {
         $('#edit_script_modal').remove();
 
         // add a button
-        edit_script_modal.addFooterBtn('Save', 'btn-success', async function () {
+        edit_script_modal.addFooterBtn('Save', 'btn-primary', async function () {
             save_script(current_account);
         });
 
@@ -338,7 +338,7 @@ $(function () {
         $('#edit_filter_modal').remove();
 
         // add a button
-        edit_filter_modal.addFooterBtn('Save', 'btn-success ms-auto', async function () {
+        edit_filter_modal.addFooterBtn('Save', 'btn-primary ms-auto', async function () {
             let result = save_filter(current_account);
             if (result) {
                 edit_filter_modal.close();
