@@ -35,6 +35,7 @@ return array(
         'profile_default' => FILTER_VALIDATE_INT,
         'profile_address' => FILTER_DEFAULT,
         'profile_sig' => FILTER_UNSAFE_RAW,
+        'profile_rmk' => FILTER_UNSAFE_RAW,
         'profile_delete' => FILTER_DEFAULT
     ),
     'allowed_get' => array(

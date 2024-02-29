@@ -259,6 +259,7 @@ return array(
     'Reply-to' => 'Beantwoord-aan',
     'SMTP Server' => 'SMTP Server',
     'Signature' => 'Handtekening',
+    'Remark' => 'Opmerking',
     'Edit' => 'Aanpassen',
     'No' => 'Nee',
     'Yes' => 'Ja',

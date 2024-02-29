@@ -263,6 +263,7 @@ return array(
     'Reply-to' => 'Cavab vermək',
     'SMTP Server' => 'SMTP Server',
     'Signature' => 'İmza',
+    'Remark' => 'Qeyd',
     'Edit' => 'Düzəliş',
     'No' => 'Xeyr',
     'Yes' => 'Bəli',

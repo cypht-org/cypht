@@ -76,6 +76,7 @@ class Hm_Profiles {
                 'replyto' => $reply_to,
                 'smtp_id' => $smtp_server['id'],
                 'sig' => '',
+                'rmk' => '',
                 'type' => 'imap',
                 'autocreate' => true,
                 'user' => $imap_server['user'],
@@ -89,7 +90,7 @@ class Hm_Profiles {
             foreach (Hm_IMAP_List::dump() as $id => $server) {
                 $profile = $hmod->user_config->get('profile_imap_'.$server['server'].'_'.$server['user'], array(
                     'profile_default' => false, 'profile_name' => '', 'profile_address' => '',
-                    'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => ''));
+                    'profile_replyto' => '', 'profile_smtp' => '', 'profile_sig' => '', 'profile_rmk' => ''));
                 if (! $profile['profile_name']) {
                     continue;
                 }
@@ -100,6 +101,7 @@ class Hm_Profiles {
                     'replyto' => $profile['profile_replyto'],
                     'smtp_id' => $profile['profile_smtp'],
                     'sig' => $profile['profile_sig'],
+                    'rmk' => $profile['profile_rmk'],
                     'type' => 'imap',
                     'user' => $server['user'],
                     'server' => $server['server'],

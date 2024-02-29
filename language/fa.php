@@ -294,6 +294,7 @@ return array(
     "Reply-to"=>"پاسخ دادن به",
     "SMTP Server"=>"سرور SMTP",
     "Signature"=>"امضا",
+    "Remark"=>"تذکر دهید",
     "Edit"=>"ویرایش کنید",
     "No"=>"نه",
     "Yes"=>"آره",

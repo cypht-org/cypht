@@ -262,6 +262,7 @@ return array(
     'Reply-to' => 'Vastus saabub siia',
     'SMTP Server' => 'SMTP server',
     'Signature' => 'Allkiri',
+    'Remark' => 'Märkus',
     'Edit' => 'Muuda',
     'No' => 'Ei',
     'Yes' => 'Jah',

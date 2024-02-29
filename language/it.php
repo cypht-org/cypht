@@ -259,6 +259,7 @@ return array(
     'Reply-to' => 'Rispondi a',
     'SMTP Server' => 'Server SMTP',
     'Signature' => 'Firma',
+    'Remark' => 'Osservazione',
     'Edit' => 'Modifica',
     'No' => 'No',
     'Yes' => 'Sì',
