@@ -751,6 +751,9 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         else {
             Hm_Debug::add(sprintf('Unable to save sent message, no IMAP server found for SMTP server: %s', $smtp_details['server']));
         }
+        if ($this->module_is_supported('contacts') && $this->user_config->get('contact_auto_collect_setting', false)) {
+            $this->out('collect_contacts', true);
+        }
 
         // Archive replied message
         if ($form['post_archive']) {

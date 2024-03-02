@@ -632,7 +632,12 @@ return array(
     'Connection To Sieve Server Failed' => false,
     'Warn for unsaved changes' => false,
     'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
-    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => 'ضمیمه،فایل،ضمیمه کردن،ضمیمه شده،در حال ضمیمه کردن، الصاق شده،CV،عنوان نامه'
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => 'ضمیمه،فایل،ضمیمه کردن،ضمیمه شده،در حال ضمیمه کردن، الصاق شده،CV،عنوان نامه',
+    'Automatically add outgoing email addresses' => false,
+    'Trusted Senders' => false,
+    'Collected Recipients' => false,
+    'Personal Addresses' => false,
+    'Contact Group' => false,
 );
 
 ?>

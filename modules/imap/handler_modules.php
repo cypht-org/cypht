@@ -1912,6 +1912,14 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('msg_attachment_remove_args', $download_args.'&amp;imap_remove_attachment=1');
                     $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=imap_%s_%s&amp;imap_show_message=1", $form['imap_msg_uid'], $form['imap_server_id'], $form['folder']));
 
+                    if ($this->get('imap_allow_images', false)) {
+                        if ($this->module_is_supported('contacts') && $this->user_config->get('contact_auto_collect_setting', false)) {
+                            $this->out('collect_contacts', true);
+                            $this->out('collected_contact_email', $msg_headers["Return-Path"]);
+                            $this->out('collected_contact_name', $msg_headers["From"]);
+                        }
+                    }
+
                     if (!$prefetch) {
                         clear_existing_reply_details($this->session);
                         if ($part == 0) {
