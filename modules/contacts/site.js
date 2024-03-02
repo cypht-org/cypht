@@ -207,6 +207,40 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
     return false;
 };
 
+var showPage = function(selected_page, total_pages) {
+    $('.import_body tr').hide();
+    $('.page_' + selected_page).show();
+    $('.page_link_selector').removeClass('active');
+    $('.page_item_' + selected_page).addClass('active');
+    $('.prev_page').toggleClass('disabled', selected_page === 1);
+    $('.next_page').toggleClass('disabled', selected_page === total_pages);
+};
+
+var contact_import_pagination = function() {
+    var selected_page = 1;
+    var total_pages = $('#totalPages').val();
+    showPage(selected_page, total_pages);
+
+    $('.page_link_selector').on('click', function () {
+        selected_page = $(this).data('page');
+        showPage(selected_page, total_pages);
+    });
+
+    $('.prev_page').on('click', function () {
+        if (selected_page > 1) {
+            selected_page--;
+            showPage(selected_page, total_pages);
+        }
+    });
+
+    $('.next_page').on('click', function () {
+        if (selected_page < total_pages) {
+            selected_page++;
+            showPage(selected_page, total_pages);
+        }
+    });
+};
+
 if (hm_page_name() == 'contacts') {
     $('.delete_contact').on("click", function() {
         delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
@@ -234,6 +268,11 @@ if (hm_page_name() == 'contacts') {
         }
 
     });
+    $('.source_link').on("click", function () { 
+        $('.list_actions').toggle(); $('#list_controls_menu').hide();
+        return false; 
+    });
+    contact_import_pagination();
 }
 else if (hm_page_name() == 'compose') {
     $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });

@@ -259,6 +259,7 @@ return array(
     'Reply-to' => false,
     'SMTP Server' => false,
     'Signature' => false,
+    'Remark' => false,
     'Edit' => false,
     'No' => false,
     'Yes' => false,

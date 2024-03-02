@@ -81,6 +81,11 @@ add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_typ
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
+/* message source page */
+setup_base_page('message_source', 'core', false);
+add_output('message_source', 'imap_message_source', true);
+add_handler('message_source', 'imap_message_source',  true);
+
 /* ajax mark as read */
 setup_base_ajax_page('ajax_imap_mark_as_read', 'core');
 add_handler('ajax_imap_mark_as_read', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -325,6 +330,7 @@ return array(
         'ajax_imap_snooze',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
+        'message_source',
     ),
 
     'allowed_output' => array(
@@ -352,7 +358,9 @@ return array(
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
-        'imap_msg_part' => FILTER_DEFAULT
+        'imap_msg_part' => FILTER_DEFAULT,
+        'imap_msg_uid' => FILTER_DEFAULT,
+        'imap_folder' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(

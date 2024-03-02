@@ -796,7 +796,9 @@ function fetch_ldap_contacts($config, $user_config, $contact_store, $session=fal
     $ldap_config = ldap_add_user_auth($ldap_config, $user_config->get('ldap_contacts_auth_setting', array()));
     if (count($ldap_config) > 0) {
         foreach ($ldap_config as $name => $vals) {
-            $vals['name'] = $name;
+            if (is_array($vals)) {
+                $vals['name'] = $name;
+            }
             $ldap = new Hm_LDAP_Contacts($vals);
             if ($ldap->connect()) {
                 $contacts = $ldap->fetch();

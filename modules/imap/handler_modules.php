@@ -721,16 +721,22 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $prefetched[] = $form['imap_server_id'];
                 $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_NUMERIC));
             }
+            $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             if ($page_cache) {
                 $this->out('imap_expanded_folder_data', $page_cache);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
                 return;
             }
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
-                $msgs = $imap->get_folder_list_by_level(hex2bin($folder));
+                $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
+                if ($with_subscription) {
+                    $only_subscribed = false;
+                }
+                $msgs = $imap->get_folder_list_by_level(hex2bin($folder), $only_subscribed, $with_subscription);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
@@ -738,6 +744,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_data', $msgs);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
+                $this->out('with_input', $with_subscription);
             }
             else {
                 Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
@@ -1829,9 +1836,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
                 $prefetch = true;
             }
-            if (array_key_exists('imap_allow_images', $this->request->post) && $this->request->post['imap_allow_images']) {
-                $this->out('imap_allow_images', true);
-            }
+            
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
 
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
@@ -1917,6 +1922,25 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                             array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                     }
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Get message source from an IMAP server
+ */
+class Hm_Handler_imap_message_source extends Hm_Handler_Module {
+    public function process() {
+        $imap_server_id = $this->request->get['imap_server_id'];
+        $imap_msg_uid = $this->request->get['imap_msg_uid'];
+        $folder = $this->request->get['imap_folder'];
+        if ($imap_server_id && $imap_msg_uid && $folder) {
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if ($imap->select_mailbox(hex2bin($folder))) {
+                $msg_source = $imap->get_message_content($imap_msg_uid, 0, false);
+                $this->out('msg_source', $msg_source);
             }
         }
     }

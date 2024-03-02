@@ -559,10 +559,7 @@ var expand_imap_folders = function(path) {
     return false;
 };
 
-var get_message_content = function(msg_part, uid, list_path, detail, callback, noupdate, images) {
-    if (!images) {
-        images = 0;
-    }
+var get_message_content = function(msg_part, uid, list_path, detail, callback, noupdate) {
     if (!uid) {
         uid = $('.msg_uid').val();
     }
@@ -577,7 +574,6 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
             {'name': 'imap_msg_uid', 'value': uid},
             {'name': 'imap_msg_part', 'value': msg_part},
-            {'name': 'imap_allow_images', 'value': images},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
@@ -715,11 +711,6 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     }
     $('.all_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
     $('.small_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
-    $('.msg_part_link').on("click", function() {
-        $('.header_subject')[0].scrollIntoView();
-        $('.msg_text_inner').css('visibility', 'hidden');
-        return get_message_content($(this).data('messagePart'), false, false, false, false, false, $(this).data('allowImages'));
-    });
     $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').on("click", function() { return imap_delete_message(); });
@@ -744,6 +735,11 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         $('#block_sender_form')[0].reset();
 
         return block_unblock_sender(msg_uid, detail, scope, action, sender, reject_message);
+    });
+    $('#show_message_source').on("click", function(e) {
+        e.preventDefault();
+        const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+        window.open(`?page=message_source&imap_msg_uid=${hm_msg_uid()}&imap_server_id=${detail.server_id}&imap_folder=${detail.folder}`);
     });
     $(document).on('click', '#unblock_sender', function(e) {
         e.preventDefault();
@@ -1016,7 +1012,7 @@ var expand_imap_move_to_folders = function(path, context) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.move_to_location'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill"></i>');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -1257,3 +1253,150 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
+var imap_show_add_contact_popup = function() {
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
+};
+
+var imap_hide_add_contact_popup = function(event) {
+    event.stopPropagation()
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
+};
+
+/**
+ * Allow external resources for the provided element.
+ *
+ * @param {HTMLElement} element - The element containing the allow button.
+ * @param {string} messagePart - The message part associated with the resource.
+ * @returns {void}
+ */
+function handleAllowResource(element, messagePart) {
+    element.querySelector('a').addEventListener('click', function (e) {
+        e.preventDefault();
+        $('.msg_text_inner').remove();
+        const externalSources = $(this).data('src').split(',');
+        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+        return get_message_content(messagePart, false, false, false, false, false);
+    });
+}
+
+/**
+ * Create and insert in the DOM an element containing a message and a button to allow the resource.
+ * 
+ * @param {HTMLElement} element - The element having the blocked resource.
+ * @returns {void}
+ */
+function handleInvisibleResource(element) {
+    const dataSrc = element.dataset.src;
+
+    const allowResource = document.createElement('div');
+    // allowResource.classList.add('allow_image_link');
+    allowResource.classList.add('alert', 'alert-warning', 'p-1');
+
+    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
+    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source} 
+    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
+    Allow</a></div>
+    `;
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
+    handleAllowResource(allowResource, element.dataset.messagePart);
+}
+
+const mutation = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach(function (node) {
+                if (node.classList.contains('msg_text_inner')) {
+                    
+                    //  Extarnal resources notice boxes container
+                    document.querySelector('.msg_text_inner').insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
+
+                    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+                    const elements = node.querySelectorAll('[data-src]');
+                    const blockedResources = [];
+                    elements.forEach(function (element) {
+
+                        const dataSrc = element.dataset.src;
+                        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
+                        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
+
+                        switch (Number(allowed) || Number(senderAllowed)) {
+                            case 1:
+                                element.src = dataSrc;
+                                break;
+                            default:
+                                if ((allowed || senderAllowed) === null) {
+                                    Hm_Utils.save_to_local_storage(dataSrc, 0);
+                                }
+                                handleInvisibleResource(element);
+                                blockedResources.push(dataSrc);
+                                break;
+                        }
+                    });
+
+                    const noticesElement = document.createElement('div');
+                    noticesElement.classList.add('notices');
+
+                    if(blockedResources.length) {
+                        const allowAll = document.createElement('div');
+                        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
+                        allowAll.textContent = 'For security reasons, external resources have been blocked.';
+                        if (blockedResources.length > 1) {
+                            const allowAllLink = document.createElement('a');
+                            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
+                            allowAllLink.href = '#';
+                            allowAllLink.dataset.src = blockedResources.join(',');
+                            allowAllLink.textContent = 'Allow all';
+                            allowAll.appendChild(allowAllLink);
+                            handleAllowResource(allowAll, elements[0].dataset.messagePart);
+                        }
+                        noticesElement.appendChild(allowAll);
+
+                        const button = document.createElement('a');
+                        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
+                        button.textContent = 'Always allow from this sender';
+                        noticesElement.appendChild(button);
+
+                        button.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            Hm_Utils.save_to_local_storage(sender, 1);
+                            $('.msg_text_inner').remove();
+                            get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+                        });
+                    }
+
+                    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
+                }
+            });
+        }
+    });
+});
+
+const message = document.querySelector('.msg_text');
+if (message) {
+    mutation.observe(document.querySelector('.msg_text'), {
+        childList: true
+    });
+}
+
+const handleDownloadMsgSource = function() {
+    const messageSource = document.querySelector('pre.msg_source');
+    const blob = new Blob([messageSource.textContent], { type: "message/rfc822" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const subject = messageSource.textContent.match(/Subject: (.*)/)?.[1] || hm_msg_uid(); // Let's use the message UID if the subject is empty
+    a.download = subject + '.eml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+const handleCopyMsgSource = function(e) {
+    e.preventDefault();
+    const messageSource = document.querySelector('pre.msg_source');
+    navigator.clipboard.writeText(messageSource.textContent);
+    Hm_Notices.show(['Copied to clipboard']);
+}

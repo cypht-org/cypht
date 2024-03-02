@@ -16,16 +16,26 @@
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
+
     $config = HTMLPurifier_Config::createDefault();
+    $config->set('HTML.DefinitionID', 'hm-message');
+    $config->set('HTML.DefinitionRev', 1);
     $config->set('Cache.DefinitionImpl', null);
     $config->set('HTML.TargetBlank', true);
     $config->set('HTML.TargetNoopener', true);
-    $config->set('HTML.Allowed', 'a[href|target]');
+
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
     }
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
+
+    $def = $config->getHTMLDefinition(true);
+    $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
+    foreach ($html_tags as $tag) {
+        $def->addAttribute($tag, 'data-src', 'Text');
+    }
+    
     try {
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($str);

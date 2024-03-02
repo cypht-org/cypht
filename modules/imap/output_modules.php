@@ -88,6 +88,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     /**
      * Format html, text, or image content
      */
+
     protected function output() {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
@@ -97,17 +98,17 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             }
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
-                $images = $this->get('imap_allow_images', false);
-                if ($allowed && stripos($this->get('msg_text'), 'img')) {
-                    if (!$images) {
-                        $id = $this->get('imap_msg_part');
-                        $txt .= '<div class="allow_image_link">'.
-                            '<a href="#" class="msg_part_link" data-allow-images="1" '.
-                            'data-message-part="'.$this->html_safe($id).'">'.
-                            $this->trans('Allow Images').'</a></div>';
-                    }
+                $msgText = $this->get('msg_text');
+                // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
+                $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
+
+                if ($allowed) {
+                    $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
+                        return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
+                    }, $msgText);
                 }
-                $txt .= format_msg_html($this->get('msg_text'), $images);
+
+                $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
                 $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
@@ -370,6 +371,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
+            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             if ($this->get('sieve_filters_enabled')) {
                 $server_id = $this->get('msg_server_id');
@@ -743,8 +745,9 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
+        $with_input = $this->get('with_input', false);
         if (!empty($folder_data)) {
-            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this);
+            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input);
             $this->out('imap_expanded_folder_formatted', $res);
         }
     }
@@ -1088,7 +1091,7 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         if (!array_key_exists('auto_advance_email', $settings) || (array_key_exists('auto_advance_email', $settings) && $settings['auto_advance_email'])) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
             $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
@@ -1262,6 +1265,29 @@ class Hm_Output_snooze_msg_control extends Hm_Output_Module {
     }
 }
 
+/**
+ * Output imap message source
+ * @subpackage imap/output
+ */
+class Hm_Output_imap_message_source extends Hm_Output_Module {
+    protected function output() {
+        $res = '<div class="w-auto mx-auto p-5">';
+        $res .= '
+        <div class="d-flex flex-column gap-2 mb-4">
+        <h1>Message source</h1>
+        <div class="d-flex justify-content-between mb-3">
+            <button class="btn btn-success" onclick="handleDownloadMsgSource()">Download</button>
+            <a href="#" class="hlink" onClick="handleCopyMsgSource(event)">Copy to clipboard</a>
+        </div>
+        </div>
+        ';
+        if($this->get('msg_source')){
+            $res .= '<div><pre class="msg_source">'.$this->html_safe($this->get('msg_source')).'</pre></div>';
+        }
+        $res .= '</div>';
+        return $res;
+    }
+}
 /**
  * @subpackage jmap/output
  */
