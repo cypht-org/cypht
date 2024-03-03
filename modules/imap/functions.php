@@ -1438,11 +1438,29 @@ if (!hm_exists('connect_to_imap_server')) {
             'pass' => $pass,
             'tls' => $tls);
 
+        if (isset($imap_sieve_host) && $imap_sieve_host) {
+            $imap_list['sieve_config_host'] = $imap_sieve_host;
+        }
+
         Hm_IMAP_List::add($imap_list);
         $servers = Hm_IMAP_List::dump(false, true);
         $ids = array_keys($servers);
         $imap_server_id = array_pop($ids);
         $server = Hm_IMAP_List::get($imap_server_id, false);
+
+        if ($enableSieve &&
+            isset($imap_sieve_host) &&
+            $context->module_is_supported('sievefilters') &&
+            $context->user_config->get('enable_sieve_filter_setting', true)) {
+            try {
+                list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_sieve_host);
+                $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+                $client->connect($user, $pass, $sieve_tls, "", "PLAIN");
+            } catch (Exception $e) {
+                Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                return;
+            }
+        }
 
         return Hm_IMAP_List::service_connect($imap_server_id, $server, $user, $pass, false);
     }
