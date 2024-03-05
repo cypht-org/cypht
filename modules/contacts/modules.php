@@ -13,6 +13,68 @@ require APP_PATH.'modules/contacts/hm-contacts.php';
 /**
  * @subpackage contacts/handler
  */
+class Hm_Handler_process_contact_auto_collect_setting extends Hm_Handler_Module {
+    public function process() {
+        function contact_auto_collect_callback($val) {
+            return $val;
+        }
+        process_site_setting('contact_auto_collect', $this, 'contact_auto_collect_callback', false, true);
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_store_contact_message extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('collect_contacts', false)) {
+            $addresses = process_address_fld($this->request->post['compose_to']);
+            $contacts = $this->get('contact_store');
+            $contact_list = $contacts->getAll();
+            $existingEmails = array_column($contact_list, 'email_address');
+            // Extract email addresses from the new format of $addresses
+            $newEmails = array_column($addresses, 'email');
+            if (!empty($newEmails)) {
+                $newContacts = array_filter($newEmails, function ($email) use ($existingEmails) {
+                    return !in_array($email, $existingEmails);
+                });
+
+                if (!empty($newContacts)) {
+                    $newContacts = array_map(function ($email) {
+                        return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => $this->trans('Collected Recipients')];
+                    }, $newContacts);
+                    $contacts->add_contact($newContacts[0]);
+                    $this->session->record_unsaved('Contact Added');
+                    Hm_Msgs::add('Contact Added');
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_store_contact_allow_images extends Hm_Handler_Module {
+    public function process() {
+        if ($this->get('imap_allow_images', false) && $this->get('collect_contacts', false)) {
+            $email = str_replace(['<', '>'], '', $this->get('collected_contact_email', ''));
+            $name = $this->get('collected_contact_name', '');
+            $contacts = $this->get('contact_store');
+            $contact_list = $contacts->getAll();
+            $existingEmails = array_column($contact_list, 'email_address');
+            if (!in_array($email, $existingEmails)) {
+                $contacts->add_contact(['source' => 'local', 'email_address' => $email, 'display_name' => $name, 'group' => $this->trans('Trusted Senders')]);
+                $this->session->record_unsaved('Contact Added');
+                Hm_Msgs::add('Contact Added');
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage contacts/handler
+ */
 class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('contact_value'));
@@ -109,6 +171,26 @@ class Hm_Handler_process_export_contacts extends Hm_Handler_Module {
             fclose($output);
             exit;
         }
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_contact_auto_collect_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('contact_auto_collect', $settings) && $settings['contact_auto_collect']) {
+            $checked = ' checked="checked"';
+        } else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="' . Hm_Image_Sources::$refresh . '" /></span>';
+        }
+
+        return '<tr class="general_setting"><td><label for="contact_auto_collect">' .
+            $this->trans('Automatically add outgoing email addresses') . '</label></td>' .
+            '<td><input type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" value="1" />' . $reset . '</td></tr>';
     }
 }
 
@@ -218,12 +300,44 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         }
 
         $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+        
+        
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
+
+        $res = '<div class="contact-group contact-group-effect-scale contact-group-theme-1">';
+        $tabIndex = 1;
+        $contactGroups = [];
+
         if ($contacts) {
-            $total = count($contacts->dump());
-            $contacts->sort('email_address');
             foreach ($contacts->page($current_page, $per_page) as $id => $contact) {
+                $group = $contact->value('group');
+                if (!$group || empty($group)) {
+                    $group = 'Personal Addresses'; // Set the group to "Personal Addresses" when it's null or empty
+                }
+                if (!array_key_exists($group, $contactGroups)) {
+                    $contactGroups[$group] = [];
+                }
+                $contactGroups[$group][] = $contact;
+            }
+        }
+
+        foreach ($contactGroups as $group => $groupContacts) {
+            $res .= '<input type="radio" name="contact-group" ' . ($tabIndex === 1 ? 'checked ' : '') . 'id="tab' . $tabIndex . '" class="' . ($tabIndex === 1 ? 'tab-content-first' : 'tab-content-' . $tabIndex) . '">';
+            $res .= '<label for="tab' . $tabIndex . '">' . $this->html_safe($group) . '</label>';
+
+            $tabIndex++;
+        }
+        $tabIndex = 1;
+        $res .= '<ul>';
+
+        foreach ($contactGroups as $group => $groupContacts) {
+            $res .= '<li class="tab-content '.($tabIndex === 1 ? 'tab-content-first' : 'tab-content-'.$tabIndex).' typography">';
+            $res .= '<table class="contact_list">';
+            $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+            $total = count($groupContacts);
+
+            foreach ($groupContacts as $contact) {
                 $name = $contact->value('display_name');
                 if (!trim($name)) {
                     $name = $contact->value('fn');
@@ -240,14 +354,14 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     $this->html_safe($contact->value('phone_number')).'</a></td>'.
                     '<td class="text-end" style="width : 100px">';
                 if (in_array($contact->value('type').':'.$contact->value('source'), $editable, true)) {
-                    $res .= '<a data-id="'.$this->html_safe($id).'" data-type="'.$this->html_safe($contact->value('type')).'" data-source="'.$this->html_safe($contact->value('source')).
+                    $res .= '<a data-id="'.$this->html_safe($contact->value('id')).'" data-type="'.$this->html_safe($contact->value('type')).'" data-source="'.$this->html_safe($contact->value('source')).
                         '" class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
-                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($id).'&amp;contact_source='.
+                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($contact->value('id')).'&amp;contact_source='.
                         $this->html_safe($contact->value('source')).'&amp;contact_type='.
                         $this->html_safe($contact->value('type')).'&amp;contact_page='.$current_page.
                         '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
                 }
-                $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($id).
+                $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($contact->value('id')).
                     '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
                     '<i class="bi bi-file-earmark-text ms-2"></i></a>';
 
@@ -257,15 +371,28 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 $res .= '</td></tr>';
             }
             $res .= '<tr><td class="contact_pages" colspan="7">';
-            if ($current_page > 1) {
-                $res .= '<a href="?page=contacts&contact_page='.($current_page-1).'">Previous</a>';
+            $contactsPerPage = $per_page;
+            $totalContacts = count($contacts->dump());
+            $totalPages = ceil($totalContacts / $contactsPerPage);
+            $currentPage = $current_page;
+
+            if ($currentPage > 1) {
+                $res .= '<a href="?page=contacts&contact_page='.($currentPage - 1).'">Previous</a>';
             }
-            if ($total > ($current_page * $per_page)) {
-                $res .= ' <a href="?page=contacts&contact_page='.($current_page+1).'">Next</a>';
+            if ($currentPage < $totalPages) {
+                $res .= ' <a href="?page=contacts&contact_page='.($currentPage + 1).'">Next</a>';
             }
             $res .= '</td></tr>';
+            $res .= '</table>';
+
+            $res .= '</li>';
+            $tabIndex++;
         }
         $res .= '</table>'.$modal.'</div>';
+        $res .= '</ul>';
+
+        $res .= '</div>';
+
         return $res;
     }
 }
@@ -338,6 +465,7 @@ function build_contact_detail($output_mod, $contact, $id) {
     $res .= '</tbody></table></div>';
     return $res;
 }}
+
 
 /**
  * @subpackage contacts/functions

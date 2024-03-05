@@ -511,6 +511,10 @@ class Hm_Output_header_css extends Hm_Output_Module {
                     $res .= '<link href="'.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
+            // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
+            if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
+                $res .= '<link href="third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
+            }
         }
         else {
             $res .= '<link href="site.css?v='.CACHE_ID.'" ';
