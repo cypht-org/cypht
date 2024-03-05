@@ -873,10 +873,7 @@ class Hm_JMAP {
             $data['uploadUrl']
         );
         foreach ($data['accounts'] as $account) {
-            //if (array_key_exists('isPrimary', $account) && $account['isPrimary']) {
-                $this->account_id = array_keys($data['accounts'])[0];
-            //    break;
-            //}
+            $this->account_id = array_keys($data['accounts'])[0];
         }
         if ($this->account_id && count($this->folder_list) == 0) {
             $this->reset_folders();
