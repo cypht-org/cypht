@@ -27,7 +27,7 @@ $.fn.serializeArray = function() {
         parts = args[i].split('=');
         res.push({'name': parts[0], 'value': parts[1]});
     }
-    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value)}});
+    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
 };
 $.fn.sort = function(sort_function) {
     var list = [];
