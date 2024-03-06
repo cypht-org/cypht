@@ -320,7 +320,6 @@ class Hm_Handler_special_folders extends Hm_Handler_Module {
 class Hm_Handler_folders_server_id extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('imap_server_id', $this->request->get)) {
-            var_dump($this->request->get['imap_server_id']);
             $this->out('folder_server', $this->request->get['imap_server_id']);
             $this->out('page', $this->request->get['page']);
         }
@@ -692,7 +691,8 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
                 </div>
             </div>';
 
-            $res .= '</div>';
+        $res .= '</div>';
+        return $res;
     }
 }
 
