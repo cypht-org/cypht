@@ -185,7 +185,7 @@ class Hm_Output_contact_auto_collect_setting extends Hm_Output_Module {
         if (array_key_exists('contact_auto_collect', $settings) && $settings['contact_auto_collect']) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="' . Hm_Image_Sources::$refresh . '" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
 
         return '<tr class="general_setting"><td><label for="contact_auto_collect">' .
