@@ -356,40 +356,44 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             $found = false;
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
             if ($success) {
-                $connection_test = address_from_url($form['new_feed_address']);
-                if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
-                    $feed = is_news_feed($form['new_feed_address']);
-                    if (!$feed) {
-                        $feed = new Hm_Feed();
-                        $homepage = $feed->get_feed_data($form['new_feed_address']);
-                        if (trim($homepage)) {
-                            list($type, $href) = search_for_feeds($homepage);
-                            if ($type && $href) {
-                                Hm_Msgs::add('Discovered a feed at that address');
-                                $found = true;
+                if (feed_exists($form['new_feed_address'])) {
+                    Hm_Msgs::add(sprintf('ERRFeed url %s already exists', $form['new_feed_address']));
+                } else {
+                    $connection_test = address_from_url($form['new_feed_address']);
+                    if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
+                        $feed = is_news_feed($form['new_feed_address']);
+                        if (!$feed) {
+                            $feed = new Hm_Feed();
+                            $homepage = $feed->get_feed_data($form['new_feed_address']);
+                            if (trim($homepage)) {
+                                list($type, $href) = search_for_feeds($homepage);
+                                if ($type && $href) {
+                                    Hm_Msgs::add('Discovered a feed at that address');
+                                    $found = true;
+                                }
+                                else {
+                                    Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
+                                }
                             }
                             else {
-                                Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
+                                Hm_Msgs::add('ERRCould not find a feed at that address');
                             }
                         }
                         else {
-                            Hm_Msgs::add('ERRCould not find a feed at that address');
+                            Hm_Msgs::add('Successfully connected to feed');
+                            $found = true;
+                            if (stristr('<feed', $feed->xml_data)) {
+                                $type = 'application/atom+xml';
+                            }
+                            else {
+                                $type = 'application/rss+xml';
+                            }
+                            $href = $form['new_feed_address'];
                         }
                     }
                     else {
-                        Hm_Msgs::add('Successfully connected to feed');
-                        $found = true;
-                        if (stristr('<feed', $feed->xml_data)) {
-                            $type = 'application/atom+xml';
-                        }
-                        else {
-                            $type = 'application/rss+xml';
-                        }
-                        $href = $form['new_feed_address'];
+                        Hm_Msgs::add(sprintf('ERRCould not add feed: %s', $errstr));
                     }
-                }
-                else {
-                    Hm_Msgs::add(sprintf('ERRCould not add feed: %s', $errstr));
                 }
             }
             else {
@@ -1035,4 +1039,18 @@ if (!hm_exists('feed_memcached_fetch')) {
 function feed_memcached_fetch($hmod, $feed_data) {
     $key = sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']);
     return $hmod->cache->get($key);
+}}
+
+/**
+ * @subpackage feeds/functions
+ */
+if (!hm_exists('feed_exists')) {
+function feed_exists($server) {
+    $list = Hm_Feed_List::dump();
+    foreach ($list as $feed) {
+        if ($feed['server'] == $server) {
+            return true;
+        }
+    }
+    return false;
 }}
