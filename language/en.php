@@ -599,6 +599,11 @@ return array(
     'Set this profile default' => false,
     'Finish' => false,
     'Add a new server' => false,
+    'Automatically add outgoing email addresses' => false,
+    'Trusted Senders' => false,
+    'Collected Recipients' => false,
+    'Personal Addresses' => false,
+    'Contact Group' => false,
 );
 
 ?>

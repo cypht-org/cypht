@@ -73,7 +73,7 @@ trait Hm_Repository {
     }
 
     public static function get($id) {
-        if (array_key_exists($id, self::$entities)) {
+        if (is_array(self::$entities) && array_key_exists($id, self::$entities)) {
             return self::$entities[$id];
         }
         return false;

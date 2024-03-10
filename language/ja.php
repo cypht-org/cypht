@@ -580,7 +580,12 @@ return array(
     'Connection To Sieve Server Failed' => false,
     'Warn for unsaved changes' => false,
     'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
-    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => '添付,ファイル,添付ファイル,同封,添え状'
+    'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => '添付,ファイル,添付ファイル,同封,添え状',
+    'Automatically add outgoing email addresses' => false,
+    'Trusted Senders' => false,
+    'Collected Recipients' => false,
+    'Personal Addresses' => false,
+    'Contact Group' => false,
 ); 
 
 ?>

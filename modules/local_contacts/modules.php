@@ -23,7 +23,7 @@ class Hm_Handler_process_add_contact_from_message extends Hm_Handler_Module {
             if (!empty($addresses)) {
                 $contacts = $this->get('contact_store');
                 foreach ($addresses as $vals) {
-                    $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name']));
+                    $contacts->add_contact(array('source' => 'local', 'email_address' => $vals['email'], 'display_name' => $vals['name'], 'group' => isset($vals['contact_group']) ? $vals['contact_group'] : 'Personal Addresses'));
                 }
                 Hm_Msgs::add('Contact Added');
             }
@@ -58,6 +58,12 @@ class Hm_Handler_process_add_contact extends Hm_Handler_Module {
             $details = array('source' => 'local', 'email_address' => $form['contact_email'], 'display_name' => $form['contact_name']);
             if (array_key_exists('contact_phone', $this->request->post) && $this->request->post['contact_phone']) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
+            }
+            if (array_key_exists('contact_group', $this->request->post) && $this->request->post['contact_group']) {
+                $details['group'] = $this->request->post['contact_group'];
+            }
+            else {
+                $details['group'] = 'Personal Addresses';
             }
             $contacts->add_contact($details);
             Hm_Msgs::add('Contact Added');
@@ -161,6 +167,12 @@ class Hm_Handler_process_edit_contact extends Hm_Handler_Module {
             if (array_key_exists('contact_phone', $this->request->post)) {
                 $details['phone_number'] = $this->request->post['contact_phone'];
             }
+            if (array_key_exists('contact_group', $this->request->post)) {
+                $details['group'] = $this->request->post['contact_group'];
+            }
+            else {
+                $details['group'] = 'Personal Addresses';
+            }
             if ($contacts->update_contact($form['contact_id'], $details)) {
                 Hm_Msgs::add('Contact Updated');
             }
@@ -176,7 +188,6 @@ class Hm_Handler_load_edit_contact extends Hm_Handler_Module {
         if (array_key_exists('contact_source', $this->request->get) && $this->request->get['contact_source'] == 'local'
             && array_key_exists('contact_type', $this->request->get) && $this->request->get['contact_type'] == 'local' &&
             array_key_exists('contact_id', $this->request->get)) {
-
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
             if (is_object($contact)) {
@@ -221,11 +232,15 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             if (array_key_exists('phone_number', $current)) {
                 $phone = $current['phone_number'];
             }
-            $form_class = 'contact_update_form mt-3';
+            if (array_key_exists('group', $current)) {
+                $group = $current['group'];
+            }
+            $form_class = 'contact_update_form  mt-3';
             $title = $this->trans('Update Local');
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="btn btn-success edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
+        // var_dump($group);die();
         return '<div class="add_contact kokokoko"><form class="" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
@@ -239,7 +254,14 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             'value="'.$this->html_safe($name).'" /><br />'.
             '<label class="form-label" for="contact_phone">'.$this->trans('Telephone Number').'</label>'.
             '<input class="form-control" placeholder="'.$this->trans('Telephone Number').'" id="contact_phone" type="text" name="contact_phone" '.
-            'value="'.$this->html_safe($phone).'" /><br />'.$button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
+            'value="'.$this->html_safe($phone).'" /><br />'.
+            '<label class="screen_reader" for="contact_group">'.$this->trans('Contact Group').'</label>'.
+            '<select class="form-select" id="contact_group" name="contact_group">'.
+            '<option value="'.$this->trans('Personal Addresses').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Personal Addresses') ? ' selected' : '').'>'.$this->trans('Personal Addresses').'</option>'.
+            '<option value="'.$this->trans('Trusted Senders').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Trusted Senders') ? ' selected' : '').'>'.$this->trans('Trusted Senders').'</option>'.
+            '<option value="'.$this->trans('Collected Recipients').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Collected Recipients') ? ' selected' : '').'>'.$this->trans('Collected Recipients').'</option>' .
+            '</select><br />'.
+            $button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
             $this->trans('Cancel').'" /></div></form></div>';
     }
 }
