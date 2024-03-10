@@ -1427,7 +1427,7 @@ function parse_sieve_config_host($host) {
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $context) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false) {
         Hm_IMAP_List::init($context->user_config, $context->session);
         $imap_list = array(
             'name' => $name,
@@ -1437,6 +1437,13 @@ if (!hm_exists('connect_to_imap_server')) {
             'user' => $user,
             'pass' => $pass,
             'tls' => $tls);
+
+        if ($type === 'jmap') {
+            $imap_list['type'] = 'jmap';
+            $imap_list['hide'] = $hidden;
+            $imap_list['port'] = false;
+            $imap_list['tls'] = false;
+        }
 
         if (isset($imap_sieve_host) && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
@@ -1463,35 +1470,5 @@ if (!hm_exists('connect_to_imap_server')) {
         }
 
         return Hm_IMAP_List::service_connect($imap_server_id, $server, $user, $pass, false);
-    }
-}
-
-
-if (!hm_exists('connect_to_jmap_server')) {
-    function connect_to_jmap_server($jmap_address, $hide_from_c_page, $name, $user, $pass, $context) {
-       $hidden = false;
-                       
-       if($hide_from_c_page) {
-           $hidden = true;
-       }
-       
-       $parsed = parse_url($jmap_address);
-       
-       if (array_key_exists('host', $parsed) && @get_headers($jmap_address)) {
-           Hm_IMAP_List::init($context->user_config, $context->session);
-           Hm_IMAP_List::add(array(
-               'name' => $name,
-               'server' => $jmap_address,
-               'hide' => $hidden,
-               'type' => 'jmap',
-               'port' => false,
-               'tls' => false));
-           $servers = Hm_IMAP_List::dump(false, true);
-           $ids = array_keys($servers);
-           $jmap_server_id = array_pop($ids);
-           $server = Hm_IMAP_List::get($jmap_server_id, false);
-
-           return Hm_IMAP_List::service_connect($jmap_server_id, $server, $user, $pass, false);
-       }
     }
 }

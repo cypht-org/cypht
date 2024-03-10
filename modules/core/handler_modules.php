@@ -1030,7 +1030,19 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     return;
                 }
                 
-                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password, $this);
+                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password, 'imap', $this);
+                 connect_to_imap_server(
+                     $jmapAddress,
+                     $profileName,
+                     $imapPort,
+                     $email,
+                     $password,
+                     $imapTls,
+                     null,
+                     false,
+                     'imap',
+                     $this,
+                     $jmapHideFromCPage);
                 
                 Hm_Msgs::add("JMAP Server saved");
                 $this->out('just_saved_credentials', true);
@@ -1066,9 +1078,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                           $imapPort,
                           $email,
                           $password,
-                          $email,
+                          $imapTls,
                           $imapSieveHost,
                           $enableSieve,
+                          'imap',
                           $this);
                       
                       if(!isset($this->imap_server_id)) {
