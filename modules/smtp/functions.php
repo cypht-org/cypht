@@ -31,12 +31,7 @@ if (!hm_exists('add_and_connect_to_smtp_server')) {
 }
 
 if (!hm_exists('delete_smtp_server')) {
-    function delete_smtp_server($smtp_server_id, $context) {
-       $res = Hm_SMTP_List::del($smtp_server_id);
-       if ($res) {
-           Hm_SMTP_List::forget_credentials($smtp_server_id);
-           $smtp_servers = Hm_SMTP_List::dump(false, true);
-           $context->user_config->set('smtp_servers', $smtp_servers);
-       }
+    function delete_smtp_server($smtp_server_id) {
+       Hm_SMTP_List::del($smtp_server_id);
     }
 }
