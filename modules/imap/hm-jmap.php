@@ -833,8 +833,8 @@ class Hm_JMAP {
             'internal_date' => $msg['receivedAt'],
             'size' => $msg['size'],
             'date' => $msg['sentAt'],
-            'from' => $this->combine_addresses($msg['from']),
-            'to' => $this->combine_addresses($msg['to']),
+            'from' => (is_array($msg['from']) ? $this->combine_addresses($msg['from']) : $msg['from']),
+            'to' => (is_array($msg['to']) ? $this->combine_addresses($msg['to']) : $msg['to']),
             'subject' => $msg['subject'],
             'content-type' => '',
             'timestamp' => strtotime($msg['receivedAt']),
@@ -842,7 +842,7 @@ class Hm_JMAP {
             'x-priority' => '',
             'type' => 'jmap',
             'references' => '',
-            'message_id' => implode(' ', $msg['messageId']),
+            'message_id' => (is_array($msg['messageId']) ? implode(' ', $msg['messageId']) : ''),
             'x_auto_bcc' => ''
         );
     }
@@ -861,6 +861,7 @@ class Hm_JMAP {
             preg_replace("/\/$/", '', $url),
             $data['apiUrl']
         );
+	$this->api_url = $data['apiUrl'];
         $this->download_url = sprintf(
             '%s%s',
             preg_replace("/\/$/", '', $url),
@@ -872,10 +873,7 @@ class Hm_JMAP {
             $data['uploadUrl']
         );
         foreach ($data['accounts'] as $account) {
-            if (array_key_exists('isPrimary', $account) && $account['isPrimary']) {
-                $this->account_id = array_keys($data['accounts'])[0];
-                break;
-            }
+            $this->account_id = array_keys($data['accounts'])[0];
         }
         if ($this->account_id && count($this->folder_list) == 0) {
             $this->reset_folders();
@@ -994,7 +992,7 @@ class Hm_JMAP {
         return json_encode(array(
             'using' => count($caps) == 0 ? $this->default_caps : $caps,
             'methodCalls' => $methods
-        ));
+        ), JSON_UNESCAPED_SLASHES);
     }
 
     /**

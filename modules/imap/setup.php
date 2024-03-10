@@ -240,9 +240,9 @@ add_output('ajax_imap_folder_expand', 'filter_expanded_folder_data', true);
 
 /* select folder */
 setup_base_ajax_page('ajax_imap_folder_display', 'core');
+add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_display', 'message_list_type', true, 'core');
 add_handler('ajax_imap_folder_display', 'imap_message_list_type', true);
-add_handler('ajax_imap_folder_display', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_folder_display', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_folder_display', 'imap_folder_page',  true);
 add_handler('ajax_imap_folder_display', 'save_imap_cache',  true);
