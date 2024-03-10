@@ -2177,7 +2177,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                         <div>
                             <form>
                                 <div class="form-floating mb-3">
-                                  <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) aria-label="'.$this->trans('Provider').'">
+                                  <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) label="'.$this->trans('Provider').'">
                                     <option value="">'.$this->trans('Other').'</option>'.$serverList.'
                                   </select>
                                   <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
@@ -2244,8 +2244,8 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                           <button class="btn btn-success px-3" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
                       </div>
                   </div>
-                  <div id="step_config_0">
-                      <button class="step_config current_config_step btn btn-success px-5" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
+                  <div id="step_config_0" class="step_config current_config_step">
+                      <button class="btn btn-success px-5" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
                   </div>
                 </div>
          </div>

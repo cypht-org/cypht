@@ -969,7 +969,6 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
     public $smtp_server_id = null;
     public $imap_server_id = null;
     public $jmap_server_id = null;
-    public $just_saved_credentials = false;
 
     public function process() {
         list($success, $form) = $this->process_form(array(
@@ -1034,7 +1033,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password, $this);
                 
                 Hm_Msgs::add("JMAP Server saved");
-                $this->out('just_saved_credentials', $this->just_saved_credentials);
+                $this->out('just_saved_credentials', true);
                           
              } else {
                  /*
@@ -1090,7 +1089,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                  }
     
                  Hm_Msgs::add("Server saved");
-                 $this->out('just_saved_credentials', $this->just_saved_credentials);
+                 $this->out('just_saved_credentials', true);
             }
         }
     }

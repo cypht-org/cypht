@@ -389,24 +389,30 @@ var Hm_Notices = {
 
     show: function(msgs, keep) {
         var msg_list = [];
+        var alertType = 'success';
+
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
                 msg_list.push(msgs[i].substring(3));
+                alertType = 'danger';
             }
             else {
                 msg_list.push(msgs[i]);
             }
         }
+        var msg_html = msg_list.join(', ');
+        $('.sys_messages').html('<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span></span></div>');
+
         if (!keep) {
-            $('.err').html(msg_list.join(', '));
+            $('.sys_messages span').html(msg_html);
         }
         else {
-            var existing = $('.err').html();
+            var existing = $('.sys_messages span').html();
             if (existing) {
-                $('.err').append('<br />'+msg_list.join(', '));
+                $('.sys_messages span').append('<br />'+msg_html);
             }
             else {
-                $('.err').html(msg_list.join(', '));
+                $('.sys_messages span').html(msg_html);
             }
         }
         $('.sys_messages').show();
@@ -2155,6 +2161,8 @@ function submitSmtpImapServer() {
     Hm_Ajax.request(requestData, function(res) {
         $('#srv_setup_stepper_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
+        Hm_Notices.show(res.router_user_msgs);
+        console.log("res", res);
 
         if (res.just_saved_credentials) {
             $('#srv_setup_stepper_stepper').find('form').trigger('reset');
@@ -2344,7 +2352,7 @@ function display_config_step(stepNumber) {
 
     if (selectedStep) {
         selectedStep.style.display = 'block';
-        if(stepNumber == 0) $('.srv_setup_stepper_btn').show();
+        if(stepNumber === 0) $('.srv_setup_stepper_btn').show();
     }
 }
 
