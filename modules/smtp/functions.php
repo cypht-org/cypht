@@ -3,7 +3,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-if (!hm_exists('add_and_connect_to_smtp_server')) {
+if (!hm_exists('connect_to_smtp_server')) {
     function connect_to_smtp_server($address, $name, $port, $user, $pass, $tls, $context) {
         Hm_SMTP_List::init($context->user_config, $context->session);
         $smtp_list = array(
