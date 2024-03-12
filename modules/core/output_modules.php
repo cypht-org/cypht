@@ -367,7 +367,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
                     return sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(substr((string) $v, 3)));
                 }
                 else {
-                    return sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span>%s</span class="info">', $this->trans($v));
+                    return sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($v));
                 }
             }, $msgs));
             $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
