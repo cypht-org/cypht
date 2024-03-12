@@ -442,8 +442,7 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                     Hm_Msgs::add('ERRThis server and username are already configured');
                     return;
                 }
-
-               $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
+                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
                 if (smtp_authed($smtp)) {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
