@@ -1449,10 +1449,7 @@ if (!hm_exists('connect_to_imap_server')) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
         }
 
-        Hm_IMAP_List::add($imap_list);
-        $servers = Hm_IMAP_List::dump(false, true);
-        $ids = array_keys($servers);
-        $imap_server_id = array_pop($ids);
+        $imap_server_id = Hm_IMAP_List::add($imap_list);
         $server = Hm_IMAP_List::get($imap_server_id, false);
 
         if ($enableSieve &&

@@ -15,10 +15,8 @@ if (!hm_exists('connect_to_smtp_server')) {
             'pass' => $pass,
             'tls' => $tls);
 
-        Hm_SMTP_List::add($smtp_list);
-        $servers = Hm_SMTP_List::dump(false, true);
-        $ids = array_keys($servers);
-        $smtp_server_id = array_pop($ids);
+
+        $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
         $server = Hm_SMTP_List::get($smtp_server_id, false);
 
         $result = Hm_SMTP_List::service_connect($smtp_server_id, $server, $user, $pass, false);
