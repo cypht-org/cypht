@@ -387,33 +387,21 @@ function Hm_Modal(options) {
 var Hm_Notices = {
     hide_id: false,
 
-    show: function(msgs, keep) {
-        var msg_list = [];
+    show: function(msgs) {
+        var message = '';
+        var type = '';
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
-                msg_list.push(msgs[i].substring(3));
+                message = msgs[i].substring(3);
+                type = 'danger';
             }
             else {
-                msg_list.push(msgs[i]);
+                type = 'info';
+                message = msgs[i];
             }
+
+            Hm_Utils.add_sys_message(message, type);
         }
-        if (!keep) {
-            $('.err').html(msg_list.join(', '));
-        }
-        else {
-            var existing = $('.err').html();
-            if (existing) {
-                $('.err').append('<br />'+msg_list.join(', '));
-            }
-            else {
-                $('.err').html(msg_list.join(', '));
-            }
-        }
-        $('.sys_messages').show();
-        $('.sys_messages').on('click', function() {
-            $('.sys_messages').hide();
-            $('.sys_messages').html('');
-        });
     },
 
     hide: function(now) {
@@ -1605,14 +1593,25 @@ var Hm_Utils = {
         $('#unsaved_changes').val(state);
     },
 
+    /**
+     * Shows pending messages added with the add_sys_message method
+     */
     show_sys_messages: function() {
-        if ($('.sys_messages').text().length) {
-            $('.sys_messages').show();
-            $('.sys_messages').on('click', function() {
-                $('.sys_messages').hide();
-                $('.sys_messages').html('');
-            });
-        }
+        $('.sys_messages').removeClass('d-none');    
+    },
+
+    /**
+     * 
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark ) 
+     * @param {*} pending : Defined if the added message must be displayed directly, or be pending until the show_sys_messages method is called
+     */
+    add_sys_message: function(msg, type = 'info', pending = false) {
+        if (pending) $('.sys_messages').addClass('d-none');
+        else  Hm_Utils.show_sys_messages();
+        if (!msg || msg  == '') return $('.sys_messages').html('');
+        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+        return $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
     },
 
     cancel_logout_event: function() {
