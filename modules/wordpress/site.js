@@ -55,13 +55,15 @@ if (hm_page_name() == 'message_list') {
     }
 }
 else if (hm_page_name() == 'servers') {
-    $('#wp_disconnect_form').submit(function(e) {
-        if (!hm_delete_prompt()) {
-            e.preventDefault();
-            return false;
-        }
-        return true;
-    });
+    if ($('#wp_disconnect_form').length) {
+        $('#wp_disconnect_form').submit(function(e) {
+            if (!hm_delete_prompt()) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        });
+    }
 }
 else if (hm_page_name() == 'message') {
     if (hm_list_path() == 'wp_notifications') {
