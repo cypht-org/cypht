@@ -2162,7 +2162,6 @@ function submitSmtpImapServer() {
         $('#srv_setup_stepper_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
         Hm_Notices.show(res.router_user_msgs);
-        console.log("res", res);
 
         if (res.just_saved_credentials) {
             $('#srv_setup_stepper_stepper').find('form').trigger('reset');
