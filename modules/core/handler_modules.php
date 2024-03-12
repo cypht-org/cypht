@@ -1030,8 +1030,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     return;
                 }
                 
-                $this->jmap_server_id = connect_to_jmap_server($jmapAddress, $jmapHideFromCPage, $profileName, $email, $password, 'imap', $this);
-                 connect_to_imap_server(
+                $this->jmap_server_id = connect_to_imap_server(
                      $jmapAddress,
                      $profileName,
                      $imapPort,
