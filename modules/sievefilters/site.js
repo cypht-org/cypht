@@ -394,19 +394,17 @@ $(function () {
 
             let idx = 0;
             if (conditions.length === 0) {
-                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide at least one condition')+'</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide at least one condition'), 'danger');
                 return false;
             }
 
-            $('.sys_messages').html('');
+            Hm_Utils.add_sys_message();
             conditions.forEach(function (elem, key) {
                 if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
                     let order = ordinal_number(key + 1);
                     let previous_messages = $('.sys_messages').html();
                     previous_messages += previous_messages ? '<br>': '';
-                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' condition (' + elem + ') must be provided</span>');
-                    Hm_Utils.show_sys_messages();
+                    Hm_Utils.add_sys_message('The ' + order + ' condition (' + elem + ') must be provided', 'danger');
                     validation_failed = true;
                 }
                  conditions_parsed.push(
@@ -435,8 +433,7 @@ $(function () {
             }).get();
 
             if (actions_type.length === 0) {
-                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide at least one action')+'</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide at least one action'), 'danger');
                 return false;
             }
 
@@ -447,8 +444,7 @@ $(function () {
                     let order = ordinal_number(key + 1);
                     let previous_messages = $('.sys_messages').html();
                     previous_messages += previous_messages ? '<br>': '';
-                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' action (' + elem + ') must be provided</span>');
-                    Hm_Utils.show_sys_messages();
+                    Hm_Utils.add_sys_message('The ' + order + ' action (' + elem + ') must be provided', 'danger');
                     validation_failed = true;
                 }
                 actions_parsed.push(
@@ -463,8 +459,7 @@ $(function () {
             });
 
             if ($('.modal_sieve_filter_name').val() == "") {
-                $('.sys_messages').html('<span class="err">'+hm_trans('Filter name is required')+'</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('Filter name is required'), 'danger');
                 return false;
             }
 
@@ -501,13 +496,11 @@ $(function () {
 
         function save_script(imap_account) {
             if ($('.modal_sieve_script_name').val() === "") {
-                $('.sys_messages').html('<span class="err">'+hm_trans('You must provide a name for your script')+'</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide a name for your script'), 'danger');
                 return false;
             }
             if ($('.modal_sieve_script_textarea').val() === "") {
-                $('.sys_messages').html('<span class="err">'+hm_trans('Empty script')+'</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('Empty script'), 'danger');
                 return false;
             }
             Hm_Ajax.request(
