@@ -972,28 +972,28 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
 
     public function process() {
         list($success, $form) = $this->process_form(array(
-           'srv_setup_stepper_profile_name',
-           'srv_setup_stepper_email',
-           'srv_setup_stepper_password',
-           'srv_setup_stepper_provider',
-           'srv_setup_stepper_is_sender',
-           'srv_setup_stepper_is_receiver',
-           'srv_setup_stepper_smtp_address',
-           'srv_setup_stepper_smtp_port',
-           'srv_setup_stepper_smtp_tls',
-           'srv_setup_stepper_imap_address',
-           'srv_setup_stepper_imap_port',
-           'srv_setup_stepper_imap_tls',
-           'srv_setup_stepper_enable_sieve',
-           'srv_setup_stepper_create_profile',
-           'srv_setup_stepper_profile_is_default',
-           'srv_setup_stepper_profile_signature',
-           'srv_setup_stepper_profile_reply_to',
-           'srv_setup_stepper_imap_sieve_host',
-           'srv_setup_stepper_only_jmap',
-           'srv_setup_stepper_jmap_hide_from_c_page',
-           'srv_setup_stepper_jmap_address',
-           ));
+            'srv_setup_stepper_profile_name',
+            'srv_setup_stepper_email',
+            'srv_setup_stepper_password',
+            'srv_setup_stepper_provider',
+            'srv_setup_stepper_is_sender',
+            'srv_setup_stepper_is_receiver',
+            'srv_setup_stepper_smtp_address',
+            'srv_setup_stepper_smtp_port',
+            'srv_setup_stepper_smtp_tls',
+            'srv_setup_stepper_imap_address',
+            'srv_setup_stepper_imap_port',
+            'srv_setup_stepper_imap_tls',
+            'srv_setup_stepper_enable_sieve',
+            'srv_setup_stepper_create_profile',
+            'srv_setup_stepper_profile_is_default',
+            'srv_setup_stepper_profile_signature',
+            'srv_setup_stepper_profile_reply_to',
+            'srv_setup_stepper_imap_sieve_host',
+            'srv_setup_stepper_only_jmap',
+            'srv_setup_stepper_jmap_hide_from_c_page',
+            'srv_setup_stepper_jmap_address',
+        ));
 
         if ($success) {
             // Destructure form array into variables
@@ -1020,88 +1020,89 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_jmap_hide_from_c_page' => $jmapHideFromCPage,
                 'srv_setup_stepper_jmap_address' => $jmapAddress,
             ] = $form;
-            
+
             /*
             * When JMAP selected only configure JMAP
             */
-             if(isset($onlyJmap) && $onlyJmap) {
+            if(isset($onlyJmap) && $onlyJmap) {
                 if (!$this->module_is_supported('jmap')) {
                     Hm_Msgs::add("ERRJMAP module is not enabled");
                     return;
                 }
-                
+
                 $this->jmap_server_id = connect_to_imap_server(
-                     $jmapAddress,
-                     $profileName,
-                     $imapPort,
-                     $email,
-                     $password,
-                     $imapTls,
-                     null,
-                     false,
-                     'imap',
-                     $this,
-                     $jmapHideFromCPage);
-                
+                    $jmapAddress,
+                    $profileName,
+                    $imapPort,
+                    $email,
+                    $password,
+                    $imapTls,
+                    null,
+                    false,
+                    'imap',
+                    $this,
+                    $jmapHideFromCPage
+                );
+
                 Hm_Msgs::add("JMAP Server saved");
                 $this->out('just_saved_credentials', true);
-                          
-             } else {
-                 /*
-                 *  Connect to SMTP server if user wants to send emails
-                 */
-                 if($isSender){
+            } else {
+                /*
+                *  Connect to SMTP server if user wants to send emails
+                */
+                if($isSender){
                     if (!$this->module_is_supported('smtp')) {
                         Hm_Msgs::add("ERRSMTP module is not enabled");
                         return;
                     }
-                    
+
                     $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this);
                     if(!isset($this->smtp_server_id)){
                         return;
                     }
-                 }
-    
-                 /*
-                  *  Connect to IMAP server if user wants to receive emails
-                  */
-                 if($isReceiver){
-                     if (!$this->module_is_supported('imap')) {
+                }
+
+                /*
+                *  Connect to IMAP server if user wants to receive emails
+                */
+                if($isReceiver){
+                    if (!$this->module_is_supported('imap')) {
                         Hm_Msgs::add("ERRIMAP module is not enabled");
                         return;
-                     }
+                    }
 
-                     $this->imap_server_id = connect_to_imap_server(
-                          $imapAddress,
-                          $profileName,
-                          $imapPort,
-                          $email,
-                          $password,
-                          $imapTls,
-                          $imapSieveHost,
-                          $enableSieve,
-                          'imap',
-                          $this);
-                      
-                      if(!isset($this->imap_server_id)) {
-                          if($isSender && isset($this->smtp_server_id)){
-                                delete_smtp_server($this->smtp_server_id, $this);
-                          }
-                          return;
-                      };
-                 }
-    
-                 if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
-                      if (!$this->module_is_supported('profiles')) {
-                         Hm_Msgs::add("ERRProfiles module is not enabled");
-                         return;
-                      }
-                                          
-                     add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
-                 }
-    
-                 Hm_Msgs::add("Server saved");
-                 $this->out('just_saved_credentials', true);
+                    $this->imap_server_id = connect_to_imap_server(
+                        $imapAddress,
+                        $profileName,
+                        $imapPort,
+                        $email,
+                        $password,
+                        $imapTls,
+                        $imapSieveHost,
+                        $enableSieve,
+                        'imap',
+                        $this
+                    );
+
+                    if(!isset($this->imap_server_id)) {
+                        if($isSender && isset($this->smtp_server_id)){
+                            delete_smtp_server($this->smtp_server_id, $this);
+                        }
+                        return;
+                    };
+                }
+
+                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                    if (!$this->module_is_supported('profiles')) {
+                        Hm_Msgs::add("ERRProfiles module is not enabled");
+                        return;
+                    }
+
+                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
+                }
+
+                Hm_Msgs::add("Server saved");
+                $this->out('just_saved_credentials', true);
             }
         }
     }
