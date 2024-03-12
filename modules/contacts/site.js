@@ -49,9 +49,9 @@ var add_contact_from_popup = function(event) {
         var name = contact.replace(emailRegex, "");
 
         var saveContactContent = `<div><table>
-                                            <tr><td><strong>Name :</strong></td><td>${name}</td></tr>
-                                            <tr><td><strong>Email :</strong></td><td>${email}</td></tr>
-                                            <tr><td><strong>Source :</strong></td><td>Local</td></tr>
+                                            <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${name}</td></tr>
+                                            <tr><td><strong>${hm_trans('Email')} :</strong></td><td>${email}</td></tr>
+                                            <tr><td><strong>${hm_trans('Source')} :</strong></td><td>Local</td></tr>
                                 </table></div>`
 
         Hm_Ajax.request(
@@ -262,7 +262,7 @@ if (hm_page_name() == 'contacts') {
         const allowed_characters = ['+','-','(',')'];
         for (let chain_counter = 0; chain_counter < contact_phone.length; chain_counter++) {
             if(!(regex_number.test(contact_phone[chain_counter])) && !(allowed_characters.indexOf(contact_phone[chain_counter]) > -1)){
-                Hm_Notices.show(["This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!"]);
+                Hm_Notices.show([hm_trans("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!")]);
                 $(this).off();
             }
         }

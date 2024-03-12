@@ -2,7 +2,7 @@
 
 var get_smtp_profile = function(profile_value) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
-        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option'], true);
+        Hm_Notices.show([err_msg('Please create a profile for saving sent messages option')], true);
     }
     else {
         Hm_Ajax.request(
@@ -15,7 +15,7 @@ var get_smtp_profile = function(profile_value) {
 };
 
 var check_attachment_dir_access = function() {
-    Hm_Notices.show(['ERRAttachment storage unavailable, please contact your site administrator']);
+    Hm_Notices.show([err_msg('Attachment storage unavailable, please contact your site administrator')]);
 };
 
 var smtp_test_action = function(event) {
@@ -363,13 +363,11 @@ var toggle_bubble_dropdown = function (element) {
         var contact_id = element.getAttribute('data-id');
         var contact_type = element.getAttribute('data-type');
         var contact_source = element.getAttribute('data-source');
-        var editIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAcQAAAHEBHD+AdwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEESURBVDiNldO/LuxRFMXxz5KJRqFSKCU6IUIp0XoGkXgBDUFHoldQ6XQ6iUqlcm8iOh5AoUGp9C83dysQMn4zmVnJKU72/q61T7KPqtLPwRL+4BAjqSpJJjHrWw9VdaZNSVaxginMYznYwRguf/TeVdVpAzyHexTWcQFXPYy9imO0Pu97uMbmAAbaR+2QvFhV/36Uzqtqt284yR5U1Zpu6b3AHQ2SrPQCNxokCTYwhFY32FdDm2bw18eynCS5wf8muNMTFvCECUzjuQlOspVktGmCJ7zgDFtV9dyUjHEM/zKoqv0OQKO67kGvBo9JRvqBkgz6+D+3LWzjKMlwHx5vOKiq13cd46KPLEvGfQAAAABJRU5ErkJggg==';
-        var copyIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADUSURBVDiN7ZI9SgNBAIW/F0JECwubQAr7gIUgVjZ2Ymed2lzB2tIjeAEPIFh4ASsbTxGIlXaCwmeRXZxdzGpi64OB4c37KyYqJZIcAjfAgOV4BU7VGWrjACfAuM23NJfAuUq/aN4BdoE5sJFkv9X6rM6q+xssvP3KvAfcAU8ds8dJLtTbkqwXHAHX6tUyd5Iz4BhoBPTq947mRk6b6H2nWgX/AX8LcK2AJENgCjzA10f6fa3OkxyoL+WCD2DzB+9WpaM2A0QlyQi4B7Y7At6BifpYkp8XA1pTMGl6mgAAAABJRU5ErkJggg==';
         dropdownContent = document.createElement('div');
         dropdownContent.classList.add('bubble_dropdown-content');
-        let html = '<ul><li><span data-value="' + textValue + '" onclick="copy_text_to_clipboard(this)"><img src="' + copyIcon + '"> Copy</span></li>';
+        let html = '<ul><li><span data-value="' + textValue + '" onclick="copy_text_to_clipboard(this)"><i class="bi bi-copy"></i> Copy</span></li>';
         if (contact_id !== "null") {
-            html += '<li><a href="?page=contacts&contact_id=' + contact_id + '&contact_source=' + contact_source + '&contact_type=' + contact_type + '"><img src="' + editIcon + '"> Edit</a></li>';
+            html += '<li><a href="?page=contacts&contact_id=' + contact_id + '&contact_source=' + contact_source + '&contact_type=' + contact_type + '"><i class="bi bi-pencil-fill"></i> Edit</a></li>';
         }
         html += '</ul>';
         dropdownContent.innerHTML = html;
@@ -465,19 +463,19 @@ $(function () {
             // If the subject is empty, we should warn the user
             if (!subject) {
                 dontWanValueInStorage = 'dont_warn_empty_subject';
-                modalContentHeadline = "<p>Your subject is empty</p>";
+                modalContentHeadline = "Your subject is empty!";
             }
 
             // If the body is empty, we should warn the user
             if (!body) {
                 dontWanValueInStorage = 'dont_warn_empty_body';
-                modalContentHeadline = "<p>Your body is empty!</p>";
+                modalContentHeadline = "Your body is empty!";
             }
 
             // if both the subject and the body are empty, we should warn the user
             if (!body && !subject) {
                 dontWanValueInStorage = 'dont_warn_empty_subject_body';
-                modalContentHeadline = "<p>Your subject and body are empty!</p>";
+                modalContentHeadline = "Your subject and body are empty!";
             }
 
             // If the user has disabled the warning, we should send the message
@@ -486,6 +484,7 @@ $(function () {
             }
             // Otherwise, we should show the modal if we have a headline
             else if (modalContentHeadline) {
+                modalContentHeadline = `<p>${hm_trans(modalContentHeadline)}</p>`;
                 return showModal(modalContentHeadline);
             }
             // Subject and body are not empty, we can send the message
@@ -500,10 +499,10 @@ $(function () {
             */
             function showModal() {
                 if (! modal.modalContent.html()) {
-                    modal.addFooterBtn('Send anyway', 'btn-warning', handleSendAnyway);
-                    modal.addFooterBtn("Send anyway and don't warn in the future", 'btn-warning', handleSendAnywayAndDontWarnMe);
+                    modal.addFooterBtn(hm_trans('Send anyway'), 'btn-warning', handleSendAnyway);
+                    modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
                 }
-                modal.setContent(modalContentHeadline + `<p>Are you sure you want to send this message?</p>`);
+                modal.setContent(modalContentHeadline + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
                 modal.open();
             }
 
