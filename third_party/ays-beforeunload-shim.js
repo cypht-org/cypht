@@ -1,3 +1,14 @@
+/*!
+ * An experimental shim to partially emulate onBeforeUnload on iOS.
+ * Part of https://github.com/codedance/jquery.AreYouSure/
+ *
+ * Copyright (c) 2012-2014, Chris Dance and PaperCut Software http://www.papercut.com/
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ * http://jquery.org/license
+ *
+ * Author:  chris.dance@papercut.com
+ * Date:    19th May 2014
+ */
 $(function() {
     if (!navigator.userAgent.toLowerCase().match(/iphone|ipad|ipod|opera/)) {
       return;

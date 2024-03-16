@@ -268,7 +268,7 @@ var Hm_Ajax_Request = function() { return {
 
     fail: function(xhr, not_callable) {
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show(['ERRServer Error']);
+            Hm_Notices.show([err_msg('Server Error')]);
         }
         else {
             $('.offline').show();
@@ -333,7 +333,7 @@ function Hm_Modal(options) {
                         <div class="modal-body"></div>
 
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
                         </div>
                     </div>
                 </div>
@@ -387,39 +387,21 @@ function Hm_Modal(options) {
 var Hm_Notices = {
     hide_id: false,
 
-    show: function(msgs, keep) {
-        var msg_list = [];
-        var alertType = 'success';
-
+    show: function(msgs) {
+        var message = '';
+        var type = '';
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
-                msg_list.push(msgs[i].substring(3));
-                alertType = 'danger';
+                message = msgs[i].substring(3);
+                type = 'danger';
             }
             else {
-                msg_list.push(msgs[i]);
+                type = 'info';
+                message = msgs[i];
             }
-        }
-        var msg_html = msg_list.join(', ');
-        $('.sys_messages').html('<div class="alert alert-' + alertType + ' alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span></span></div>');
 
-        if (!keep) {
-            $('.sys_messages span').html(msg_html);
+            Hm_Utils.add_sys_message(message, type);
         }
-        else {
-            var existing = $('.sys_messages span').html();
-            if (existing) {
-                $('.sys_messages span').append('<br />'+msg_html);
-            }
-            else {
-                $('.sys_messages span').html(msg_html);
-            }
-        }
-        $('.sys_messages').show();
-        $('.sys_messages').on('click', function() {
-            $('.sys_messages').hide();
-            $('.sys_messages').html('');
-        });
     },
 
     hide: function(now) {
@@ -879,23 +861,23 @@ function Message_List() {
         var tbody = Hm_Utils.tbody();
         if (hm_list_path() == 'unread') {
             count = rows.length;
-            document.title = count+' Unread';
+            document.title = count+' '+hm_trans('Unread');
         }
         else if (hm_list_path() == 'flagged') {
             count = rows.length;
-            document.title = count+' Flagged';
+            document.title = count+' '+hm_trans('Flagged');
         }
         else if (hm_list_path() == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Everything';
+            document.title = count+' '+hm_trans('Unread in Everything');
         }
         else if (hm_list_path() == 'email') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Email';
+            document.title = count+' '+hm_trans('Unread in Email');
         }
         else if (hm_list_path() == 'feeds') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Feeds';
+            document.title = count+' '+hm_trans('Unread in Feeds');
         }
     };
 
@@ -1611,14 +1593,25 @@ var Hm_Utils = {
         $('#unsaved_changes').val(state);
     },
 
+    /**
+     * Shows pending messages added with the add_sys_message method
+     */
     show_sys_messages: function() {
-        if ($('.sys_messages').text().length) {
-            $('.sys_messages').show();
-            $('.sys_messages').on('click', function() {
-                $('.sys_messages').hide();
-                $('.sys_messages').html('');
-            });
-        }
+        $('.sys_messages').removeClass('d-none');
+    },
+
+    /**
+     *
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
+     * @param {*} pending : Defined if the added message must be displayed directly, or be pending until the show_sys_messages method is called
+     */
+    add_sys_message: function(msg, type = 'info', pending = false) {
+        if (pending) $('.sys_messages').addClass('d-none');
+        else  Hm_Utils.show_sys_messages();
+        if (!msg || msg  == '') return $('.sys_messages').html('');
+        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+        return $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
     },
 
     cancel_logout_event: function() {
@@ -1764,14 +1757,14 @@ var reset_default_value_checkbox = function() {
     let checkbox = this.parentElement.parentElement.firstChild;
     if (checkbox.disabled == false) {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         checkbox.setAttribute("current_value", checkbox.checked);
         checkbox.checked = !checkbox.checked;
         checkbox.disabled = true;
     }
     else {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         checkbox.checked = checkbox.getAttribute("current_value") == "true" ? true : false;
         checkbox.disabled = false;
     }
@@ -1786,7 +1779,7 @@ var reset_default_value_select = function() {
     
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         field.selectedIndex = field.getAttribute("current_value");
         field.style.backgroundColor = "#fff";
         field.style.pointerEvents = "auto";
@@ -1794,7 +1787,7 @@ var reset_default_value_select = function() {
     }
     else {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         field.setAttribute("current_value", field.selectedIndex);
         if (field.getAttribute("name") == "language") {
             for(let compter = 0; field.length > compter; compter ++){
@@ -1818,7 +1811,7 @@ var reset_default_value_input = function() {
 
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         field.value = field.getAttribute("current_value");
         field.style.backgroundColor = "#fff";
         field.style.pointerEvents = "auto";
@@ -1826,7 +1819,7 @@ var reset_default_value_input = function() {
     }
     else {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         field.setAttribute("current_value", field.value);
         field.value = 20;
         if(defaultValue) {
@@ -1843,6 +1836,10 @@ var decrease_servers = function(section) {
     const parts = element.innerHTML.split(' ');
     parts[0] = Number(parts[0]) - 1;
     element.innerHTML = parts.join(' ');
+};
+
+var err_msg = function(msg) {
+    return "ERR"+hm_trans(msg);
 };
 
 /* create a default message list object */
