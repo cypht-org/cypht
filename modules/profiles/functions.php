@@ -16,7 +16,6 @@ if (!hm_exists('add_profile')) {
             'type' => 'imap'
         );
 
-        Hm_Profiles::init($context);
         Hm_Profiles::add($profile);
     }
 }

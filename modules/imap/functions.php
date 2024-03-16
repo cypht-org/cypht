@@ -1428,7 +1428,6 @@ function parse_sieve_config_host($host) {
 
 if (!hm_exists('connect_to_imap_server')) {
     function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false) {
-        Hm_IMAP_List::init($context->user_config, $context->session);
         $imap_list = array(
             'name' => $name,
             'server' => $address,

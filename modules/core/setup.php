@@ -175,6 +175,7 @@ add_handler('ajax_quick_servers_setup', 'load_user_data', true, 'core');
 add_handler('ajax_quick_servers_setup', 'quick_servers_setup', true);
 add_handler('ajax_quick_servers_setup', 'load_smtp_servers_from_config',  true, 'smtp');
 add_handler('ajax_quick_servers_setup', 'load_imap_servers_from_config',  true, 'imap');
+add_handler('ajax_quick_servers_setup', 'profile_data',  true, 'profiles');
 add_handler('ajax_quick_servers_setup', 'compose_profile_data',  true, 'profiles');
 add_handler('ajax_quick_servers_setup', 'save_user_data',  true, 'core');
 add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
