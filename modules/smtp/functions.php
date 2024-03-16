@@ -14,7 +14,6 @@ if (!hm_exists('connect_to_smtp_server')) {
             'pass' => $pass,
             'tls' => $tls);
 
-
         $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
         $server = Hm_SMTP_List::get($smtp_server_id, false);
 
