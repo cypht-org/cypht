@@ -2186,6 +2186,9 @@ function submitSmtpImapServer() {
             Hm_Folders.reload_folders(true);
             location.reload();
         }
+    }, null, null, function (res) {
+        $('#srv_setup_stepper_form_loader').addClass('hide');
+        $('.step_config-actions').removeClass('hide');
     });
 }
 
