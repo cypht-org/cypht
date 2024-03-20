@@ -27,7 +27,7 @@ $.fn.serializeArray = function() {
         parts = args[i].split('=');
         res.push({'name': parts[0], 'value': parts[1]});
     }
-    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value)}});
+    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
 };
 $.fn.sort = function(sort_function) {
     var list = [];
@@ -268,7 +268,7 @@ var Hm_Ajax_Request = function() { return {
 
     fail: function(xhr, not_callable) {
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show(['ERRServer Error']);
+            Hm_Notices.show([err_msg('Server Error')]);
         }
         else {
             $('.offline').show();
@@ -303,37 +303,105 @@ var Hm_Ajax_Request = function() { return {
     }
 }};
 
+/**
+ * Show a modal dialog with a title, content and buttons.
+ */
+function Hm_Modal(options) {
+    var defaults = {
+        title: 'Cypht',
+        size: '',
+        btnSize: '',
+        modalId: 'myModal',
+    };
+  
+    this.opts = { ...defaults, ...options };
+
+    this.init = function () {
+        if (this.modal) {
+            return;
+        }
+
+        const modal = `
+            <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h2 class="modal-title">${this.opts.title}</h2>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="modal-body"></div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        $('body').append(modal);
+
+        this.modal = $(`#${this.opts.modalId}`);
+        this.modalContent = this.modal.find('.modal-body');
+        this.modalTitle = this.modal.find('.modal-title');
+        this.modalFooter = this.modal.find('.modal-footer');
+
+        this.bsModal = new bootstrap.Modal(document.getElementById(this.opts.modalId));
+    };
+
+    this.open = () => {
+        this.bsModal.show();
+    };
+
+    this.hide = () => {
+        this.bsModal.hide();
+    };
+
+    this.addFooterBtn = (label, classes, callback) => {
+        const btn = document.createElement('button');
+        btn.innerHTML = label;
+
+        btn.classList.add('btn', ...classes.split(' '));
+        if (this.opts.btnSize) {
+            btn.classList.add(`btn-${this.opts.btnSize}`);
+        }
+
+        btn.addEventListener('click', callback);
+        btn.addEventListener('click', this.hide);
+
+        this.modalFooter.append(btn);
+    };
+
+    this.setContent = (content) => {
+        this.modalContent.html(content);
+    };
+
+    this.setTitle = (title) => {
+        this.modalTitle.html(title);
+    };
+
+    this.init();
+}
+
 /* user notification manager */
 var Hm_Notices = {
     hide_id: false,
 
-    show: function(msgs, keep) {
-        var msg_list = [];
+    show: function(msgs) {
+        var message = '';
+        var type = '';
         for (var i in msgs) {
             if (msgs[i].match(/^ERR/)) {
-                msg_list.push('<span class="err">'+msgs[i].substring(3)+'</span>');
+                message = msgs[i].substring(3);
+                type = 'danger';
             }
             else {
-                msg_list.push(msgs[i]);
+                type = 'info';
+                message = msgs[i];
             }
+
+            Hm_Utils.add_sys_message(message, type);
         }
-        if (!keep) {
-            $('.sys_messages').html(msg_list.join(', '));
-        }
-        else {
-            var existing = $('.sys_messages').html();
-            if (existing) {
-                $('.sys_messages').append('<br />'+msg_list.join(', '));
-            }
-            else {
-                $('.sys_messages').html(msg_list.join(', '));
-            }
-        }
-        $('.sys_messages').show();
-        $('.sys_messages').on('click', function() {
-            $('.sys_messages').hide();
-            $('.sys_messages').html('');
-        });
     },
 
     hide: function(now) {
@@ -341,13 +409,13 @@ var Hm_Notices = {
             clearTimeout(Hm_Notices.hide_id);
         }
         if (now) {
-            $('.sys_messages').hide();
-            $('.sys_messages').html('');
+            $('.sys_messages').addClass('d-none');
+            Hm_Utils.clear_sys_messages();
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').hide();
-                $('.sys_messages').html('');
+                $('.sys_messages').addClass('d-none');
+                Hm_Utils.clear_sys_messages();
             }, 5000);
         }
     }
@@ -414,7 +482,10 @@ function Message_List() {
         'combined_inbox': 'formatted_combined_inbox',
         'email': 'formatted_all_mail',
         'unread': 'formatted_unread_data',
-        'flagged': 'formatted_flagged_data'
+        'flagged': 'formatted_flagged_data',
+        'junk': 'formatted_junk_data',
+        'trash': 'formatted_trash_data',
+        'drafts': 'formatted_drafts_data'
     };
 
     this.run_callbacks = function (completed) {
@@ -614,10 +685,12 @@ function Message_List() {
 
     this.toggle_msg_controls = function() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            $('.msg_controls').addClass('msg_controls_visible');
+            $('.msg_controls').addClass('d-flex');
+            $('.msg_controls').removeClass('d-none');
         }
         else {
-            $('.msg_controls').removeClass('msg_controls_visible');
+            $('.msg_controls').removeClass('d-flex');
+            $('.msg_controls').addClass('d-none');
         }
     };
 
@@ -699,7 +772,7 @@ function Message_List() {
             class_name = selected[index];
             row = $('.'+Hm_Utils.clean_selector(class_name));
             if (action_type == 'flag') {
-                $('.icon', row).html('<img width="16" height="16" src="'+hm_flag_image_src()+'" />');
+                $('.icon', row).html(hm_flag_image_src());
             }
             else {
                 $('.icon', row).empty();
@@ -788,23 +861,23 @@ function Message_List() {
         var tbody = Hm_Utils.tbody();
         if (hm_list_path() == 'unread') {
             count = rows.length;
-            document.title = count+' Unread';
+            document.title = count+' '+hm_trans('Unread');
         }
         else if (hm_list_path() == 'flagged') {
             count = rows.length;
-            document.title = count+' Flagged';
+            document.title = count+' '+hm_trans('Flagged');
         }
         else if (hm_list_path() == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Everything';
+            document.title = count+' '+hm_trans('Unread in Everything');
         }
         else if (hm_list_path() == 'email') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Email';
+            document.title = count+' '+hm_trans('Unread in Email');
         }
         else if (hm_list_path() == 'feeds') {
             count = $('tr .unseen', tbody).length;
-            document.title = count+' Unread in Feeds';
+            document.title = count+' '+hm_trans('Unread in Feeds');
         }
     };
 
@@ -867,13 +940,13 @@ function Message_List() {
         if (prev.length) {
             phref = prev.find('.subject').find('a').prop('href');
             subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+phref+'"><div class="prevnext prev_img"></div> '+subject+'</a>';
+            plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next.length) {
             nhref = next.find('.subject').find('a').prop('href');
             subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+nhref+'"><div class="prevnext next_img"></div> '+subject+'</a>';
+            nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
         return [phref, nhref];
@@ -889,6 +962,7 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
+                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
@@ -1063,6 +1137,9 @@ function Message_List() {
     this.set_flagged_state = function() { self.set_message_list_state('formatted_flagged_data'); };
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
     this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
+    this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
+    this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
+    this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
 };
 
 /* folder list */
@@ -1201,10 +1278,23 @@ var Hm_Folders = {
 
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
-        $('.src_name').on("click", function() { return Hm_Utils.toggle_section($(this).data('source')); });
+        $('.src_name').on("click", function() {
+            var class_name = $(this).data('source');
+            var icon_element = $(this).find('.bi');
+            Hm_Utils.toggle_section(class_name);
+            setTimeout(() => {
+                var target_element = document.querySelector(class_name);
+                var is_visible = Hm_Utils.is_element_visible(target_element);
+                if (is_visible) {
+                    icon_element.removeClass('bi-chevron-down').addClass('bi-chevron-up');
+                } else {
+                    icon_element.removeClass('bi-chevron-up').addClass('bi-chevron-down');
+                }
+            }, 0);
+        });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
-            e.target.innerHTML = '<img src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />';
+            e.target.innerHTML = '<div class="spinner-border spinner-border-sm text-dark role="status"><span class="visually-hidden">Loading...</span></div>';
             Hm_Folders.update_folder_list();
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
@@ -1212,7 +1302,7 @@ var Hm_Folders = {
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
-        $('.logout_link').on("click", function() { return Hm_Utils.confirm_logout(); });
+        $('.logout_link').on("click", function(e) { return Hm_Utils.confirm_logout(); });
         if (hm_search_terms()) {
             $('.search_terms').val(hm_search_terms());
         }
@@ -1334,6 +1424,8 @@ var Hm_Utils = {
             document.getElementById('logout_without_saving').click();
         }
         else {
+            var confirmLogoutModal = new bootstrap.Modal(document.getElementById('confirmLogoutModal'), {keyboard: true})
+            confirmLogoutModal.show();
             $('.confirm_logout').show();
         }
         return false;
@@ -1438,7 +1530,7 @@ var Hm_Utils = {
         var results = {}
         var i;
         var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting'];
+        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {
@@ -1501,14 +1593,29 @@ var Hm_Utils = {
         $('#unsaved_changes').val(state);
     },
 
+    /**
+     * Shows pending messages added with the add_sys_message method
+     */
     show_sys_messages: function() {
-        if ($('.sys_messages').text().length) {
-            $('.sys_messages').show();
-            $('.sys_messages').on('click', function() {
-                $('.sys_messages').hide();
-                $('.sys_messages').html('');
-            });
+        $('.sys_messages').removeClass('d-none');    
+    },
+
+    /**
+     * 
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
+     */
+    add_sys_message: function(msg, type = 'info') {
+        if (!msg) {
+            return;
         }
+        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
+        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+        this.show_sys_messages();
+    },
+
+    clear_sys_messages: function () {
+        $('.sys_messages').html('');
     },
 
     cancel_logout_event: function() {
@@ -1553,7 +1660,13 @@ var Hm_Utils = {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_test'}],
             false, [], false, false, false);
-    }
+    },
+
+    is_element_visible: function (elem) {
+        if (!elem) return false;
+        var style = window.getComputedStyle(elem);
+        return style.display !== 'none' && style.visibility !== 'hidden' && elem.offsetWidth > 0 && elem.offsetHeight > 0;
+    },
 };
 
 var Hm_Crypt = {
@@ -1648,14 +1761,14 @@ var reset_default_value_checkbox = function() {
     let checkbox = this.parentElement.parentElement.firstChild;
     if (checkbox.disabled == false) {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         checkbox.setAttribute("current_value", checkbox.checked);
         checkbox.checked = !checkbox.checked;
         checkbox.disabled = true;
     }
     else {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         checkbox.checked = checkbox.getAttribute("current_value") == "true" ? true : false;
         checkbox.disabled = false;
     }
@@ -1670,7 +1783,7 @@ var reset_default_value_select = function() {
     
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         field.selectedIndex = field.getAttribute("current_value");
         field.style.backgroundColor = "#fff";
         field.style.pointerEvents = "auto";
@@ -1678,7 +1791,7 @@ var reset_default_value_select = function() {
     }
     else {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         field.setAttribute("current_value", field.selectedIndex);
         if (field.getAttribute("name") == "language") {
             for(let compter = 0; field.length > compter; compter ++){
@@ -1702,7 +1815,7 @@ var reset_default_value_input = function() {
 
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore default value")
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
         field.value = field.getAttribute("current_value");
         field.style.backgroundColor = "#fff";
         field.style.pointerEvents = "auto";
@@ -1710,7 +1823,7 @@ var reset_default_value_input = function() {
     }
     else {
         this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label","Restore current value");
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
         field.setAttribute("current_value", field.value);
         field.value = 20;
         if(defaultValue) {
@@ -1720,6 +1833,17 @@ var reset_default_value_input = function() {
         field.style.pointerEvents = "none";
         field.style.touchAction = "none";
     }
+};
+
+var decrease_servers = function(section) {
+    const element = document.querySelector(`.${section}_server_setup .server_count`);
+    const parts = element.innerHTML.split(' ');
+    parts[0] = Number(parts[0]) - 1;
+    element.innerHTML = parts.join(' ');
+};
+
+var err_msg = function(msg) {
+    return "ERR"+hm_trans(msg);
 };
 
 /* create a default message list object */
@@ -1748,9 +1872,6 @@ $(function() {
     /* check for folder reload */
     var reloaded = Hm_Folders.reload_folders();
 
-    /* show any pending notices */
-    Hm_Utils.show_sys_messages();
-
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();
     Hm_Folders.toggle_folders_event();
@@ -1759,7 +1880,7 @@ $(function() {
     Hm_Timer.fire();
 
     /* load folder list */
-    if (!reloaded && !Hm_Folders.load_from_local_storage()) {
+    if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
         Hm_Folders.update_folder_list();
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
@@ -1796,7 +1917,11 @@ $(function() {
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
     }
-    
+
+    if (hm_check_dirty_flag()) {
+        $('form:not(.search_terms)').areYouSure();
+    }
+
     fixLtrInRtl()
 });
 
@@ -1848,6 +1973,156 @@ function fixLtrInRtl() {
 }
 
 function listControlsMenu() {
-    $('#list_controls_menu').toggle();
+    $('#list_controls_menu').toggleClass('show')
     $('.list_sources').hide();
+}
+
+
+// Sortablejs
+const tableBody = document.querySelector('.message_table_body');
+if(tableBody && !hm_mobile()) {
+    const allFoldersClassNames = [];
+    let targetFolder;
+    let movingElement;
+    let movingNumber;
+    Sortable.create(tableBody, {
+        sort: false,
+        group: 'messages',
+        ghostClass: 'drag_target',
+
+        onMove: (sortableEvent) => {
+            movingElement = sortableEvent.dragged;
+            targetFolder = sortableEvent.related?.className.split(' ')[0];
+            return false;
+        },
+
+        onEnd: () => {
+            // Remove the highlight class from the tr
+            document.querySelectorAll('.message_table_body > tr.drag_target').forEach((row) => {
+                row.classList.remove('drag_target');
+            });
+            return false;
+        }
+    });
+
+    const isValidFolderReference = (className='') => {
+        return className.startsWith('imap_') && allFoldersClassNames.includes(className)
+    }
+
+    Sortable.utils.on(tableBody, 'dragstart', (evt) => {
+        let movingElements = [];
+        // Is the target element checked
+        const isChecked = evt.target.querySelector('.checkbox_cell input[type=checkbox]:checked');
+        if (isChecked) {
+            movingElements = document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked');
+            // Add a highlight class to the tr
+            movingElements.forEach((checkbox) => {
+                checkbox.parentElement.parentElement.classList.add('drag_target');
+            });
+        } else {
+            // If not, uncheck all other checked elements so that they don't get moved
+            document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked').forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+        }
+        
+        movingNumber = movingElements.length || 1;
+        
+        const element = document.createElement('div');
+        element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
+        element.style.position = 'absolute';
+        element.className = 'dragged_element';
+        document.body.appendChild(element);
+
+        function moveElement() {
+            element.style.display = 'none';
+        }
+        
+        function removeElement() {
+            element.remove();
+        }
+        
+        document.addEventListener('drag', moveElement);
+        document.addEventListener('mouseover', removeElement);
+
+        evt.dataTransfer.setDragImage(element, 0, 0);
+    });
+
+    Sortable.utils.on(tableBody, 'dragend', () => {
+        // If the target is not a folder, do nothing
+        if (!isValidFolderReference(targetFolder ?? '')) {
+            return;
+        }
+
+        const page = hm_page_name();
+        const selectedRows = [];
+
+        if(movingNumber > 1) {
+            document.querySelectorAll('.message_table_body > tr').forEach(row => {
+                if (row.querySelector('.checkbox_cell input[type=checkbox]:checked')) {
+                    selectedRows.push(row);
+                }
+            });
+        }
+        
+        if (selectedRows.length == 0) {
+            selectedRows.push(movingElement);
+        }
+
+        const movingIds = selectedRows.map(row => row.className.split(' ')[0]);
+
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
+            {'name': 'imap_move_ids', 'value': movingIds.join(',')},
+            {'name': 'imap_move_to', 'value': targetFolder},
+            {'name': 'imap_move_page', 'value': page},
+            {'name': 'imap_move_action', 'value': 'move'}],
+            (res) =>{
+                for (const index in res.move_count) {
+                    $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
+                    select_imap_folder(hm_list_path());
+                }
+            }
+        );
+        
+        // Reset the target folder
+        targetFolder = null;
+    });
+
+    const folderList = document.querySelector('.folder_list');
+
+    const observer = new MutationObserver((mutations) => {
+        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
+        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
+
+        // Keep track of all folders class names
+        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
+
+        emailFoldersGroups.forEach((emailFolders) => {
+            Sortable.create(emailFolders, {
+                sort: false,
+                group: {
+                    put: 'messages'
+                }
+            });
+        });
+        
+        emailFoldersElements.forEach((emailFolder) => {
+            emailFolder.addEventListener('dragenter', () => {
+                emailFolder.classList.add('drop_target');
+            });
+            emailFolder.addEventListener('dragleave', () => {
+                emailFolder.classList.remove('drop_target');
+            });
+            emailFolder.addEventListener('drop', () => {
+                emailFolder.classList.remove('drop_target');
+            });
+        });
+    });
+
+    const config = {
+        childList: true
+    };
+
+    observer.observe(folderList, config);
 }

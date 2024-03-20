@@ -42,7 +42,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current = Hm_SMTP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
-                Hm_SMTP_List::add($current, $server['id']);
+                Hm_SMTP_List::edit($server['id'], $current);
                 $smtp = Hm_SMTP_List::connect($server['id'], false);
                 if ($smtp->state == 'authed') {
                     Hm_Msgs::add('Password Updated');
@@ -50,7 +50,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 }
                 else {
                     unset($current['pass']);
-                    Hm_SMTP_List::add($current, $server['id']);
+                    Hm_SMTP_List::edit($server['id'], $current);
                     Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
                     $this->out('connect_status', false);
                 }
@@ -59,7 +59,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current = Hm_IMAP_List::dump($server['id']);
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
-                Hm_IMAP_List::add($current, $server['id']);
+                Hm_IMAP_List::edit($server['id'], $current);
                 $imap = Hm_IMAP_List::connect($server['id'], false);
                 if ($imap->get_state() == 'authenticated') {
                     Hm_Msgs::add('Password Updated');
@@ -67,7 +67,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 }
                 else {
                     unset($current['pass']);
-                    Hm_IMAP_List::add($current, $server['id']);
+                    Hm_IMAP_List::edit($server['id'], $current);
                     Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
                     $this->out('connect_status', false);
                 }
@@ -92,7 +92,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
         if ($this->module_is_supported('imap')) {
             foreach (Hm_IMAP_List::dump() as $index => $vals) {
                 if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
                     $vals['type'] = 'IMAP';
                     $key = 'imap_'.$index;
                     $missing[$key] = $vals;
@@ -102,7 +101,6 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
         if ($this->module_is_supported('smtp')) {
             foreach (Hm_SMTP_List::dump() as $index => $vals) {
                 if (array_key_exists('nopass', $vals)) {
-                    $vals['id'] = $index;
                     $vals['type'] = 'SMTP';
                     $key = 'smtp_'.$index;
                     $missing[$key] = $vals;
@@ -597,6 +595,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
      */
     public $validate_request = true;
     public function process() {
+        $this->out('fancy_login_allowed', $this->config->get('fancy_login', false));
         $this->out('is_mobile', $this->request->mobile);
         if ($this->get('create_username', false)) {
             return;
@@ -618,6 +617,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
         if ($this->session->is_active()) {
             $this->out('changed_settings', $this->session->get('changed_settings', array()), false);
             $this->out('username', $this->session->get('username'));
+            $this->out('is_logged', true);
         }
         if ($this->validate_request) {
             Hm_Request_Key::load($this->session, $this->request, $this->session->loaded);
@@ -678,6 +678,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
             }
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
+        $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
         if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
@@ -736,8 +737,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
                     $this->session->destroy($this->request);
-                    Hm_Msgs::add('Saved user data on logout');
-                    Hm_Msgs::add('Session destroyed on logout');
+                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout');
                 }
             }
             else {
@@ -868,3 +868,96 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('junk_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_junk_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('junk_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process input from the max per source setting for the Trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('trash_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the trash page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trash_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('trash_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process input from the max per source setting for the Draft page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('drafts_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the Drafts page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('drafts_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Process warn for unsaved changes in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Module {
+    /**
+     * valid values are true and false
+     */
+    public function process() {
+        function warn_for_unsaved_changes_callback($val) {
+            return $val;
+        }
+        process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback');
+    }
+}

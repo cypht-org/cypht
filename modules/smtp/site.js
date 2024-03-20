@@ -2,7 +2,7 @@
 
 var get_smtp_profile = function(profile_value) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
-        Hm_Notices.show(['ERRPlease create a profile for saving sent messages option'], true);
+        Hm_Notices.show([err_msg('Please create a profile for saving sent messages option')]);
     }
     else {
         Hm_Ajax.request(
@@ -15,7 +15,7 @@ var get_smtp_profile = function(profile_value) {
 };
 
 var check_attachment_dir_access = function() {
-    Hm_Notices.show(['ERRAttachment storage unavailable, please contact your site administrator']);
+    Hm_Notices.show([err_msg('Attachment storage unavailable, please contact your site administrator')]);
 };
 
 var smtp_test_action = function(event) {
@@ -24,9 +24,7 @@ var smtp_test_action = function(event) {
     Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
-        function(res) {
-            Hm_Notices.show(res.router_user_msgs);
-        },
+        false,
         {'smtp_connect': 1}
     );
 };
@@ -44,7 +42,7 @@ var smtp_save_action = function(event) {
                 form.find('.save_smtp_connection').hide();
                 form.find('.smtp_password').val('');
                 form.find('.smtp_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_smtp_connection" />');
+                form.append('<input type="submit" value="Forget" class="forget_smtp_connection btn btn-outline-secondary btn-sm" />');
                 $('.forget_smtp_connection').on('click', smtp_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -87,10 +85,11 @@ var smtp_delete_action = function(event) {
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                form.parent().parent().remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
+                decrease_servers('smtp');
             }
         },
         {'smtp_delete': 1}
@@ -112,7 +111,7 @@ var smtp_delete_draft = function(id) {
 
 var send_archive = function() {
     $('.compose_post_archive').val(1);
-    document.getElementsByClassName("smtp_send")[0].click();
+    document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
 var save_compose_state = function(no_files, notice) {
@@ -139,8 +138,8 @@ var save_compose_state = function(no_files, notice) {
         return;
     }
 
-    $('.smtp_send').prop('disabled', true);
-    $('.smtp_send').addClass('disabled_input');
+    $('.smtp_send_placeholder').prop('disabled', true);
+    $('.smtp_send_placeholder').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
@@ -155,8 +154,8 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_to', 'value': to},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
-            $('.smtp_send').prop('disabled', false);
-            $('.smtp_send').removeClass('disabled_input');
+            $('.smtp_send_placeholder').prop('disabled', false);
+            $('.smtp_send_placeholder').removeClass('disabled_input');
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
@@ -170,11 +169,11 @@ var save_compose_state = function(no_files, notice) {
 };
 
 var toggle_recip_flds = function() {
-    var symbol = '+';
-    if ($('.toggle_recipients').text() == '+') {
-        symbol = '-';
+    var symbol = '<i class="bi bi-plus-square-fill fs-3"></i>';
+    if ($('.toggle_recipients').html() == '<i class="bi bi-plus-square-fill fs-3"></i>') {
+        symbol = '<i class="bi bi-dash-square fs-3"></i>';
     }
-    $('.toggle_recipients').text(symbol);
+    $('.toggle_recipients').html(symbol);
     $('.recipient_fields').toggle();
     return false;
 }
@@ -220,7 +219,7 @@ var init_resumable_upload = function () {
     r.on('fileAdded', function(file, event){
         $('.uploaded_files').append('<tr id="tr-'+file.uniqueIdentifier+'"><td>'
                 +file.fileName+'</td><td>'+file.file.type+' ' + (Math.round((file.file.size/1024) * 100)/100) + 'KB '
-                +'</td><td><a class="remove_attachment" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
+                +'</td><td><a class="remove_attachment text-danger" id="remove-'+file.uniqueIdentifier+'" style="display:none" href="#">Remove</a><a  id="pause-'+file.uniqueIdentifier+'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'+file.uniqueIdentifier+'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'
                 +'<div class="meter" style="width:100%"><span id="progress-'
                 +file.uniqueIdentifier+'" style="width:0%;"><span class="progress" id="progress-bar-'
                 +file.uniqueIdentifier+'"></span></span></div></td></tr>');
@@ -327,13 +326,14 @@ var text_to_bubbles = function(input) {
     var contact_type = input.getAttribute("data-type");
     var contact_source = input.getAttribute("data-source");
 
-    if ($(input).val() && contact_id) {
+    if ($(input).val()) {
         var recipients = $(input).val().split(/,|;/);
         var invalid_recipients = '';
 
         for (var i = 0; i < recipients.length; i++) {
             if (is_valid_recipient(recipients[i])) {
-                append_bubble(recipients[i].trim(), input, contact_id, contact_type, contact_source);
+                const value = recipients[i].trim().replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                append_bubble(value, input, contact_id, contact_type, contact_source);
             } else {
                 if (invalid_recipients) {
                     invalid_recipients = invalid_recipients + ', ';
@@ -348,27 +348,30 @@ var text_to_bubbles = function(input) {
 
 var bubble_index = 0;
 var append_bubble = function(value, to, id, type, source) {
-    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" draggable="true" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
+    var bubble = '<div id="bubble_'+bubble_index+'" class="bubble bubble_dropdown-toggle" onclick="toggle_bubble_dropdown(this)" draggable="true"  ondragstart="drag(event)" data-id="'+id+'"  data-type="'+type+'"  data-source="'+source+'" data-value="'+value+'">'+value+'<span class="bubble_close">&times;</span></div>';
     $(to).prev().append(bubble);
     bubble_index++;
 };
 
-var toggle_bubble_dropdown = function(element) {
+var toggle_bubble_dropdown = function (element) {
     var dropdownContent = element.nextElementSibling;
-  
+
     if (!dropdownContent) {
-      var textValue = element.dataset.value;
-      var contact_id = element.getAttribute('data-id');
-      var contact_type = element.getAttribute('data-type');
-      var contact_source = element.getAttribute('data-source');
-      var editIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAcQAAAHEBHD+AdwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEESURBVDiNldO/LuxRFMXxz5KJRqFSKCU6IUIp0XoGkXgBDUFHoldQ6XQ6iUqlcm8iOh5AoUGp9C83dysQMn4zmVnJKU72/q61T7KPqtLPwRL+4BAjqSpJJjHrWw9VdaZNSVaxginMYznYwRguf/TeVdVpAzyHexTWcQFXPYy9imO0Pu97uMbmAAbaR+2QvFhV/36Uzqtqt284yR5U1Zpu6b3AHQ2SrPQCNxokCTYwhFY32FdDm2bw18eynCS5wf8muNMTFvCECUzjuQlOspVktGmCJ7zgDFtV9dyUjHEM/zKoqv0OQKO67kGvBo9JRvqBkgz6+D+3LWzjKMlwHx5vOKiq13cd46KPLEvGfQAAAABJRU5ErkJggg==';
-      var copyIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdAAAAHQBMYXlgQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADUSURBVDiN7ZI9SgNBAIW/F0JECwubQAr7gIUgVjZ2Ymed2lzB2tIjeAEPIFh4ASsbTxGIlXaCwmeRXZxdzGpi64OB4c37KyYqJZIcAjfAgOV4BU7VGWrjACfAuM23NJfAuUq/aN4BdoE5sJFkv9X6rM6q+xssvP3KvAfcAU8ds8dJLtTbkqwXHAHX6tUyd5Iz4BhoBPTq947mRk6b6H2nWgX/AX8LcK2AJENgCjzA10f6fa3OkxyoL+WCD2DzB+9WpaM2A0QlyQi4B7Y7At6BifpYkp8XA1pTMGl6mgAAAABJRU5ErkJggg==';
-      dropdownContent = document.createElement('div');
-      dropdownContent.classList.add('bubble_dropdown-content');
-      dropdownContent.innerHTML = '<ul><li><span data-value="'+textValue+'" onclick="copy_text_to_clipboard(this)"><img src="'+copyIcon+'"> Copy</span></li><li><a href="?page=contacts&contact_id='+contact_id+'&contact_source='+contact_source+'&contact_type='+contact_type+'"><img src="'+editIcon+'"> Edit</a></li></ul>';
-      element.parentNode.appendChild(dropdownContent);
+        var textValue = element.dataset.value;
+        var contact_id = element.getAttribute('data-id');
+        var contact_type = element.getAttribute('data-type');
+        var contact_source = element.getAttribute('data-source');
+        dropdownContent = document.createElement('div');
+        dropdownContent.classList.add('bubble_dropdown-content');
+        let html = '<ul><li><span data-value="' + textValue + '" onclick="copy_text_to_clipboard(this)"><i class="bi bi-copy"></i> Copy</span></li>';
+        if (contact_id !== "null") {
+            html += '<li><a href="?page=contacts&contact_id=' + contact_id + '&contact_source=' + contact_source + '&contact_type=' + contact_type + '"><i class="bi bi-pencil-fill"></i> Edit</a></li>';
+        }
+        html += '</ul>';
+        dropdownContent.innerHTML = html;
+        element.parentNode.appendChild(dropdownContent);
     }
-  
+
     dropdownContent.classList.toggle('show');
 }
 
@@ -378,18 +381,56 @@ var copy_text_to_clipboard = function(e) {
 }
 
 var is_valid_recipient = function(recipient) {
-    var valid_regex = /^[\w ]*[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    var valid_regex = /^[\p{L}|\d' ]*(<)?[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*(>)?$/u;
     return recipient.match(valid_regex);
 };
 
-$(function() {    
+var process_compose_form = function(){
+    var msg_uid = hm_msg_uid();
+    var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    var class_name = 'imap_' + detail.server_id + '_' + msg_uid + '_' + detail.folder;
+    var key = 'imap_' + Hm_Utils.get_url_page_number() + '_' + hm_list_path();
+    var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
+
+    if (next_message) {
+        $('.compose_next_email_data').val(next_message);
+    }
+
+    var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+    $('#send_uploaded_files').val(uploaded_files);
+    Hm_Ajax.show_loading_icon();
+    $('.smtp_send_placeholder').addClass('disabled_input');
+    $('.smtp_send_archive').addClass('disabled_input');
+    $('.smtp_send').on("click", function () { return false; });
+}
+var force_send_message = function() {
+    // Check if the force_send input already exists
+    var forceSendInput = document.getElementById('force_send');
+    if (! forceSendInput) {
+        // Create a hidden input element
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'force_send';
+        hiddenInput.value = '1';
+        hiddenInput.id = 'force_send';
+        hiddenInput.classList.add('force_send');
+        // Append the hidden input to the form
+        var form = document.querySelector('.compose_form');
+        form.appendChild(hiddenInput);
+    }
+}
+
+$(function () {
+    if (!hm_is_logged()) {
+        return;
+    }
     if (hm_page_name() === 'settings') {
         $('#clear_chunks_button').on('click', function(e) {
             e.preventDefault();
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_clear_attachment_chunks'}],
                 function(res) {
-                    
+
                 },
                 []
             );
@@ -406,20 +447,114 @@ $(function() {
         $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
         $('.smtp_save').on("click", function() { save_compose_state(false, true); });
         $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
-        $('.compose_form').on('submit', function() {
-            var msg_uid = hm_msg_uid();
-            var detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-            var class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
-            var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
-            var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
-            if (next_message) {
-                $('.compose_next_email_data').val(next_message);
+
+        const modal = new Hm_Modal({
+            modalId: 'emptySubjectBodyModal',
+            title: 'Warning',
+            btnSize: 'sm'
+        });
+
+        $('.smtp_send_placeholder').on("click", function (e) {
+            const body = $('.compose_body').val().trim();
+            const subject = $('.compose_subject').val().trim();
+
+            let modalContentHeadline = '';
+            let dontWanValueInStorage = '';
+
+            // If the subject is empty, we should warn the user
+            if (!subject) {
+                dontWanValueInStorage = 'dont_warn_empty_subject';
+                modalContentHeadline = "Your subject is empty!";
             }
-            var uploaded_files = $("input[name='uploaded_files[]']").map(function(){return $(this).val();}).get();
-            $('#send_uploaded_files').val(uploaded_files);
-            Hm_Ajax.show_loading_icon(); $('.smtp_send').addClass('disabled_input');
-            $('.smtp_send_archive').addClass('disabled_input'); 
-            $('.smtp_send').on("click", function() { return false; }); 
+
+            // If the body is empty, we should warn the user
+            if (!body) {
+                dontWanValueInStorage = 'dont_warn_empty_body';
+                modalContentHeadline = "Your body is empty!";
+            }
+
+            // if both the subject and the body are empty, we should warn the user
+            if (!body && !subject) {
+                dontWanValueInStorage = 'dont_warn_empty_subject_body';
+                modalContentHeadline = "Your subject and body are empty!";
+            }
+
+            // If the user has disabled the warning, we should send the message
+            if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
+                handleSendAnyway();
+            }
+            // Otherwise, we should show the modal if we have a headline
+            else if (modalContentHeadline) {
+                modalContentHeadline = `<p>${hm_trans(modalContentHeadline)}</p>`;
+                return showModal(modalContentHeadline);
+            }
+            // Subject and body are not empty, we can send the message
+            else {
+                handleSendAnyway();
+            }
+
+            /*
+            ========================================
+            Functions declarations
+            ========================================
+            */
+            function showModal() {
+                if (! modal.modalContent.html()) {
+                    modal.addFooterBtn(hm_trans('Send anyway'), 'btn-warning', handleSendAnyway);
+                    modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
+                }
+                modal.setContent(modalContentHeadline + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
+                modal.open();
+            }
+
+            function handleSendAnyway() {
+                if (handleMissingAttachment()) {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                } else {
+                    e.preventDefault();
+                }
+            };
+
+            function handleSendAnywayAndDontWarnMe() {
+                Hm_Utils.save_to_local_storage(dontWanValueInStorage, true);
+                handleSendAnyway();
+            };
+
+            function handleMissingAttachment() {
+                var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
+                const compose_body_value = document.getElementById('compose_body').value;
+                const force_send = document.getElementById('force_send')?.value;
+                var reminder_value = $('.compose_form').data('reminder');
+                if (reminder_value === 1 && force_send !== '1') {
+                    let all_translated_keywords = [];
+                    for (let lang in window.hm_translations) {
+                        if (window.hm_translations.hasOwnProperty(lang)) {
+                            // Get translated keywords for the current language
+                            const translated_keywords = hm_trans('attachment,file,attach,attached,attaching,enclosed,CV,cover letter', lang).split(',');
+                            // Concatenate translated keywords with the array
+                            all_translated_keywords = all_translated_keywords.concat(translated_keywords);
+                        }
+                    }
+                    const additional_keywords = ['.doc', '.pdf'];
+                    // Split the translated keywords into an array && Add additional keywords or file extensions
+                    const combined_keywords = all_translated_keywords.concat(additional_keywords);
+                    // Build the regex pattern
+                    const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
+                    // Check if the pattern is found in the message
+                    if (pattern.test(compose_body_value) && uploaded_files.length === 0) {
+                        
+                        if (confirm(hm_trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
+                            force_send_message();
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        });
+        $('.compose_form').on('submit', function() {
+            process_compose_form();
         });
         if ($('.compose_cc').val() || $('.compose_bcc').val()) {
             toggle_recip_flds();
@@ -446,12 +581,14 @@ $(function() {
         $('.compose_to, .compose_cc, .compose_bcc').on('keypress', function(e) {
             if(e.which == 13) {
                 e.preventDefault();
-                if (is_valid_recipient($(this).val())) {
-                    text_to_bubbles(this);
-                }
+                text_to_bubbles(this);
             }
         });
-        $('.compose_subject, .compose_body, .compose_server, .smtp_send, .smtp_send_archive').on('focus', function(e) {
+        $('.compose_to, .compose_cc, .compose_bcc').on('blur', function(e) {
+            e.preventDefault();
+            text_to_bubbles(this);
+        });
+        $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
             $('.compose_to, .compose_cc, .compose_bcc').each(function() {
                 bubbles_to_text(this);
             });
@@ -463,7 +600,7 @@ $(function() {
             $(this).find('input').focus();
         });
         $(document).on('click', '.bubble_close', function(e) {
-            e.stopPropagation();   
+            e.stopPropagation();
             $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });

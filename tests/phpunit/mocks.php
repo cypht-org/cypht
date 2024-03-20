@@ -6,6 +6,7 @@ class Hm_Mock_Session {
     public $auth_state = true;
     public $cookie_set = false;
     public $data = array();
+    public $lifetime;
     public function get($id, $default=false) {
         if ($id == 'saved_pages') {
             return array('foo' => array('bar', false));
@@ -172,6 +173,7 @@ class Hm_Mock_Config {
 }
 class Hm_Mock_Request {
     public $invalid_input_detected;
+    public $invalid_input_fields;
     public $post = array('hm_page_key' => 'asdf', 'fld1' => '0', 'fld2' => '1', 'fld3' => 0, 'fld4' => NULL);
     public $get = array();
     public $cookie = array();
@@ -262,7 +264,7 @@ class Hm_Functions {
     public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }
     public static function function_exists($func) {
-        if ((float) substr(phpversion(), 0, 3) < 5.6) {
+        if ((float) substr(phpversion(), 0, 3) < 7.4) {
             return false;
         }
         return self::$exists;
@@ -339,9 +341,9 @@ function filters() {
         'allowed_pages' => array('test'),
         'allowed_post' => array('bar' => FILTER_VALIDATE_INT),
         'allowed_output' => array(),
-        'allowed_server' => array('REQUEST_METHOD' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'REQUEST_SCHEME' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'HTTP_USER_AGENT' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'HTTPS' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-            'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_FULL_SPECIAL_CHARS, 'REQUEST_URI' => FILTER_SANITIZE_FULL_SPECIAL_CHARS),
+        'allowed_server' => array('REQUEST_METHOD' => FILTER_DEFAULT, 'REQUEST_SCHEME' => FILTER_DEFAULT,
+            'HTTP_USER_AGENT' => FILTER_DEFAULT, 'HTTPS' => FILTER_DEFAULT,
+            'HTTP_X_REQUESTED_WITH' => FILTER_DEFAULT, 'REQUEST_URI' => FILTER_DEFAULT),
         'allowed_get' => array('foo' => FILTER_UNSAFE_RAW),
         'allowed_cookie' => array()
     );

@@ -6,7 +6,7 @@
  * This module set is intented to give developers an overview of
  * the module system. Most of what it does is silly and consists of printing "Hello
  * World" in different ways. You can enable this module by adding it to the modules
- * value in the hm3.ini file, and rebuilding the site config.
+ * value in the config/app.php file.
  */
 
 /**
@@ -20,7 +20,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  * These set the default sources for modules assigned in this file. It can be overridden
  * by the module assignment itself. The module system uses the source to know which PHP
  * files to include when servicing a given request. It should match the name of the module
- * set as used in the hm3.ini file, as well as the current directory name.
+ * set as used in the config/app.php file, as well as the current directory name.
  */
 handler_source('hello_world');
 output_source('hello_world');
@@ -101,7 +101,7 @@ return array(
      * value not defined here will be filtered out of an ajax response.
      */
     'allowed_output' => array(
-        'hello_world_ajax_result' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false)
+        'hello_world_ajax_result' => array(FILTER_DEFAULT, false)
     ),
 
     /**

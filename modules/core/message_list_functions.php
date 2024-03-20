@@ -44,6 +44,24 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
         $mailbox_list_title = array('Everything');
     }
+    elseif ($path == 'junk') {
+        $list_path = 'junk';
+        $message_list_since = $handler->user_config->get('junk_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Junk');
+    }
+    elseif ($path == 'trash') {
+        $list_path = 'trash';
+        $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Trash');
+    }
+    elseif ($path == 'drafts') {
+        $list_path = 'drafts';
+        $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('drafts_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Drafts');
+    }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }}
 
@@ -86,7 +104,7 @@ function message_list_meta($input, $output_mod) {
     $date = sprintf('%s', strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
-    return '<div class="list_meta">'.
+    return '<div class="list_meta d-flex align-items-center fs-6">'.
         $date.
         '<b>-</b>'.
         '<span class="src_count"></span> '.$max.
@@ -109,7 +127,7 @@ function combined_sort_dialog($mod) {
         '3' => $mod->trans('Subject'),
     );
 
-    $res = '<select name="sort" class="combined_sort">';
+    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {
         $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
         $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
@@ -213,7 +231,7 @@ function safe_output_callback($vals, $style, $output_mod) {
     $title = '';
     if (count($vals) > 2) {
         if ($vals[2]){
-            $img = '<img src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+            $img = '<i class="bi bi-filetype-'.$vals[2].'"></i>';
         }
         if (count($vals) > 3) {
             $title = $output_mod->html_safe($vals[3]);
@@ -261,7 +279,7 @@ if (!hm_exists('subject_callback')) {
 function subject_callback($vals, $style, $output_mod) {
     $img = '';
     if (count($vals) == 4 && $vals[3]) {
-        $img = '<img alt="'.$output_mod->trans('list item').'" src="'.Hm_Image_Sources::${$vals[3]}.'" />';
+        $img = '<i class="bi bi-filetype-'.$vals[3].'"></i>';
     }
     $subject = $output_mod->html_safe($vals[0]);
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
@@ -302,19 +320,19 @@ function icon_callback($vals, $style, $output_mod) {
     $title = array();
     $show_icons = $output_mod->get('msg_list_icons');
     if (in_array('flagged', $vals[0])) {
-        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Flagged').'" />' : ' F';
+        $icons .= $show_icons ? '<i class="bi bi-star-half"></i>' : ' F';
         $title[] = $output_mod->trans('Flagged');
     }
     if (in_array('draft', $vals[0])) {
-        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$star.'" width="16" height="16" alt="'.$output_mod->trans('Draft').'" />' : ' D';
+        $icons .= $show_icons ? '<i class="bi bi-star-half"></i>' : ' D';
         $title[] = $output_mod->trans('Draft');
     }
     if (in_array('answered', $vals[0])) {
-        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$circle_check.'" width="16" height="16" alt="'.$output_mod->trans('Answered').'" />' : ' A';
+        $icons .= $show_icons ? '<i class="bi bi-check-circle-fill"></i>' : ' A';
         $title[] = $output_mod->trans('Answered');
     }
     if (in_array('attachment', $vals[0])) {
-        $icons .= $show_icons ? '<img src="'.Hm_Image_Sources::$paperclip.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" />' : ' +';
+        $icons .= $show_icons ? '<i class="bi bi-paperclip"></i>' : ' <i class="bi bi-plus-circle"></i>';
         $title[] = $output_mod->trans('Attachment');
     }
     $title = implode(', ', $title);
@@ -332,14 +350,14 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
-    $res = '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
-        '<div class="msg_controls">'.
-        '<a class="msg_read core_msg_control" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-        '<a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-        '<a class="msg_flag core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-        '<a class="msg_unflag core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-        '<a class="msg_archive core_msg_control" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+    $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
+        '<div class="msg_controls fs-6 d-none gap-1">'.
+        '<a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+        '<a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
+        '<a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+        '<a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+        '<a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
+        '<a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
@@ -368,14 +386,14 @@ function message_since_dropdown($since, $name, $output_mod) {
         '-1 year' => 'Last year',
         '-5 years' => 'Last 5 years'
     );
-    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since">';
+    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm w-auto">';
     $reset = '';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {
             $res .= ' selected="selected"';
             if (($name == 'feed_since' && $val != 'today') || ($name != 'feed_since' && $val != '-1 week')) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-paperclip refresh_list reset_default_value_select"></i></span>';
             }
 
         }
@@ -474,10 +492,10 @@ function update_search_label_field($search_term, $output_mod) {
  */
 if (!hm_exists('list_controls')) {
 function list_controls($refresh_link, $config_link, $source_link=false, $search_field='') {
-    return '<div class="list_controls no_mobile">'.
+    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">'.
         $refresh_link.$source_link.$config_link.$search_field.'</div>
     <div class="list_controls on_mobile">'.$search_field.'
-        <img alt="" src="'.Hm_Image_Sources::$three_dot.'" width="20" height="20" onclick="listControlsMenu()"/>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
         <div id="list_controls_menu" classs="list_controls_menu">'.$refresh_link.$source_link.$config_link.'</div>
     </div>';
 }}
@@ -528,7 +546,7 @@ function search_field_selection($current, $output_mod) {
         'TO' => 'To',
         'CC' => 'Cc',
     );
-    $res = '<select id="search_fld" name="search_fld">';
+    $res = '<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {
         $res .= '<option ';
         if ($current == $val) {
@@ -588,8 +606,8 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     if ($ceil > $max_pages) {
         $floor -= ($ceil - $max_pages);
     }
-    $prev = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
-    $next = '<a class="disabled_link"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+    $prev = '<a class="disabled_link"><i class="bi bi-caret-left-fill"></i></a>';
+    $next = '<a class="disabled_link"><i class="bi bi-caret-right-fill"></i></a>';
 
     if ($floor > 1 ) {
         $first = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page=1'.$keyword_str.$filter_str.$sort_str.'">1</a> ... ';
@@ -598,10 +616,10 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
         $last = ' ... <a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$max_pages.$keyword_str.$filter_str.$sort_str.'">'.$max_pages.'</a>';
     }
     if ($current_page > 1) {
-        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$keyword_str.$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_left.'" alt="&larr;" /></a>';
+        $prev = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page - 1).$keyword_str.$filter_str.$sort_str.'"><i class="bi bi-caret-left-fill"></i></a>';
     }
     if ($max_pages > 1 && $current_page < $max_pages) {
-        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$keyword_str.$filter_str.$sort_str.'"><img src="'.Hm_Image_Sources::$caret_right.'" alt="&rarr;" /></a>';
+        $next = '<a href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.($current_page + 1).$keyword_str.$filter_str.$sort_str.'"><i class="bi bi-caret-right-fill"></i></a>';
     }
     for ($i=1;$i<=$max_pages;$i++) {
         if ($i < $floor || $i > $ceil) {
@@ -609,7 +627,7 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
         }
         $links .= ' <a ';
         if ($i == $current_page) {
-            $links .= 'class="current_page" ';
+            $links .= 'class="current_page fw-bolder" ';
         }
         $links .= 'href="?page=message_list&amp;list_path='.urlencode($path).'&amp;list_page='.$i.$keyword_str.$filter_str.$sort_str.'">'.$i.'</a>';
     }

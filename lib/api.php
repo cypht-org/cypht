@@ -58,9 +58,6 @@ class Hm_API_Curl {
         Hm_Functions::c_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         Hm_Functions::c_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         Hm_Functions::c_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        if ($this->format == 'binary') {
-            Hm_Functions::c_setopt($ch, CURLOPT_BINARYTRANSFER, 1);
-        }
     }
 
     /**

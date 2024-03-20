@@ -1,19 +1,9 @@
-.targets_section, .other_section, .submit_section, .time_section, .source_section, .terms_section { padding: 20px; padding-left: 60px; margin-bottom: 10px; }
 .adv_controls { margin-left: 25px; display: none; }
-.targets_section img, .time_section img, .source_section img, .terms_section img { cursor: pointer; margin-left: 10px; vertical-align: -3px; opacity: .4; }
-.submit_section { margin-top: 20px; }
-.other_section table, .targets_section table { width: 1%; white-space: nowrap; margin-bottom: 5px; }
-.other_section th, .targets_section th { vertical-align: top; font-weight: normal; text-align: left; padding: 5px; padding-bottom: 10px; }
-.other_section .flags { line-height: 150%; }
-.andor { width: 200px; padding: 10px; text-align: center; }
-.timeandor { width: 400px; padding: 10px; text-align: center; }
 .adv_folder_list { width: 400px; }
 .adv_source_list { margin-top: 10px; line-height: 150%; }
 .adv_source_list img { margin-right: 10px; }
-.adv_collapse_all, .adv_expand_all { margin-right: 10px; opacity: .4; vertical-align: -1px; cursor: pointer; }
 .adv_expand_all { display: none; }
 #adv_search { cursor: pointer; }
-.search_result_title { margin-bottom: 20px; }
 .source_count, .time_count, .target_count, .other_count, .term_count { display: none; float: right; margin-right: 30px; }
 .imap_support_required { padding: 100px; text-align: center; font-size: 120%; color: #666; }
 .adv_reset { margin-left: 20px; cursor: pointer; }

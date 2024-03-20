@@ -14,8 +14,7 @@ from selenium.common import exceptions
 from contextlib import contextmanager
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as exp_cond
-
-INI_PATH = '../../hm3.ini'
+import glob
 
 class WebTest:
 
@@ -31,11 +30,21 @@ class WebTest:
 
     def read_ini(self):
         self.modules = []
-        ini = open(INI_PATH)
-        for row in ini.readlines():
-            if re.match('^modules\[\]\=', row):
-                parts = row.split('=')
-                self.modules.append(parts[1].strip())
+        self.auth_type = ''
+        # Assuming each PHP file returns an associative array
+        config_files = glob.glob('../../config/*.php')
+
+        for file_path in config_files:
+            # Create an empty dictionary to hold the variables from the included file
+            config_dict = {}
+            # Execute the PHP file in a new dictionary
+            exec(open(file_path).read(), config_dict)
+            # Check if 'modules' is in the dictionary and is a list
+            if 'modules' in config_dict and isinstance(config_dict['modules'], list):
+                self.modules += config_dict['modules']
+            # Check if 'auth_type' is in the dictionary
+            if 'auth_type' in config_dict:
+                self.auth_type = config_dict['auth_type']
 
     def load(self):
         print(" - loading site")

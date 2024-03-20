@@ -16,14 +16,27 @@
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
     $str = str_ireplace('</body>', '', $str);
-    require_once VENDOR_PATH.'autoload.php';
+
     $config = HTMLPurifier_Config::createDefault();
+    $config->set('HTML.DefinitionID', 'hm-message');
+    $config->set('HTML.DefinitionRev', 1);
     $config->set('Cache.DefinitionImpl', null);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('HTML.TargetNoopener', true);
+
     if (!$images) {
         $config->set('URI.DisableExternalResources', true);
     }
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
+
+    if ($def = $config->maybeGetRawHTMLDefinition()) {
+        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
+        foreach ($html_tags as $tag) {
+            $def->addAttribute($tag, 'data-src', 'Text');
+        }
+    }
+    
     try {
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($str);
@@ -68,7 +81,7 @@ function format_msg_text($str, $output_mod, $links=true) {
     $str = preg_replace("/(&(?!amp)[^;]+;)/", " $1", $str);
     if ($links) {
         $link_regex = "/((http|ftp|rtsp)s?:\/\/(%[[:digit:]A-Fa-f][[:digit:]A-Fa-f]|[-_\.!~\*';\/\?#:@&=\+$,%[:alnum:]])+)/m";
-        $str = preg_replace($link_regex, "<a href=\"$1\">$1</a>", $str);
+        $str = preg_replace($link_regex, "<a href=\"$1\" target=\"_blank\" rel=\"noopener\">$1</a>", $str);
     }
     $str = preg_replace("/ (&[^;]+;)/", "$1", $str);
     $str = str_replace('<wbr>', '&#160;<wbr>', $str);
@@ -436,7 +449,7 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
+        $doc->loadHTML(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }

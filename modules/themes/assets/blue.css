@@ -1,4 +1,4 @@
-div { background-color: transparent !important; }
+div:not(.dragged_element) { background-color: transparent !important; }
 html * { color: #404a5d !important; border-color: #cfdeff !important; }
 body, .folder_cell { background: none !important; background-color: transparent !important; }
 html { background: linear-gradient(0deg, #e8f0ff, #ecf2ff) !important; }
@@ -20,3 +20,7 @@ textarea, select, input, .toggle_link { border-color: #ccc !important; color: #6
 .sys_messages { background-color: #e8f0ff !important; }
 .empty_list { color: #bbb !important; }
 .checkbox_cell input[type="checkbox"]:checked + label { background-color: #c6d7ff !important; }
+.drop_target { background-color: #cfdeff !important; }
+.drag_target {
+    background-color: #8391b0 !important;
+}

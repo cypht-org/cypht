@@ -4,10 +4,11 @@ use PHPUnit\Framework\TestCase;
 
 class Hm_Test_Dispatch extends TestCase {
 
+    public $config;
     public function setUp(): void {
         require 'bootstrap.php';
         require 'helpers.php';
-        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
         $this->config = new Hm_Mock_Config();
     }
     /**
@@ -15,7 +16,7 @@ class Hm_Test_Dispatch extends TestCase {
      * @runInSeparateProcess
      */
     public function test_is_php_setup() {
-        if ((float) substr(phpversion(), 0, 3) >= 5.6) {
+        if ((float) substr(phpversion(), 0, 3) >= 7.4) {
             $this->assertTrue(Hm_Dispatch::is_php_setup());
         }
         Hm_Functions::$exists = false;
@@ -142,7 +143,7 @@ class Hm_Test_Debug_Page_Redirect extends TestCase {
     public function setUp(): void {
         define('DEBUG_MODE', true);
         require 'bootstrap.php';
-        define('CONFIG_FILE', APP_PATH.'hm3.rc');
+        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
     }
     /**
      * @preserveGlobalState disabled

@@ -171,7 +171,7 @@ $(function () {
 
     $(document).on('change', '#block_action', function(e) {
         if ($(this).val() == 'reject_with_message') {
-            $('<div id="reject_message"><label>Message</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
+            $('<div id="reject_message"><label>'+hm_trans('Message')+'</label><textarea id="reject_message_textarea"></textarea></div>').insertAfter($(this));
         } else {
             $('#reject_message').remove();
         }
@@ -184,7 +184,7 @@ $(function () {
                     .find('.select_default_reject_message')
                     .remove();
             } else {
-                $('<input type="text" class="select_default_reject_message" placeholder="Reject message" />').insertAfter($(this));
+                $('<input type="text" class="select_default_reject_message form-control" placeholder="'+hm_trans('Reject message')+'" />').insertAfter($(this));
             }
         });
         $(document).on('click', '.submit_default_behavior', function(e) {
@@ -213,7 +213,7 @@ $(function () {
 
         $(document).on('click', '.unblock_button', function(e) {
            e.preventDefault();
-           if (!confirm('Do you want to unblock sender?')) {
+           if (!confirm(hm_trans('Do you want to unblock sender?'))) {
                 return;
             }
            let sender = $(this).parent().parent().children().html();
@@ -239,7 +239,6 @@ $(function () {
             let sender = $(this).closest('tr').children().first().html();
             let scope = sender.startsWith('*@') ? 'domain': 'sender';
 
-            $('.cypht-dropdown').toggle();
             Hm_Ajax.request(
                 [
                     {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
@@ -261,7 +260,6 @@ $(function () {
         $(document).on('click', '.toggle-behavior-dropdown', function(e) {
             e.preventDefault();
             var default_val = $(this).data('action');
-            $('.cypht-dropdown').insertAfter(this).toggle();
             $('#block_sender_form').trigger('reset');
             $('#reject_message').remove();
             $('#block_action').val(default_val).trigger('change');
@@ -302,30 +300,18 @@ $(function () {
         });
 
         $('.sievefilters_accounts_title').on("click", function () {
-            $(this).parent().find('.sievefilters_accounts').toggle();
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
         });
     }
 
     if (hm_page_name() === 'sieve_filters') {
         /**************************************************************************************
-         *                             TINGLE SCRIPT MODAL
+         *                             BOOTSTRAP SCRIPT MODAL
          **************************************************************************************/
-        var edit_script_modal = new tingle.modal({
-            footer: true,
-            stickyFooter: false,
-            closeMethods: ['overlay', 'button', 'escape'],
-            closeLabel: "Close",
-            cssClass: ['custom-class-1', 'custom-class-2'],
-            onOpen: function () {
-            },
-            onClose: function () {
-            },
-            beforeClose: function () {
-                // here's goes some logic
-                // e.g. save content before closing the modal
-                return true; // close the modal
-                return false; // nothing happens
-            }
+        var edit_script_modal = new Hm_Modal({
+            size: 'xl',
+            modalId: 'myEditScriptModal',
+            btnSize: 'lg'
         });
 
         // set content
@@ -333,41 +319,18 @@ $(function () {
         $('#edit_script_modal').remove();
 
         // add a button
-        edit_script_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
+        edit_script_modal.addFooterBtn('Save', 'btn-success', async function () {
             save_script(current_account);
-        });
-
-        // add another button
-        edit_script_modal.addFooterBtn('Close', 'tingle-btn tingle-btn--default tingle-btn--pull-right', function () {
-            // here goes some logic
-            edit_script_modal.close();
         });
 
 
         /**************************************************************************************
-         *                             TINGLE SIEVE FILTER MODAL
+         *                             BOOTSTRAP SIEVE FILTER MODAL
          **************************************************************************************/
-        var edit_filter_modal = new tingle.modal({
-            footer: true,
-            stickyFooter: false,
-            closeMethods: ['overlay', 'button', 'escape'],
-            closeLabel: "Close",
-            cssClass: ['custom-class-1', 'custom-class-2'],
-            onOpen: function () {
-            },
-            onClose: function () {
-                $(".sieve_list_conditions_modal").html("");
-                $(".filter_actions_modal_table").html("");
-                $(".modal_sieve_filter_name").val("");
-                $(".modal_sieve_filter_priority").val("0");
-                $(".modal_sieve_filter_test").val("ALLOF");
-            },
-            beforeClose: function () {
-                // here's goes some logic
-                // e.g. save content before closing the modal
-                return true; // close the modal
-                return false; // nothing happens
-            }
+        var edit_filter_modal = new Hm_Modal({
+            size: 'xl',
+            modalId: 'myEditFilterModal',
+            btnSize: 'lg'
         });
 
         // set content
@@ -375,7 +338,7 @@ $(function () {
         $('#edit_filter_modal').remove();
 
         // add a button
-        edit_filter_modal.addFooterBtn('Save', 'tingle-btn tingle-btn--primary tingle-btn--pull-right', async function () {
+        edit_filter_modal.addFooterBtn('Save', 'btn-success ms-auto', async function () {
             let result = save_filter(current_account);
             if (result) {
                 edit_filter_modal.close();
@@ -383,10 +346,13 @@ $(function () {
         });
 
         // add another button
-        edit_filter_modal.addFooterBtn('Close', 'tingle-btn tingle-btn--default tingle-btn--pull-right', function () {
-            // here goes some logic
-            edit_filter_modal.close();
+        edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
+            let result = save_filter(current_account, true);
+            if (result) {
+                edit_filter_modal.close();
+            }
         });
+
 
         function ordinal_number(n)
         {
@@ -406,7 +372,7 @@ $(function () {
         /**************************************************************************************
          *                                    FUNCTIONS
          **************************************************************************************/
-        function save_filter(imap_account) {
+        function save_filter(imap_account, gen_script = false) {
             let validation_failed = false
             let conditions_parsed = []
             let actions_parsed = []
@@ -428,19 +394,17 @@ $(function () {
 
             let idx = 0;
             if (conditions.length === 0) {
-                $('.sys_messages').html('<span class="err">You must provide at least one condition</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide at least one condition'), 'danger');
                 return false;
             }
 
-            $('.sys_messages').html('');
+            Hm_Utils.clear_sys_messages();
             conditions.forEach(function (elem, key) {
                 if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
                     let order = ordinal_number(key + 1);
                     let previous_messages = $('.sys_messages').html();
                     previous_messages += previous_messages ? '<br>': '';
-                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' condition (' + elem + ') must be provided</span>');
-                    Hm_Utils.show_sys_messages();
+                    Hm_Utils.add_sys_message('The ' + order + ' condition (' + elem + ') must be provided', 'danger');
                     validation_failed = true;
                 }
                  conditions_parsed.push(
@@ -469,8 +433,7 @@ $(function () {
             }).get();
 
             if (actions_type.length === 0) {
-                $('.sys_messages').html('<span class="err">You must provide at least one action</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide at least one action'), 'danger');
                 return false;
             }
 
@@ -481,8 +444,7 @@ $(function () {
                     let order = ordinal_number(key + 1);
                     let previous_messages = $('.sys_messages').html();
                     previous_messages += previous_messages ? '<br>': '';
-                    $('.sys_messages').html(previous_messages + '<span class="err">The ' + order + ' action (' + elem + ') must be provided</span>');
-                    Hm_Utils.show_sys_messages();
+                    Hm_Utils.add_sys_message('The ' + order + ' action (' + elem + ') must be provided', 'danger');
                     validation_failed = true;
                 }
                 actions_parsed.push(
@@ -497,8 +459,7 @@ $(function () {
             });
 
             if ($('.modal_sieve_filter_name').val() == "") {
-                $('.sys_messages').html('<span class="err">Filter name is required</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('Filter name is required'), 'danger');
                 return false;
             }
 
@@ -515,23 +476,31 @@ $(function () {
                     {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
                     {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
                     {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
-                    {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()}
-                    ],
+                    {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
+                    {'name': 'gen_script', 'value': gen_script},
+                ],
                 function(res) {
-                    window.location = window.location;
+                    if (Object.keys(res.script_details).length === 0) {
+                        window.location = window.location;
+                    } else {
+                        edit_script_modal.open();
+                        $('.modal_sieve_script_textarea').val(res.script_details.gen_script);
+                        $('.modal_sieve_script_name').val(res.script_details.filter_name);
+                        $('.modal_sieve_script_priority').val(res.script_details.filter_priority);
+                    }
                 }
             );
+
+            return true;
         }
 
         function save_script(imap_account) {
             if ($('.modal_sieve_script_name').val() === "") {
-                $('.sys_messages').html('<span class="err">You must provide a name for your script</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('You must provide a name for your script'), 'danger');
                 return false;
             }
             if ($('.modal_sieve_script_textarea').val() === "") {
-                $('.sys_messages').html('<span class="err">Empty script</span>');
-                Hm_Utils.show_sys_messages();
+                Hm_Utils.add_sys_message(hm_trans('Empty script'), 'danger');
                 return false;
             }
             Hm_Ajax.request(
@@ -552,16 +521,16 @@ $(function () {
          *                                      MODAL EVENTS
          **************************************************************************************/
         $('.sievefilters_accounts_title').on("click", function () {
-            $(this).parent().find('.sievefilters_accounts').toggle();
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
         });
         $('.add_filter').on('click', function () {
-            $('.filter_modal_title').html('Add Filter');
+            edit_filter_modal.setTitle('Add Filter');
             current_account = $(this).attr('account');
             edit_filter_modal.open();
         });
         $('.add_script').on('click', function () {
-            $('.script_modal_title').html('Add Script');
-            $('.modal_sieve_script_textarea').html('');
+            edit_script_modal.setTitle('Add Script');
+            $('.modal_sieve_script_textarea').val('');
             $('.modal_sieve_script_name').val('');
             $('.modal_sieve_script_priority').val('');
             is_editing_script = false;
@@ -572,7 +541,7 @@ $(function () {
         $('.edit_filter').on('click', function (e) {
             e.preventDefault();
             let script_name = $(this).parent().parent().children().next().html();
-            $('.filter_modal_title').html(script_name);
+            edit_filter_modal.setTitle(script_name);
             edit_filter_modal.open();
         });
 
@@ -618,11 +587,11 @@ $(function () {
                     header_fields += '<option value="'+value.name+'">' + value.description + '</option>';
                 }
             });
-            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_value" name="sieve_selected_extra_option_value[]" /></td>';
+            let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
             $('.sieve_list_conditions_modal').append(
                 '                            <tr>' +
-                '                                <td>' +
-                '                                    <select class="add_condition_sieve_filters" name="sieve_selected_conditions_field[]" style="width: 200px;">' +
+                '                                <td class="col-sm-2">' +
+                '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
                 '                                        <optgroup label="Message">' +
                 message_fields +
                 '                                        </optgroup>' +
@@ -632,8 +601,8 @@ $(function () {
                 '                                    </select>' +
                 '                                </td>' +
                 extra_options +
-                '                                <td>' +
-                '                                    <select class="condition_options" name="sieve_selected_conditions_options[]">' +
+                '                                <td class="col-sm-3">' +
+                '                                    <select class="condition_options form-control form-control-sm" name="sieve_selected_conditions_options[]">' +
                 '                                        <option value="Contains">' +
                 '                                            Contains' +
                 '                                        </option>' +
@@ -654,10 +623,10 @@ $(function () {
                 '                                        </option>' +
                 '                                    </select>' +
                 '                                </td>' +
-                '                                <td style="width: 43%;">' +
-                '                                    <input type="text" name="sieve_selected_option_value[]" />' +
+                '                                <td class="col-sm-3">' +
+                '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
                 '                                </td>' +
-                '                                <td style="vertical-align: middle; width: 70px;">' +
+                '                                <td class="col-sm-1 text-end align-middle">' +
                 '                                    <a href="#" class="delete_condition_modal_button">Delete</a>' +
                 '                                </td>' +
                 '                            </tr>'
@@ -682,20 +651,24 @@ $(function () {
                 possible_actions_html += '<option value="'+value.name+'">' + value.description + '</option>';
             });
 
-            let extra_options = '<td style="width: 230px;"><input type="hidden" class="condition_extra_action_value" name="sieve_selected_extra_action_value[]" /></td>';
+            let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
             $('.filter_actions_modal_table').append(
-                '<tr style="border-bottom-color: black;" default_value="'+default_value+'">' +
-                '   <td>' +
-                '       <select class="sieve_actions_select" name="sieve_selected_actions[]" style="width: 200px;">' +
+                '<tr class="border" default_value="'+default_value+'">' +
+                '   <td class="col-sm-3">' +
+                '       <select class="sieve_actions_select form-control form-control-sm" name="sieve_selected_actions[]">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
                 extra_options +
-                '    <td style="width: 43%;">' +
-                '    <img style="display: none" src="'+hm_web_root_path()+'modules/core/assets/images/spinner.gif" />' +
+                '    <td class="col-sm-5">' +
+                '    <div class="d-flex justify-content-center spinner d-none">' + 
+                '       <div class="spinner-border text-dark role="status">' +
+                '           <span class="visually-hidden">Loading...</span>' +
+                '       </div>' +
+                '    </div>' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
-                '    <td style="vertical-align: middle; width: 70px;">' +
+                '    <td class="col-sm-1 text-end align-middle">' +
                 '           <a href="#" class="delete_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'
@@ -724,15 +697,15 @@ $(function () {
             });
 
             $('.filter_else_actions_modal_table').append(
-                '<tr style="border-bottom-color: black;">' +
-                '   <td>' +
-                '       <select class="sieve_actions_select">' +
+                '<tr class="border">' +
+                '   <td class="col-sm-4">' +
+                '       <select class="sieve_actions_select form-control form-control-sm">' +
                 '          ' + possible_actions_html +
                 '       </select>' +
                 '    </td>' +
                 '    <td>' +
                 '    </td>' +
-                '    <td style="vertical-align: middle; width: 70px;">' +
+                '    <td class="col-sm-1 text-end align-middle">' +
                 '           <a href="#" class="delete_else_action_modal_button">Delete</a>' +
                 '    </td>' +
                 '</tr>'
@@ -762,19 +735,19 @@ $(function () {
                     elem_extra.attr('placeholder', selected_action.extra_field_placeholder)
                 }
                 if (selected_action.type === 'none') {
-                    elem.html('<input name="sieve_selected_action_value[]" type="hidden" value="" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" type="hidden" value="" />');
                 }
                 if (selected_action.type === 'string') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="text" value="" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="text" value="" />');
                 }
                 if (selected_action.type === 'int') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'number') {
-                    elem.html('<input name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" type="number" />');
+                    elem.html('<input name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'" type="number" />');
                 }
                 if (selected_action.type === 'text') {
-                    elem.html('<textarea name="sieve_selected_action_value[]" placeholder="'+selected_action.placeholder+'" style="width: 235px;"></textarea>');
+                    elem.html('<textarea name="sieve_selected_action_value[]" class="form-control form-control-sm" placeholder="'+selected_action.placeholder+'"></textarea>');
                 }
                 if (selected_action.type === 'select') {
                     options = '';
@@ -785,11 +758,11 @@ $(function () {
                             options = options + '<option value="' + val + '">'+ val +'</option>'
                         }
                     });
-                    elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                    elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
                 }
                 if (selected_action.type === 'mailbox') {
                     let mailboxes = null;
-                    tr_elem.children().find('img').attr('style', '');
+                    tr_elem.children().find('.spinner').removeClass('d-none');
                     Hm_Ajax.request(
                         [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
                             {'name': 'imap_account', 'value': current_account} ],
@@ -803,7 +776,7 @@ $(function () {
                                     options = options + '<option value="' + val + '">'+ val +'</option>'
                                 }
                             });
-                            elem.html('<select name="sieve_selected_action_value[]">'+ options +'</select>');
+                            elem.html('<select name="sieve_selected_action_value[]" class="form-control form-control-sm">'+ options +'</select>');
                             $("[name^=sieve_selected_action_value]").last().val(elem.parent().attr('default_value'));
                         }
                     );
@@ -846,10 +819,10 @@ $(function () {
                 elem.html(options_html);
 
                 if (condition.type === 'string') {
-                    elem_type.html('<input name="sieve_selected_option_value[]" type="text" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="text" class="form-control form-control-sm" />')
                 }
                 if (condition.type === 'int') {
-                    elem_type.html('<input name="sieve_selected_option_value[]" type="number" />')
+                    elem_type.html('<input name="sieve_selected_option_value[]" type="number" class="form-control form-control-sm" />')
                 }
                 if (condition.type === 'none') {
                     elem_type.html('<input name="sieve_selected_option_value[]" type="hidden" value="none" />')
@@ -906,7 +879,7 @@ $(function () {
         $(document).on('click', '.edit_script', function (e) {
             e.preventDefault();
             let obj = $(this);
-            $('.script_modal_title').html('Edit Script');
+            edit_script_modal.setTitle('Edit Script');
             current_account = $(this).attr('account');
             is_editing_script = true;
             current_editing_script_name = $(this).attr('script_name');

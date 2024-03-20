@@ -18,7 +18,11 @@ define('WEB_ROOT', '');
 chdir(APP_PATH);
 
 /* get the framework */
+require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
+
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* check for proper php support */
 check_php();
@@ -33,9 +37,10 @@ build_config();
  * @return void
  * */
 function check_php() {
+    $minVersion = 7.4;
     $version = phpversion();
-    if (substr($version, 0, 3) < 5.4) {
-        die('Cypht requires PHP version 5.4 or greater');
+    if (substr($version, 0, 3) < $minVersion) {
+        die("Cypht requires PHP version $minVersion or greater");
     }
     if (!function_exists('mb_strpos')) {
         die('Cypht requires PHP MB support');
@@ -68,38 +73,6 @@ function build_integrity_hash($data) {
 }
 
 /**
- * include module ini files in the main config
- */
-function parse_module_ini_files($settings) {
-    $files = array(
-        array('2fa.ini', false),
-        array('github.ini', false),
-        array('ldap.ini', true),
-        array('oauth2.ini', true),
-        array('carddav.ini', true),
-        array('wordpress.ini', false),
-        array('recaptcha.ini', false),
-        array('dynamic_login.ini', false)
-    );
-    if (!array_key_exists('app_data_dir', $settings)) {
-        return $settings;
-    }
-    foreach ($files as $vals) {
-        $file = $vals[0];
-        $sections = $vals[1];
-        $ini_file = rtrim($settings['app_data_dir'], '/').'/'.$file;
-        if (is_readable($ini_file)) {
-            $data = parse_ini_file($ini_file, $sections);
-            if (is_array($data) && count($data) > 0) {
-                echo 'Found module set ini file: '.$ini_file."\n";
-                $settings[$file] = $data;
-            }
-        }
-    }
-    return $settings;
-}
-
-/**
  * Entry point into the configuration process
  *
  * @return void
@@ -115,12 +88,10 @@ function build_config() {
     }
 
     /* get the site settings */
-    $settings = parse_ini_file(APP_PATH.'hm3.ini');
+    $settings = merge_config_files(APP_PATH.'config');
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
-        $settings = parse_module_ini_files($settings);
-
         /* determine compression commands */
         list($js_compress, $css_compress) = compress_methods($settings);
 
@@ -130,7 +101,7 @@ function build_config() {
         /* combine and compress page content */
         $hashes = combine_includes($js, $js_compress, $css, $css_compress, $settings);
 
-        /* write out the hm3.rc file */
+        /* write out the dynamic.php file */
         write_config_file($settings, $filters);
 
         /* create the production version */
@@ -223,6 +194,12 @@ function get_module_assignments($settings) {
                 $assets[] = sprintf("modules/%s/assets", $mod);
             }
         }
+        // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
+        if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
+            if (is_readable(sprintf("third_party/contact-group.css", 'third_party'))) {
+                $css .= file_get_contents(sprintf("third_party/contact-group.css", 'third_party'));
+            }
+        }
     }
     return array($js, $css, $filters, $assets);
 }
@@ -258,17 +235,17 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $js_hash = '';
     $css_hash = '';
     if ($css) {
-        $css_out = compress($css, $css_compress);
+        $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/css/bootstrap.min.css");
+        $css_out .= file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);
         printf("site.css file created\n");
     }
     if ($js) {
         $mods = get_modules($settings);
-        $js_lib = file_get_contents("third_party/cash.min.js");
-        if (in_array('sievefilters', $mods, true)) {
-            $js_lib .= file_get_contents("third_party/tingle.min.js");
-        }
+        $js_lib = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/js/bootstrap.bundle.min.js");
+        $js_lib .= file_get_contents("third_party/cash.min.js");
         if (in_array('desktop_notifications', $mods, true)) {
             $js_lib .= file_get_contents("third_party/push.min.js");
         }
@@ -279,6 +256,9 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
             $js_lib .= file_get_contents("third_party/forge.min.js");
         }
         $js_lib .= file_get_contents("third_party/resumable.min.js");
+        $js_lib .= file_get_contents("third_party/ays-beforeunload-shim.js");
+        $js_lib .= file_get_contents("third_party/jquery.are-you-sure.js");
+        $js_lib .= file_get_contents("third_party/sortable.min.js");
         file_put_contents('tmp.js', $js);
         $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
         $js_hash = build_integrity_hash($js_out);
@@ -292,8 +272,8 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
 /**
  * Write the hm3.rc file to disk
  *
- * @param $settings array site settings list
- * @param $filters array combined list of filters from all modules
+ * @param $settings array site settings list (unsued with .env support)
+ * @param $filters array combined list of filters from all modules (unsued with .env support)
  * 
  * @return void
  */
@@ -304,11 +284,34 @@ function write_config_file($settings, $filters) {
     Hm_Output_Modules::try_queued_modules();
     Hm_Output_Modules::process_all_page_queue();
     Hm_Output_Modules::try_queued_modules();
-    $settings['handler_modules'] = Hm_Handler_Modules::dump();
-    $settings['output_modules'] = Hm_Output_Modules::dump();
-    $settings['input_filters'] = $filters;
-    file_put_contents('hm3.rc', json_encode($settings));
-    printf("hm3.rc file written\n");
+
+    $data = [
+        'handler_modules' => Hm_Handler_Modules::dump(),
+        'output_modules' => Hm_Output_Modules::dump(),
+        'input_filters' => $filters,
+    ];
+    $dynamicConfigPath = APP_PATH.'config/dynamic.php';
+    // Create or overwrite the PHP file
+    file_put_contents($dynamicConfigPath, '<?php return ' . var_export($data, true) . ';');
+    printf("dynamic.php file written\n");
+}
+
+/**
+ * Copies bootstrap icons fonts folder as it is
+ * referenced and needed by bootstrap icons css file
+ *
+ * @return void
+ */
+function append_bootstrap_icons_files() {
+    if (!is_dir("site/fonts")) {
+        mkdir('site/fonts', 0755);
+    }
+    $source_folder = 'vendor/twbs/bootstrap-icons/font/fonts/';
+    $files = glob("$source_folder*.*");
+    foreach($files as $file){
+        $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
+        copy($file, $dest_forlder);
+    }
 }
 
 /**
@@ -324,6 +327,8 @@ function create_production_site($assets, $settings, $hashes) {
     printf("creating production site\n");
     copy('site.css', 'site/site.css');
     copy('site.js', 'site/site.js');
+    append_bootstrap_icons_files();
+
     $index_file = file_get_contents('index.php');
     $index_file = preg_replace("/APP_PATH', ''/", "APP_PATH', '".APP_PATH."'", $index_file);
     $index_file = preg_replace("/CACHE_ID', ''/", "CACHE_ID', '".urlencode(Hm_Crypt::unique_id(32))."'", $index_file);

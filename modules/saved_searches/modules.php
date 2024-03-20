@@ -149,8 +149,7 @@ class Hm_Output_filter_saved_search_result extends Hm_Output_Module {
 class Hm_Output_update_search_icon extends Hm_Output_Module {
     protected function output() {
         if ($this->get('search_param_update')) {
-            return '<a href="" class="update_search" title="'.$this->trans('Update saved search').'"><img width="20" height="20" alt="'.
-                $this->trans('Update search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+            return '<a href="" class="update_search" title="'.$this->trans('Update saved search').'"><i class="bi bi-check-circle-fill"></i></a>';
         }
     }
 }
@@ -165,8 +164,7 @@ class Hm_Output_update_search_label_icon extends Hm_Output_Module {
         if (!$this->get('search_name')) {
             $style = 'style="display: none;"';
         }
-        $res = '<a href="" class="update_search_label" title="'.$this->trans('Update saved search label').'"><img '.$style.' width="20" height="20" alt="'.
-            $this->trans('Update saved search label').'" src="'.Hm_Image_Sources::$edit.'" /></a>' . update_search_label_field($this->get('search_name'), $this);
+        $res = '<a href="" class="update_search_label" title="'.$this->trans('Update saved search label').'"><i class="bi bi-pencil-fill"></i></a>' . update_search_label_field($this->get('search_name'), $this);
         return $res;
     }
 }
@@ -180,8 +178,7 @@ class Hm_Output_delete_search_icon extends Hm_Output_Module {
         if (!$this->get('search_name')) {
             $style = 'style="display: none;"';
         }
-        return '<a href="" '.$style.' class="delete_search" title="'.$this->trans('Delete saved search').'"><img width="20" height="20" alt="'.
-            $this->trans('Delete search').'" src="'.Hm_Image_Sources::$circle_x.'" /></a>';
+        return '<a href="" '.$style.' class="delete_search" title="'.$this->trans('Delete saved search').'"><i class="bi bi-x-circle-fill"></i></a>';
     }
 }
 
@@ -192,8 +189,7 @@ class Hm_Output_save_search_icon extends Hm_Output_Module {
     protected function output() {
         $name = $this->get('search_name', '');
         if (!$name) {
-            return '<a style="display: none;" href="" class="save_search" title="'.$this->trans('Save search').'"><img width="20" height="20" alt="'.
-                $this->trans('Save search').'" src="'.Hm_Image_Sources::$circle_check.'" /></a>';
+            return '<a style="display: none;" href="" class="save_search" title="'.$this->trans('Save search').'"><i class="bi bi-check-circle-fill"></i></a>';
         }
     }
 }
@@ -229,7 +225,7 @@ class Hm_Output_search_folders extends Hm_Output_Module {
                 );
                 $res .= '<li class="menu_search_'.$this->html_safe($name).'"><a class="unread_link" href="'.$url.'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$search).'" alt="" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-search account_icon"></i> ';
                 }
                 $res .= $this->html_safe($name).'</a></li>';
             }

@@ -46,8 +46,7 @@ class Hm_Output_tag_bar extends hm_output_module {
     protected function output() {
         $headers = $this->get('msg_headers');
         if (is_string($headers)) {
-            $this->out('msg_headers', $headers.'<img class="tag_icon refresh_list" src="'.
-                Hm_Image_Sources::$tags.'" alt="'.$this->trans('Tags').'" width="24" height="24" />');
+            $this->out('msg_headers', $headers.'<i class="bi bi-tags-fill fs-4 tag_icon refresh_list"></i>');
         }
     }
 }

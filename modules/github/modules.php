@@ -406,13 +406,13 @@ class Hm_Output_github_folders extends Hm_Output_Module {
         if (!empty($details)) {
             $res = '<li class="menu_github_all"><a class="unread_link" href="?page=message_list&list_path=github_all">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-code-slash account_icon"></i> ';
             }
             $res .= $this->trans('All').'</a></li>';
             foreach ($this->get('github_repos', array()) as $repo) {
                 $res .= '<li class="menu_github_'.$this->html_safe($repo).'"><a class="unread_link" href="?page=message_list&list_path=github_'.$this->html_safe($repo).'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$code).'" alt="" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-code-slash account_icon"></i> ';
                 }
                 $res .= $this->html_safe(explode('/', urldecode($repo))[1]).'</a></li>';
             }
@@ -616,12 +616,18 @@ class Hm_Output_display_github_status extends Hm_Output_Module {
 class Hm_Output_github_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('github_connect_details', array());
-        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$code.'" alt="" width="16" height="16" /> '.
-            $this->trans('Github Connect').'</div><div class="github_connect_section"><div class="add_server">';
+        $res = '<div class="github_connect"><div data-target=".github_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-github me-3"></i>
+                        <b>'.$this->trans('Github Connect').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="github_connect_section"><div class="add_server">';
+        
         if (empty($details)) {
             $res .= 'Connect to Github<br /><br />';
-            $res .= '<a href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
         }
         else {
             $res .= $this->trans('Already connected');
@@ -656,8 +662,8 @@ class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
  */
 class Hm_Output_start_github_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$code.'" width="16" height="16" />'.$this->trans('Github Settings').'</td></tr>';
+        return '<tr><td colspan="2" data-target=".github_all_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-github fs-5 me-2"></i>'.$this->trans('Github Settings').'</td></tr>';
     }
 }
 
@@ -696,7 +702,8 @@ class Hm_Output_github_limit_setting extends Hm_Output_Module {
  */
 if (!hm_exists('github_connect_details')) {
 function github_connect_details($config) {
-    return get_ini($config, 'github.ini');
+    $confs = $config->dump();
+    return $confs['github'];
 }}
 
 /**
@@ -781,14 +788,14 @@ function github_parse_headers($data, $output_mod) {
 
     if (array_key_exists('actor', $data) && array_key_exists('login', $data['actor'])) {
         $from = $data['actor']['login'];
-        $from_link = sprintf(' - <a href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($from), $output_mod->html_safe($from));
+        $from_link = sprintf(' - <a href="https://github.com/%s" target="_blank" rel="noopener">https://github.com/%s</a>', $output_mod->html_safe($from), $output_mod->html_safe($from));
     }
     else {
         $from = '[No From]';
     }
     if (array_key_exists('repo', $data) && array_key_exists('name', $data['repo'])) {
         $name = $data['repo']['name'];
-        $repo_link = sprintf(' - <a href="https://github.com/%s">https://github.com/%s</a>', $output_mod->html_safe($name), $output_mod->html_safe($name));
+        $repo_link = sprintf(' - <a href="https://github.com/%s" target="_blank" rel="noopener">https://github.com/%s</a>', $output_mod->html_safe($name), $output_mod->html_safe($name));
     }
     else {
         $name = '[No Repo]';
@@ -836,7 +843,7 @@ function github_parse_payload($data, $output_mod) {
         }
         if (array_key_exists('url', $vals) && array_key_exists('sha', $vals)) {
             $url = str_replace(array('commits', 'https://api.github.com/repos'), array('commit', 'https://github.com'), $vals['url']);
-            $res .= sprintf('<div class="github_link"><a href="%s">%s</a></div>',
+            $res .= sprintf('<div class="github_link"><a href="%s" target="_blank" rel="noopener">%s</a></div>',
                 $output_mod->html_safe($url), $output_mod->html_safe($vals['sha']));
         }
         $res .= '</div>';

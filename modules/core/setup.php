@@ -36,6 +36,7 @@ setup_base_page('settings');
 add_handler('settings', 'process_language_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_list_style_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_timezone_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_warn_for_unsaved_changes_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_unread_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_flagged_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_flagged_source_max_setting', true, 'core', 'date', 'after');
@@ -44,6 +45,12 @@ add_handler('settings', 'process_all_source_max_setting', true, 'core', 'date', 
 add_handler('settings', 'process_all_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_since_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_all_email_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_junk_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_junk_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_trash_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_trash_source_max_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_drafts_since_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_drafts_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
@@ -59,7 +66,8 @@ add_output('settings', 'start_settings_form', true, 'core', 'content_section_sta
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
-add_output('settings', 'no_folder_icon_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'warn_for_unsaved_changes_setting', true, 'core', 'timezone_setting', 'after');
+add_output('settings', 'no_folder_icon_setting', true, 'core', 'warn_for_unsaved_changes_setting', 'after');
 add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_setting', 'after');
 add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
@@ -73,7 +81,16 @@ add_output('settings', 'unread_source_max_setting', true, 'core', 'unread_since_
 add_output('settings', 'start_flagged_settings', true, 'core', 'unread_source_max_setting', 'after');
 add_output('settings', 'flagged_since_setting', true, 'core', 'start_flagged_settings', 'after');
 add_output('settings', 'flagged_source_max_setting', true, 'core', 'flagged_since_setting', 'after');
-add_output('settings', 'start_everything_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'start_junk_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'junk_since_setting', true, 'core', 'start_junk_settings', 'after');
+add_output('settings', 'junk_source_max_setting', true, 'core', 'junk_since_setting', 'after');
+add_output('settings', 'start_trash_settings', true, 'core', 'junk_source_max_setting', 'after');
+add_output('settings', 'trash_since_setting', true, 'core', 'start_trash_settings', 'after');
+add_output('settings', 'trash_source_max_setting', true, 'core', 'trash_since_setting', 'after');
+add_output('settings', 'start_drafts_settings', true, 'core', 'trash_source_max_setting', 'after');
+add_output('settings', 'drafts_since_setting', true, 'core', 'start_drafts_settings', 'after');
+add_output('settings', 'drafts_source_max_setting', true, 'core', 'drafts_since_setting', 'after');
+add_output('settings', 'start_everything_settings', true, 'core', 'drafts_source_max_setting', 'after');
 add_output('settings', 'all_since_setting', true, 'core', 'start_everything_settings', 'after');
 add_output('settings', 'all_source_max_setting', true, 'core', 'all_since_setting', 'after');
 add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max_setting', 'after');
@@ -169,103 +186,111 @@ return array(
         'search'
     ),
     'allowed_output' => array(
-        'date' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
+        'date' => array(FILTER_DEFAULT, false),
         'formatted_folder_list' => array(FILTER_UNSAFE_RAW, false),
-        'router_user_msgs' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
+        'router_user_msgs' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'router_login_state' => array(FILTER_VALIDATE_BOOLEAN, false),
         'formatted_message_list' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'just_saved_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
         'just_forgot_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'deleted_server_id' => array(FILTER_VALIDATE_INT, false),
+        'deleted_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
+        'msg_source' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
-        'folder_status' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
+        'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
     ),
     'allowed_cookie' => array(
-        'CYPHTID' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_session' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_msgs'    => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'CYPHTID' => FILTER_DEFAULT,
+        'hm_id' => FILTER_DEFAULT,
+        'hm_session' => FILTER_DEFAULT,
+        'hm_msgs'    => FILTER_DEFAULT,
         'hm_reload_folders'    => FILTER_VALIDATE_INT
     ),
     'allowed_server' => array(
-        'REQUEST_URI' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'REQUEST_METHOD' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'REQUEST_URI' => FILTER_DEFAULT,
+        'REQUEST_METHOD' => FILTER_DEFAULT,
         'SERVER_ADDR' => FILTER_VALIDATE_IP,
         'REMOTE_ADDR' => FILTER_VALIDATE_IP,
         'SERVER_PORT' => FILTER_VALIDATE_INT,
-        'SERVER_PROTOCOL' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'PHP_SELF' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'REQUEST_SCHEME' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_HOST' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'SERVER_PROTOCOL' => FILTER_DEFAULT,
+        'PHP_SELF' => FILTER_DEFAULT,
+        'REQUEST_SCHEME' => FILTER_DEFAULT,
+        'HTTP_HOST' => FILTER_DEFAULT,
         'HTTP_ORIGIN' => FILTER_VALIDATE_URL,
         'HTTP_REFERER' => FILTER_VALIDATE_URL,
-        'HTTP_ACCEPT_LANGUAGE' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_ACCEPT_ENCODING' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_ACCEPT_CHARSET' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_ACCEPT' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_USER_AGENT' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTPS' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'SERVER_NAME' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_X_REQUESTED_WITH' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'HTTP_X_FORWARDED_HOST' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'HTTP_ACCEPT_LANGUAGE' => FILTER_DEFAULT,
+        'HTTP_ACCEPT_ENCODING' => FILTER_DEFAULT,
+        'HTTP_ACCEPT_CHARSET' => FILTER_DEFAULT,
+        'HTTP_ACCEPT' => FILTER_DEFAULT,
+        'HTTP_USER_AGENT' => FILTER_DEFAULT,
+        'HTTPS' => FILTER_DEFAULT,
+        'SERVER_NAME' => FILTER_DEFAULT,
+        'HTTP_X_REQUESTED_WITH' => FILTER_DEFAULT,
+        'HTTP_X_FORWARDED_HOST' => FILTER_DEFAULT
     ),
 
     'allowed_get' => array(
-        'page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'msgs' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'list_path' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'list_parent' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'page' => FILTER_DEFAULT,
+        'msgs' => FILTER_DEFAULT,
+        'list_path' => FILTER_DEFAULT,
+        'list_parent' => FILTER_DEFAULT,
         'list_page' => FILTER_VALIDATE_INT,
-        'uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'uid' => FILTER_DEFAULT,
         'search_terms' => FILTER_UNSAFE_RAW,
-        'search_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'search_fld' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'filter' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'keyword' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_since' => FILTER_DEFAULT,
+        'search_fld' => FILTER_DEFAULT,
+        'filter' => FILTER_DEFAULT,
+        'sort' => FILTER_DEFAULT,
+        'keyword' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(
-        'payload' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'reset_factory' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'hm_page_key' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'payload' => FILTER_DEFAULT,
+        'reset_factory' => FILTER_DEFAULT,
+        'hm_page_key' => FILTER_DEFAULT,
         'logout' => FILTER_VALIDATE_BOOLEAN,
         'save_and_logout' => FILTER_VALIDATE_BOOLEAN,
         'limit' => FILTER_VALIDATE_INT,
-        'username' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'username' => FILTER_DEFAULT,
         'show_list_icons' => FILTER_VALIDATE_BOOLEAN,
         'password' => FILTER_UNSAFE_RAW,
-        'hm_ajax_hook' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'save_settings' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'save_settings_permanently' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'save_settings_permanently_then_logout' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'language' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'hm_ajax_hook' => FILTER_DEFAULT,
+        'save_settings' => FILTER_DEFAULT,
+        'save_settings_permanently' => FILTER_DEFAULT,
+        'save_settings_permanently_then_logout' => FILTER_DEFAULT,
+        'language' => FILTER_DEFAULT,
         'flagged_per_source' => FILTER_VALIDATE_INT,
-        'flagged_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'flagged_since' => FILTER_DEFAULT,
         'unread_per_source' => FILTER_VALIDATE_INT,
-        'unread_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'unread_since' => FILTER_DEFAULT,
         'all_email_per_source' => FILTER_VALIDATE_INT,
-        'all_email_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'all_email_since' => FILTER_DEFAULT,
         'all_per_source' => FILTER_VALIDATE_INT,
-        'all_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'all_since' => FILTER_DEFAULT,
         'no_folder_icons' => FILTER_VALIDATE_BOOLEAN,
         'mailto_handler' => FILTER_VALIDATE_BOOLEAN,
-        'list_style' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'timezone' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'list_style' => FILTER_DEFAULT,
+        'timezone' => FILTER_DEFAULT,
         'disable_delete_prompt' => FILTER_VALIDATE_INT,
-        'section_state' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'section_class' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'message_ids' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'action_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'server_pw_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'message_list_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'section_state' => FILTER_DEFAULT,
+        'section_class' => FILTER_DEFAULT,
+        'message_ids' => FILTER_DEFAULT,
+        'action_type' => FILTER_DEFAULT,
+        'server_pw_id' => FILTER_DEFAULT,
+        'message_list_since' => FILTER_DEFAULT,
         'no_password_save' => FILTER_VALIDATE_BOOLEAN,
-        'start_page' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'default_sort_order' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'stay_logged_in' => FILTER_VALIDATE_BOOLEAN
+        'start_page' => FILTER_SANITIZE_URL,
+        'default_sort_order' => FILTER_DEFAULT,
+        'stay_logged_in' => FILTER_VALIDATE_BOOLEAN,
+        'junk_per_source' => FILTER_VALIDATE_INT,
+        'junk_since' => FILTER_DEFAULT,
+        'trash_per_source' => FILTER_VALIDATE_INT,
+        'trash_since' => FILTER_DEFAULT,
+        'drafts_per_source' => FILTER_VALIDATE_INT,
+        'drafts_since' => FILTER_DEFAULT,
+        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN
     )
 );
 

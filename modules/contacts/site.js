@@ -20,12 +20,49 @@ var delete_contact = function(id, source, type) {
 var add_contact_from_message_view = function() {
     var contact = $('#add_contact').val();
     var source = $('#contact_source').val();
+
     if (contact) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'contact_value', value: contact },
+          { name: 'contact_source', value: source },
+        ],
+        function (res) {
+          $('.add_contact_controls').toggle();
+          window.location.reload();
+          remove_message_content();
+        }
+      );
+    }
+  };
+
+var add_contact_from_popup = function(event) {
+    event.stopPropagation()
+    var source = 'local:local';
+    var contact = $('#contact_info').text().replace('>','').replace('<','');
+
+
+    if (contact) {
+        var emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
+        var email = contact.match(emailRegex)[0];
+        var name = contact.replace(emailRegex, "");
+
+        var saveContactContent = `<div><table>
+                                            <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${name}</td></tr>
+                                            <tr><td><strong>${hm_trans('Email')} :</strong></td><td>${email}</td></tr>
+                                            <tr><td><strong>${hm_trans('Source')} :</strong></td><td>Local</td></tr>
+                                </table></div>`
+
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
             {'name': 'contact_value', 'value': contact},
             {'name': 'contact_source', 'value': source}],
-            function(res) { $('.add_contact_controls').toggle(); }
+            function (res) {
+                $("#contact_popup_body").html(saveContactContent);
+                sessionStorage.removeItem(`${window.location.pathname}imap_4_${hm_list_path()}`);
+                sessionStorage.removeItem(`${window.location.pathname}${hm_msg_uid()}_${hm_list_path()}`);
+            }
         );
     }
 };
@@ -60,7 +97,7 @@ var autocomplete_contact = function(e, class_name, list_div) {
                         $(list_div).html('');
                         for (i in res.contact_suggestions) {
                             var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
-                            
+
                             div.html(suggestion.contact);
                             if ($(class_name).val().match(div.text())) {
                                 continue;
@@ -170,6 +207,40 @@ var add_autocomplete = function(event, class_name, list_div, fld_val) {
     return false;
 };
 
+var showPage = function(selected_page, total_pages) {
+    $('.import_body tr').hide();
+    $('.page_' + selected_page).show();
+    $('.page_link_selector').removeClass('active');
+    $('.page_item_' + selected_page).addClass('active');
+    $('.prev_page').toggleClass('disabled', selected_page === 1);
+    $('.next_page').toggleClass('disabled', selected_page === total_pages);
+};
+
+var contact_import_pagination = function() {
+    var selected_page = 1;
+    var total_pages = $('#totalPages').val();
+    showPage(selected_page, total_pages);
+
+    $('.page_link_selector').on('click', function () {
+        selected_page = $(this).data('page');
+        showPage(selected_page, total_pages);
+    });
+
+    $('.prev_page').on('click', function () {
+        if (selected_page > 1) {
+            selected_page--;
+            showPage(selected_page, total_pages);
+        }
+    });
+
+    $('.next_page').on('click', function () {
+        if (selected_page < total_pages) {
+            selected_page++;
+            showPage(selected_page, total_pages);
+        }
+    });
+};
+
 if (hm_page_name() == 'contacts') {
     $('.delete_contact').on("click", function() {
         delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
@@ -191,12 +262,17 @@ if (hm_page_name() == 'contacts') {
         const allowed_characters = ['+','-','(',')'];
         for (let chain_counter = 0; chain_counter < contact_phone.length; chain_counter++) {
             if(!(regex_number.test(contact_phone[chain_counter])) && !(allowed_characters.indexOf(contact_phone[chain_counter]) > -1)){
-                Hm_Notices.show(["This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!"]);
+                Hm_Notices.show([hm_trans("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!")]);
                 $(this).off();
             }
         }
 
     });
+    $('.source_link').on("click", function () { 
+        $('.list_actions').toggle(); $('#list_controls_menu').hide();
+        return false; 
+    });
+    contact_import_pagination();
 }
 else if (hm_page_name() == 'compose') {
     $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });

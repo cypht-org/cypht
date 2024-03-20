@@ -1,7 +1,7 @@
 Requirements
 ------------
 
-Cypht requires at least PHP 5.6, with the OpenSSL and cURL extensions. You will
+Cypht requires at least PHP 7.4, with the OpenSSL and cURL extensions. You will
 also need PDO support if using any database features. Testing is done on
 Debian and Ubuntu platforms with Nginx, Apache, standard PHP, and HHVM. We also
 use Composer to manage our few PHP dependencies.
@@ -18,8 +18,8 @@ re-running the configuration script. Do NOT put the source in the document root
 as this could create a security risk. On Debian, it's common to use the
 /usr/local/share/ sub-directory for a situation like this. Here is short bash
 script that will download the latest code, setup the correct permissions and
-ownership, put the source in /usr/local/share/cypht, and create a default
-hm3.ini file. It requires sudo access:
+ownership, put the source in /usr/local/share/cypht
+It requires sudo access:
 
 
 #!/bin/bash
@@ -50,9 +50,6 @@ else
     echo "You may need to install php's composer."
 fi
 
-# create a vanilla ini file
-cp cypht-master/hm3.sample.ini cypht-master/hm3.ini
-
 # fix permissions and ownership
 find cypht-master -type d -print | xargs chmod 755
 find cypht-master -type f -print | xargs chmod 644
@@ -69,15 +66,15 @@ sudo rm -rf cypht-temp
 2. Configure the program
 ------------------------
 
-To configure Cypht for your environment, you must first edit the hm3.ini file
-to your liking, then run the config_gen.php script to generate the optimized
-configuration file and assets used at run-time.
+To configure Cypht for your environment, make adjustments to the .env file file according to your preferences. The .env file serves as the primary configuration file, eliminating the need to edit the previously used hm3.ini file.
 
-First edit the hm3.ini file to configure Cypht for your environment. If you
-choose to use a database for any of the 3 available purposes (authentication,
-sessions, or user settings), you will need to complete the "DB support" section
-and create the required tables. SQL to do so can be found in the hm3.sample.ini
-file. The ini file has lots of comments explaining what each option does.
+First, copy the `.env.example` file to create a new `.env` file:
+cp .env.example .env
+
+Then edit the .env file to configure Cypht for your environment. If you choose to leverage a database for authentication, sessions, or user settings, ensure to complete the relevant sections within the .env file based on the information provided in the config/app.php file.
+
+The necessary SQL commands for creating tables can be found in the config/app.php file, specifically starting from line 617 in the "DB Sessions" section.
+
 
 Cypht needs read, and read-write access to a few directories on the server. For
 security reasons these should NOT be inside the web-server document root. A
@@ -94,25 +91,21 @@ sudo chown -R www-data /var/lib/hm3/
       
 The /var/lib/hm3/users directory is only required if you are using the
 file-system and not a database to store user settings (user_config_type = file
-in the hm3.ini). You can put these directories anywhere, just make sure the
-values in the ini file point to the right place.
+in the config/app.php). You can put these directories anywhere, just make sure the
+values in the config file point to the right place.
 
 
 3. Generate the run-time configuration
 --------------------------------------
 
-Cypht uses a build process to create an optimized configuration, and to combine
-and minimize page assets. Once you have edited your hm3.ini file, generate the
-configuration with:
+Cypht utilizes a build process to create an optimized configuration and to combine and minimize page assets. Previously, after editing the hm3.ini file, the configuration and asset minimization were generated using the following steps:
 
 cd /usr/local/share/cypht  (or wherever you put the code in section 1)
 sudo php ./scripts/config_gen.php
 
-This will create a sub-directory called site that contains the code and page
-assets that need to be inside the document root, and it creates an optimized
-configuration file called hm3.rc in the current directory. Anytime you change
-the ini file settings, or move the source location, you will need to re-run the
-config_gen script to update the program.
+Recent updates have streamlined the process, and running the command above will now specifically generate the config/dynamic.php file. This file incorporates dynamic configurations, including 'handler_modules,' 'output_modules,' and 'input_filters.' Furthermore, the command continues to optimize the configuration and combine/minimize page assets, ensuring efficient runtime operation.
+
+Additionally, executing this command will create a sub-directory called 'site' that contains the code and page assets required within the document root. If you ever relocate the source location, you'll need to re-run the config_gen script to update the program.
 
 
 4. Enable the program in your web-server
@@ -134,7 +127,7 @@ symlinks.
 5. Users
 --------
 Setting up users depends on what type of authentication you configure in the
-hm3.ini file. If you are using the local database configuration for users,
+config/app.php file. If you are using the local database configuration for users,
 there are scripts in the scripts/ directory to help manage them:
 
 
@@ -165,23 +158,14 @@ php.ini settings and web-server software.
 
 7. Other INI files
 ------------------
-Some Cypht modules require additional ini files to be configured. These should
-NOT be inside the web-server document root. Cypht will look for them in the
-location defined by "app_data_dir" in the hm3.ini file. A sample ini file for
-each module set that requires one is included in the source for that module. To
-configure them you must copy the sample ini file to the "app_data_dir" and edit
-it for your setup. Some of these require configuring your service with a
-provider, specifically ones related to Oauth2 client setup (Github, WordPress,
-Oauth2 over IMAP for Gmail and Outlook). Re-run the config_gen script after
-configuring an ini file and it will be merged into the main configuration
-settings.
+Some Cypht modules necessitate additional configuration files for proper setup. It is crucial that these files are NOT located within the web-server document root. Certain modules may require configuration with a service provider, particularly those related to Oauth2 client setup (such as Github, WordPress, Oauth2 over IMAP for Gmail, and Outlook). After configuring related files, there is no need to rerun the config_gen script; the changes will be automatically merged into the main configuration settings.Alternatively, you can clear your app cache.
 
 Github
 Cypht can connect to github and aggregate notification data about repository
 activity.
 
-Example github.ini file:
-https://github.com/cypht-org/cypht/blob/master/modules/github/github.ini
+Example github.php file:
+https://github.com/cypht-org/cypht/blob/master/config/github.php
 
 Authorize an application for github:
 https://github.com/settings/developers
@@ -191,8 +175,8 @@ Gmail and Outlook.com support OAUTH2 authentication over IMAP. This is
 preferable to normal IMAP authentication because Cypht never has access to your
 account password.
 
-Example oauth2 ini file:
-https://github.com/cypht-org/cypht/blob/master/modules/imap/oauth2.ini
+Example oauth2.php file:
+https://github.com/cypht-org/cypht/blob/master/config/oauth2.php
 
 Authorize an application for gmail
 https://console.developers.google.com/project
@@ -203,23 +187,23 @@ https://account.live.com/developers/applications/
 LDAP contacts
 Cypht can use an LDAP server for contacts.
 
-Example ldap.ini file:
-https://github.com/cypht-org/cypht/blob/master/modules/ldap_contacts/ldap.ini
+Example ldap.php file:
+https://github.com/cypht-org/cypht/blob/master/config/ldap.php
 
 WordPress
 Cypht can aggregate WordPress.com notifications.
 
-Example wordpress.ini file:
-https://github.com/cypht-org/cypht/blob/master/modules/wordpress/wordpress.ini
+Example wordpress.php file:
+https://github.com/cypht-org/cypht/blob/master/config/wordpress.php
 
 Authorize an application for WordPress.com:
 https://developer.wordpress.com/apps/
 
 Custom themes
-You can create your own themes for Cypht. Edit the themes.ini file to include
+You can create your own themes for Cypht. Edit the themes.php file to include
 your theme, and put the css file in modules/themes/assets.
 
-https://github.com/cypht-org/cypht/blob/master/modules/themes/themes.ini
+https://github.com/cypht-org/cypht/blob/master/config/themes.php
 
 Having problems?
 

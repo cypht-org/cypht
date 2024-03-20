@@ -222,6 +222,7 @@ class Hm_Redis {
     use Hm_Cache_Base;
     private $type = 'Redis';
     private $db_index;
+    private $socket;
 
     /**
      * @param Hm_Config $config site config object

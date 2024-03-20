@@ -66,7 +66,7 @@ class Hm_Output_recaptcha_form extends Hm_Output_Module {
  */
 if (!hm_exists('recaptcha_config')) {
 function recaptcha_config($config) {
-    return get_ini($config, 'recaptcha.ini');
+    return $config->get('recaptcha', array());
 }}
 
 /**

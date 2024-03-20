@@ -127,7 +127,7 @@ $(function() {
         $('.nux_next_button').on("click", nux_service_select);
         $('#service_select').on("change", function() {
             if ($(this).val() == 'all-inkl') {
-                add_extra_fields(this, 'all_inkl_login', 'Login', 'Your All-inkl Login');
+                add_extra_fields(this, 'all_inkl_login', 'Login', hm_trans('Your All-inkl Login'));
             } else {
                 $('.nux_extra_fields').remove();
             }

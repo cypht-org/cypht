@@ -18,17 +18,18 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @param string $inbox include inbox in search for auto-bcc messages
  * @return array
  */
-if (!hm_exists('imap_sent_sources')) {
-function imap_sent_sources($callback, $mod) {
+if (!hm_exists('imap_sources')) {
+function imap_sources($callback, $mod, $folder = 'sent') {
     $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
     $sources = array();
+    $folder = $folder == 'drafts' ? 'draft': $folder;
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
             continue;
         }
         $folders = get_special_folders($mod, $index);
-        if (array_key_exists('sent', $folders) && $folders['sent']) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders['sent']), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        if (array_key_exists($folder, $folders) && $folders[$folder]) {
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex('Drafts'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
@@ -85,7 +86,7 @@ function imap_data_sources($callback, $custom=array()) {
 }}
 
 /**
- * Prepare and format message list data 
+ * Prepare and format message list data
  * @subpackage imap/functions
  * @param array $msgs list of message headers to format
  * @param object $mod Hm_Output_Module
@@ -110,40 +111,48 @@ function prepare_imap_message_list($msgs, $mod, $type) {
  * @return string
  */
 if (!hm_exists('format_imap_folder_section')) {
-function format_imap_folder_section($folders, $id, $output_mod) {
+function format_imap_folder_section($folders, $id, $output_mod, $with_input = false) {
     $results = '<ul class="inner_list">';
     $manage = $output_mod->get('imap_folder_manage_link');
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
         if ($folder['children']) {
-            $results .= '<a href="#" class="imap_folder_link expand_link" data-target="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).'">+</a>';
+            $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
         }
         else {
-            $results .= ' <img class="folder_icon" src="'.Hm_Image_Sources::$folder.'" alt="" width="16" height="16" />';
+            $results .= '<i class="bi bi-folder2-open"></i> ';
         }
         if (!$folder['noselect']) {
+            if (!$folder['clickable']) {
+                $attrs = 'tabindex="0"';
+                if (!$with_input && isset($folder['subscribed']) && !$folder['subscribed']) {
+                    $attrs .= ' class="folder-disabled"';
+                }
+            } else {
+                $attrs = 'data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
+                '" href="?page=message_list&amp;list_path='.
+                urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
+            }
             if (strlen($output_mod->html_safe($folder['basename']))>15) {
-                $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
-                    '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-                    '"title="'.$output_mod->html_safe($folder['basename']).
+                $results .= '<a ' . $attrs .
+                    ' title="'.$output_mod->html_safe($folder['basename']).
                     '">'.substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
             }
-            else{
-                $results .= '<a data-id="imap_'.intval($id).'_'.$output_mod->html_safe($folder_name).
-                    '" href="?page=message_list&amp;list_path='.
-                    urlencode('imap_'.intval($id).'_'.$output_mod->html_safe($folder_name)).
-                    '">'.$output_mod->html_safe($folder['basename']).'</a>';
+            else {
+                $results .= '<a ' . $attrs. '>'.$output_mod->html_safe($folder['basename']).'</a>';
             }
         }
         else {
             $results .= $output_mod->html_safe($folder['basename']);
         }
+        if ($with_input) {
+            $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$output_mod->html_safe($folder_name).'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').($folder['special']? ' disabled="disabled"': '').' />';
+        }
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
     }
     if ($manage) {
-        $results .= '<li class="manage_folders_li"><a class="manage_folder_link" href="'.$manage.'"><img class="folder_icon manage_folder_icon" src="'.Hm_Image_Sources::$cog.'" alt="" width="16" height="16" />'.$output_mod->trans('Manage Folders').'</a>';
+        $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a>';
     }
     $results .= '</ul>';
     return $results;
@@ -192,7 +201,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $row_class = 'email';
         $icon = 'env_open';
         if (!$parent_list) {
-            $parent_value = sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']);
+            $parent_value = sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']);
         }
         else {
             $parent_value = $parent_list;
@@ -255,7 +264,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
-        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%d_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
+        $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
         if ($list_page) {
             $url .= '&list_page='.$output_module->html_safe($list_page);
         }
@@ -432,10 +441,10 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         $icon = $icons[strtolower($vals['type'])];
     }
     if ($icon) {
-        $res .= '<img class="msg_part_icon" src="'.Hm_Image_Sources::$$icon.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon"></i> ';
     }
     else {
-        $res .= '<img class="msg_part_icon msg_part_placeholder" src="'.Hm_Image_Sources::$doc.'" width="16" height="16" alt="'.$output_mod->trans('Attachment').'" /> ';
+        $res .= '<i class="bi bi-file-plus-fill msg_part_icon msg_part_placeholder"></i> ';
     }
     if (in_array($lc_type, $allowed, true)) {
         $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
@@ -715,7 +724,6 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     $sent_results = array();
     $status = array();
     foreach($ids as $index => $id) {
-        $id = intval($id);
         $cache = Hm_IMAP_List::get_cache($hm_cache, $id);
         $imap = Hm_IMAP_List::connect($id, $cache);
         if (imap_authed($imap)) {
@@ -1245,7 +1253,7 @@ function get_request_params($request) {
     if (array_key_exists('uid', $request) && $request['uid']) {
         $uid = $request['uid'];
     }
-    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\d+)_(.+)/", $request['list_path'], $matches)) {
+    if (array_key_exists('list_path', $request) && preg_match("/^imap_(\w+)_(.+)/", $request['list_path'], $matches)) {
         $server_id = $matches[1];
         $folder = hex2bin($matches[2]);
     }
@@ -1384,21 +1392,36 @@ function snooze_formats() {
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
-    $txt = '<div style="display: inline-block;">';
-    $txt .= '<a class="snooze_link hlink" id="snooze_message" href="#">'.$output->trans('Snooze').'</a>';
-    $txt .= '<div class="snooze_dropdown" style="display:none;">';
+
+    $txt = '<div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_snooze_date($format, true);
-        $txt .= '<a href="#" class="snooze_helper" data-value="'.$format.'">'.$output->trans($labels[0]).' <span>'.$labels[1].'</span></a>';
+        $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
-    $txt .= '<label for="snooze_input_date" class="snooze_date_picker">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<li><hr class="dropdown-divider"></li>';
+    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
     $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="snooze_input" style="display:none;">';
+    $txt .= '<input class="snooze_input" style="display:none;"></li>';
     if ($unsnooze) {
-        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper">'.$output->trans('Unsnooze').'</a>';
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
-    $txt .= '</div></div>';
+    $txt .= '</ul></div>';
 
     return $txt;
 }}
 
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_sieve_config_host')) {
+function parse_sieve_config_host($host) {
+    $url = parse_url($host);
+    $host = $url['host'] ?? $url['path'];
+    $port = $url['port'] ?? '4190';
+    $scheme = $url['scheme'] ?? 'tcp://';
+    $tls = $scheme === 'tls';
+    // $host = '$scheme://'.$host;
+    return [$host, $port, $tls];
+}}

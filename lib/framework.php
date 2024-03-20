@@ -9,6 +9,7 @@
 define('VERSION', .1);
 
 /* load the framework */
+require APP_PATH.'lib/repository.php';
 require APP_PATH.'lib/module.php';
 require APP_PATH.'lib/modules.php';
 require APP_PATH.'lib/modules_exec.php';
@@ -28,6 +29,7 @@ require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/crypt_sodium.php';
 require APP_PATH.'lib/sodium_compat.php';
+require APP_PATH.'lib/environment.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
@@ -68,16 +70,16 @@ if (!class_exists('Hm_Functions')) {
          */
         public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
             $prefix = $lifetime != 0 && $lifetime < time() ? 'Deleting' : 'Setting';
-            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',
-                $prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
+            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
             if (version_compare(PHP_VERSION, '7.3', '>=')) {
-                return setcookie($name, $value, array(
-                    'expires' => $lifetime,
-                    'path' => $path,
-                    'domain' => $domain,
-                    'secure' => $secure,
-                    'httponly' => $html_only,
-                    'samesite' => 'Strict')
+                return setcookie($name,$value, array(
+                        'expires' => $lifetime,
+                        'path' => $path,
+                        'domain' => $domain,
+                        'secure' => $secure,
+                        'httponly' => $html_only,
+                        'samesite' => 'Strict'
+                    )
                 );
             }
             else {

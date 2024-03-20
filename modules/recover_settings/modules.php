@@ -64,8 +64,7 @@ class Hm_Output_recover_settings_page_link extends Hm_Output_Module {
     protected function output() {
         if ($this->get('load_recover_options')) {
             $res = '<li class="menu_recover_settings"><a class="unread_link" href="?page=recover_settings">'.
-                '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$unlocked).
-                '" alt="" width="16" height="16" /> '.$this->trans('Recover Settings').'</a></li>';
+                '<i class="bi bi-unlock-fill account_icon"></i> '.$this->trans('Recover Settings').'</a></li>';
             if ($this->format == 'HTML5') {
                 return $res;
             }

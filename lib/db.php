@@ -26,7 +26,8 @@ class Hm_DB {
      * @return void
      */
     static private function parse_config($site_config) {
-        self::$config = array('db_driver' => $site_config->get('db_driver', false),
+        self::$config = array(
+            'db_driver' => $site_config->get('db_driver', false),
             'db_host' => $site_config->get('db_host', false),
             'db_name' => $site_config->get('db_name', false),
             'db_user' => $site_config->get('db_user', false),
@@ -35,6 +36,7 @@ class Hm_DB {
             'db_conn_type' => $site_config->get('db_connection_type', 'host'),
             'db_port' => $site_config->get('db_port', false),
         );
+
         foreach (self::$required_config as $v) {
             if (!self::$config[$v]) {
                 Hm_Debug::add(sprintf('Missing configuration setting for %s', $v));
@@ -48,13 +50,13 @@ class Hm_DB {
      */
     static private function db_key() {
         return md5(self::$config['db_driver'].
-            self::$config['db_host'].
-            self::$config['db_port'].
-            self::$config['db_name'].
-            self::$config['db_user'].
-            self::$config['db_pass'].
-            self::$config['db_conn_type'].
-            self::$config['db_socket']
+                self::$config['db_host'].
+                self::$config['db_port'].
+                self::$config['db_name'].
+                self::$config['db_user'].
+                self::$config['db_pass'].
+                self::$config['db_conn_type'].
+                self::$config['db_socket']
         );
     }
 

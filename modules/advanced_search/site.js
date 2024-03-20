@@ -4,13 +4,14 @@ var add_remove_terms = function(el) {
     var close = $(globals.close_html);
     var count = $('.adv_terms').length;
     var term = $('#adv_term').clone(false);
-    var not_chk = $('<span id="adv_term_not" class="adv_term_nots"><input type="checkbox" value="not" id="adv_term_not" /> !</span>');
-    var and_or_html = '<div class="andor"><input checked="checked" type="radio" name="term_and'
-    and_or_html += '_or'+count+'" value="and">and <input type="radio" name="term_and_or'+count;
+    var not_chk = $('<span id="adv_term_not" class="adv_term_nots"><input type="checkbox" class="form-check-input" value="not" id="adv_term_not" /> !</span>');
+    var and_or_html = '<div class="andor px-4"><input class="form-check-input" checked="checked" type="radio" name="term_and'
+    and_or_html += '_or'+count+'" value="and">and <input class="form-check-input" type="radio" name="term_and_or'+count;
     and_or_html += '" value="or">or</div>';
     var and_or = $(and_or_html);
     term.attr('id', 'adv_term'+count);
     close.attr('id', 'term_adv_remove'+count);
+    close.addClass('ms-2');
     and_or.attr('id', 'term_and_or'+count);
     not_chk.attr('id', 'adv_term_not'+count);
     $(el).prev().after(and_or.prop('outerHTML')+not_chk.prop('outerHTML')+term.prop('outerHTML')+close.prop('outerHTML'));
@@ -27,14 +28,15 @@ var add_remove_terms = function(el) {
 var add_remove_times = function(el) {
     var close = $(globals.close_html);
     var count = $('.adv_times').length;
-    var time_html = '<span id="adv_time" class="adv_times">From <input class="adv_time_fld_from" ';
-    time_html += 'type="date" value=""> To <input class="adv_time_fld_to" type="date" value=""></span>';
+    var time_html = '<span id="adv_time" class="adv_times d-flex align-items-center gap-2">From <input class="adv_time_fld_from form-control w-auto" ';
+    time_html += 'type="date" value=""> To <input class="adv_time_fld_to form-control w-auto" type="date" value=""></span>';
     var timeset = $(time_html);
-    var and_or_html = '<div class="timeandor"><input type="radio" name="time_and_or'+count;
+    var and_or_html = '<div class="timeandor"><input class="form-check-input" type="radio" name="time_and_or'+count;
     and_or_html += '" checked="checked" value="or">or</div>';
     var and_or = $(and_or_html);
     timeset.attr('id', 'adv_time'+count);
     close.attr('id', 'time_adv_remove'+count);
+    close.addClass('me-2');
     and_or.attr('id', 'time_and_or'+count);
     $(el).prev().after(and_or.prop('outerHTML')+timeset.prop('outerHTML')+close.prop('outerHTML'));
     $('#time_adv_remove'+count).on("click", function() {
@@ -48,8 +50,8 @@ var add_remove_targets = function(el) {
     var close = $(globals.close_html);
     var count = $('.adv_targets').length;
     var target = $('#adv_target').clone(false);
-    var and_or_html = '<div class="andor"><input type="radio" name="target_and_or'+count;
-    and_or_html += '" value="and">and <input type="radio" name="target_and_or'+count;
+    var and_or_html = '<div class="andor"><input class="form-check-input" type="radio" name="target_and_or'+count;
+    and_or_html += '" value="and">and <input class="form-check-input" type="radio" name="target_and_or'+count;
     and_or_html += '" checked="checked" value="or">or</div>';
     var and_or = $(and_or_html);
 
@@ -57,6 +59,7 @@ var add_remove_targets = function(el) {
     $('.target_radio', target).attr('name', 'target_type'+count);
     $('.target_radio', target).removeAttr('checked');
     close.attr('id', 'target_adv_remove'+count);
+    close.addClass('ms-2');
     and_or.attr('id', 'target_and_or'+count);
     $(el).prev().after(and_or.prop('outerHTML')+target.prop('outerHTML')+close.prop('outerHTML'));
     $(el).hide();
@@ -84,7 +87,7 @@ var expand_adv_folder = function(res) {
 
 var adv_select_imap_folder = function(el) {
     var close = $(globals.close_html);
-    close.addClass('close_adv_folders');
+    close.addClass('close_adv_folders ms-2');
     var list_container = $('.adv_folder_list');
     var folders = $('.email_folders').clone(false);
     folders.find('.manage_folders_li').remove();
@@ -147,7 +150,7 @@ var expand_adv_folder_list = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.adv_folder_list'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill"></i>');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -288,22 +291,22 @@ var process_advanced_search = function() {
     Hm_Notices.hide(true);
     var terms = get_adv_terms();
     if (terms.length == 0) {
-        Hm_Notices.show(['ERRYou must enter at least one search term']);
+        Hm_Notices.show([err_msg('You must enter at least one search term')]);
         return;
     }
     var sources = get_adv_sources();
     if (sources.length == 0) {
-        Hm_Notices.show(['ERRYou must select at least one source']);
+        Hm_Notices.show([err_msg('You must select at least one source')]);
         return;
     }
     var targets = get_adv_targets();
     if (targets.length == 0) {
-        Hm_Notices.show(['ERRYou must have at least one target']);
+        Hm_Notices.show([err_msg('You must have at least one target')]);
         return;
     }
     var times = get_adv_times();
     if (times.length == 0) {
-        Hm_Notices.show(['ERRYou must enter at least one time range']);
+        Hm_Notices.show([err_msg('You must enter at least one time range')]);
         return;
     }
     var other = get_adv_other();
@@ -515,13 +518,7 @@ var adv_reset_page = function() {
 $(function() {
     if (hm_page_name() == 'advanced_search') {
 
-        globals.close_html = '<img width="16" height="16" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22';
-        globals.close_html += 'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%2';
-        globals.close_html += '2%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.21%';
-        globals.close_html += '200-4%201.79-4%204s1.79%204%204%204%204-1.79%204-4-1.79-4-4-4zm-1.5%201.781';
-        globals.close_html += 'l1.5%201.5%201.5-1.5.719.719-1.5%201.5%201.5%201.5-.719.719-1.5-1.5-1.5%201';
-        globals.close_html += '.5-.719-.719%201.5-1.5-1.5-1.5.719-.719z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="R';
-        globals.close_html += 'emove">';
+        globals.close_html = '<i class="bi bi-x-circle-fill cursor-pointer"></i>';
 
         $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
         $('.adv_folder_select').on("click", function() { adv_select_imap_folder(this); });

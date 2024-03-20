@@ -14,6 +14,7 @@
  */
 define('APP_PATH', '');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('CONFIG_PATH', APP_PATH.'config/');
 define('WEB_ROOT', '');
 define('DEBUG_MODE', true);
 define('CACHE_ID', '');
@@ -26,20 +27,20 @@ if (DEBUG_MODE) {
     error_reporting(E_ALL | E_STRICT);
 }
 
-/* config file location */
-define('CONFIG_FILE', APP_PATH.'hm3.rc');
-
 /* don't let anything output content until we are ready */
 ob_start();
 
 /* set default TZ */
 date_default_timezone_set( 'UTC' );
 
+require VENDOR_PATH.'autoload.php';
 /* get includes */
 require APP_PATH.'lib/framework.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
 
 /* get configuration */
-$config = new Hm_Site_Config_File(CONFIG_FILE);
+$config = new Hm_Site_Config_File();
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {

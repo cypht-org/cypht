@@ -89,7 +89,9 @@ class Hm_MIME_Msg {
 
     /* output mime message */
     function get_mime_msg() {
-        $this->prep_message_body();
+        if (!empty($this->body)) {
+            $this->prep_message_body();
+        }
         $res = '';
         $headers = '';
         foreach ($this->headers as $name => $val) {

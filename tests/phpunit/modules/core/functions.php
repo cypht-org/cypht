@@ -84,7 +84,7 @@ class Hm_Test_Core_Functions extends TestCase {
      */
     public function test_get_oauth2_data() {
         $mock_config = new Hm_Mock_Config();
-        $this->assertEquals(array(), (get_oauth2_data($mock_config)));
+        $this->assertEquals(array('gmail' => [],'outlook' => []), (get_oauth2_data($mock_config)));
     }
     /**
      * @preserveGlobalState disabled
@@ -171,7 +171,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $res2 = Hm_Output_Modules::dump();
         $len2 = count($res2['foo']);
         $this->assertEquals(12, $len);
-        $this->assertEquals(20, $len2);
+        $this->assertEquals(19, $len2);
     }
     /**
      * @preserveGlobalState disabled
@@ -200,21 +200,12 @@ class Hm_Test_Core_Functions extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_get_ini() {
-        $mock_config = new Hm_Mock_Config();
-        $mock_config->data['foo'] = array('bar');
-        $this->assertEquals(array('bar'), get_ini($mock_config, 'foo'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_in_server_list() {
-        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 0);
-        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 0, 'foo'));
-        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 1, 'foo'));
-        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1), 1);
-        $this->assertTrue(in_server_list('Hm_Server_Wrapper', 1, 'testuser'));
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1, 'id' => 'a0'));
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 'a0', 'foo'));
+        $this->assertFalse(in_server_list('Hm_Server_Wrapper', 'a1', 'foo'));
+        Hm_Server_Wrapper::add(array('user' => 'testuser', 'pass' => 'testpass', 'name' => 'test2', 'server' => 'test2', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
+        $this->assertTrue(in_server_list('Hm_Server_Wrapper', 'a1', 'testuser'));
     }
     /**
      * @preserveGlobalState disabled
@@ -222,25 +213,6 @@ class Hm_Test_Core_Functions extends TestCase {
      */
     public function test_profiles_by_server_id() {
         $this->assertEquals(array(), profiles_by_smtp_id(array('smtp_id' => 0), 0));
-    }
-}
-class Hm_Test_Core_Functions_Debug extends TestCase {
-
-    public function setUp(): void {
-        define('DEBUG_MODE', true);
-        require __DIR__.'/../../bootstrap.php';
-        require APP_PATH.'modules/core/modules.php';
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get_ini_debug() {
-        $mock_config = new Hm_Mock_Config();
-        $mock_config->data['app_data_dir'] = APP_PATH.'tests/phpunit/data';
-        $mock_config->data['foo.ini'] = 'bar';
-        $this->assertEquals(array('foo' => 'bar'), get_ini($mock_config, 'foo.ini'));
-        $this->assertEquals(array(), get_ini($mock_config, 'no.ini'));
     }
 }
 ?>

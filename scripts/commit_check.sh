@@ -42,6 +42,7 @@ php_check() {
     find . -name "*.php" -print \
         | grep -v .autoload-legacy.php \
         | grep -v PhpCsFixer.php \
+        | grep -v ./vendor \
         | xargs -L 1  php -l
     err_condition
 }
@@ -49,7 +50,7 @@ php_check() {
 # syntax check on all javascript files
 js_check() {
     echo; echo -e "$YELLOW JS CHECK $END"; echo
-    find . -name "*.js" \
+    find . -name "*.js" | grep -v ./vendor | grep -v ./third_party \
         | while read fname;
         do echo $fname;
             acorn --ecma2020 --silent "$fname"; if [[ $? != 0 ]];

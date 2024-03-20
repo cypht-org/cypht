@@ -259,7 +259,7 @@ class Hm_Output_wordpress_folders extends Hm_Output_Module {
         if (!empty($details)) {
             $res = '<li class="menu_wp_notifications"><a class="unread_link" href="?page=message_list&list_path=wp_notifications">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$w).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-caret-down-fill account_icon"></i> ';
             }
             $res .= $this->trans('Notifications').'</a></li>';
             $this->append('folder_sources', array('wordPress_folders', $res));
@@ -393,8 +393,8 @@ class Hm_Output_unread_wp_included_setting extends Hm_Output_Module {
  */
 class Hm_Output_start_wordpress_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".wp_notifications_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$w.'" width="16" height="16" />'.$this->trans('WordPress.com Settings').'</td></tr>';
+        return '<tr><td colspan="2" data-target=".wp_notifications_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-wordpress fs-5 me-2"></i>'.$this->trans('WordPress.com Settings').'</td></tr>';
     }
 }
 
@@ -419,12 +419,19 @@ class Hm_Output_wordpress_since_setting extends Hm_Output_Module {
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
-        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section">'.
-            '<img src="'.Hm_Image_Sources::$key.'" alt="" width="16" height="16" /> '.
-            $this->trans('WordPress.com Connect').'</div><div class="wordpress_connect_section">';
+        
+        $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-wordpress me-3"></i>
+                        <b>'.$this->trans('WordPress.com Connect').'</b>
+                    </a>
+                </div>';
+        
+        $res .= '<div class="wordpress_connect_section">';
+        
         if (empty($details)) {
             $res .= 'Connect to WordPress.com to view notifications and posts.<br /><br />';
-            $res .= '<a href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
         }
         else {
             $res .= $this->trans('Already connected');
@@ -442,7 +449,7 @@ class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
  */
 if (!hm_exists('wp_connect_details')) {
 function wp_connect_details($config) {
-    return get_ini($config, 'wordpress.ini');
+    return $config->get('wordpress', array());
 }}
 
 /**

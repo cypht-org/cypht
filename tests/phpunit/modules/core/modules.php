@@ -27,11 +27,13 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->run();
         $this->assertEquals(array(), Hm_Msgs::get());
 
-        $test->post = array('server_pw_id' => 0, 'password' => 'foo');
+        $test->post = array('server_pw_id' => 'a1', 'password' => 'foo');
         $test->run();
         $this->assertEquals(array(), Hm_Msgs::get());
 
-        $test->input = array('missing_pw_servers' => array(0 => array('id' => 0, 'type' => 'SMTP')));
+        Hm_SMTP_List::add(array('user' => 'testuser', 'nopass' => 1, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
+
+        $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'SMTP')));
         $res = $test->run();
         $this->assertEquals(array('ERRUnable to authenticate to the SMTP server'), Hm_Msgs::get());
         $this->assertFalse($res->handler_response['connect_status']);
@@ -43,7 +45,9 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $this->assertTrue($res->handler_response['connect_status']);
         Hm_Msgs::flush();
 
-        $test->input = array('missing_pw_servers' => array(0 => array('id' => 0, 'type' => 'IMAP')));
+        Hm_IMAP_List::add(array('user' => 'testuser', 'nopass' => 1, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
+
+        $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'IMAP')));
         $res = $test->run();
         $this->assertEquals(array('ERRUnable to authenticate to the IMAP server'), Hm_Msgs::get());
         $this->assertFalse($res->handler_response['connect_status']);
@@ -68,7 +72,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         Hm_IMAP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
         Hm_SMTP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
         $res = $test->run();
-        $this->assertEquals(9, count($res->handler_response['missing_pw_servers']));
+        $this->assertEquals(4, count($res->handler_response['missing_pw_servers']));
     }
     /**
      * @preserveGlobalState disabled
@@ -483,7 +487,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->prep();
         $test->ses_obj->auth_state = true;
         $test->run_only();
-        $this->assertEquals(array('Saved user data on logout', 'Session destroyed on logout'), Hm_Msgs::get());
+        $this->assertEquals(array('Saved user data on logout, Session destroyed on logout'), Hm_Msgs::get());
         Hm_Msgs::flush();
 
         $test->post = array('save_and_logout' => true);
@@ -567,7 +571,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->run();
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals('<li class="menu_search"><form method="get"><a class="unread_link" href="?page=search"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200c-1.927%200-3.5%201.573-3.5%203.5s1.573%203.5%203.5%203.5c.592%200%201.166-.145%201.656-.406a1%201%200%200%200%20.125.125l1%201a1.016%201.016%200%201%200%201.438-1.438l-1-1a1%201%200%200%200-.156-.125c.266-.493.438-1.059.438-1.656%200-1.927-1.573-3.5-3.5-3.5zm0%201c1.387%200%202.5%201.113%202.5%202.5%200%20.661-.241%201.273-.656%201.719l-.031.031a1%201%200%200%200-.125.125c-.442.397-1.043.625-1.688.625-1.387%200-2.5-1.113-2.5-2.5s1.113-2.5%202.5-2.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="Search" width="16" height="16" /></a><input type="hidden" name="page" value="search" /><label class="screen_reader" for="search_terms">Search</label><input type="search" class="search_terms" name="search_terms" placeholder="Search" /></form></li>', $res->output_data['formatted_folder_list']);
+        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></form></div></li>', $res->output_data['formatted_folder_list']);
     }
     /**
      * @preserveGlobalState disabled
@@ -576,7 +580,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_content_start() {
         $test = new Output_Test('search_content_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="search_content"><div class="content_title"><a class="toggle_link" href="#"><img alt="x" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6.406%201l-.719.688-2.781%202.781-.781-.781-.719-.688-1.406%201.406.688.719%201.5%201.5.719.688.719-.688%203.5-3.5.688-.719-1.406-1.406z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></a><div class="msg_controls"><a class="msg_read core_msg_control" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control" href="#" data-action="archive">Archive</a></div>Search'), $res->output_response);
+        $this->assertEquals(array('<div class="search_content px-0"><div class="content_title px-3 d-flex align-items-center"><a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a><div class="msg_controls fs-6 d-none gap-1"><a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">Archive</a></div>Search'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -597,7 +601,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array(), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_reminder"><a title="You have unsaved changes" href="?page=save"><img alt="Save" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3%200v3h-2l3%203%203-3h-2v-3h-2zm-3%207v1h8v-1h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_reminder"><a title="You have unsaved changes" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('single_server_mode' => true), $res->output_response);
@@ -609,7 +613,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_form_start() {
         $test = new Output_Test('search_form_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="search_form"><form method="get">'), $res->output_response);
+        $this->assertEquals(array('<div class="search_form"><form class="d-flex align-items-center" method="get">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -618,7 +622,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_form_content() {
         $test = new Output_Test('search_form_content', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" class="combined_sort"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update" value="Update" /> <input type="button" class="search_reset" value="Reset" />'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update btn btn-success btn-sm" value="Update" /> <input type="button" class="search_reset btn btn-light border btn-sm" value="Reset" />'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -627,10 +631,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_form_end() {
         $test = new Output_Test('search_form_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('</form></div><div class="list_controls no_mobile"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        $this->assertEquals(array('</form></div><div class="list_controls no_mobile d-flex gap-3 align-items-center"><a class="refresh_link ms-3" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a></div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
-        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
+        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link ms-3" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a></div>
     </div><div class="list_sources"><div class="src_title">Sources</div></div></div>'), $res->output_response);
     }
     /**
@@ -664,13 +668,37 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_fancy_login_end() {
+        $test = new Output_Test('login_end', 'core');
+        $test->handler_response = array('fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('</form></div>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_login_start() {
         $test = new Output_Test('login_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<style type="text/css">.mobile .login_form{margin-top:60px;display:block;float:none;width:100%;background-color:#fff;font-size:130%;height:auto;}.logged_out{display:block !important;}.sys_messages{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin-left:-12px;}.mobile .g-recaptcha{clear:left;margin-left:20px;}.title{font-weight:normal;padding:0px;margin:0px;margin-left:20px;margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{max-width:100%;min-height:100%;background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,#fff);font-size:1em;height:100%;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid 1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute;top:auto;width:1px;height:1px;overflow:hidden;}.login_form{float:left;font-size:90%;padding-top:60px;height:300px;border-radius:0px 0px 20px 0px;margin:0px;background-color:#f5f5f5;width:300px;padding-left:20px;}.login_form input{clear:both;float:left;padding:4px;margin-left:20px;margin-top:10px;margin-bottom:10px;}#username,#password{width:200px;}.err{color:red !important;}.long_session{float:left;}.long_session input{padding:0px;float:none;}.mobile .long_session{float:left;clear:both;}</style><form class="login_form" method="POST">'), $res->output_response);
+        $this->assertEquals(array('<form class="login_form" method="POST">'), $res->output_response);
         $test->handler_response = array('router_login_state' => true);
         $res = $test->run();
         $this->assertEquals(array('<form class="logout_form" method="POST">'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_fancy_login_start() {
+        $test = new Output_Test('login_start', 'core');
+        $test->handler_response = array('fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<style type="text/css">body,html{max-width:100vw !important; max-height:100vh !important; overflow:hidden !important;}.form-container{background-color:#f1f1f1;background: linear-gradient( rgba(4, 26, 0, 0.85), rgba(4, 26, 0, 0.85)), url(modules/core/assets/images/cloud.jpg);background-attachment: fixed;background-position: center;background-repeat: no-repeat;background-size: cover;display:grid; place-items:center; height:100vh; width:100vw;} .logged_out{display:block !important;}.sys_messages{position:fixed;right:20px;top:15px;min-height:30px;display:none;background-color:#fff;color:teal;margin-top:0px;padding:15px;padding-bottom:5px;white-space:nowrap;border:solid 1px #999;border-radius:5px;filter:drop-shadow(4px 4px 4px #ccc);z-index:101;}.g-recaptcha{margin:0px 10px 10px 10px;}.mobile .g-recaptcha{margin:0px 10px 5px 10px;}.title{font-weight:normal;padding:0px;margin:0px;margin-left:20px;margin-bottom:20px;letter-spacing:-1px;color:#999;}html,body{min-width:100px !important;background-color:#fff;}body{background:linear-gradient(180deg,#faf6f5,#faf6f5,#faf6f5,#faf6f5,#fff);font-size:1em;color:#333;font-family:Arial;padding:0px;margin:0px;min-width:700px;font-size:100%;}input,option,select{font-size:100%;padding:3px;}textarea,select,input{border:solid 1px #ddd;background-color:#fff;color:#333;border-radius:3px;}.screen_reader{position:absolute;top:auto;width:1px;height:1px;overflow:hidden;}.login_form{display:flex; justify-content:space-evenly; align-items:center; flex-direction:column;font-size:90%;padding-top:60px;height:360px;border-radius:20px 20px 20px 20px;margin:0px;background-color:rgba(0,0,0,.6);min-width:300px;}.login_form input{clear:both;float:left;padding:4px;margin-top:10px;margin-bottom:10px;}#username,#password{width:200px; height:25px;} .err{color:red !important;}.long_session{float:left;}.long_session input{padding:0px;float:none;font-size:18px;}.mobile .long_session{float:left;clear:both;} @media screen and (min-width:400px){.login_form{min-width:400px;}}.user-icon_signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-120px; box-shadow: #6eb549 .4px 2.4px 6.2px; }.label_signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;} @media (max-height : 500px){ .user-icon_signin{display:none;}}
+                    </style><div class="form-container"><form class="login_form" method="POST">'), $res->output_response);
+        $test->handler_response = array('router_login_state' => true, 'fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<div class="form-container"><form class="logout_form" method="POST">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -680,13 +708,145 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('login', 'core');
         $test->handler_response = array('allow_long_session' => true, 'router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" id="unsaved_changes" value="0" /><input type="hidden" name="hm_page_key" value="" /><div class="confirm_logout"><div class="confirm_text">Unsaved changes will be lost! Re-enter your password to save and exit. &nbsp;<a href="?page=save">More info</a></div><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="logout_password">Password</label><input id="logout_password" autocomplete="current-password" name="password" class="save_settings_password" type="password" placeholder="Password" /><input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" /><input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" /><input class="cancel_logout save_settings" type="button" value="Cancel" /></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">Do you want to log out?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="hm_page_key" value="" />
+                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
+                        <div class="my-3 form-floating">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <label for="logout_password" class="form-label screen-reader">Password</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                    </div>
+                </div>
+                </div>
+            </div>'), $res->output_response);
         $test->handler_response = array('allow_long_session' => true, 'router_login_state' => false);
         $res = $test->run();
-        $this->assertEquals(array('<h1 class="title"></h1> <input type="hidden" name="hm_page_key" value="" /> <label class="screen_reader" for="username">Username</label><input autofocus required type="text" placeholder="Username" id="username" name="username" value=""> <label class="screen_reader" for="password">Password</label><input required type="password" id="password" placeholder="Password" name="password"><div class="long_session"><input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" /> <label for="stay_logged_in">Stay logged in</label></div> <input style="cursor:pointer;" type="submit" id="login" value="Login" />'), $res->output_response);
+        $this->assertEquals(array('<div class="bg-light"><div class="d-flex align-items-center justify-content-center vh-100 p-3">
+                    <div class="card col-12 col-md-6 col-lg-4 p-3">
+                        <div class="card-body">
+                            <p class="text-center"><img class="w-50" src="modules/core/assets/images/logo_dark.svg"></p>
+                            <div class="mt-5">
+                                <div class="mb-3 form-floating">
+                                    <input autofocus required type="text" placeholder="Username" id="username" name="username" class="form-control">
+                                    <label for="username" class="form-label screen-reader">Username</label>
+                                </div>
+                                <div class="mb-3 form-floating">
+                                    <input required type="password" id="password" placeholder="Password" name="password" class="form-control">
+                                    <label for="password" class="form-label screen-reader">Password</label>
+                                </div><div class="d-grid"><div class="form-check form-switch long-session">
+                <input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" class="form-check-input">
+                <label class="form-check-label" for="stay_logged_in">Stay logged in</label>
+            </div><input type="hidden" name="hm_page_key" value="" />
+                                    <input type="submit" id="login" class="btn btn-success btn-lg" value="Login">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div></div>'), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo'), 'router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" id="unsaved_changes" value="1" /><input type="hidden" name="hm_page_key" value="" /><div class="confirm_logout"><div class="confirm_text">Unsaved changes will be lost! Re-enter your password to save and exit. &nbsp;<a href="?page=save">More info</a></div><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="logout_password">Password</label><input id="logout_password" autocomplete="current-password" name="password" class="save_settings_password" type="password" placeholder="Password" /><input class="save_settings" type="submit" name="save_and_logout" value="Save and Logout" /><input class="save_settings" id="logout_without_saving" type="submit" name="logout" value="Just Logout" /><input class="cancel_logout save_settings" type="button" value="Cancel" /></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">Do you want to log out?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="hm_page_key" value="" />
+                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
+                        <div class="my-3 form-floating">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <label for="logout_password" class="form-label screen-reader">Password</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                    </div>
+                </div>
+                </div>
+            </div>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_fancy_login() {
+        $test = new Output_Test('login', 'core');
+        $test->handler_response = array('allow_long_session' => true, 'router_login_state' => true, 'fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">Do you want to log out?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="hm_page_key" value="" />
+                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
+                        <div class="my-3 form-floating">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <label for="logout_password" class="form-label screen-reader">Password</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                    </div>
+                </div>
+                </div>
+            </div>'), $res->output_response);
+        $test->handler_response = array('allow_long_session' => true, 'router_login_state' => false, 'fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<svg class="user-icon_signin" viewBox="0 0 20 20"><path d="M12.075,10.812c1.358-0.853,2.242-2.507,2.242-4.037c0-2.181-1.795-4.618-4.198-4.618S5.921,4.594,5.921,6.775c0,1.53,0.884,3.185,2.242,4.037c-3.222,0.865-5.6,3.807-5.6,7.298c0,0.23,0.189,0.42,0.42,0.42h14.273c0.23,0,0.42-0.189,0.42-0.42C17.676,14.619,15.297,11.677,12.075,10.812 M6.761,6.775c0-2.162,1.773-3.778,3.358-3.778s3.359,1.616,3.359,3.778c0,2.162-1.774,3.778-3.359,3.778S6.761,8.937,6.761,6.775 M3.415,17.69c0.218-3.51,3.142-6.297,6.704-6.297c3.562,0,6.486,2.787,6.705,6.297H3.415z"></path></svg><img src="modules/core/assets/images/logo.svg" style="height:90px;"><!--h1 class="title"></h1--> <input type="hidden" name="hm_page_key" value="" /> <label class="label_signin" for="username">Username</label><input autofocus required type="text" placeholder="Username" id="username" name="username" value=""> <label class="label_signin" for="password">Password</label><input required type="password" id="password" placeholder="Password" name="password"><div class="form-check form-switch long-session">
+                <input type="checkbox" id="stay_logged_in" value="1" name="stay_logged_in" class="form-check-input">
+                <label class="form-check-label" for="stay_logged_in">Stay logged in</label>
+            </div> <input style="cursor:pointer; display:block; width:210px; background-color:#6eb549; color:white; height:40px;" type="submit" id="login" value="Login" />'), $res->output_response);
+        $test->handler_response = array('changed_settings' => array('foo'), 'router_login_state' => true, 'fancy_login_allowed' => true);
+        $res = $test->run();
+        $this->assertEquals(array('<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">Do you want to log out?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="hm_page_key" value="" />
+                        <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
+                        <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
+                        <div class="my-3 form-floating">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <label for="logout_password" class="form-label screen-reader">Password</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <input class="cancel_logout save_settings btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                        <input class="save_settings btn btn-success" id="logout_without_saving" type="submit" name="logout" value="Just Logout" />
+                        <input class="save_settings btn btn-success" type="submit" name="save_and_logout" value="Save and Logout" />
+                    </div>
+                </div>
+                </div>
+            </div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -725,7 +885,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('msgs', 'core');
         $test->handler_response = array('router_login_state' => false);
         $res = $test->run();
-        $this->assertEquals(array('<div class="sys_messages logged_out"><span class="err">foo</span>,foo</div>'), $res->output_response);
+        $this->assertEquals(array('<div class="d-none z-3 position-fixed top-0 end-0 mt-3 me-3 sys_messages logged_out"><div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">foo</span>,<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -755,7 +915,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><script type="text/javascript">sessionStorage.clear();</script>'), $res->output_response);
         $test->handler_response = array('changed_settings' => array(0), 'router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><input type="hidden" id="hm_page_key" value="" /><a class="unsaved_icon" href="?page=save" title="Unsaved Changes"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AgSFQseE+bgxAAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAAS0lEQVQ4y6WTSQoAMAgDk/z/z+21lK6ON5UZEIklNdXLIbAkhcBVgccmBP4VeDUMgV8FPi1D4JvAL7eFwDuBf/4aAs8CV0NB0sirA+jtAijusTaJAAAAAElFTkSuQmCC" alt="Unsaved changes" class="unsaved_reminder" /></a>'), $res->output_response);
+        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><input type="hidden" id="hm_page_key" value="" /><a class="unsaved_icon" href="?page=save" title="Unsaved Changes"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -837,10 +997,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };</script>'), $res->output_response);
+        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var globals = {};var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E"; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };</script>'), $res->output_response);
+        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };', implode($res->output_response));
     }
     /**
      * @preserveGlobalState disabled
@@ -858,7 +1018,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_settings_form() {
         $test = new Output_Test('start_settings_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="user_settings"><div class="content_title">Site Settings</div><form method="POST"><input type="hidden" name="hm_page_key" value="" /><table class="settings_table"><colgroup><col class="label_col"><col class="setting_col"></colgroup>'), $res->output_response);
+        $this->assertEquals(array('<div class="user_settings px-0"><div class="content_title px-3">Site Settings</div><form method="POST"><input type="hidden" name="hm_page_key" value="" /><div class="px-3"><table class="settings_table table table-borderless"><colgroup><col class="label_col"><col class="setting_col"></colgroup>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -867,10 +1027,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_page_setting() {
         $test = new Output_Test('start_page_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('start_page' => 'page=message_list&list_path=unread'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option selected="selected" value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option selected="selected" value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -879,10 +1039,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_list_style_setting() {
         $test = new Output_Test('list_style_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select id="list_style" name="list_style"><option value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style"><option value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('list_style' => 'email_style'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select id="list_style" name="list_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -892,10 +1052,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('mailto_handler_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="mailto_handler">Allow handling of mailto links</label></td><td><input type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('mailto_handler' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="mailto_handler">Allow handling of mailto links</label></td><td><input type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -905,10 +1065,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_folder_icon_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="no_folder_icons">Hide folder list icons</label></td><td><input type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_folder_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="no_folder_icons">Hide folder list icons</label></td><td><input type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -918,10 +1078,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_password_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="no_password_save">Don\'t save account passwords between logins</label></td><td><input type="checkbox"  value="1" id="no_password_save" name="no_password_save" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_password_save" name="no_password_save" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_password_save' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="no_password_save">Don\'t save account passwords between logins</label></td><td><input type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -931,10 +1091,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('delete_prompt_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('disable_delete_prompt' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -943,7 +1103,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_flagged_settings() {
         $test = new Output_Test('start_flagged_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />Flagged</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".flagged_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -952,7 +1112,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_everything_settings() {
         $test = new Output_Test('start_everything_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v1h8v-1h-8zm0%202v5.906c0%20.06.034.094.094.094h7.813c.06%200%20.094-.034.094-.094v-5.906h-2.969v1.031h-2.031v-1.031h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />Everything</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".all_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-box2-fill fs-5 me-2"></i>Everything</td></tr>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('single_server_mode' => true), $res->output_response);
@@ -961,10 +1121,19 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_start_junk_settings() {
+        $test = new Output_Test('start_junk_settings', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr><td data-target=".junk_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_start_unread_settings() {
         $test = new Output_Test('start_unread_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1l4%202%204-2v-1h-8zm0%202v4h8v-4l-4%202-4-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />Unread</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".unread_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -977,7 +1146,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('router_module_list' => array()), $res->output_response);
         $test->handler_response = array('router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1l4%202%204-2v-1h-8zm0%202v4h8v-4l-4%202-4-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />All Email</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".email_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-envelope-fill fs-5 me-2"></i>All Email</td></tr>'), $res->output_response);
         $test->handler_response = array('router_module_list' => array('imap'), 'single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('router_module_list' => array('imap'), 'single_server_mode' => true), $res->output_response);
@@ -989,7 +1158,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_general_settings() {
         $test = new Output_Test('start_general_settings', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle"><img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="16" />General</td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr><td data-target=".general_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary"><i class="bi bi-gear-wide-connected fs-5 me-2"></i>General</td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -998,10 +1167,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_unread_source_max_setting() {
         $test = new Output_Test('unread_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input type="text" size="2" id="unread_per_source" name="unread_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('unread_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input type="text" size="2" id="unread_per_source" name="unread_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1010,10 +1179,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_unread_since_setting() {
         $test = new Output_Test('unread_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('unread_since' => '-1 week'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1022,10 +1191,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_flagged_source_max_setting() {
         $test = new Output_Test('flagged_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('flagged_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1034,10 +1203,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_flagged_since_setting() {
         $test = new Output_Test('flagged_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('flagged_since' => '-1 week'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1050,7 +1219,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('user_settings' => array('all_email_per_source' => 10), 'router_module_list' => array()), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_email_per_source' => 10), 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_per_source">Max messages per source</label></td><td><input type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1059,10 +1228,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_all_source_max_setting() {
         $test = new Output_Test('all_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input type="text" size="2" id="all_per_source" name="all_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input type="text" size="2" id="all_per_source" name="all_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1075,7 +1244,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('user_settings' => array('all_email_since' => '-1 week'), 'router_module_list' => array()), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_email_since' => '-1 week'), 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_since">Show messages received since</label></td><td><select name="all_email_since" id="all_email_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_since">Show messages received since</label></td><td><select name="all_email_since" id="all_email_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1084,10 +1253,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_all_since_setting() {
         $test = new Output_Test('all_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_since' => '-1 week'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1097,7 +1266,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1118,10 +1287,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_msg_list_icons_setting() {
         $test = new Output_Test('msg_list_icons_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="show_list_icons">Show icons in message lists</label></td><td><input type="checkbox"  id="show_list_icons" name="show_list_icons" value="1" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  id="show_list_icons" name="show_list_icons" value="1" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('show_list_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="show_list_icons">Show icons in message lists</label></td><td><input type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" /></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1130,10 +1299,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_end_settings_form() {
         $test = new Output_Test('end_settings_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button" type="submit" name="reset_factory" value="Restore Defaults" /></form></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-success" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
-        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings" type="submit" name="save_settings" value="Save" /></td></tr></table></form><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button" type="submit" name="reset_factory" value="Restore Defaults" /></form></div>'), $res->output_response);
+        $this->assertEquals(array('<tr><td class="submit_cell" colspan="2"><input class="save_settings btn btn-success" type="submit" name="save_settings" value="Save" /></td></tr></table></div></form><div class="px-3 d-flex justify-content-end"><form method="POST"><input type="hidden" name="hm_page_key" value="" /><input class="reset_factory_button btn btn-light border" type="submit" name="reset_factory" value="Restore Defaults" /></form></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1142,7 +1311,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_start() {
         $test = new Output_Test('folder_list_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1h8v-1h-8zm0%202.969v1h8v-1h-8zm0%203v1h8v-1h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="16" height="20" /></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
+        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<i class="bi bi-menu-up"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1163,10 +1332,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_main_menu_start() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name main_menu" data-source=".main">Main<img alt="" class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main<i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu" data-source=".main">Main<img alt="" class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main<i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1176,10 +1345,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('main_menu_content', 'core');
         $test->handler_response = array('folder_sources' => array(array('email_folders', 'baz')));
         $res = $test->run();
-        $this->assertEquals(array('<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v1h8v-1h-8zm0%202v5.906c0%20.06.034.094.094.094h7.813c.06%200%20.094-.034.094-.094v-5.906h-2.969v1.031h-2.031v-1.031h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Everything</a><span class="combined_inbox_count"></span></li><li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1l4%202%204-2v-1h-8zm0%202v4h8v-4l-4%202-4-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Unread</a><span class="total_unread_count"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Flagged</a> <span class="flagged_count"></span></li>'), $res->output_response);
+        $this->assertEquals(array('<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox"><i class="bi bi-box2-fill fs-5 me-2"></i>Everything</a><span class="combined_inbox_count"></span></li><li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v1h8v-1h-8zm0%202v5.906c0%20.06.034.094.094.094h7.813c.06%200%20.094-.034.094-.094v-5.906h-2.969v1.031h-2.031v-1.031h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Everything</a><span class="combined_inbox_count"></span></li><li class="menu_unread"><a class="unread_link" href="?page=message_list&amp;list_path=unread"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%201v1l4%202%204-2v-1h-8zm0%202v4h8v-4l-4%202-4-2z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Unread</a><span class="total_unread_count"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v8h1v-8h-1zm2%200v4h2v1h4l-2-1.969%202-2.031h-3v-1h-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Flagged</a> <span class="flagged_count"></span></li>'), $res->output_response);
+        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox"><i class="bi bi-box2-fill fs-5 me-2"></i>Everything</a><span class="combined_inbox_count"></span></li><li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1188,10 +1357,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_logout_menu_item() {
         $test = new Output_Test('logout_menu_item', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<li class="menu_logout"><a class="unread_link logout_link" href="#"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3%200v4h1v-4h-1zm-1.281%201.438l-.375.313c-.803.64-1.344%201.634-1.344%202.75%200%201.929%201.571%203.5%203.5%203.5s3.5-1.571%203.5-3.5c0-1.116-.529-2.11-1.344-2.75l-.375-.313-.625.781.375.313c.585.46.969%201.165.969%201.969%200%201.391-1.109%202.5-2.5%202.5s-2.5-1.109-2.5-2.5c0-.804.361-1.509.938-1.969l.406-.313-.625-.781z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Logout</a></li>'), $res->output_response);
+        $this->assertEquals(array('<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i>Logout</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_logout"><a class="unread_link logout_link" href="#"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3%200v4h1v-4h-1zm-1.281%201.438l-.375.313c-.803.64-1.344%201.634-1.344%202.75%200%201.929%201.571%203.5%203.5%203.5s3.5-1.571%203.5-3.5c0-1.116-.529-2.11-1.344-2.75l-.375-.313-.625.781.375.313c.585.46.969%201.165.969%201.969%200%201.391-1.109%202.5-2.5%202.5s-2.5-1.109-2.5-2.5c0-.804.361-1.509.938-1.969l.406-.313-.625-.781z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Logout</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i>Logout</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1216,10 +1385,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<div class="email_folders"><ul class="folders">baz</ul></div>'), $res->output_response);
         $test->handler_response = array('folder_sources' => array(array('email_folders', 'baz')));
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name" data-source=".email_folders">Email<img class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="8" height="8" /></div><div style="display: none;" class="email_folders"><ul class="folders"><li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.21%200-4%201.79-4%204s1.79%204%204%204%204-1.79%204-4-1.79-4-4-4zm0%201c.333%200%20.637.086.938.188-.214.197-.45.383-.406.563.04.18.688.13.688.5%200%20.27-.425.346-.125.656.35.35-.636.978-.656%201.438-.03.83.841.969%201.531.969.424%200%20.503.195.469.438-.546.758-1.438%201.25-2.438%201.25-.378%200-.729-.09-1.063-.219.224-.442-.313-1.344-.781-1.625-.226-.226-.689-.114-.969-.219-.092-.271-.178-.545-.188-.844.031-.05.081-.094.156-.094.19%200%20.454.374.594.344.18-.04-.742-1.313-.313-1.563.2-.12.609.394.469-.156-.12-.51.366-.276.656-.406.26-.11.455-.414.125-.594l-.219-.188c.45-.27.972-.438%201.531-.438zm2.313%201.094c.184.222.323.481.438.75l-.188.219c-.29.27-.327-.212-.438-.313-.13-.11-.638.025-.688-.125-.077-.181.499-.418.875-.531z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> All</a> <span class="unread_mail_count"></span></li>baz</ul></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".email_folders">Email<i class="bi bi-chevron-down"></i></div><div style="display: none;" class="email_folders"><ul class="folders"><li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email"><i class="bi bi-globe-americas fs-5 me-2"></i>All</a> <span class="unread_mail_count"></span></li>baz</ul></div>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<div class="src_name" data-source=".email_folders">Email<img class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="8" height="8" /></div><div style="display: none;" class="email_folders"><ul class="folders"><li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.21%200-4%201.79-4%204s1.79%204%204%204%204-1.79%204-4-1.79-4-4-4zm0%201c.333%200%20.637.086.938.188-.214.197-.45.383-.406.563.04.18.688.13.688.5%200%20.27-.425.346-.125.656.35.35-.636.978-.656%201.438-.03.83.841.969%201.531.969.424%200%20.503.195.469.438-.546.758-1.438%201.25-2.438%201.25-.378%200-.729-.09-1.063-.219.224-.442-.313-1.344-.781-1.625-.226-.226-.689-.114-.969-.219-.092-.271-.178-.545-.188-.844.031-.05.081-.094.156-.094.19%200%20.454.374.594.344.18-.04-.742-1.313-.313-1.563.2-.12.609.394.469-.156-.12-.51.366-.276.656-.406.26-.11.455-.414.125-.594l-.219-.188c.45-.27.972-.438%201.531-.438zm2.313%201.094c.184.222.323.481.438.75l-.188.219c-.29.27-.327-.212-.438-.313-.13-.11-.638.025-.688-.125-.077-.181.499-.418.875-.531z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> All</a> <span class="unread_mail_count"></span></li>baz</ul></div>'), $res->output_response);
+        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".email_folders">Email<i class="bi bi-chevron-down"></i></div><div style="display: none;" class="email_folders"><ul class="folders"><li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email"><i class="bi bi-globe-americas fs-5 me-2"></i>All</a> <span class="unread_mail_count"></span></li>baz</ul></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1228,10 +1397,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name" data-source=".settings">Settings<img class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="8" height="8" /></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200l-4%203h1v4h2v-2h2v2h2v-4.031l1%20.031-4-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name" data-source=".settings">Settings<img class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="8" height="8" /></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200l-4%203h1v4h2v-2h2v2h2v-4.031l1%20.031-4-3z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1240,10 +1409,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_save_form() {
         $test = new Output_Test('save_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page"><div class="content_title">Save Settings</div><div class="save_details">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle">Unsaved Changes</div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password" type="password" placeholder="Password" /><input class="save_settings" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page"><div class="content_title">Save Settings</div><div class="save_details">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle">Unsaved Changes</div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password" type="password" placeholder="Password" /><input class="save_settings" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-success me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1252,7 +1421,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_servers_link() {
         $test = new Output_Test('settings_servers_link', 'core');
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_servers"><a class="unread_link" href="?page=servers"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M.344%200a.5.5%200%200%200-.344.5v5a.5.5%200%200%200%20.5.5h2.5v1h-1c-.55%200-1%20.45-1%201h6c0-.55-.45-1-1-1h-1v-1h2.5a.5.5%200%200%200%20.5-.5v-5a.5.5%200%200%200-.5-.5h-7a.5.5%200%200%200-.094%200%20.5.5%200%200%200-.063%200zm.656%201h6v4h-6v-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Servers</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_servers"><a class="unread_link" href="?page=servers"><i class="bi bi-pc-display-horizontal fs-5 me-2"></i>Servers</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1261,7 +1430,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_site_link() {
         $test = new Output_Test('settings_site_link', 'core');
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_settings"><a class="unread_link" href="?page=settings"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Site</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_settings"><a class="unread_link" href="?page=settings"><i class="bi bi-gear-wide-connected fs-5 me-2"></i>Site</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1270,7 +1439,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_save_link() {
         $test = new Output_Test('settings_save_link', 'core');
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_save"><a class="unread_link" href="?page=save"><img class="account_icon" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3%200v3h-2l3%203%203-3h-2v-3h-2zm-3%207v1h8v-1h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="" width="16" height="16" /> Save</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_save"><a class="unread_link" href="?page=save"><i class="bi bi-download fs-5 me-2"></i>Save</a></li>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('single_server_mode' => 1), $res->output_response);
@@ -1294,10 +1463,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6%200l-4%204%204%204v-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="Collapse" width="16" height="16" /></a>'), $res->output_response);
+        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6%200l-4%204%204%204v-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="Collapse" width="16" height="16" /></a>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1315,7 +1484,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_section_start() {
         $test = new Output_Test('content_section_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<main class="content_cell"><div class="offline">Offline</div>'), $res->output_response);
+        $this->assertEquals(array('<main class="container-fluid content_cell"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1324,7 +1493,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_section_end() {
         $test = new Output_Test('content_section_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('</main>'), $res->output_response);
+        $this->assertEquals(array('</div></main>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1351,13 +1520,13 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('<div class="content_title"><a href="?page=message_list&amp;list_path=unread">Unread</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'search', 'list_page' => 1, 'list_filter' => 'foo', 'list_sort' => 'bar', 'uid' => 5, 'mailbox_list_title' => array('Search', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search">Search</a><img class="path_delim" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M2%200v8l4-4-4-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="&gt;" /><a href="?page=message_list&amp;list_path=">bar</a></div><div class="msg_text">'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search">Search</a><i class="bi bi-caret-right-fill path_delim"></i><a href="?page=message_list&amp;list_path=">bar</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_parent' => 'search', 'list_page' => 1, 'list_filter' => 'foo', 'list_sort' => 'bar', 'uid' => 5, 'mailbox_list_title' => array('search', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search">Search</a><img class="path_delim" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M2%200v8l4-4-4-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="&gt;" /><a href="?page=message_list&amp;list_path=">search<img class="path_delim" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M2%200v8l4-4-4-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="&gt;" />bar</a></div><div class="msg_text">'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=search&amp;list_path=search">Search</a><i class="bi bi-caret-right-fill path_delim"></i><a href="?page=message_list&amp;list_path=">search<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
         $test->handler_response = array('list_page' => 1, 'list_filter' => 'foo', 'list_sort' => 'bar', 'uid' => 5, 'mailbox_list_title' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&list_page=1&filter=foo&sort=bar">foo<img class="path_delim" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M2%200v8l4-4-4-4z%22%20%2F%3E%0A%3C%2Fsvg%3E" alt="&gt;" />bar</a></div><div class="msg_text">'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" class="msg_uid" value="5" /><div class="content_title"><a href="?page=message_list&amp;list_path=&list_page=1&filter=foo&sort=bar">foo<i class="bi bi-caret-right-fill path_delim"></i>bar</a></div><div class="msg_text">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1385,10 +1554,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('message_list_start', 'core');
         $test->handler_response = array('message_list_fields' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<table class="message_table"><colgroup><col class="f"><col class="b"></colgroup><thead><tr><th class="o">o</th><th class="a">r</th></tr></thead><tbody class="message_table_body">'), $res->output_response);
+        $this->assertEquals(array('<div class="p-3"><table class="message_table table pt-5"><colgroup><col class="f"><col class="b"></colgroup><thead><tr><th class="o">o</th><th class="a">r</th></tr></thead><tbody class="message_table_body">'), $res->output_response);
         $test->handler_response = array('message_list_fields' => array(array(false, true, false)));
         $res = $test->run();
-        $this->assertEquals(array('<table class="message_table"><thead><tr><th></th></tr></thead><tbody class="message_table_body">'), $res->output_response);
+        $this->assertEquals(array('<div class="p-3"><table class="message_table table pt-5"><thead><tr><th></th></tr></thead><tbody class="message_table_body">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1419,31 +1588,31 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('message_list_heading', 'core');
         $res = $test->run();
 
-        $this->assertEquals(array('<div class="message_list _list"><div class="content_title"><a class="toggle_link" href="#"><img alt="x" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6.406%201l-.719.688-2.781%202.781-.781-.781-.719-.688-1.406%201.406.688.719%201.5%201.5.719.688.719-.688%203.5-3.5.688-.719-1.406-1.406z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></a><div class="msg_controls"><a class="msg_read core_msg_control" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" class="combined_sort"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select><div class="list_controls no_mobile"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a title="Configure" href="?page=settings#_setting"><img alt="Configure" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        $this->assertEquals(array('<div class="message_list p-0 _list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center"><div class="d-flex align-items-center gap-1"><a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a><div class="msg_controls fs-6 d-none gap-1"><a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select></div><div class="list_controls no_mobile d-flex gap-3 align-items-center"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a><a title="Configure" href="?page=settings#_setting"><i class="bi bi-gear-wide refresh_list"></i></a></div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
-        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a title="Configure" href="?page=settings#_setting"><img alt="Configure" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
+        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a><a title="Configure" href="?page=settings#_setting"><i class="bi bi-gear-wide refresh_list"></i></a></div>
     </div><div class="list_sources"><div class="src_title">Sources</div></div></div>'), $res->output_response);
         $test->handler_response = array('custom_list_controls' => 'foo');
         $res = $test->run();
-        $this->assertEquals(array('<div class="message_list _list"><div class="content_title"><a class="toggle_link" href="#"><img alt="x" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6.406%201l-.719.688-2.781%202.781-.781-.781-.719-.688-1.406%201.406.688.719%201.5%201.5.719.688.719-.688%203.5-3.5.688-.719-1.406-1.406z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></a><div class="msg_controls"><a class="msg_read core_msg_control" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" class="combined_sort"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select><div class="list_controls no_mobile"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a>foo</div>
+        $this->assertEquals(array('<div class="message_list p-0 _list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center"><div class="d-flex align-items-center gap-1"><a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a><div class="msg_controls fs-6 d-none gap-1"><a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select></div><div class="list_controls no_mobile d-flex gap-3 align-items-center"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>foo</div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
-        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a>foo</div>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
+        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>foo</div>
     </div><div class="list_sources"><div class="src_title">Sources</div></div></div>'), $res->output_response);
         $test->handler_response = array('no_list_controls' => true);
         $res = $test->run();
-        $this->assertEquals(array('<div class="message_list _list"><div class="content_title"><a class="toggle_link" href="#"><img alt="x" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6.406%201l-.719.688-2.781%202.781-.781-.781-.719-.688-1.406%201.406.688.719%201.5%201.5.719.688.719-.688%203.5-3.5.688-.719-1.406-1.406z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></a><div class="msg_controls"><a class="msg_read core_msg_control" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" class="combined_sort"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select><div class="list_controls no_mobile"></div>
+        $this->assertEquals(array('<div class="message_list p-0 _list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center"><div class="d-flex align-items-center gap-1"><a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a><div class="msg_controls fs-6 d-none gap-1"><a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select></div><div class="list_controls no_mobile d-flex gap-3 align-items-center"></div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
         <div id="list_controls_menu" classs="list_controls_menu"></div>
     </div><div class="list_sources"><div class="src_title">Sources</div></div></div>'), $res->output_response);
         $test->handler_response = array('list_path' => 'combined_inbox');
         $res = $test->run();
-        $this->assertEquals(array('<div class="message_list combined_inbox_list"><div class="content_title"><a class="toggle_link" href="#"><img alt="x" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M6.406%201l-.719.688-2.781%202.781-.781-.781-.719-.688-1.406%201.406.688.719%201.5%201.5.719.688.719-.688%203.5-3.5.688-.719-1.406-1.406z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></a><div class="msg_controls"><a class="msg_read core_msg_control" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" class="combined_sort"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select><div class="list_controls no_mobile"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a title="Configure" href="?page=settings#all_setting"><img alt="Configure" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        $this->assertEquals(array('<div class="message_list p-0 combined_inbox_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center"><div class="d-flex align-items-center gap-1"><a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a><div class="msg_controls fs-6 d-none gap-1"><a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">Read</a><a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">Unread</a><a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">Flag</a><a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">Unflag</a><a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">Delete</a><a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">Archive</a></div><div class="mailbox_list_title"></div><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select></div><div class="list_controls no_mobile d-flex gap-3 align-items-center"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a><a title="Configure" href="?page=settings#all_setting"><i class="bi bi-gear-wide refresh_list"></i></a></div>
     <div class="list_controls on_mobile">
-        <img alt="" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2030%2030%22%20width%3D%2230px%22%20height%3D%2230px%22%3E%20%20%20%20%3Cpath%20d%3D%22M%207%204%20C%206.744125%204%206.4879687%204.0974687%206.2929688%204.2929688%20L%204.2929688%206.2929688%20C%203.9019687%206.6839688%203.9019687%207.3170313%204.2929688%207.7070312%20L%2011.585938%2015%20L%204.2929688%2022.292969%20C%203.9019687%2022.683969%203.9019687%2023.317031%204.2929688%2023.707031%20L%206.2929688%2025.707031%20C%206.6839688%2026.098031%207.3170313%2026.098031%207.7070312%2025.707031%20L%2015%2018.414062%20L%2022.292969%2025.707031%20C%2022.682969%2026.098031%2023.317031%2026.098031%2023.707031%2025.707031%20L%2025.707031%2023.707031%20C%2026.098031%2023.316031%2026.098031%2022.682969%2025.707031%2022.292969%20L%2018.414062%2015%20L%2025.707031%207.7070312%20C%2026.098031%207.3170312%2026.098031%206.6829688%2025.707031%206.2929688%20L%2023.707031%204.2929688%20C%2023.316031%203.9019687%2022.682969%203.9019687%2022.292969%204.2929688%20L%2015%2011.585938%20L%207.7070312%204.2929688%20C%207.5115312%204.0974687%207.255875%204%207%204%20z%22%2F%3E%3C%2Fsvg%3E" width="20" height="20" onclick="listControlsMenu()"/>
-        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><img alt="Refresh" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M4%200c-2.201%200-4%201.799-4%204s1.799%204%204%204c1.104%200%202.092-.456%202.813-1.188l-.688-.688c-.54.548-1.289.875-2.125.875-1.659%200-3-1.341-3-3s1.341-3%203-3c.834%200%201.545.354%202.094.906l-1.094%201.094h3v-3l-1.188%201.188c-.731-.72-1.719-1.188-2.813-1.188z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a href="#" title="Sources" class="source_link"><img alt="Sources" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M0%200v2h8v-1h-5v-1h-3zm0%203v4.5c0%20.28.22.5.5.5h7c.28%200%20.5-.22.5-.5v-4.5h-8z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a><a title="Configure" href="?page=settings#all_setting"><img alt="Configure" class="refresh_list" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M3.5%200l-.5%201.188-.281.125-1.188-.5-.719.719.5%201.188-.125.281-1.188.5v1l1.188.5.125.313-.5%201.156.719.719%201.188-.5.281.125.5%201.188h1l.5-1.188.281-.125%201.188.5.719-.719-.5-1.188.125-.281%201.188-.5v-1l-1.188-.5-.125-.281.469-1.188-.688-.719-1.188.5-.281-.125-.5-1.188h-1zm.5%202.5c.83%200%201.5.67%201.5%201.5s-.67%201.5-1.5%201.5-1.5-.67-1.5-1.5.67-1.5%201.5-1.5z%22%0A%20%20%2F%3E%0A%3C%2Fsvg%3E" width="20" height="20" /></a></div>
+        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
+        <div id="list_controls_menu" classs="list_controls_menu"><a class="refresh_link" title="Refresh" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a><a href="#" title="Sources" class="source_link"><i class="bi bi-folder-fill refresh_list"></i></a><a title="Configure" href="?page=settings#all_setting"><i class="bi bi-gear-wide refresh_list"></i></a></div>
     </div><div class="list_sources"><div class="src_title">Sources</div></div></div>'), $res->output_response);
     }
     /**
@@ -1453,7 +1622,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_message_list_end() {
         $test = new Output_Test('message_list_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('</tbody></table><div class="page_links"></div></div>'), $res->output_response);
+        $this->assertEquals(array('</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>'), $res->output_response);
     }
 }
 class Hm_Test_Core_Output_Modules_Debug extends TestCase {
@@ -1471,7 +1640,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list' => array('core'));
         $res = $test->run();
-        $this->assertEquals(array('<link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
+        $this->assertEquals(array('<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1481,10 +1650,10 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('page_js', 'core');
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('foo', 'core'));
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/tingle.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/tingle.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1493,10 +1662,10 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function test_main_menu_start_debug() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name main_menu" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><img alt="" class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><img alt="" class="menu_caret" src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%228%22%20height%3D%228%22%20viewBox%3D%220%200%208%208%22%3E%0A%20%20%3Cpath%20d%3D%22M1.5%201l-1.5%201.5%204%204%204-4-1.5-1.5-2.5%202.5-2.5-2.5z%22%20%2F%3E%0A%3C%2Fsvg%3E" width="8" height="8" /></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
     }
 }
 ?>

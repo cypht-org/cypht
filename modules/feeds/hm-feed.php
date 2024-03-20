@@ -16,6 +16,10 @@ class Hm_Feed_List {
 
     use Hm_Server_List;
 
+    public static function init($user_config, $session) {
+        self::initRepo('feeds', $user_config, $session, self::$server_list);
+    }
+
     /*
      * Connect to an RSS/ATOM feed
      * @param int $id server id

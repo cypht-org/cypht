@@ -105,7 +105,7 @@ class Hm_Output_dynamic_login extends Hm_Output_login {
                 $res .= '<input type="hidden" value="other" name="email_provider" />';
             }
             else {
-                $res .= '<select class="dynamic_service_select" required name="email_provider"><option value="">'.
+                $res .= '<select class="dynamic_service_select form-select m-3 w-auto" required name="email_provider"><option value="">'.
                     $this->trans('E-mail Provider').'</option>'.Nux_Quick_Services::option_list(false, $this).
                     '<option value="other">'.$this->trans('Other').'</option></select><br />';
             }
@@ -142,7 +142,7 @@ function dynamic_login_config($config) {
         'mail_pre' => '',
         'smtp_pre' => ''
     );
-    $res = get_ini($config, 'dynamic_login.ini');
+    $res = $config->dump();
     if (array_key_exists('dynamic_host', $res) && $res['dynamic_host']) {
         $settings['host'] = $res['dynamic_host'];
     }

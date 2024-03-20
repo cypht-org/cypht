@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/gmail_contacts/hm-gmail-contacts.php';
+require_once APP_PATH.'modules/imap/hm-imap.php';
 
 /**
  * @subpackage gmail_contacts/handler
@@ -82,7 +83,7 @@ function fetch_gmail_contacts($config, $contact_store, $session=false, $max_goog
             $results = imap_refresh_oauth2_token($server, $config);
             if (!empty($results)) {
                 if (Hm_IMAP_List::update_oauth2_token($id, $results[1], $results[0])) {
-                    Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %d', $id));
+                    Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $id));
                     $server = Hm_IMAP_List::dump($id, true);
                 }
             }

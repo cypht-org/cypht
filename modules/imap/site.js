@@ -10,8 +10,11 @@ var imap_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            if (res.deleted_server_id > -1 ) {
-                form.parent().remove();
+            if (res.deleted_server_id) {
+                const configured_server = form.closest('.configured_server');
+                const section = configured_server.parent().parent()[0].classList.contains('imap_section') ? 'imap': 'jmap';
+                decrease_servers(section);
+                configured_server.remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
             }
@@ -65,7 +68,7 @@ var imap_forget_action = function(event) {
             if (res.just_forgot_credentials) {
                 form.find('.credentials').prop('disabled', false);
                 form.find('.credentials').val('');
-                form.append('<input type="submit" value="Save" class="save_imap_connection" />');
+                form.append('<input type="submit" value="Save" class="save_imap_connection btn btn-success-warning btn-sm" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).hide();
                 Hm_Utils.set_unsaved_changes(1);
@@ -88,7 +91,7 @@ var imap_save_action = function(event) {
                 form.find('.save_imap_connection').hide();
                 form.find('.imap_password').val('');
                 form.find('.imap_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_imap_connection" />');
+                form.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -165,7 +168,7 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     var msg_cache_key = 'imap_'+detail.server_id+'_'+hm_msg_uid()+'_'+detail.folder;
                     remove_from_cached_imap_pages(msg_cache_key);
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -203,7 +206,7 @@ var imap_unread_message = function(supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -301,7 +304,7 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
             }
 
             Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
-            
+
             $('.page_links').html(res.page_links);
             cache_imap_page();
         },
@@ -319,13 +322,9 @@ var add_auto_folder = function(folder) {
     $('.src_count').html(count);
 };
 
-var imap_sent_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_sent', cache_sent_data);
-};
-
-var cache_sent_data = function() {
-    if (hm_list_path() == 'sent') {
-        Hm_Message_List.set_message_list_state('formatted_sent_data');
+var cache_folder_data = function() {
+    if (['sent', 'drafts', 'junk', 'trash'].includes(hm_list_path())) {
+        Hm_Message_List.set_message_list_state('formatted_'+hm_list_path()+'_data');
     }
 };
 
@@ -381,6 +380,10 @@ var imap_combined_flagged_content = function(id, folder) {
 
 var imap_combined_inbox_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
+};
+
+var imap_folder_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_folder_data', cache_folder_data);
 };
 
 var cache_imap_page = function() {
@@ -535,7 +538,7 @@ var expand_imap_folders = function(path) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -549,17 +552,14 @@ var expand_imap_folders = function(path) {
         }
     }
     else {
-        $('.expand_link', list).html('+');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill">');
         $('ul', list).remove();
         Hm_Folders.save_folder_list();
     }
     return false;
 };
 
-var get_message_content = function(msg_part, uid, list_path, detail, callback, noupdate, images) {
-    if (!images) {
-        images = 0;
-    }
+var get_message_content = function(msg_part, uid, list_path, detail, callback, noupdate) {
     if (!uid) {
         uid = $('.msg_uid').val();
     }
@@ -574,7 +574,6 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
             {'name': 'imap_msg_uid', 'value': uid},
             {'name': 'imap_msg_part', 'value': msg_part},
-            {'name': 'imap_allow_images', 'value': images},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
@@ -596,6 +595,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                 if (!res.show_pagination_links) {
                     $('.prev, .next').hide();
                 }
+                globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
             },
             [],
             false,
@@ -690,6 +690,15 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         else if (hm_list_parent() === 'sent') {
             Hm_Message_List.prev_next_links('formatted_sent_data', class_name);
         }
+        else if (hm_list_parent() === 'junk') {
+            Hm_Message_List.prev_next_links('formatted_junk_data', class_name);
+        }
+        else if (hm_list_parent() === 'trash') {
+            Hm_Message_List.prev_next_links('formatted_trash_data', class_name);
+        }
+        else if (hm_list_parent() === 'drafts') {
+            Hm_Message_List.prev_next_links('formatted_drafts_data', class_name);
+        }
         else {
             var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
             Hm_Message_List.prev_next_links(key, class_name);
@@ -702,11 +711,6 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     }
     $('.all_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
     $('.small_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
-    $('.msg_part_link').on("click", function() {
-        $('.header_subject')[0].scrollIntoView();
-        $('.msg_text_inner').css('visibility', 'hidden');
-        return get_message_content($(this).data('messagePart'), false, false, false, false, false, $(this).data('allowImages'));
-    });
     $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#unflag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
     $('#delete_message').on("click", function() { return imap_delete_message(); });
@@ -731,6 +735,11 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         $('#block_sender_form')[0].reset();
 
         return block_unblock_sender(msg_uid, detail, scope, action, sender, reject_message);
+    });
+    $('#show_message_source').on("click", function(e) {
+        e.preventDefault();
+        const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+        window.open(`?page=message_source&imap_msg_uid=${hm_msg_uid()}&imap_server_id=${detail.server_id}&imap_folder=${detail.folder}`);
     });
     $(document).on('click', '#unblock_sender', function(e) {
         e.preventDefault();
@@ -784,7 +793,7 @@ var imap_prefetch_message_content = function(uid, server_id, folder) {
 var imap_prefetch_msgs = function() {
     var detail;
     var key;
-    
+
     $(Hm_Utils.get_from_local_storage('formatted_unread_data')).each(function() {
         if ($(this).attr('class').match(/^imap/)) {
             detail = Hm_Utils.parse_folder_path($(this).attr('class'), 'imap');
@@ -878,7 +887,7 @@ var unselect_non_imap_messages = function() {
 
 var imap_move_copy = function(e, action, context) {
     var move_to;
-    if (!e.target || e.target.className == 'imap_move') {
+    if (!e.target || e.target.classList.contains('imap_move')) {
         move_to = $('.msg_controls .move_to_location');
     }
     else {
@@ -893,12 +902,12 @@ var imap_move_copy = function(e, action, context) {
     folders.show();
     $('.imap_folder_link', folders).addClass('imap_move_folder_link').removeClass('imap_folder_link');
     if (action == 'move') {
-        label = $('.move_to_string1').val(); 
+        label = $('.move_to_string1').val();
     }
     else {
         label = $('.move_to_string2').val();
     }
-    folders.prepend('<div class="move_to_title">'+label+'<span><a class="close_move_to" href="#">X</a></span></div>');
+    folders.prepend('<div class="move_to_title">'+label+'<a class="close_move_to close" href="#" aria-label="Close"><span aria-hidden="true">&times;</span></a></div>');
     move_to.html(folders.html());
     $('.imap_move_folder_link', move_to).on("click", function() { return expand_imap_move_to_folders($(this).data('target'), context); });
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').off('click');
@@ -965,7 +974,7 @@ var imap_perform_move_copy = function(dest_id, context) {
                 else {
                     if (action == 'move') {
                         var nlink = $('.nlink');
-                        if (nlink.length) {
+                        if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                             window.location.href = nlink.attr('href');
                         }
                         else {
@@ -1003,7 +1012,7 @@ var expand_imap_move_to_folders = function(path, context) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.move_to_location'));
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('-');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill"></i>');
         if (detail) {
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
@@ -1063,11 +1072,6 @@ var imap_folder_status = function() {
 };
 
 var imap_setup_snooze = function() {
-    $(document).on('click', '#snooze_message', function(e) {
-        e.preventDefault();
-        $('.snooze_dropdown').toggle();
-        $('.snooze_input').hide();
-    });
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
     });
@@ -1122,7 +1126,7 @@ var imap_setup_snooze = function() {
     });
 }
 
-var imap_unsnooze_messages = function() { 
+var imap_unsnooze_messages = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unsnooze'}],
         function() {},
@@ -1177,13 +1181,15 @@ $(function() {
     else if (hm_page_name() === 'info') {
         setTimeout(imap_status_update, 100);
     }
-    
+
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
         imap_setup_snooze();
     }
 
-    imap_unsnooze_messages();
-    setInterval(imap_unsnooze_messages, 60000);
+    if (hm_is_logged()) {
+        imap_unsnooze_messages();
+        setInterval(imap_unsnooze_messages, 60000);
+    }
 
     if ($('.imap_move').length > 0) {
         check_select_for_imap();
@@ -1205,11 +1211,6 @@ $(function() {
     var prefetch_interval = Hm_Utils.get_from_global('imap_prefetch_msg_interval', 43);
     Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
-
-    $(document).on('click', '.dropdown-toggle', function(e) {
-        e.preventDefault();
-        $(this).next().toggle();
-    });
 });
 
 
@@ -1234,7 +1235,7 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                         return;
                     }
                     var nlink = $('.nlink');
-                    if (nlink.length) {
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         window.location.href = nlink.attr('href');
                     }
                     else {
@@ -1251,3 +1252,151 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     }
     return false;
 };
+
+var imap_show_add_contact_popup = function() {
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
+};
+
+var imap_hide_add_contact_popup = function(event) {
+    event.stopPropagation()
+    var popup = document.getElementById("contact_popup");
+    popup.classList.toggle("show");
+};
+
+/**
+ * Allow external resources for the provided element.
+ *
+ * @param {HTMLElement} element - The element containing the allow button.
+ * @param {string} messagePart - The message part associated with the resource.
+ * @returns {void}
+ */
+function handleAllowResource(element, messagePart) {
+    element.querySelector('a').addEventListener('click', function (e) {
+        e.preventDefault();
+        $('.msg_text_inner').remove();
+        const externalSources = $(this).data('src').split(',');
+        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+        return get_message_content(messagePart, false, false, false, false, false);
+    });
+}
+
+/**
+ * Create and insert in the DOM an element containing a message and a button to allow the resource.
+ * 
+ * @param {HTMLElement} element - The element having the blocked resource.
+ * @returns {void}
+ */
+function handleInvisibleResource(element) {
+    const dataSrc = element.dataset.src;
+
+    const allowResource = document.createElement('div');
+    // allowResource.classList.add('allow_image_link');
+    allowResource.classList.add('alert', 'alert-warning', 'p-1');
+
+    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
+    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source} 
+    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
+    Allow</a></div>
+    `;
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
+    handleAllowResource(allowResource, element.dataset.messagePart);
+}
+
+const mutation = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach(function (node) {
+                if (node.classList.contains('msg_text_inner')) {
+                    
+                    //  Extarnal resources notice boxes container
+                    document.querySelector('.msg_text_inner').insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
+
+                    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+                    const elements = node.querySelectorAll('[data-src]');
+                    const blockedResources = [];
+                    elements.forEach(function (element) {
+
+                        const dataSrc = element.dataset.src;
+                        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
+                        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
+
+                        switch (Number(allowed) || Number(senderAllowed)) {
+                            case 1:
+                                element.src = dataSrc;
+                                break;
+                            default:
+                                if ((allowed || senderAllowed) === null) {
+                                    Hm_Utils.save_to_local_storage(dataSrc, 0);
+                                }
+                                handleInvisibleResource(element);
+                                blockedResources.push(dataSrc);
+                                break;
+                        }
+                    });
+
+                    const noticesElement = document.createElement('div');
+                    noticesElement.classList.add('notices');
+
+                    if(blockedResources.length) {
+                        const allowAll = document.createElement('div');
+                        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
+                        allowAll.textContent = 'For security reasons, external resources have been blocked.';
+                        if (blockedResources.length > 1) {
+                            const allowAllLink = document.createElement('a');
+                            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
+                            allowAllLink.href = '#';
+                            allowAllLink.dataset.src = blockedResources.join(',');
+                            allowAllLink.textContent = 'Allow all';
+                            allowAll.appendChild(allowAllLink);
+                            handleAllowResource(allowAll, elements[0].dataset.messagePart);
+                        }
+                        noticesElement.appendChild(allowAll);
+
+                        const button = document.createElement('a');
+                        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
+                        button.textContent = 'Always allow from this sender';
+                        noticesElement.appendChild(button);
+
+                        button.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            Hm_Utils.save_to_local_storage(sender, 1);
+                            $('.msg_text_inner').remove();
+                            get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+                        });
+                    }
+
+                    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
+                }
+            });
+        }
+    });
+});
+
+const message = document.querySelector('.msg_text');
+if (message) {
+    mutation.observe(document.querySelector('.msg_text'), {
+        childList: true
+    });
+}
+
+const handleDownloadMsgSource = function() {
+    const messageSource = document.querySelector('pre.msg_source');
+    const blob = new Blob([messageSource.textContent], { type: "message/rfc822" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const subject = messageSource.textContent.match(/Subject: (.*)/)?.[1] || hm_msg_uid(); // Let's use the message UID if the subject is empty
+    a.download = subject + '.eml';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+};
+
+const handleCopyMsgSource = function(e) {
+    e.preventDefault();
+    const messageSource = document.querySelector('pre.msg_source');
+    navigator.clipboard.writeText(messageSource.textContent);
+    Hm_Notices.show(['Copied to clipboard']);
+}

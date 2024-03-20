@@ -23,13 +23,13 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
             }
-            elseif (preg_match("/^feeds_\d+$/", $path)) {
+            elseif (preg_match("/^feeds_.+$/", $path)) {
                 $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
-                $details = Hm_Feed_List::dump(intval($parts[1]));
+                $details = Hm_Feed_List::dump($parts[1]);
                 if (!empty($details)) {
                     $this->out('mailbox_list_title', array('Feeds', $details['name']));
                 }
@@ -356,40 +356,44 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             $found = false;
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
             if ($success) {
-                $connection_test = address_from_url($form['new_feed_address']);
-                if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
-                    $feed = is_news_feed($form['new_feed_address']);
-                    if (!$feed) {
-                        $feed = new Hm_Feed();
-                        $homepage = $feed->get_feed_data($form['new_feed_address']);
-                        if (trim($homepage)) {
-                            list($type, $href) = search_for_feeds($homepage);
-                            if ($type && $href) {
-                                Hm_Msgs::add('Discovered a feed at that address');
-                                $found = true;
+                if (feed_exists($form['new_feed_address'])) {
+                    Hm_Msgs::add(sprintf('ERRFeed url %s already exists', $form['new_feed_address']));
+                } else {
+                    $connection_test = address_from_url($form['new_feed_address']);
+                    if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
+                        $feed = is_news_feed($form['new_feed_address']);
+                        if (!$feed) {
+                            $feed = new Hm_Feed();
+                            $homepage = $feed->get_feed_data($form['new_feed_address']);
+                            if (trim($homepage)) {
+                                list($type, $href) = search_for_feeds($homepage);
+                                if ($type && $href) {
+                                    Hm_Msgs::add('Discovered a feed at that address');
+                                    $found = true;
+                                }
+                                else {
+                                    Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
+                                }
                             }
                             else {
-                                Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
+                                Hm_Msgs::add('ERRCould not find a feed at that address');
                             }
                         }
                         else {
-                            Hm_Msgs::add('ERRCound not find a feed at that address');
+                            Hm_Msgs::add('Successfully connected to feed');
+                            $found = true;
+                            if (stristr('<feed', $feed->xml_data)) {
+                                $type = 'application/atom+xml';
+                            }
+                            else {
+                                $type = 'application/rss+xml';
+                            }
+                            $href = $form['new_feed_address'];
                         }
                     }
                     else {
-                        Hm_Msgs::add('Successfully connected to feed');
-                        $found = true;
-                        if (stristr('<feed', $feed->xml_data)) {
-                            $type = 'application/atom+xml';
-                        }
-                        else {
-                            $type = 'application/rss+xml';
-                        }
-                        $href = $form['new_feed_address'];
+                        Hm_Msgs::add(sprintf('ERRCould not add feed: %s', $errstr));
                     }
-                }
-                else {
-                    Hm_Msgs::add(sprintf('ERRCound not add feed: %s', $errstr));
                 }
             }
             else {
@@ -414,12 +418,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
  */
 class Hm_Handler_load_feeds_from_config extends Hm_Handler_Module {
     public function process() {
-        $feeds = $this->user_config->get('feeds', array());
-        $index = 0;
-        foreach ($feeds as $index => $feed) {
-            Hm_Feed_List::add($feed, $index);
-            $index++;
-        }
+        Hm_Feed_List::init($this->user_config, $this->session);
         Hm_Feed_Uid_Cache::load($this->cache->get('feed_read_uids', array(), true));
     }
 }
@@ -449,7 +448,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
-            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
         
     }
@@ -481,7 +480,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 $callback = 'feeds_combined_content';
                 break;
             default:
-                if (preg_match("/^feeds_(\d+)$/", $path, $matches)) {
+                if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
                     $server_id = $matches[1];
                     $callback = 'load_feed_list';
                 }
@@ -492,7 +491,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
                 if ($server_id !== false && $index != $server_id) {
                     continue;
                 }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $index));
+                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
             }
         }
     }
@@ -503,8 +502,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
  */
 class Hm_Handler_save_feeds extends Hm_Handler_Module {
     public function process() {
-        $feeds = Hm_Feed_List::dump();
-        $this->user_config->set('feeds', $feeds);
+        Hm_Feed_List::save();
         $this->cache->set('feed_read_uids', Hm_Feed_Uid_Cache::dump(), 0, true);
     }
 }
@@ -533,20 +531,41 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
         if ($this->format == 'HTML5') {
             $count = count($this->get('feeds', array()));
             $count = sprintf($this->trans('%d configured'), $count);
-            return '<div class="feed_server_setup"><div data-target=".feeds_section" class="server_section">'.
-                '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.
-                ' '.$this->trans('Feeds').' <div class="server_count">'.$count.'</div></div><div class="feeds_section"><form class="add_server" method="POST">'.
-                '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                '<div class="subtitle">'.$this->trans('Add an RSS/ATOM Feed').'</div><table>'.
-                '<tr><td><label class="screen_reader" for="new_feed_name">'.$this->trans('Feed name').'</label>'.
-                '<input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld" value="" placeholder="'.$this->trans('Feed name').'" /></td></tr>'.
-                '<tr><td><label for="new_feed_address" class="screen_reader">'.$this->trans('Site address or feed URL').'</label>'.
-                '<input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld" placeholder="'.$this->trans('Site address or feed URL').'" value="" /></td></tr>'.
-                '<tr><td><input type="submit" value="'.$this->trans('Add').'" name="submit_feed" /></td></tr>'.
-                '</table></form>';
+
+            return '<div class="feed_server_setup">
+                        <div data-target=".feeds_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                            <a href="#" class="pe-auto">
+                                <i class="bi bi-rss-fill me-3"></i>
+                                <b> '.$this->trans('Feeds').'</b>
+                            </a> 
+                            <div class="server_count">'.$count.'</div>
+                        </div>
+
+                        <div class="feeds_section px-4 pt-3 me-0">
+                            <div class="row">
+                                <div class="col-12 col-lg-4 mb-4">
+                                    <form class="add_server me-0" method="POST">
+                                        <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+
+                                        <div class="subtitle mt-4">'.$this->trans('Add an RSS/ATOM Feed').'</div>
+
+                                        <div class="form-floating mb-3">
+                                            <input required type="text" id="new_feed_name" name="new_feed_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Feed name').'">
+                                            <label class="" for="new_feed_name">'.$this->trans('Feed name').'</label>
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            <input required type="url" id="new_feed_address" name="new_feed_address" class="txt_fld form-control" placeholder="'.$this->trans('Site address or feed URL').'" value="">
+                                            <label for="new_feed_address" class="">'.$this->trans('Site address or feed URL').'</label>
+                                        </div>
+
+                                        <input type="submit" class="btn btn-success px-5" value="'.$this->trans('Add').'" name="submit_feed" />
+                                    </form>
+                                </div>';
         }
     }
 }
+
 
 /**
  * @subpackage feeds/output
@@ -556,15 +575,15 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
         $res = '';
         if ($this->format == 'HTML5') {
             foreach ($this->get('feeds', array()) as $index => $vals) {
-                $res .= '<div class="configured_server">';
-                $res .= sprintf('<div class="server_title">%s</div><div title="%s" class="server_subtitle">%s</div>',
+                $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
+                $res .= sprintf('<div class="server_title"><b>%s</b></div><div title="%s" class="server_subtitle">%s</div>',
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
-                $res .= '<form class="feed_connect" method="POST">';
+                $res .= '<form class="feed_connect d-flex gap-2" method="POST">';
                 $res .= '<input type="hidden" name="feed_id" value="'.$this->html_safe($index).'" />';
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect btn btn-outline-secondary btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete btn btn-outline-danger btn-sm" />';
                 $res .= '<input type="hidden" value="ajax_feed_debug" name="hm_ajax_hook" />';
-                $res .= '</form></div>';
+                $res .= '</form></div></div>';
             }
             $res .= '<br class="clear_float" /></div></div>';
         }
@@ -773,21 +792,21 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         if (is_array($folders) && !empty($folders)) {
             $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$rss_alt).'" alt="" width="16" height="16" /> ';
+                $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('All').'</a> <span class="unread_feed_count"></span></li>';
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<img class="account_icon" alt="'.$this->trans('Load Feed').'" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" /> ';
+                    $res .= '<i class="bi bi-rss fs-5 me-2"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
         }
         $res .= '<li class="feeds_add_new"><a href="?page=servers#feeds_section">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<img class="account_icon" src="'.$this->html_safe(Hm_Image_Sources::$plus).'" alt="" width="16" height="16" /> ';
+            $res .= '<i class="bi bi-plus-square fs-5 me-2"></i>';
         }
         $res .= $this->trans('Add a feed').'</a></li>';
         if ($res) {
@@ -819,14 +838,14 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('unread_exclude_feeds', $settings) && $settings['unread_exclude_feeds']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_checkbox"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
             $reset = '';
         }
-        return '<tr class="unread_setting"><td><label for="unread_exclude_feeds">'.$this->trans('Exclude unread feed items').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_feeds" name="unread_exclude_feeds" />'.$reset.'</td></tr>';
+        return '<tr class="unread_setting"><td><label class="form-check-label" for="unread_exclude_feeds">'.$this->trans('Exclude unread feed items').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="unread_exclude_feeds" name="unread_exclude_feeds" />'.$reset.'</td></tr>';
     }
 }
 
@@ -850,8 +869,8 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
  */
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output() {
-        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle">'.
-            '<img alt="" src="'.Hm_Image_Sources::$rss.'" width="16" height="16" />'.$this->trans('Feed Settings').'</td></tr>';
+        return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle cursor-pointer border-bottom p-2 text-secondary">'.
+            '<i class="bi bi-rss-fill fs-5 me-2"></i>'.$this->trans('Feed Settings').'</td></tr>';
     }
 }
 
@@ -882,10 +901,10 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $limit = $settings['feed_limit'];
         }
         if ($limit != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_input" src="'.Hm_Image_Sources::$refresh.'" /></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
-            '<td><input type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
+            '<td><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -895,7 +914,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
 if (!hm_exists('feed_source_callback')) {
 function feed_source_callback($vals, $style, $output_mod) {
     if ($vals[2]) {
-        $img = '<img alt="'.$output_mod->trans('feed item').'" src="'.Hm_Image_Sources::${$vals[2]}.'" />';
+        $img = '<i class="bi bi-rss-fill"></i>';
     }
     else {
         $img = '';
@@ -1020,4 +1039,18 @@ if (!hm_exists('feed_memcached_fetch')) {
 function feed_memcached_fetch($hmod, $feed_data) {
     $key = sprintf('%s%s%s', $feed_data['server'], $feed_data['tls'], $feed_data['port']);
     return $hmod->cache->get($key);
+}}
+
+/**
+ * @subpackage feeds/functions
+ */
+if (!hm_exists('feed_exists')) {
+function feed_exists($server) {
+    $list = Hm_Feed_List::dump();
+    foreach ($list as $feed) {
+        if ($feed['server'] == $server) {
+            return true;
+        }
+    }
+    return false;
 }}

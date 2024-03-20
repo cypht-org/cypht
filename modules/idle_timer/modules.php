@@ -101,13 +101,13 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
             $idle_time = 1;
         }
         $res = '<tr class="general_setting"><td><label for="idle_time">'.$this->trans('Allowed idle time until logout').'</label></td>'.
-            '<td><select id="idle_time" name="idle_time">';
+            '<td><select class="form-select form-select-sm w-auto" id="idle_time" name="idle_time">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($idle_time == $val) {
                 $res .= 'selected="selected" ';
                 if ($idle_time != '0') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><img alt="Refresh" class="refresh_list reset_default_value_select"  src="'.Hm_Image_Sources::$refresh.'" /></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';

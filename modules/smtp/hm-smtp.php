@@ -14,8 +14,13 @@ class Hm_SMTP_List {
     
     use Hm_Server_List;
 
+    public static function init($user_config, $session) {
+        self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+    }
+
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
         $config = array(
+            'id'        => $id,
             'server'    => $server['server'],
             'port'      => $server['port'],
             'tls'       => $server['tls'],
@@ -29,6 +34,7 @@ class Hm_SMTP_List {
             $config['no_auth'] = true;
         }
         self::$server_list[$id]['object'] = new Hm_SMTP($config);
+
         if (!self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }
@@ -522,17 +528,24 @@ class Hm_SMTP {
     }
 
     /* Send a message */
-    function send_message($from, $recipients, $message) {
+    function send_message($from, $recipients, $message, $from_params = '', $recipients_params = '') {
         $this->clean($from);
-        $command = 'MAIL FROM:<'.$from.'>';
+        if ($from_params) {
+            $from_params = ' ' . $from_params;
+        }
+        $from_params = $from_params ? ' ' . $from_params : '';
+        $command = 'MAIL FROM:<'.$from.'>' . $from_params;
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
         $result = 'An error occurred sending the message';
         if(is_array($recipients)) {
+            if ($recipients_params) {
+                $recipients_params = ' ' . $recipients_params;
+            }
             foreach($recipients as $rcpt) {
                 $this->clean($rcpt);
-                $command = 'RCPT TO:<'.$rcpt.'>';
+                $command = 'RCPT TO:<'.$rcpt.'>'.$recipients_params;
                 $this->send_command($command);
                 $res = $this->get_response();
                 if ($this->compare_response($res, '250') != 0) {

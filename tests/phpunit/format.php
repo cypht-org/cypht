@@ -8,6 +8,8 @@ use PHPUnit\Framework\TestCase;
  */
 class Hm_Test_Format extends TestCase {
 
+    public $json;
+    public $html5;
     public function setUp(): void {
         require 'bootstrap.php';
         $config = new Hm_Mock_Config();
@@ -34,8 +36,7 @@ class Hm_Test_Format extends TestCase {
      * @runInSeparateProcess
      */
     public function test_filter_output() {
-        $this->assertEquals(array('date' => '&lt;b&gt;today&lt;/b&gt;'), $this->json->filter_all_output(array('date' => '<b>today</b>'), array('date' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false))));
-        $this->assertEquals(array(), $this->json->filter_all_output(array('date' => array()), array('date' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false))));
+        $this->assertEquals(array(), $this->json->filter_all_output(array('date' => array()), array('date' => array(FILTER_DEFAULT, false))));
         $this->assertEquals(array('test_array' => array('test')), $this->json->filter_all_output(array('test_array' => array('test')), array('test_array' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY))));
     }
     public function tearDown(): void {

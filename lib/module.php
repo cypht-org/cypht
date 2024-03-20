@@ -320,6 +320,7 @@ abstract class Hm_Handler_Module {
     public $user_config;
 
     public $cache;
+
     /**
      * Assign input and state sources
      * @param object $parent instance of the Hm_Request_Handler class
@@ -499,6 +500,29 @@ abstract class Hm_Output_Module {
             Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
         }
         return str_replace('\n', '<br />', strip_tags($string));
+    }
+
+    /**
+     * Return all translations for earch supported language
+     * @return array translations
+     */
+    public function all_trans() {
+        // Get all files in the language directory
+        $language_files = glob(APP_PATH.'language/'. '*.php');
+        $translations = [];
+
+        foreach ($language_files as $file) {
+            // Extract the language code from the file name
+            $language_code = pathinfo($file, PATHINFO_FILENAME);
+
+            // Read the content of the file
+            $content = include $file;
+
+            // Store the content in the translations array
+            $translations[$language_code] = $content;
+        }
+
+        return $translations;
     }
 
 
