@@ -409,13 +409,13 @@ var Hm_Notices = {
             clearTimeout(Hm_Notices.hide_id);
         }
         if (now) {
-            $('.sys_messages').hide();
-            $('.sys_messages').html('');
+            $('.sys_messages').addClass('d-none');
+            Hm_Utils.clear_sys_messages();
         }
         else {
             Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').hide();
-                $('.sys_messages').html('');
+                $('.sys_messages').addClass('d-none');
+                Hm_Utils.clear_sys_messages();
             }, 5000);
         }
     }
@@ -1604,14 +1604,18 @@ var Hm_Utils = {
      *
      * @param {*} msg : The alert message to display
      * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
-     * @param {*} pending : Defined if the added message must be displayed directly, or be pending until the show_sys_messages method is called
      */
-    add_sys_message: function(msg, type = 'info', pending = false) {
-        if (pending) $('.sys_messages').addClass('d-none');
-        else  Hm_Utils.show_sys_messages();
-        if (!msg || msg  == '') return $('.sys_messages').html('');
+    add_sys_message: function(msg, type = 'info') {
+        if (!msg) {
+            return;
+        }
         const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        return $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
+        this.show_sys_messages();
+    },
+
+    clear_sys_messages: function () {
+        $('.sys_messages').html('');
     },
 
     cancel_logout_event: function() {
@@ -1867,9 +1871,6 @@ $(function() {
 
     /* check for folder reload */
     var reloaded = Hm_Folders.reload_folders();
-
-    /* show any pending notices */
-    Hm_Utils.show_sys_messages();
 
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();

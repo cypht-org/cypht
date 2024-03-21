@@ -24,9 +24,7 @@ var smtp_test_action = function(event) {
     Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
-        function(res) {
-            Hm_Notices.show(res.router_user_msgs);
-        },
+        false,
         {'smtp_connect': 1}
     );
 };
@@ -423,6 +421,9 @@ var force_send_message = function() {
 }
 
 $(function () {
+    if (!hm_is_logged()) {
+        return;
+    }
     if (hm_page_name() === 'settings') {
         $('#clear_chunks_button').on('click', function(e) {
             e.preventDefault();

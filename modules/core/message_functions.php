@@ -30,10 +30,11 @@ function format_msg_html($str, $images=false) {
     $config->set('URI.AllowedSchemes', array('mailto' => true, 'data' => true, 'http' => true, 'https' => true));
     $config->set('Filter.ExtractStyleBlocks.TidyImpl', true);
 
-    $def = $config->getHTMLDefinition(true);
-    $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
-    foreach ($html_tags as $tag) {
-        $def->addAttribute($tag, 'data-src', 'Text');
+    if ($def = $config->maybeGetRawHTMLDefinition()) {
+        $html_tags = ['img', 'script', 'iframe', 'audio', 'embed', 'source', 'track', 'video'];
+        foreach ($html_tags as $tag) {
+            $def->addAttribute($tag, 'data-src', 'Text');
+        }
     }
     
     try {
