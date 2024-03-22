@@ -222,7 +222,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
                     '<td><form method="POST">'.
                     '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                     '<input type="hidden" name="rule_del_id" value="'.$this->html_safe($index).'" />'.
-                    '<button type="submit" class="rule_del"><i class="bi bi-x-circle-fiill"></i></button></form>'.
+                    '<button type="submit" class="rule_del btn btn-light"><i class="bi bi-x-circle-fill"></i></button></form>'.
                     '</tr>';
             }
         }

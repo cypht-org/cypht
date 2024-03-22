@@ -1316,7 +1316,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li>';
+        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';

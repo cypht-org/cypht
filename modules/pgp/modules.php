@@ -159,8 +159,8 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
             $res .= '</td><td><form method="post" action="?page=pgp#public_keys">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" value="'.$this->html_safe($index).'" name="delete_public_key_id" />'.
-                '<button type="submit" class="delete_pgp_key" title="'.$this->trans('Delete').'">';
-            $res .= '"<i class="bi bi-x-circle-fiill"></i></button></form></td></tr>';
+                '<button type="submit" class="delete_pgp_key btn btn-light" title="'.$this->trans('Delete').'">';
+            $res .= '"<i class="bi bi-x-circle-fill"></i></button></form></td></tr>';
         }
         $res .= '</tbody></table>';
         $res .= '</div>';

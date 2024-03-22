@@ -653,7 +653,7 @@ class Hm_Output_unread_github_included_setting extends Hm_Output_Module {
             $checked = '';
         }
         return '<tr class="unread_setting"><td><label for="unread_exclude_github">'.$this->trans('Exclude unread Github notices').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_github" name="unread_exclude_github" /></td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="unread_exclude_github" name="unread_exclude_github" /></td></tr>';
     }
 }
 

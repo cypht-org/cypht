@@ -580,7 +580,7 @@ class Hm_Output_display_configured_feeds extends Hm_Output_Module {
                     $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['server']));
                 $res .= '<form class="feed_connect d-flex gap-2" method="POST">';
                 $res .= '<input type="hidden" name="feed_id" value="'.$this->html_safe($index).'" />';
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect btn btn-outline-secondary btn-sm" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_feed_connect btn btn-primary btn-sm" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="feed_delete btn btn-outline-danger btn-sm" />';
                 $res .= '<input type="hidden" value="ajax_feed_debug" name="hm_ajax_hook" />';
                 $res .= '</form></div></div>';

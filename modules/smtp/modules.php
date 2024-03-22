@@ -1105,7 +1105,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
                 
                 '<div class="to_outer">'.
-                    '<div class="mb-3 position-relative compose_container p-1 w-100">'.
+                    '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
                         '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
@@ -1114,12 +1114,12 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '</div>'.
 
                 '<div class="recipient_fields">'.
-                    '<div class="mb-3 compose_container">'.
+                    '<div class="mb-3 compose_container form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($cc).'" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc" />'.
                     '</div>'.
                     '<div id="cc_contacts"></div>'.
-                    '<div class="mb-3 compose_container">'.
+                    '<div class="mb-3 compose_container form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($bcc).'" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" id="compose_bcc" />'.
                     '</div>'.
@@ -1417,7 +1417,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                     $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm me-2" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-secondary btn-sm me-2" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-primary btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-secondary btn-sm me-2" />';
                 }

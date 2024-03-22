@@ -13,3 +13,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 @import url('../../../../../vendor/thomaspark/bootswatch/dist/zephyr/bootstrap.min.css');
+
+.text-secondary {
+    color: #79797e !important;
+}
