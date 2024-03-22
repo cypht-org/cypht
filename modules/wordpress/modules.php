@@ -384,7 +384,7 @@ class Hm_Output_unread_wp_included_setting extends Hm_Output_Module {
             $checked = '';
         }
         return '<tr class="unread_setting"><td><label for="unread_exclude_wordpress">'.$this->trans('Exclude unread WordPress notices').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' value="1" id="unread_exclude_wordpress" name="unread_exclude_wordpress" /></td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="unread_exclude_wordpress" name="unread_exclude_wordpress" /></td></tr>';
     }
 }
 

@@ -178,7 +178,7 @@ class Hm_Output_delete_search_icon extends Hm_Output_Module {
         if (!$this->get('search_name')) {
             $style = 'style="display: none;"';
         }
-        return '<a href="" '.$style.' class="delete_search" title="'.$this->trans('Delete saved search').'"><i class="bi bi-x-circle-fill"></i></a>';
+        return '<a href="" '.$style.' class="delete_search btn btn-light" title="'.$this->trans('Delete saved search').'"><i class="bi bi-x-circle-fill"></i></a>';
     }
 }
 

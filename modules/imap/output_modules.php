@@ -500,9 +500,9 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2" />';
             } else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-secondary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-primary btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />';
             }
@@ -683,7 +683,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-outline-danger btn-sm imap_delete me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Save').'" class="btn btn-outline-success btn-sm save_imap_connection me-2" />';
             } else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="btn btn-outline-secondary btn-sm test_imap_connect me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="btn btn-primary btn-sm test_imap_connect me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-danger btn-sm imap_delete me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="btn btn-outline-warning btn-sm forget_imap_connection me-2" />';
             }

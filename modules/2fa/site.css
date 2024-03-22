@@ -5,8 +5,8 @@
     --tfa-form-invalid-border-color: #dc3545;
     --tfa-border-radius: 0.375rem;
     --tfa-border-color: #dee2e6;
-    --tfa-base-color: #666;
-    --tfa-secondary-color: rgba(33, 37, 41, 0.75);
+    --tfa-base-color: var(--bs-body-color);
+    --tfa-secondary-color: var(--bs-secondary);
 }
 
 .tfa_error,

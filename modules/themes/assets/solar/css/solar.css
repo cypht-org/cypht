@@ -2,7 +2,7 @@
 /*Bootswatch theme adapted by the Cypht Community for Cypht */
 /* Original Bootswatch information:
  * Bootswatch v5.3.1 (https://bootswatch.com)
- * Theme: cosmo
+ * Theme: solar
  * Copyright 2012-2023 Thomas Park
  * Licensed under MIT
  * Based on Bootstrap
@@ -13,3 +13,11 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 @import url('../../../../../vendor/thomaspark/bootswatch/dist/solar/bootstrap.min.css');
+
+:root {
+    --bs-secondary-bg: #003542;;
+    --bs-input-placeholder-color: #657b83;
+}
+.form-floating>.form-control:disabled~label, .form-floating>:disabled~label {
+    color: #576a71;
+}
