@@ -1470,6 +1470,13 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         }
 
-        return Hm_IMAP_List::service_connect($imap_server_id, $server, $user, $pass, false);
+        $imap = Hm_IMAP_List::connect($imap_server_id, false);
+        if ($imap && $imap->get_state() == 'authenticated') {
+            return $imap_server_id;
+        }else {
+            Hm_IMAP_List::del($imap_server_id);
+            Hm_Msgs::add('ERRAuthentication failed');
+            return null;
+        }
     }
 }
