@@ -790,11 +790,14 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
         $res = '';
         $folders = $this->get('feed_folders', array());
         if (is_array($folders) && !empty($folders)) {
-            $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
-            if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
+            if(count($this->get('feeds', array()))  > 1) {
+                $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
+                }
+                $res .= $this->trans('All');
+                $res .= '</a> <span class="unread_feed_count"></span></li>';
             }
-            $res .= $this->trans('All').'</a> <span class="unread_feed_count"></span></li>';
             foreach ($this->get('feed_folders') as $id => $folder) {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">';
