@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/profiles/hm-profiles.php';
+require APP_PATH.'modules/profiles/functions.php';
 
 /**
  * @subpackage profile/handler
@@ -262,9 +263,9 @@ class Hm_Output_profile_content extends Hm_Output_Module {
 
             foreach ($profiles as $id => $profile) {
                 $smtp = '';
-                    if ($profile['smtp_id'] !== false && array_key_exists($profile['smtp_id'], $smtp_servers)) {
+                   if (isset($profile['smtp_id']) && is_scalar($profile['smtp_id']) && array_key_exists($profile['smtp_id'], $smtp_servers)) {
                         $smtp = $smtp_servers[$profile['smtp_id']]['name'];
-                    }
+                   }
                 $res .= '<tr>'.
                     '<td>'.$this->html_safe($profile['name']).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['server']).'</td>'.

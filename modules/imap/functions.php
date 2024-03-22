@@ -1425,3 +1425,51 @@ function parse_sieve_config_host($host) {
     // $host = '$scheme://'.$host;
     return [$host, $port, $tls];
 }}
+
+if (!hm_exists('connect_to_imap_server')) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false) {
+        $imap_list = array(
+            'name' => $name,
+            'server' => $address,
+            'hide' => false,
+            'port' => $port,
+            'user' => $user,
+            'pass' => $pass,
+            'tls' => $tls);
+
+        if ($type === 'jmap') {
+            $imap_list['type'] = 'jmap';
+            $imap_list['hide'] = $hidden;
+            $imap_list['port'] = false;
+            $imap_list['tls'] = false;
+        }
+
+        if (isset($imap_sieve_host) && $imap_sieve_host) {
+            $imap_list['sieve_config_host'] = $imap_sieve_host;
+        }
+
+        $imap_server_id = Hm_IMAP_List::add($imap_list);
+        $server = Hm_IMAP_List::get($imap_server_id, false);
+
+        if ($enableSieve &&
+            isset($imap_sieve_host) &&
+            $context->module_is_supported('sievefilters') &&
+            $context->user_config->get('enable_sieve_filter_setting', true)) {
+            try {
+
+                include APP_PATH.'modules/sievefilters/hm-sieve.php';
+                $sieveClientFactory = new Hm_Sieve_Client_Factory();
+                $client = $sieveClientFactory::init(null, $server);
+
+                if (!$client) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                }
+            } catch (Exception $e) {
+                Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                return;
+            }
+        }
+
+        return Hm_IMAP_List::service_connect($imap_server_id, $server, $user, $pass, false);
+    }
+}

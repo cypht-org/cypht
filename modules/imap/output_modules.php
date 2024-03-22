@@ -422,11 +422,19 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $res = '';
-        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+        $list = $this->get('imap_servers', array());
+
+        if (empty($list)) {
+            return '';
+        }
+
+        $res = '<div class="subtitle mt-4">Imap & JMAP Serves</div>';
+        foreach ($list as $index => $vals) {
             $server_id = $vals['id'];
+            $type = 'IMAP';
+
             if (array_key_exists('type', $vals) && $vals['type'] == 'jmap') {
-                continue;
+                $type = 'JMAP';
             }
 
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
@@ -452,33 +460,43 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
-            $res .= sprintf('<div class="server_title"><b>%s</b></div><div class="server_subtitle">%s/%d %s</div>',
-                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
-                $vals['tls'] ? 'TLS' : '' );
-
+            $res .= '<div>';
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
-            
+            $res .= '<table class="table">
+                      <tbody>
+                        <tr>
+                          <td style="width: 250px;">';
+            $res .= sprintf('
+                    <div>
+                        <div class="text-muted"><strong>%s</strong></div>
+                        <div class="server_subtitle">%s/%d %s</div>
+                    </div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
+                $vals['tls'] ? 'TLS' : '' );
+            $res .= '</td><td>';
+
             // IMAP Username
             $res .= '<div class="form-floating mb-3">';
             $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('IMAP username').'</label></div>';
-            
+            $res .= '</td><td>';
             // IMAP Password
             $res .= '<div class="form-floating mb-3">';
             $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('IMAP password').'</label></div>';
-            
+            $res .= '</td><td>';
+
             // Sieve Host (Conditional)
             if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
                 $default_value = $vals['sieve_config_host'];
                 $res .= '<div class="form-floating mb-3">';
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
+                $res .= '</td><td>';
             }
-            
+
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
@@ -488,19 +506,25 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />';
             }
-            
+
             // Hide/Unhide Buttons
             $hidden = array_key_exists('hide', $vals) && $vals['hide'];
             $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
-            
+
+
+            $res .= '</td>
+                </tr>
+              </tbody>
+            </table>';
+
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             $res .= '</form>';
-                
 
-            $res .= '</div></div>';
+
+            $res .= '</div>';
         }
-        $res .= '<br class="clear_float" /></div></div></div></div>';
+        $res .= '<br class="clear_float" />';
         return $res;
     }
 }
@@ -531,54 +555,9 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
                 '<label for="enable_sieve_filter" class="form-check-label"> '.$this->trans('Enable Sieve Filters').'</label></div></td></tr>';
         }
 
-        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section border-bottom cursor-pointer px-1 py-3">'.
-            '<a href="#" class="pe-auto"><i class="bi bi-envelope-fill me-3"></i>'.
-            '<b> '.$this->trans('IMAP Servers').'</b></a>'.
-            '<div class="server_count">'.$count.'</div></div>
-            <div class="imap_section px-4 pt-3">
-                <div class="row">
-                    <div class="col-12 col-lg-4 mb-4">
-                        <form class="add_server" method="POST">'.
-                            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                            '<div class="subtitle">'.$this->trans('Add an IMAP Server').'</div>'.
-
-                            // Account Name Field
-                            '<div class="form-floating mb-3">'.
-                            '<input id="new_imap_name" required type="text" name="new_imap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'">'.
-                            '<label for="new_imap_name" class="">'.$this->trans('Account name').'</label></div>'.
-
-                            // Server Address Field
-                            '<div class="form-floating mb-3">'.
-                            '<input required type="text" id="new_imap_address" name="new_imap_address" class="txt_fld form-control" placeholder="'.$this->trans('IMAP server address').'" value="">'.
-                            '<label for="new_imap_address" class="">'.$this->trans('Server address').'</label></div>'.
-
-                            // IMAP Port Field
-                            '<div class="form-floating mb-3">'.
-                            '<input required type="number" id="new_imap_port" name="new_imap_port" class="txt_fld form-control" value="993" placeholder="'.$this->trans('Port').'">'.
-                            '<label for="new_imap_port" class="">'.$this->trans('IMAP port').'</label></div>'.
-
-                            $sieve_extra.
-
-                            // Checkbox for Hide From Combined Pages
-                            '<div class="form-check mb-3 mt-2">'.
-                            '<input type="checkbox" id="new_imap_hidden" name="new_imap_hidden" class="form-check-input" value="1">'.
-                            '<label for="new_imap_hidden" class="form-check-label">'.$this->trans('Hide From Combined Pages').'</label></div>'.
-
-                            $sieve_extra2.
-
-                            // TLS Radio Button
-                            '<div class="form-check">'.
-                            '<input type="radio" class="form-check-input" name="tls" value="1" id="imap_tls" checked="checked">'.
-                            '<label class="form-check-label" for="imap_tls">'.$this->trans('Use TLS').'</label></div>'.
-
-                            '<div class="form-check mb-3">'.
-                            '<input type="radio" class="form-check-input" name="tls" value="0" id="imap_notls">'.
-                            '<label class="form-check-label" for="imap_notls">'.$this->trans('STARTTLS or unencrypted').'</label></div>'.
-
-                            '<input class="btn btn-success px-5" type="submit" value="'.$this->trans('Add').'" name="submit_imap_server" />'.
-                        '</form>
-                    </div>';
-
+        return '<div class="imap_server_setup"><div data-target=".imap_section" class="server_section">'.
+            '<img alt="" src="'.Hm_Image_Sources::$env_closed.'" width="16" height="16" />'.
+            ' '.$this->trans('IMAP Servers').'<div class="server_count">'.$count.'</div></div><div class="imap_section"></div></div>';
     }
 }
 
@@ -1307,5 +1286,93 @@ class Hm_Output_imap_message_source extends Hm_Output_Module {
         }
         $res .= '</div>';
         return $res;
+    }
+}
+/**
+ * @subpackage jmap/output
+ */
+class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
+    protected function output() {
+        if(!in_array('jmap', $this->get('router_module_list'), true)) return '';
+        return '
+                <div class="form-check"  id="srv_setup_stepper_jmap_select_box">
+                    <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_only_jmap" name="srv_setup_stepper_only_jmap" onchange="handleJmapCheckboxChange(this)">
+                    <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_only_jmap">
+                      '.$this->trans('Setup JMAP Server').'
+                    </label>
+                </div>
+                <div class="step_config-jmap_bloc hide" id="step_config-jmap_bloc">
+                      <label><strong>JMAP</strong></label>
+                      <div class="form-floating">
+                          <input required type="text" id="srv_setup_stepper_jmap_address" name="srv_setup_stepper_jmap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                          <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
+                          <span id="srv_setup_stepper_jmap_address-error" class="error-message"></span>
+                      </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
+                        <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
+                          '.$this->trans('Hide From Combined Pages').'
+                        </label>
+                    </div>
+                </div>
+        ';
+    }
+}
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
+    protected function output() {
+       $res = '
+                   <div class="step_config-imap_bloc mb-6" id="step_config-imap_bloc">
+                      <label><strong>IMAP</strong></label>
+                      <div class="form-floating">
+                        <input required type="text" id="srv_setup_stepper_imap_address" name="srv_setup_stepper_imap_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                        <label class="" for="srv_setup_stepper_imap_address">'.$this->trans('Address').'</label>
+                        <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                      </div>
+                      <div class="d-flex">
+                        <div class="flex-fill">
+                              <div class="form-floating">
+                                <input required type="number" id="srv_setup_stepper_imap_port" name="srv_setup_stepper_imap_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
+                                <label class="" for="srv_setup_stepper_imap_port">'.$this->trans('Port').'</label>
+                                <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
+                              </div>
+                              <span id="srv_setup_stepper_imap_port-error" class="error-message"></span>
+                        </div>
+                        <div class="p-2 flex-fill">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls">
+                                <label class="form-check-label" style="font-size: 12px;" for="imap_tls">
+                                  '.$this->trans('Use TLS').'
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" checked>
+                                <label class="form-check-label" style="font-size: 12px;" for="imap_start_tls">
+                                  '.$this->trans('STARTTLS or unencrypted').'
+                                </label>
+                            </div>
+                        </div>
+                      </div>
+                   ';
+
+                     if (!$this->get('sieve_filters_enabled')) {
+                         $default_value = '';
+                             $res .=  '
+                                        
+                                        <div class="form-check">
+                                           <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
+                                           <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
+                                        </div>
+                                        <div class="form-floating hide" id="srv_setup_stepper_imap_sieve_host_bloc">
+                                            <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
+                                            <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
+                                            <span id="srv_setup_stepper_imap_sieve_host-error" class="error-message"></span>
+                                        </div>';
+                     }
+               $res .= '</div>';
+       return $res;
     }
 }

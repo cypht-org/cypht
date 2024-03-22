@@ -57,7 +57,7 @@ var display_final_nux_step = function(res) {
                 }
             );
         }
-            
+
         window.location.href = "?page=servers";
     }
 };

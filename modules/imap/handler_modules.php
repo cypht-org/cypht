@@ -688,7 +688,7 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                                     }
                                 }
                             }
-                            
+
                         }
                     }
                 }
@@ -899,7 +899,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
         $archive_folder = false;
         $errors = 0;
-        
+
         $specials = get_special_folders($this, $form['imap_server_id']);
         if (array_key_exists('archive', $specials) && $specials['archive']) {
             $archive_folder = $specials['archive'];
@@ -917,13 +917,13 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             }
 
             $form_folder = hex2bin($form['folder']);
-            
+
             /* select source folder */
             if ($errors || !$imap->select_mailbox($form_folder)) {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
                 $errors++;
             }
-            
+
             /* path according to original option setting */
             if ($this->user_config->get('original_folder_setting', false)) {
                 $archive_folder .= '/'.$form_folder;
@@ -931,7 +931,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                     $imap->create_mailbox($archive_folder);
                 }
             }
-            
+
             /* try to move the message */
             if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
                 Hm_Msgs::add("Message archived");
@@ -1063,7 +1063,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
 }
 
 /**
- * Perform an IMAP message action 
+ * Perform an IMAP message action
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
@@ -1082,7 +1082,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 foreach ($ids as $server => $folders) {
                     $specials = get_special_folders($this, $server);
                     $trash_folder = false;
-                    $archive_folder = false;                    
+                    $archive_folder = false;
                     $cache = Hm_IMAP_List::get_cache($this->cache, $server);
                     $imap = Hm_IMAP_List::connect($server, $cache);
                     if (imap_authed($imap)) {
@@ -1554,7 +1554,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 else {
                     $name = $this->config->get('imap_auth_name', 'Default');
                 }
-                $imap_details = array( 
+                $imap_details = array(
                     'name' => $name,
                     'default' => true,
                     'server' => $auth_server['server'],

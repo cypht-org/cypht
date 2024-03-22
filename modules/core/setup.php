@@ -21,6 +21,9 @@ add_output('home', 'home_password_dialogs', true, 'core', 'home_heading', 'after
 setup_base_page('servers');
 add_handler('servers', 'reload_folder_cookie', true, 'core', 'save_user_data', 'after');
 add_output('servers', 'server_content_start', true, 'core', 'content_section_start', 'after');
+add_output('servers', 'server_config_stepper', true, 'core', 'server_content_start', 'after');
+add_output('servers', 'server_config_stepper_end_part', true, 'core', 'server_config_stepper', 'after');
+add_output('servers', 'server_config_stepper_accordion_end_part', true, 'core', 'server_config_stepper_end_part', 'after');
 add_output('servers', 'server_content_end', true, 'core', 'content_section_end', 'before');
 
 /* compose */
@@ -166,6 +169,19 @@ add_handler('ajax_test', 'load_user_data', true, 'core');
 add_handler('ajax_test', 'date', true, 'core');
 add_handler('ajax_test', 'http_headers', true, 'core');
 
+/* Server setup */
+add_handler('ajax_quick_servers_setup', 'login', false, 'core');
+add_handler('ajax_quick_servers_setup', 'load_user_data', true, 'core');
+add_handler('ajax_quick_servers_setup', 'quick_servers_setup', true);
+add_handler('ajax_quick_servers_setup', 'load_smtp_servers_from_config',  true, 'smtp', 'quick_servers_setup', 'before');
+add_handler('ajax_quick_servers_setup', 'load_imap_servers_from_config',  true, 'imap', 'quick_servers_setup', 'before');
+add_handler('ajax_quick_servers_setup', 'profile_data',  true, 'profiles', 'quick_servers_setup', 'before');
+add_handler('ajax_quick_servers_setup', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_quick_servers_setup', 'save_user_data',  true, 'core');
+add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
+add_handler('ajax_quick_servers_setup', 'date', true, 'core');
+add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -183,7 +199,8 @@ return array(
         'ajax_update_server_pw',
         'ajax_no_op',
         'notfound',
-        'search'
+        'search',
+        'ajax_quick_servers_setup',
     ),
     'allowed_output' => array(
         'date' => array(FILTER_DEFAULT, false),
@@ -193,7 +210,7 @@ return array(
         'formatted_message_list' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'just_saved_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
         'just_forgot_credentials' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'deleted_server_id' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
+        'deleted_server_id' => array(FILTER_DEFAULT, false),
         'msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_source' => array(FILTER_UNSAFE_RAW, false),
@@ -288,9 +305,30 @@ return array(
         'junk_since' => FILTER_DEFAULT,
         'trash_per_source' => FILTER_VALIDATE_INT,
         'trash_since' => FILTER_DEFAULT,
-        'drafts_per_source' => FILTER_VALIDATE_INT,
+        'drafts_per_source' => FILTER_DEFAULT,
         'drafts_since' => FILTER_DEFAULT,
-        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN
+        'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_name'  => FILTER_DEFAULT,
+        'srv_setup_stepper_email' => FILTER_DEFAULT,
+        'srv_setup_stepper_password' => FILTER_UNSAFE_RAW,
+        'srv_setup_stepper_provider' => FILTER_DEFAULT,
+        'srv_setup_stepper_is_sender' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_is_receiver' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_smtp_address' => FILTER_DEFAULT,
+        'srv_setup_stepper_smtp_port' => FILTER_DEFAULT,
+        'srv_setup_stepper_smtp_tls' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_imap_address' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_port' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_tls' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_enable_sieve' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_create_profile' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_is_default' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_profile_signature' => FILTER_DEFAULT,
+        'srv_setup_stepper_profile_reply_to' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_sieve_host' => FILTER_DEFAULT,
+        'srv_setup_stepper_only_jmap' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_jmap_address' => FILTER_DEFAULT
     )
 );
 

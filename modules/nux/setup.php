@@ -6,7 +6,7 @@ handler_source('nux');
 output_source('nux');
 
 /* servers page */
-add_output('servers', 'quick_add_section', true, 'nux', 'server_content_start', 'after');
+add_output('servers', 'quick_add_section', true, 'nux', 'server_config_stepper_accordion_end_part', 'after');
 add_output('servers', 'quick_add_dialog', true, 'nux', 'quick_add_section', 'after');
 
 add_handler('ajax_nux_service_select', 'login', false, 'core');
@@ -17,6 +17,14 @@ add_handler('ajax_nux_service_select', 'language',  true, 'core');
 add_handler('ajax_nux_service_select', 'date', true, 'core');
 add_handler('ajax_nux_service_select', 'http_headers', true, 'core');
 add_output('ajax_nux_service_select', 'filter_service_select', true);
+
+add_handler('ajax_get_nux_service_details', 'login', false, 'core');
+add_handler('ajax_get_nux_service_details', 'load_user_data', true, 'core');
+add_handler('ajax_get_nux_service_details', 'get_nux_service_details', true);
+add_handler('ajax_get_nux_service_details', 'language',  true, 'core');
+add_handler('ajax_get_nux_service_details', 'date', true, 'core');
+add_handler('ajax_get_nux_service_details', 'http_headers', true, 'core');
+add_output('ajax_get_nux_service_details', 'service_details', true);
 
 add_handler('ajax_nux_add_service', 'login', false, 'core');
 add_handler('ajax_nux_add_service', 'load_user_data', true, 'core');
@@ -45,7 +53,8 @@ add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list
 return array(
     'allowed_pages' => array(
         'ajax_nux_service_select',
-        'ajax_nux_add_service',
+        'ajax_get_nux_service_details',
+        'ajax_nux_add_service'
     ),
     'allowed_get' => array(
         'code' => FILTER_DEFAULT,
@@ -55,6 +64,7 @@ return array(
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
+        'service_details' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
         'nux_server_id' => array(FILTER_VALIDATE_INT, false),
         'nux_service_name' => array(FILTER_DEFAULT, false)

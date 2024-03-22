@@ -2072,3 +2072,192 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
             '<td><input type="checkbox" '.$checked.' id="warn_for_unsaved_changes" name="warn_for_unsaved_changes" class="form-check-input" value="1" />'.$reset.'</td></tr>';
     }
 }
+
+class Hm_Output_server_config_stepper extends Hm_Output_Module {
+    protected function output() {
+        $accordionTitle = '';
+        $configuredText = $this->trans('Configured') .' ';
+        $hasEssentialModuleActivated = false;
+
+        $hasImapActivated = in_array('imap', $this->get('router_module_list'), true);
+        $hasSmtpActivated = in_array('smtp', $this->get('router_module_list'), true);
+        $hasJmapActivated = in_array('jmap', $this->get('router_module_list'), true);
+
+        if($hasImapActivated){
+            $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
+            $accordionTitle .= 'IMAP';
+            $configuredText .= $imap_servers_count .' IMAP';
+            $hasEssentialModuleActivated = true;
+        }
+
+        if($hasJmapActivated){
+            $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
+            if($accordionTitle != ''){
+                $accordionTitle .= ' - ';
+                $configuredText .= ' / ';
+            }
+            $accordionTitle .= 'JMAP';
+            $configuredText .= $jmap_servers_count .' JMAP';
+            $hasEssentialModuleActivated = true;
+        }
+
+        if($hasSmtpActivated){
+            $smtp_servers_count = count($this->get('smtp_servers', array()));
+            if($accordionTitle != ''){
+                $accordionTitle .= ' - ';
+                $configuredText .= ' / ';
+            }
+            $accordionTitle .= 'SMTP';
+            $configuredText .= $smtp_servers_count .' SMTP';
+            $hasEssentialModuleActivated = true;
+        }
+
+        $accordionTitle .= ' Servers';
+
+        // When essential module is not activated, we don't display the accordion
+        if(!$hasEssentialModuleActivated) return '';
+
+        $serverList = null;
+
+        if(class_exists('Nux_Quick_Services')){
+            $serverList = Nux_Quick_Services::option_list(false, $this);
+        }
+
+        $hideClass = 'd-none';
+
+        // Don't hide this section if at least one of the essential module is activated
+        if($hasImapActivated || $hasSmtpActivated || $hasJmapActivated){
+            $hideClass = '';
+        }
+
+        $res = '<div class="smtp_imap_server_setup '. $hideClass .'">
+                  <div data-target=".server_config_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                      <a href="#" class="pe-auto">
+                          <i class="bi bi-envelope-fill me-3"></i>
+                          <b> '.$accordionTitle.'</b>
+                      </a> 
+                      <div class="server_count">'.$configuredText.'</div>
+                  </div>
+             <div class="server_config_section">
+                <div class="stepper" id="srv_setup_stepper_stepper">
+                    <div class="step-container">
+                        <div id="step_config_1" class="step step_config">
+                            <div class="step_config-title">
+                                <h2>'.$this->trans('Step 1').'</h2>
+                                <span>('.$this->trans('Authentication').')</span>
+                            </div>
+                            <div>
+                                <form class=" me-0" method="POST">
+                                        <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                                        <div class="form-floating mb-3">
+                                            <input required type="text" id="srv_setup_stepper_profile_name" name="srv_setup_stepper_profile_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Name').'">
+                                            <label class="" for="srv_setup_stepper_profile_name">'.$this->trans('Name').'</label>
+                                            <span id="srv_setup_stepper_profile_name-error" class="error-message"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
+                                            <span id="srv_setup_stepper_email-error" class="error-message"></span>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control" value="" placeholder="'.$this->trans('Password').'">
+                                            <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
+                                            <span id="srv_setup_stepper_password-error" class="error-message"></span>
+                                        </div>
+                                </form>
+                            </div>
+                            <div class="step_config-actions">
+                                <button class="btn btn-success px-5" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                                <button class="btn btn-success px-5" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
+                            </div>
+                        </div>
+                        <div id="step_config_2" class="step step_config">
+                            <div class="step_config-title">
+                                <h2>'.$this->trans('Step 2').'</h2>
+                                <span>('.$this->trans('Mail server configuration').')</span>
+                            </div>
+                            <div>
+                                <form>
+                                    <div class="form-floating mb-3">
+                                      <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) label="'.$this->trans('Provider').'">
+                                        <option value="">'.$this->trans('Other').'</option>'.$serverList.'
+                                      </select>
+                                      <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
+                                    </div>';
+
+        if($hasSmtpActivated && $hasImapActivated) {
+            $res .= '
+                 <div class="form-check form-switch">
+                   <input class="form-check-input" type="checkbox" role="switch" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_sender" checked>
+                   <label class="form-check-label" for="srv_setup_stepper_is_sender">'.$this->trans('Sender account').'</label>
+                 </div>
+                 <div class="form-check form-switch">
+                   <input class="form-check-input" type="checkbox" role="switch" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_receiver" checked>
+                   <label class="form-check-label" for="srv_setup_stepper_is_receiver">'.$this->trans('Receiver account').'</label>
+                 </div>
+                  <span id="srv_setup_stepper_serve_type-error" class="error-message"></span>
+            ';
+        }
+
+        $res .= '<div class="step_config-smtp_imap_bloc">';
+
+        return $res;
+    }
+}
+
+class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
+    protected function output() {
+        $res = '</div>';
+
+        if(in_array('profiles', $this->get('router_module_list'), true)) {
+            $res .= '
+                <div class="form-check form-switch mt-3" id="srv_setup_stepper_profile_checkbox_bloc">
+                    <input class="form-check-input" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="srv_setup_stepper_create_profile" checked>
+                    <label class="form-check-label" for="srv_setup_stepper_create_profile">'.$this->trans('Create Profile').'</label>
+                </div>
+                <div class="ms-3" id="srv_setup_stepper_profile_bloc">
+                    <div class="form-floating mb-2">
+                        <input required type="text" id="srv_setup_stepper_profile_reply_to" name="srv_setup_stepper_profile_reply_to" class="txt_fld form-control" value="" placeholder="'.$this->trans('Reply to').'">
+                        <label class="" for="srv_setup_stepper_profile_reply_to">'.$this->trans('Reply to').'</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input required type="text" id="srv_setup_stepper_profile_signature" name="srv_setup_stepper_profile_signature" class="txt_fld form-control" value="" placeholder="'.$this->trans('Signature').'">
+                        <label class="" for="srv_setup_stepper_profile_signature">'.$this->trans('Signature').'</label>
+                    </div>
+                    <div class="form-check" id="srv_setup_stepper_profile_checkbox_bloc">
+                        <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_profile_is_default" checked>
+                        <label class="form-check-label" for="srv_setup_stepper_profile_is_default">'.$this->trans('Set this profile default').'</label>
+                    </div>
+                </div>
+            ';
+        }
+
+        $res .= '</form>
+            </div>
+            <div class="srv_setup_stepper_form_loader hide" id="srv_setup_stepper_form_loader">
+                <div class="spinner-border text-dark" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+            <div class="step_config-actions">
+                <button class="btn btn-danger px-3" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                <button class="btn btn-success px-3" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
+                <button class="btn btn-success px-3" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
+            </div>
+        </div>
+        <div id="step_config_0" class="step_config current_config_step">
+            <button class="btn btn-success px-5" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
+        </div>
+    </div>
+</div>
+<div class="px-5">';
+
+        return $res;
+    }
+}
+
+class Hm_Output_server_config_stepper_accordion_end_part extends Hm_Output_Module {
+    protected function output() {
+        return '</div></div></div>';
+    }
+}

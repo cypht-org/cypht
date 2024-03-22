@@ -581,6 +581,24 @@ return array(
     'Warn for unsaved changes' => false,
     'We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.' => false,
     'attachment,file,attach,attached,attaching,enclosed,CV,cover letter' => false,
+    'Connection To Sieve Server Failed' => false,
+    'Step 1' => false,
+    'Step 2' => false,
+    'Authentication' => false,
+    'Profile name' => false,
+    'Email' => false,
+    'Password' => false,
+    'Mail server configuration' => false,
+    'Sender account' => false,
+    'Receiver account' => false,
+    'Address' => false,
+    'Enable Sieve' => false,
+    'Create Profile' => false,
+    'Sieve server' => false,
+    'Reply to' => false,
+    'Set this profile default' => false,
+    'Finish' => false,
+    'Add a new server' => false,
     'Automatically add outgoing email addresses' => false,
     'Trusted Senders' => false,
     'Collected Recipients' => false,
@@ -624,6 +642,6 @@ return array(
     'Send anyway' => false,
     'Send anyway and don\'t warn in the future' => false,
     'Are you sure you want to send this message?' => false,
-); 
+);
 
 ?>

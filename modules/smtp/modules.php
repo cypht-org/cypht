@@ -11,6 +11,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 use League\CommonMark\GithubFlavoredMarkdownConverter;
 
 define('MAX_RECIPIENT_WARNING', 20);
+require_once APP_PATH.'modules/smtp/functions.php';
 require APP_PATH.'modules/smtp/hm-smtp.php';
 require APP_PATH.'modules/smtp/hm-mime-message.php';
 
@@ -59,9 +60,9 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
-                
+
                 # Attachment Download
-                # Draft attachments must be redownloaded and added to the file cache to prevent 
+                # Draft attachments must be redownloaded and added to the file cache to prevent
                 # attachments from being deleted when editing a previously saved draft.
                 $attached_files = [];
                 $this->session->set('uploaded_files', array());
@@ -118,7 +119,7 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
         if (!$this->module_is_supported('imap')) {
             return;
         }
-        
+
         if (array_key_exists('forward', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
             $imap = Hm_IMAP_List::connect($path[1]);
@@ -228,26 +229,26 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
                 continue;
             }
-    
+
             if(isset($this->request->get['resumableIdentifier']) && trim($this->request->get['resumableIdentifier'])!=''){
                 $temp_dir = $filepath.'/'.$userpath.'/chunks-'.$this->request->get['resumableIdentifier'];
             }
             $dest_file = $temp_dir.'/'.$this->request->get['resumableFilename'].'.part'.$this->request->get['resumableChunkNumber'];
-        
+
             // create the temporary directory
             if (!is_dir($temp_dir)) {
                 mkdir($temp_dir, 0777, true);
             }
-        
+
             // move the temporary file
             if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
                 Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename']);
             } else {
                 // check if all the parts present, and create the final destination file
                 $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
-                                $this->request->get['resumableChunkSize'], 
+                                $this->request->get['resumableChunkSize'],
                                 $this->request->get['resumableTotalSize'],
-                                $this->request->get['resumableTotalChunks']);    
+                                $this->request->get['resumableTotalChunks']);
             }
         }
     }
@@ -273,7 +274,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             delete_uploaded_files($this->session, $draft_id);
             return;
         }
-        
+
         if ($this->module_is_supported('imap')) {
             $uploaded_files = explode(',', $uploaded_files);
             $userpath = md5($this->session->get('username', false));
@@ -347,7 +348,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($draft_id <= 0 && array_key_exists('uid', $this->request->get)) {
             $draft_id = $this->request->get['uid'];
         }
-        
+
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
         $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
         if ($this->get('is_mobile', false)) {
@@ -388,6 +389,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                         'server' => $form['new_smtp_address'],
                         'port' => $form['new_smtp_port'],
                         'tls' => $tls));
+
                     Hm_Msgs::add('Added SMTP server!');
                     $this->session->record_unsaved('SMTP server added');
                 }
@@ -539,11 +541,11 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
     public function process() {
         $profiles = $this->user_config->get('profiles');
         $profile_value = $this->request->post['profile_value'];
-        
+
         if (!strstr($profile_value, '.')) {
             Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
             return;
-        } 
+        }
         $profile = profile_from_compose_smtp_id($profiles, $profile_value);
         if (!$profile) {
             Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
@@ -635,7 +637,7 @@ if (!hm_exists('get_mime_type')) {
  * @subpackage smtp/handler
  */
 class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
-    public function process() {       
+    public function process() {
         /* not sending */
         if (!array_key_exists('smtp_send', $this->request->post)) {
             $this->out('enable_attachment_reminder', $this->user_config->get('enable_attachment_reminder_setting', false));
@@ -759,7 +761,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if ($form['post_archive']) {
             $msg_path = explode('_', $this->request->post['compose_msg_path']);
             $msg_uid = $this->request->post['compose_msg_uid'];
-            
+
             $imap = Hm_IMAP_List::connect($msg_path[1]);
             if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
                 $specials = get_special_folders($this, $msg_path[1]);
@@ -863,19 +865,19 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
         $size_in_kbs = 0;
         $num_chunks = 0;
         $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
-        $files = array(); 
-        
+        $files = array();
+
         foreach ($rii as $file) {
             if ($file->getFilename() == '.' || $file->getFilename() == '..') {
                 continue;
             }
-            if ($file->isDir()){ 
+            if ($file->isDir()){
                 continue;
             }
             if (strpos($file->getPathname(), '.part') !== False) {
                 $num_chunks++;
                 $size_in_kbs += filesize($file->getPathname());
-                $files[] = $file->getPathname(); 
+                $files[] = $file->getPathname();
             }
         }
         if ($size_in_kbs > 0) {
@@ -998,7 +1000,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
-        
+
         if (!$msg_path) {
             $msg_path = $this->get('compose_msg_path', '');
         }
@@ -1063,13 +1065,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             }
             $draft_id = $msg_uid;
         }
-        
+
         // User clicked on compose
         if ($reply_type) {
             $imap_server_id = explode('_', $msg_path)[1];
             $imap_server = Hm_IMAP_List::get($imap_server_id, false);
             $reply_from = process_address_fld($reply['msg_headers']['From']);
-    
+
             if ($reply_type == 'reply_all' && $reply_from[0]['email'] != $imap_server['user'] && strpos($to, $reply_from[0]['email']) === false) {
                 $to .= ', '.$reply_from[0]['label'].' '.$reply_from[0]['email'];
             }
@@ -1350,8 +1352,15 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $res = '';
-        foreach ($this->get('smtp_servers', array()) as $index => $vals) {
+
+        $list = $this->get('smtp_servers', array());
+
+        if (empty($list)) {
+            return '';
+        }
+
+        $res = '<div class="subtitle mt-4">SMTP Servers</div>';
+        foreach ($list as $index => $vals) {
 
             $no_edit = false;
 
@@ -1373,24 +1382,34 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="configured_server col-12 col-lg-4 mb-3"><div class="card card-body">';
-            $res .= sprintf('<div class="server_title"><b>%s</b></div><div class="server_subtitle">%s/%d %s</div>',
-                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-            
+            $res .= '<div>';
+
             $res .= '<form class="smtp_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
-            
+            $res .= '<table class="table">
+                      <tbody>
+                        <tr>
+                          <td style="width: 250px;">';
+            $res .= sprintf('<div>
+                               <div class="text-muted"><strong>%s</strong></div>
+                               <div class="server_subtitle">%s/%d %s</div>
+                            </div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
+            $res .= '</td><td>';
+
             // SMTP Username
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials" id="smtp_user_'.$index.'" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label></div>';
-            
+            $res .= '</td><td>';
+
             // SMTP Password
-            $res .= '<div class="form-floating mb-3">';
+            $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials smtp_password" type="password" id="smtp_pass_'.$index.'" name="smtp_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label></div>';
-            
+            $res .= '</td><td>';
+
             // Buttons
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
@@ -1404,11 +1423,16 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-            $res .= '</form>';
 
-            $res .= '</div></div>';
+            $res .= '</td>
+                    </tr>
+                  </tbody>
+                </table>
+            </form>';
+
+            $res .= '</div>';
         }
-        $res .= '<br class="clear_float" /></div></div></div>';
+        $res .= '<br class="clear_float" />';
         return $res;
     }
 }
@@ -1428,6 +1452,48 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
             return $res;
         }
         $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * @subpackage
+ */
+class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
+    protected function output() {
+        return '
+            <div class="step_config-smtp_bloc mb-3" id="step_config-smtp_bloc">
+               <label><strong>SMTP</strong></label>
+                 <div class="form-floating">
+                   <input required type="text" id="srv_setup_stepper_smtp_address" name="srv_setup_stepper_smtp_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
+                   <label class="" for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
+                   <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
+                 </div>
+                 <div class="d-flex">
+                   <div class="flex-fill">
+                         <div class="form-floating">
+                           <input required type="number" id="srv_setup_stepper_smtp_port" name="srv_setup_stepper_smtp_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
+                           <label class="" for="srv_setup_stepper_smtp_port">'.$this->trans('Port').'</label>
+                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                         </div>
+                         <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
+                   </div>
+                   <div class="p-2 flex-fill">
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" id="smtp_tls" name="srv_setup_stepper_smtp_tls" value="true" checked>
+                           <label class="form-check-label" style="font-size: 12px;" for="smtp_tls">
+                             '.$this->trans('Use TLS').'
+                           </label>
+                       </div>
+                       <div class="form-check">
+                           <input class="form-check-input" type="radio" id="smtp_start_tls" name="srv_setup_stepper_smtp_tls"  value="false" >
+                           <label class="form-check-label" style="font-size: 12px;" for="smtp_start_tls">
+                             '.$this->trans('STARTTLS or unencrypted').'
+                           </label>
+                       </div>
+                   </div>
+                 </div>
+           </div>
+        ';
     }
 }
 
@@ -1584,7 +1650,7 @@ if (!hm_exists('format_attachment_row')) {
 function format_attachment_row($file, $output_mod) {
     $unique_identifier = str_replace(' ', '_', $output_mod->html_safe($file['name']));
     return '<tr id="tr-'.$unique_identifier.'"><td>'.
-            $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '. 
+            $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '.
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
             '</td><td><a class="remove_attachment text-danger" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
             '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
@@ -1682,7 +1748,7 @@ if (!hm_exists('rrmdir')) {
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
                     if (filetype($dir . "/" . $object) == "dir") {
-                        rrmdir($dir . "/" . $object); 
+                        rrmdir($dir . "/" . $object);
                     } else {
                         unlink($dir . "/" . $object);
                     }
@@ -1696,7 +1762,7 @@ if (!hm_exists('rrmdir')) {
 
 /**
  *
- * Check if all the parts exist, and 
+ * Check if all the parts exist, and
  * gather all the parts of the file together
  * @param string $temp_dir - the temporary directory holding all the parts of the file
  * @param string $fileName - the original file name
@@ -1718,7 +1784,7 @@ if (!hm_exists('createFileFromChunks')) {
         // check that all the parts are present
         // If the Size of all the chunks on the server is equal to the size of the file uploaded.
         if ($total_files_on_server_size >= $totalSize) {
-        // create the final destination file 
+        // create the final destination file
             if (($fp = fopen($temp_dir.'/../'.$fileName, 'w')) !== false) {
                 for ($i=1; $i<=$total_files; $i++) {
                     fwrite($fp, file_get_contents($temp_dir.'/'.$fileName.'.part'.$i));
@@ -1730,7 +1796,7 @@ if (!hm_exists('createFileFromChunks')) {
                 return false;
             }
 
-            // rename the temporary directory (to avoid access from other 
+            // rename the temporary directory (to avoid access from other
             // concurrent chunks uploads) and than delete it
             if (rename($temp_dir, $temp_dir.'_UNUSED')) {
                 rrmdir($temp_dir.'_UNUSED');
@@ -1800,7 +1866,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
     $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
     $draft_folder = $imap->select_mailbox($specials['draft']);
-    
+
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
@@ -1813,14 +1879,14 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $name,
         $atts['draft_in_reply_to']
     );
-    
+
     $mime->add_attachments($uploaded_files);
     $res = $mime->process_attachments();
-    
+
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
-    
+
     if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
         $imap->append_feed($msg."\r\n");
         if (!$imap->append_end()) {
