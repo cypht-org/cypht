@@ -2140,8 +2140,8 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                       </a> 
                       <div class="server_count">'.$configuredText.'</div>
                   </div>
-             <div class="server_config_section">
-                <div class="stepper" id="srv_setup_stepper_stepper">
+             <div class="server_config_section px-4 pt-3 me-0">
+                <div class="stepper col-12 col-lg-4 mb-4" id="srv_setup_stepper_stepper">
                     <div class="step-container">
                         <div id="step_config_1" class="step step_config">
                             <div class="step_config-title">
@@ -2154,23 +2154,23 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                         <div class="form-floating mb-3">
                                             <input required type="text" id="srv_setup_stepper_profile_name" name="srv_setup_stepper_profile_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Name').'">
                                             <label class="" for="srv_setup_stepper_profile_name">'.$this->trans('Name').'</label>
-                                            <span id="srv_setup_stepper_profile_name-error" class="error-message"></span>
+                                            <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control" value="" placeholder="'.$this->trans('Email or Username').'">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
-                                            <span id="srv_setup_stepper_email-error" class="error-message"></span>
+                                            <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control" value="" placeholder="'.$this->trans('Password').'">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
-                                            <span id="srv_setup_stepper_password-error" class="error-message"></span>
+                                            <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>
                                 </form>
                             </div>
-                            <div class="step_config-actions">
-                                <button class="btn btn-success px-5" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                                <button class="btn btn-success px-5" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
+                            <div class="step_config-actions mt-4 d-flex justify-content-between">
+                                <button class="btn btn-primary px-5" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                                <button class="btn btn-primary px-5" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
                             </div>
                         </div>
                         <div id="step_config_2" class="step step_config">
@@ -2197,7 +2197,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                    <input class="form-check-input" type="checkbox" role="switch" onchange="handleSmtpImapCheckboxChange(this)" id="srv_setup_stepper_is_receiver" checked>
                    <label class="form-check-label" for="srv_setup_stepper_is_receiver">'.$this->trans('Receiver account').'</label>
                  </div>
-                  <span id="srv_setup_stepper_serve_type-error" class="error-message"></span>
+                  <span id="srv_setup_stepper_serve_type-error" class="invalid-feedback"></span>
             ';
         }
 
@@ -2241,18 +2241,18 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
                     <span class="visually-hidden">Loading...</span>
                 </div>
             </div>
-            <div class="step_config-actions">
+            <div class="step_config-actions mt-4 d-flex justify-content-between">
                 <button class="btn btn-danger px-3" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                <button class="btn btn-success px-3" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
-                <button class="btn btn-success px-3" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
+                <button class="btn btn-primary px-4" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
+                <button class="btn btn-primary px-3" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
             </div>
         </div>
         <div id="step_config_0" class="step_config current_config_step">
-            <button class="btn btn-success px-5" onclick="display_config_step(1)">+ '.$this->trans('Add a new server').'</button>
+            <button class="btn btn-primary px-4" onclick="display_config_step(1)"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>
         </div>
     </div>
 </div>
-<div class="px-5">';
+<div class="d-block">';
 
         return $res;
     }

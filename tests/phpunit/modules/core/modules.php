@@ -99,7 +99,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
             'X-Frame-Options' => 'SAMEORIGIN',
             'X-XSS-Protection' => '1; mode=block',
             'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';",
+            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
             'Content-Type' => 'application/json',
 		);
         foreach ($out as $key => $val) {
@@ -118,7 +118,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->config['allow_external_image_sources'] = true;
         $res = $test->run();
 		$out = array(
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self'; img-src * data:; style-src 'self' 'unsafe-inline';",
+            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
 		);
         foreach ($out as $key => $val) {
             $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
@@ -1345,10 +1345,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('main_menu_content', 'core');
         $test->handler_response = array('folder_sources' => array(array('email_folders', 'baz')));
         $res = $test->run();
-        $this->assertEquals(array('<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
+        $this->assertEquals(array('<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge bg-secondary ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
+        $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill fs-5 me-2"></i>Unread</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill fs-5 me-2"></i>Flagged</a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>Junk</a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill fs-5 me-2"></i>Trash</a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square fs-5 me-2"></i>Drafts</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1640,7 +1640,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list' => array('core'));
         $res = $test->run();
-        $this->assertEquals(array('<link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
+        $this->assertEquals(array('<link href="modules/themes/assets/default/css/default.css?v=asdf" media="all" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
