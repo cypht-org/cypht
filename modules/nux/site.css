@@ -1,6 +1,6 @@
 /* .nux_add_account { table-layout: fixed; width: 100%; display: table; background-color: #fff; } */
 /* .nux_subtitle { font-size: 80%; margin-left: 40px; display: inline; } */
-/* .quick_add_section { padding: 20px; padding-bottom: 40px; display: none; padding-left: 40px; } */
+.quick_add_section { display: none; }
 /* .nux_step_two_title { padding-top: 20px; font-size: 110%; padding-bottom: 10px; } */
 /* .nux_step_one, .nux_step_two { padding-left: 40px; max-width: 600px; } */
 /* .enable_auth2 { float: left; padding: 20px; padding-left: 0px; padding-bottom: 40px; font-size: 110%; } */

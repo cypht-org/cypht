@@ -1359,7 +1359,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             return '';
         }
 
-        $res = '<div class="subtitle mt-4">SMTP Servers</div>';
+        $res = '<div class="subtitle mt-4 fw-bold border-top pt-4">'.$this->trans('SMTP Servers').'</div>';
         foreach ($list as $index => $vals) {
 
             $no_edit = false;
@@ -1382,35 +1382,30 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div>';
 
             $res .= '<form class="smtp_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
-            $res .= '<table class="table">
-                      <tbody>
-                        <tr>
-                          <td style="width: 250px;">';
-            $res .= sprintf('<div>
-                               <div class="text-muted"><strong>%s</strong></div>
-                               <div class="server_subtitle">%s/%d %s</div>
-                            </div>',
+            $res .= '<div class="row"><div class="col-sm-2">';
+            $res .= sprintf('<div class="text-muted"><strong>%s</strong></div>
+                <div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']), $vals['tls'] ? 'TLS' : '' );
-            $res .= '</td><td>';
+            $res .= '</div><div class="col-sm-2">';
 
             // SMTP Username
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials" id="smtp_user_'.$index.'" type="text" name="smtp_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="smtp_user_'.$index.'">'.$this->trans('SMTP username').'</label></div>';
-            $res .= '</td><td>';
+            $res .= '</div><div class="col-sm-2">';
 
             // SMTP Password
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' class="form-control credentials smtp_password" type="password" id="smtp_pass_'.$index.'" name="smtp_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="smtp_pass_'.$index.'">'.$this->trans('SMTP password').'</label></div>';
-            $res .= '</td><td>';
+            $res .= '</div><div class="col-sm-2"></div>';
 
             // Buttons
+            $res .= '<div class="col-sm-4 text-end">';
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-light border btn-sm me-2" />';
@@ -1423,16 +1418,8 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-
-            $res .= '</td>
-                    </tr>
-                  </tbody>
-                </table>
-            </form>';
-
-            $res .= '</div>';
+            $res .= '</div></div></form>';
         }
-        $res .= '<br class="clear_float" />';
         return $res;
     }
 }
@@ -1466,16 +1453,16 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                  <div class="form-floating">
                    <input required type="text" id="srv_setup_stepper_smtp_address" name="srv_setup_stepper_smtp_address" class="txt_fld form-control" value="" placeholder="'.$this->trans('Address').'">
                    <label class="" for="srv_setup_stepper_smtp_address">'.$this->trans('Address').'</label>
-                   <span id="srv_setup_stepper_smtp_address-error" class="error-message"></span>
+                   <span id="srv_setup_stepper_smtp_address-error" class="invalid-feedback"></span>
                  </div>
                  <div class="d-flex">
                    <div class="flex-fill">
                          <div class="form-floating">
                            <input required type="number" id="srv_setup_stepper_smtp_port" name="srv_setup_stepper_smtp_port" class="txt_fld form-control" value="" placeholder="'.$this->trans('Port').'">
                            <label class="" for="srv_setup_stepper_smtp_port">'.$this->trans('Port').'</label>
-                           <span id="srv_setup_stepper_imap_address-error" class="error-message"></span>
+                           <span id="srv_setup_stepper_imap_address-error" class="invalid-feedback"></span>
                          </div>
-                         <span id="srv_setup_stepper_smtp_port-error" class="error-message"></span>
+                         <span id="srv_setup_stepper_smtp_port-error" class="invalid-feedback"></span>
                    </div>
                    <div class="p-2 flex-fill">
                        <div class="form-check">
@@ -1652,7 +1639,7 @@ function format_attachment_row($file, $output_mod) {
     return '<tr id="tr-'.$unique_identifier.'"><td>'.
             $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '.
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
-            '</td><td><a class="remove_attachment text-danger" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
+            '</td><td><a class="remove_attachment invalid-feedback" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
             '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
             $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
             $unique_identifier.'"></span></span></div></td></tr>';
