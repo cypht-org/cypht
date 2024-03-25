@@ -330,7 +330,6 @@ $(function () {
         var edit_filter_modal = new Hm_Modal({
             size: 'xl',
             modalId: 'myEditFilterModal',
-            btnSize: 'lg'
         });
 
         // set content

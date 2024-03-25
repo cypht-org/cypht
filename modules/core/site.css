@@ -533,7 +533,7 @@ button {
   padding-top: 20px;
 }
 .checkbox_cell {
-  width: 20px;
+  width: 30px;
   padding-right: 10px !important;
 }
 .news_cell {
@@ -691,7 +691,6 @@ button {
   display: block;
   width: 100%;
 }
-.src_title,
 .update_saved_search_title {
   color: #666;
   font-size: 110%;
@@ -1308,6 +1307,18 @@ div.unseen,
 }
 .cursor-pointer {
   cursor: pointer !important;
+}
+.list_sources, .update_search_label_field, .list_actions {
+  z-index: 100;
+  border-left: solid 1px #ede8e6;
+  border-bottom: solid 1px #ede8e6;
+  position: absolute;
+  right: 0px;
+  top: 54px;
+  background-color: #fafafa;
+  font-size: 85%;
+  padding: 15px 20px;
+  display: none;
 }
 
 .step_config-title {display: flex;align-items: center;gap: 10px;}
