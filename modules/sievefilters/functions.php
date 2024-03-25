@@ -59,8 +59,8 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                 <h3 class="mb-1">Conditions & Actions</h3>
                 <small>Filters must have at least one action and one condition</small>
             </div>
-            <div style="background-color: #f7f2ef;" class="mt-2 rounded">
-                <div class="p-2">
+            <div class="mt-2 rounded card">
+                <div class="p-3">
                     <div class="d-flex">
                         <div class="col-sm-10">
                             <h5 class="mt-0">Conditions</h5>
@@ -75,7 +75,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                     </div>
                 </div>
                 <hr/>
-                <div class="p-2">
+                <div class="p-3">
                     <div class="d-flex">
                         <div class="col-sm-10">
                             <h5 class="mt-0">Actions</h5>

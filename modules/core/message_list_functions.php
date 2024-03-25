@@ -412,7 +412,7 @@ function message_since_dropdown($since, $name, $output_mod) {
 if (!hm_exists('list_sources')) {
 function list_sources($sources, $output_mod) {
     $res = '<div class="list_sources">';
-    $res .= '<div class="src_title">'.$output_mod->html_safe('Sources').'</div>';
+    $res .= '<div class="src_title fs-5 mb-2">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
         if (array_key_exists('group', $src) && $src['group'] == 'background') {
             continue;

@@ -217,7 +217,7 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
 class Hm_Output_contacts_content_start extends Hm_Output_Module {
     protected function output() {
         $contact_source_list = $this->get('contact_sources', array());
-        $actions = '<div class="src_title">'.$this->trans('Export Contacts as CSV').'</div>';
+        $actions = '<div class="src_title fs-5 mb-2">'.$this->trans('Export Contacts as CSV').'</div>';
         $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source=all">'.$this->trans('All Contacts').'</a></div>';
         foreach ($contact_source_list as $value) {
             $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source='.$this->html_safe($value).'">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
