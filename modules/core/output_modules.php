@@ -2179,7 +2179,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                             <div>
                                 <form>
                                     <div class="form-floating mb-3">
-                                      <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) label="'.$this->trans('Provider').'">
+                                      <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this)" label="'.$this->trans('Provider').'">
                                         <option value="">'.$this->trans('Other').'</option>'.$serverList.'
                                       </select>
                                       <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>
