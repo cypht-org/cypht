@@ -2267,8 +2267,12 @@ function handleProviderChange(select) {
         $("#srv_setup_stepper_imap_port").val(993);
     }
 }
+
+function setDefaultReplyTo(val) {
+    $("#srv_setup_stepper_profile_reply_to").val(val);
+}
 function display_config_step(stepNumber) {
-    if(stepNumber == 2) {
+    if(stepNumber === 2) {
 
         var isValid = true;
 
@@ -2288,9 +2292,10 @@ function display_config_step(stepNumber) {
 
         let providerKey = getEmailProviderKey($('#srv_setup_stepper_email').val());
         getServiceDetails(providerKey);
+        setDefaultReplyTo($('#srv_setup_stepper_email').val());
     }
 
-    if(stepNumber == 3) {
+    if(stepNumber === 3) {
         var requiredFields = [];
         var isValid = true;
 
