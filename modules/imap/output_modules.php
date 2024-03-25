@@ -1358,7 +1358,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                       </div>
                    ';
 
-                     if (!$this->get('sieve_filters_enabled')) {
+                     if ($this->get('sieve_filters_enabled')) {
                          $default_value = '';
                              $res .=  '
                                         
