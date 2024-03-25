@@ -350,14 +350,30 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
-    $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
-        '<div class="msg_controls fs-6 d-none gap-1">'.
-        '<a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-        '<a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-        '<a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-        '<a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-        '<a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+    $res = '<a class="toggle_link" href="#"><img alt="x" src="'.Hm_Image_Sources::$check.'" width="8" height="8" /></a>'.
+        '<div class="msg_controls">
+            <div class="dynamic_dropdown on_mobile">
+              <button class="dynamic_dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+                Actions
+                <span class="arrow"></span>
+              </button>
+              <ul class="dynamic_dropdown-menu" aria-hidden="true" aria-labelledby="dropdownMenuButton">
+                '.
+                '<li><a class="msg_read core_msg_control" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
+                '<li><a class="msg_unread core_msg_control" href="#" data-action="unread">'.$output_mod->trans('Unreade').'</a></li>'.
+                '<li><a class="msg_flag core_msg_control" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
+                '<li><a class="msg_unflag core_msg_control" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
+                '<li><a class="msg_delete core_msg_control" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
+                '<li><a class="msg_archive core_msg_control" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>
+              </ul>
+            </div>';
+
+     $res .= '<a class="msg_read core_msg_control no_mobile" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+            '<a class="msg_unread core_msg_control no_mobile" href="#" data-action="unread">'.$output_mod->trans('Unreade').'</a>'.
+            '<a class="msg_flag core_msg_control no_mobile" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+            '<a class="msg_unflag core_msg_control no_mobile" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+            '<a class="msg_delete core_msg_control no_mobile" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
+            '<a class="msg_archive core_msg_control no_mobile" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
