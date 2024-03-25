@@ -1471,7 +1471,8 @@ if (!hm_exists('connect_to_imap_server')) {
         }
 
         $imap = Hm_IMAP_List::connect($imap_server_id, false);
-        if ($imap && $imap->get_state() == 'authenticated') {
+
+        if (imap_authed($imap)) {
             return $imap_server_id;
         }else {
             Hm_IMAP_List::del($imap_server_id);

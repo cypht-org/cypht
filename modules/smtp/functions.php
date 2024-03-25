@@ -17,7 +17,7 @@ if (!hm_exists('connect_to_smtp_server')) {
         $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
 
         $smtp = Hm_SMTP_List::connect($smtp_server_id, false);
-        if ($smtp->state == 'authed') {
+        if (smtp_authed($smtp)) {
             return $smtp_server_id;
         }
         else {
