@@ -6,17 +6,16 @@ var imap_delete_action = function(event) {
     }
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
             if (res.deleted_server_id) {
-                const configured_server = form.closest('.configured_server');
-                const section = configured_server.parent().parent()[0].classList.contains('imap_section') ? 'imap': 'jmap';
+                const section = form.parent().hasClass('imap_server') ? 'imap': 'jmap';
                 decrease_servers(section);
-                configured_server.remove();
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
+                form.parent().fadeOutAndRemove()
             }
         },
         {'imap_delete': 1}
@@ -45,7 +44,7 @@ var imap_hide_action = function(form, server_id, hide) {
 var imap_hide = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
     var server_id = $('.imap_server_id', form).val();
     imap_hide_action(form, server_id, 1);
 };
@@ -53,7 +52,7 @@ var imap_hide = function(event) {
 var imap_unhide = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
     var server_id = $('.imap_server_id', form).val();
     imap_hide_action(form, server_id, 0);
 };
@@ -61,14 +60,15 @@ var imap_unhide = function(event) {
 var imap_forget_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
+    var btnContainer = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
             if (res.just_forgot_credentials) {
                 form.find('.credentials').prop('disabled', false);
                 form.find('.credentials').val('');
-                form.append('<input type="submit" value="Save" class="save_imap_connection btn btn-primary-warning btn-sm" />');
+                btnContainer.append('<input type="submit" value="Save" class="save_imap_connection btn btn-outline-secondary btn-sm me-2" />');
                 $('.save_imap_connection').on('click', imap_save_action);
                 $('.forget_imap_connection', form).hide();
                 Hm_Utils.set_unsaved_changes(1);
@@ -82,7 +82,8 @@ var imap_forget_action = function(event) {
 var imap_save_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
+    var btnContainer = $(this).parent();
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
@@ -91,7 +92,7 @@ var imap_save_action = function(event) {
                 form.find('.save_imap_connection').hide();
                 form.find('.imap_password').val('');
                 form.find('.imap_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm" />');
+                btnContainer.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />');
                 $('.forget_imap_connection').on('click', imap_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -105,7 +106,7 @@ var imap_test_action = function(event) {
     $('.imap_folder_data').empty();
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
         form.serializeArray(),
         false,

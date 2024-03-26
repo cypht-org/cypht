@@ -1039,7 +1039,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     $imapTls,
                     null,
                     false,
-                    'imap',
+                    'jmap',
                     $this,
                     $jmapHideFromCPage
                 );

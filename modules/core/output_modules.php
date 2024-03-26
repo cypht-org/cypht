@@ -2088,18 +2088,19 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         if($hasImapActivated){
             $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
             $accordionTitle .= 'IMAP';
-            $configuredText .= $imap_servers_count .' IMAP';
+            $configuredText .=  '<span class="imap_server_count"> ' . $imap_servers_count .'</span> IMAP';
             $hasEssentialModuleActivated = true;
         }
 
         if($hasJmapActivated){
+            
             $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
             if($accordionTitle != ''){
                 $accordionTitle .= ' - ';
                 $configuredText .= ' / ';
             }
             $accordionTitle .= 'JMAP';
-            $configuredText .= $jmap_servers_count .' JMAP';
+            $configuredText .= '<span class="jmap_server_count">' . $jmap_servers_count .'</span> JMAP';
             $hasEssentialModuleActivated = true;
         }
 
@@ -2110,7 +2111,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                 $configuredText .= ' / ';
             }
             $accordionTitle .= 'SMTP';
-            $configuredText .= $smtp_servers_count .' SMTP';
+            $configuredText .= '<span class="smtp_server_count">' . $smtp_servers_count .'</span> SMTP';
             $hasEssentialModuleActivated = true;
         }
 

@@ -25,7 +25,9 @@ $.fn.serializeArray = function() {
     var args = this.serialize().split('&');
     for (var i in args) {
         parts = args[i].split('=');
-        res.push({'name': parts[0], 'value': parts[1]});
+        if (parts[0] && parts[1]) {
+            res.push({'name': parts[0], 'value': parts[1]});
+        }
     }
     return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
 };
@@ -35,6 +37,18 @@ $.fn.sort = function(sort_function) {
         list.push(this[i]);
     }
     return $(list.sort(sort_function));
+};
+$.fn.fadeOut = function(timeout = 600) {
+    return this.css("opacity", 0)
+    .css("transition", `opacity ${timeout}ms`)
+};
+$.fn.fadeOutAndRemove = function(timeout = 600) {
+    this.fadeOut(timeout)
+    var tm = setTimeout(() => {
+        this.remove();
+        clearTimeout(tm)
+    }, timeout);
+    return this;
 };
 
 /* swipe event handler */
@@ -1836,10 +1850,11 @@ var reset_default_value_input = function() {
 };
 
 var decrease_servers = function(section) {
-    const element = document.querySelector(`.${section}_server_setup .server_count`);
-    const parts = element.innerHTML.split(' ');
-    parts[0] = Number(parts[0]) - 1;
-    element.innerHTML = parts.join(' ');
+    const element = document.querySelector(`.server_count .${section}_server_count`);
+    const value = parseInt(element.textContent);
+    if (value > 0) {
+        element.innerHTML  = value - 1;
+    }
 };
 
 var err_msg = function(msg) {
