@@ -15,11 +15,16 @@ if (!hm_exists('connect_to_smtp_server')) {
             'tls' => $tls);
 
         $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
-        $server = Hm_SMTP_List::get($smtp_server_id, false);
 
-        $result = Hm_SMTP_List::service_connect($smtp_server_id, $server, $user, $pass, false);
-
-        return $result;
+        $smtp = Hm_SMTP_List::connect($smtp_server_id, false);
+        if (smtp_authed($smtp)) {
+            return $smtp_server_id;
+        }
+        else {
+            Hm_SMTP_List::del($smtp_server_id);
+            Hm_Msgs::add('ERRAuthentication failed');
+            return null;
+        }
     }
 }
 
