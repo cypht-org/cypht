@@ -1101,6 +1101,7 @@ class Hm_JMAP {
                     'name' => $vals['name'],
                     'type' => 'jmap',
                     'noselect' => false,
+                    'clickable' => true,
                     'id' => $vals['id'],
                     'role' => $vals['role'],
                     'name_parts' => $vals['name_parts'],
