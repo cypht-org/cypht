@@ -428,7 +428,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             return '';
         }
 
-        $res = '<div class="subtitle mt-4 fw-bold">'.$this->trans('IMAP and JMAP Servers').'</div>';
+        $res = '<div class="subtitle mt-4">Imap & JMAP Servers</div>';
         foreach ($list as $index => $vals) {
             $server_id = $vals['id'];
             $type = 'IMAP';
@@ -460,6 +460,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
+            $res .= '<div class="' . strtolower($type) . '_server">';
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';

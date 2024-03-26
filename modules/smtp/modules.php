@@ -1382,6 +1382,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
+            $res .= '<div class="smtp_server">';
 
             $res .= '<form class="smtp_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';

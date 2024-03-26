@@ -20,7 +20,7 @@ var check_attachment_dir_access = function() {
 
 var smtp_test_action = function(event) {
     event.preventDefault();
-    var form = $(this).parent();
+    var form = $(this).closest('.smtp_connect');
     Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
@@ -31,18 +31,18 @@ var smtp_test_action = function(event) {
 
 var smtp_save_action = function(event) {
     event.preventDefault();
-    var form = $(this).parent();
+    var form = $(this).closest('.smtp_connect');
+    var btnContainer = $(this).parent();
     Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.just_saved_credentials) {
                 form.find('.credentials').attr('disabled', true);
                 form.find('.save_smtp_connection').hide();
                 form.find('.smtp_password').val('');
                 form.find('.smtp_password').attr('placeholder', '[saved]');
-                form.append('<input type="submit" value="Forget" class="forget_smtp_connection btn btn-outline-secondary btn-sm" />');
+                btnContainer.append('<input type="submit" value="Forget" class="forget_smtp_connection btn btn-outline-secondary btn-sm me-2" />');
                 $('.forget_smtp_connection').on('click', smtp_forget_action);
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
@@ -54,16 +54,16 @@ var smtp_save_action = function(event) {
 
 var smtp_forget_action = function(event) {
     event.preventDefault();
-    var form = $(this).parent();
+    var form = $(this).closest('.smtp_connect');
+    var btnContainer = $(this).parent();
     Hm_Notices.hide(true);
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.just_forgot_credentials) {
                 form.find('.credentials').prop('disabled', false);
                 form.find('.credentials').val('');
-                form.append('<input type="submit" value="Save" class="save_smtp_connection" />');
+                btnContainer.append('<input type="submit" value="Save" class="save_smtp_connection btn btn-outline-secondary btn-sm me-2" />');
                 $('.save_smtp_connection').on('click', smtp_save_action);
                 $('.forget_smtp_connection', form).remove();
                 Hm_Utils.set_unsaved_changes(1);
@@ -80,13 +80,13 @@ var smtp_delete_action = function(event) {
     }
     event.preventDefault();
     Hm_Notices.hide(true);
-    var form = $(this).parent();
+    var form = $(this).closest('.smtp_connect');
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
             Hm_Notices.show(res.router_user_msgs);
             if (res.deleted_server_id) {
-                form.parent().parent().remove();
+                form.parent().fadeOutAndRemove()
                 Hm_Utils.set_unsaved_changes(1);
                 Hm_Folders.reload_folders(true);
                 decrease_servers('smtp');
