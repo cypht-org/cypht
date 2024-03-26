@@ -1419,7 +1419,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
-            $res .= '</div></div></form>';
+            $res .= '</div></div></form></div>';
         }
         return $res;
     }

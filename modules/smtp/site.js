@@ -84,7 +84,6 @@ var smtp_delete_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function(res) {
-            Hm_Notices.show(res.router_user_msgs);
             if (res.deleted_server_id) {
                 form.parent().fadeOutAndRemove()
                 Hm_Utils.set_unsaved_changes(1);
