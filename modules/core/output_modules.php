@@ -501,10 +501,10 @@ class Hm_Output_header_css extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $mods = $this->get('router_module_list');
+        if (! $this->get('theme')) {
+            $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+        }
         if (DEBUG_MODE) {
-            if ($this->get('theme') == '') {
-                $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
-            }
             $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
