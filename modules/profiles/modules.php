@@ -220,7 +220,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                         continue;
                     }
                     if (strlen(trim($smtp_vals['sig']))) {
-                        $sigs[] = sprintf("%s: \"\\n%s\\n\"", $smtp_vals['smtp_id'].'.'.($index+1), $this->html_safe(str_replace("\r\n", "\\n", $smtp_vals['sig'])));
+                        $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $smtp_vals['smtp_id'].'.'.($index+1), $this->html_safe(str_replace("\r\n", "\\n", $smtp_vals['sig'])));
                         $used[] = $smtp_vals['id'];
                     }
                 }
@@ -230,7 +230,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                     continue;
                 }
                 if (strlen(trim($vals['sig']))) {
-                    $sigs[] = sprintf("%s: \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
+                    $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
                     $used[] = $vals['id'];
                 }
             }

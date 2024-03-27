@@ -856,22 +856,33 @@ class Hm_JMAP {
     private function init_session($data, $url) {
         $this->state = 'authenticated';
         $this->session = $data;
-        $this->api_url = sprintf(
-            '%s%s',
-            preg_replace("/\/$/", '', $url),
-            $data['apiUrl']
-        );
-	$this->api_url = $data['apiUrl'];
-        $this->download_url = sprintf(
-            '%s%s',
-            preg_replace("/\/$/", '', $url),
-            $data['downloadUrl']
-        );
-        $this->upload_url = sprintf(
-            '%s%s',
-            preg_replace("/\/$/", '', $url),
-            $data['uploadUrl']
-        );
+        if (!str_contains($data['apiUrl'], $url)){
+            $this->api_url = sprintf(
+                '%s%s',
+                preg_replace("/\/$/", '', $url),
+                $data['apiUrl']
+            );
+        }else{
+            $this->api_url = $data['apiUrl'];
+        }
+        if (!str_contains($data['downloadUrl'], $url)){
+            $this->download_url = sprintf(
+                '%s%s',
+                preg_replace("/\/$/", '', $url),
+                $data['downloadUrl']
+            );
+        }else{
+            $this->download_url = $data['downloadUrl'];
+        }
+        if (!str_contains($data['uploadUrl'], $url)){
+            $this->upload_url = sprintf(
+                '%s%s',
+                preg_replace("/\/$/", '', $url),
+                $data['uploadUrl']
+            );
+        }else{
+            $this->upload_url = $data['uploadUrl'];
+        }
         foreach ($data['accounts'] as $account) {
             $this->account_id = array_keys($data['accounts'])[0];
         }
