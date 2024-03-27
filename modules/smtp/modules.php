@@ -1825,14 +1825,14 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $profiles = $mod->get('compose_profiles', array());
     $profile = profile_from_compose_smtp_id($profiles, $atts['draft_smtp']);
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
-
+    
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
         $from = $profile['replyto'];
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
 
-    if (!$imap_profile) {
+    if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
@@ -1841,12 +1841,10 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
             $from = $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'];
         }
     }
-    if (!$imap_profile) {
+    if (!$imap_profile || empty($imap_profile)) {
         return -1;
     }
-
     $specials = get_special_folders($mod, $imap_profile['id']);
-
     if (!array_key_exists('draft', $specials) || !$specials['draft']) {
         Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
@@ -1854,7 +1852,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
     $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
     $draft_folder = $imap->select_mailbox($specials['draft']);
-
+    
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
@@ -1893,7 +1891,9 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
 
     foreach ($mailbox_page[1] as $mail) {
         $msg_header = $imap->get_message_headers($mail['uid']);
-        if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
+        //stalwart return Message-ID instead of Message-Id and we add trim to avoid any extra spaces
+        $msg_header_id = $msg_header['Message-ID'] ? trim($msg_header['Message-ID']) : trim($msg_header['Message-Id']);
+        if ($msg_header_id === $mime->get_headers()['Message-Id']) {
             return $mail['uid'];
         }
     }
