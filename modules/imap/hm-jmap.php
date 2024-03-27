@@ -861,17 +861,21 @@ class Hm_JMAP {
             preg_replace("/\/$/", '', $url),
             $data['apiUrl']
         );
-	$this->api_url = $data['apiUrl'];
+	    $this->api_url = $data['apiUrl'];
         $this->download_url = sprintf(
             '%s%s',
             preg_replace("/\/$/", '', $url),
             $data['downloadUrl']
         );
-        $this->upload_url = sprintf(
-            '%s%s',
-            preg_replace("/\/$/", '', $url),
-            $data['uploadUrl']
-        );
+        if (!str_contains($data['uploadUrl'], $url)){
+            $this->upload_url = sprintf(
+                '%s%s',
+                preg_replace("/\/$/", '', $url),
+                $data['uploadUrl']
+            );
+        }else{
+            $this->upload_url = $data['uploadUrl'];
+        }
         foreach ($data['accounts'] as $account) {
             $this->account_id = array_keys($data['accounts'])[0];
         }
@@ -1101,6 +1105,7 @@ class Hm_JMAP {
                     'name' => $vals['name'],
                     'type' => 'jmap',
                     'noselect' => false,
+                    'clickable' => true,
                     'id' => $vals['id'],
                     'role' => $vals['role'],
                     'name_parts' => $vals['name_parts'],
