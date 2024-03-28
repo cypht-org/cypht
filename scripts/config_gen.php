@@ -106,6 +106,8 @@ function build_config() {
 
         /* create the production version */
         create_production_site($assets, $settings, $hashes);
+
+        process_bootswatch_files();
     }
     else {
         printf("\nNo settings found in ini file\n");
@@ -235,8 +237,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     $js_hash = '';
     $css_hash = '';
     if ($css) {
-        $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/css/bootstrap.min.css");
-        $css_out .= file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
+        $css_out = file_get_contents(VENDOR_PATH . "twbs/bootstrap-icons/font/bootstrap-icons.css");
         $css_out .= compress($css, $css_compress);
         $css_hash = build_integrity_hash($css_out);
         file_put_contents('site.css', $css_out);
@@ -312,6 +313,33 @@ function append_bootstrap_icons_files() {
         $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
         copy($file, $dest_forlder);
     }
+}
+
+function process_bootswatch_files() {
+    $src = 'site/modules/themes/assets';
+    if (! is_dir($src)) {
+        return;
+    }
+    $dir = opendir($src); 
+    while(false !== ($folder = readdir($dir))) { 
+        if (($folder != '.' ) && ($folder != '..' )) { 
+            if (is_dir($src . '/' . $folder)) {
+                $target = $src . '/' . $folder . '/css/' . $folder . '.css';
+                if ($folder == 'default') {
+                    $content = file_get_contents('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
+                    // Append customization done to the default theme
+                    $custom = file_get_contents($target);
+                    $custom = preg_replace('/^@import.+/m', '', $custom);
+                    $custom = preg_replace('/^@charset.+/m', '', $custom);
+                    $content .= "\n" . $custom;
+                } else {
+                    $content = file_get_contents('vendor/thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
+                }
+                file_put_contents($target, $content);
+            }
+        } 
+    } 
+    closedir($dir); 
 }
 
 /**
