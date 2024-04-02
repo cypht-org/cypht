@@ -170,14 +170,14 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     remove_from_cached_imap_pages(msg_cache_key);
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                        window.location.href = nlink.attr('href');
+                        Hm_Utils.redirect(nlink.attr('href'));
                     }
                     else {
                         if (!hm_list_parent()) {
-                            window.location.href = "?page=message_list&list_path="+hm_list_path();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_path());
                         }
                         else {
-                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                         }
                     }
                 }
@@ -208,14 +208,14 @@ var imap_unread_message = function(supplied_uid, supplied_detail) {
                     }
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                        window.location.href = nlink.attr('href');
+                        Hm_Utils.redirect(nlink.attr('href'));
                     }
                     else {
                         if (!hm_list_parent()) {
-                            window.location.href = "?page=message_list&list_path="+hm_list_path();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_path());
                         }
                         else {
-                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                         }
                     }
             },
@@ -976,16 +976,16 @@ var imap_perform_move_copy = function(dest_id, context) {
                     if (action == 'move') {
                         var nlink = $('.nlink');
                         if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                            window.location.href = nlink.attr('href');
+                            Hm_Utils.redirect(nlink.attr('href'));
                         }
                         else {
-                            if(hm_page_name() == 'search'){
+                            if (hm_page_name() == 'search') {
                                 window.location.reload();
                             }
-                            else if(hm_page_name() == 'advanced_search'){
+                            else if (hm_page_name() == 'advanced_search'){
                                 process_advanced_search();
-                            }else{
-                                window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            } else {
+                                Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                             }
                         }
                     }
@@ -1237,14 +1237,14 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                     }
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                        window.location.href = nlink.attr('href');
+                        Hm_Utils.redirect(nlink.attr('href'));
                     }
                     else {
                         if (!hm_list_parent()) {
-                            window.location.href = "?page=message_list&list_path="+hm_list_path();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_path());
                         }
                         else {
-                            window.location.href = "?page=message_list&list_path="+hm_list_parent();
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                         }
                     }
                 }
