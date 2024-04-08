@@ -151,11 +151,11 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
             '<i class="bi bi-unlock-fill fs-5 me-2"></i>'.$this->trans('2 Factor Authentication').'</td></tr>';
 
         $res .= '<tr class="tfa_setting"><td><label class="form-check-label">'.$this->trans('Enable 2 factor authentication').'</label>'.
-            '</td><td><input class="form-check-input" value="1" type="checkbox" name="2fa_enable"';
+            '<input class="form-check-input ms-3" value="1" type="checkbox" name="2fa_enable"';
         if ($enabled) {
             $res .= ' checked="checked"';
         }
-        $res .= '></td></tr>';
+        $res .= '>';
         $svg = $this->get('2fa_svg');
 
         if ($svg) {
@@ -174,9 +174,9 @@ class Hm_Output_enable_2fa_setting extends Hm_Output_Module {
         else {
             $qr_code = '<div class="tfa_mt_1">'.$this->trans('Unable to generate 2 factor authentication QR code').'</div>';
         }
-        $res .= $qr_code . '</td>';
+        $res .= $qr_code;
 
-        $res .= '<td><div class="tfa_mb_1">'.$this->trans('The following backup codes can be used to access your account if you lose your device'). '</div>';
+        $res .= '<div class="tfa_mb_1">'.$this->trans('The following backup codes can be used to access your account if you lose your device'). '</div>';
 
         foreach ($backup_codes as $val) {
             $res .= ' '.$val.'<input type="hidden" name="2fa_backup_codes[]" value="'.$val.'" /></br >';
@@ -238,12 +238,12 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
                     <meta charset="utf-8" />
                     <link href="site.css" media="all" rel="stylesheet" type="text/css" />
                     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-                    <link href="vendor/twbs/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+                    <link href="modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />
                     <link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />
                 </head>
                 <body>
-                    <div class="container bg-light">
-                        <div class="row align-items-center justify-content-center vh-100 p-3">
+                    <div class="bg-light">
+                        <div class="d-flex align-items-center justify-content-center vh-100 p-3">
                                 <div class="card col-12 col-md-6 col-lg-4 p-3">
                                     <div class="card-body">
                                         <form class="mt-5" method="POST">
