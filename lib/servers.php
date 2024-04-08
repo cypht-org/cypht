@@ -190,10 +190,10 @@ trait Hm_Server_List {
      * @param int $id server id
      * @return void
      */
-    public static function add($atts) {
+    public static function add($atts, $save = true) {
         $atts['object'] = false;
         $atts['connected'] = false;
-        return self::repo_add($atts);
+        return self::repo_add($atts, $save);
     }
 
     /**

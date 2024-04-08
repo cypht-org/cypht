@@ -1536,11 +1536,10 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
         foreach (Hm_IMAP_List::getAll() as $id => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
-                    $updated = true;
                     $server['expiration'] = 1;
+                    Hm_IMAP_List::edit($id, $server);
                 }
             }
-            Hm_IMAP_List::edit($id, $server);
             if (array_key_exists('default', $server) && $server['default']) {
                 $has_default = true;
             }

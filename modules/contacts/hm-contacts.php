@@ -24,7 +24,7 @@ class Hm_Contact_Store {
     public function init($user_config, $session) {
         self::initRepo('contacts', $user_config, $session, $this->data, function($initial) {
             foreach ($initial as $contact) {
-                $this->add_contact($contact);
+                $this->add_contact($contact, false);
             }
         });
     }
@@ -43,9 +43,9 @@ class Hm_Contact_Store {
     public function __construct() {
     }
 
-    public function add_contact($data) {
+    public function add_contact($data, $save = true) {
         $contact = new Hm_Contact($data);
-        self::add($contact);
+        self::add($contact, $save);
         return true;
     }
 
