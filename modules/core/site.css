@@ -1195,7 +1195,7 @@ div.unseen,
 .reset_default_value_checkbox,
 .reset_default_value_select,
 .reset_default_value_input {
-  vertical-align: bottom;
+  vertical-align: center;
   transform: scaleX(-1);
   width: 18px;
   height: 18px;
@@ -1331,3 +1331,7 @@ div.unseen,
 .server_config_section { display: none; }
 .hide {display: none;}
 .step-container .invalid-feedback { display: block; }
+
+.settings_table .form-select {
+  display: inline-block;
+}
