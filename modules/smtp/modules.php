@@ -1832,7 +1832,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
 
-    if (!$imap_profile) {
+    if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
             $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]
@@ -1841,7 +1841,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
             $from = $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'];
         }
     }
-    if (!$imap_profile) {
+    if (!$imap_profile || empty($imap_profile)) {
         return -1;
     }
 
@@ -1893,8 +1893,13 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
 
     foreach ($mailbox_page[1] as $mail) {
         $msg_header = $imap->get_message_headers($mail['uid']);
-        if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
-            return $mail['uid'];
+        // Convert all header keys to lowercase
+        $msg_header_lower = array_change_key_case($msg_header, CASE_LOWER);
+        $mime_headers_lower = array_change_key_case($mime->get_headers(), CASE_LOWER);
+        if (isset($msg_header_lower['message-id'], $mime_headers_lower['message-id'])) {
+            if ($msg_header_lower['message-id'] === $mime_headers_lower['message-id']) {
+                return $mail['uid'];
+            }
         }
     }
     return -1;
