@@ -393,7 +393,7 @@ function message_since_dropdown($since, $name, $output_mod) {
         if ($val == $since) {
             $res .= ' selected="selected"';
             if (($name == 'feed_since' && $val != 'today') || ($name != 'feed_since' && $val != '-1 week')) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-paperclip refresh_list reset_default_value_select"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
             }
 
         }
