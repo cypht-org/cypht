@@ -1896,8 +1896,13 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         // Convert all header keys to lowercase
         $msg_header_lower = array_change_key_case($msg_header, CASE_LOWER);
         $mime_headers_lower = array_change_key_case($mime->get_headers(), CASE_LOWER);
-        if (isset($msg_header_lower['message-id'], $mime_headers_lower['message-id'])) {
-            if ($msg_header_lower['message-id'] === $mime_headers_lower['message-id']) {
+        if (!empty($msg_header_lower['message_id']) && !empty($mime_headers_lower['message_id'])) {
+            if (trim($msg_header_lower['message_id']) === trim($mime_headers_lower['message_id'])) {
+                return $mail['uid'];
+            }
+        }
+        if (!empty($msg_header_lower['message-id']) && !empty($mime_headers_lower['message-id'])) {
+            if (trim($msg_header_lower['message-id']) === trim($mime_headers_lower['message-id'])) {
                 return $mail['uid'];
             }
         }
