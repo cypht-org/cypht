@@ -24,7 +24,9 @@ by the framework. Modules provide a flexible way to add new features or
 customize the program without hacking the code.
 
 
-Installation instructions [https://cypht.org/install.html](https://cypht.org/install.html)
+Installation instructions 
+* Version 1: [https://cypht.org/install-1x.html](https://cypht.org/install-1x.html)
+* Version 2: [https://cypht.org/install-2x.html](https://cypht.org/install-2x.html)
 
 Security details: [https://cypht.org/security.html](https://cypht.org/security.html)
 
