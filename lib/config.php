@@ -481,7 +481,7 @@ class Hm_Site_Config_File extends Hm_Config {
      * @param string $source source location for site configuration
      */
     public function __construct($all_configs = []) {
-        $this->load(empty($all_configs) ? merge_config_files(APP_PATH.'config') : $all_configs, false);
+        $this->load(empty($all_configs) ? merge_config_files(CONFIG_PATH) : $all_configs, false);
     }
 
     /**
