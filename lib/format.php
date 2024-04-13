@@ -48,7 +48,7 @@ class Hm_Format_JSON extends HM_Format {
         $output['router_user_msgs'] = Hm_Msgs::get();
         $output = $this->filter_all_output($output, $allowed_output);
         if ($this->config->get('encrypt_ajax_requests', false)) {
-            $output = array('payload' => Hm_Crypt_Base::ciphertext(json_encode($output, JSON_FORCE_OBJECT), Hm_Request_Key::generate()));
+            $output = ['payload' => Hm_Crypt_Base::ciphertext(json_encode($output, JSON_FORCE_OBJECT), Hm_Request_Key::generate())];
         }
         return json_encode($output, JSON_FORCE_OBJECT);
     }
@@ -85,8 +85,7 @@ class Hm_Format_JSON extends HM_Format {
     private function filter_output($name, $value, $allowed) {
         if ($allowed[$name][1]) {
             $new_value = filter_var($value, $allowed[$name][0], $allowed[$name][1]);
-        }
-        else {
+        } else {
             $new_value = filter_var($value, $allowed[$name][0]);
         }
         if ($new_value === false && $allowed[$name] != FILTER_VALIDATE_BOOLEAN) {
@@ -126,7 +125,7 @@ class Hm_Transform {
      * @param string $encoding encoding to use for values
      * @return string on success, false on failure
      */
-    public static function stringify($data, $encoding='base64_encode') {
+    public static function stringify($data, $encoding = 'base64_encode') {
         if (is_string($data)) {
             return $data;
         }
@@ -144,8 +143,7 @@ class Hm_Transform {
     public static function convert($data) {
         if (substr($data, 0, 2) === 'a:') {
             return @unserialize($data);
-        }
-        elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
+        } elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
             return @json_decode($data, true);
         }
         return false;
@@ -158,7 +156,7 @@ class Hm_Transform {
      * @param boolean $return return original string if true
      * @return mixed array on success, false or original string on failure
      */
-    public static function unstringify($data, $encoding='base64_decode', $return=false) {
+    public static function unstringify($data, $encoding = 'base64_decode', $return = false) {
         if (!is_string($data) || !trim($data)) {
             return false;
         }
@@ -179,16 +177,14 @@ class Hm_Transform {
      * @return array
      */
     public static function hm_encode($data, $encoding) {
-        $result = array();
+        $result = [];
         foreach ($data as $name => $val) {
             if (is_array($val)) {
                 $result[$name] = self::hm_encode($val, $encoding);
-            }
-            else {
+            } else {
                 if (is_string($val)) {
                     $result[$name] = $encoding($val);
-                }
-                else {
+                } else {
                     $result[$name] = $val;
                 }
             }

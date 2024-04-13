@@ -37,10 +37,9 @@ class Hm_Environment {
         }
     }
 
-    public static function get($key, $defaultValue = null) {
+    public static function get($key, $default = null) {
         $variables = self::getInstance()->get_environment_variables();
-
-        return array_key_exists($key, $variables) ? $variables[$key] : $defaultValue;
+        return $variables[$key] ?? $default;
     }
 
     /**

@@ -71,8 +71,8 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $this->connect();
-        $row = Hm_DB::execute($this->dbh, 'select hash from hm_user where username = ?', array($user));
-        if ($row && array_key_exists('hash', $row) && $row['hash'] && Hm_Crypt::check_password($pass, $row['hash'])) {
+        $row = Hm_DB::execute($this->dbh, 'select hash from hm_user where username = ?', [$user]);
+        if ($row && !empty($row['hash']) && Hm_Crypt::check_password($pass, $row['hash'])) {
             return true;
         }
         sleep(2);
@@ -87,7 +87,7 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function delete($user) {
         $this->connect();
-        if (Hm_DB::execute($this->dbh, 'delete from hm_user where username = ?', array($user))) {
+        if (Hm_DB::execute($this->dbh, 'delete from hm_user where username = ?', [$user])) {
             return true;
         }
         return false;
@@ -115,7 +115,7 @@ class Hm_Auth_DB extends Hm_Auth {
     public function change_pass($user, $pass) {
         $this->connect();
         $hash = Hm_Crypt::hash_password($pass);
-        if (Hm_DB::execute($this->dbh, 'update hm_user set hash=? where username=?', array($hash, $user))) {
+        if (Hm_DB::execute($this->dbh, 'update hm_user set hash=? where username=?', [$hash, $user])) {
             return true;
         }
         return false;
@@ -130,13 +130,13 @@ class Hm_Auth_DB extends Hm_Auth {
     public function create($user, $pass) {
         $this->connect();
         $result = 0;
-        $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', array($user));
+        $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', [$user]);
         if (!empty($res)) {
             $result = 1;
         }
         else {
             $hash = Hm_Crypt::hash_password($pass);
-            if (Hm_DB::execute($this->dbh, 'insert into hm_user values(?,?)', array($user, $hash))) {
+            if (Hm_DB::execute($this->dbh, 'insert into hm_user values(?,?)', [$user, $hash])) {
                 $result = 2;
             }
         }
@@ -159,7 +159,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
     }
 
     /* IMAP authentication server settings */
-    private $imap_settings = array();
+    private $imap_settings = [];
 
     /**
      * @param object $imap imap connection object
@@ -196,11 +196,11 @@ class Hm_Auth_IMAP extends Hm_Auth {
             Hm_Debug::add('Invalid IMAP auth configuration settings');
             return false;
         }
-        $this->imap_settings = array('server' => $server, 'port' => $port,
+        $this->imap_settings = ['server' => $server, 'port' => $port,
             'tls' => $tls, 'username' => $user, 'password' => $pass,
-            'no_caps' => false, 'blacklisted_extensions' => array('enable'),
+            'no_caps' => false, 'blacklisted_extensions' => ['enable'],
             'sieve_config_host' => $sieve_config
-        );
+        ];
         return $this->check_connection($imap);
     }
 
@@ -219,7 +219,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
  */
 class Hm_Auth_LDAP extends Hm_Auth {
 
-    protected $config = array();
+    protected $config = [];
     protected $fh;
     protected $source = 'ldap';
 
@@ -231,7 +231,7 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $prefix = 'ldaps://';
         $server = $this->apply_config_value('server', 'localhost');
         $port = $this->apply_config_value('port', 389);
-        if (array_key_exists('enable_tls', $this->config) && !$this->config['enable_tls']) {
+        if (!empty($this->config['enable_tls'])) {
             $prefix = 'ldap://';
         }
         return $prefix.$server.':'.$port;
@@ -243,10 +243,7 @@ class Hm_Auth_LDAP extends Hm_Auth {
      * @return mixed
      */
     private function apply_config_value($name, $default) {
-        if (array_key_exists($name, $this->config) && trim($this->config[$name])) {
-            return $this->config[$name];
-        }
-        return $default;
+        return !empty($this->config[$name]) ? $this->config[$name] : $default;
     }
 
     /**
@@ -260,14 +257,14 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
         if ($server && $port && $base_dn) {
             $user = sprintf('cn=%s,%s', $user, $base_dn);
-            $this->config = array(
+            $this->config = [
                 'server' => $server,
                 'port' => $port,
                 'enable_tls' => $tls,
                 'base_dn' => $base_dn,
                 'user' => $user,
                 'pass' => $pass
-            );
+            ];
             return $this->connect();
         }
         Hm_Debug::add('Invalid LDAP auth configuration settings');
@@ -315,7 +312,7 @@ function get_auth_config($config, $prefix) {
     $server = $config->get($prefix.'_auth_server', false);
     $port = $config->get($prefix.'_auth_port', false);
     $tls = $config->get($prefix.'_auth_tls', false);
-    $ret = array($server, $port, $tls);
+    $ret = [$server, $port, $tls];
     if ($prefix == 'imap') {
         $ret[] = $config->get($prefix.'_auth_sieve_conf_host', false);
     }

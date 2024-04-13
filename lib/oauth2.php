@@ -37,7 +37,7 @@ class Hm_Oauth2 {
      * @param string $login_hint optional username
      * @return string
      */
-    public function request_authorization_url($url, $scope, $state, $login_hint=false) {
+    public function request_authorization_url($url, $scope, $state, $login_hint = false) {
         $res = sprintf('%s?response_type=code&amp;scope=%s&amp;state=%s&amp;'.
             'approval_prompt=force&amp;access_type=offline&amp;client_id=%s&amp;redirect_uri=%s',
             $url, $scope, $state, $this->client_id, $this->redirect_uri);
@@ -54,7 +54,7 @@ class Hm_Oauth2 {
      * @param array $headers HTTP headers to add to the request
      * @return array
      */
-    public function request_token($url, $authorization_code, $headers=array()) {
+    public function request_token($url, $authorization_code, $headers = []) {
         return $this->api->command($url, $headers, array('code' => $authorization_code, 'client_id' => $this->client_id,
             'client_secret' => $this->client_secret, 'redirect_uri' => $this->redirect_uri, 'grant_type' => 'authorization_code'));
     }
@@ -66,7 +66,7 @@ class Hm_Oauth2 {
      * @return array
      */
     public function refresh_token($url, $refresh_token) {
-        return $this->api->command($url, array(), array('client_id' => $this->client_id, 'client_secret' => $this->client_secret,
+        return $this->api->command($url, [], array('client_id' => $this->client_id, 'client_secret' => $this->client_secret,
             'refresh_token' => $refresh_token, 'grant_type' => 'refresh_token'));
     }
 }

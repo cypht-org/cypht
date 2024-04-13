@@ -11,17 +11,17 @@
  * to fetch data set by other modules and to return their own output. Handler modules must use these
  * methods to set a response, output modules must if the format is AJAX, otherwise they should return
  * an HTML5 string
- */ 
+ */
 trait Hm_Module_Output {
 
     /* module output */
-    protected $output = array();
+    protected $output = [];
 
     /* protected output keys */
-    protected $protected = array();
+    protected $protected = [];
 
     /* list of appendable keys */
-    protected $appendable = array();
+    protected $appendable = [];
 
     /**
      * @param string $name name to check for
@@ -45,7 +45,7 @@ trait Hm_Module_Output {
      * @param bool $protected true disallows overwriting
      * @return bool true on success
      */
-    public function out($name, $value, $protected=true) {
+    public function out($name, $value, $protected = true) {
         if (!$this->check_overwrite($name, $this->protected, 'protected', $value)) {
             return false;
         }
@@ -73,14 +73,12 @@ trait Hm_Module_Output {
             if (is_array($this->output[$name])) {
                 $this->output[$name][] = $value;
                 return true;
-            }
-            else {
+            } else {
                 Hm_Debug::add(sprintf('Tried to append %s to scaler %s', $value, $name));
                 return false;
             }
-        }
-        else {
-            $this->output[$name] = array($value);
+        } else {
+            $this->output[$name] = [$value];
             $this->appendable[] = $name;
             return true;
         }
@@ -92,11 +90,11 @@ trait Hm_Module_Output {
      * @param bool $special_only only use htmlspecialchars not htmlentities
      * @return string sanitized value
      */
-    public function html_safe($string, $special_only=false) {
+    public function html_safe($string, $special_only = false) {
         if ($special_only) {
-            return htmlspecialchars((string) $string, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+            return htmlspecialchars((string) $string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         }
-        return htmlentities((string) $string, ENT_QUOTES | ENT_SUBSTITUTE, "UTF-8");
+        return htmlentities((string) $string, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     }
 
     /**
@@ -110,13 +108,11 @@ trait Hm_Module_Output {
             if (is_string($this->output[$name])) {
                 $this->output[$name] .= $value;
                 return true;
-            }
-            else {
+            } else {
                 Hm_Debug::add(sprintf('Could not append %s to %s', print_r($value,true), $name));
                 return false;
             }
-        }
-        else {
+        } else {
             $this->output[$name] = $value;
             return true;
         }
@@ -145,7 +141,7 @@ trait Hm_Module_Output {
      * @param string $typed if a default value is given, typecast the result to it's type
      * @return mixed value if found or default
      */
-    public function get($name, $default=NULL, $typed=true) {
+    public function get($name, $default = NULL, $typed = true) {
         if (array_key_exists($name, $this->output)) {
             $val = $this->output[$name];
             if (!is_null($default) && $typed) {
@@ -195,7 +191,7 @@ trait Hm_Handler_Validate {
      * @return bool
      */
     public function validate_method($session, $request) {
-        if (!in_array(strtolower($request->method), array('get', 'post'), true)) {
+        if (!in_array(strtolower($request->method), ['get', 'post'], true)) {
             if ($session->loaded) {
                 $session->destroy($request);
                 Hm_Debug::add(sprintf('LOGGED OUT: invalid method %s', $request->method));
@@ -231,18 +227,18 @@ trait Hm_Handler_Validate {
         if ($target == 'none') {
             $target = false;
         }
-        $server_vars = array(
+        $server_vars = [
             'HTTP_REFERER' => 'source',
             'HTTP_ORIGIN' => 'source',
             'HTTP_HOST' => 'target',
             'HTTP_X_FORWARDED_HOST' => 'target'
-        );
+        ];
         foreach ($server_vars as $header => $type) {
-            if (array_key_exists($header, $request->server) && $request->server[$header]) {
+            if (!empty($request->server[$header])) {
                 $$type = $request->server[$header];
             }
         }
-        return array($source, $target);
+        return [$source, $target];
     }
 
     /**
@@ -328,7 +324,7 @@ abstract class Hm_Handler_Module {
      * @param array $output data from handler modules
      * @param array $protected list of protected output names
      */
-    public function __construct($parent, $page, $output=array(), $protected=array()) {
+    public function __construct($parent, $page, $output = [], $protected = []) {
         $this->session = $parent->session;
         $this->request = $parent->request;
         $this->cache = $parent->cache;
@@ -348,7 +344,7 @@ abstract class Hm_Handler_Module {
             Hm_Debug::load_page_stats();
             Hm_Debug::show();
         }
-        Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+        Hm_Functions::cease(json_encode(['status' => 'not callable']));
         return 'exit';
     }
 
@@ -381,8 +377,7 @@ abstract class Hm_Handler_Module {
         }
         if ($this->request->type == 'AJAX') {
             return $this->invalid_ajax_key();
-        }
-        else {
+        } else {
             return $this->invalid_http_key();
         }
     }
@@ -413,7 +408,7 @@ abstract class Hm_Handler_Module {
      * @return array tuple with a bool indicating success, and an array of valid form values
      */
     public function process_form($form) {
-        $new_form = array();
+        $new_form = [];
         foreach($form as $name) {
             if (!array_key_exists($name, $this->request->post)) {
                 continue;
@@ -423,7 +418,7 @@ abstract class Hm_Handler_Module {
                 $new_form[$name] = $val;
             }
         }
-        return array((count($form) === count($new_form)), $new_form);
+        return [(count($form) === count($new_form)), $new_form];
     }
 
     /**
@@ -461,7 +456,7 @@ abstract class Hm_Output_Module {
     use Hm_Module_Output;
 
     /* translated language strings */
-    protected $lstr = array();
+    protected $lstr = [];
 
     /* langauge name */
     protected $lang = false;
@@ -491,8 +486,7 @@ abstract class Hm_Output_Module {
         if (array_key_exists($string, $this->lstr)) {
             if ($this->lstr[$string] === false) {
                 return strip_tags($string);
-            }
-            else {
+            } else {
                 return strip_tags($this->lstr[$string]);
             }
         }
@@ -532,7 +526,7 @@ abstract class Hm_Output_Module {
      * @return string translated string
      */
     public function translate_number($number) {
-        if (!is_numeric($number) || !in_array($this->lang, array("fa"))) {
+        if (!is_numeric($number) || !in_array($this->lang, ['fa'])) {
             return $number;
         }
         $number_splitted = str_split($number);

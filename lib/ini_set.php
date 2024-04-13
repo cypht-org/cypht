@@ -33,7 +33,7 @@ if (!$config->get('disable_tls', false)) {
 }
 
 /* gc max lifetime */
-ini_set('session.gc_maxlifetime', 1440); 
+ini_set('session.gc_maxlifetime', 1440);
 
 /* disable trans sid */
 ini_set('session.use_trans_sid', 0);
@@ -44,8 +44,7 @@ ini_set('session.cache_limiter', 'nocache');
 /* session hash mechanism */
 if (version_compare(PHP_VERSION, 7.4, '==')) {
     ini_set('session.hash_function', 1);
-}
-else {
+} else {
     ini_set('session.hash_function', 'sha256');
 }
 

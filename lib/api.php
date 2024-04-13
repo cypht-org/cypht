@@ -18,7 +18,7 @@ class Hm_API_Curl {
      * Init
      * @param string $format format of the result
      */
-    public function __construct($format='json') {
+    public function __construct($format = 'json') {
         $this->format = $format;
     }
 
@@ -29,7 +29,7 @@ class Hm_API_Curl {
      * @param array $post post fields
      * @return array
      */
-    public function command($url, $headers=array(), $post=array(), $body='', $method=false) {
+    public function command($url, $headers = [], $post = [], $body = '', $method = false) {
         $ch = Hm_Functions::c_init();
         if (!$ch) {
             return [];
@@ -86,7 +86,7 @@ class Hm_API_Curl {
         }
         $result = @json_decode($curl_result, true);
         if ($result === NULL) {
-            return array();
+            return [];
         }
         return $result;
     }
@@ -97,7 +97,7 @@ class Hm_API_Curl {
      * @return string
      */
     private function format_post_data($data) {
-        $post = array();
+        $post = [];
         if (!is_array($data)) {
             return $data;
         }

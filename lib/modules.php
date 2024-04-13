@@ -19,19 +19,19 @@ trait Hm_Modules_Queue {
     private static $queue_attempts = 0;
 
     /* holds the module to page assignment list */
-    private static $module_list = array();
+    private static $module_list = [];
 
     /* current module set name, used for error tracking and limiting php file inclusion */
     private static $source = '';
 
     /* a retry queue for modules that fail to insert immediately */
-    private static $module_queue = array();
+    private static $module_queue = [];
 
     /* queue for delayed module insertion for all pages */
-    private static $all_page_queue = array();
+    private static $all_page_queue = [];
 
     /* queue for module replacement */
-    private static $replace_queue = array();
+    private static $replace_queue = [];
 
     /**
      * Queue a module to be added to all defined pages
@@ -43,7 +43,7 @@ trait Hm_Modules_Queue {
      * return void
      */
     public static function queue_module_for_all_pages($module, $logged_in, $marker, $placement, $source) {
-        self::$all_page_queue[] = array($module, $logged_in, $marker, $placement, $source);
+        self::$all_page_queue[] = [$module, $logged_in, $marker, $placement, $source];
     }
 
     /**
@@ -68,10 +68,9 @@ trait Hm_Modules_Queue {
      */
     private static function queue_module($queue, $page, $module, $logged_in, $marker, $placement, $source) {
         if ($queue) {
-            self::$module_queue[] = array($page, $module, $logged_in, $marker, $placement, $source);
+            self::$module_queue[] = [$page, $module, $logged_in, $marker, $placement, $source];
             return true;
-        }
-        else {
+        } else {
             Hm_Debug::add(sprintf('failed to insert module %s on %s', $module, $page));
         }
         return false;
@@ -85,7 +84,7 @@ trait Hm_Modules_Queue {
      * @return void
      */
     private static function queue_replacement_module($target, $replacement, $page) {
-        self::$replace_queue[] = array($target, $replacement, $page, self::$source);
+        self::$replace_queue[] = [$target, $replacement, $page, self::$source];
     }
 
     /**
@@ -104,7 +103,7 @@ trait Hm_Modules_Queue {
      */
     public static function try_queued_modules() {
         $requeue = true;
-        $new_queue = array();
+        $new_queue = [];
         if (self::$queue_attempts >= self::$queue_limit) {
             $requeue = false;
         }
@@ -197,7 +196,7 @@ trait Hm_Modules {
      */
     private static function add_page($page) {
         if (!array_key_exists($page, self::$module_list)) {
-            self::$module_list[$page] = array();
+            self::$module_list[$page] = [];
             return true;
         }
         return false;
@@ -215,9 +214,8 @@ trait Hm_Modules {
     private static function insert_module($marker, $page, $module, $logged_in, $placement, $source) {
         if ($marker !== false) {
             $inserted = self::insert_at_marker($marker, $page, $module, $logged_in, $placement, $source);
-        }
-        else {
-            self::$module_list[$page][$module] = array($source, $logged_in);
+        } else {
+            self::$module_list[$page][$module] = [$source, $logged_in];
             $inserted = true;
         }
         return $inserted;
@@ -242,8 +240,8 @@ trait Hm_Modules {
                 $index++;
             }
             $list = self::$module_list[$page];
-            self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
-                array($module => array($source, $logged_in)),
+            self::$module_list[$page] = array_merge(array_slice($list, 0, $index),
+                [$module => [$source, $logged_in]],
                 array_slice($list, $index));
             $inserted = true;
         }
@@ -265,8 +263,7 @@ trait Hm_Modules {
                 self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page], $source);
                 $found = true;
             }
-        }
-        else {
+        } else {
             foreach (self::$module_list as $page => $modules) {
                 if (array_key_exists($target, $modules)) {
                     self::$module_list[$page] = self::swap_key($target, $replacement, self::$module_list[$page], $source);
@@ -322,7 +319,7 @@ trait Hm_Modules {
      * @return array list of assigned modules
      */
     public static function get_for_page($page) {
-        $res = array();
+        $res = [];
         if (array_key_exists($page, self::$module_list)) {
             $res = array_merge($res, self::$module_list[$page]);
         }
@@ -354,7 +351,7 @@ class Hm_Output_Modules { use Hm_Modules; }
  * This is the functional interface used by module sets to
  * setup data handlers and output modules in their setup.php files.
  * They are easier to use than dealing directly with the class instances
- */ 
+ */
 
 /**
  * Add a module set name to the input processing manager

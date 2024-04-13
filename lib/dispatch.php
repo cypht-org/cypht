@@ -43,7 +43,7 @@ trait Hm_Dispatch_Redirect {
      * @return void
      */
     private function redirect_to_url($mod_exec) {
-        if (array_key_exists('redirect_url', $mod_exec->handler_response) && $mod_exec->handler_response['redirect_url']) {
+        if (!empty($mod_exec->handler_response['redirect_url'])) {
             Hm_Dispatch::page_redirect($mod_exec->handler_response['redirect_url']);
         }
     }
@@ -89,19 +89,16 @@ trait Hm_Dispatch_Redirect {
      * @return string|false
      */
     public function check_for_redirect($request, $mod_exec, $session) {
-        if (array_key_exists('no_redirect', $mod_exec->handler_response) && $mod_exec->handler_response['no_redirect']) {
+        if (!empty($mod_exec->handler_response['no_redirect'])) {
             return 'noredirect';
         }
         if ($this->post_redirect($request, $session, $mod_exec)) {
             return 'redirect';
-        }
-        elseif (array_key_exists('redirect_url', $mod_exec->handler_response) &&
-            $mod_exec->handler_response['redirect_url']) {
+        } elseif (!empty($mod_exec->handler_response['redirect_url'])) {
             $session->end();
             $this->redirect_to_url($mod_exec);
             return 'redirect';
-        }
-        elseif ($this->unpack_messages($request, $session)) {
+        } elseif ($this->unpack_messages($request, $session)) {
             return 'msg_forward';
         }
         return false;
@@ -114,7 +111,7 @@ trait Hm_Dispatch_Redirect {
      * @return boolean
      */
     public function unpack_messages($request, $session) {
-        if (array_key_exists('hm_msgs', $request->cookie) && trim($request->cookie['hm_msgs'])) {
+        if (!empty($request->cookie['hm_msgs'])) {
             $msgs = @json_decode(base64_decode($request->cookie['hm_msgs']), true);
             if (is_array($msgs)) {
                 array_walk($msgs, function($v) { Hm_Msgs::add($v); });
@@ -131,7 +128,7 @@ trait Hm_Dispatch_Redirect {
      * @param int $status current HTTP status
      * @return void
      */
-    static public function page_redirect($url, $status=false) {
+    static public function page_redirect($url, $status = false) {
         if (DEBUG_MODE) {
             Hm_Debug::add(sprintf('Redirecting to %s', $url));
             Hm_Debug::load_page_stats();
@@ -239,7 +236,7 @@ class Hm_Dispatch {
         /* output content to the browser */
         $this->render_output();
     }
-    
+
     /**
      * Check for a flag to save settings on login
      */
@@ -257,7 +254,7 @@ class Hm_Dispatch {
      * @return void
      */
     private function close_connections() {
-        foreach (array('Hm_IMAP_List', 'Hm_SMTP_List') as $class) {
+        foreach (['Hm_IMAP_List', 'Hm_SMTP_List'] as $class) {
             if (Hm_Functions::class_exists($class)) {
                 $class::clean_up();
             }
@@ -294,11 +291,7 @@ class Hm_Dispatch {
      * @param return array
      */
     private function get_pages($filters) {
-        $pages = array();
-        if (array_key_exists('allowed_pages', $filters)) {
-            $pages = $filters['allowed_pages'];
-        }
-        return $pages;
+        return $filters['allowed_pages'] ?? [];
     }
 
     /**
@@ -311,17 +304,15 @@ class Hm_Dispatch {
         if (array_key_exists('hm_ajax_hook', $request->get)) {
             if (in_array($request->get['hm_ajax_hook'], $this->get_pages($filters), true)) {
                 return true;
-            }
-            else {
-                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+            } else {
+                Hm_Functions::cease(json_encode(['status' => 'not callable']));;
             }
         }
         if (array_key_exists('hm_ajax_hook', $request->post)) {
             if (in_array($request->post['hm_ajax_hook'], $this->get_pages($filters), true)) {
                 return true;
-            }
-            else {
-                Hm_Functions::cease(json_encode(array('status' => 'not callable')));;
+            } else {
+                Hm_Functions::cease(json_encode(['status' => 'not callable']));;
             }
         }
         return false;
@@ -336,16 +327,10 @@ class Hm_Dispatch {
     public function get_page($filters, $request) {
         $this->page = 'notfound';
         if ($request->type == 'AJAX' && $this->validate_ajax_request($request, $filters)) {
-            if (array_key_exists('hm_ajax_hook', $request->get)) {
-                $this->page = $request->get['hm_ajax_hook'];
-            } else {
-                $this->page = $request->post['hm_ajax_hook'];
-            }
-        }
-        elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {
+            $this->page = $request->get['hm_ajax_hook'] ?? $request->post['hm_ajax_hook'];
+        } elseif (array_key_exists('page', $request->get) && in_array($request->get['page'], $this->get_pages($filters), true)) {
             $this->page = $request->get['page'];
-        }
-        elseif (!array_key_exists('page', $request->get)) {
+        } elseif (!array_key_exists('page', $request->get)) {
             $this->page = 'home';
         }
         $this->module_exec->page = $this->page;

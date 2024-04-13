@@ -26,7 +26,7 @@ class Hm_Memcached_Session extends Hm_DB_Session {
      * @param object $request request details
      * @return void
      */
-    public function start($request, $existing_session=False) {
+    public function start($request, $existing_session = false) {
         $this->db_start($request);
     }
 
@@ -104,5 +104,4 @@ class Hm_Memcached_Session extends Hm_DB_Session {
     public function get_session_data($key) {
         return $this->plaintext($this->conn->get($key));
     }
-
 }
