@@ -426,7 +426,7 @@ class Hm_Session_Setup {
         }
         return (isset($session_class) && class_exists($session_class))
              ? $session_class
-             : 'Hm_PHP_Session'
+             : 'Hm_PHP_Session';
     }
 
     /**
