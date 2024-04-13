@@ -88,7 +88,7 @@ function build_config() {
     }
 
     /* get the site settings */
-    $settings = merge_config_files(APP_PATH.'config');
+    $settings = merge_config_files(CONFIG_PATH);
 
     if (is_array($settings) && !empty($settings)) {
         $settings['version'] = VERSION;
