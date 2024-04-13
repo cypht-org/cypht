@@ -30,7 +30,7 @@ require APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 /* get config object */
-$config = new Hm_Site_Config_File(merge_config_files(APP_PATH.'config'));
+$config = new Hm_Site_Config_File(merge_config_files(CONFIG_PATH));
 
 /* check config for db auth */
 if ($config->get('auth_type') != 'DB') {
