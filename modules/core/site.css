@@ -1337,4 +1337,7 @@ div.unseen,
 .settings_table .form-select {
   display: inline-block;
 }
+.on_mobile {display: none;}
 .mobile .no_mobile {display: none !important;}
+.mobile .on_mobile {display: block !important;}
+.mobile .move_to_location {right: 0;}
