@@ -18,6 +18,7 @@ on:
 
 jobs:
   Test-phpunit:
+    name: (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
     runs-on: ubuntu-latest
 
     strategy:
