@@ -159,7 +159,7 @@ $(function() {
     }
     if (hm_page_name() == 'shortcuts') {
         $('.reset_shortcut').on("click", function() {
-            window.location.href = '?page=shortcuts';
+            Hm_Utils.redirect('?page=shortcuts');
         });
     }
 });

@@ -1681,6 +1681,13 @@ var Hm_Utils = {
         var style = window.getComputedStyle(elem);
         return style.display !== 'none' && style.visibility !== 'hidden' && elem.offsetWidth > 0 && elem.offsetHeight > 0;
     },
+
+    redirect: function (path) {
+        if (! path) {
+            path = window.location.href;
+        }
+        window.location.href = path;
+    }
 };
 
 var Hm_Crypt = {
