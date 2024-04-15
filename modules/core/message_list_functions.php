@@ -352,18 +352,18 @@ if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
-        '<div class="msg_controls fs-6 d-none gap-1 align-items-center">
-            <div class="dropdown on_mobile">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>
-                <ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">
-                 <li><a class="dropdown-item msg_read core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
-                '<li><a class="dropdown-item msg_unread core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
-                '<li><a class="dropdown-item msg_flag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
-                '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
-                '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
-                '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>
-                </ul>
-             </div>'.
+        '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
+            '<div class="dropdown on_mobile">'.
+                '<button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
+                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">'.
+                    '<li><a class="dropdown-item msg_read core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
+                    '<li><a class="dropdown-item msg_unread core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
+                    '<li><a class="dropdown-item msg_flag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
+                    '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
+                    '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
+                    '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>'.
+                '</ul>'.
+            '</div>'.
             '<a class="msg_read core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
             '<a class="msg_unread core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
             '<a class="msg_flag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
