@@ -827,7 +827,9 @@ function Message_List() {
             this.sort_fld = sort_type;
             $('.combined_sort').val(sort_type);
         }
-        $('.core_msg_control').on("click", function() { return self.message_action($(this).data('action')); });
+        $('.core_msg_control').on("click", function(e) {
+            e.preventDefault();
+            return self.message_action($(this).data('action')); });
         $('.toggle_link').on("click", function() { return self.toggle_rows(); });
         $('.refresh_link').on("click", function() { return self.load_sources(); });
     };
@@ -936,7 +938,6 @@ function Message_List() {
         if (!updated) {
             self.update_after_action(action_type, selected);
         }
-        return false;
     };
 
     this.prev_next_links = function(cache, class_name) {

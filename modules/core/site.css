@@ -978,6 +978,7 @@ div.unseen,
   background-color: #fff;
   position: fixed;
   padding-left: 45px !important;
+  padding-right: 45px !important;
   padding-top: 10px !important;
   margin-bottom: 5px;
   left: 0px;
@@ -1288,6 +1289,9 @@ div.unseen,
 }
 .mobile #list_controls_menu.show {
   display: flex;
+  width: 100vw;
+  left: 0px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 .mobile .imap_sort {
   width: 100%;
