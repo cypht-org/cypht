@@ -17,7 +17,7 @@ on:
 #permissions: write-all
 
 jobs:
-  Test:
+  Test-phpunit:
     runs-on: ubuntu-latest
 
     strategy:
