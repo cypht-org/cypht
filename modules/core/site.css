@@ -465,7 +465,6 @@ button {
   padding-bottom: 10px;
   padding-top: 20px;
   letter-spacing: -1px;
-  font-size: 125%;
 }
 .header_subject .content_title {
   color: #555;
@@ -963,10 +962,6 @@ div.unseen,
   padding-top: 5px;
   padding-bottom: 5px;
 }
-.mobile .src_name {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
 .mobile .content_cell {
   padding-top: 60px;
   display: block;
@@ -975,18 +970,17 @@ div.unseen,
 .mobile .content_title {
   z-index: 100;
   top: 0px;
-  background-color: #fff;
   position: fixed;
   padding-left: 45px !important;
-  padding-right: 45px !important;
-  padding-top: 10px !important;
   margin-bottom: 5px;
   left: 0px;
   right: 0px;
-  padding-bottom: 17px;
   display: flex;
-  flex-flow: row wrap;
   max-height: 35rem;
+  align-items: center;
+}
+.mobile .list_meta, .mobile .search_form {
+  flex-flow: row wrap;
 }
 .mobile .account_icon {
   width: 16px;
@@ -999,12 +993,7 @@ div.unseen,
   left: -3px;
   font-size: 20px;
   font-weight: bold;
-}
-.mobile .folder_toggle i {
-  font-size: 2rem;
-  font-weight: bold;
-}
-.mobile .folder_toggle {
+  margin-top: 17px !important;
   position: fixed;
   z-index: 101;
 }
@@ -1012,14 +1001,10 @@ div.unseen,
   padding-left: 5px !important;
   margin-top: 30px !important;
 }
-.mobile .list_settings_link,
-.mobile .refresh_list {
+.mobile .list_settings_link {
   width: 24px;
   height: 24px;
   vertical-align: -13px;
-}
-.mobile .refresh_list {
-  margin-right: 5px;
 }
 .mobile .update_message_list {
   margin-right: 20px;
@@ -1042,6 +1027,9 @@ div.unseen,
   padding-top: 5px;
   top: 1px;
   left: 70px !important;
+}
+.mobile .sys_messages {
+  z-index: 1000 !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
@@ -1147,15 +1135,8 @@ div.unseen,
 }
 .mobile .list_controls {
   color: #777;
-  background: linear-gradient(180deg, #fff, #fff, #f7f2ef);
-  height: 48px;
   padding-left: 5px;
   padding-right: 5px;
-}
-.mobile .list_controls i {
-  margin-top: 10px !important;
-  font-size: 2rem;
-  font-weight: bold;
 }
 .mobile .page_links {
   font-size: 150%;
@@ -1168,7 +1149,6 @@ div.unseen,
   padding: 4px 6px !important;
   line-height: normal !important;
   margin-left: -3px !important;
-  margin-top: -4px;
   position: relative;
 }
 .mobile .toggle_link img {
