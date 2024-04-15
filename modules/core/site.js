@@ -1687,7 +1687,11 @@ var Hm_Utils = {
             path = window.location.href;
         }
         window.location.href = path;
-    }
+    },
+
+    is_valid_email: function (val) {
+        return /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val)
+    },
 };
 
 var Hm_Crypt = {
@@ -2291,7 +2295,9 @@ function handleProviderChange(select) {
 }
 
 function setDefaultReplyTo(val) {
-    $("#srv_setup_stepper_profile_reply_to").val(val);
+    if (Hm_Utils.is_valid_email(val)) {
+        $("#srv_setup_stepper_profile_reply_to").val(val);
+    }
 }
 function display_config_step(stepNumber) {
     if(stepNumber === 2) {
@@ -2406,6 +2412,18 @@ function getServiceDetails(providerKey){
 
                     if(serverConfig.tls)$("input[name='srv_setup_stepper_imap_tls'][value='true']").prop("checked", true);
                     else $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
+
+                    if (serverConfig.hasOwnProperty('sieve')) {
+                        $('#srv_setup_stepper_enable_sieve')
+                            .prop('checked', true)
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
+                    } else {
+                        $('#srv_setup_stepper_enable_sieve')
+                            .prop('checked', false)
+                            .trigger('change');;
+                        $('#srv_setup_stepper_imap_sieve_host').val('');
+                    }
                 }
             },
             [],
