@@ -1,4 +1,4 @@
-name: Test CI
+name: Test CI -phpunit
 
 defaults:
   run:
@@ -8,6 +8,11 @@ on:
   push:
     branches:
       - master
+
+  pull_request:
+    branches:
+      - master
+
   workflow_dispatch: # on button click
 #permissions: write-all
 
