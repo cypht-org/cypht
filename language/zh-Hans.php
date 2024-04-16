@@ -623,4 +623,6 @@ return array(
     'Send anyway and don\'t warn in the future' => '强制发送并永久关闭警告',
     'Are you sure you want to send this message?' => '确定发送信息？',
     'IMAP and JMAP Servers' => 'IMAP 服务器及 JMAP 服务器',
+    'Junk' => false,
+    'Trash' => false,
 ); 
