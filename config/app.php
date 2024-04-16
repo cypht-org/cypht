@@ -369,7 +369,7 @@ return [
     | ----------------
     |
     | Users can select from available interface languages on the site settings page.
-    | This sets the default for a user who has not done so. Valid values are 2 character
+    | This sets the default for a user who has not done so. Valid values are the
     | langauge codes that have matching language definitions in the language/ folder.
     | 
     */
