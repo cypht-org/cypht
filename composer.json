@@ -32,7 +32,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-session": "*",
-        "ezyang/htmlpurifier": "^4.13",
+        "ezyang/htmlpurifier": "^4.17",
         "henrique-borba/php-sieve-manager": "^1.0.0",
         "league/commonmark": "^2.4",
         "paragonie/random_compat": "^2.0.18",
