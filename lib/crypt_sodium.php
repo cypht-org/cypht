@@ -101,5 +101,4 @@ class Hm_Crypt extends Hm_Crypt_Base {
         }
         return parent::keygen($key, $salt);
     }
-
 }

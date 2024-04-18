@@ -135,7 +135,7 @@ class Hm_Msgs { use Hm_List; }
  * System debug notices
  */
 class Hm_Debug {
-    
+
     use Hm_List;
 
     /**

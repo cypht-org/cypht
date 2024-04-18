@@ -134,7 +134,7 @@ class Hm_Output_nasa_connect_section extends Hm_Output_Module {
                         <b>'.$this->trans('NASA APIs').'</b>
                     </a>
                 </div>';
-        
+
         $res .= '<div class="nasa_connect_section"><div class="nasa_connect_inner_1" ';
 
         if ($this->get('nasa_api_key')) {

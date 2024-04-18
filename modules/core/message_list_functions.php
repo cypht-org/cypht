@@ -645,4 +645,3 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     }
     return $prev.' '.$first.$links.$last.' '.$next;
 }}
-

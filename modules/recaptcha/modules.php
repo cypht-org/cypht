@@ -83,4 +83,3 @@ function check_recaptcha($secret, $response, $ip) {
     }
     return false;
 }}
-

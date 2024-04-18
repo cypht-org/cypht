@@ -563,7 +563,7 @@ class Hm_Test_Session_Functions extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
         require APP_PATH.'modules/site/lib.php';
     }
@@ -614,5 +614,3 @@ class Hm_Test_Session_Functions extends TestCase {
         unset($this->config);
     }
 }
-
-?>

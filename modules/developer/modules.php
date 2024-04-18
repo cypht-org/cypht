@@ -277,5 +277,3 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
         return '</tbody></table></div></div>';
     }
 }
-
-

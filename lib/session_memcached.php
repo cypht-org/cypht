@@ -104,5 +104,4 @@ class Hm_Memcached_Session extends Hm_DB_Session {
     public function get_session_data($key) {
         return $this->plaintext($this->conn->get($key));
     }
-
 }

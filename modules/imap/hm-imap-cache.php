@@ -145,7 +145,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
                     continue;
                 }
                 foreach ($commands as $command => $value) {
-                    $to_remove[] = array($key, $command); 
+                    $to_remove[] = array($key, $command);
                     $count--;
                     if ($count == $this->cache_limit) {
                         break 2;
@@ -269,7 +269,7 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
                 if (isset($this->cache_data[$type])) {
                     if (!$full) {
                         foreach ($this->cache_data[$type] as $command => $res) {
-                            if (!preg_match("/^UID FETCH/", $command)) { 
+                            if (!preg_match("/^UID FETCH/", $command)) {
                                 unset($this->cache_data[$type][$command]);
                                 $this->debug[] = 'Partial cache flush: '.$command;
                             }
@@ -327,5 +327,4 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
             }
         }
     }
-
 }

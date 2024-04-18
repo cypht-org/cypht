@@ -45,5 +45,3 @@ class Hm_Test_API_Curl extends TestCase {
         $this->assertEquals('{"unit":"test"}', $api->command('asdf', array(), array(), 'foo', 'FOO'));
     }
 }
-
-?>

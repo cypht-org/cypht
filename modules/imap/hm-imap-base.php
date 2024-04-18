@@ -29,7 +29,7 @@ class Hm_IMAP_Base {
     protected $capability = false;             // IMAP CAPABILITY response
     protected $server_id = array();            // server ID response values
     protected $literal_overflow = false;
-    public $struct_object = false;          
+    public $struct_object = false;
 
 
     /* attributes that can be set for the IMAP connaction */
@@ -140,7 +140,7 @@ class Hm_IMAP_Base {
             elseif ($line[$i] == '*' || $line[$i] == '[' || $line[$i] == ']' || $line[$i] == '(' || $line[$i] == ')') {
                 $chunk = $line[$i];
             }
-        
+
             /* regex match a quoted string */
             elseif ($line[$i] == '"') {
                 if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", substr($line, $i), $matches)) {
@@ -527,6 +527,4 @@ class Hm_IMAP_Base {
             }
         }
     }
-
 }
-

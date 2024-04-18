@@ -111,7 +111,7 @@ var folder_page_rename = function() {
         return;
     }
     if (!val.length) {
-        notices[0] = 'ERR'+$('#rename_folder_error').val(); 
+        notices[0] = 'ERR'+$('#rename_folder_error').val();
     }
     if (!folder.length) {
         notices[1] = 'ERR'+$('#folder_name_error').val();

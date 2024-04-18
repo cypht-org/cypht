@@ -102,4 +102,3 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         return $res;
     }
 }
-

@@ -535,7 +535,7 @@ $(function() {
         apply_saved_search();
         var data = Hm_Utils.get_from_local_storage('formatted_advanced_search_data');
         if (data && data.length) {
-            adv_collapse(); 
+            adv_collapse();
             Hm_Utils.tbody().html(data);
             $('.adv_controls').show();
             $('.core_msg_control').off('click');

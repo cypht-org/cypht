@@ -49,7 +49,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return void
      */
     public function start_new($request) {
-        $this->session_key = Hm_Crypt::unique_id(); 
+        $this->session_key = Hm_Crypt::unique_id();
         $this->secure_cookie($request, $this->cname, $this->session_key);
         if ($this->insert_session_row()) {
             Hm_Debug::add('LOGGED IN');

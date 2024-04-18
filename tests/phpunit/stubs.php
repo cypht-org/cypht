@@ -81,5 +81,3 @@ if (!defined("IMAP_TEST")) {
         public function show_debug() {}
     }
 }
-
-?>

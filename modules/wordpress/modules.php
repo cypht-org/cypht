@@ -66,7 +66,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
 
 /**
  * @subpackage wordpress/handler
- * @todo: fix for background unread 
+ * @todo: fix for background unread
  */
 class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
     public function process() {
@@ -419,16 +419,16 @@ class Hm_Output_wordpress_since_setting extends Hm_Output_Module {
 class Hm_Output_wordpress_connect_section extends Hm_Output_Module {
     protected function output() {
         $details = $this->get('wp_connect_details', array());
-        
+
         $res = '<div class="wordpress_connect"><div data-target=".wordpress_connect_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                     <a href="#" class="pe-auto">
                         <i class="bi bi-wordpress me-3"></i>
                         <b>'.$this->trans('WordPress.com Connect').'</b>
                     </a>
                 </div>';
-        
+
         $res .= '<div class="wordpress_connect_section">';
-        
+
         if (empty($details)) {
             $res .= 'Connect to WordPress.com to view notifications and posts.<br /><br />';
             $res .= '<a class="btn btn-secondary" href="'.$this->get('wp_auth_url', '').'">'.$this->trans('Enable').'</a></div></div>';
@@ -514,4 +514,3 @@ function wp_fetch_content($details, $url, $post=array()) {
     $api = new Hm_API_Curl();
     return $api->command($url, array('Authorization: Bearer ' . $details['access_token']), $post);
 }}
-

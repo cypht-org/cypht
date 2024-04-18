@@ -25,4 +25,3 @@ class Hm_Handler_disable_servers_page extends Hm_Handler_Module {
         Hm_Dispatch::page_redirect('?page=home');
     }
 }
-

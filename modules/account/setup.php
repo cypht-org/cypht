@@ -41,5 +41,3 @@ return array(
         'change_password' => FILTER_DEFAULT,
     )
 );
-
-

@@ -33,5 +33,3 @@ return array(
         'delete_public_key_id' => FILTER_VALIDATE_INT
     )
 );
-
-

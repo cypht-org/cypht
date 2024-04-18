@@ -373,7 +373,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
         $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div><ul class="mt-4">';
-        
+
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
             if ($proto == 'feeds') {
@@ -478,26 +478,26 @@ if (!hm_exists('credentials_form')) {
         $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
         $res .= '<div class="nux_step_two_title"><b>'.$mod->html_safe($details['name']).'</b></div>';
         $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
-    
+
         $res .= '<div class="row"><div class="col col-lg-4">';
         // E-mail Address Field
         $res .= '<div class="form-floating mb-3 mt-3">';
         $res .= '<input type="email" class="form-control" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
         $res .= '<label for="nux_email">'.$mod->trans('E-mail Address').'</label></div>';
-    
+
         // E-mail Password Field
         $res .= '<div class="form-floating mb-3">';
         $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
         $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
-    
+
         // Connect Button
         $res .= '<input type="button" class="nux_submit px-5 btn btn-primary me-3" value="'.$mod->trans('Connect').'">';
-    
+
         // Reset Link
         $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';
 
         $res .= '</div></div>';
-    
+
         return $res;
     }
 }
@@ -566,5 +566,3 @@ class Nux_Quick_Services {
         return array();
     }
 }
-
-

@@ -12,7 +12,7 @@ from creds import SITE_URL, USER, PASS, get_driver
 from selenium.webdriver.common.by import By
 from selenium.common import exceptions
 from contextlib import contextmanager
-from selenium.webdriver.support.ui import WebDriverWait 
+from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as exp_cond
 import glob
 

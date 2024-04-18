@@ -242,7 +242,7 @@ trait Hm_Modules {
                 $index++;
             }
             $list = self::$module_list[$page];
-            self::$module_list[$page] = array_merge(array_slice($list, 0, $index), 
+            self::$module_list[$page] = array_merge(array_slice($list, 0, $index),
                 array($module => array($source, $logged_in)),
                 array_slice($list, $index));
             $inserted = true;
@@ -354,7 +354,7 @@ class Hm_Output_Modules { use Hm_Modules; }
  * This is the functional interface used by module sets to
  * setup data handlers and output modules in their setup.php files.
  * They are easier to use than dealing directly with the class instances
- */ 
+ */
 
 /**
  * Add a module set name to the input processing manager

@@ -408,5 +408,3 @@ class Hm_Test_Module_Functions extends TestCase {
         }
     }
 }
-
-?>

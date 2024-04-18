@@ -215,7 +215,7 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
             return '<div class="imap_support_required">'.
                 $this->trans('the IMAP module set must be enabled for advanced search').'</div>';
         }
-        return 
+        return
             $this->terms().
             $this->sources().
             $this->targets().
@@ -337,4 +337,3 @@ class Hm_Output_filter_imap_advanced_search extends Hm_Output_Module {
         }
     }
 }
-

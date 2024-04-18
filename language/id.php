@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
    language       : Indonesian
    languageNative : Bahasa Indonesia
    translators    : gemelli & naomi16i
@@ -634,6 +634,4 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
-); 
-
-?>
+);

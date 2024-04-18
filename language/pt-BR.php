@@ -627,5 +627,3 @@ return array(
     'Junk' => false,
     'Trash' => false,
 );
-
-?>

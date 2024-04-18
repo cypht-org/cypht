@@ -18,7 +18,7 @@ add_output('settings', 'enable_2fa_setting', true, '2fa', 'end_settings_form', '
 setup_base_ajax_page('ajax_2fa_setup_check', 'core');
 add_handler('ajax_2fa_setup_check', '2fa_setup_check',  true);
 
-return array( 
+return array(
     'allowed_pages' => array(
         'ajax_2fa_setup_check',
     ),

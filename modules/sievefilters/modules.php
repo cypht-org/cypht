@@ -137,7 +137,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         $factory = get_sieve_client_factory($this->config);
         try {
             $client = $factory->init($this->user_config, $imap_account);
-        
+
             $scripts = $client->listScripts();
             foreach ($scripts as $script) {
                 if ($script == 'main_script') {
@@ -651,7 +651,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $conditions = json_decode($this->request->post['conditions_json']);
         $actions = json_decode($this->request->post['actions_json']);
         $test_type = strtolower($this->request->post['filter_test_type']);
-        
+
         $filter = \PhpSieveManager\Filters\FilterFactory::create($script_name);
         $custom_condition = new \PhpSieveManager\Filters\Condition(
             "CYPHT GENERATED CONDITION", $test_type

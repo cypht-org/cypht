@@ -9,7 +9,7 @@ class Hm_Test_User_Config_File extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'bootstrap.php';
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
     }
@@ -164,7 +164,7 @@ class Hm_Test_Site_Config_File extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'bootstrap.php';
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
     }
@@ -206,7 +206,7 @@ class Hm_Test_User_Config_DB extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'bootstrap.php';
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
     }
@@ -220,7 +220,7 @@ class Hm_Test_User_Config_DB extends TestCase {
         $user_config = new Hm_User_Config_DB($site_config);
         $this->assertTrue($user_config->connect());
     }
-    
+
     /*public function test_db_load() {
         $site_config = new Hm_Mock_Config();
         setup_db($site_config);
@@ -240,7 +240,7 @@ class Hm_Test_User_Config_DB extends TestCase {
         $user_config->load('testuser', 'testkey');
         $this->assertTrue(array_key_exists('version', $user_config->dump()));
     }*/
-    
+
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -296,7 +296,7 @@ class Hm_Test_User_Config_Functions extends TestCase {
 
     public $config;
     public function setUp(): void {
-        require 'bootstrap.php'; 
+        require 'bootstrap.php';
         $mock_config = new Hm_Mock_Config();
         $this->config = new Hm_User_Config_File($mock_config);
     }
@@ -330,6 +330,3 @@ class Hm_Test_User_Config_Functions extends TestCase {
         unset($this->config);
     }
 }
-
-
-?>

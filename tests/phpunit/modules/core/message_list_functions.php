@@ -175,4 +175,3 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
         $this->assertEquals('<a class="disabled_link"><i class="bi bi-caret-left-fill"></i></a>  <a class="current_page fw-bolder" href="?page=message_list&amp;list_path=%2F&amp;list_page=1&amp;keyword=cypht&amp;filter=1&amp;sort=1">1</a> <a href="?page=message_list&amp;list_path=%2F&amp;list_page=2&amp;keyword=cypht&amp;filter=1&amp;sort=1">2</a> <a href="?page=message_list&amp;list_path=%2F&amp;list_page=3&amp;keyword=cypht&amp;filter=1&amp;sort=1">3</a> <a href="?page=message_list&amp;list_path=%2F&amp;list_page=2&amp;keyword=cypht&amp;filter=1&amp;sort=1"><i class="bi bi-caret-right-fill"></i></a>', build_page_links(10, 1, 30, '/', true, true, "cypht"));
     }
 }
-?>

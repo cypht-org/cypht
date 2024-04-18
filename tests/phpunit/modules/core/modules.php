@@ -476,7 +476,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->run();
         $this->assertEquals(array(), Hm_Msgs::get());
         Hm_Msgs::flush();
-        
+
         $test->config = array('user_settings_dir' => './data');
         $test->session = array('username' => 'foo');
         $test->prep();
@@ -1667,4 +1667,3 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
     }
 }
-?>

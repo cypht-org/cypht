@@ -628,6 +628,4 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
-); 
-
-?>
+);

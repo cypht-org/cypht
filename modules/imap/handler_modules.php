@@ -1835,7 +1835,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
                 $prefetch = true;
             }
-            
+
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
 
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);

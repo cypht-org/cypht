@@ -17,4 +17,3 @@ require APP_PATH.'modules/core/message_functions.php';
 require APP_PATH.'modules/core/message_list_functions.php';
 require APP_PATH.'modules/core/handler_modules.php';
 require APP_PATH.'modules/core/output_modules.php';
-

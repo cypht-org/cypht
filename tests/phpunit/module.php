@@ -253,5 +253,3 @@ class Hm_Test_Output_Module extends TestCase {
         unset($this->output_mod);
     }
 }
-
-?>

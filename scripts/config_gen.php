@@ -275,7 +275,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
  *
  * @param $settings array site settings list (unsued with .env support)
  * @param $filters array combined list of filters from all modules (unsued with .env support)
- * 
+ *
  * @return void
  */
 function write_config_file($settings, $filters) {
@@ -320,9 +320,9 @@ function process_bootswatch_files() {
     if (! is_dir($src)) {
         return;
     }
-    $dir = opendir($src); 
-    while(false !== ($folder = readdir($dir))) { 
-        if (($folder != '.' ) && ($folder != '..' )) { 
+    $dir = opendir($src);
+    while(false !== ($folder = readdir($dir))) {
+        if (($folder != '.' ) && ($folder != '..' )) {
             if (is_dir($src . '/' . $folder)) {
                 $target = $src . '/' . $folder . '/css/' . $folder . '.css';
                 if ($folder == 'default') {
@@ -337,9 +337,9 @@ function process_bootswatch_files() {
                 }
                 file_put_contents($target, $content);
             }
-        } 
-    } 
-    closedir($dir); 
+        }
+    }
+    closedir($dir);
 }
 
 /**
@@ -392,5 +392,3 @@ function copy_recursive($path) {
         }
     }
 }
-
-?>

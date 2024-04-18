@@ -56,7 +56,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
      * @param string $filter message type to filter by
      * @param string $flags IMAP flag value string
      * @return bool true if the message matches the filter
-     */ 
+     */
     protected function flag_match($filter, $flags) {
         $res = false;
         switch($filter) {
@@ -273,7 +273,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             $delim = $nsvals['delim'];
             $ns_class = $nsvals['class'];
             $mailbox = $this->utf7_encode(str_replace('"', '\"', $mailbox));
-            if (strtoupper(substr($namespace, 0, 5)) == 'INBOX') { 
+            if (strtoupper(substr($namespace, 0, 5)) == 'INBOX') {
                 $namespace = '';
             }
 
@@ -350,4 +350,3 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
         return $attributes;
     }
 }
-

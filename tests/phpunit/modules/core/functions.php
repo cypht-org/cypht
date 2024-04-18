@@ -215,4 +215,3 @@ class Hm_Test_Core_Functions extends TestCase {
         $this->assertEquals(array(), profiles_by_smtp_id(array('smtp_id' => 0), 0));
     }
 }
-?>
