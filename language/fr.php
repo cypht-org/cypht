@@ -624,6 +624,8 @@ return array(
     'Send anyway and don\'t warn in the future' => false,
     'Are you sure you want to send this message?' => false,
     'IMAP and JMAP Servers' => false,
+    'Junk' => false,
+    'Trash' => false,
 ); 
 
 ?>

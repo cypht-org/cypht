@@ -747,8 +747,10 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('move_copy_controls', false)) {
-            $res = '<span class="ctr_divider"></span> <div class="d-flex gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-            $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location dropdown-menu"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
@@ -1345,7 +1347,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                       </div>
                    ';
 
-                     if (!$this->get('sieve_filters_enabled')) {
+                     if ($this->get('sieve_filters_enabled')) {
                          $default_value = '';
                              $res .=  '
                                         

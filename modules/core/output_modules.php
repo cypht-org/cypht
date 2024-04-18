@@ -1243,7 +1243,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-menu-up"></i></a>'.
+        $res = '<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -2182,7 +2182,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                             <div>
                                 <form>
                                     <div class="form-floating mb-3">
-                                      <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this) label="'.$this->trans('Provider').'">
+                                      <select class="form-select" id="srv_setup_stepper_provider" onchange="handleProviderChange(this)" label="'.$this->trans('Provider').'">
                                         <option value="">'.$this->trans('Other').'</option>'.$serverList.'
                                       </select>
                                       <label for="srv_setup_stepper_provider">'.$this->trans('Provider').'</label>

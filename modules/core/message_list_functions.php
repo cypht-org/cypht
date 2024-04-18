@@ -350,14 +350,26 @@ function icon_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
+    $txt = '';
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
-        '<div class="msg_controls fs-6 d-none gap-1">'.
-        '<a class="msg_read core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-        '<a class="msg_unread core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-        '<a class="msg_flag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-        '<a class="msg_unflag core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-        '<a class="msg_delete core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-        '<a class="msg_archive core_msg_control btn btn-sm btn-light border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+        '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
+            '<div class="dropdown on_mobile">'.
+                '<button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
+                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">'.
+                    '<li><a class="dropdown-item msg_read core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
+                    '<li><a class="dropdown-item msg_unread core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
+                    '<li><a class="dropdown-item msg_flag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
+                    '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
+                    '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
+                    '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>'.
+                '</ul>'.
+            '</div>'.
+            '<a class="msg_read core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
+            '<a class="msg_unread core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
+            '<a class="msg_flag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
+            '<a class="msg_unflag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
+            '<a class="msg_delete core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
+            '<a class="msg_archive core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
@@ -453,11 +465,11 @@ function update_search_label_field($search_term, $output_mod) {
     <input type="hidden" name="page" value="search">
     <input type="hidden" name="search_terms" value="'. $search_term .'">
     <label class="screen_reader" for="search_terms_label">Current Search Label</label>
-    <input required="" disabled id="old_search_terms_label" type="search" value="' . $search_term . '" class="old_search_terms_label" name="old_search_terms_label">
+    <input required="" disabled id="old_search_terms_label" type="search" value="' . $search_term . '" class="old_search_terms_label form-control form-control-sm" name="old_search_terms_label">
     <label class="screen_reader" for="search_terms_label">New Search Terms</label>
-    <input required="" placeholder="New search terms label" id="search_terms_label" type="search" class="search_terms_label" name="search_terms_label">
+    <input required="" placeholder="New search terms label" id="search_terms_label" type="search" class="search_terms_label form-control form-control-sm" name="search_terms_label">
     <div>
-        <input type="button" class="search_label_update" value="Update">
+        <input type="button" class="search_label_update btn w-100 btn-primary btn-sm" value="Update">
     </div>
     </div>';
     $res .= '</div>';
@@ -495,7 +507,7 @@ function list_controls($refresh_link, $config_link, $source_link=false, $search_
     return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">'.
         $refresh_link.$source_link.$config_link.$search_field.'</div>
     <div class="list_controls on_mobile">'.$search_field.'
-        <i class="bi bi-three-dots-vertical" onclick="listControlsMenu()"></i>
+        <i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>
         <div id="list_controls_menu" classs="list_controls_menu">'.$refresh_link.$source_link.$config_link.'</div>
     </div>';
 }}
@@ -574,7 +586,7 @@ function build_page_links($page_size, $current_page, $total, $path, $filter=fals
     $links = '';
     $first = '';
     $last = '';
-    $display_links = 10; 
+    $display_links = 10;
     if ($filter) {
         $filter_str = '&amp;filter='.$filter;
     }

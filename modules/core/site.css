@@ -465,7 +465,6 @@ button {
   padding-bottom: 10px;
   padding-top: 20px;
   letter-spacing: -1px;
-  font-size: 125%;
 }
 .header_subject .content_title {
   color: #555;
@@ -602,8 +601,7 @@ button {
 .folder_toggle {
   font-size: 0px;
   float: left;
-  margin: 15px;
-  margin-top: 19px;
+  margin: 10px 15px;
   display: none;
 }
 .folder_toggle img {
@@ -964,10 +962,6 @@ div.unseen,
   padding-top: 5px;
   padding-bottom: 5px;
 }
-.mobile .src_name {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
 .mobile .content_cell {
   padding-top: 60px;
   display: block;
@@ -976,17 +970,17 @@ div.unseen,
 .mobile .content_title {
   z-index: 100;
   top: 0px;
-  background-color: #fff;
   position: fixed;
   padding-left: 45px !important;
-  padding-top: 20px;
   margin-bottom: 5px;
   left: 0px;
   right: 0px;
-  padding-bottom: 17px;
   display: flex;
-  flex-flow: row wrap;
   max-height: 35rem;
+  align-items: center;
+}
+.mobile .list_meta, .mobile .search_form {
+  flex-flow: row wrap;
 }
 .mobile .account_icon {
   width: 16px;
@@ -997,13 +991,9 @@ div.unseen,
   display: block;
   top: 0px;
   left: -3px;
-}
-.mobile .folder_toggle img {
-  width: 24px;
-  height: 32px;
-  margin-top: -7px;
-}
-.mobile .folder_toggle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 17px !important;
   position: fixed;
   z-index: 101;
 }
@@ -1011,14 +1001,10 @@ div.unseen,
   padding-left: 5px !important;
   margin-top: 30px !important;
 }
-.mobile .list_settings_link,
-.mobile .refresh_list {
+.mobile .list_settings_link {
   width: 24px;
   height: 24px;
   vertical-align: -13px;
-}
-.mobile .refresh_list {
-  margin-right: 5px;
 }
 .mobile .update_message_list {
   margin-right: 20px;
@@ -1040,7 +1026,10 @@ div.unseen,
   padding-left: 5px;
   padding-top: 5px;
   top: 1px;
-  left: 65px !important;
+  left: 70px !important;
+}
+.mobile .sys_messages {
+  z-index: 1000 !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
@@ -1146,13 +1135,8 @@ div.unseen,
 }
 .mobile .list_controls {
   color: #777;
-  background: linear-gradient(180deg, #fff, #fff, #f7f2ef);
-  height: 48px;
   padding-left: 5px;
   padding-right: 5px;
-}
-.mobile .list_controls img {
-  margin-top: 10px;
 }
 .mobile .page_links {
   font-size: 150%;
@@ -1165,7 +1149,6 @@ div.unseen,
   padding: 4px 6px !important;
   line-height: normal !important;
   margin-left: -3px !important;
-  margin-top: -4px;
   position: relative;
 }
 .mobile .toggle_link img {
@@ -1286,6 +1269,9 @@ div.unseen,
 }
 .mobile #list_controls_menu.show {
   display: flex;
+  width: 100vw;
+  left: 0px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 .mobile .imap_sort {
   width: 100%;
@@ -1335,3 +1321,7 @@ div.unseen,
 .settings_table .form-select {
   display: inline-block;
 }
+.on_mobile {display: none;}
+.mobile .no_mobile {display: none !important;}
+.mobile .on_mobile {display: block !important;}
+.mobile .move_to_location {right: 0;}
