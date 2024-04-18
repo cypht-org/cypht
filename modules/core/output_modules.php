@@ -205,7 +205,7 @@ class Hm_Output_login_start extends Hm_Output_Module {
                     '.user-icon_signin{display:block; background-color:white; border-radius:100%; padding:10px; height:40px; margin-top:-120px; box-shadow: #6eb549 .4px 2.4px 6.2px; }'.
                     '.label_signin{width:210px; margin:0px 0px -18px 0px;color:#fff;opacity:0.7;} @media (max-height : 500px){ .user-icon_signin{display:none;}}
                     </style>';
-    
+
                 return $css.'<div class="form-container"><form class="login_form" method="POST">';
             }
             else {
@@ -275,7 +275,7 @@ class Hm_Output_login extends Hm_Output_Module {
             if (!$single && count($settings) > 0) {
                 $changed = 1;
             }
-           
+
         return '<div class="modal fade" id="confirmLogoutModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
                 <div class="modal-content">
@@ -505,17 +505,17 @@ class Hm_Output_header_css extends Hm_Output_Module {
             $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         }
         if (DEBUG_MODE) {
-            $res .= '<link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
+            $res .= '<link href="'.WEB_ROOT.'vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" />';
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.css", $name))) {
-                    $res .= '<link href="'.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
+                    $res .= '<link href="'.WEB_ROOT.sprintf("%ssite.css", $rel_name).'" media="all" rel="stylesheet" type="text/css" />';
                 }
             }
             // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
             if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
-                $res .= '<link href="third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
+                $res .= '<link href="'.WEB_ROOT.'third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
             }
         }
         else {
@@ -544,14 +544,14 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/cash.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="third_party/sortable.min.js"></script>';
+            $js_lib = '<script type="text/javascript" src="'.WEB_ROOT.'vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/cash.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/resumable.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/ays-beforeunload-shim.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/jquery.are-you-sure.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/sortable.min.js"></script>';
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
-                $js_lib .= '<script type="text/javascript" src="third_party/forge.min.js"></script>';
+                $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/forge.min.js"></script>';
             }
             $core = false;
             $mods = $this->get('router_module_list');
@@ -563,11 +563,11 @@ class Hm_Output_page_js extends Hm_Output_Module {
                 }
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
                 if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
-                    $res .= '<script type="text/javascript" src="'.sprintf("%ssite.js", $rel_name).'"></script>';
+                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
                 }
             }
             if ($core) {
-                $res = '<script type="text/javascript" src="'.sprintf("%ssite.js", $core).'"></script>'.$res;
+                $res = '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.$res;
             }
             return $js_lib.$res;
         }
@@ -576,7 +576,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             if (defined('JS_HASH') && JS_HASH) {
                 $res .= 'integrity="'.JS_HASH.'" ';
             }
-            $res .= 'src="site.js?v='.CACHE_ID.'" async></script>';
+            $res .= 'src="'.WEB_ROOT.'site.js?v='.CACHE_ID.'" async></script>';
             return $res;
         }
     }
@@ -1116,7 +1116,7 @@ class Hm_Output_all_since_setting extends Hm_Output_Module {
      * Processed by Hm_Handler_process_all_since_setting
      */
     protected function output() {
-        $since = DEFAULT_SINCE; 
+        $since = DEFAULT_SINCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('all_since', $settings) && $settings['all_since']) {
             $since = $settings['all_since'];
@@ -1778,7 +1778,7 @@ class Hm_Output_home_password_dialogs extends Hm_Output_Module {
             $res = '<div class="home_password_dialogs">';
             $res .= '<div class="nux_title">Passwords</div>'.$this->trans('You have elected to not store passwords between logins.').
                 ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'<br /><br />';
-                
+
             foreach ($missing as $vals) {
                 $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
                 $res .= '<div class="div_'.$id.'" >'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
@@ -2093,7 +2093,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         }
 
         if($hasJmapActivated){
-            
+
             $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
             if($accordionTitle != ''){
                 $accordionTitle .= ' - ';
@@ -2138,7 +2138,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                       <a href="#" class="pe-auto">
                           <i class="bi bi-envelope-fill me-3"></i>
                           <b> '.$accordionTitle.'</b>
-                      </a> 
+                      </a>
                       <div class="server_count">'.$configuredText.'</div>
                   </div>
              <div class="server_config_section px-4 pt-3 me-0">
