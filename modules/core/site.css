@@ -351,6 +351,7 @@ button {
   margin-top: 10px;
   margin-bottom: 20px;
   margin-left: 20px !important;
+  z-index: 1000;
 }
 .inner_list {
   margin-bottom: 10px;
