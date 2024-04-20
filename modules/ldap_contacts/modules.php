@@ -847,4 +847,3 @@ function ldap_config($config, $key=false) {
     }
     return $details;
 }}
-

@@ -19,6 +19,5 @@ return [
 
         /* Site key from the recaptcha admin */
         'site_key' => env('RECAPTCHA_SITE_KEY', '')
-
     ],
 ];

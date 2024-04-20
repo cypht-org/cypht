@@ -201,5 +201,3 @@ class Hm_Test_Request_Key extends TestCase {
     public function tearDown(): void {
     }
 }
-
-?>

@@ -174,7 +174,7 @@ class Hm_Crypt_Base {
      * @param string $a hash
      * @param string $b hash
      * @return bool
-     */ 
+     */
     public static function hash_compare($a, $b) {
         if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
             return false;

@@ -237,8 +237,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             }
             $date = translate_time_str(human_readable_interval($msg[$date_field]), $output_module);
             $timestamp = strtotime($msg[$date_field]);
-        }    
-        
+        }
+
         $flags = array();
         if (!stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';

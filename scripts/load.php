@@ -37,5 +37,3 @@ function out($str) {
     echo Hm_Debug::str($str);
     echo "\n\n";
 }
-
-?>

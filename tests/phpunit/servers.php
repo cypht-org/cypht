@@ -124,5 +124,3 @@ class Hm_Test_Server_List extends TestCase {
         Hm_Server_Wrapper::clean_up();
     }
 }
-
-?>

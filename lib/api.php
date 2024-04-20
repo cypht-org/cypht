@@ -107,4 +107,3 @@ class Hm_API_Curl {
         return implode('&', $post);
     }
 }
-

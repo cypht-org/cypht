@@ -576,7 +576,7 @@ function get_special_folders($mod, $id) {
             array_key_exists('imap_server', $vals) &&
             $server['server'] == $vals['imap_server'] &&
             $server['user'] == $vals['imap_user']) {
-            
+
             return $vals;
         }
     }

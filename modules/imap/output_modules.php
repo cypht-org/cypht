@@ -484,7 +484,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '</div><div class="col-sm-2">';
 
             // Sieve Host (Conditional)
-            
+
             if ($this->get('sieve_filters_enabled') && isset($vals['sieve_config_host'])) {
                 $res .= '<div class="form-floating">';
                 $default_value = $vals['sieve_config_host'];
@@ -537,7 +537,7 @@ class Hm_Output_add_imap_server_dialog extends Hm_Output_Module {
             $sieve_extra = '<tr class="sieve_config" style="display: none;"><td><div class="subtitle">'.$this->trans('Sieve Configuration').'</div></td></tr>'.
                 '<tr class="sieve_config" style="display: none;"><td colspan="2"><label class="screen_reader" for="new_imap_port">'.$this->trans('Sieve Host').'</label>'.
                 '<input class="form-control" type="text" id="sieve_config_host" name="sieve_config_host" class="txt_fld" placeholder="'.$this->trans('localhost:4190').'"></td></tr>';
-            
+
                 $sieve_extra2 = '<tr><td colspan="2"><div class="form-check mb-3 mt-2"><input type="checkbox" id="enable_sieve_filter" name="enable_sieve_filter" class="form-check-input" value="0">'.
                 '<label for="enable_sieve_filter" class="form-check-label"> '.$this->trans('Enable Sieve Filters').'</label></div></td></tr>';
         }
@@ -560,21 +560,21 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-    
+
         if(!$this->get('is_jmap_supported')){
             return '<div class="jmap_server_setup"><div class="jmap_section" style="display: none;">';
         }
-    
+
         $count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap';}));
         $count = sprintf($this->trans('%d configured'), $count);
-    
+
         return '
         <div class="jmap_server_setup">
             <div data-target=".jmap_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                 <a href="#" class="pe-auto">
                     <i class="bi bi-envelope-fill me-3"></i>
                     <b>'.$this->trans('JMAP Servers').'</b>
-                </a> 
+                </a>
                 <div class="server_count">'.$count.'</div>
             </div>
             <div class="jmap_section px-4 pt-3">
@@ -583,27 +583,27 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
                     <form class="add_server" method="POST">
                         <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
                         <div class="subtitle">'.$this->trans('Add a JMAP Server').'</div>
-        
+
                         <div class="form-floating mb-3">
                             <input id="new_jmap_name" required type="text" name="new_jmap_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Account name').'">
                             <label class="" for="new_jmap_name">'.$this->trans('Account name').'</label>
                         </div>
-        
+
                         <div class="form-floating mb-3">
                             <input required type="url" id="new_jmap_address" name="new_jmap_address" class="txt_fld form-control" placeholder="'.$this->trans('Server URL').'" value="">
                             <label class="" for="new_jmap_address">'.$this->trans('Server URL').'</label>
                         </div>
-        
+
                         <div class="mb-3">
                             <input type="checkbox" id="new_jmap_hidden" name="new_jmap_hidden" class="form-check-input" value="1">
                             <label for="new_jmap_hidden">'.$this->trans('Hide From Combined Pages').'</label>
                         </div>
-        
+
                         <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_jmap_server" />
                     </form>
                 </div>';
     }
-    
+
 }
 
 /**
@@ -650,7 +650,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             $res .= '<div class="configured_server col-12 col-lg-4 mb-2"><div class="card card-body">';
             $res .= sprintf('<div class="server_title">%s</div><div class="server_subtitle">%s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']));
-            
+
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
@@ -1350,7 +1350,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                      if ($this->get('sieve_filters_enabled')) {
                          $default_value = '';
                              $res .=  '
-                                        
+
                                         <div class="form-check">
                                            <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
                                            <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>

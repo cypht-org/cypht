@@ -1103,7 +1103,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
-                
+
                 '<div class="to_outer">'.
                     '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
@@ -1231,13 +1231,13 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
         if (array_key_exists('new_smtp_port', $add_form_vals)) {
             $port = $this->html_safe($add_form_vals['new_smtp_port']);
         }
-        
+
         return '<div class="smtp_server_setup">
                     <div data-target=".smtp_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                         <a href="#" class="pe-auto">
                             <i class="bi bi-file-earmark-text-fill me-3"></i>
                             <b>'.$this->trans('SMTP Servers').'</b>
-                        </a> 
+                        </a>
                         <div class="server_count">'.$count.'</div>
                     </div>
                     <div class="smtp_section px-4 pt-3">

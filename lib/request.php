@@ -9,7 +9,7 @@
 /**
  * Data request details
  *
- * This is an interface to HTTP request details. All request data 
+ * This is an interface to HTTP request details. All request data
  * must be white-listed and sanitized by module set filters.
  */
 class Hm_Request {
@@ -24,7 +24,7 @@ class Hm_Request {
     public $cookie = array();
 
     /* sanitized $_SERVER variables */
-    public $server = array(); 
+    public $server = array();
 
     /* $_ENV variables (fallback for missing $_SERVER vals) */
     private $env = array();
@@ -150,7 +150,7 @@ class Hm_Request {
         $_FILES = array();
         $_REQUEST = array();
         $_ENV = array();
-        
+
         foreach (array_keys($GLOBALS) as $key) {
             if (isset($GLOBALS)) {
                 unset($GLOBALS[$key]);

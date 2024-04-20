@@ -314,4 +314,3 @@ function get_search_from_url($request) {
         array_key_exists('search_name', $request->get) ? $request->get['search_name'] : '',
     );
 }}
-

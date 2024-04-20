@@ -52,7 +52,7 @@ class SendTest(WebTest):
         header = detail_subject.find_element_by_tag_name('th')
         assert header.text == 'Test'
 
-        
+
 if __name__ == '__main__':
 
     print("SEND TEST")

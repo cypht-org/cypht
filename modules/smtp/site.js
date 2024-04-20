@@ -8,7 +8,7 @@ var get_smtp_profile = function(profile_value) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_profiles_status'},
             {'name': 'profile_value', 'value': profile_value}],
-            function(res) { 
+            function(res) {
             }
         );
     }
@@ -126,7 +126,7 @@ var save_compose_state = function(no_files, notice) {
     var cc = $('.compose_cc').val();
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
-    
+
     var draft_id = $('.compose_draft_id').val();
     if (globals.draft_state == body+subject+to+smtp+cc+bcc+uploaded_files) {
         return;
@@ -541,7 +541,7 @@ $(function () {
                     const pattern = new RegExp('(' + combined_keywords.map(keyword => keyword.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')).join('|') + ')', 'i');
                     // Check if the pattern is found in the message
                     if (pattern.test(compose_body_value) && uploaded_files.length === 0) {
-                        
+
                         if (confirm(hm_trans('We couldn\'t find the attachment you referred to. Please confirm if you attached it or provide the details again.'))) {
                             force_send_message();
                         } else {

@@ -97,7 +97,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                 $create_count = 0;
                 $invalid_mail_count = 0;
                 $import_result = [];
-                
+
 
                 while (($data = fgetcsv($csv)) !== FALSE) {
                     $single_contact = [
@@ -143,7 +143,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                 if (isset($import_result) && (!$create_count && !$update_count)) {
                     $message = 'ERR'.$create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
                 } elseif (isset($import_result) && ($create_count || $update_count)) {
-                    $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address'; 
+                    $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
                 } else {
                     $message = 'ERRAn error occured';
                 }

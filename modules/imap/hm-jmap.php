@@ -78,7 +78,7 @@ class Hm_JMAP {
     public $read_only = false;
     public $server_type = 'JMAP';
 
-    /** 
+    /**
      * PUBLIC INTERFACE
      */
 

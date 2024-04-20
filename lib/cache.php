@@ -79,7 +79,7 @@ trait Hm_Uid_Cache {
     }
 
     /**
-     * Add a UID to the unread list 
+     * Add a UID to the unread list
      * @param string $uid uid to add
      */
     public static function unread($uid) {
@@ -90,7 +90,7 @@ trait Hm_Uid_Cache {
     }
 
     /**
-     * Add a UID to the read list 
+     * Add a UID to the read list
      * @param string $uid uid to add
      */
     public static function read($uid) {
@@ -274,7 +274,7 @@ class Hm_Redis {
             $this->cache_con->auth($this->config->get('redis_pass'));
         }
     }
-    
+
     /**
      * @param string $key cache key to delete
      */
@@ -649,4 +649,3 @@ class Hm_Cache_Setup {
         return $cache_class;
     }
 }
-

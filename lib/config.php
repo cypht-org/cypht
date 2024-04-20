@@ -25,7 +25,7 @@ abstract class Hm_Config {
 
     /* flag to save config after page handling */
     public $save_on_login = false;
-    
+
     /**
      * This method must be overriden by classes extending this one
      * @param string $source source or identifier to determine the source
@@ -81,9 +81,9 @@ abstract class Hm_Config {
      */
     public function reset_factory() {
         $this->config = array(
-            "version"=>$this->config["version"], 
-            "feeds"=>$this->config["feeds"], 
-            "imap_servers"=>$this->config["imap_servers"], 
+            "version"=>$this->config["version"],
+            "feeds"=>$this->config["feeds"],
+            "imap_servers"=>$this->config["imap_servers"],
             "smtp_servers"=>$this->config["smtp_servers"]
         );
     }
@@ -303,9 +303,9 @@ class Hm_User_Config_File extends Hm_Config {
      */
     public function reset_factory() {
         $this->config = array(
-            "version"=>$this->config["version"], 
-            "feeds"=>$this->config["feeds"], 
-            "imap_servers"=>$this->config["imap_servers"], 
+            "version"=>$this->config["version"],
+            "feeds"=>$this->config["feeds"],
+            "imap_servers"=>$this->config["imap_servers"],
             "smtp_servers"=>$this->config["smtp_servers"]
         );
         if (!$this->crypt) {
@@ -458,9 +458,9 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     public function reset_factory() {
         $this->config = array(
-            "version"=>$this->config["version"], 
-            "feeds"=>$this->config["feeds"], 
-            "imap_servers"=>$this->config["imap_servers"], 
+            "version"=>$this->config["version"],
+            "feeds"=>$this->config["feeds"],
+            "imap_servers"=>$this->config["imap_servers"],
             "smtp_servers"=>$this->config["smtp_servers"]
         );
         if (!$this->crypt) {

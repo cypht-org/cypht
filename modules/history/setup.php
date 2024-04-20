@@ -21,4 +21,3 @@ return array(
         'history',
     )
 );
-

@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /* 
+    /*
     | -------------------------------------------------
     | Constants used for oauth2 authentication over IMAP
     | -------------------------------------------------
@@ -10,19 +10,19 @@ return [
     | app_data_dir in your config/app.php file. No need to re-run the
     | config_gen.php script.
     |
-    | Do not forget to add the service to $services = ['gmail', 'outlook']; in 
+    | Do not forget to add the service to $services = ['gmail', 'outlook']; in
     | oauth2_setup function from modules/nux/modules.php
-    | 
+    |
     | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER !
-    | 
+    |
     | Currently there are only two popular E-mail providers supporting IMAP/oauth2,
     | Outlook and Gmail. In order to use oauth2 you must create a web application
     | that generates a client id, client secret and a redirect URI, then define them
     | in this file.
-    | 
+    |
     | Outlook.com https://account.live.com/developers/applications/
     | Gmail: https://console.developers.google.com/project
-    | 
+    |
     */
 
     //[gmail]

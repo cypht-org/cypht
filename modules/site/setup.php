@@ -25,5 +25,3 @@ return array(
     'allowed_get' => array(),
     'allowed_post' => array()
 );
-
-

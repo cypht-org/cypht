@@ -15,5 +15,3 @@ return array(
     'allowed_get' => array(),
     'allowed_post' => array('email_provider' => FILTER_DEFAULT)
 );
-
-

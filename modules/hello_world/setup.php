@@ -121,9 +121,7 @@ return array(
 
 /**
  * For more examples check out the setup.php file for the other module sets. They don't have
- * a lot of comments, but they show how this sytem works in practice for real module sets. 
+ * a lot of comments, but they show how this sytem works in practice for real module sets.
  * Also see the examples in the site module set for more information about how to configure
  * modules.
  */
-
-

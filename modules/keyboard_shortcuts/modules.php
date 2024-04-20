@@ -163,10 +163,10 @@ class Hm_Output_shortcut_edit_form extends Hm_Output_Module {
         }
         $res .= '</select></td></tr>';
         $res .= '<tr><td colspan="2">
-                        <input type="submit" class="btn btn-primary" value="'.$this->trans('Update').'" /> 
+                        <input type="submit" class="btn btn-primary" value="'.$this->trans('Update').'" />
                         <input type="button" class="btn btn-light border reset_shortcut" value="'.$this->trans('Cancel').'" />
                 </td></tr>';
-        
+
         $res .= '</table></form></div>';
         return $res;
     }
@@ -343,4 +343,3 @@ function keycodes() {
 		'open bracket' => 219, 'back slash' => 220, 'close bracket' => 221, 'single quote' => 222
 	);
 }}
-

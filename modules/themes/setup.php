@@ -23,7 +23,7 @@ add_handler('ajax_wordpess_notifications', 'load_theme', true, 'themes', 'load_u
 add_handler('ajax_feed_combined', 'load_theme', true, 'themes', 'load_user_data', 'after');
 add_handler('ajax_github_data', 'load_theme', true, 'themes', 'load_user_data', 'after');
 
-add_handler('settings', 'process_theme_setting', true, 'themes', 'save_user_settings', 'before'); 
+add_handler('settings', 'process_theme_setting', true, 'themes', 'save_user_settings', 'before');
 add_output('settings', 'theme_setting', true, 'feeds', 'language_setting', 'after');
 
 return array(
@@ -31,5 +31,3 @@ return array(
         'theme_setting' => FILTER_DEFAULT
     )
 );
-
-

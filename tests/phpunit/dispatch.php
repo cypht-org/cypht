@@ -153,5 +153,3 @@ class Hm_Test_Debug_Page_Redirect extends TestCase {
         $this->assertEquals(null, Hm_Dispatch::page_redirect('test', 200));
     }
 }
-
-?>

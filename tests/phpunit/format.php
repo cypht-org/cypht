@@ -71,4 +71,3 @@ class Hm_Test_Transform extends TestCase {
         $this->assertEquals(array('foo' => 1), Hm_Transform::unstringify($int_test));
     }
 }
-?>

@@ -181,4 +181,3 @@ END:VCALENDAR';
         $this->assertEquals(18, count($parser->parsed_data()));
     }
 }
-?>

@@ -11,7 +11,7 @@
  * Date:    13th August 2014
  */
 $.fn.areYouSure = function(options) {
-      
+
   var settings = $.extend(
     {
       'message' : 'You have unsaved changes!',
@@ -76,7 +76,7 @@ $.fn.areYouSure = function(options) {
       return (getValue($field) != origValue);
     };
 
-    var $form = ($(this).is('form')) 
+    var $form = ($(this).is('form'))
                   ? $(this)
                   : $(this).parents('form');
 
@@ -88,7 +88,7 @@ $.fn.areYouSure = function(options) {
 
     $fields = $form.find(settings.fieldSelector);
 
-    if (settings.addRemoveFieldsMarksDirty) {              
+    if (settings.addRemoveFieldsMarksDirty) {
       // Check if field count has changed
       var origCount = $form.data("ays-orig-field-count");
       if (origCount != $fields.length) {
@@ -106,7 +106,7 @@ $.fn.areYouSure = function(options) {
         return false; // break
       }
     });
-    
+
     setDirtyStatus($form, isDirty);
   };
 
@@ -122,7 +122,7 @@ $.fn.areYouSure = function(options) {
   var setDirtyStatus = function($form, isDirty) {
     var changed = isDirty != $form.hasClass(settings.dirtyClass);
     $form.toggleClass(settings.dirtyClass, isDirty);
-      
+
     // Fire change event if required
     if (changed) {
       if (settings.change) settings.change.call($form, $form);
@@ -175,7 +175,7 @@ $.fn.areYouSure = function(options) {
       return;
     }
     var $form = $(this);
-      
+
     $form.on('submit', function() {
       $form.removeClass(settings.dirtyClass);
     });

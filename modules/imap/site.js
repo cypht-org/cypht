@@ -1284,7 +1284,7 @@ function handleAllowResource(element, messagePart) {
 
 /**
  * Create and insert in the DOM an element containing a message and a button to allow the resource.
- * 
+ *
  * @param {HTMLElement} element - The element having the blocked resource.
  * @returns {void}
  */
@@ -1296,7 +1296,7 @@ function handleInvisibleResource(element) {
     allowResource.classList.add('alert', 'alert-warning', 'p-1');
 
     const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
-    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source} 
+    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
     <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
     Allow</a></div>
     `;
@@ -1310,7 +1310,7 @@ const mutation = new MutationObserver(function (mutations) {
         if (mutation.addedNodes.length > 0) {
             mutation.addedNodes.forEach(function (node) {
                 if (node.classList.contains('msg_text_inner')) {
-                    
+
                     //  Extarnal resources notice boxes container
                     document.querySelector('.msg_text_inner').insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 

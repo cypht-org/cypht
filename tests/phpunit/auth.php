@@ -132,5 +132,3 @@ class Hm_Test_Auth extends TestCase {
         unset($this->config);
     }
 }
-
-?>

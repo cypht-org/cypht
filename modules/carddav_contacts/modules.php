@@ -218,14 +218,14 @@ class Hm_Handler_process_carddav_auth_settings extends Hm_Handler_Module {
         $settings = $this->user_config->get('carddav_contacts_auth_setting', array());
         $users = array();
         $passwords = array();
-        $results = $settings; 
+        $results = $settings;
         if (array_key_exists('carddav_usernames', $this->request->post)) {
             $users = $this->request->post['carddav_usernames'];
         }
         if (array_key_exists('carddav_passwords', $this->request->post)) {
             $passwords = $this->request->post['carddav_passwords'];
         }
-                
+
         if(empty($settings)){
             $settings = array_fill_keys(array_keys($users),[]);
         }

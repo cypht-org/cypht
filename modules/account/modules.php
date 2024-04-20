@@ -21,7 +21,7 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
             return;
         }
         if ($form['new_pass1'] !== $form['new_pass2']) {
-            Hm_Msgs::add("ERRNew passwords don't not match"); 
+            Hm_Msgs::add("ERRNew passwords don't not match");
             return;
         }
         $user = $this->session->get('username', false);
@@ -255,6 +255,3 @@ class Hm_Output_change_password extends Hm_Output_Module {
         return $res;
     }
 }
-
-
-

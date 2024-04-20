@@ -11,7 +11,7 @@
  * to fetch data set by other modules and to return their own output. Handler modules must use these
  * methods to set a response, output modules must if the format is AJAX, otherwise they should return
  * an HTML5 string
- */ 
+ */
 trait Hm_Module_Output {
 
     /* module output */

@@ -239,7 +239,7 @@ class Hm_Dispatch {
         /* output content to the browser */
         $this->render_output();
     }
-    
+
     /**
      * Check for a flag to save settings on login
      */
@@ -363,6 +363,5 @@ class Hm_Dispatch {
             Hm_Functions::function_exists('curl_exec') &&
             Hm_Functions::function_exists('openssl_random_pseudo_bytes') &&
             Hm_Functions::class_exists('PDO');
-
     }
 }

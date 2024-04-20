@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 # This is an example config file to run the Selenium tests remotely,
-# specifically with BrowserStack (https://www.browserstack.com) 
+# specifically with BrowserStack (https://www.browserstack.com)
 
 # recipient E-mail for the send test
 RECIP='testuser@localhost.localdomain'

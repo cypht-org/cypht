@@ -227,7 +227,7 @@ class Hm_Output_highlight_config_page extends Hm_Output_Module {
             }
         }
         $res .= '</table></div>';
-        
+
         $res .= '<div class="settings_subtitle mt-3 px-3"><b>'.$this->trans('Add a new rule').'</b></div>';
         $res .= '<div class="col-12 col-lg-5 mt-2 px-3">';
         $res .= '<form method="POST">';

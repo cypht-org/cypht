@@ -46,5 +46,3 @@ if ($user && $pass) {
         die("An error occured\n\n");
     }
 }
-
-?>

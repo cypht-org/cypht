@@ -61,7 +61,7 @@ trait Hm_Output_Module_Exec {
 
     /**
      * Run a single output modules and return the results
-     * @param array $input handler output 
+     * @param array $input handler output
      * @param array $protected list of protected output
      * @param string $name handler module name
      * @param array $args module arguments
@@ -362,7 +362,7 @@ class Hm_Module_Exec {
         if (!count($active_mods)) {
             Hm_Functions::cease('No module assignments found');
         }
-        $mods = $this->site_config->get_modules(); 
+        $mods = $this->site_config->get_modules();
         $this->load_module_set_files($mods, $active_mods);
     }
 
@@ -380,4 +380,3 @@ class Hm_Module_Exec {
         }
     }
 }
-

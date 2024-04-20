@@ -14,4 +14,3 @@ class Hm_Output_push_js_include extends Hm_Output_Module {
         }
     }
 }
-

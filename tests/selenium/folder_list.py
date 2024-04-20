@@ -28,7 +28,7 @@ class FolderListTests(WebTest):
         list_item = self.by_class('menu_unread')
         link = list_item.find_element_by_tag_name('a')
         assert link.is_displayed() == False
-        
+
     def hide_folders(self):
         self.by_class('hide_folders').click()
         list_item = self.by_class('menu_home')

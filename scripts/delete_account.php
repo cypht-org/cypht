@@ -45,5 +45,3 @@ if ($user) {
         die("An error occured\n\n");
     }
 }
-
-?>

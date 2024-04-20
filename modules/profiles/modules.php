@@ -380,4 +380,3 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     return $res;
 
 }}
-

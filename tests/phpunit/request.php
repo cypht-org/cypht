@@ -17,7 +17,7 @@ class Hm_Test_Request extends TestCase {
      * @runInSeparateProcess
      */
     public function test_request() {
-        
+
         $_SERVER['REQUEST_URI'] = 'test';
         $_SERVER['REQUEST_METHOD'] = 'GET';
         $_GET['foo'] = 'bar';
@@ -88,5 +88,3 @@ class Hm_Test_Request extends TestCase {
         $this->assertTrue($req->mobile);
     }
 }
-
-?>

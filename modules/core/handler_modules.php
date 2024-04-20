@@ -20,7 +20,7 @@ class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
 }
 
 /**
- * Process a password update 
+ * Process a password update
  * @subpackage core/handler
  */
 class Hm_Handler_process_pw_update extends Hm_Handler_Module {
@@ -77,7 +77,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
 }
 
 /**
- * Check for missing passwords to populate a home page dialog 
+ * Check for missing passwords to populate a home page dialog
  * @subpackage core/handler
  */
 class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
@@ -253,7 +253,7 @@ class Hm_Handler_process_default_sort_order_setting extends Hm_Handler_Module {
 }
 
 /**
- * Process "hide folder list icons" setting 
+ * Process "hide folder list icons" setting
  * @subpackage core/handler
  */
 class Hm_Handler_process_hide_folder_icons extends Hm_Handler_Module {
