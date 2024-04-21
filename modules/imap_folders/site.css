@@ -2,6 +2,7 @@
 /* .folder_dialog input { display: inline-block; margin-top: 15px; } */
 .sent_folder_select, .draft_folder_select, .trash_folder_select, .folder_dialog, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select, .junk_folder_select { display: none; }
 .draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select { width: 215px; position: absolute; background-color: #fff; padding: 15px; border: solid 1px #ede8e6; font-weight: normal; padding-left: 10px; min-width: 55px; padding-top: 10px; margin-left: 0px !important; margin-top: 0px; }
+.delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .sent_folder_select, .archive_folder_select, .draft_folder_select, .trash_folder_select, .junk_folder_select, .parent_folder_select { z-index: 10; }
 .folder_row { margin-top: 15px; }
 .close { margin-left: 10%; font-size: 100%; color: teal !important; }
 .sp_folder_title { font-size: 110%; color: #777; }

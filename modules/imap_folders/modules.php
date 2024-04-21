@@ -504,7 +504,7 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
                         <a href="#" class="select_sent_folder">'.$this->trans('Select Folder').'</a>:
                         <span class="selected_sent"></span>
                     </div>
-                    <ul class="folders sent_folder_select" style="z-index: 10">
+                    <ul class="folders sent_folder_select">
                         <li class="sent_title">
                             <a href="#" class="close">'.$this->trans('Cancel').'</a>
                         </li>
@@ -548,7 +548,7 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
                         <a href="#" class="select_archive_folder">'.$this->trans('Select Folder').'</a>:
                         <span class="selected_archive"></span>
                     </div>
-                    <ul class="folders archive_folder_select" style="z-index : 10">
+                    <ul class="folders archive_folder_select">
                         <li class="archive_title">
                             <a href="#" class="close">'.$this->trans('Cancel').'</a>
                         </li>
@@ -635,7 +635,7 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
                         <a href="#" class="select_trash_folder">'.$this->trans('Select Folder').'</a>:
                         <span class="selected_trash"></span>
                     </div>
-                    <ul class="folders trash_folder_select" style="z-index : 10">
+                    <ul class="folders trash_folder_select">
                         <li class="trash_title">
                             <a href="#" class="close">'.$this->trans('Cancel').'</a>
                         </li>
@@ -677,7 +677,7 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
                         <a href="#" class="select_junk_folder">'.$this->trans('Select Folder').'</a>:
                         <span class="selected_junk"></span>
                     </div>
-                    <ul class="folders junk_folder_select" style="z-index: 10">
+                    <ul class="folders junk_folder_select">
                         <li class="junk_title">
                             <a href="#" class="close">'.$this->trans('Cancel').'</a>
                         </li>
