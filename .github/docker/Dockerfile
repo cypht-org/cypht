@@ -1,5 +1,10 @@
 FROM php:fpm-alpine
 
+
+ENV REPO "wangxiaoeryah/cypht"
+# ENV REPO "cypht-org/cypht"
+ENV BRANCH "dev"
+# ENV BRANCH "master"
 ENV CYPHT_DEST "/usr/local/share/cypht"
 
 WORKDIR "/var/www"
@@ -21,15 +26,11 @@ RUN set -e \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd pdo_mysql \
     # Install
-    # && wget https://github.com/cypht-org/cypht/archive/master.zip \
-    && wget https://github.com/wangxiaoeryah/cypht/archive/dev.zip \
-    # && unzip master.zip \
-    # && rm master.zip \
-    && unzip dev.zip \
-    && rm dev.zip \
+    && wget https://github.com/${REPO}/archive/${BRANCH}.zip \
+    && unzip ${BRANCH}.zip \
+    && rm ${BRANCH}.zip \
     && mkdir -p ${CYPHT_DEST} \
-    # && mv cypht-master/* ${CYPHT_DEST} \
-    && mv cypht-dev/* ${CYPHT_DEST} \
+    && mv cypht-${BRANCH}/* ${CYPHT_DEST} \
     && find ${CYPHT_DEST} -type d -print | xargs chmod 755 \
     && find ${CYPHT_DEST} -type f -print | xargs chmod 644 \
     && chown -R root:root ${CYPHT_DEST} \
