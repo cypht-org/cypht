@@ -24,17 +24,11 @@ env:
 
 jobs:
   Nightly-Image-Build:
-    name: Nightly-Image ${{ matrix.platform }}
+    name: Nightly-Image
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-    
-    strategy:
-      matrix:
-        platform:
-          - linux/amd64
-          - linux/arm64
+      packages: write      
 
     steps:
       - name: "Checkout code"
@@ -69,7 +63,9 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platform }}
+          platforms: 
+            - linux/amd64
+            - linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
