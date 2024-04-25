@@ -50,11 +50,17 @@ add_output('home', 'nux_dev_news', true, 'nux', 'nux_help', 'after');
 
 add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list_start', 'before');
 
+setup_base_page('add_multiple_servers', 'core');
+add_handler('add_multiple_servers', 'process_import_accouts_servers', true, 'nux','load_user_data', 'after');
+add_output('servers', 'quick_add_multiple_section', true, 'nux', 'server_config_stepper_accordion_end_part', 'after');
+add_output('servers', 'quick_add_multiple_dialog', true, 'nux', 'quick_add_multiple_section', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_nux_service_select',
         'ajax_get_nux_service_details',
-        'ajax_nux_add_service'
+        'ajax_nux_add_service',
+        'add_multiple_servers',
     ),
     'allowed_get' => array(
         'code' => FILTER_DEFAULT,
@@ -75,6 +81,9 @@ return array(
         'nux_name' => FILTER_DEFAULT,
         'nux_pass' => FILTER_UNSAFE_RAW,
         'nux_account_name' => FILTER_DEFAULT,
-        'nux_all_inkl_login' => FILTER_DEFAULT
+        'nux_all_inkl_login' => FILTER_DEFAULT,
+        'accounts_source' => FILTER_DEFAULT,
+        'accounts_source' => FILTER_DEFAULT,
+        'accounts_csv' => FILTER_DEFAULT,
     )
 );

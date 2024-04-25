@@ -1,0 +1,36 @@
+Migadu.com:
+  jmap:
+    jmap_server: 
+  user:
+    username: test@enterprisedepartment.com
+    password: 8xiK&z5TsQaJ!t
+  imap:
+    port: 993
+    tls: true
+    imap_server: imap.migadu.com
+  smtp:
+    support_smtp: true
+    smtp_server: smtp.migadu.com
+    smtp_port: 587
+    smtp_tls: true
+  sieve:
+    sieve_host: tls://imap.migadu.com
+    sieve_port: 4190
+Postale.io:
+  jmap:
+    jmap_server: 
+  user:
+    username: test@notrewiki.com
+    password: FuMxdfhCLD3vEuP5
+  imap:
+    port: 993
+    tls: true
+    imap_server: mail.postale.io
+  smtp:
+    support_smtp: true
+    smtp_server: mail.postale.io
+    smtp_port: 465
+    smtp_tls: true
+  sieve:
+    sieve_host: tls://mail.postale.io
+    sieve_port: 4190
