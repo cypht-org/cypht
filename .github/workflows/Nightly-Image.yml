@@ -9,26 +9,27 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}-nightly
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   Nightly-Image-Build:
-    name: Nightly-Image
+    name: Nightly-Image ${{ matrix.platform }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
-      id-token: write
+    
+    strategy:
+      matrix:
+        platform:
+          - linux/amd64
+          - linux/arm64
 
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
-      - name: Install cosign
-        if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@v3.5.0
       
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -49,20 +50,15 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: type=schedule,enable=true,priority=1000,prefix=,suffix=,pattern=nightly
+
       
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ matrix.platform }}
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
       
-      - name: Sign the published Docker image
-        if: ${{ github.event_name != 'pull_request' }}
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        run: echo "${{ steps.meta.outputs.tags }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
