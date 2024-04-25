@@ -5,23 +5,22 @@ defaults:
     shell: bash
 
 on:
-  push:
-    branches:
-      - master
-      - dev
+  # push:
+  #   branches:
+  #     - master
+  #     - dev
 
-  pull_request:
-    branches:
-      - master
-      - dev
+  # pull_request:
+  #   branches:
+  #     - master
+  #     - dev
 
+  workflow_call:
+  # workflow_dispatch:
 
-  # workflow_call:
-  workflow_dispatch:
-
-concurrency:
-  group: build-nightly
-  cancel-in-progress: true
+# concurrency:
+#   group: build-nightly
+#   cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
