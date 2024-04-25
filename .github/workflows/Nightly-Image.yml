@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.head_ref }}
+  group: build-nightly
   cancel-in-progress: true
 
 env:
