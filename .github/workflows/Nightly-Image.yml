@@ -52,7 +52,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=schedule,pattern=nightly
+            type=raw,value=nightly,enable=true
 
       
       - name: Build and push
