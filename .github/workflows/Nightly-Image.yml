@@ -18,6 +18,10 @@ on:
   # workflow_call:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cance-in-progress: true
+
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}

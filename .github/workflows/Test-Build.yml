@@ -15,6 +15,10 @@ on:
 
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.head_ref }}
+  cance-in-progress: true
+
 jobs:
   Test-phpunit:
     name: PHPUNIT (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
