@@ -7,51 +7,9 @@ CYPHT_CONFIG_FILE=/usr/local/share/cypht/.env
 #
 
 # General Settings
-# if [ ! -z ${CYPHT_SESSION_TYPE+x} ]; then sed -i "s/session_type=.*/session_type=${CYPHT_SESSION_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_AUTH_TYPE+x} ]; then sed -i "s/auth_type=.*/auth_type=${CYPHT_AUTH_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_LDAP_AUTH_SERVER+x} ]; then sed -i "s/ldap_auth_server=.*/ldap_auth_server=${CYPHT_LDAP_AUTH_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_LDAP_AUTH_PORT+x} ]; then sed -i "s/ldap_auth_port=.*/ldap_auth_port=${CYPHT_LDAP_AUTH_PORT}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_LDAP_AUTH_TLS+x} ]; then sed -i "s/ldap_auth_tls=.*/ldap_auth_tls=${CYPHT_LDAP_AUTH_TLS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_LDAP_AUTH_BASE_DN+x} ]; then sed -i "s/ldap_auth_base_dn=.*/ldap_auth_base_dn=${CYPHT_LDAP_AUTH_BASE_DN}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_IMAP_AUTH_NAME+x} ]; then sed -i "s/imap_auth_name=.*/imap_auth_name=${CYPHT_IMAP_AUTH_NAME}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_IMAP_AUTH_SERVER+x} ]; then sed -i "s/imap_auth_server=.*/imap_auth_server=${CYPHT_IMAP_AUTH_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_IMAP_AUTH_PORT+x} ]; then sed -i "s/imap_auth_port=.*/imap_auth_port=${CYPHT_IMAP_AUTH_PORT}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_IMAP_AUTH_TLS+x} ]; then sed -i "s/imap_auth_tls=.*/imap_auth_tls=${CYPHT_IMAP_AUTH_TLS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_SMTP_NAME+x} ]; then sed -i "s/default_smtp_name=.*/default_smtp_name=${CYPHT_DEFAULT_SMTP_NAME}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_SMTP_SERVER+x} ]; then sed -i "s/default_smtp_server=.*/default_smtp_server=${CYPHT_DEFAULT_SMTP_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_SMTP_PORT+x} ]; then sed -i "s/default_smtp_port=.*/default_smtp_port=${CYPHT_DEFAULT_SMTP_PORT}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_SMTP_TLS+x} ]; then sed -i "s/default_smtp_tls=.*/default_smtp_tls=${CYPHT_DEFAULT_SMTP_TLS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_SMTP_NO_AUTH+x} ]; then sed -i "s/default_smtp_no_auth=.*/default_smtp_no_auth=${CYPHT_DEFAULT_SMTP_NO_AUTH}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_USER_CONFIG_TYPE+x} ]; then sed -i "s/user_config_type=.*/user_config_type=${CYPHT_USER_CONFIG_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_USER_SETTINGS_DIR+x} ]; then sed -i "s!user_settings_dir=.*!user_settings_dir=${CYPHT_USER_SETTINGS_DIR}!" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ATTACHMENT_DIR+x} ]; then sed -i "s/attachment_dir=.*/attachment_dir=${CYPHT_ATTACHMENT_DIR}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_APP_DATA_DIR+x} ]; then sed -i "s/app_data_dir=.*/app_data_dir=${CYPHT_APP_DATA_DIR}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_ORIGIN_CHECK+x} ]; then sed -i "s/disable_origin_check=.*/disable_origin_check=${CYPHT_DISABLE_ORIGIN_CHECK}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ADMIN_USERS+x} ]; then sed -i "s/admin_users=.*/admin_users=${CYPHT_ADMIN_USERS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_COOKIE_DOMAIN+x} ]; then sed -i "s/cookie_domain=.*/cookie_domain=${CYPHT_COOKIE_DOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_EMAIL_DOMAIN+x} ]; then sed -i "s/default_email_domain=.*/default_email_domain=${CYPHT_DEFAULT_EMAIL_DOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_REDIRECT_AFTER_LOGIN+x} ]; then sed -i "s/redirect_after_login=.*/redirect_after_login=${CYPHT_REDIRECT_AFTER_LOGIN}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_APP_NAME+x} ]; then sed -i "s/app_name=.*/app_name=${CYPHT_APP_NAME}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DEFAULT_LANGUAGE+x} ]; then sed -i "s/default_language=.*/default_language=${CYPHT_DEFAULT_LANGUAGE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_JS_COMPRESS+x} ]; then sed -i "s/js_compress=.*/js_compress=${CYPHT_JS_COMPRESS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_CSS_COMPRESS+x} ]; then sed -i "s/css_compress=.*/css_compress=${CYPHT_CSS_COMPRESS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ENABLE_MEMCACHED+x} ]; then sed -i "s/enable_memcached=.*/enable_memcached=${CYPHT_ENABLE_MEMCACHED}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_MEMCACHED_SERVER+x} ]; then sed -i "s/memcached_server=.*/memcached_server=${CYPHT_MEMCACHED_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_MEMCACHED_PORT+x} ]; then sed -i "s/memcached_port=.*/memcached_port=${CYPHT_MEMCACHED_PORT}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_MEMCACHED_AUTH+x} ]; then sed -i "s/memcached_auth=.*/memcached_auth=${CYPHT_MEMCACHED_AUTH}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_MEMCACHED_USER+x} ]; then sed -i "s/memcached_user=.*/memcached_user=${CYPHT_MEMCACHED_USER}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_MEMCACHED_PASS+x} ]; then sed -i "s/memcached_pass=.*/memcached_pass=${CYPHT_MEMCACHED_PASS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ALLOW_LONG_SESSION+x} ]; then sed -i "s/allow_long_session=.*/allow_long_session=${CYPHT_ALLOW_LONG_SESSION}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_LONG_SESSION_LIFETIME+x} ]; then sed -i "s/long_session_lifetime=.*/long_session_lifetime=${CYPHT_LONG_SESSION_LIFETIME}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ENCRYPT_AJAX_REQUESTS+x} ]; then sed -i "s/encrypt_ajax_requests=.*/encrypt_ajax_requests=${CYPHT_ENCRYPT_AJAX_REQUESTS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ENCRYPT_LOCAL_STORAGE+x} ]; then sed -i "s/encrypt_local_storage=.*/encrypt_local_storage=${CYPHT_ENCRYPT_LOCAL_STORAGE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_IP_CHECK+x} ]; then sed -i "s/disable_ip_check=.*/disable_ip_check=${CYPHT_DISABLE_IP_CHECK}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_ALLOW_EXTERNAL_IMAGE_SOURCES+x} ]; then sed -i "s/allow_external_image_sources=.*/allow_external_image_sources=${CYPHT_ALLOW_EXTERNAL_IMAGE_SOURCES}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_SINGLE_SERVER_MODE+x} ]; then sed -i "s/single_server_mode=.*/single_server_mode=${CYPHT_SINGLE_SERVER_MODE}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_EMPTY_SUPERGLOBALS+x} ]; then sed -i "s/disable_empty_superglobals=.*/disable_empty_superglobals=${CYPHT_DISABLE_EMPTY_SUPERGLOBALS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_OPEN_BASEDIR+x} ]; then sed -i "s/disable_open_basedir=.*/disable_open_basedir=${CYPHT_DISABLE_OPEN_BASEDIR}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_INI_SETTINGS+x} ]; then sed -i "s/disable_ini_settings=.*/disable_ini_settings=${CYPHT_DISABLE_INI_SETTINGS}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_DISABLE_FINGERPRINT+x} ]; then sed -i "s/disable_fingerprint=.*/disable_fingerprint=${CYPHT_DISABLE_FINGERPRINT}/" ${CYPHT_CONFIG_FILE}; fi
+## APP_NAME
+if [ ! -z ${CYPHT_APP_NAME+x} ]; then sed -i "s/APP_NAME=.*/APP_NAME=${CYPHT_APP_NAME}/" ${CYPHT_CONFIG_FILE}; fi
+## DB
 if [ ! -z ${CYPHT_DB_CONNECTION_TYPE+x} ]; then sed -i "s/DB_CONNECTION_TYPE=.*/DB_CONNECTION_TYPE=${CYPHT_DB_CONNECTION_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
 if [ ! -z ${CYPHT_DB_DRIVER+x} ]; then sed -i "s/DB_DRIVER=.*/DB_DRIVER=${CYPHT_DB_DRIVER}/" ${CYPHT_CONFIG_FILE}; fi
 if [ ! -z ${CYPHT_DB_PORT+x} ]; then sed -i "s/DB_PORT=.*/DB_PORT=${CYPHT_DB_PORT}/" ${CYPHT_CONFIG_FILE}; fi
@@ -60,97 +18,197 @@ if [ ! -z ${CYPHT_DB_NAME+x} ]; then sed -i "s/DB_NAME=.*/DB_NAME=${CYPHT_DB_NAM
 if [ ! -z ${CYPHT_DB_USER+x} ]; then sed -i "s/DB_NAME=.*/DB_NAME=${CYPHT_DB_USER}/" ${CYPHT_CONFIG_FILE}; fi
 if [ ! -z ${CYPHT_DB_PASS+x} ]; then sed -i "s/DB_PASS=.*/DB_PASS=${CYPHT_DB_PASS}/" ${CYPHT_CONFIG_FILE}; fi
 if [ ! -z ${CYPHT_DB_SOCKET+x} ]; then sed -i "s/DB_SOCKET=.*/DB_SOCKET=${CYPHT_DB_SOCKET}/" ${CYPHT_CONFIG_FILE}; fi
-# if [ ! -z ${CYPHT_API_LOGIN_KEY+x} ]; then sed -i "s/api_login_key=.*/api_login_key=${CYPHT_API_LOGIN_KEY}/" ${CYPHT_CONFIG_FILE}; fi
-if [ -z ${CYPHT_AUTH_USERNAME+x} ]; then CYPHT_AUTH_USERNAME=demo ; fi
-if [ -z ${CYPHT_AUTH_PASSWORD+x} ]; then CYPHT_AUTH_PASSWORD=demo ; fi
+## SESSION
+if [ ! -z ${CYPHT_SESSION_TYPE+x} ]; then sed -i "s/SESSION_TYPE=.*/SESSION_TYPE=${CYPHT_SESSION_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_AUTH_TYPE+x} ]; then sed -i "s/AUTH_TYPE=.*/AUTH_TYPE=${CYPHT_AUTH_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
+## IMAP
+if [ ! -z ${CYPHT_IMAP_AUTH_NAME+x} ]; then sed -i "s/IMAP_AUTH_NAME=.*/IMAP_AUTH_NAME=${CYPHT_IMAP_AUTH_NAME}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_IMAP_AUTH_SERVER+x} ]; then sed -i "s/IMAP_AUTH_SERVER=.*/IMAP_AUTH_SERVER=${CYPHT_IMAP_AUTH_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_IMAP_AUTH_PORT+x} ]; then sed -i "s/IMAP_AUTH_PORT=.*/IMAP_AUTH_PORT=${CYPHT_IMAP_AUTH_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_IMAP_AUTH_TLS+x} ]; then sed -i "s/IMAP_AUTH_TLS=.*/IMAP_AUTH_TLS=${CYPHT_IMAP_AUTH_TLS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_IMAP_AUTH_SIEVE_CONF_HOST+x} ]; then sed -i "s/IMAP_AUTH_SIEVE_CONF_HOST=.*/IMAP_AUTH_SIEVE_CONF_HOST=${CYPHT_IMAP_AUTH_SIEVE_CONF_HOST}/" ${CYPHT_CONFIG_FILE}; fi
+## SMTP
+if [ ! -z ${CYPHT_DEFAULT_SMTP_NAME+x} ]; then sed -i "s/DEFAULT_SMTP_NAME=.*/DEFAULT_SMTP_NAME=${CYPHT_DEFAULT_SMTP_NAME}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SMTP_SERVER+x} ]; then sed -i "s/DEFAULT_SMTP_SERVER=.*/DEFAULT_SMTP_SERVER=${CYPHT_DEFAULT_SMTP_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SMTP_PORT+x} ]; then sed -i "s/DEFAULT_SMTP_PORT=.*/DEFAULT_SMTP_PORT=${CYPHT_DEFAULT_SMTP_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SMTP_TLS+x} ]; then sed -i "s/DEFAULT_SMTP_TLS=.*/DEFAULT_SMTP_TLS=${CYPHT_DEFAULT_SMTP_TLS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SMTP_NO_AUTH+x} ]; then sed -i "s/DEFAULT_SMTP_NO_AUTH=.*/DEFAULT_SMTP_NO_AUTH=${CYPHT_DEFAULT_SMTP_NO_AUTH}/" ${CYPHT_CONFIG_FILE}; fi
+## User Settings
+if [ ! -z ${CYPHT_USER_CONFIG_TYPE+x} ]; then sed -i "s/USER_CONFIG_TYPE=.*/USER_CONFIG_TYPE=${CYPHT_USER_CONFIG_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_USER_SETTINGS_DIR+x} ]; then sed -i "s!USER_SETTINGS_DIR=.*!USER_SETTINGS_DIR=${CYPHT_USER_SETTINGS_DIR}!" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_ATTACHMENT_DIR+x} ]; then sed -i "s/ATTACHMENT_DIR=.*/ATTACHMENT_DIR=${CYPHT_ATTACHMENT_DIR}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_APP_DATA_DIR+x} ]; then sed -i "s/APP_DATA_DIR=.*/APP_DATA_DIR=${CYPHT_APP_DATA_DIR}/" ${CYPHT_CONFIG_FILE}; fi
 
-# Modules
+if [ ! -z ${CYPHT_ADMIN_USERS+x} ]; then sed -i "s/ADMIN_USERS=.*/ADMIN_USERS=${CYPHT_ADMIN_USERS}/" ${CYPHT_CONFIG_FILE}; fi
 
-# enable_disable_module() {
-#     local module=${1}
-#     local setting=${2}
-#     # For some reason, "(; )?" isn't working but ";\{0,1\} \{0,1\}" does the same thing
-#     if [ ${setting} = enable ]
-#     then
-#         sed -i "s/^;\{0,1\} \{0,1\}modules\[\]=${module}/modules[]=${module}/" ${CYPHT_CONFIG_FILE}
-#         if [ ${module} = api_login ]; then sed -i "s/;\{0,1\} \{0,1\}api_login_key=/api_login_key=/" ${CYPHT_CONFIG_FILE}; fi
-#     else
-#         sed -i "s/^;\{0,1\} \{0,1\}modules\[\]=${module}/; modules[]=${module}/" ${CYPHT_CONFIG_FILE}
-#         if [ ${module} = api_login ]; then sed -i "s/;\{0,1\} \{0,1\}api_login_key=/; api_login_key=/" ${CYPHT_CONFIG_FILE}; fi
-#     fi
-# }
+## COOKIE
+if [ ! -z ${CYPHT_COOKIE_DOMAIN+x} ]; then sed -i "s/COOKIE_DOMAIN=.*/COOKIE_DOMAIN=${CYPHT_COOKIE_DOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_COOKIE_PATH+x} ]; then sed -i "s/COOKIE_PATH=.*/COOKIE_PATH=${CYPHT_COOKIE_PATH}/" ${CYPHT_CONFIG_FILE}; fi
 
-# if [ ! -z ${CYPHT_MODULE_CORE+x} ]; then enable_disable_module core ${CYPHT_MODULE_CORE}; fi
-# if [ ! -z ${CYPHT_MODULE_CONTACTS+x} ]; then enable_disable_module contacts ${CYPHT_MODULE_CONTACTS}; fi
-# if [ ! -z ${CYPHT_MODULE_LOCAL_CONTACTS+x} ]; then enable_disable_module local_contacts ${CYPHT_MODULE_LOCAL_CONTACTS}; fi
-# if [ ! -z ${CYPHT_MODULE_LDAP_CONTACTS+x} ]; then enable_disable_module ldap_contacts ${CYPHT_MODULE_LDAP_CONTACTS}; fi
-# if [ ! -z ${CYPHT_MODULE_GMAIL_CONTACTS+x} ]; then enable_disable_module gmail_contacts ${CYPHT_MODULE_GMAIL_CONTACTS}; fi
-# if [ ! -z ${CYPHT_MODULE_FEEDS+x} ]; then enable_disable_module feeds ${CYPHT_MODULE_FEEDS}; fi
-# if [ ! -z ${CYPHT_MODULE_IMAP+x} ]; then enable_disable_module imap ${CYPHT_MODULE_IMAP}; fi
-# if [ ! -z ${CYPHT_MODULE_2FA+x} ]; then enable_disable_module 2fa ${CYPHT_MODULE_2FA}; fi
-# if [ ! -z ${CYPHT_MODULE_SMTP+x} ]; then enable_disable_module smtp ${CYPHT_MODULE_SMTP}; fi
-# if [ ! -z ${CYPHT_MODULE_ACCOUNT+x} ]; then enable_disable_module account ${CYPHT_MODULE_ACCOUNT}; fi
-# if [ ! -z ${CYPHT_MODULE_IDLE_TIMER+x} ]; then enable_disable_module idle_timer ${CYPHT_MODULE_IDLE_TIMER}; fi
-# if [ ! -z ${CYPHT_MODULE_CALENDAR+x} ]; then enable_disable_module calendar ${CYPHT_MODULE_CALENDAR}; fi
-# if [ ! -z ${CYPHT_MODULE_THEMES+x} ]; then enable_disable_module themes ${CYPHT_MODULE_THEMES}; fi
-# if [ ! -z ${CYPHT_MODULE_NUX+x} ]; then enable_disable_module nux ${CYPHT_MODULE_NUX}; fi
-# if [ ! -z ${CYPHT_MODULE_DEVELOPER+x} ]; then enable_disable_module developer ${CYPHT_MODULE_DEVELOPER}; fi
-# if [ ! -z ${CYPHT_MODULE_GITHUB+x} ]; then enable_disable_module github ${CYPHT_MODULE_GITHUB}; fi
-# if [ ! -z ${CYPHT_MODULE_RECAPTCHA+x} ]; then enable_disable_module recaptcha ${CYPHT_MODULE_RECAPTCHA}; fi
-# if [ ! -z ${CYPHT_MODULE_WORDPRESS+x} ]; then enable_disable_module wordpress ${CYPHT_MODULE_WORDPRESS}; fi
-# if [ ! -z ${CYPHT_MODULE_HISTORY+x} ]; then enable_disable_module history ${CYPHT_MODULE_HISTORY}; fi
-# if [ ! -z ${CYPHT_MODULE_SAVED_SEARCHES+x} ]; then enable_disable_module saved_searches ${CYPHT_MODULE_SAVED_SEARCHES}; fi
-# if [ ! -z ${CYPHT_MODULE_NASA+x} ]; then enable_disable_module nasa ${CYPHT_MODULE_NASA}; fi
-# if [ ! -z ${CYPHT_MODULE_PROFILES+x} ]; then enable_disable_module profiles ${CYPHT_MODULE_PROFILES}; fi
-# if [ ! -z ${CYPHT_MODULE_INLINE_MESSAGE+x} ]; then enable_disable_module inline_message ${CYPHT_MODULE_INLINE_MESSAGE}; fi
-# if [ ! -z ${CYPHT_MODULE_IMAP_FOLDERS+x} ]; then enable_disable_module imap_folders ${CYPHT_MODULE_IMAP_FOLDERS}; fi
-# if [ ! -z ${CYPHT_MODULE_KEYBOARD_SHORTCUTS+x} ]; then enable_disable_module keyboard_shortcuts ${CYPHT_MODULE_KEYBOARD_SHORTCUTS}; fi
-# if [ ! -z ${CYPHT_MODULE_SIEVEFILTERS+x} ]; then enable_disable_module sievefilters ${CYPHT_MODULE_SIEVEFILTERS}; fi
-# if [ ! -z ${CYPHT_MODULE_SITE+x} ]; then enable_disable_module site ${CYPHT_MODULE_SITE}; fi
-# if [ ! -z ${CYPHT_MODULE_DYNAMIC_LOGIN+x} ]; then enable_disable_module dynamic_login ${CYPHT_MODULE_DYNAMIC_LOGIN}; fi
-# if [ ! -z ${CYPHT_MODULE_API_LOGIN+x} ]; then enable_disable_module api_login ${CYPHT_MODULE_API_LOGIN}; fi
-# if [ ! -z ${CYPHT_MODULE_RECOVER_SETTINGS+x} ]; then enable_disable_module recover_settings ${CYPHT_MODULE_RECOVER_SETTINGS}; fi
-# if [ ! -z ${CYPHT_MODULE_HELLO_WORLD+x} ]; then enable_disable_module hello_world ${CYPHT_MODULE_HELLO_WORLD}; fi
-# if [ ! -z ${CYPHT_MODULE_DESKTOP_NOTIFICATIONS+x} ]; then enable_disable_module desktop_notifications ${CYPHT_MODULE_DESKTOP_NOTIFICATIONS}; fi
+if [ ! -z ${CYPHT_DEFAULT_EMAIL_DOMAIN+x} ]; then sed -i "s/DEFAULT_EMAIL_DOMAIN=.*/DEFAULT_EMAIL_DOMAIN=${CYPHT_DEFAULT_EMAIL_DOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_AUTO_CREATE_PROFILE+x} ]; then sed -i "s/AUTO_CREATE_PROFILE=.*/AUTO_CREATE_PROFILE=${CYPHT_AUTO_CREATE_PROFILE}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_REDIRECT_AFTER_LOGIN+x} ]; then sed -i "s/REDIRECT_AFTER_LOGIN=.*/REDIRECT_AFTER_LOGIN=${CYPHT_REDIRECT_AFTER_LOGIN}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_ALWAYS_MOBILE_UI+x} ]; then sed -i "s/ALWAYS_MOBILE_UI=.*/ALWAYS_MOBILE_UI=${CYPHT_ALWAYS_MOBILE_UI}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_DEFAULT_LANGUAGE+x} ]; then sed -i "s/DEFAULT_LANGUAGE=.*/DEFAULT_LANGUAGE=${CYPHT_DEFAULT_LANGUAGE}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_JS_COMPRESS+x} ]; then sed -i "s/JS_COMPRESS=.*/JS_COMPRESS=${CYPHT_JS_COMPRESS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_CSS_COMPRESS+x} ]; then sed -i "s/CSS_COMPRESS=.*/CSS_COMPRESS=${CYPHT_CSS_COMPRESS}/" ${CYPHT_CONFIG_FILE}; fi
+
+## SESSION CACHE
+if [ ! -z ${CYPHT_ALLOW_SESSION_CACHE+x} ]; then sed -i "s/ALLOW_SESSION_CACHE=.*/ALLOW_SESSION_CACHE=${CYPHT_ALLOW_SESSION_CACHE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_CACHE_CLASS+x} ]; then sed -i "s/CACHE_CLASS=.*/CACHE_CLASS=${CYPHT_CACHE_CLASS}/" ${CYPHT_CONFIG_FILE}; fi
+
+## REDIS
+if [ ! -z ${CYPHT_ENABLE_REDIS+x} ]; then sed -i "s/ENABLE_REDIS=.*/ENABLE_REDIS=${CYPHT_ENABLE_REDIS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_REDIS_SERVER+x} ]; then sed -i "s/REDIS_SERVER=.*/REDIS_SERVER=${CYPHT_REDIS_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_REDIS_PORT+x} ]; then sed -i "s/REDIS_PORT=.*/REDIS_PORT=${CYPHT_REDIS_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_REDIS_INDEX+x} ]; then sed -i "s/REDIS_INDEX=.*/REDIS_INDEX=${CYPHT_REDIS_INDEX}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_REDIS_PASS+x} ]; then sed -i "s/REDIS_PASS=.*/REDIS_PASS=${CYPHT_REDIS_PASS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_REDIS_SOCKET+x} ]; then sed -i "s/REDIS_SOCKET=.*/REDIS_SOCKET=${CYPHT_REDIS_SOCKET}/" ${CYPHT_CONFIG_FILE}; fi
+## MEMCACHED
+if [ ! -z ${CYPHT_ENABLE_MEMCACHED+x} ]; then sed -i "s/ENABLE_MEMCACHED=.*/ENABLE_MEMCACHED=${CYPHT_ENABLE_MEMCACHED}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_MEMCACHED_SERVER+x} ]; then sed -i "s/MEMCACHED_SERVER=.*/MEMCACHED_SERVER=${CYPHT_MEMCACHED_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_MEMCACHED_PORT+x} ]; then sed -i "s/MEMCACHED_PORT=.*/MEMCACHED_PORT=${CYPHT_MEMCACHED_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_MEMCACHED_AUTH+x} ]; then sed -i "s/MEMCACHED_AUTH=.*/MEMCACHED_AUTH=${CYPHT_MEMCACHED_AUTH}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_MEMCACHED_USER+x} ]; then sed -i "s/MEMCACHED_USER=.*/MEMCACHED_USER=${CYPHT_MEMCACHED_USER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_MEMCACHED_PASS+x} ]; then sed -i "s/MEMCACHED_PASS=.*/MEMCACHED_PASS=${CYPHT_MEMCACHED_PASS}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_ALLOW_LONG_SESSION+x} ]; then sed -i "s/ALLOW_LONG_SESSION=.*/ALLOW_LONG_SESSION=${CYPHT_ALLOW_LONG_SESSION}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LONG_SESSION_LIFETIME+x} ]; then sed -i "s/LONG_SESSION_LIFETIME=.*/LONG_SESSION_LIFETIME=${CYPHT_LONG_SESSION_LIFETIME}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_ENCRYPT_AJAX_REQUESTS+x} ]; then sed -i "s/ENCRYPT_AJAX_REQUESTS=.*/ENCRYPT_AJAX_REQUESTS=${CYPHT_ENCRYPT_AJAX_REQUESTS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_ENCRYPT_LOCAL_STORAGE+x} ]; then sed -i "s/ENCRYPT_LOCAL_STORAGE=.*/ENCRYPT_LOCAL_STORAGE=${CYPHT_ENCRYPT_LOCAL_STORAGE}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_DISABLE_IP_CHECK+x} ]; then sed -i "s/DISABLE_IP_CHECK=.*/DISABLE_IP_CHECK=${CYPHT_DISABLE_IP_CHECK}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DISABLE_ORIGIN_CHECK+x} ]; then sed -i "s/DISABLE_ORIGIN_CHECK=.*/DISABLE_ORIGIN_CHECK=${CYPHT_DISABLE_ORIGIN_CHECK}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_ALLOW_EXTERNAL_IMAGE_SOURCES+x} ]; then sed -i "s/ALLOW_EXTERNAL_IMAGE_SOURCES=.*/ALLOW_EXTERNAL_IMAGE_SOURCES=${CYPHT_ALLOW_EXTERNAL_IMAGE_SOURCES}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_SINGLE_SERVER_MODE+x} ]; then sed -i "s/SINGLE_SERVER_MODE=.*/SINGLE_SERVER_MODE=${CYPHT_SINGLE_SERVER_MODE}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_DISABLE_EMPTY_SUPERGLOBALS+x} ]; then sed -i "s/DISABLE_EMPTY_SUPERGLOBALS=.*/DISABLE_EMPTY_SUPERGLOBALS=${CYPHT_DISABLE_EMPTY_SUPERGLOBALS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DISABLE_OPEN_BASEDIR+x} ]; then sed -i "s/DISABLE_OPEN_BASE_DIR=.*/DISABLE_OPEN_BASE_DIR=${CYPHT_DISABLE_OPEN_BASEDIR}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DISABLE_INI_SETTINGS+x} ]; then sed -i "s/DISABLE_INI_SETTINGS=.*/DISABLE_INI_SETTINGS=${CYPHT_DISABLE_INI_SETTINGS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DISABLE_FINGERPRINT+x} ]; then sed -i "s/DISABLE_FINGERPRINT=.*/DISABLE_FINGERPRINT=${CYPHT_DISABLE_FINGERPRINT}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_AUTH_CLASS+x} ]; then sed -i "s/AUTH_CLASS=.*/AUTH_CLASS=${CYPHT_AUTH_CLASS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_SESSION_CLASS+x} ]; then sed -i "s/SESSION_CLASS=.*/SESSION_CLASS=${CYPHT_SESSION_CLASS}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_API_LOGIN_KEY+x} ]; then sed -i "s/API_LOGIN_KEY=.*/API_LOGIN_KEY=${CYPHT_API_LOGIN_KEY}/" ${CYPHT_CONFIG_FILE}; fi
 
 # Defaults
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_NO_PASSWORD_SAVE+x} ]; then sed -i "s/; default_setting_no_password_save=.*/default_setting_no_password_save=${CYPHT_DEFAULT_SETTING_NO_PASSWORD_SAVE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_IMAP_PER_PAGE+x} ]; then sed -i "s/; default_setting_imap_per_page=.*/default_setting_imap_per_page=${CYPHT_DEFAULT_SETTING_IMAP_PER_PAGE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SIMPLE_MSG_PARTS+x} ]; then sed -i "s/; default_setting_simple_msg_parts=.*/default_setting_simple_msg_parts=${CYPHT_DEFAULT_SETTING_SIMPLE_MSG_PARTS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_MSG_PART_ICONS+x} ]; then sed -i "s/; default_setting_msg_part_icons=.*/default_setting_msg_part_icons=${CYPHT_DEFAULT_SETTING_MSG_PART_ICONS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_TEXT_ONLY+x} ]; then sed -i "s/; default_setting_text_only=.*/default_setting_text_only=${CYPHT_DEFAULT_SETTING_TEXT_ONLY}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SENT_PER_SOURCE+x} ]; then sed -i "s/; default_setting_sent_per_source=.*/default_setting_sent_per_source=${CYPHT_DEFAULT_SETTING_SENT_PER_SOURCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SENT_SINCE+x} ]; then sed -i "s/; default_setting_sent_since=.*/default_setting_sent_since=${CYPHT_DEFAULT_SETTING_SENT_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SHOW_LIST_ICONS+x} ]; then sed -i "s/; default_setting_show_list_icons=.*/default_setting_show_list_icons=${CYPHT_DEFAULT_SETTING_SHOW_LIST_ICONS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_START_PAGE+x} ]; then sed -i "s/; default_setting_start_page=.*/default_setting_start_page=${CYPHT_DEFAULT_SETTING_START_PAGE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_DISABLE_DELETE_PROMPT+x} ]; then sed -i "s/; default_setting_disable_delete_prompt=.*/default_setting_disable_delete_prompt=${CYPHT_DEFAULT_SETTING_DISABLE_DELETE_PROMPT}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_NO_FOLDER_ICONS+x} ]; then sed -i "s/; default_setting_no_folder_icons=.*/default_setting_no_folder_icons=${CYPHT_DEFAULT_SETTING_NO_FOLDER_ICONS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE+x} ]; then sed -i "s/; default_setting_all_email_per_source=.*/default_setting_all_email_per_source=${CYPHT_DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_EMAIL_SINCE+x} ]; then sed -i "s/; default_setting_all_email_since=.*/default_setting_all_email_since=${CYPHT_DEFAULT_SETTING_ALL_EMAIL_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_SINCE+x} ]; then sed -i "s/; default_setting_all_since=.*/default_setting_all_since=${CYPHT_DEFAULT_SETTING_ALL_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_PER_SOURCE+x} ]; then sed -i "s/; default_setting_all_per_source=.*/default_setting_all_per_source=${CYPHT_DEFAULT_SETTING_ALL_PER_SOURCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_PER_SOURCE+x} ]; then sed -i "s/; default_setting_unread_per_source=.*/default_setting_unread_per_source=${CYPHT_DEFAULT_SETTING_UNREAD_PER_SOURCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_FLAGGED_PER_SOURCE+x} ]; then sed -i "s/; default_setting_flagged_per_source=.*/default_setting_flagged_per_source=${CYPHT_DEFAULT_SETTING_FLAGGED_PER_SOURCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_FLAGGED_SINCE+x} ]; then sed -i "s/; default_setting_flagged_since=.*/default_setting_flagged_since=${CYPHT_DEFAULT_SETTING_FLAGGED_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_SINCE+x} ]; then sed -i "s/; default_setting_unread_since=.*/default_setting_unread_since=${CYPHT_DEFAULT_SETTING_UNREAD_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_TIMEZONE+x} ]; then sed -i "s/; default_setting_timezone=.*/default_setting_timezone=${CYPHT_DEFAULT_SETTING_TIMEZONE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_LIST_STYLE+x} ]; then sed -i "s/; default_setting_list_style=.*/default_setting_list_style=${CYPHT_DEFAULT_SETTING_LIST_STYLE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_LANGUAGE+x} ]; then sed -i "s/; default_setting_language=.*/default_setting_language=${CYPHT_DEFAULT_SETTING_LANGUAGE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS+x} ]; then sed -i "s/; default_setting_unread_exclude_feeds=.*/default_setting_unread_exclude_feeds=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_FEED_LIMIT+x} ]; then sed -i "s/; default_setting_feed_limit=.*/default_setting_feed_limit=${CYPHT_DEFAULT_SETTING_FEED_LIMIT}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_FEED_SINCE+x} ]; then sed -i "s/; default_setting_feed_since=.*/default_setting_feed_since=${CYPHT_DEFAULT_SETTING_FEED_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SMTP_COMPOSE_TYPE+x} ]; then sed -i "s/; default_setting_smtp_compose_type=.*/default_setting_smtp_compose_type=${CYPHT_DEFAULT_SETTING_SMTP_COMPOSE_TYPE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_SMTP_AUTO_BCC+x} ]; then sed -i "s/; default_setting_smtp_auto_bcc=.*/default_setting_smtp_auto_bcc=${CYPHT_DEFAULT_SETTING_SMTP_AUTO_BCC}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_THEME+x} ]; then sed -i "s/; default_setting_theme=.*/default_setting_theme=${CYPHT_DEFAULT_SETTING_THEME}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS+x} ]; then sed -i "s/; default_setting_unread_exclude_wordpress=.*/default_setting_unread_exclude_wordpress=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_WORDPRESS_SINCE+x} ]; then sed -i "s/; default_setting_wordpress_since=.*/default_setting_wordpress_since=${CYPHT_DEFAULT_SETTING_WORDPRESS_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB+x} ]; then sed -i "s/; default_setting_unread_exclude_github=.*/default_setting_unread_exclude_github=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_GITHUB_LIMIT+x} ]; then sed -i "s/; default_setting_github_limit=.*/default_setting_github_limit=${CYPHT_DEFAULT_SETTING_GITHUB_LIMIT}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_GITHUB_SINCE+x} ]; then sed -i "s/; default_setting_github_since=.*/default_setting_github_since=${CYPHT_DEFAULT_SETTING_GITHUB_SINCE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_INLINE_MESSAGE+x} ]; then sed -i "s/; default_setting_inline_message=.*/default_setting_inline_message=${CYPHT_DEFAULT_SETTING_INLINE_MESSAGE}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS+x} ]; then sed -i "s/; default_setting_enable_keyboard_shortcuts=.*/default_setting_enable_keyboard_shortcuts=${CYPHT_DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS}/" config.ini; fi
-# if [ ! -z ${CYPHT_DEFAULT_SETTING_ENABLE_SIEVE_FILTER+x} ]; then sed -i "s/; default_setting_enable_sieve_filter=.*/default_setting_enable_sieve_filter=${CYPHT_DEFAULT_SETTING_ENABLE_SIEVE_FILTER}/" config.ini; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_NO_PASSWORD_SAVE+x} ]; then sed -i "s/DEFAULT_SETTING_NO_PASSWORD_SAVE=.*/DEFAULT_SETTING_NO_PASSWORD_SAVE=${CYPHT_DEFAULT_SETTING_NO_PASSWORD_SAVE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_IMAP_PER_PAGE+x} ]; then sed -i "s/DEFAULT_SETTING_IMAP_PER_PAGE=.*/DEFAULT_SETTING_IMAP_PER_PAGE=${CYPHT_DEFAULT_SETTING_IMAP_PER_PAGE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SIMPLE_MSG_PARTS+x} ]; then sed -i "s/DEFAULT_SETTING_SIMPLE_MSG_PARTS=.*/DEFAULT_SETTING_SIMPLE_MSG_PARTS=${CYPHT_DEFAULT_SETTING_SIMPLE_MSG_PARTS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_PAGINATE_LINKS+x} ]; then sed -i "s/DEFAULT_SETTING_PAGINATE_LINKS=.*/DEFAULT_SETTING_PAGINATE_LINKS=${CYPHT_DEFAULT_SETTING_PAGINATE_LINKS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_MSG_PART_ICONS+x} ]; then sed -i "s/DEFAULT_SETTING_MSG_PART_ICONS=.*/DEFAULT_SETTING_MSG_PART_ICONS=${CYPHT_DEFAULT_SETTING_MSG_PART_ICONS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_TEXT_ONLY+x} ]; then sed -i "s/DEFAULT_SETTING_TEXT_ONLY=.*/DEFAULT_SETTING_TEXT_ONLY=${CYPHT_DEFAULT_SETTING_TEXT_ONLY}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SENT_PER_SOURCE+x} ]; then sed -i "s/DEFAULT_SETTING_SENT_PER_SOURCE=.*/DEFAULT_SETTING_SENT_PER_SOURCE=${CYPHT_DEFAULT_SETTING_SENT_PER_SOURCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SENT_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_SENT_SINCE=.*/DEFAULT_SETTING_SENT_SINCE=${CYPHT_DEFAULT_SETTING_SENT_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SHOW_LIST_ICONS+x} ]; then sed -i "s/DEFAULT_SETTING_SHOW_LIST_ICONS=.*/DEFAULT_SETTING_SHOW_LIST_ICONS=${CYPHT_DEFAULT_SETTING_SHOW_LIST_ICONS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_START_PAGE+x} ]; then sed -i "s/DEFAULT_SETTING_START_PAGE=.*/DEFAULT_SETTING_START_PAGE=${CYPHT_DEFAULT_SETTING_START_PAGE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_DISABLE_DELETE_PROMPT+x} ]; then sed -i "s/DEFAULT_SETTING_DISABLE_DELETE_PROMPT=.*/DEFAULT_SETTING_DISABLE_DELETE_PROMPT=${CYPHT_DEFAULT_SETTING_DISABLE_DELETE_PROMPT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_FLAGGED_PER_SOURCE+x} ]; then sed -i "s/DEFAULT_SETTING_FLAGGED_PER_SOURCE=.*/DEFAULT_SETTING_FLAGGED_PER_SOURCE=${CYPHT_DEFAULT_SETTING_FLAGGED_PER_SOURCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_NO_FOLDER_ICONS+x} ]; then sed -i "s/DEFAULT_SETTING_NO_FOLDER_ICONS=.*/DEFAULT_SETTING_NO_FOLDER_ICONS=${CYPHT_DEFAULT_SETTING_NO_FOLDER_ICONS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE+x} ]; then sed -i "s/DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE=.*/DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE=${CYPHT_DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_EMAIL_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_ALL_EMAIL_SINCE=.*/DEFAULT_SETTING_ALL_EMAIL_SINCE=${CYPHT_DEFAULT_SETTING_ALL_EMAIL_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_ALL_SINCE=.*/DEFAULT_SETTING_ALL_SINCE=${CYPHT_DEFAULT_SETTING_ALL_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ALL_PER_SOURCE+x} ]; then sed -i "s/DEFAULT_SETTING_ALL_PER_SOURCE=.*/DEFAULT_SETTING_ALL_PER_SOURCE=${CYPHT_DEFAULT_SETTING_ALL_PER_SOURCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_PER_SOURCE+x} ]; then sed -i "s/DEFAULT_SETTING_UNREAD_PER_SOURCE=.*/DEFAULT_SETTING_UNREAD_PER_SOURCE=${CYPHT_DEFAULT_SETTING_UNREAD_PER_SOURCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_FLAGGED_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_FLAGGED_SINCE=.*/DEFAULT_SETTING_FLAGGED_SINCE=${CYPHT_DEFAULT_SETTING_FLAGGED_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_UNREAD_SINCE=.*/DEFAULT_SETTING_UNREAD_SINCE=${CYPHT_DEFAULT_SETTING_UNREAD_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_TIMEZONE+x} ]; then sed -i "s/DEFAULT_SETTING_TIMEZONE=.*/DEFAULT_SETTING_TIMEZONE=${CYPHT_DEFAULT_SETTING_TIMEZONE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_LIST_STYLE+x} ]; then sed -i "s/DEFAULT_SETTING_LIST_STYLE=.*/DEFAULT_SETTING_LIST_STYLE=${CYPHT_DEFAULT_SETTING_LIST_STYLE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_LANGUAGE+x} ]; then sed -i "s/DEFAULT_SETTING_LANGUAGE=.*/DEFAULT_SETTING_LANGUAGE=${CYPHT_DEFAULT_SETTING_LANGUAGE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS+x} ]; then sed -i "s/DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS=.*/DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_FEED_LIMIT+x} ]; then sed -i "s/DEFAULT_SETTING_FEED_LIMIT=.*/DEFAULT_SETTING_FEED_LIMIT=${CYPHT_DEFAULT_SETTING_FEED_LIMIT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_FEED_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_FEED_SINCE=.*/DEFAULT_SETTING_FEED_SINCE=${CYPHT_DEFAULT_SETTING_FEED_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SMTP_COMPOSE_TYPE+x} ]; then sed -i "s/DEFAULT_SETTING_SMTP_COMPOSE_TYPE=.*/DEFAULT_SETTING_SMTP_COMPOSE_TYPE=${CYPHT_DEFAULT_SETTING_SMTP_COMPOSE_TYPE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_SMTP_AUTO_BCC+x} ]; then sed -i "s/DEFAULT_SETTING_SMTP_AUTO_BCC=.*/DEFAULT_SETTING_SMTP_AUTO_BCC=${CYPHT_DEFAULT_SETTING_SMTP_AUTO_BCC}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_THEME+x} ]; then sed -i "s/DEFAULT_SETTING_THEME=.*/DEFAULT_SETTING_THEME=${CYPHT_DEFAULT_SETTING_THEME}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS+x} ]; then sed -i "s/DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS=.*/DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_WORDPRESS_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_WORDPRESS_SINCE=.*/DEFAULT_SETTING_WORDPRESS_SINCE=${CYPHT_DEFAULT_SETTING_WORDPRESS_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB+x} ]; then sed -i "s/DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB=.*/DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB=${CYPHT_DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_GITHUB_LIMIT+x} ]; then sed -i "s/DEFAULT_SETTING_GITHUB_LIMIT=.*/DEFAULT_SETTING_GITHUB_LIMIT=${CYPHT_DEFAULT_SETTING_GITHUB_LIMIT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_GITHUB_SINCE+x} ]; then sed -i "s/DEFAULT_SETTING_GITHUB_SINCE=.*/DEFAULT_SETTING_GITHUB_SINCE=${CYPHT_DEFAULT_SETTING_GITHUB_SINCE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_INLINE_MESSAGE+x} ]; then sed -i "s/DEFAULT_SETTING_INLINE_MESSAGE=.*/DEFAULT_SETTING_INLINE_MESSAGE=${CYPHT_DEFAULT_SETTING_INLINE_MESSAGE}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS+x} ]; then sed -i "s/DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS=.*/DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS=${CYPHT_DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DEFAULT_SETTING_ENABLE_SIEVE_FILTER+x} ]; then sed -i "s/DEFAULT_SETTING_ENABLE_SIEVE_FILTER=.*/DEFAULT_SETTING_ENABLE_SIEVE_FILTER=${CYPHT_DEFAULT_SETTING_ENABLE_SIEVE_FILTER}/" ${CYPHT_CONFIG_FILE}; fi
 
+## APP 2FA
+if [ ! -z ${CYPHT_APP_2FA_SECRET+x} ]; then sed -i "s/APP_2FA_SECRET=.*/APP_2FA_SECRET=${CYPHT_APP_2FA_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_APP_2FA_SIMPLE+x} ]; then sed -i "s/APP_2FA_SIMPLE=.*/APP_2FA_SIMPLE=${CYPHT_APP_2FA_SIMPLE}/" ${CYPHT_CONFIG_FILE}; fi
+
+if [ ! -z ${CYPHT_CARD_DAV_SERVER+x} ]; then sed -i "s/CARD_DAV_SERVER=.*/CARD_DAV_SERVER=${CYPHT_CARD_DAV_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+
+## DYNAMIC LOGIN
+if [ ! -z ${CYPHT_DYNAMIC_HOST+x} ]; then sed -i "s/DYNAMIC_HOST=.*/DYNAMIC_HOST=${CYPHT_DYNAMIC_HOST}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DYNAMIC_HOST_SUBDOMAIN+x} ]; then sed -i "s/DYNAMIC_HOST_SUBDOMAIN=.*/DYNAMIC_HOST_SUBDOMAIN=${CYPHT_DYNAMIC_HOST_SUBDOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DYNAMIC_USER+x} ]; then sed -i "s/DYNAMIC_USER=.*/DYNAMIC_USER=${CYPHT_DYNAMIC_USER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DYNAMIC_SMTP_SUBDOMAIN+x} ]; then sed -i "s/DYNAMIC_SMTP_SUBDOMAIN=.*/DYNAMIC_SMTP_SUBDOMAIN=${CYPHT_DYNAMIC_SMTP_SUBDOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_DYNAMIC_MAIL_SUBDOMAIN+x} ]; then sed -i "s/DYNAMIC_MAIL_SUBDOMAIN=.*/DYNAMIC_MAIL_SUBDOMAIN=${CYPHT_DYNAMIC_MAIL_SUBDOMAIN}/" ${CYPHT_CONFIG_FILE}; fi
+
+## GITHUB
+if [ ! -z ${CYPHT_GITHUB_CLIENT_ID+x} ]; then sed -i "s/GITHUB_CLIENT_ID=.*/GITHUB_CLIENT_ID=${CYPHT_GITHUB_CLIENT_ID}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GITHUB_CLIENT_SECRET+x} ]; then sed -i "s/GITHUB_CLIENT_SECRET=.*/GITHUB_CLIENT_SECRET=${CYPHT_GITHUB_CLIENT_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GITHUB_REDIRECT_URI+x} ]; then sed -i "s/GITHUB_REDIRECT_URI=.*/GITHUB_REDIRECT_URI=${CYPHT_GITHUB_REDIRECT_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GITHUB_AUTH_URL+x} ]; then sed -i "s/GITHUB_AUTH_URL=.*/GITHUB_AUTH_URL=${CYPHT_GITHUB_AUTH_URL}/" ${CYPHT_CONFIG_FILE}; fi
+
+## Gmail
+if [ ! -z ${CYPHT_GMAIL_CLIENT_ID+x} ]; then sed -i "s/GMAIL_CLIENT_ID=.*/GMAIL_CLIENT_ID=${CYPHT_GMAIL_CLIENT_ID}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GMAIL_CLIENT_SECRET+x} ]; then sed -i "s/GMAIL_CLIENT_SECRET=.*/GMAIL_CLIENT_SECRET=${CYPHT_GMAIL_CLIENT_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GMAIL_CLIENT_URI+x} ]; then sed -i "s/GMAIL_CLIENT_URI=.*/GMAIL_CLIENT_URI=${CYPHT_GMAIL_CLIENT_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GMAIL_AUTH_URI+x} ]; then sed -i "s/GMAIL_AUTH_URI=.*/GMAIL_AUTH_URI=${CYPHT_GMAIL_AUTH_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GMAIL_TOKEN_URI+x} ]; then sed -i "s/GMAIL_TOKEN_URI=.*/GMAIL_TOKEN_URI=${CYPHT_CGMAIL_TOKEN_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_GMAIL_REFRESH_URI+x} ]; then sed -i "s/GMAIL_REFRESH_URI=.*/GMAIL_REFRESH_URI=${CYPHT_GMAIL_REFRESH_URI}/" ${CYPHT_CONFIG_FILE}; fi
+
+## Outlook
+if [ ! -z ${CYPHT_OUTLOOK_CLIENT_ID+x} ]; then sed -i "s/OUTLOOK_CLIENT_ID=.*/OUTLOOK_CLIENT_ID=${CYPHT_OUTLOOK_CLIENT_ID}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_OUTLOOK_CLIENT_SECRET+x} ]; then sed -i "s/OUTLOOK_CLIENT_SECRET=.*/OUTLOOK_CLIENT_SECRET=${CYPHT_OUTLOOK_CLIENT_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_OUTLOOK_CLIENT_URI+x} ]; then sed -i "s/OUTLOOK_CLIENT_URI=.*/OUTLOOK_CLIENT_URI=${CYPHT_OUTLOOK_CLIENT_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_OUTLOOK_AUTH_URI+x} ]; then sed -i "s/OUTLOOK_AUTH_URI=.*/OUTLOOK_AUTH_URI=${CYPHT_OUTLOOK_AUTH_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_OUTLOOK_TOKEN_URI+x} ]; then sed -i "s/OUTLOOK_TOKEN_URI=.*/OUTLOOK_TOKEN_URI=${CYPHT_OUTLOOK_TOKEN_URI}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_OUTLOOK_REFRESH_URI+x} ]; then sed -i "s/OUTLOOK_REFRESH_URI=.*/OUTLOOK_REFRESH_URI=${CYPHT_OUTLOOK_REFRESH_URI}/" ${CYPHT_CONFIG_FILE}; fi
+
+## LDAP
+if [ ! -z ${CYPHT_LDAP_SERVER+x} ]; then sed -i "s/LDAP_SERVER=.*/LDAP_SERVER=${CYPHT_LDAP_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_ENABLE_TLS+x} ]; then sed -i "s/LDAP_ENABLE_TLS=.*/LDAP_ENABLE_TLS=${CYPHT_LDAP_ENABLE_TLS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_PORT+x} ]; then sed -i "s/LDAP_PORT=.*/LDAP_PORT=${CYPHT_LDAP_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_BASE_DN+x} ]; then sed -i "s/LDAP_BASE_DN=.*/LDAP_BASE_DN=${CYPHT_LDAP_BASE_DN}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_SEARCH_TERM+x} ]; then sed -i "s/LDAP_SEARCH_TERM=.*/LDAP_SEARCH_TERM=${CYPHT_LDAP_SEARCH_TERM}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_AUTH+x} ]; then sed -i "s/LDAP_AUTH=.*/LDAP_AUTH=${CYPHT_LDAP_AUTH}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_USER+x} ]; then sed -i "s/LDAP_USER=.*/LDAP_USER=${CYPHT_LDAP_USER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_PASS+x} ]; then sed -i "s/LDAP_PASS=.*/LDAP_PASS=${CYPHT_LDAP_PASS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_OBJECT_CLASS+x} ]; then sed -i "s/LDAP_OBJECT_CLASS=.*/LDAP_OBJECT_CLASS=${CYPHT_LDAP_OBJECT_CLASS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_READ_WRITE+x} ]; then sed -i "s/LDAP_READ_WRITE=.*/LDAP_READ_WRITE=${CYPHT_LDAP_READ_WRITE}/" ${CYPHT_CONFIG_FILE}; fi
+
+## App.php
+if [ ! -z ${CYPHT_LDAP_AUTH_PORT+x} ]; then sed -i "s/LDAP_AUTH_PORT=.*/LDAP_AUTH_PORT=${CYPHT_LDAP_AUTH_PORT}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_AUTH_SERVER+x} ]; then sed -i "s/LDAP_AUTH_SERVER=.*/LDAP_AUTH_SERVER=${CYPHT_LDAP_AUTH_SERVER}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_AUTH_TLS+x} ]; then sed -i "s/LDAP_AUTH_TLS=.*/LDAP_AUTH_TLS=${CYPHT_LDAP_AUTH_TLS}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_LDAP_AUTH_BASE_DN+x} ]; then sed -i "s/LDAP_AUTH_BASE_DN=.*/LDAP_AUTH_BASE_DN=${CYPHT_LDAP_AUTH_BASE_DN}/" ${CYPHT_CONFIG_FILE}; fi
+
+## Worldpress
+if [ ! -z ${CYPHT_WORDPRESS_CLIENT_ID+x} ]; then sed -i "s/WORDPRESS_CLIENT_ID=.*/WORDPRESS_CLIENT_ID=${CYPHT_WORDPRESS_CLIENT_ID}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_WORDPRESS_CLIENT_SECRET+x} ]; then sed -i "s/WORDPRESS_CLIENT_SECRET=.*/WORDPRESS_CLIENT_SECRET=${CYPHT_WORDPRESS_CLIENT_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_WORDPRESS_CLIENT_URI+x} ]; then sed -i "s/WORDPRESS_CLIENT_URI=.*/WORDPRESS_CLIENT_URI=${CYPHT_WORDPRESS_CLIENT_URI}/" ${CYPHT_CONFIG_FILE}; fi
+
+## RECAPTCHA
+if [ ! -z ${CYPHT_RECAPTCHA_SECRET+x} ]; then sed -i "s/RECAPTCHA_SECRET=.*/RECAPTCHA_SECRET=${CYPHT_RECAPTCHA_SECRET}/" ${CYPHT_CONFIG_FILE}; fi
+if [ ! -z ${CYPHT_RECAPTCHA_SITE_KEY+x} ]; then sed -i "s/RECAPTCHA_SITE_KEY=.*/RECAPTCHA_SITE_KEY=${CYPHT_RECAPTCHA_SITE_KEY}/" ${CYPHT_CONFIG_FILE}; fi
+
+## CYPHT_MODULES
+if [ ! -z ${CYPHT_CYPHT_MODULES+x} ]; then sed -i "s/CYPHT_MODULES=.*/CYPHT_MODULES=${CYPHT_CYPHT_MODULES}/" ${CYPHT_CONFIG_FILE}; fi
+
+## Login page
+if [ ! -z ${CYPHT_FANCY_LOGIN+x} ]; then sed -i "s/FANCY_LOGIN=.*/FANCY_LOGIN=${CYPHT_FANCY_LOGIN}/" ${CYPHT_CONFIG_FILE}; fi
+
+
+if [ -z ${CYPHT_AUTH_USERNAME+x} ]; then CYPHT_AUTH_USERNAME=demo ; fi
+if [ -z ${CYPHT_AUTH_PASSWORD+x} ]; then CYPHT_AUTH_PASSWORD=demo ; fi
 
 #
 # Wait for database to be ready then setup tables for sessions, authentication, and settings as needed
@@ -163,6 +221,18 @@ db_name=$(sed -n 's/DB_NAME=//p' ${CYPHT_CONFIG_FILE})
 db_user=$(sed -n 's/DB_USER=//p' ${CYPHT_CONFIG_FILE})
 db_pass=$(sed -n 's/DB_PASS=//p' ${CYPHT_CONFIG_FILE})
 db_driver=$(sed -n 's/DB_DRIVER=//p' ${CYPHT_CONFIG_FILE})
+db_socket=$(sed -n 's/DB_SOCKET=//p' ${CYPHT_CONFIG_FILE})
+
+if [ "${db_driver}" = "sqlite" ] && [ ! -f ${db_socket} ]
+then
+    echo "Use SQLite database: ${db_socket}"
+    mkdir -p /var/lib/hm3
+    touch ${db_socket} && chown www-data:www-data ${db_socket}
+    sqlite3 ${db_socket} 'create table hm_user (username varchar(255), hash varchar(255), primary key (username));'
+    sqlite3 ${db_socket} 'create table hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));'
+    sqlite3 ${db_socket} 'create table hm_user_settings(username varchar(255), settings longblob, primary key (username));'
+fi
+
 if [ "${session_type}" = "DB" ] || [ "${auth_type}" = "DB" ] || [ "${user_config_type}" = "DB" ]
 then
     sed -i "s/CYPHT_SESSION_TYPE/${session_type}/" /tmp/cypht_setup_database.php
@@ -194,13 +264,13 @@ attachment_dir=$(sed -n 's/ATTACHMENT_DIR=//p' ${CYPHT_CONFIG_FILE})
 mkdir -p ${attachment_dir}
 chown www-data:www-data ${attachment_dir}
 
-# Change /var/lib/nginx owner from root to www-data to avoid "permission denied" error.
-chown -R www-data:www-data /var/lib/nginx
-
 # Application Data Location - create directory
 app_data_dir=$(sed -n 's/APP_DATA_DIR=//p' ${CYPHT_CONFIG_FILE})
 mkdir -p ${app_data_dir}
 chown www-data:www-data ${app_data_dir}
+
+# Change /var/lib/nginx owner from root to www-data to avoid "permission denied" error.
+chown -R www-data:www-data /var/lib/nginx
 
 #
 # Generate the run-time configuration
@@ -211,8 +281,17 @@ php ./scripts/config_gen.php
 #
 # Enable the program in the web-server
 #
-rm -r /var/www
-ln -s /usr/local/share/cypht/site /var/www
+rm -rf /var/www
+if [ ! -z ${CYPHT_DEBUG+x} ] && [ ${CYPHT_DEBUG} = "true" ]
+then
+    echo -e "\033[31mDebug mode is enabled\033[0m"
+    ln -sf /usr/local/share/cypht /var/www
+else
+    echo -e "\033[32mDebug mode is disabled\033[0m"
+    ln -sf /usr/local/share/cypht/site /var/www
+fi
+
+
 
 #
 # Create user account in database (or change password if user already exists)
