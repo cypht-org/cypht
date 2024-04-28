@@ -1,9 +1,14 @@
 <?php
+
+// TODO: this file should probably start with something like #!/usr/bin/env php
+
 $connected = false;
 $session_type = CYPHT_SESSION_TYPE;
 $auth_type = CYPHT_AUTH_TYPE;
 $user_config_type = CYPHT_USER_CONFIG_TYPE;
 $db_driver = CYPHT_DB_DRIVER;
+
+// TODO: move this into the scripts/ dir. its not docker specific
 
 while(!$connected) {
     try{
@@ -22,6 +27,7 @@ if ($session_type == 'DB')  {
     } elseif ($db_driver == 'pgsql') {
         $stmt = "CREATE TABLE IF NOT EXISTS hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);";
     }
+    // TODO: sqlite command
     printf("Creating database table hm_user_session ...\n");
     $conn->exec($stmt);
 }
@@ -31,6 +37,7 @@ if ($auth_type == 'DB')  {
     } elseif ($db_driver == 'pgsql') {
         $stmt = "CREATE TABLE IF NOT EXISTS hm_user (username varchar(255) primary key not null, hash varchar(255));";
     }
+    // TODO: sqlite command
     printf("Creating database table hm_user ...\n");
     $conn->exec($stmt);
 }
@@ -40,6 +47,7 @@ if ($user_config_type == 'DB')  {
     } elseif ($db_driver == 'pgsql') {
         $stmt = "CREATE TABLE IF NOT EXISTS hm_user_settings (username varchar(250) primary key not null, settings text);";
     }
+    // TODO: sqlite command
     printf("Creating database table hm_user_settings ...\n");
     $conn->exec($stmt);
 }

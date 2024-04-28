@@ -2,6 +2,9 @@
 
 CYPHT_CONFIG_FILE=/usr/local/share/cypht/hm3.ini
 
+# TODO: move to /app/scripts/setup_database.php
+DB_SETUP_SCRIPT=/usr/local/share/cypht/docker/cypht_setup_database.php
+
 #
 # Update ini file based on environment variables (only if the specific environment variable is set)
 #
@@ -162,15 +165,15 @@ db_pass=$(sed -n 's/db_pass=//p' ${CYPHT_CONFIG_FILE})
 db_driver=$(sed -n 's/db_driver=//p' ${CYPHT_CONFIG_FILE})
 if [ "${session_type}" = "DB" ] || [ "${auth_type}" = "DB" ] || [ "${user_config_type}" = "DB" ]
 then
-    sed -i "s/CYPHT_SESSION_TYPE/${session_type}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_AUTH_TYPE/${auth_type}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_USER_CONFIG_TYPE/${user_config_type}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_DB_HOST/${db_host}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_DB_NAME/${db_name}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_DB_USER/${db_user}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_DB_PASS/${db_pass}/" /tmp/cypht_setup_database.php
-    sed -i "s/CYPHT_DB_DRIVER/${db_driver}/" /tmp/cypht_setup_database.php
-    php /tmp/cypht_setup_database.php
+    sed -i "s/CYPHT_SESSION_TYPE/${session_type}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_AUTH_TYPE/${auth_type}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_USER_CONFIG_TYPE/${user_config_type}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_DB_HOST/${db_host}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_DB_NAME/${db_name}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_DB_USER/${db_user}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_DB_PASS/${db_pass}/" ${DB_SETUP_SCRIPT}
+    sed -i "s/CYPHT_DB_DRIVER/${db_driver}/" ${DB_SETUP_SCRIPT}
+    php ${DB_SETUP_SCRIPT}
 fi
 
 #
