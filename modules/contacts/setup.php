@@ -95,5 +95,3 @@ return array(
         'collected_contact_name' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, false),
     ),
 );
-
-

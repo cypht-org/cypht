@@ -18,5 +18,3 @@ return array(
         'api_login_key' => FILTER_DEFAULT
     )
 );
-
-

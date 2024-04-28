@@ -60,5 +60,3 @@ class Hm_Test_DB extends TestCase {
         unset($this->config);
     }
 }
-
-?>

@@ -71,7 +71,7 @@ class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_feed_connect extends Hm_Handler_Module {
     public function process() {
-        $failed = true; 
+        $failed = true;
         if (isset($this->request->post['feed_connect'])) {
             list($success, $form) = $this->process_form(array('feed_id'));
             if ($success) {
@@ -207,7 +207,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             }
             else {
                 $limit = $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_SINCE)); 
+                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_SINCE));
                 $cutoff_timestamp = strtotime($date);
             }
             if (!$search || ($search && $terms)) {
@@ -433,7 +433,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
             $excluded = $this->user_config->get('unread_exclude_feeds_setting', false);
         }
         if ($excluded) {
-            return; 
+            return;
         }
         $feeds = Hm_Feed_List::dump();
         if (!empty($feeds)) {
@@ -450,7 +450,7 @@ class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
             $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
-        
+
     }
 }
 
@@ -537,7 +537,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
                             <a href="#" class="pe-auto">
                                 <i class="bi bi-rss-fill me-3"></i>
                                 <b> '.$this->trans('Feeds').'</b>
-                            </a> 
+                            </a>
                             <div class="server_count">'.$count.'</div>
                         </div>
 

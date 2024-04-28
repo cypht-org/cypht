@@ -138,5 +138,3 @@ class Hm_Test_Elog extends TestCase {
         $this->assertEquals('string: test', elog('test'));
     }
 }
-
-?>

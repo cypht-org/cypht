@@ -660,7 +660,7 @@ $(function () {
                 '    </td>' +
                 extra_options +
                 '    <td class="col-sm-5">' +
-                '    <div class="d-flex justify-content-center spinner d-none">' + 
+                '    <div class="d-flex justify-content-center spinner d-none">' +
                 '       <div class="spinner-border text-dark role="status">' +
                 '           <span class="visually-hidden">Loading...</span>' +
                 '       </div>' +

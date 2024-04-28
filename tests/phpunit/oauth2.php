@@ -38,5 +38,3 @@ class Hm_Test_Oauth2 extends TestCase {
         unset($this->oauth2);
     }
 }
-
-?>

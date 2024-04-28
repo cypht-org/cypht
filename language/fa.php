@@ -2,7 +2,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-/* Hello from Iran with LOVE! :) 
+/* Hello from Iran with LOVE! :)
    سلام از ایران با عشق! :)
 */
 
@@ -680,5 +680,3 @@ return array(
     'Junk' => false,
     'Trash' => false,
 );
-
-?>

@@ -49,5 +49,3 @@ if ($user && $pass) {
         die("An error occured when creating user  '" . $user . "'\n\n");
     }
 }
-
-?>

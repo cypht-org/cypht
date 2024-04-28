@@ -300,8 +300,8 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         }
 
         $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
-        
-        
+
+
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
 

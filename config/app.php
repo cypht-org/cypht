@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /* 
+    /*
     |
     | -----------------------------------------------------------------------------
     | General settings
@@ -211,7 +211,7 @@ return [
     | If user_config_type is set to file, this must be set to an existing directory
     | that the webserver software can read and write to. If settings storage is set
     | to DB, this is ignored. It should not be inside the webserver document root.
-    | 
+    |
     */
     'user_settings_dir' => env('USER_SETTINGS_DIR', '/var/lib/hm3/users'),
 
@@ -223,7 +223,7 @@ return [
     | If user_config_type is set to file, this must be set to an existing directory
     | that the webserver software can read and write to. If settings storage is set
     | to DB, this is ignored. It should not be inside the webserver document root.
-    | 
+    |
     */
     'attachment_dir' => env('ATTACHMENT_DIR', '/var/lib/hm3/attachments'),
 
@@ -235,7 +235,7 @@ return [
     | Some Cypht module sets have their own ini files that need to be readable by
     | the webserver software, but not writable, and definitely not inside the
     | webserver document root.
-    | 
+    |
     */
     'app_data_dir' => env('APP_DATA_DIR', '/var/lib/hm3/app_data'),
 
@@ -248,7 +248,7 @@ return [
     | that the source and target origin domains match. If you are using proxies this
     | could create a problem making it impossible to login. Change this to true to
     | disable the origin check.
-    | 
+    |
     */
     'disable_origin_check' => env('DISABLE_ORIGIN_CHECK', false),
 
@@ -262,7 +262,7 @@ return [
     | the account module set that provides a form to create a new account. This is
     | only used if the auth_type is set to DB. Leave this blank if you don't want
     | to define any admin users, or are using IMAP authentication.
-    | 
+    |
     */
     'admin_users' => env('ADMIN_USERS'),
 
@@ -278,7 +278,7 @@ return [
     | the special value of "none" to force Cypht to NOT set the cookie domain
     | property at all. This is not recommended unless you know what you are
     | doing!
-    | 
+    |
     */
     'cookie_domain' => env('COOKIE_DOMAIN'),
 
@@ -295,7 +295,7 @@ return [
     | determine the path. You can also use the special value of "none" to force
     | Cypht to NOT set the cookie path property at all. This is not recommended
     | unless you know what you are doing!
-    | 
+    |
     */
     'cookie_path' => env('COOKIE_PATH'),
 
@@ -307,7 +307,7 @@ return [
     | Default domain used for outbound email addresses when using IMAP auth and
     | users don't login with a full email address. Users can customize this with
     | the profiles module which will override this default
-    | 
+    |
     */
     'default_email_domain' => env('DEFAULT_EMAIL_DOMAIN'),
 
@@ -320,7 +320,7 @@ return [
     | no configured profiles - enabling this option will auto-create a profile for
     | them. Email and reply-to addresses will use the default_email_domain if
     | set, otherwise it will fallback to the domain Cypht is hosted on.
-    | 
+    |
     */
     'autocreate_profile' => env('AUTO_CREATE_PROFILE'),
 
@@ -337,7 +337,7 @@ return [
     | to the combined unread view you would use:
     |
     | redirect_after_login="?page=message_list&list_path=unread"
-    | 
+    |
     */
     'redirect_after_login' => env('REDIRECT_AFTER_LOGIN'),
 
@@ -348,7 +348,7 @@ return [
     |
     | This label is used in the UI to reference the program - you can change it to
     | "Your awesome webmail" to replace the Cypht name used in various places.
-    | 
+    |
     */
     'app_name' => env('APP_NAME', 'Cypht'),
 
@@ -359,7 +359,7 @@ return [
     |
     | Cypht will detect mobile devices and display a mobile optimized UI. If you want
     | to aways use this UI regardless of device, set this to true
-    | 
+    |
     */
     'always_mobile_ui' => env('ALWAYS_MOBILE_UI'),
 
@@ -371,7 +371,7 @@ return [
     | Users can select from available interface languages on the site settings page.
     | This sets the default for a user who has not done so. Valid values are the
     | langauge codes that have matching language definitions in the language/ folder.
-    | 
+    |
     */
     'default_language' => env('DEFAULT_LANGUAGE', 'en'),
 
@@ -387,7 +387,7 @@ return [
     | external compression. Compression software must be able to handle ES6.
     | Example:
     |     js_compress='uglifyjs.terser -c -m --verbose --warn'
-    | 
+    |
     */
     'js_compress' => env('JS_COMPRESS', false),
 
@@ -425,8 +425,8 @@ return [
     | server, and using the session as a cache is likely to cause race conditions
     | and integrity issues. If you are running Cypht in an "embedded" mode with
     | only one email source, this option is less likely to be a problem.
-    | 
-    | 
+    |
+    |
     | 'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
     | 'cache_class' => env('CACHE_CLASS')
     */
@@ -485,9 +485,9 @@ return [
     | or moving to a new network, will cause you to be logged out. This setting
     | provides users with a "stay logged in" option during login that will set the
     | sesison lifetime to a default of 30 days, and disable the IP address check.
-    | 
+    |
     | USE WITH CAUTION SINCE THIS DISABLES SOME SESSION PROTECTIONS.
-    | 
+    |
     | Specifically:
     | - Session cookies stay active after a browser restart making them more
     |   susceptible to snooping
@@ -513,7 +513,7 @@ return [
     | responses and data stored in browser local storage. Enabling either one of
     | these options causes the Forge JavaScript library to be included. This adds
     | about 70KB to the page size (when gzipped).
-    | 
+    |
     | Use AES encryption for AJAX responses. Set to true to enable, leave blank or
     | set to false to disable.
     */
@@ -582,25 +582,25 @@ return [
     | setting, tweaks PHP ini settings to increase security, and uses a browser
     | "fingerprint" to improve session security. You can disable each with the
     | following options:
-    | 
+    |
     | Don't empty PHP super globals
     */
     'disable_empty_superglobals' => env('DISABLE_EMPTY_SUPERGLOBALS', false),
 
     /*
-    | 
+    |
     | Don't apply open basedir restrictions
     */
     'disable_open_basedir' => env('DISABLE_OPEN_BASE_DIR', false),
 
     /*
-    | 
+    |
     | Don't tweak ini settings
     */
     'disable_ini_settings' => env('DISABLE_INI_SETTINGS', false),
 
     /*
-    | 
+    |
     | Don't use a browser fingerprint
     */
     'disable_fingerprint' => env('DISABLE_FINGERPRINT', false),
@@ -984,7 +984,7 @@ return [
     //     | Allows an API based login that returns a JSON response containing the session
     //     | and hm_id values needed to create a login session. You will need to set the
     //     | api_login_key value to something unique and include that in the POST request.
-    //     | 
+    //     |
     //     */
     //     // 'api_login',
 
@@ -997,7 +997,7 @@ return [
     //     | can't decrypt the existing user settings. This module detects that situation
     //     | and provides a page where a user can enter their old and new passwords to
     //     | recover their previous settings.
-    //     | 
+    //     |
     //     */
     //     'recover_settings',
 
@@ -1007,7 +1007,7 @@ return [
     //     | ------------
     //     |
     //     | Example module set with lots of comments
-    //     | 
+    //     |
     //     */
     //     // 'hello_world',
     // ],
@@ -1026,7 +1026,7 @@ return [
     | All of these settings can be changed by users, but you can uncomment and set
     | the default behavior using the following options. This will only effect new
     | users or ones that have never saved their settings.
-    | 
+    |
     | Per source time limits have valid values of:
     | -1 day
     | -1 week
@@ -1036,7 +1036,7 @@ return [
     | -6 months
     | -1 year
     | -5 years
-    | 
+    |
     | -----------------------------------------------------------------------------
     | Per source maximums can be from 1 to 1000
     | -----------------------------------------------------------------------------
@@ -1052,7 +1052,7 @@ return [
     | Defaults to 20
     */
     // 'default_setting_imap_per_page' => env('DEFAULT_SETTING_IMAP_PER_PAGE', 20),
-    
+
     /*
     |
     | Amount of IMAP message structure detail on the message view page
@@ -1066,7 +1066,7 @@ return [
     | Defaults to full structure
     */
     // 'default_setting_pagination_links' => env('DEFAULT_SETTING_PAGINATE_LINKS', true),
-    
+
     /*
     |
     | Show icons for each IMAP message part type

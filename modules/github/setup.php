@@ -85,5 +85,3 @@ return array(
         'unread_exclude_github' => FILTER_VALIDATE_INT,
     )
 );
-
-

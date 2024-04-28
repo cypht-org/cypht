@@ -331,5 +331,3 @@ return array(
         'srv_setup_stepper_jmap_address' => FILTER_DEFAULT
     )
 );
-
-

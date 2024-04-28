@@ -160,35 +160,35 @@ class Hm_Output_add_cal_event_form extends Hm_Output_Module {
                         <div class="px-4 mt-5">
                             <form method="post">
                                 <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
-                                
+
                                 <div class="mb-3 row">
                                     <label for="event_title" class="col-md-2 col-form-label">'.$this->trans('Title').'</label>
                                     <div class="col-md-10">
                                         <input required type="text" class="form-control" id="event_title" name="event_title">
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="event_detail" class="col-md-2 col-form-label">'.$this->trans('Detail').'</label>
                                     <div class="col-md-10">
                                         <textarea class="form-control" id="event_detail" name="event_detail"></textarea>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="event_date" class="col-md-2 col-form-label">'.$this->trans('Date').'</label>
                                     <div class="col-md-5">
                                         <input required type="date" class="form-control" id="event_date" name="event_date" placeholder="MM/DD/YYYY">
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="event_time" class="col-md-2 col-form-label">'.$this->trans('Time').'</label>
                                     <div class="col-md-5">
                                         <input required type="time" class="form-control" id="event_time" name="event_time" placeholder="HH:MM">
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <label for="event_repeat" class="col-md-2 col-form-label">'.$this->trans('Repeat').'</label>
                                     <div class="col-md-5">
@@ -199,7 +199,7 @@ class Hm_Output_add_cal_event_form extends Hm_Output_Module {
                                         $res .= '</select>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3 row">
                                     <div class="col-md-2"></div>
                                     <div class="col-md-10">

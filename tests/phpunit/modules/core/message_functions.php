@@ -176,6 +176,4 @@ class Hm_Test_Core_Message_Functions extends TestCase {
         );
         $this->assertEquals($res, process_address_fld('"stuff" foo blah@tests.com (comment here), bad address <"foo@blah.com">, good address <brack@ets.org>, \'not@addy.com\' actual@foo.com'));
     }
-
 }
-?>

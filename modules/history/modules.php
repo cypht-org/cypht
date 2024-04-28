@@ -69,7 +69,7 @@ class Hm_Handler_history_record_github_message extends Hm_Handler_Module {
         $history = $this->session->get('msg_history', array());
         if (array_key_exists($url, $history)) {
             return;
-        } 
+        }
         $stub = new Hm_Github_Output_Module(array(), array());
         $subject = build_github_subject($data, $stub);
         $date = '';
@@ -107,7 +107,7 @@ class Hm_Handler_history_record_wp_message extends Hm_Handler_Module {
         $id = sprintf('wp_%s', $this->request->post['wp_uid']);
         if (array_key_exists($url, $history)) {
             return;
-        } 
+        }
         $history[$url] = array(
             'source' => 'WordPress.com',
             'date' => date('r', $data['notes'][0]['timestamp']),

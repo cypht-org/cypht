@@ -97,7 +97,7 @@ class Hm_IMAP_Struct {
     /**
      * Create a name => value attribute set
      * @param array $vals set of attributes
-     * 
+     *
      * @return array
      */
     private function attribute_set($vals) {
@@ -422,7 +422,7 @@ class Hm_IMAP_Struct {
                 if (!$all) {
                     return $res;
                 }
-                
+
             }
             if (isset($vals['subs'])) {
                 $res = $this->recursive_search($vals['subs'], $flds, $all, $res, $parent);
@@ -437,7 +437,7 @@ class Hm_IMAP_Struct {
      */
     public function data () {
         return $this->struct;
-    } 
+    }
 
     /**
      * Public search function, returns a list of matching parts

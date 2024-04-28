@@ -57,10 +57,10 @@
 .contact-group .typography h4,
 .contact-group .typography h5,
 .contact-group .typography h6 { margin: 40px 0 0 0; padding: 0; text-align: left; color: #333; }
-.contact-group .typography h1 { font-size: 40px; line-height: 60px; text-shadow: 3px 3px rgba(0, 0, 0, 0.1); }  
-.contact-group .typography h2 { font-size: 32px; line-height: 48px; text-shadow: 2px 2px rgba(0, 0, 0, 0.1); }  
+.contact-group .typography h1 { font-size: 40px; line-height: 60px; text-shadow: 3px 3px rgba(0, 0, 0, 0.1); }
+.contact-group .typography h2 { font-size: 32px; line-height: 48px; text-shadow: 2px 2px rgba(0, 0, 0, 0.1); }
 .contact-group .typography h3 { font-size: 26px;line-height: 38px;text-shadow: 1px 1px rgba(0, 0, 0, 0.1); }
-.contact-group .typography h4 { font-size: 20px;line-height: 30px; } 
+.contact-group .typography h4 { font-size: 20px;line-height: 30px; }
 .contact-group .typography h5 { font-size: 15px;line-height: 23px;text-transform: uppercase; }
 .contact-group .typography h6 { font-size: 13px;line-height: 20px;font-weight: 700;text-transform: uppercase; }
 .contact-group .typography p { margin: 20px 0 0 0;padding: 0;line-height: 20px;text-align: left; }

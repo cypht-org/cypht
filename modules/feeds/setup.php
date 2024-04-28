@@ -26,7 +26,7 @@ add_handler('search', 'load_feeds_for_search',  true, 'feeds', 'load_feeds_from_
 add_handler('search', 'feed_list_type', true, 'feeds', 'message_list_type', 'after');
 
 /* settings page */
-add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before'); 
+add_handler('settings', 'process_unread_feeds_setting', true, 'feeds', 'save_user_settings', 'before');
 add_handler('settings', 'process_feed_limit_setting', true, 'feeds', 'save_user_settings', 'before');
 add_handler('settings', 'process_feed_since_setting', true, 'feeds', 'save_user_settings', 'before');
 add_output('settings', 'unread_feeds_included', true, 'feeds', 'unread_source_max_setting', 'after');
@@ -135,5 +135,3 @@ return array(
         'feed_search' => FILTER_VALIDATE_INT,
     )
 );
-
-

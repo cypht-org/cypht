@@ -649,4 +649,3 @@ class Hm_Cache_Setup {
         return $cache_class;
     }
 }
-

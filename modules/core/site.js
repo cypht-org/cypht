@@ -164,7 +164,7 @@ var Hm_Ajax = {
 };
 
 /* ajax request wrapper */
-var Hm_Ajax_Request = function() { return { 
+var Hm_Ajax_Request = function() { return {
     callback: false,
     name: false,
     batch_callback: false,
@@ -327,7 +327,7 @@ function Hm_Modal(options) {
         btnSize: '',
         modalId: 'myModal',
     };
-  
+
     this.opts = { ...defaults, ...options };
 
     this.init = function () {
@@ -641,7 +641,7 @@ function Message_List() {
                 continue;
             }
             id = id.replace(/ /, '-');
-            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) { 
+            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) {
                 this.insert_into_message_list(row, msg_rows);
                 $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
             }
@@ -1313,7 +1313,7 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             Hm_Ajax.add_callback_hook('hm_reload_folders', function() {
                 e.target.innerHTML = text;
-            }); 
+            });
             return false;
         });
         $('.hide_folders').on("click", function() { return Hm_Folders.hide_folder_list(); });
@@ -1806,7 +1806,7 @@ var reset_default_value_select = function() {
     "timezone" : 0, "list_style" : 0, "idle_time" : 4, "start_page" : 0, "default_sort_order" : 0,
     "unread_since" : 1, "flagged_since" : 1, "all_since" : 1, "all_email_since" : 1, "feed_since" : 0,
     "sent_since" : 1};
-    
+
     if (this.style.transform == "scaleX(1)") {
         this.style.transform = "scaleX(-1)";
         this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
@@ -1953,7 +1953,7 @@ $(function() {
 });
 
 /*
-   check if language is rtl, it checks some elements based on the page and 
+   check if language is rtl, it checks some elements based on the page and
    if those contain non-Arabic letters, the ltr class will be added and it
    will fix the direction and font.
 */
@@ -1987,7 +1987,7 @@ function fixLtrInRtl() {
     }
 
     setTimeout(function(){
-        var elements = getElements() 
+        var elements = getElements()
         for (var index = 0; index < elements.length; index++) {
             if (isTextEnglish(elements[index].textContent)) {
                 if ((elements[index].className).indexOf("ltr") > -1) {
@@ -2052,9 +2052,9 @@ if(tableBody && !hm_mobile()) {
                 checkbox.checked = false;
             });
         }
-        
+
         movingNumber = movingElements.length || 1;
-        
+
         const element = document.createElement('div');
         element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
         element.style.position = 'absolute';
@@ -2064,11 +2064,11 @@ if(tableBody && !hm_mobile()) {
         function moveElement() {
             element.style.display = 'none';
         }
-        
+
         function removeElement() {
             element.remove();
         }
-        
+
         document.addEventListener('drag', moveElement);
         document.addEventListener('mouseover', removeElement);
 
@@ -2091,7 +2091,7 @@ if(tableBody && !hm_mobile()) {
                 }
             });
         }
-        
+
         if (selectedRows.length == 0) {
             selectedRows.push(movingElement);
         }
@@ -2111,7 +2111,7 @@ if(tableBody && !hm_mobile()) {
                 }
             }
         );
-        
+
         // Reset the target folder
         targetFolder = null;
     });
@@ -2133,7 +2133,7 @@ if(tableBody && !hm_mobile()) {
                 }
             });
         });
-        
+
         emailFoldersElements.forEach((emailFolder) => {
             emailFolder.addEventListener('dragenter', () => {
                 emailFolder.classList.add('drop_target');
@@ -2469,5 +2469,3 @@ function getEmailProviderKey(email) {
 
     return "";
 }
-
-

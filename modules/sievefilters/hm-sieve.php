@@ -18,4 +18,3 @@ class Hm_Sieve_Client_Factory {
         }
     }
 }
-

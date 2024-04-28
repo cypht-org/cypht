@@ -86,4 +86,3 @@ class Hm_Gmail_Contact_XML {
         $this->current = true;
     }
 }
-

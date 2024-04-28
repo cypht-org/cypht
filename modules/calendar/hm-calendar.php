@@ -400,7 +400,7 @@ class Hm_Cal_Data {
         $offset = date('w', $first_day);
         $this->day_pos = strtotime(sprintf('-%d day', $offset), $first_day);
     }
- 
+
     private function start_year($ts) {
         $first_day = strtotime(date('Y-01-01', $ts));
         $offset = date('w', $first_day);

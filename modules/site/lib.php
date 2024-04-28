@@ -37,7 +37,7 @@ class Custom_Session extends Hm_PHP_Session {
      * @return void
      */
     public function start($request, $existing_session=false) {
-        return parent::start($request, $existing_session); 
+        return parent::start($request, $existing_session);
     }
 
     /**
@@ -67,7 +67,7 @@ class Custom_Session extends Hm_PHP_Session {
      * @return void
      */
     public function set($name, $value, $user=false) {
-        return parent::set($name, $value); 
+        return parent::set($name, $value);
     }
 
     /**
@@ -125,7 +125,8 @@ class Custom_Auth extends Hm_Auth_DB {
     }
 }
 
-/*function format_msg_html($str, $images=false) {
+/*
+function format_msg_html($str, $images=false) {
     return '';
-}*/
-?>
+}
+*/

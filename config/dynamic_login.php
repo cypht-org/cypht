@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /* 
+    /*
     | ----------------------------------------------
     | Constants used for dynamic login configuration
     | ----------------------------------------------
@@ -9,16 +9,16 @@ return [
     | Once you edit this file, you must move it to the directory defined by
     | app_data_dir in your config/app.php file. No need to re-run the
     | config_gen.php script.
-    | 
+    |
     | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER !
-    | 
+    |
     | The dynamic login module set tries to autodetect mail server configurations,
     | but you can configure it to act specifically with the following settings.
-    | 
+    |
     | Set this to true to use the hostname in the URL used to access Cypht to
     | determine the domain for mail services (IMAP/SMTP). If this is set to
     | true, the mail service selection dropdown is not displayed on the login page.
-    | 
+    |
     */
     'dynamic_host' => env('DYNAMIC_HOST', true),
 
@@ -27,7 +27,7 @@ return [
     | setting. Leave empty for no subdomain. For example, if a user accesses Cypht
     | at webmail.example.com, set this to "webmail" to use just example.com for the
     | IMAP/SMTP services.
-    | 
+    |
     */
     'dynamic_host_subdomain' => env('DYNAMIC_HOST_SUBDOMAIN', ''),
 
@@ -54,4 +54,3 @@ return [
     */
     'dynamic_mail_subdomain' => env('DYNAMIC_MAIL_SUBDOMAIN', ''),
 ];
-

@@ -133,4 +133,3 @@ else if (hm_page_name() == 'message_list') {
 else if (hm_page_name() == 'info') {
     setTimeout(github_repo_update, 200);
 }
-

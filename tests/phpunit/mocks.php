@@ -43,7 +43,7 @@ class Hm_Mock_Session {
         return true;
     }
     public function end() {
-       return true; 
+       return true;
     }
     public function secure_cookie($request, $name, $value, $path='', $domain='') {
         $this->cookie_set = true;
@@ -360,5 +360,3 @@ function build_parent_mock($request_type='HTML5') {
 function delete_uploaded_files($obj) {
     return true;
 }
-
-?>

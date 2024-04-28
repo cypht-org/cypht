@@ -133,7 +133,7 @@ class Hm_Feed {
                 unset($curl_handle);
                 break;
             case 'file':
-                $buffer = file_get_contents($url); 
+                $buffer = file_get_contents($url);
                 break;
         }
         $this->xml_data = $buffer;
@@ -218,7 +218,7 @@ class Hm_Feed {
             else {
                 Hm_Debug::add(sprintf('XML Parse error: %s', xml_error_string(xml_get_error_code($xml_parser))));
                 Hm_Debug::add($this->xml_data);
-                return false; 
+                return false;
             }
         }
         else {
@@ -358,7 +358,7 @@ class Hm_Feed {
                 case 'LINK':
                     $this->collect = strtolower($tagname);
                     break;
-                    
+
             }
         }
         $this->depth++;
@@ -397,5 +397,3 @@ class Hm_Feed {
         }
     }
 }
-
-

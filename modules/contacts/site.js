@@ -267,9 +267,9 @@ if (hm_page_name() == 'contacts') {
         }
 
     });
-    $('.source_link').on("click", function () { 
+    $('.source_link').on("click", function () {
         $('.list_actions').toggle(); $('#list_controls_menu').hide();
-        return false; 
+        return false;
     });
     contact_import_pagination();
 }

@@ -369,7 +369,7 @@ class Hm_Test_Hm_Cache extends TestCase {
         $this->assertEquals('bar', $cache->get('foo'));
         $cache->del('foo');
         $this->assertFalse($cache->get('foo', false));
-        
+
         $this->config->set('enable_memcached', true);
         $this->config->set('memcached_server', 'asdf');
         $this->config->set('memcached_port', 10);
@@ -378,7 +378,7 @@ class Hm_Test_Hm_Cache extends TestCase {
         $this->assertEquals('bar', $cache->get('foo'));
         $cache->del('foo');
         $this->assertFalse($cache->get('foo', false));
-        
+
         $this->config->set('enable_redis', true);
         $this->config->set('redis_server', 'asdf');
         $this->config->set('redis_port', 10);

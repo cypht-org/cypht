@@ -2,8 +2,6 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-
-
 if (!hm_exists('get_script_modal_content')) {
     function get_script_modal_content()
     {
@@ -18,7 +16,7 @@ if (!hm_exists('get_script_modal_content')) {
             </div>
             <div class="mb-2">
                 <label for="sieve-script-priority" class="form-label fw-bold">Priority:</label>
-                <input class="modal_sieve_script_priority form-control" type="number" placeholder="0" id="sieve-script-priority"" /> 
+                <input class="modal_sieve_script_priority form-control" type="number" placeholder="0" id="sieve-script-priority"" />
             </div>
             <div class="mb-2">
                 <h3 class="mb-1">Sieve Script</h3>
@@ -46,11 +44,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
             </div>
             <div class="mb-2">
                 <label for="sieve-filter-priority" class="form-label fw-bold">Priority:</label>
-                <input class="modal_sieve_filter_priority form-control" type="number" placeholder="0" id="sieve-filter-priority" /> 
+                <input class="modal_sieve_filter_priority form-control" type="number" placeholder="0" id="sieve-filter-priority" />
             </div>
             <div class="mb-2">
                 <label for="sieve-filter-test" class="form-label fw-bold">Test:</label>
-                <select class="modal_sieve_filter_test form-control" name="test_type" placeholder="0" id="sieve-filter-test"> 
+                <select class="modal_sieve_filter_test form-control" name="test_type" placeholder="0" id="sieve-filter-test">
                     <option value="ANYOF">ANYOF (OR)</option>
                     <option value="ALLOF" selected>ALLOF (AND)</option>
                 </select>
@@ -438,10 +436,8 @@ if (!hm_exists('get_blocked_senders')){
 }
 
 if (!hm_exists('initialize_sieve_client_factory')) {
-    function initialize_sieve_client_factory($site_config, $user_config, $imapServer)
-    {
+    function initialize_sieve_client_factory($site_config, $user_config, $imapServer) {
         $factory = get_sieve_client_factory($site_config);
         return $factory->init($user_config, $imapServer);
     }
-
 }

@@ -11,7 +11,7 @@
  * @subpackage smtp/lib
  */
 class Hm_SMTP_List {
-    
+
     use Hm_Server_List;
 
     public static function init($user_config, $session) {
@@ -143,8 +143,8 @@ class Hm_SMTP {
     }
 
     /* loop through "lines" returned from smtp and parse
-       them. It can return the lines in a raw format, or 
-       parsed into atoms. 
+       them. It can return the lines in a raw format, or
+       parsed into atoms.
     */
     function get_response($chunked=true) {
         $n = -1;
@@ -187,9 +187,9 @@ class Hm_SMTP {
         $parts[] = $remainder;
 
         return $parts;
-        
+
     }
-    /* Checks if the numeric response matches the code in $check. 
+    /* Checks if the numeric response matches the code in $check.
        The return value is simalar to strcmp
        Returns <0 if $check is less than the response
        Returns  0 if $check is equal to the response
@@ -245,7 +245,7 @@ class Hm_SMTP {
 
         if ($this->tls) {
             $server = 'tls://'.$server;
-        } 
+        }
         $this->debug[] = 'Connecting to '.$server.' on port '.$this->port;
         $ctx = stream_context_create();
         stream_context_set_option($ctx, 'ssl', 'verify_peer_name', false);
@@ -595,7 +595,7 @@ class Hm_SMTP {
             print_r($this->debug, true).
             print_r($this->commands, true).
             print_r($this->responses, true);
-    } 
+    }
 
     /* issue a logout and close the socket to the server */
     function disconnect() {
@@ -615,4 +615,3 @@ class Hm_SMTP {
         }
     }
 }
-

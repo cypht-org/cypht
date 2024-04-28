@@ -419,5 +419,3 @@ return array(
         'auto_advance_email' => FILTER_VALIDATE_BOOLEAN
     )
 );
-
-

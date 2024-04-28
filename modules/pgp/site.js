@@ -26,7 +26,7 @@ var Hm_Pgp = {
         if (!body || !body.length) {
             return true;
         }
-        body += "\n"; 
+        body += "\n";
         try {
             var decrypted = await key.decrypt(pass);
         }

@@ -17,7 +17,7 @@ class KeyboardShortcutTests(SettingsHelpers):
 
     def nav_to_page(self, key_combo, titlestr, title_class):
         el = self.by_tag('body')
-        el.send_keys(key_combo)  
+        el.send_keys(key_combo)
         self.wait_with_folder_list()
         assert self.by_class(title_class).text.startswith(titlestr)
 

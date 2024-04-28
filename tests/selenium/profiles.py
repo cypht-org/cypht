@@ -30,7 +30,7 @@ class ProfileTest(WebTest):
         self.wait_with_folder_list()
         from time import sleep; sleep(5)
         assert 'test@test.com' in self.by_class('profile_details').text
-        
+
     def edit_profile(self):
         table = self.by_class('profile_details')
         table.find_element_by_tag_name('a').click()
@@ -40,7 +40,7 @@ class ProfileTest(WebTest):
         self.by_class('profile_update').click()
         self.wait_with_folder_list()
         assert 'New Name' in self.by_class('profile_details').text
-        
+
     def del_profile(self):
         table = self.by_class('profile_details')
         table.find_element_by_tag_name('a').click()

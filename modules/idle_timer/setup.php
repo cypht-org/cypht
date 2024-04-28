@@ -26,5 +26,3 @@ return array(
         'idle_time' => FILTER_VALIDATE_INT
     )
 );
-
-

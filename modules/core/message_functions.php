@@ -36,7 +36,7 @@ function format_msg_html($str, $images=false) {
             $def->addAttribute($tag, 'data-src', 'Text');
         }
     }
-    
+
     try {
         $purifier = new HTMLPurifier($config);
         return $purifier->purify($str);
@@ -132,7 +132,7 @@ function reply_to_address($headers, $type) {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
-        if (array_key_exists($fld, $headers)) { 
+        if (array_key_exists($fld, $headers)) {
             list($parsed, $msg_to) = format_reply_address($headers[$fld], $parsed);
             if ($msg_to) {
                 break;
@@ -432,7 +432,7 @@ function convert_to_utf8($data, $from_encoding) {
     try {
         $data = mb_convert_encoding($data, 'UTF-8', $from_encoding);
     } catch (ValueError $e) {
-        $data = iconv($from_encoding, 'UTF-8', $data); 
+        $data = iconv($from_encoding, 'UTF-8', $data);
     }
     return $data;
 }}
@@ -508,7 +508,7 @@ function addr_split($str, $seps = array(',', ';')) {
         elseif (!$capture && in_array($str[$i], array_keys($capture_chars))) {
             $capture = $str[$i];
         }
-        
+
         if (!$capture && in_array($str[$i], $seps)) {
             $words[] = trim($word);
             $word = '';

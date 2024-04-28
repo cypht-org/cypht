@@ -131,7 +131,7 @@ class Hm_Handler_2fa_setup_check extends Hm_Handler_Module {
         if (check_2fa_pin($this->request->post['2fa_code'], $secret)) {
             $verified = true;
         }
-        
+
         $this->out('ajax_2fa_verified', $verified);
     }
 }

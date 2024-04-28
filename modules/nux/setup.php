@@ -78,5 +78,3 @@ return array(
         'nux_all_inkl_login' => FILTER_DEFAULT
     )
 );
-
-

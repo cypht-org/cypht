@@ -1,14 +1,30 @@
 #!/bin/bash
 
+STATUS_TITLE() {
+	echo -ne "\033[0;34m${1}: \033[0m"
+}
+
+STATUS_DONE() {
+	echo -e "\033[0;33mDone √\033[0m"
+}
+
+STATUS_ERROR() {
+	echo -e "\033[1;31mError ×\033[0m"
+}
+
 # Configure Cypht
 setup_cypht() {
     cp .github/tests/.env .
     if [ "$DB" = "postgres" ]; then
+        # .env
         sed -i 's/db_driver=mysql/db_driver=pgsql/' .env
+        # mocks.php
         sed -i 's/mysql/pgsql/' tests/phpunit/mocks.php
     fi
     if [ "$DB" = "sqlite" ]; then
+        # .env
         sed -i 's/db_driver=mysql/db_driver=sqlite/' .env
+        # mocks.php
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
     fi
@@ -56,6 +72,70 @@ sys_info() {
     sudo netstat -lntp
 }
 
+##### UI START #####
+# Add a system user dovecot will use for authentication
+setup_user() {
+	STATUS_TITLE "Setup MailUser"
+	sudo useradd -m -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
+	sudo mkdir -p /home/testuser/mail/.imap/INBOX
+	sudo chown -R testuser:testuser /home/testuser
+	sudo usermod -aG mail testuser
+	sudo usermod -aG postdrop testuser
+	STATUS_DONE
+}
+
+# config Dovecot
+setup_dovecot() {
+	STATUS_TITLE "Setup Dovecot"
+	sudo bash .github/tests/scripts/dovecot.sh
+	if [ "$(sudo systemctl is-active dovecot.service)" == "active" ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		exit 1
+	fi
+}
+
+# config postfix
+setup_postfix() {
+	STATUS_TITLE "Setup Postfix"
+	sudo bash .github/tests/scripts/postfix.sh
+	if [ "$(sudo systemctl is-active postfix.service)" == "active" ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		exit 1
+	fi
+}
+
+#config site
+setup_site() {
+	STATUS_TITLE "Setup php${PHP_V}-fpm"
+	sudo systemctl start php"${PHP_V}"-fpm.service
+	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		exit 1
+	fi
+	STATUS_TITLE "Setup Nginx"
+	sudo systemctl stop nginx.service
+	sudo cp .github/tests/selenium/nginx/nginx-site.conf /etc/nginx/sites-available/default
+	sudo mkdir /etc/nginx/nginxconfig
+	sudo cp .github/tests/selenium/nginx/php_fastcgi.conf /etc/nginx/nginxconfig/php_fastcgi.conf
+	sudo sed -e "s?%VERSION%?${PHP_V}?g" --in-place /etc/nginx/sites-available/default
+	sudo ln -sf "$(pwd)" /var/www/cypht
+	sudo systemctl start nginx.service
+	if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
+		STATUS_DONE
+	else
+		STATUS_ERROR
+		exit 1
+	fi
+}
+
+##### UI END #####
+
 # setup just what is needed for the phpunit unit tests
 setup_unit_tests() {
     setup_cypht
@@ -63,7 +143,12 @@ setup_unit_tests() {
 }
 
 setup_ui_tests() {
-    echo "To do..."
+    setup_cypht
+    bootstrap_unit_tests
+    setup_user
+    setup_dovecot
+    setup_postfix
+    setup_site
 }
 
 # Main

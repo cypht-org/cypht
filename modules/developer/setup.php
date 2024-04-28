@@ -36,5 +36,3 @@ if (DEBUG_MODE) {
 
 }
 return array();
-
-

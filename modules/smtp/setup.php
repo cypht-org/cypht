@@ -184,4 +184,3 @@ return array(
         'enable_attachment_reminder' => FILTER_VALIDATE_INT
     )
 );
-
