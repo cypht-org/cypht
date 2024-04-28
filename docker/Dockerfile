@@ -4,6 +4,7 @@ FROM php:7.4.33-fpm-alpine
 
 # WORKDIR "/var/www"
 
+# TODO: change this to /app for simplification
 WORKDIR "/usr/local/share/cypht"
 
 RUN set -e \
@@ -45,23 +46,22 @@ RUN set -e \
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
-COPY docker/docker-entrypoint.sh /usr/local/bin/
-COPY docker/cypht_setup_database.php /tmp/cypht_setup_database.php
+# COPY docker/docker-entrypoint.sh /usr/local/bin/
+# COPY docker/cypht_setup_database.php /tmp/cypht_setup_database.php
 
 RUN set -ex \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log \
-    && chmod 700 /tmp/cypht_setup_database.php \
-    && chmod +x /usr/local/bin/docker-entrypoint.sh
+    && ln -sf /dev/stderr /var/log/nginx/error.log 
+# && chmod 700 docker/cypht_setup_database.php 
+#    && chmod +x /usr/local/bin/docker-entrypoint.sh
 
 COPY composer.* .
 
-RUN composer update \
-    && composer install
+RUN composer update && composer install
 
 COPY . .
 COPY .env.example .env
 
 EXPOSE 80 443
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["docker/docker-entrypoint.sh"]

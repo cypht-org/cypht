@@ -18,6 +18,7 @@ services:
       dockerfile: ./docker/Dockerfile
     volumes:
       - ./cypht/users:/var/lib/hm3/users
+    # TODO: add health check here
     ports:
       - "80:80"
     environment:
@@ -29,3 +30,5 @@ services:
       - CYPHT_DB_USER=cypht
       - CYPHT_DB_PASS=cypht_password
       - CYPHT_SESSION_TYPE=db
+
+  # TODO: add memcache and redis to this sample
