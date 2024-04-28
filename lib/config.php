@@ -460,7 +460,7 @@ class Hm_User_Config_DB extends Hm_Config {
 }
 
 /**
- * File based site configuration
+ * File-based site configuration
  */
 class Hm_Site_Config_File extends Hm_Config {
 
