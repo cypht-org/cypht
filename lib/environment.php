@@ -30,7 +30,7 @@ class Hm_Environment {
             return;
         }
 
-        $envFile = static::get('TM_DOTENV');
+        $envFile = static::get('CYPHT_DOTENV');
         $dotenvLoader->load($envDistFile);
         if ($envFile) {
             $dotenvLoader->loadEnv($envFile);
@@ -46,7 +46,7 @@ class Hm_Environment {
      * Sets required environment variables that are used within .env files
      */
     private function set_required_environment_variables() {
-        $_ENV['TM_DOTENV'] = APP_PATH . '.env';
+        $_ENV['CYPHT_DOTENV'] = APP_PATH . '.env';
     }
 
     /**
