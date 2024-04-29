@@ -42,13 +42,12 @@ if (!function_exists('random_bytes')) {
 
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {
-    if (extension_loaded('libsodium')) {
-        if (function_exists('\Sodium\crypto_pwhash_str_verify') || function_exists('sodium_crypto_pwhash_str_verify')) {
-            define('LIBSODIUM', true);
-            class Hm_Sodium_Compat extends Hm_Sodium_PHP {}
-        } else {
-            define('LIBSODIUM', false);
-        }
+    if (extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify')) {
+        define('LIBSODIUM', true);
+        class Hm_Sodium_Compat extends Hm_Sodium_PECL {}
+    } elseif (extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
+        define('LIBSODIUM', true);
+        class Hm_Sodium_Compat extends Hm_Sodium_PHP {}
     } else {
         define('LIBSODIUM', false);
     }
