@@ -1305,7 +1305,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $email = true;
         }
         $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
-        if ($total_accounts > 2) {
+        if ($total_accounts > 1) {
             $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
