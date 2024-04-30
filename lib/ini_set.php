@@ -44,8 +44,7 @@ ini_set('session.cache_limiter', 'nocache');
 /* session hash mechanism */
 if (version_compare(PHP_VERSION, 7.4, '==')) {
     ini_set('session.hash_function', 1);
-}
-else {
+} else {
     ini_set('session.hash_function', 'sha256');
 }
 

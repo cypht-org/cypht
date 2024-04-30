@@ -32,7 +32,7 @@ trait Hm_Session_Fingerprint {
      * @param string $default value to return if $name is not found
      * @return mixed the value if found, otherwise $default
      */
-    abstract protected function get($name, $default=false);
+    abstract protected function get($name, $default = false);
 
     /**
      * Check HTTP header "fingerprint" against the session value
@@ -60,8 +60,8 @@ trait Hm_Session_Fingerprint {
      * @return array
      */
     private function fingerprint_flds() {
-        $flds = array('HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
-            'HTTP_ACCEPT_CHARSET', 'HTTP_HOST');
+        $flds = ['HTTP_USER_AGENT', 'REQUEST_SCHEME', 'HTTP_ACCEPT_LANGUAGE',
+            'HTTP_ACCEPT_CHARSET', 'HTTP_HOST'];
         if (!$this->site_config->get('allow_long_session') && !$this->site_config->get('disable_ip_check')) {
             $flds[] = 'REMOTE_ADDR';
         }
@@ -73,7 +73,7 @@ trait Hm_Session_Fingerprint {
      * @param array $env server env values
      * @return string fingerprint value
      */
-    public function build_fingerprint($env, $input='') {
+    public function build_fingerprint($env, $input = '') {
         $id = $input;
         foreach ($this->fingerprint_flds() as $val) {
             $id .= (array_key_exists($val, $env)) ? $env[$val] : '';
@@ -120,7 +120,7 @@ abstract class Hm_Session {
     public $site_config;
 
     /* session data */
-    protected $data = array();
+    protected $data = [];
 
     /* session cookie name */
     protected $cname = 'hm_session';
@@ -356,7 +356,7 @@ abstract class Hm_Session {
         if (preg_match("/:\d+$/", $domain, $matches)) {
             $domain = str_replace($matches[0], '', $domain);
         }
-        return array($path, $domain, $html_only);
+        return [$path, $domain, $html_only];
     }
 
     /**
@@ -410,23 +410,23 @@ class Hm_Session_Setup {
      * @return string
      */
     private function get_session_class() {
-        $custom_session_class = $this->config->get('session_class', 'Custom_Session');
-        if ($this->session_type == 'DB') {
-            $session_class = 'Hm_DB_Session';
+        switch ($this->session_type) {
+            case 'DB':
+                $session_class = 'Hm_DB_Session';
+                break;
+            case 'MEM':
+                $session_class = 'Hm_Memcached_Session';
+                break;
+            case 'REDIS':
+                $session_class = 'Hm_Redis_Session';
+                break;
+            case 'custom':
+                $session_class = $this->config->get('session_class', 'Custom_Session');
+                break;
         }
-        elseif ($this->session_type == 'MEM') {
-            $session_class = 'Hm_Memcached_Session';
-        }
-        elseif ($this->session_type == 'REDIS') {
-            $session_class = 'Hm_Redis_Session';
-        }
-        elseif ($this->session_type == 'custom' && class_exists($custom_session_class)) {
-            $session_class = $custom_session_class;
-        }
-        else {
-            $session_class = 'Hm_PHP_Session';
-        }
-        return $session_class;
+        return (isset($session_class) && class_exists($session_class))
+             ? $session_class
+             : 'Hm_PHP_Session';
     }
 
     /**
@@ -461,7 +461,7 @@ class Hm_Session_Setup {
      * @return string|false
      */
     private function standard_auth() {
-        if ($this->auth_type && in_array($this->auth_type, array('DB', 'LDAP', 'IMAP'), true)) {
+        if ($this->auth_type && in_array($this->auth_type, ['DB', 'LDAP', 'IMAP'], true)) {
             return sprintf('Hm_Auth_%s', $this->auth_type);
         }
         return false;

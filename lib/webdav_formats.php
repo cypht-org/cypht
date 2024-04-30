@@ -29,7 +29,7 @@ trait Hm_Card_Line_Parse {
      * @return string
      */
     private function standard_eol($str) {
-        return rtrim(str_replace(array( "\r\n", "\n\r", "\r"), "\n", $str));
+        return rtrim(str_replace([ "\r\n", "\n\r", "\r"], "\n", $str));
     }
 
     /**
@@ -47,10 +47,10 @@ trait Hm_Card_Line_Parse {
      * @param string $type property type
      * @return array
      */
-    private function process_value($value, $type=false) {
-        $res = array();
+    private function process_value($value, $type = false) {
+        $res = [];
         foreach ($this->split_value($value, ',', -1) as $val) {
-            $res[] = str_replace(array('\n', '\,'), array("\n", ','), $val);
+            $res[] = str_replace(['\n', '\,'], ["\n", ','], $val);
         }
         return $res;
     }
@@ -96,10 +96,10 @@ trait Hm_Card_Line_Parse {
      */
     private function parse_prop($prop) {
         $vals = $this->split_value($prop, ';', -1);
-        $res = array(
+        $res = [
             'prop' => $vals[0],
-            'params' => array()
-        );
+            'params' => []
+        ];
         if (count($vals) > 1) {
             $res['params'] = $this->parse_prop_params($vals);
         }
@@ -112,7 +112,7 @@ trait Hm_Card_Line_Parse {
      * @return array
      */
     private function parse_prop_params($vals) {
-        $res = array();
+        $res = [];
         array_shift($vals);
         foreach ($vals as $val) {
             $pair = $this->split_value($val, '=', 2);
@@ -142,13 +142,13 @@ class Hm_Card_Parse {
     protected $raw_card = '';
 
     /* placeholder for parsed data */
-    protected $data = array();
+    protected $data = [];
 
     /* list of valid parameters for the file type */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /* list of valid properties for the file type */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * init
@@ -162,7 +162,7 @@ class Hm_Card_Parse {
      * @return boolean
      */
     public function import($str) {
-        $this->data = array();
+        $this->data = [];
         $this->raw_card = $str;
         $lines = explode("\n", $this->unfold($this->standard_eol($str)));
         if ($this->is_valid($lines)) {
@@ -196,18 +196,16 @@ class Hm_Card_Parse {
      * Format as vcard
      */
     public function build_card() {
-        $new_card = array();
+        $new_card = [];
         foreach ($this->data as $name => $val) {
             if (method_exists($this, 'format_vcard_'.$name)) {
                 $res = $this->{'format_vcard_'.$name}();
-            }
-            else {
+            } else {
                 $res = $this->format_vcard_generic($name);
             }
             if (is_array($res) && $res) {
                 $new_card = array_merge($new_card, $res);
-            }
-            elseif ($res) {
+            } elseif ($res) {
                 $new_card[] = $res;
             }
         }
@@ -225,7 +223,7 @@ class Hm_Card_Parse {
     /**
      * Get the value for a field
      */
-    public function fld_val($name, $type=false, $default=false, $all=false) {
+    public function fld_val($name, $type = false, $default = false, $all = false) {
         if (!array_key_exists($name, $this->data)) {
             return $default;
         }
@@ -243,8 +241,7 @@ class Hm_Card_Parse {
         }
         if (array_key_exists('formatted', $fld[0])) {
             return $fld[0]['formatted']['values'];
-        }
-        else {
+        } else {
             return $fld[0]['values'];
         }
     }
@@ -261,8 +258,7 @@ class Hm_Card_Parse {
         }
         if (is_array($vals['type']) && in_array($type, $vals['type'])) {
             return true;
-        }
-        elseif (strtolower($type) == strtolower($vals['type'])) {
+        } elseif (strtolower($type) == strtolower($vals['type'])) {
             return true;
         }
         return false;
@@ -299,9 +295,8 @@ class Hm_Card_Parse {
             $data['id'] = $id;
             if (array_key_exists(strtolower($prop['prop']), $this->data)) {
                 $this->data[strtolower($prop['prop'])][] = $data;
-            }
-            else {
-                $this->data[strtolower($prop['prop'])] = array($data);
+            } else {
+                $this->data[strtolower($prop['prop'])] = [$data];
             }
         }
         $this->data['raw'] = $this->raw_card;
@@ -358,17 +353,17 @@ class Hm_Card_Parse {
      * @return array
      */
     protected function format_vcard_generic($name) {
-        $res = array();
-        if (in_array($name, array('raw'), true)) {
+        $res = [];
+        if (in_array($name, ['raw'], true)) {
             return;
         }
-        $vals = $this->fld_val($name, false, array(), true);
+        $vals = $this->fld_val($name, false, [], true);
         if (count($vals) == 0) {
             $res;
         }
         foreach ($vals as $val) {
             $name = substr($name, 0, 2) == 'x-' ? $name : strtoupper($name);
-            $params = array_merge(array($name), $this->build_vcard_params($val));
+            $params = array_merge([$name], $this->build_vcard_params($val));
             $res[] = sprintf("%s:%s", implode(';', $params), $val['values']);
         }
         return $res;
@@ -380,7 +375,7 @@ class Hm_Card_Parse {
      * @return array
      */
     protected function build_vcard_params($fld_val) {
-        $props = array();
+        $props = [];
         foreach ($this->parameters as $param) {
             if (array_key_exists(strtolower($param), $fld_val)) {
                 $props[] = sprintf('%s=%s', strtoupper($param),
@@ -397,7 +392,7 @@ class Hm_Card_Parse {
      */
     protected function combine($val) {
         if (is_array($val)) {
-            return implode(',', array_map(array($this, 'vcard_format'), $val));
+            return implode(',', array_map([$this, 'vcard_format'], $val));
         }
         return $this->vcard_format($val);
     }
@@ -409,7 +404,7 @@ class Hm_Card_Parse {
      * @return string
      */
     protected function vcard_format($val) {
-        return str_replace(array(',', "\n"), array('\,', '\n'), $val);
+        return str_replace([',', "\n"], ['\,', '\n'], $val);
     }
 }
 
@@ -419,13 +414,13 @@ class Hm_Card_Parse {
 class Hm_VCard extends Hm_Card_Parse {
     protected $format = 'vCard';
     protected $raw_card = '';
-    protected $data = array();
-    protected $parameters = array(
+    protected $data = [];
+    protected $parameters = [
         'TYPE', 'PREF', 'LABEL', 'VALUE', 'LANGUAGE',
         'MEDIATYPE', 'ALTID', 'PID', 'CALSCALE',
         'SORT-AS', 'GEO', 'TZ'
-    );
-    protected $properties = array(
+    ];
+    protected $properties = [
         'BEGIN', 'VERSION', 'END', 'FN', 'N',
         'KIND', 'BDAY', 'ANNIVERSARY', 'GENDER',
         'PRODID', 'REV', 'UID', 'SOURCE', 'XML',
@@ -435,7 +430,7 @@ class Hm_VCard extends Hm_Card_Parse {
         'RELATED', 'CATEGORIES', 'NOTE', 'SOUND',
         'CLIENTPIDMAP', 'PHOTO', 'URL', 'KEY',
         'FBURL', 'CALADRURI', 'CALURI'
-    );
+    ];
 
     /* CONVERT VCARD INPUT */
 
@@ -447,13 +442,13 @@ class Hm_VCard extends Hm_Card_Parse {
     protected function parse_n($vals) {
         foreach ($vals as $index => $name) {
             $flds = $this->split_value($name['values'], ';', 5);
-            $vals[$index]['values'] = array(
+            $vals[$index]['values'] = [
                 'lastname' => $flds[0],
                 'firstname' => $flds[1],
                 'additional' => $flds[2],
                 'prefixes' => $flds[3],
                 'suffixes' => $flds[4]
-            );
+            ];
         }
         return $vals;
     }
@@ -475,7 +470,7 @@ class Hm_VCard extends Hm_Card_Parse {
         }
         $value = sprintf('%s, %s, %s, %s, %s', $street, $vals['locality'], $vals['region'],
             $vals['country'], $vals['postal_code']);
-        return array('name' => $name, 'values' => $value);
+        return ['name' => $name, 'values' => $value];
     }
 
     /**
@@ -486,7 +481,7 @@ class Hm_VCard extends Hm_Card_Parse {
     protected function parse_adr($vals) {
         foreach ($vals as $index => $addr) {
             $flds = $this->split_value($addr['values'], ';', 7);
-            $vals[$index]['values'] = array(
+            $vals[$index]['values'] = [
                 'po' => $flds[0],
                 'apartment' => $flds[1],
                 'street' => $flds[2],
@@ -494,7 +489,7 @@ class Hm_VCard extends Hm_Card_Parse {
                 'region' => $flds[4],
                 'postal_code' => $flds[5],
                 'country' => $flds[6]
-            );
+            ];
             $vals[$index]['formatted'] = $this->format_addr($vals[$index]);
         }
         return $vals;
@@ -517,10 +512,10 @@ class Hm_VCard extends Hm_Card_Parse {
      * @return array
      */
     protected function format_vcard_adr() {
-        $res = array();
-        foreach ($this->fld_val('adr', array(), false, true) as $adr) {
+        $res = [];
+        foreach ($this->fld_val('adr', [], false, true) as $adr) {
             $parts = $adr['values'];
-            $params = array_merge(array('ADR'), $this->build_vcard_params($adr));
+            $params = array_merge(['ADR'], $this->build_vcard_params($adr));
             $res[] = sprintf('%s:%s;%s;%s;%s;%s;%s;%s', implode(';', $params),
                 $parts['po'], $parts['apartment'], $parts['street'], $parts['locality'],
                 $parts['region'], $parts['postal_code'], $parts['country']);
@@ -535,15 +530,15 @@ class Hm_VCard extends Hm_Card_Parse {
 class Hm_ICal extends Hm_Card_Parse {
     protected $format = 'iCal';
     protected $raw_card = '';
-    protected $data = array();
-    protected $parameters = array(
+    protected $data = [];
+    protected $parameters = [
         'ALTREP', 'CN', 'CUTYPE', 'DELEGATED-FROM',
         'DELEGATED-TO', 'DIR', 'ENCODING', 'FMTTYPE',
         'FBTYPE', 'LANGUAGE', 'MEMBER', 'PARTSTAT',
         'RANGE', 'RELATED', 'RELTYPE', 'ROLE', 'RSVP',
         'SENT-BY', 'TZID', 'VALUE'
-    );
-    protected $properties = array(
+    ];
+    protected $properties = [
         'BEGIN', 'VERSION', 'END', 'CALSCALE',
         'METHOD', 'PRODID', 'ATTACH', 'CATEGORIES',
         'CLASS', 'COMMENT', 'DESCRIPTION', 'GEO',
@@ -557,7 +552,7 @@ class Hm_ICal extends Hm_Card_Parse {
         'RRULE', 'ACTION', 'REPEAT', 'TRIGGER',
         'CREATED', 'DTSTAMP', 'LAST-MODIFIED',
         'SEQUENCE', 'REQUEST-STATUS'
-    );
+    ];
 
     protected function parse_due($vals) {
         return $this->parse_dt($vals);

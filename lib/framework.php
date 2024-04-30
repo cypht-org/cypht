@@ -6,7 +6,7 @@
  * @subpackage setup
  */
 
-define('VERSION', .1);
+const VERSION = .1;
 
 /* load the framework */
 require APP_PATH.'lib/repository.php';
@@ -45,12 +45,10 @@ if (!defined('LIBSODIUM')) {
     if (extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify')) {
         define('LIBSODIUM', true);
         class Hm_Sodium_Compat extends Hm_Sodium_PECL {}
-    }
-    if (!defined('LIBSODIUM') && extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
+    } elseif (extension_loaded('sodium') && function_exists('sodium_crypto_pwhash_str_verify')) {
         define('LIBSODIUM', true);
         class Hm_Sodium_Compat extends Hm_Sodium_PHP {}
-    }
-    if (!defined('LIBSODIUM')) {
+    } else {
         define('LIBSODIUM', false);
     }
 }
@@ -68,21 +66,20 @@ if (!class_exists('Hm_Functions')) {
          * @param string $value
          * @return boolean
          */
-        public static function setcookie($name, $value, $lifetime=0, $path='', $domain='', $secure=false, $html_only=false) {
-            $prefix = $lifetime != 0 && $lifetime < time() ? 'Deleting' : 'Setting';
+        public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false) {
+            $prefix = ($lifetime != 0 && $lifetime < time()) ? 'Deleting' : 'Setting';
             Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
             if (version_compare(PHP_VERSION, '7.3', '>=')) {
-                return setcookie($name,$value, array(
+                return setcookie($name, $value, [
                         'expires' => $lifetime,
                         'path' => $path,
                         'domain' => $domain,
                         'secure' => $secure,
                         'httponly' => $html_only,
                         'samesite' => 'Strict'
-                    )
+                    ]
                 );
-            }
-            else {
+            } else {
                 return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
             }
         }
@@ -99,7 +96,7 @@ if (!class_exists('Hm_Functions')) {
          * @param string $msg
          * @return null
          */
-        public static function cease($msg='') {
+        public static function cease($msg = '') {
             die($msg);
         }
 

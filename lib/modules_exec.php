@@ -246,15 +246,10 @@ class Hm_Module_Exec {
      * return array
      */
     public function get_current_language() {
-        if (array_key_exists('language', $this->handler_response)) {
-            $lang = $this->handler_response['language'];
-        }
-        else {
-            $lang = 'en';
-        }
-        $strings = array();
-        if (file_exists(APP_PATH.'language/'.$lang.'.php')) {
-            $strings = require APP_PATH.'language/'.$lang.'.php';
+        $lang = $this->handler_response['language'] ?? 'en';
+        $strings = [];
+        if (file_exists(APP_PATH."language/{$lang}.php")) {
+            $strings = require APP_PATH."language/{$lang}.php";
         }
         return $strings;
     }
@@ -309,8 +304,7 @@ class Hm_Module_Exec {
             if (array_key_exists($v, $new)) {
                 if ($v == 'allowed_pages' || $v == 'allowed_output') {
                     $existing[$v] = array_merge($existing[$v], $new[$v]);
-                }
-                else {
+                } else {
                     $existing[$v] += $new[$v];
                 }
             }

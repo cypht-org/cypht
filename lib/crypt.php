@@ -193,8 +193,9 @@ class Hm_Crypt_Base {
      * @return string[]
      */
     protected static function keygen($key, $salt) {
-        return array($salt, self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac));
+        return [$salt, self::pbkdf2($key, $salt, 32, self::$encryption_rounds, self::$hmac)];
     }
+
     /**
      * Key derivation wth pbkdf2: http://en.wikipedia.org/wiki/PBKDF2
      * @param string $key payload
@@ -235,7 +236,7 @@ class Hm_Crypt_Base {
      * @param string $type Can be either pbkdf2 or php
      * @return string
      */
-    public static function hash_password($password, $salt=false, $count=false, $algo='sha512', $type='php') {
+    public static function hash_password($password, $salt = false, $count = false, $algo = 'sha512', $type = 'php') {
         if (function_exists('password_hash') && $type === 'php') {
             return password_hash($password,  PASSWORD_DEFAULT);
         }
@@ -275,7 +276,7 @@ class Hm_Crypt_Base {
      * @param int $size length of the result
      * @return string
      */
-    public static function unique_id($size=128) {
+    public static function unique_id($size = 128) {
         return base64_encode(openssl_random_pseudo_bytes($size));
     }
 
@@ -284,11 +285,10 @@ class Hm_Crypt_Base {
      * @param int $size
      * @return string
      */
-    public static function random($size=128) {
+    public static function random($size = 128) {
         try {
             return Hm_Functions::random_bytes($size);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Hm_Functions::cease('No reliable random byte source found');
         }
     }

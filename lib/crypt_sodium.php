@@ -64,7 +64,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * @param string $password password to hash
      * @return string
      */
-    public static function hash_password($password, $salt=false, $count=false, $algo='sha512', $type='php') {
+    public static function hash_password($password, $salt = false, $count = false, $algo = 'sha512', $type = 'php') {
         if (!LIBSODIUM) {
             return parent::hash_password($password, $salt, $count, $algo, $type);
         }
@@ -95,7 +95,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
      * @param string $salt a salt to use, or create one if needed
      * @return string[]
      */
-    protected static function keygen($key, $salt=false) {
+    protected static function keygen($key, $salt = false) {
         if ($salt === false) {
             $salt = Hm_Sodium_Compat::randombytes_buf();
         }

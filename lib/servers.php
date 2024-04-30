@@ -8,7 +8,7 @@
 trait Hm_Server_Connect {
 
     /* list of server connections */
-    protected static $server_list = array();
+    protected static $server_list = [];
 
     /**
      * Connect to a server
@@ -19,7 +19,7 @@ trait Hm_Server_Connect {
      * @param bool $save_credentials true to save the username and password
      * @return object|false connection object on success, otherwise false
      */
-    public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
+    public static function connect($id, $cache = false, $user = false, $pass = false, $save_credentials = false) {
         if (!array_key_exists($id, self::$server_list)) {
             return false;
         }
@@ -85,11 +85,10 @@ trait Hm_Server_Connect {
      * @param int $id server id
      * @return void
      */
-    public static function clean_up($id=false) {
+    public static function clean_up($id = false) {
         if ($id !== false && array_key_exists($id, self::$server_list)) {
             self::disconnect($id);
-        }
-        else {
+        } else {
             foreach (self::$server_list as $index => $server) {
                 self::disconnect($index);
             }
@@ -202,8 +201,8 @@ trait Hm_Server_List {
      * @param bool $full true to return passwords for server connections. CAREFUL!
      * @return array server details
      */
-    public static function dump($id=false, $full=false) {
-        $list = array();
+    public static function dump($id = false, $full = false) {
+        $list = [];
         if ($id !== false) {
             return self::get($id, $full);
         }

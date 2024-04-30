@@ -15,7 +15,7 @@ abstract class Hm_Config {
     protected $source = '';
 
     /* config data */
-    protected $config = array('version' => VERSION);
+    protected $config = ['version' => VERSION];
 
     /* flag indicating failed decryption */
     public $decrypt_failed = false;
@@ -80,12 +80,12 @@ abstract class Hm_Config {
      * @return void
      */
     public function reset_factory() {
-        $this->config = array(
-            "version"=>$this->config["version"],
-            "feeds"=>$this->config["feeds"],
-            "imap_servers"=>$this->config["imap_servers"],
-            "smtp_servers"=>$this->config["smtp_servers"]
-        );
+        $this->config = [
+            'version' => $this->config['version'],
+            'feeds' => $this->config['feeds'],
+            'imap_servers' => $this->config['imap_servers'],
+            'smtp_servers' => $this->config['smtp_servers']
+        ];
     }
 
     /**
@@ -94,8 +94,8 @@ abstract class Hm_Config {
      * @param false|string $default value to return if the name is not found
      * @return mixed found value, otherwise $default
      */
-    public function get($name, $default=false) {
-        return array_key_exists($name, $this->config) ? $this->config[$name] : $default;
+    public function get($name, $default = false) {
+        return $this->config[$name] ?? $default;
     }
 
     /**
@@ -111,7 +111,7 @@ abstract class Hm_Config {
      * @return void
      */
     public function shuffle() {
-        $new_config = array();
+        $new_config = [];
         $keys = array_keys($this->config);
         shuffle($keys);
         foreach ($keys as $key) {
@@ -140,21 +140,19 @@ abstract class Hm_Config {
      * @return array of items removed
      */
     public function filter_servers() {
-        $removed = array();
-        $excluded = array('imap_servers','smtp_servers');
+        $removed = [];
+        $excluded = ['imap_servers', 'smtp_servers'];
         $no_password = $this->get('no_password_save_setting', false);
         foreach ($this->config as $key => $vals) {
             if (in_array($key, $excluded, true)) {
                 foreach ($vals as $index => $server) {
-                    if (array_key_exists('default', $server) && $server['default']) {
+                    if (!empty($server['default'])) {
                         $removed[$key][$index] = $server;
                         unset($this->config[$key][$index]);
-                    }
-                    elseif (!array_key_exists('server', $server)) {
+                    } elseif (!array_key_exists('server', $server)) {
                         $removed[$key][$index] = $server;
                         unset($this->config[$key][$index]);
-                    }
-                    else {
+                    } else {
                         $this->config[$key][$index]['object'] = false;
                         if ($no_password) {
                             if (!array_key_exists('auth', $server) || $server['auth'] != 'xoauth2') {
@@ -179,8 +177,7 @@ abstract class Hm_Config {
             foreach ($vals as $index => $server) {
                 if (is_array($server)) {
                     $this->config[$key][$index] = $server;
-                }
-                else {
+                } else {
                     $this->config[$key][$index]['pass'] = $server;
                 }
             }
@@ -236,15 +233,13 @@ class Hm_User_Config_File extends Hm_Config {
             if ($str_data) {
                 if (!$this->crypt) {
                     $data = $this->decode($str_data);
-                }
-                else {
+                } else {
                     $data = $this->decode(Hm_Crypt::plaintext($str_data, $key));
                 }
                 if (is_array($data)) {
                     $this->config = array_merge($this->config, $data);
                     $this->set_tz();
-                }
-                else {
+                } else {
                     $this->decrypt_failed = true;
                     $this->encrypted_str = $str_data;
                 }
@@ -258,7 +253,7 @@ class Hm_User_Config_File extends Hm_Config {
      * @param string $username
      * @return void
      */
-    public function reload($data, $username=false) {
+    public function reload($data, $username = false) {
         $this->username = $username;
         $this->config = $data;
         $this->set_tz();
@@ -276,8 +271,7 @@ class Hm_User_Config_File extends Hm_Config {
         $removed = $this->filter_servers();
         if (!$this->crypt) {
             $data = json_encode($this->config);
-        }
-        else {
+        } else {
             $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         }
         file_put_contents($destination, $data);
@@ -302,12 +296,12 @@ class Hm_User_Config_File extends Hm_Config {
      * @return void
      */
     public function reset_factory() {
-        $this->config = array(
-            "version"=>$this->config["version"],
-            "feeds"=>$this->config["feeds"],
-            "imap_servers"=>$this->config["imap_servers"],
-            "smtp_servers"=>$this->config["smtp_servers"]
-        );
+        $this->config = [
+            'version' => $this->config['version'],
+            'feeds' => $this->config['feeds'],
+            'imap_servers' => $this->config['imap_servers'],
+            'smtp_servers' => $this->config['smtp_servers']
+        ];
         if (!$this->crypt) {
             $this->save($this->username, false);
         }
@@ -346,9 +340,9 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return boolean
      */
     private function new_settings($username) {
-        $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, ''));
+        $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', [$username, '']);
         Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
-        $this->config = array();
+        $this->config = [];
         return $res ? true : false;
     }
 
@@ -360,16 +354,14 @@ class Hm_User_Config_DB extends Hm_Config {
     private function decrypt_settings($data, $key) {
         if (!$this->crypt) {
             $data = $this->decode($data['settings']);
-        }
-        else {
+        } else {
             $data = $this->decode(Hm_Crypt::plaintext($data['settings'], $key));
         }
         if (is_array($data)) {
             $this->config = array_merge($this->config, $data);
             $this->set_tz();
             return true;
-        }
-        else {
+        } else {
             $this->decrypt_failed = true;
             return false;
         }
@@ -384,7 +376,7 @@ class Hm_User_Config_DB extends Hm_Config {
     public function load($username, $key) {
         $this->username = $username;
         $this->connect();
-        $data = Hm_DB::execute($this->dbh, 'select * from hm_user_settings where username=?', array($username));
+        $data = Hm_DB::execute($this->dbh, 'select * from hm_user_settings where username=?', [$username]);
         if (!$data || !array_key_exists('settings', $data)) {
             return $this->new_settings($username);
         }
@@ -397,7 +389,7 @@ class Hm_User_Config_DB extends Hm_Config {
      * @param string $username
      * @return void
      */
-    public function reload($data, $username=false) {
+    public function reload($data, $username = false) {
         $this->username = $username;
         $this->config = $data;
         $this->set_tz();
@@ -422,18 +414,16 @@ class Hm_User_Config_DB extends Hm_Config {
         $removed = $this->filter_servers();
         if (!$this->crypt) {
             $config = json_encode($this->config);
-        }
-        else {
+        } else {
             $config = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         }
         $this->connect();
-        if (Hm_DB::execute($this->dbh, 'select settings from hm_user_settings where username=?', array($username))) {
-            Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', array($config, $username));
+        if (Hm_DB::execute($this->dbh, 'select settings from hm_user_settings where username=?', [$username])) {
+            Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', [$config, $username]);
             Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
             $res = true;
-        }
-        else {
-            $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', array($username, $config));
+        } else {
+            $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', [$username, $config]);
         }
         $this->restore_servers($removed);
         return $res;
@@ -457,12 +447,12 @@ class Hm_User_Config_DB extends Hm_Config {
      * @return void
      */
     public function reset_factory() {
-        $this->config = array(
-            "version"=>$this->config["version"],
-            "feeds"=>$this->config["feeds"],
-            "imap_servers"=>$this->config["imap_servers"],
-            "smtp_servers"=>$this->config["smtp_servers"]
-        );
+        $this->config = [
+            'version' => $this->config['version'],
+            'feeds' => $this->config['feeds'],
+            'imap_servers' => $this->config['imap_servers'],
+            'smtp_servers' => $this->config['smtp_servers']
+        ];
         if (!$this->crypt) {
             $this->save($this->username, false);
         }
@@ -470,11 +460,11 @@ class Hm_User_Config_DB extends Hm_Config {
 }
 
 /**
- * File based site configuration
+ * File-based site configuration
  */
 class Hm_Site_Config_File extends Hm_Config {
 
-    public $user_defaults = array();
+    public $user_defaults = [];
 
     /**
      * Load data based on source
@@ -538,10 +528,10 @@ function load_user_config_object($config) {
         case 'custom':
             if (class_exists($class)) {
                 $user_config = new $class($config);
-                Hm_Debug::add("Using custom user configuration: $class");
+                Hm_Debug::add("Using custom user configuration: {$class}");
                 break;
             } else {
-                Hm_Debug::add("User configuration class does not exist: $class");
+                Hm_Debug::add("User configuration class does not exist: {$class}");
             }
         default:
             $user_config = new Hm_User_Config_File($config);
@@ -558,7 +548,7 @@ function load_user_config_object($config) {
  */
 function crypt_state($config) {
     if ($config->get('single_server_mode') &&
-        in_array($config->get('auth_type'), array('IMAP'), true)) {
+        in_array($config->get('auth_type'), ['IMAP'], true)) {
         return false;
     }
     return true;

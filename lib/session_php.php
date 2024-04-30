@@ -27,7 +27,7 @@ trait Hm_Session_Auth {
     }
 
     /**
-     * Save auth detail if i'ts needed (mech specific)
+     * Save auth detail if it's needed (mech specific)
      * @return void
      */
     public function save_auth_detail() {
@@ -71,8 +71,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
     protected function validate_session_data($request) {
         if ($this->existing && count($this->data) == 0) {
             $this->destroy($request);
-        }
-        else {
+        } else {
             Hm_Debug::add('LOGGED IN');
             $this->active = true;
         }
@@ -87,8 +86,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
             $data = $this->plaintext($_SESSION['data']);
             if (is_array($data)) {
                 $this->data = $data;
-            }
-            elseif (!$this->loaded) {
+            } elseif (!$this->loaded) {
                 $this->destroy($request);
                 Hm_Debug::add('Mismatched session level encryption key');
             }
@@ -102,11 +100,10 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
      * @param bool $user if true, only search the user_data section of the session
      * @return mixed the value if found, otherwise $default
      */
-    public function get($name, $default=false, $user=false) {
+    public function get($name, $default = false, $user = false) {
         if ($user) {
             return array_key_exists('user_data', $this->data) && array_key_exists($name, $this->data['user_data']) ? $this->data['user_data'][$name] : $default;
-        }
-        else {
+        } else {
             return array_key_exists($name, $this->data) ? $this->data[$name] : $default;
         }
     }
@@ -118,11 +115,10 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
      * @param bool $user if true, save in the user_data section of the session
      * @return void
      */
-    public function set($name, $value, $user=false) {
+    public function set($name, $value, $user = false) {
         if ($user) {
             $this->data['user_data'][$name] = $value;
-        }
-        else {
+        } else {
             $this->data[$name] = $value;
         }
     }
@@ -194,13 +190,12 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
      * @param string $pass password
      * @return bool
      */
-    public function check($request, $user=false, $pass=false, $fingerprint=true) {
+    public function check($request, $user = false, $pass = false, $fingerprint = true) {
         if ($user !== false && $pass !== false) {
             if ($this->auth($user, $pass)) {
                 $this->authed($request, $fingerprint);
             }
-        }
-        elseif (array_key_exists($this->cname, $request->cookie)) {
+        } elseif (array_key_exists($this->cname, $request->cookie)) {
             $this->get_key($request);
             $this->existing = true;
             $this->start($request);
@@ -235,8 +230,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
         $path = false;
         if ($request->tls) {
             $secure = true;
-        }
-        else {
+        } else {
             $secure = false;
         }
         if (isset($request->path)) {
@@ -247,8 +241,7 @@ class Hm_PHP_Session extends Hm_PHP_Session_Data {
             $host = parse_url($request->server['HTTP_HOST'],  PHP_URL_HOST);
             if (trim((string) $host)) {
                 $domain = $host;
-            }
-            else {
+            } else {
                 $domain = $request->server['HTTP_HOST'];
             }
         }

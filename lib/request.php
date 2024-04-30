@@ -15,19 +15,19 @@
 class Hm_Request {
 
     /* sanitized $_POST variables */
-    public $post = array();
+    public $post = [];
 
     /* sanitized $_GET variables */
-    public $get = array();
+    public $get = [];
 
     /* sanitized $_COOKIE variables */
-    public $cookie = array();
+    public $cookie = [];
 
     /* sanitized $_SERVER variables */
-    public $server = array();
+    public $server = [];
 
     /* $_ENV variables (fallback for missing $_SERVER vals) */
-    private $env = array();
+    private $env = [];
 
     /* request type. either AJAX or HTTP */
     public $type = '';
@@ -48,19 +48,19 @@ class Hm_Request {
     public $path = '';
 
     /* allowed AJAX output field names defined by module sets */
-    public $allowed_output = array();
+    public $allowed_output = [];
 
     /* bool indicating unknown input data */
     public $invalid_input_detected = false;
 
     /* invalid input fields */
-    public $invalid_input_fields = array();
+    public $invalid_input_fields = [];
 
     /* uploaded file details */
-    public $files = array();
+    public $files = [];
 
     /* module filters */
-    public $filters = array();
+    public $filters = [];
 
     /* HTTP request method */
     public $method = false;
@@ -125,8 +125,7 @@ class Hm_Request {
         }
         if (array_key_exists('REQUEST_METHOD', $this->server)) {
             $this->method = $this->server['REQUEST_METHOD'];
-        }
-        elseif (array_key_exists('REQUEST_METHOD', $this->env)) {
+        } elseif (array_key_exists('REQUEST_METHOD', $this->env)) {
             $this->method = $this->env['REQUEST_METHOD'];
             $this->server = $this->env;
         }
@@ -143,13 +142,13 @@ class Hm_Request {
         if (version_compare(PHP_VERSION, '8.1', '>=')) {
             return;
         }
-        $_POST = array();
-        $_SERVER = array();
-        $_GET = array();
-        $_COOKIE = array();
-        $_FILES = array();
-        $_REQUEST = array();
-        $_ENV = array();
+        $_POST = [];
+        $_SERVER = [];
+        $_GET = [];
+        $_COOKIE = [];
+        $_FILES = [];
+        $_REQUEST = [];
+        $_ENV = [];
 
         foreach (array_keys($GLOBALS) as $key) {
             if (isset($GLOBALS)) {
@@ -167,7 +166,7 @@ class Hm_Request {
     public function filter_input($type, $filters) {
         $data = Hm_Functions::filter_input_array($type, $filters);
         if ($data === false || $data === NULL) {
-            return array();
+            return [];
         }
         return $data;
     }
@@ -195,8 +194,7 @@ class Hm_Request {
     private function is_tls() {
         if (array_key_exists('HTTPS', $this->server) && strtolower($this->server['HTTPS']) == 'on') {
             $this->tls = true;
-        }
-        elseif (array_key_exists('REQUEST_SCHEME', $this->server) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
+        } elseif (array_key_exists('REQUEST_SCHEME', $this->server) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
             $this->tls = true;
         }
     }
@@ -209,8 +207,7 @@ class Hm_Request {
         if ($this->is_ajax()) {
             $this->type = 'AJAX';
             $this->format = 'Hm_Format_JSON';
-        }
-        else {
+        } else {
             $this->type = 'HTTP';
             $this->format = 'Hm_Format_HTML5';
         }
@@ -233,8 +230,7 @@ class Hm_Request {
         if (strpos($uri, '?') !== false) {
             $parts = explode('?', $uri, 2);
             $path = $parts[0];
-        }
-        else {
+        } else {
             $path = $uri;
         }
         $path = str_replace('index.php', '', $path);

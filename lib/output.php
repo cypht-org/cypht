@@ -26,13 +26,8 @@ abstract class Hm_Output {
      * @param array $input raw module data
      * @return void
      */
-    public function send_response($response, $input=array()) {
-        if (array_key_exists('http_headers', $input)) {
-            $this->output_content($response, $input['http_headers']);
-        }
-        else {
-            $this->output_content($response, array());
-        }
+    public function send_response($response, $input = []) {
+        $this->output_content($response, $input['http_headers'] ?? []);
     }
 }
 
@@ -58,7 +53,7 @@ class Hm_Output_HTTP extends Hm_Output {
      * @param array $headers HTTP headers to set
      * @return void
      */
-    protected function output_content($content, $headers=array()) {
+    protected function output_content($content, $headers = []) {
         $this->output_headers($headers);
         ob_end_clean();
         echo $content;
@@ -71,7 +66,7 @@ class Hm_Output_HTTP extends Hm_Output {
 trait Hm_List {
 
     /* message list */
-    private static $msgs = array();
+    private static $msgs = [];
 
     /**
      * Add a message
@@ -95,7 +90,7 @@ trait Hm_List {
      * @return null
      */
     public static function flush() {
-        self::$msgs = array();
+        self::$msgs = [];
     }
 
     /**
@@ -103,15 +98,13 @@ trait Hm_List {
      * @param mixed $mixed value to stringify
      * @return string
      */
-    public static function str($mixed, $return_type=true) {
+    public static function str($mixed, $return_type = true) {
         $type = gettype($mixed);
         if (in_array($type, array('array', 'object'), true)) {
             $str = print_r($mixed, true);
-        }
-        elseif ($return_type) {
+        } elseif ($return_type) {
             $str = sprintf("%s: %s", $type, $mixed);
-        }
-        else {
+        } else {
             $str = (string) $mixed;
         }
         return $str;

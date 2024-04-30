@@ -23,8 +23,8 @@
 trait Hm_Uid_Cache {
 
     /* UID list */
-    private static $read = array();
-    private static $unread = array();
+    private static $read = [];
+    private static $unread = [];
 
     /* Load UIDs from an outside source
      * @param array $data list of uids
@@ -75,7 +75,7 @@ trait Hm_Uid_Cache {
      * @return array list of known UIDs
      */
     public static function dump() {
-        return array(array_keys(self::$read), array_keys(self::$unread));
+        return [array_keys(self::$read), array_keys(self::$unread)];
     }
 
     /**
@@ -153,7 +153,7 @@ trait Hm_Cache_Base {
      * @param string $crypt_key encryption key
      * @return boolean
      */
-    public function set($key, $val, $lifetime=600, $crypt_key='') {
+    public function set($key, $val, $lifetime = 600, $crypt_key = '') {
         if (!$this->is_active()) {
             return false;
         }
@@ -165,7 +165,7 @@ trait Hm_Cache_Base {
      * @param string $crypt_key encryption key
      * @return false|array|string
      */
-    public function get($key, $crypt_key='') {
+    public function get($key, $crypt_key = '') {
         if (!$this->is_active()) {
             return false;
         }
@@ -258,8 +258,7 @@ class Hm_Redis {
                 $this->cache_con = false;
                 return false;
             }
-        }
-        catch (Exception $oops) {
+        } catch (Exception $oops) {
             Hm_Debug::add('Redis connect failed');
             $this->cache_con = false;
             return false;
@@ -373,6 +372,7 @@ class Hm_Noop_Cache {
     public function del($key) {
         return true;
     }
+
     public function set($key, $val, $lifetime, $crypt_key) {
         return false;
     }
@@ -475,7 +475,7 @@ class Hm_Cache {
      * @param boolean $session store in the session instead of the enabled cache
      * @return boolean
      */
-    public function set($key, $val, $lifetime=600, $session=false) {
+    public function set($key, $val, $lifetime = 600, $session = false) {
         if ($session || $this->type == 'session') {
             return $this->session_set($key, $val, false);
         }
@@ -488,7 +488,7 @@ class Hm_Cache {
      * @param boolean $session fetch from the session instead of the enabled cache
      * @return mixed
      */
-    public function get($key, $default=false, $session=false) {
+    public function get($key, $default = false, $session = false) {
         if ($session || $this->type == 'session') {
             return $this->session_get($key, $default);
         }
@@ -500,7 +500,7 @@ class Hm_Cache {
      * @param boolean $session fetch from the session instead of the enabled cache
      * @return boolean
      */
-    public function del($key, $session=false) {
+    public function del($key, $session = false) {
         if ($session || $this->type == 'session') {
             return $this->session_del($key);
         }

@@ -80,7 +80,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return mixed array results or false on failure
      */
     public function get_session_data($key) {
-        $results = Hm_DB::execute($this->dbh, 'select data from hm_user_session where hm_id=?', array($key));
+        $results = Hm_DB::execute($this->dbh, 'select data from hm_user_session where hm_id=?', [$key]);
         if (is_array($results) && array_key_exists('data', $results)) {
             return $this->plaintext($results['data']);
         }
@@ -123,11 +123,10 @@ class Hm_DB_Session extends Hm_PHP_Session {
      */
     public function upsert($type) {
         $res = false;
-        $params = array(':key' => $this->session_key, ':data' => $this->ciphertext($this->data));
+        $params = [':key' => $this->session_key, ':data' => $this->ciphertext($this->data)];
         if ($type == 'update') {
             $res = Hm_DB::execute($this->dbh, 'update hm_user_session set data=:data where hm_id=:key', $params);
-        }
-        elseif ($type == 'insert') {
+        } elseif ($type == 'insert') {
             $res = Hm_DB::execute($this->dbh, 'insert into hm_user_session values(:key, :data, current_date)', $params);
         }
         if (!$res) {
@@ -145,7 +144,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if (Hm_Functions::function_exists('delete_uploaded_files')) {
             delete_uploaded_files($this);
         }
-        Hm_DB::execute($this->dbh, 'delete from hm_user_session where hm_id=?', array($this->session_key));
+        Hm_DB::execute($this->dbh, 'delete from hm_user_session where hm_id=?', [$this->session_key]);
         $this->delete_cookie($request, $this->cname);
         $this->delete_cookie($request, 'hm_id');
         $this->delete_cookie($request, 'hm_reload_folders');
@@ -163,11 +162,9 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if ($this->connect()) {
             if ($this->loaded) {
                 $this->start_new($request);
-            }
-            elseif (!array_key_exists($this->cname, $request->cookie)) {
+            } elseif (!array_key_exists($this->cname, $request->cookie)) {
                 $this->destroy($request);
-            }
-            else {
+            } else {
                 $this->start_existing($request->cookie[$this->cname]);
             }
         }
