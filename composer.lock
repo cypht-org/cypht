@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6013adf98d7b2e19f6d9d05829b64290",
+    "content-hash": "ffbdf4b8fa2d474a70df7e5a590c539e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -398,16 +398,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "29a9b4396322cc3403b5d64578917ea025c5164e"
+                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/29a9b4396322cc3403b5d64578917ea025c5164e",
-                "reference": "29a9b4396322cc3403b5d64578917ea025c5164e",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
+                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
                 "shasum": ""
             },
             "require": {
@@ -429,20 +429,23 @@
                     "email": "henrique.borba.dev@gmail.com"
                 }
             ],
-            "description": "PHP library to create and manage Sieve filters through the ManageSieve protocol",
+            "description": "PHP library to create and manage Sieve filters through the ManageSieve protocol (RFC5228)",
             "keywords": [
+                "RFC5228",
                 "cypht",
                 "email",
+                "filters",
                 "imap",
+                "mail",
                 "managesieve",
                 "php",
                 "sieve"
             ],
             "support": {
                 "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
-                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.1"
+                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.2"
             },
-            "time": "2023-10-19T14:43:05+00:00"
+            "time": "2023-12-21T18:28:46+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -971,16 +974,16 @@
         },
         {
             "name": "zbateson/mail-mime-parser",
-            "version": "2.4.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zbateson/mail-mime-parser.git",
-                "reference": "20b3e48eb799537683780bc8782fbbe9bc25934a"
+                "reference": "ff49e02f6489b38f7cc3d1bd3971adc0f872569c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zbateson/mail-mime-parser/zipball/20b3e48eb799537683780bc8782fbbe9bc25934a",
-                "reference": "20b3e48eb799537683780bc8782fbbe9bc25934a",
+                "url": "https://api.github.com/repos/zbateson/mail-mime-parser/zipball/ff49e02f6489b38f7cc3d1bd3971adc0f872569c",
+                "reference": "ff49e02f6489b38f7cc3d1bd3971adc0f872569c",
                 "shasum": ""
             },
             "require": {
@@ -1042,7 +1045,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-14T22:58:03+00:00"
+            "time": "2024-04-28T00:58:54+00:00"
         },
         {
             "name": "zbateson/mb-wrapper",
