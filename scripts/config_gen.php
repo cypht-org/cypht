@@ -323,7 +323,7 @@ function process_bootswatch_files() {
     $dir = opendir($src);
     while(false !== ($folder = readdir($dir))) {
         if (($folder != '.' ) && ($folder != '..' )) {
-            if (is_dir($src . '/' . $folder)) {
+            if (is_dir($src . '/' . $folder) && $folder != 'fonts') {
                 $target = $src . '/' . $folder . '/css/' . $folder . '.css';
                 if ($folder == 'default') {
                     $content = file_get_contents('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
