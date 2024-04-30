@@ -15,6 +15,8 @@ from contextlib import contextmanager
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as exp_cond
 import glob
+import subprocess
+import json
 
 class WebTest:
 
@@ -31,18 +33,12 @@ class WebTest:
     def read_ini(self):
         self.modules = []
         self.auth_type = ''
-        # Assuming each PHP file returns an associative array
         config_files = glob.glob('../../config/*.php')
-
         for file_path in config_files:
-            # Create an empty dictionary to hold the variables from the included file
-            config_dict = {}
-            # Execute the PHP file in a new dictionary
-            exec(open(file_path).read(), config_dict)
-            # Check if 'modules' is in the dictionary and is a list
+            result = subprocess.run(['php', 'get_config.php'], stdout=subprocess.PIPE)
+            config_dict = json.loads(result.stdout.decode())
             if 'modules' in config_dict and isinstance(config_dict['modules'], list):
                 self.modules += config_dict['modules']
-            # Check if 'auth_type' is in the dictionary
             if 'auth_type' in config_dict:
                 self.auth_type = config_dict['auth_type']
 
