@@ -17,10 +17,11 @@ return [
     | standard PHP sessions, as well as its own completely independent session
     | system that uses memcached or a database for storage. In order to use
     | database sessions, the database must be correctly configured in the "DB
-    | Support" section and the hm_user_session table must be created. In order to
-    | use Memcached sessions, the memcached server must be correctly configured
-    | in the "Memcached Support" section. In order to use Redis session, the
-    | Redis server must be configured in the "Redis Support" section.
+    | Support" section and the hm_user_session table must be created (see
+    | config/database.php for more information). In order to use Memcached
+    | sessions, the memcached server must be correctly configured in the
+    | "Memcached Support" section. In order to use Redis session, the Redis
+    | server must be configured in the "Redis Support" section.
     | Valid values for this setting:
     | PHP     Standard PHP session handlers
     | DB      Custom database based sessions
@@ -38,15 +39,16 @@ return [
     |
     | This setting defines how Cypht will authenticate your username and password
     | when you login. If you want to use a database it must be correctly configured
-    | in the "DB Support" section and the hm_user table must be created. There are
-    | 3 PHP cli scripts to help manage database users in the scripts/ directory (
-    | create_account.php, delete_account.php, and update_password.php). If you want
-    | to authenticate against an IMAP server, you must setup the imap_auth_* settings
-    | below. If you want to authenticate against an LDAP server,
-    | you must setup the ldap_auth_* settings. Finally, if you want to let users
-    | pick from a list of popular mail services or try to auto-discover a mail
-    | system, set this to dynamic and make sure the dynamic_login module set is
-    | enabled in the "Module Sets" section of this file.
+    | in the "DB Support" section and the hm_user table must be created (see
+    | config/database.php for more information). There are 3 PHP cli scripts to
+    | help manage database users in the scripts/ directory (create_account.php,
+    | delete_account.php, and update_password.php). If you want to authenticate
+    | against an IMAP server, you must setup the imap_auth_* settings below. If
+    | you want to authenticate against an LDAP server, you must setup the ldap_auth_*
+    | settings. Finally, if you want to let users pick from a list of popular mail
+    | services or try to auto-discover a mail system, set this to dynamic and make
+    | sure the dynamic_login module set is enabled in the "Module Sets" section of
+    | this file.
     |
     | Valid values for this setting:
     |
@@ -190,9 +192,10 @@ return [
     | Cypht supports 3 methods for saving user settings between logins. File based
     | settings, database table or custom implementation. To store settings in a
     | database, it must be configured in the "DB Support" section and the
-    | hm_user_settings table must be created. To store settings on the filesystem,
-    | the user_settings_dir must be created and the webserver software must be able
-    | to write to it. For custom implementations, see Hm_User_Config_File.
+    | hm_user_settings table must be created (see config/database.php for more
+    | information). To store settings on the filesystem, the user_settings_dir must
+    | be created and the webserver software must be able to write to it. For custom
+    | implementations, see Hm_User_Config_File.
     |
     | Valid values for this setting:
     | file    Store user settings in the filesystem
@@ -613,49 +616,6 @@ return [
     */
     'auth_class' => env('AUTH_CLASS'),
     'session_class' => env('SESSION_CLASS'),
-
-    /*
-    | -----------
-    | DB Sessions
-    | -----------
-    |
-    | If your session_type is set to DB, the following table must exist in the DB
-    | defined above, and the db user must have read-write access to it:
-    |
-    | Postgresql:
-    |   CREATE TABLE hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);
-    | MySQL or SQLite:
-    |   CREATE TABLE hm_user_session (hm_id varchar(180), data longblob, date timestamp, primary key (hm_id));
-    |
-    |
-    |
-    | -----------------
-    | DB Authentication
-    | -----------------
-    |
-    | If your auth_type is set to DB, the following table must exist in the DB
-    | defined above, and the db user must have read-write access to it:
-    |
-    | Postgresql:
-    |   CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));
-    | MySQL or SQLite:
-    |   CREATE TABLE hm_user (username varchar(250), hash varchar(250), primary key (username));
-    |
-    |
-    |
-    |
-    | -----------
-    | DB Settings
-    | -----------
-    |
-    | If your user_config_type is set to DB, the following table must exist in the
-    | DB defined above, and the db user must have read-write access to it:
-    |
-    | Postgresql:
-    |   CREATE TABLE hm_user_settings (username varchar(250) primary key not null, settings text);
-    | MySQL or SQLite:
-    |   CREATE TABLE hm_user_settings(username varchar(250), settings longblob, primary key (username));
-    */
 
     /*
     | -----------------------------------------------------------------------------
