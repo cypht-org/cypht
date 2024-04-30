@@ -64,4 +64,41 @@ return [
     | Database type. can be any supported PDO driver ; (http://php.net/manual/en/pdo.drivers.php)
     */
     'db_driver' => env('DB_DRIVER','mysql')
+
+    /*
+    | DB Sessions
+    | -----------
+    | If your session_type is set to DB, the following table must exist in the DB
+    | defined above, and the db user must have read-write access to it:
+    |
+    |  Postgresql:
+    |   CREATE TABLE hm_user_session (hm_id varchar(250) primary key not null, data text, date timestamp);
+    |
+    |  MySQL or SQLite:
+    |   CREATE TABLE hm_user_session (hm_id varchar(180), data longblob, date timestamp, primary key (hm_id));
+    |
+    |
+    | DB Authentication
+    | -----------------
+    | If your auth_type is set to DB, the following table must exist in the DB
+    | defined above, and the db user must have read-write access to it:
+    |
+    |  Postgresql:
+    |   CREATE TABLE hm_user (username varchar(255) primary key not null, hash varchar(255));
+    |
+    |  MySQL or SQLite:
+    |   CREATE TABLE hm_user (username varchar(250), hash varchar(250), primary key (username));
+    |
+    |
+    | DB Settings
+    | -----------
+    | If your user_config_type is set to DB, the following table must exist in the
+    | DB defined above, and the db user must have read-write access to it:
+    |
+    |  Postgresql:
+    |   CREATE TABLE hm_user_settings (username varchar(250) primary key not null, settings text);
+    |
+    |  MySQL or SQLite:
+    |   CREATE TABLE hm_user_settings(username varchar(250), settings longblob, primary key (username));
+    */
 ];
