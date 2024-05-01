@@ -684,7 +684,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
-        if ($this->request->post['compose_delivery_receipt']) {
+        if (!empty($this->request->post['compose_delivery_receipt'])) {
             $from_params      = 'RET=HDRS';
             $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
         }
