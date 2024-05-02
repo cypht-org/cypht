@@ -201,6 +201,17 @@ if (!class_exists('Hm_Functions')) {
          * @return array filtered list
          */
         public static function filter_input_array($type, $filters) {
+            /*
+            In FastCGI, filter_input_array does not work as intended with INPUT_SERVER because its stored copy of data doesn't get modified during the request.
+            So we need to explicitly access the $_SERVER.
+            */
+            if ($type === INPUT_SERVER) {
+                $value = array();
+                foreach ($filters as $var => $flag) {
+                    $value[$var] = filter_var($_SERVER[$var], $flag);
+                }
+                return $value;
+            }
             return filter_input_array($type, $filters, false);
         }
 
