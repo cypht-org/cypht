@@ -181,6 +181,68 @@ if (!hm_exists('generate_main_script')) {
     }
 }
 
+if (!hm_exists('save_main_script')) {
+    function save_main_script($client, $main_script, $scripts)
+    {
+        $success = $client->putScript(
+            'main_script',
+            $main_script
+        );
+        if (! $success && strpos($client->getErrorMessage(), 'failed to include') !== false) {
+            $main_script = '';
+            foreach ($scripts as $scriptName) {
+                if ($scriptName == 'main_script') {
+                    $client->removeScripts('main_script');
+                    continue;
+                }
+                $script = $client->getScript($scriptName);
+                if (strpos($script, 'failed to include') !== false) {
+                    $script = substr($script, strpos($script, '#'));
+                    $client->putScript(
+                        $scriptName,
+                        $script
+                    );
+                }
+                $main_script .= $script . "\n";                
+            }
+            $main_script = format_main_script($main_script);
+            $ret = $client->putScript(
+                'main_script',
+                $main_script
+            );
+            if (! $ret) {
+                throw new Exception($client->getErrorMessage());
+            }
+        }
+    }
+}
+
+if (!hm_exists('format_main_script')) {
+    function format_main_script($script)
+    {
+        // We need to remove require statements found in middle of script
+        $lines = explode("\n", $script);
+        $reqs = [];
+        foreach ($lines as $key => $line) {
+            if (preg_match('/^require (\[.+\]);$/', $line, $matches)) {
+                unset($lines[$key]);
+                $reqs = array_merge($reqs, json_decode($matches[1]));
+            } else if (preg_match('/^#/', $line)) {
+                unset($lines[$key]);
+            }
+        }
+        $reqs = array_unique($reqs);
+        $reqs = array_map(function($req) {
+            return '"' . $req . '"';
+        }, $reqs);
+
+        $script = 'require [' . implode(',', $reqs) . '];' . "\n";
+        $script .= implode("\n", $lines);
+        
+        return $script;
+    }
+}
+
 if (!hm_exists('generate_script_name')) {
     function generate_script_name($name, $priority)
     {

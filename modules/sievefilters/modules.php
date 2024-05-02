@@ -150,10 +150,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
             }
             $scripts = $client->listScripts();
             $main_script = generate_main_script($scripts);
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
             Hm_Msgs::add('Script removed');
@@ -191,10 +188,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
             $scripts = $client->listScripts();
             $main_script = generate_main_script($scripts);
 
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
             Hm_Msgs::add('Script removed');
@@ -270,10 +264,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
                 'blocked_senders',
                 $script_parsed
             );
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
         } catch (Exception $e) {
@@ -427,10 +418,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
                 'blocked_senders',
                 $script_parsed
             );
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
 
@@ -590,10 +578,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 'blocked_senders',
                 $script_parsed
             );
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
 
@@ -1010,10 +995,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             $scripts = $client->listScripts();
             $main_script = generate_main_script($scripts);
 
-            $client->putScript(
-                'main_script',
-                $main_script
-            );
+            save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
         } catch (Exception $e) {

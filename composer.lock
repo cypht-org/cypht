@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea2fc41f47338264c0a182257629dced",
+    "content-hash": "74bf15aae5f035fe60666720af3d2bc4",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -423,16 +423,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.2",
+            "version": "v1.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e"
+                "reference": "601cb7dad4b39fd225273a01357b5a71163a96b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
-                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/601cb7dad4b39fd225273a01357b5a71163a96b7",
+                "reference": "601cb7dad4b39fd225273a01357b5a71163a96b7",
                 "shasum": ""
             },
             "require": {
@@ -468,9 +468,9 @@
             ],
             "support": {
                 "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
-                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.2"
+                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.3"
             },
-            "time": "2023-12-21T18:28:46+00:00"
+            "time": "2024-05-02T06:55:04+00:00"
         },
         {
             "name": "league/commonmark",
