@@ -920,6 +920,9 @@ div.unseen,
 .next th {
   white-space: normal !important;
 }
+.sys_messages {
+  z-index: 1100 !important;
+}
 
 /* mobile */
 .mobile {
@@ -1028,9 +1031,6 @@ div.unseen,
   padding-top: 5px;
   top: 1px;
   left: 70px !important;
-}
-.mobile .sys_messages {
-  z-index: 1000 !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {

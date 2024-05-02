@@ -381,7 +381,6 @@ function Hm_Modal(options) {
         }
 
         btn.addEventListener('click', callback);
-        btn.addEventListener('click', this.hide);
 
         this.modalFooter.append(btn);
     };
