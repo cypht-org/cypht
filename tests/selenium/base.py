@@ -32,6 +32,7 @@ class WebTest:
 
     def read_ini(self):
         self.modules = []
+        self.servers = 1
         self.auth_type = ''
         config_files = glob.glob('../../config/*.php')
         for file_path in config_files:
@@ -60,6 +61,12 @@ class WebTest:
             return True
         print(" - module not enabled: %s" % name)
         return False
+    
+    def single_server(self):
+        if self.servers <= 1:
+            return True
+        print(" - servers account: %s" % self.servers)
+        return False
 
     def go(self, url):
         self.driver.get(url)
@@ -84,35 +91,39 @@ class WebTest:
 
     def logout_no_save(self):
         print(" - logging out")
-        self.driver.find_element_by_class_name('logout_link').click()
+        self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
         logout = self.by_id('logout_without_saving').click()
 
     def logout(self):
         print(" - logging out")
-        self.driver.find_element_by_class_name('logout_link').click()
+        self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
 
     def end(self):
         self.driver.quit()
 
     def by_id(self, el_id):
         print(" - finding element by id {0}".format(el_id))
-        return self.driver.find_element_by_id(el_id)
+        return self.driver.find_element(By.ID, el_id)
 
     def by_tag(self, name):
         print(" - finding element by tag name {0}".format(name))
-        return self.driver.find_element_by_tag_name(name)
+        return self.driver.find_element(By.TAG_NAME, name)
 
     def by_name(self, name):
         print(" - finding element by name {0}".format(name))
-        return self.driver.find_element_by_name(name)
+        return self.driver.find_element(By.NAME, name)
 
     def by_css(self, selector):
         print(" - finding element by selector {0}".format(selector))
-        return self.driver.find_element_by_css_selector(selector)
+        return self.driver.find_element(By.CSS_SELECTOR, selector)
 
     def by_class(self, class_name):
         print(" - finding element by class {0}".format(class_name))
-        return self.driver.find_element_by_class_name(class_name)
+        return self.driver.find_element(By.CLASS_NAME, class_name)
+
+    def by_xpath(self, element_xpath):
+        print(" - finding element by xpath {0}".format(element_xpath))
+        return self.driver.find_element(By.XPATH, element_xpath)
 
     def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=30):
         print(" - waiting for page by {0}: {1} ...".format(el_type, el_value))

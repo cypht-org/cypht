@@ -158,7 +158,7 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
 class Hm_Output_profile_edit_form extends Hm_Output_Module {
     protected function output() {
         $new_id = $this->get('new_profile_id', -1);
-        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span>'.$this->trans('Profiles').'</span>';
+        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span class="profile_content_title">'.$this->trans('Profiles').'</span>';
         $smtp_servers = $this->get('smtp_servers', array());
         $imap_servers = $this->get('imap_servers', array());
         if ($this->get('edit_profile')) {

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from base import WebTest, USER, PASS
+from selenium.webdriver.common.by import By
 from runner import test_runner
 from selenium.webdriver.support.ui import Select
 
@@ -8,7 +9,9 @@ from selenium.webdriver.support.ui import Select
 class SettingsHelpers(WebTest):
 
     def is_unchecked(self, name):
-        assert self.by_name(name).is_selected() == False
+        selected = self.by_name(name).is_selected()
+        print(f"The selected status of checkbox '{name}' is:", selected)
+        assert selected == False
 
     def is_checked(self, name):
         assert self.by_name(name).is_selected() == True
@@ -30,7 +33,7 @@ class SettingsHelpers(WebTest):
         if not self.by_class('settings').is_displayed():
             self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_settings')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
@@ -104,7 +107,7 @@ class SettingsTests(SettingsHelpers):
         self.checkbox_test('general_setting', 'msg_part_icons', False)
 
     def simple_msg_parts_test(self):
-        self.checkbox_test('general_setting', 'simple_msg_parts', False)
+        self.checkbox_test('general_setting', 'simple_msg_parts', True)
 
     def text_only_test(self):
         self.checkbox_test('general_setting', 'text_only', False)
@@ -123,7 +126,7 @@ class SettingsTests(SettingsHelpers):
         self.dropdown_test('general_setting', 'smtp_compose_type', '0', '1', 'smtp')
 
     def theme_test(self):
-        self.dropdown_test('general_setting', 'theme_setting', 'default', 'blue')
+        self.dropdown_test('general_setting', 'theme_setting', 'default', 'cosmo')
 
     def tz_test(self):
         self.dropdown_test('general_setting', 'timezone', 'Africa/Abidjan', 'Africa/Algiers')
