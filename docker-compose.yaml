@@ -12,7 +12,6 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
   cypht:
-    # image: sailfrog/cypht-docker:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
@@ -22,13 +21,16 @@ services:
     ports:
       - "80:80"
     environment:
-      - CYPHT_AUTH_USERNAME=admin
-      - CYPHT_AUTH_PASSWORD=admin_password
-      - CYPHT_DB_CONNECTION_TYPE=host
-      - CYPHT_DB_HOST=db
-      - CYPHT_DB_NAME=cypht
-      - CYPHT_DB_USER=cypht
-      - CYPHT_DB_PASS=cypht_password
-      - CYPHT_SESSION_TYPE=db
+      - AUTH_USERNAME=admin
+      - AUTH_PASSWORD=admin # TODO: does this make sense for IMAP auth?
+      - DB_CONNECTION_TYPE=socket
+      - DB_HOST=DB
+      - DB_NAME=cypht
+      - DB_USER=cypht
+      - DB_PASS=cypht_password
+      - DB_DRIVER=sqlite
+      - DB_SOCKET=/tmp/cypht_1.sqlite # TODO: move to ./db ?
+      - SESSION_TYPE=DB
+      - USER_CONFIG_TYPE=DB
 
-  # TODO: add memcache and redis to this sample
+  # TODO: add memcache and redis to this sample, or disable it via env vars

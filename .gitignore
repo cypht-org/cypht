@@ -1,5 +1,5 @@
 /config/dynamic.php
-/config/app.php
+/config/app.php # TODO: this should not be here??
 /site.js
 /site.css
 /site/
@@ -9,6 +9,8 @@
 /tests/selenium/remote_creds.py
 *.pyc
 /.env
+/.env.*
+!.env.example
 apigen4.sh
 testuser.txt
 website/docs

@@ -35,7 +35,8 @@ $config = new Hm_Site_Config_File();
 
 /* check config for db auth */
 if ($config->get('auth_type') != 'DB') {
-    die("Incorrect usage\n\nThis script only works if DB auth is enabled in your site configuration\n\n");
+    print("Incorrect usage\n\nThis script only works if DB auth is enabled in your site configuration\n\n");
+    exit(1);
 }
 
 $auth = new Hm_Auth_DB($config);
@@ -46,6 +47,7 @@ if ($user && $pass) {
     else {
         print_r(Hm_Debug::get());
         print_r(Hm_Msgs::get());
-        die("An error occured when creating user  '" . $user . "'\n\n");
+        print("An error occured when creating user '" . $user . "'\n\n");
+        exit(2);    # TODO: since php cant die with an error code ??
     }
 }
