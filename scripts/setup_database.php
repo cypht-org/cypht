@@ -17,6 +17,7 @@ $db_user = getenv('DB_USER');
 $db_pass = getenv('DB_PASS');
 $db_driver = getenv('DB_DRIVER') ?: 'mysql';
 $db_host = getenv('DB_HOST') ?: '127.0.0.1';
+$db_socket = getenv('DB_SOCKET', '/tmp/temp_cypht.sqlite');
 
 $connected = false;
 $create_table = "CREATE TABLE IF NOT EXISTS";
@@ -31,6 +32,12 @@ while (!$connected) {
     print("Not connected\n");
     try {
         $conn = new pdo("{$db_driver}:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
+
+        if ($db_driver == 'sqlite') {
+            // TODO: password protect sqlite?
+            $conn = new pdo("{$db_driver}:{$db_socket}");
+        }
+
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         printf("Database connection successful ...\n");
         printf("{$db_driver}:host={$db_host};dbname={$db_name}\n");
@@ -41,6 +48,7 @@ while (!$connected) {
     }
 }
 print("Connected\n");
+
 if (strcasecmp($session_type,'DB')==0) {
     printf("Creating database table hm_user_session ...\n");
 
@@ -70,7 +78,6 @@ if (strcasecmp($auth_type, 'DB')==0) {
         // TODO: figure out why this is not working for sqlite
         $rows = $conn->exec($stmt);
         printf($stmt);
-        printf("\nrows updated: {$rows}\n");
     } catch (PDOException $e) {
         print($e);
         exit (1);
@@ -92,4 +99,4 @@ if (strcasecmp($user_config_type, 'DB')==0) {
     $conn->exec($stmt);
 }
 
-print("Db setup finished");
+print("Db setup finished\n");

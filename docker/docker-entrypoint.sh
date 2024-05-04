@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-# set -e
+set -e
 
 APP_DIR=/usr/local/share/cypht
 # CYPHT_CONFIG_FILE=${APP_DIR}/hm3.ini
@@ -10,6 +10,8 @@ APP_DIR=/usr/local/share/cypht
 
 
 # Modules
+
+# TODO: deal with modules
 
 enable_disable_module() {
     local module=${1}
@@ -55,6 +57,7 @@ then
 fi
 
 # Attachment Location - create directory
+echo "\nCreating director for attachment location: ${ATTACHMENT_DIR}\n"
 mkdir -p ${ATTACHMENT_DIR}
 chown www-data:www-data ${ATTACHMENT_DIR}
 
