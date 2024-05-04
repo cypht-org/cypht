@@ -2469,3 +2469,112 @@ function getEmailProviderKey(email) {
 
     return "";
 }
+
+/**
+ * Allow external resources for the provided element.
+ *
+ * @param {HTMLElement} element - The element containing the allow button.
+ * @param {string} messagePart - The message part associated with the resource.
+ * * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
+ * @returns {void}
+ */
+function handleAllowResource(element, messagePart, inline = false) {
+    element.querySelector('a').addEventListener('click', function (e) {
+        e.preventDefault();
+        $('.msg_text_inner').remove();
+        const externalSources = $(this).data('src').split(',');
+        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+        if (inline) {
+            return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+        }
+        return get_message_content(messagePart, false, false, false, false, false);
+    });
+}
+
+/**
+ * Create and insert in the DOM an element containing a message and a button to allow the resource.
+ *
+ * @param {HTMLElement} element - The element having the blocked resource.
+ * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
+ * @returns {void}
+ */
+function handleInvisibleResource(element, inline = false) {
+    const dataSrc = element.dataset.src;
+
+    const allowResource = document.createElement('div');
+    allowResource.classList.add('alert', 'alert-warning', 'p-1');
+
+    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
+    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
+    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
+    Allow</a></div>
+    `;
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
+    handleAllowResource(allowResource, element.dataset.messagePart, inline);
+}
+
+const handleExternalResources = (inline) => {
+    const messageContainer = document.querySelector('.msg_text_inner');
+    messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
+
+    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+    const elements = messageContainer.querySelectorAll('[data-src]');
+    const blockedResources = [];
+    elements.forEach(function (element) {
+
+        const dataSrc = element.dataset.src;
+        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
+        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
+
+        switch (Number(allowed) || Number(senderAllowed)) {
+            case 1:
+                element.src = dataSrc;
+                break;
+            default:
+                if ((allowed || senderAllowed) === null) {
+                    Hm_Utils.save_to_local_storage(dataSrc, 0);
+                }
+                handleInvisibleResource(element, inline);
+                blockedResources.push(dataSrc);
+                break;
+        }
+    });
+
+    const noticesElement = document.createElement('div');
+    noticesElement.classList.add('notices');
+
+    if (blockedResources.length) {
+        const allowAll = document.createElement('div');
+        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
+        allowAll.textContent = 'For security reasons, external resources have been blocked.';
+        if (blockedResources.length > 1) {
+            const allowAllLink = document.createElement('a');
+            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
+            allowAllLink.href = '#';
+            allowAllLink.dataset.src = blockedResources.join(',');
+            allowAllLink.textContent = 'Allow all';
+            allowAll.appendChild(allowAllLink);
+            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+        }
+        noticesElement.appendChild(allowAll);
+
+        const button = document.createElement('a');
+        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
+        button.textContent = 'Always allow from this sender';
+        noticesElement.appendChild(button);
+
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            Hm_Utils.save_to_local_storage(sender, 1);
+            $('.msg_text_inner').remove();
+            if (inline) {
+                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+            } else {
+                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+            }
+        });
+    }
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
+};
