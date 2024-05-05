@@ -57,7 +57,7 @@ then
 fi
 
 # Attachment Location - create directory
-echo "\nCreating director for attachment location: ${ATTACHMENT_DIR}\n"
+echo "Creating directory for attachment location: ${ATTACHMENT_DIR}"
 mkdir -p ${ATTACHMENT_DIR}
 chown www-data:www-data ${ATTACHMENT_DIR}
 
