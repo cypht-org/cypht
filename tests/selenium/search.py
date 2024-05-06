@@ -14,7 +14,7 @@ class SearchTest(WebTest):
 
     def load_search_page(self):
         list_item = self.by_class('menu_search')
-        link = list_item.find_element(By.TAG_NAME, 'a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text.startswith('Search')
 
@@ -26,12 +26,8 @@ class SearchTest(WebTest):
         self.wait_with_folder_list()
         sleep(1)
         table = self.by_class('message_table_body')
-    
-        # Get the count of table rows
         table_rows = table.find_elements(By.TAG_NAME, 'tr')
         row_count = len(table_rows)
-        # Print the count of table rows
-        print("Number of table rows:", row_count)
         assert row_count >= 0
 
     def reset_search(self):
@@ -41,7 +37,6 @@ class SearchTest(WebTest):
         assert self.by_id('search_terms').get_attribute('value') == ''
         table = self.by_class('message_table_body')
         assert len(table.find_elements(By.TAG_NAME, 'tr')) == 0
-        # assert len(table.find_elements_by_tag_name('tr')) == 0
 
 if __name__ == '__main__':
 

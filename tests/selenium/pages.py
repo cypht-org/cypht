@@ -2,6 +2,7 @@
 
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
 from runner import test_runner
 
 class PageTests(WebTest):
@@ -92,12 +93,12 @@ class PageTests(WebTest):
         self.safari_workaround()
         assert self.by_class('content_title').text == 'Home'
 
-    # def servers(self):
-    #     list_item = self.by_class('menu_servers')
-    #     list_item.find_element(By.TAG_NAME, 'a').click()
-    #     self.wait_with_folder_list()
-    #     self.safari_workaround()
-    #     assert self.by_class('content_title').text == 'Servers'
+    def servers_page(self):
+        list_item = self.by_class('menu_servers')
+        list_item.find_element(By.TAG_NAME, 'a').click()
+        self.wait_with_folder_list()
+        self.safari_workaround()
+        assert self.by_class('content_title').text == 'Servers'
 
     def site(self):
         list_item = self.by_class('menu_settings')
@@ -156,7 +157,7 @@ if __name__ == '__main__':
         'calendar',
         'history',
         'home',
-        # 'servers',
+        'servers_page',
         'site',
         'folders',
         'save',
