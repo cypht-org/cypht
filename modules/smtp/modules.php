@@ -28,8 +28,12 @@ class Hm_Handler_load_smtp_reply_to_details extends Hm_Handler_Module {
                 $this->request->get['uid']
             );
             $reply_details = $this->session->get($cache_name, false);
+
             if ($reply_details) {
-                recip_count_check($reply_details['msg_headers'], $this);
+                $reply_type = get_reply_type($this->request->get);
+                if ($reply_type == 'reply_all') {
+                    recip_count_check($reply_details['msg_headers'], $this);
+                }
                 $this->out('reply_details', $reply_details);
             }
         }
@@ -310,21 +314,13 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         }
         $draft = array();
         $draft_id = next_draft_key($this->session);
-        $reply_type = false;
-        if (array_key_exists('reply', $this->request->get) && $this->request->get['reply']) {
-            $reply_type = 'reply';
-        }
-        elseif (array_key_exists('reply_all', $this->request->get) && $this->request->get['reply_all']) {
-            $reply_type = 'reply_all';
-        }
-        elseif (array_key_exists('forward', $this->request->get) && $this->request->get['forward']) {
-            $reply_type = 'forward';
+        $reply_type = get_reply_type($this->request->get);
+        if ($reply_type == 'forward') {
             $draft_id = $this->get('compose_draft_id', -1);
             if ($draft_id >= 0) {
                 $draft = get_draft($draft_id, $this->session);
             }
-        }
-        elseif (array_key_exists('draft_id', $this->request->get)) {
+        } elseif (array_key_exists('draft_id', $this->request->get)) {
             $draft = get_draft($this->request->get['draft_id'], $this->session);
             $draft_id = $this->request->get['draft_id'];
         }
@@ -2160,9 +2156,11 @@ if (!hm_exists('recip_count_check')) {
 function recip_count_check($headers, $omod) {
     $headers = lc_headers($headers);
     $recip_count = 0;
+
     if (array_key_exists('to', $headers) && $headers['to']) {
         $recip_count += count(process_address_fld($headers['to']));
     }
+
     if (array_key_exists('cc', $headers) && $headers['cc']) {
         $recip_count += count(process_address_fld($headers['cc']));
     }
