@@ -33,3 +33,16 @@ if (!hm_exists('delete_smtp_server')) {
        Hm_SMTP_List::del($smtp_server_id);
     }
 }
+
+if (!hm_exists('get_reply_type')) {
+    function get_reply_type($request) {
+        if (array_key_exists('reply', $request) && $request['reply']) {
+            return 'reply';
+        } elseif (array_key_exists('reply_all', $request) && $request['reply_all']) {
+            return 'reply_all';
+        } elseif (array_key_exists('forward', $request) && $request['forward']) {
+            return 'forward';
+        }
+        return false;
+    }
+}
