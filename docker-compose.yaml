@@ -17,12 +17,11 @@ services:
       dockerfile: ./docker/Dockerfile
     volumes:
       - ./cypht/users:/var/lib/hm3/users
-    # TODO: add health check here
     ports:
       - "80:80"
     environment:
       - AUTH_USERNAME=admin
-      - AUTH_PASSWORD=admin # TODO: does this make sense for IMAP auth?
+      - AUTH_PASSWORD=admin
       # - DB_CONNECTION_TYPE=socket
       # - DB_NAME=cypht
       # - DB_USER=cypht
@@ -37,7 +36,6 @@ services:
       - DB_USER=cypht
       - DB_PASS=cypht_password
       - DB_DRIVER=mysql
-      # - DB_SOCKET=/tmp/cypht_1.sqlite # TODO: move to ./db ?
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
 

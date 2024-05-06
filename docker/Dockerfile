@@ -10,12 +10,10 @@ WORKDIR "/usr/local/share/cypht"
 RUN set -e \
     && apk add --no-cache \
     supervisor nginx composer sqlite \
-    # GD
     freetype libpng libjpeg-turbo \
     php-session php-fileinfo php-dom php-xml libxml2-dev php-xmlwriter php-tokenizer \
     && apk add --no-cache --virtual .build-deps \
     ca-certificates \
-    # For GD (2fa module)
     libpng-dev libjpeg-turbo-dev freetype-dev \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd pdo pdo_mysql \
@@ -38,5 +36,7 @@ COPY . .
 COPY .env.example .env
 
 EXPOSE 80 443
+
+HEALTHCHECK CMD curl --fail http://localhost || exit 1
 
 ENTRYPOINT ["docker/docker-entrypoint.sh"]
