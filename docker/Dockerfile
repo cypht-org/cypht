@@ -12,6 +12,7 @@ RUN set -e \
     libpng-dev libjpeg-turbo-dev freetype-dev \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd pdo pdo_mysql \
+    && composer self-update --2 \
     && apk del .build-deps \
     && echo "post_max_size = 60M" >> /usr/local/etc/php/php.ini \
     && echo "upload_max_filesize = 50M" >> /usr/local/etc/php/php.ini \
@@ -24,7 +25,7 @@ COPY docker/supervisord.conf /etc/supervisord.conf
 COPY composer.* .
 
 # TODO: probably dont want to run update here since it modifies composer.lock and its inconsistant with INSTALL
-RUN composer update && composer self-update --2 && composer install
+RUN composer update && composer install
 
 COPY . .
 COPY .env.example .env

@@ -13,10 +13,10 @@ USER_SETTINGS_DIR="${USER_SETTINGS_DIR:-/var/lib/hm3/users}"
 ATTACHMENT_DIR="${ATTACHMENT_DIR:-/var/lib/hm3/attachments}"
 APP_DATA_DIR="${APP_DATA_DIR:-/var/lib/hm3/app_data}"
 
-
-# Wait for database to be ready then setup tables for sessions, authentication, and settings as needed
+# Wait for database to be ready then setup tables
 ./scripts/setup_database.php
 
+# Setup filesystem and users
 ./scripts/setup_system.sh
 
 # Generate the run-time configuration
@@ -39,5 +39,3 @@ ln -s $(pwd)/site /var/www
 
 # Start services
 /usr/bin/supervisord -c /etc/supervisord.conf
-
-# exec "$@"   # TODO: what is this for?

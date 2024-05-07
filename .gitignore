@@ -27,4 +27,4 @@ scripts/test.php
 composer.phar
 lib/hm3/users/
 .env
-/db/
+/data/

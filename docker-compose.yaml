@@ -5,7 +5,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./db:/var/lib/mysql
+      - ./data/db:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
       - MYSQL_DATABASE=cypht
@@ -13,24 +13,23 @@ services:
       - MYSQL_PASSWORD=cypht_password
   cypht:
     # image: sailfrog/cypht-docker:latest
+    # image: jonocodes/cypht:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
     volumes:
-      - ./cypht/users:/var/lib/hm3/users
+      - ./data/users:/var/lib/hm3/users
+      - ./data/attachments:/var/lib/hm3/attachments
+      - ./data/app_data:/var/lib/hm3/app_data
+      - ./:/usr/local/share/cypht # allows live develompent in container
     ports:
       - "80:80"
     environment:
       - AUTH_USERNAME=admin
       - AUTH_PASSWORD=admin
       # - DB_CONNECTION_TYPE=socket
-      # - DB_NAME=cypht
-      # - DB_USER=cypht
-      # - DB_PASS=cypht_password
       # - DB_DRIVER=sqlite
       # - DB_SOCKET=/tmp/cypht_1.sqlite # TODO: move to ./db ?
-      # - SESSION_TYPE=DB
-      # - USER_CONFIG_TYPE=DB
       - DB_CONNECTION_TYPE=host
       - DB_HOST=db
       - DB_NAME=cypht
