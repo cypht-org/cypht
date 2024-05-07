@@ -41,7 +41,7 @@ class Hm_Handler_store_contact_message extends Hm_Handler_Module {
 
                 if (!empty($newContacts)) {
                     $newContacts = array_map(function ($email) {
-                        return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => $this->trans('Collected Recipients')];
+                        return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => 'Collected Recipients'];
                     }, $newContacts);
                     $contacts->add_contact($newContacts[0]);
                     $this->session->record_unsaved('Contact Added');
@@ -64,7 +64,7 @@ class Hm_Handler_store_contact_allow_images extends Hm_Handler_Module {
             $contact_list = $contacts->getAll();
             $existingEmails = array_column($contact_list, 'email_address');
             if (!in_array($email, $existingEmails)) {
-                $contacts->add_contact(['source' => 'local', 'email_address' => $email, 'display_name' => $name, 'group' => $this->trans('Trusted Senders')]);
+                $contacts->add_contact(['source' => 'local', 'email_address' => $email, 'display_name' => $name, 'group' => 'Trusted Senders']);
                 $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
