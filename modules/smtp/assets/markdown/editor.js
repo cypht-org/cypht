@@ -7224,7 +7224,7 @@ Editor.prototype.render = function(el) {
     tabSize: '2',
     indentWithTabs: true,
     lineNumbers: false,
-    autofocus: true,
+    autofocus: false,
     extraKeys: keyMaps
   });
 
