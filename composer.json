@@ -33,7 +33,7 @@
         "ext-openssl": "*",
         "ext-session": "*",
         "ezyang/htmlpurifier": "^4.17",
-        "henrique-borba/php-sieve-manager": "^1.0.2",
+        "henrique-borba/php-sieve-manager": "^1.0",
         "league/commonmark": "^2.4",
         "paragonie/random_compat": "^2.0.18",
         "php": ">=7.4",
