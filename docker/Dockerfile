@@ -14,11 +14,14 @@ RUN set -e \
     && docker-php-ext-install gd pdo pdo_mysql \
     && composer self-update --2 \
     && apk del .build-deps \
-    && echo "post_max_size = 60M" >> /usr/local/etc/php/php.ini \
-    && echo "upload_max_filesize = 50M" >> /usr/local/etc/php/php.ini \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
-    && ln -sf /dev/stderr /var/log/nginx/error.log 
-    # TODO: can we pipe php-fpm messages to stdout here?
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+
+COPY <<EOF /usr/local/etc/php/conf.d/cypht.ini
+post_max_size = 60M
+upload_max_filesize = 50M
+EOF
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
