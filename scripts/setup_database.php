@@ -1,27 +1,14 @@
 #!/usr/bin/env php
 
 <?php
+
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 
-/* get the framework */
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
 
-
-/* get config object */
 $config = new Hm_Site_Config_File();
-
-// $session_type = getenv('SESSION_TYPE') ?: 'PHP';
-// $auth_type = getenv('AUTH_TYPE') ?: 'DB';
-// $user_config_type = getenv('USER_CONFIG_TYPE') ?: 'file';
-// $db_driver = getenv('DB_DRIVER') ?: 'mysql';
-// $db_name = getenv('DB_NAME') ?: 'cypht_db';
-// $db_user = getenv('DB_USER');
-// $db_pass = getenv('DB_PASS');
-// $db_driver = getenv('DB_DRIVER') ?: 'mysql';
-// $db_host = getenv('DB_HOST') ?: '127.0.0.1';
-// $db_socket = getenv('DB_SOCKET') ?:  '/tmp/temp_cypht.sqlite';
 
 $session_type = $config->get('session_type');
 $auth_type = $config->get('auth_type');
@@ -50,7 +37,7 @@ while (!$connected) {
         // $conn = new pdo("{$db_driver}:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
 
         if ($db_driver == 'sqlite') {
-            // TODO: sqlite should be handled by connection. not manually done here.
+            // TODO: sqlite should be handled by connect(). not manually done here.
             $conn = new pdo("{$db_driver}:{$db_socket}");
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
@@ -93,7 +80,6 @@ if (strcasecmp($auth_type, 'DB')==0) {
     }
 
     try {
-        // TODO: figure out why this is not working for sqlite
         $rows = $conn->exec($stmt);
         printf("{$stmt}\n");
     } catch (PDOException $e) {

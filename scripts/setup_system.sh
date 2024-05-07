@@ -25,9 +25,16 @@ mkdir -p ${ATTACHMENT_DIR}
 echo "Creating directory for application data ${APP_DATA_DIR}"
 mkdir -p ${APP_DATA_DIR}
 
+# TODO: should a user be created if USER_CONFIG_TYPE=file  ?
+if [[ "${USER_CONFIG_TYPE}" = "DB" && -n "${AUTH_USERNAME}" ]]
+then
+    php ./scripts/create_account.php ${AUTH_USERNAME} ${AUTH_PASSWORD}
+fi
 
-# TODO: move this here from docker-entrypoint. I think it depends on the module system?
-#
+
+# TODO: move this here from docker-entrypoint. I think it depends on the module system? works in docker, but not local
+# 
 # Generate the run-time configuration
 #
 # php ${SCRIPT_DIR}/../scripts/config_gen.php
+# php ./scripts/config_gen.php

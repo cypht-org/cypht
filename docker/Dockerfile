@@ -1,10 +1,5 @@
 FROM php:7.4.33-fpm-alpine
 
-# ENV CYPHT_DEST "/usr/local/share/cypht"
-
-# WORKDIR "/var/www"
-
-# TODO: change this to /app for simplification?
 WORKDIR "/usr/local/share/cypht"
 
 RUN set -e \
@@ -28,14 +23,13 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY composer.* .
 
-# TODO: probably dont want to run update here since it modifies composer.lock
+# TODO: probably dont want to run update here since it modifies composer.lock and its inconsistant with INSTALL
 RUN composer update && composer self-update --2 && composer install
-# RUN composer install
 
 COPY . .
 COPY .env.example .env
 
-EXPOSE 80 443
+EXPOSE 80
 
 HEALTHCHECK CMD curl --fail http://localhost || exit 1
 

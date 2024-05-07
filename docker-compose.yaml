@@ -12,6 +12,7 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
   cypht:
+    # image: sailfrog/cypht-docker:latest
     build:
       context: .
       dockerfile: ./docker/Dockerfile
