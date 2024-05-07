@@ -454,6 +454,14 @@ $(function () {
         });
 
         $('.smtp_send_placeholder').on("click", function (e) {
+            if (window.kindEditor) {
+                kindEditor.sync();
+            }
+
+            if (window.mdEditor) {
+                mdEditor.codemirror.save();
+            }
+
             const body = $('.compose_body').val().trim();
             const subject = $('.compose_subject').val().trim();
 

@@ -1085,7 +1085,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         if ($html == 1) {
             $res .= '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
                 '<link href="'.WEB_ROOT.'modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
-                '<script type="text/javascript">KindEditor.ready(function(K) { K.create("#compose_body", {items:'.
+                '<script type="text/javascript">KindEditor.ready(function(K) { window.kindEditor = K.create("#compose_body", {items:'.
                 "['formatblock', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'bold',".
                 "'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'pagebreak', 'link', 'unlink',".
                 "'justifyleft', 'justifycenter', 'justifyright',".
@@ -1131,14 +1131,14 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '</div>'.
                 '<div class="form-floating mb-3">'.
                     '<textarea id="compose_body" name="compose_body" class="compose_body form-control" placeholder="'.$this->trans('Message').'">'.$this->html_safe($body).'</textarea>'.
-                    '<label for="compose_body">'.$this->trans('Message').'</label>'.
+                    (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>'.
                 '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/marked.js"></script>'.
-                '<script type="text/javascript">var editor = new Editor(); editor.render();</script>';
+                '<script type="text/javascript">window.mdEditor = new Editor(); mdEditor.render();</script>';
         }
         $res .= '<table class="uploaded_files">';
 
