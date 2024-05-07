@@ -13,7 +13,7 @@ add_handler('servers', 'setup_github_connect', true, 'github', 'load_user_data',
 add_handler('servers', 'github_disconnect', true, 'github', 'setup_github_connect', 'after');
 add_handler('servers', 'github_process_add_repo', true, 'github', 'github_disconnect', 'after');
 add_handler('servers', 'github_process_remove_repo', true, 'github', 'github_process_add_repo', 'after');
-add_output('servers', 'github_connect_section', true, 'github', 'server_content_end', 'before');
+add_output('servers', 'github_connect_section', true, 'github', 'wordpress_connect_section', 'before');
 add_output('servers', 'github_add_repo', true, 'github', 'github_connect_section', 'after');
 
 add_handler('home', 'process_github_authorization', true, 'github', 'load_user_data', 'after');
