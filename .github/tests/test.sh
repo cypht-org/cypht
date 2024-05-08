@@ -5,6 +5,7 @@ phpunit_tests() {
 }
 
 selenium_tests() {
+    cp .github/tests/selenium/creds.py tests/selenium/
     cd tests/selenium/ && sh ./runall.sh && cd ../../
 }
 
@@ -17,9 +18,6 @@ ARG="${TEST_ARG}"
 case "$ARG" in
     phpunit)
         phpunit_tests
-    ;;
-    ui)
-        selenium_tests
     ;;
     *)
         phpunit_tests

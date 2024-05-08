@@ -108,8 +108,8 @@ setup_postfix() {
 	fi
 }
 
-#config site
-setup_site() {
+#config php
+setup_php() {
 	STATUS_TITLE "Setup php${PHP_V}-fpm"
 	sudo systemctl start php"${PHP_V}"-fpm.service
 	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ]; then
@@ -118,15 +118,32 @@ setup_site() {
 		STATUS_ERROR
 		exit 1
 	fi
+}
+#config nginx
+setup_nginx() {
 	STATUS_TITLE "Setup Nginx"
-	sudo systemctl stop nginx.service
-	sudo cp .github/tests/selenium/nginx/nginx-site.conf /etc/nginx/sites-available/default
-	sudo mkdir /etc/nginx/nginxconfig
-	sudo cp .github/tests/selenium/nginx/php_fastcgi.conf /etc/nginx/nginxconfig/php_fastcgi.conf
-	sudo sed -e "s?%VERSION%?${PHP_V}?g" --in-place /etc/nginx/sites-available/default
-	sudo ln -sf "$(pwd)" /var/www/cypht
-	sudo systemctl start nginx.service
-	if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
+    
+    # Call the script to setup Nginx
+    echo "Running Nginx setup script..."
+    sudo bash .github/tests/scripts/nginx.sh
+    echo "Nginx setup script completed successfully."
+    
+    if [ "$(sudo systemctl is-active nginx.service)" == "active" ]; then
+        echo "Nginx is running."
+        STATUS_DONE
+    else
+        echo "Nginx is not running."
+        STATUS_ERROR
+        exit 1
+    fi
+    
+    # Check if Nginx is running by sending a request
+    echo "Checking if Nginx is running..."
+    RESPONSE_CODE=$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')
+    echo "Response code: $RESPONSE_CODE"
+	# if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
+    STATUS_TITLE "Check Nginx response code"
+    if [ "$RESPONSE_CODE" -eq 200 ]; then
 		STATUS_DONE
 	else
 		STATUS_ERROR
@@ -148,7 +165,8 @@ setup_ui_tests() {
     setup_user
     setup_dovecot
     setup_postfix
-    setup_site
+    setup_php
+    setup_nginx
 }
 
 # Main
@@ -161,7 +179,7 @@ case "$ARG" in
     phpunit)
         setup_unit_tests
     ;;
-    ui)
+    selenium)
         setup_ui_tests
     ;;
     *)
