@@ -423,16 +423,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.2",
+            "version": "v1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e"
+                "reference": "dbed4e59534aea2b4876588c19ac269b7102b27a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
-                "reference": "ce2816c935943e28cc3b8ddf72f791be3f7f4e5e",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/dbed4e59534aea2b4876588c19ac269b7102b27a",
+                "reference": "dbed4e59534aea2b4876588c19ac269b7102b27a",
                 "shasum": ""
             },
             "require": {
@@ -468,9 +468,9 @@
             ],
             "support": {
                 "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
-                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.2"
+                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.4"
             },
-            "time": "2023-12-21T18:28:46+00:00"
+            "time": "2024-05-07T10:39:39+00:00"
         },
         {
             "name": "league/commonmark",
@@ -3705,5 +3705,5 @@
     "platform-overrides": {
         "php": "7.4"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.2.0"
 }
