@@ -36,8 +36,8 @@ services:
       - DB_DRIVER=mysql
       - DB_HOST=db
       - DB_NAME=cypht
-      - DB_USER=cypht
-      - DB_PASS=cypht_password
+      - DB_USER=testuser
+      - DB_PASS=testuser
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
     extra_hosts:

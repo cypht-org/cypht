@@ -139,6 +139,11 @@ jobs:
 
       - name: "Script: test.sh"
         run: bash .github/tests/test.sh
+      - name: "Run Selenium Tests"
+        run: |
+          docker compose -f docker-compose.dev.yml up -d
+          cp .github/tests/selenium/creds.py tests/selenium/
+          cd tests/selenium/ && sh ./runall.sh && cd ../../
 
   Call-Image-Build:
     needs: Test-selenium

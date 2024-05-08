@@ -12,9 +12,12 @@ chrome_options.BinaryLocation = "/usr/bin/google-chrome"
 RECIP='testuser@localhost.org'
 IMAP_ID='0'
 DRIVER_CMD =Service('/usr/bin/chromedriver')
-SITE_URL = 'http://cypht-test.org'
+SITE_URL = 'http://cypht-test.org/'
 USER = 'testuser'
 PASS = 'testuser'
+# SITE_URL = 'https://cypht.dev4.evoludata.com'
+# USER = 'cypht@cypht.dev4.evoludata.com'
+# PASS = 'L4TEJSePrT63YQq'
 DESIRED_CAP = None
 
 def get_driver(cap):
