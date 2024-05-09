@@ -15,7 +15,7 @@ add_output('ajax_hm_folders', 'wordpress_folders',  true, 'wordpress', 'folder_l
 
 add_handler('servers', 'setup_wordpress_connect', true, 'wordpress', 'load_user_data', 'after');
 add_handler('servers', 'wordpress_disconnect', true, 'wordpress', 'setup_wordpress_connect', 'after');
-add_output('servers', 'wordpress_connect_section', true, 'wordpress', 'nasa_connect_section', 'before');
+add_output('servers', 'wordpress_connect_section', true, 'wordpress', 'server_content_end', 'before');
 
 add_handler('ajax_message_action', 'wordpress_list_type', true, 'wordpress', 'load_user_data', 'after');
 add_handler('ajax_message_action', 'wordpress_msg_action', true, 'wordpress', 'wordpress_list_type', 'after');
