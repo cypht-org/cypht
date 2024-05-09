@@ -16,7 +16,7 @@ add_output('ajax_hm_folders', 'nasa_folders',  true, 'nasa', 'folder_list_conten
 
 /* servers page */
 add_handler('servers', 'nasa_folder_data',  true, 'nasa', 'load_user_data', 'after');
-add_output('servers', 'nasa_connect_section', true, 'nasa', 'content_section_end', 'before');
+add_output('servers', 'nasa_connect_section', true, 'nasa', 'server_content_end', 'before');
 
 /* AJAX request to disconnect */
 setup_base_ajax_page('ajax_nasa_disconnect', 'core');
