@@ -2578,3 +2578,22 @@ const handleExternalResources = (inline) => {
 
     document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
 };
+
+const observeMessageTextMutationAndHandleExternalResources = (inline) => {
+    const message = document.querySelector('.msg_text');
+    if (message) {
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.classList.contains('msg_text_inner')) {
+                            handleExternalResources(inline);                    
+                        }
+                    });
+                }
+            });
+        }).observe(message, {
+            childList: true
+        });
+    }
+};

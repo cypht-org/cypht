@@ -1265,22 +1265,7 @@ var imap_hide_add_contact_popup = function(event) {
     popup.classList.toggle("show");
 };
 
-const message = document.querySelector('.msg_text');
-if (message) {
-    new MutationObserver(function (mutations) {
-        mutations.forEach(function (mutation) {
-            if (mutation.addedNodes.length > 0) {
-                mutation.addedNodes.forEach(function (node) {
-                    if (node.classList.contains('msg_text_inner')) {
-                        handleExternalResources();                    
-                    }
-                });
-            }
-        });
-    }).observe(message, {
-        childList: true
-    });
-}
+observeMessageTextMutationAndHandleExternalResources();
 
 const handleDownloadMsgSource = function() {
     const messageSource = document.querySelector('pre.msg_source');

@@ -182,7 +182,8 @@ const messagesListMutation = new MutationObserver(function (mutations) {
         if (mutation.addedNodes.length > 0) {
             mutation.addedNodes.forEach(function (node) {
                 if (node.classList.contains('msg_text') || node.classList.contains('inline_msg')) {
-                    if(node.querySelector('.msg_text_inner')) {
+                    observeMessageTextMutationAndHandleExternalResources(true);
+                    if(node.querySelector('.msg_text_inner') && !document.querySelector('.external_notices')) {
                         handleExternalResources(true);
                     }
                 }
