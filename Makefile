@@ -19,6 +19,7 @@ test-unit:	## locally run the unit tests
 .PHONY: setup
 .ONESHELL:
 setup:  ## locally setup app and users. presumes env vars are set
+	set -e
 	echo "Installing dependencies"
 	composer install
 	echo "Creating directories and configs"
