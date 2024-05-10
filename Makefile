@@ -14,16 +14,17 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 .PHONY: test-unit
 test-unit:	## locally run the unit tests
 	cd tests/phpunit/ && phpunit && cd ../../
-	# TODO: how are local tests supposed to run?
+	# TODO: how are local tests supposed to run? see https://github.com/cypht-org/cypht/issues/1011
 
-
-# TODO: make recipes or perhaps use go-task?
-# add user
-# start local?
-# make local dirs
-# setup local db
-# install local requirements
-
+.PHONY: setup
+.ONESHELL:
+setup:  ## locally setup app and users. presumes env vars are set
+	echo "Installing dependencies"
+	composer install
+	echo "Creating directories and configs"
+	./scripts/setup_system.sh
+	echo "Creating tables and user"
+	./scripts/setup_database.php
 
 help:  ## get help
 	@grep -E '^[a-zA-Z_-]+:.*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

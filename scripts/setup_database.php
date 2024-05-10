@@ -29,7 +29,7 @@ $bad_driver = "Unsupported db driver: {$db_driver}";
 
 print("session_type={$session_type}  auth_type={$auth_type}  user_config_type={$user_config_type}  db_driver={$db_driver}\n");
 
-while (!$connected) {
+while (!$connected) {   # TODO: set a timeout and exit code
     print("Attempting to connect to database ...\n");
     try {
         $conn = Hm_DB::connect($config);
