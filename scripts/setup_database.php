@@ -14,11 +14,6 @@ $session_type = $config->get('session_type');
 $auth_type = $config->get('auth_type');
 $user_config_type = $config->get('user_config_type');
 $db_driver = $config->get('db_driver');
-$db_name = $config->get('db_name');
-$db_user = $config->get('db_user');
-$db_pass = $config->get('db_pass');
-$db_host = $config->get('db_host');
-$db_socket = $config->get('db_socket');
 
 $connected = false;
 $create_table = "CREATE TABLE IF NOT EXISTS";
@@ -27,8 +22,6 @@ $bad_driver = "Unsupported db driver: {$db_driver}";
 // NOTE: these sql commands could be db agnostic if we change the blobs to text
 
 
-print("session_type={$session_type}  auth_type={$auth_type}  user_config_type={$user_config_type}  db_driver={$db_driver}\n");
-
 $connection_tries=0;
 $max_tries=10;
 
@@ -36,20 +29,13 @@ while (!$connected) {
     $connection_tries = $connection_tries + 1;
 
     $conn = Hm_DB::connect($config);
-    // $conn = new pdo("{$db_driver}:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
-
-    // if ($db_driver == 'sqlite') {
-    //     // TODO: sqlite should be handled by connect(). not manually done here.
-    //     $conn = new pdo("{$db_driver}:{$db_socket}");
-    // $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    // }
 
     if ($conn !== false) {
         printf("Database connection successful ...\n");
         $connected = true;
     } else {
         printf("Attempting to connect to database ... ({$connection_tries}/{$max_tries})\n");
-        sleep(2);
+        sleep(1);
     }
         
     if ($connection_tries >= $max_tries) {

@@ -1,7 +1,7 @@
 
 .PHONY: docker-up
 docker-up:  ## start docker stack in foreground
-	docker compose up --build --abort-on-container-exit
+	docker compose up --build # --abort-on-container-exit
 
 .PHONY: docker-push
 .ONESHELL:
