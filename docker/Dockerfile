@@ -27,7 +27,11 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
 COPY composer.* .
 
+# TODO: figuer out missing extensions https://github.com/cypht-org/cypht/issues/1009
+# RUN  pecl install redis gnupg memcached
+
 # TODO: probably dont want to run update here since it modifies composer.lock and its inconsistant with INSTALL
+#  see https://github.com/cypht-org/cypht/issues/1009
 RUN composer update && composer install
 
 COPY . .
