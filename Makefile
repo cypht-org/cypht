@@ -22,10 +22,10 @@ setup:  ## locally setup app and users. presumes env vars are set
 	set -e
 	echo "Installing dependencies"
 	composer install
-	echo "Creating directories and configs"
-	./scripts/setup_system.sh
 	echo "Creating tables and user"
 	./scripts/setup_database.php
+	echo "Creating directories and configs"
+	./scripts/setup_system.sh
 
 help:  ## get help
 	@grep -E '^[a-zA-Z_-]+:.*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
