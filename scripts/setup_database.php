@@ -17,7 +17,6 @@ $db_driver = $config->get('db_driver');
 $db_name = $config->get('db_name');
 $db_user = $config->get('db_user');
 $db_pass = $config->get('db_pass');
-$db_driver = $config->get('db_driver');
 $db_host = $config->get('db_host');
 $db_socket = $config->get('db_socket');
 
@@ -36,11 +35,11 @@ while (!$connected) {
         $conn = Hm_DB::connect($config);
         // $conn = new pdo("{$db_driver}:host={$db_host};dbname={$db_name}", $db_user, $db_pass);
 
-        if ($db_driver == 'sqlite') {
-            // TODO: sqlite should be handled by connect(). not manually done here.
-            $conn = new pdo("{$db_driver}:{$db_socket}");
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        }
+        // if ($db_driver == 'sqlite') {
+        //     // TODO: sqlite should be handled by connect(). not manually done here.
+        //     $conn = new pdo("{$db_driver}:{$db_socket}");
+        // $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // }
 
         if ($conn !== false) {
         printf("Database connection successful ...\n");

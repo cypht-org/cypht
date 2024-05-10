@@ -19,10 +19,6 @@ APP_DATA_DIR="${APP_DATA_DIR:-/var/lib/hm3/app_data}"
 # Setup filesystem and users
 ./scripts/setup_system.sh
 
-# Generate the run-time configuration
-php ./scripts/config_gen.php
-
-
 # Enable the program in the web-server
 
 if [ "${USER_CONFIG_TYPE}" = "file" ]

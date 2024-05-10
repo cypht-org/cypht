@@ -5,7 +5,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - ./data/db:/var/lib/mysql
+      - ./data/mysql:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root_password
       - MYSQL_DATABASE=cypht
@@ -21,6 +21,7 @@ services:
       - ./data/users:/var/lib/hm3/users
       - ./data/attachments:/var/lib/hm3/attachments
       - ./data/app_data:/var/lib/hm3/app_data
+      - ./data/sqlite:/var/lib/hm3/sqlite
       - ./:/usr/local/share/cypht # allows live develompent in container
     ports:
       - "80:80"
@@ -29,15 +30,12 @@ services:
       - AUTH_PASSWORD=admin
       # - DB_CONNECTION_TYPE=socket
       # - DB_DRIVER=sqlite
-      # - DB_SOCKET=/tmp/cypht_1.sqlite # TODO: move to ./db ?
+      # - DB_SOCKET=/var/lib/hm3/sqlite/cypht.db
       - DB_CONNECTION_TYPE=host
+      - DB_DRIVER=mysql
       - DB_HOST=db
       - DB_NAME=cypht
       - DB_USER=cypht
       - DB_PASS=cypht_password
-      - DB_DRIVER=mysql
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
-
-
-  # TODO: add memcache and redis to this sample, or disable it via env vars

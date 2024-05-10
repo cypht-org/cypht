@@ -1,5 +1,7 @@
 <?php
 
+require_once APP_PATH.'modules/core/functions.php';
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 handler_source('contacts');
