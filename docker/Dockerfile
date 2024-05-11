@@ -1,5 +1,10 @@
 FROM php:7.4.33-fpm-alpine
 
+# TODO: figure out conditional debug build
+ARG WITH_DEBUG=false
+
+# TODO: figure out verbose/debug logging at run time
+
 WORKDIR "/usr/local/share/cypht"
 
 RUN set -e \
@@ -18,9 +23,21 @@ RUN set -e \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
     && ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/
+RUN install-php-extensions xdebug
+COPY <<EOF /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+[xdebug]
+zend_extension=xdebug.so
+
+xdebug.mode=debug
+xdebug.client_host=host.docker.internal
+EOF
+
 COPY <<EOF /usr/local/etc/php/conf.d/cypht.ini
 post_max_size = 60M
 upload_max_filesize = 50M
+# the following is needed for sqlite access
+open_basedir = /var/lib/hm3/:/usr/local/share/cypht/
 EOF
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf

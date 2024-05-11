@@ -1,7 +1,7 @@
 
 .PHONY: docker-up
 docker-up:  ## start docker stack in foreground
-	docker compose up --build # --abort-on-container-exit
+	docker compose up --build || true # --abort-on-container-exit
 
 .PHONY: docker-push
 .ONESHELL:
@@ -15,6 +15,11 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 test-unit:	## locally run the unit tests
 	cd tests/phpunit/ && phpunit && cd ../../
 	# TODO: how are local tests supposed to run? see https://github.com/cypht-org/cypht/issues/1011
+
+.PHONY: run-local
+run-local:
+	php -S localhost:8002 index.php
+	# TODO: get this to work. "No module assignments found"
 
 .PHONY: setup
 .ONESHELL:

@@ -20,6 +20,9 @@ services:
       - ./data/attachments:/var/lib/hm3/attachments
       - ./data/app_data:/var/lib/hm3/app_data
       - ./data/sqlite:/var/lib/hm3/sqlite
+      # The following allow for live code updates during development
+      - ./lib:/usr/local/share/cypht/lib
+      - ./modules:/usr/local/share/cypht/modules
     ports:
       - "80:80"
     environment:
@@ -36,3 +39,5 @@ services:
       - DB_PASS=cypht_password
       - SESSION_TYPE=DB
       - USER_CONFIG_TYPE=DB
+    extra_hosts:
+      host.docker.internal: host-gateway  # for xdebug
