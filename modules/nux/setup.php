@@ -6,7 +6,7 @@ handler_source('nux');
 output_source('nux');
 
 /* servers page */
-add_output('servers', 'quick_add_section', true, 'nux', 'server_config_stepper_accordion_end_part', 'after');
+add_output('servers', 'quick_add_section', true, 'nux', 'server_content_start', 'after');
 add_output('servers', 'quick_add_dialog', true, 'nux', 'quick_add_section', 'after');
 
 add_handler('ajax_nux_service_select', 'login', false, 'core');
