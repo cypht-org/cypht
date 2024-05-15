@@ -137,7 +137,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
             if (strlen($output_mod->html_safe($folder['basename']))>15) {
                 $results .= '<a ' . $attrs .
                     ' title="'.$output_mod->html_safe($folder['basename']).
-                    '">'.substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
+                    '">'.mb_substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
             }
             else {
                 $results .= '<a ' . $attrs. '>'.$output_mod->html_safe($folder['basename']).'</a>';
@@ -1217,7 +1217,7 @@ function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
     if ($parent) {
         $folder = sprintf('%s%s%s', $parent, $ns['delim'], $folder);
     }
-    if ($folder && $ns['prefix'] && substr($folder, 0, strlen($ns['prefix'])) !== $ns['prefix']) {
+    if ($folder && $ns['prefix'] && mb_substr($folder, 0, strlen($ns['prefix'])) !== $ns['prefix']) {
         $folder = sprintf('%s%s', $ns['prefix'], $folder);
     }
     return $folder;
