@@ -52,11 +52,13 @@ var display_final_nux_step = function(res) {
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                 {'name': 'imap_server_id', value: res.nux_server_id},
                 {'name': 'imap_service_name', value: res.nux_service_name}],
-                false
+                function () {
+                    Hm_Utils.redirect();
+                }
             );
+        } else {
+            Hm_Utils.redirect();
         }
-
-        Hm_Utils.redirect();
     }
 };
 
