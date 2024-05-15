@@ -2,14 +2,13 @@
 
 from base import WebTest, USER, PASS
 from runner import test_runner
-
 class LoginTests(WebTest):
 
     def bad_login_values(self):
         self.login('asdf', 'asdf')
         self.wait()
         self.safari_workaround()
-        assert self.by_class('err') != None
+        assert self.by_class('sys_messages') != None
 
     def missing_password(self):
         self.load()
@@ -44,7 +43,7 @@ class LoginTests(WebTest):
         assert self.by_class('content_title') != None
 
     def good_logout(self):
-        self.logout()
+        self.logout_no_save()
         self.wait()
         assert self.by_class('sys_messages').text == 'Session destroyed on logout'
 

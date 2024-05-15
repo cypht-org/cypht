@@ -1,6 +1,9 @@
+from time import sleep
 from base import WebTest, USER, PASS
+from selenium.webdriver.common.by import By
 from runner import test_runner
-from creds import IMAP_ID
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 class ServersTest(WebTest):
 
@@ -15,62 +18,66 @@ class ServersTest(WebTest):
     def load_servers_page(self):
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_servers')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text == 'Servers'
 
-    def smtp_add(self):
-        self.toggle_server_section('smtp')
-        name = self.by_name('new_smtp_name')
+    def server_stmp_and_imap_add(self):
+        self.toggle_server_section('server_config')
+        self.by_id('add_new_server_button').click()
+        name = self.by_name('srv_setup_stepper_profile_name')
         name.send_keys('Test')
-        addr = self.by_name('new_smtp_address')
-        addr.send_keys('localhost')
-        port = self.by_name('new_smtp_port')
-        port.clear()
-        port.send_keys(25)
-        self.by_id('smtp_notls').click()
-        self.by_name('submit_smtp_server').click()
-        self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Added SMTP server!' or self.by_class('sys_messages').text == 'Could not add server: Connection refused'
+        email = self.by_name('srv_setup_stepper_email')
+        email.send_keys('test@localhost')
+        pwd = self.by_name('srv_setup_stepper_password')
+        pwd.send_keys('test')
+        next_button = WebDriverWait(self.driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "step_config_action_next"))
+        )
+        next_button.click()
+        # show step two
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located((By.XPATH, '//h2[text()="Step 2"]'))
+        )
+        stmp_addr = self.by_name('srv_setup_stepper_smtp_address')
+        stmp_addr.send_keys('localhost')
+        smtp_port = self.by_name('srv_setup_stepper_smtp_port')
+        smtp_port.clear()
+        smtp_port.send_keys(25)
+        imap_addr = self.by_name('srv_setup_stepper_imap_address')
+        imap_addr.send_keys('localhost')
+        imap_port = self.by_name('srv_setup_stepper_imap_port')
+        imap_port.clear()
+        imap_port.send_keys(143)
+        reply_to = self.by_name('srv_setup_stepper_profile_reply_to')
+        reply_to.send_keys('test@localhost')
+        signature = self.by_name('srv_setup_stepper_profile_signature')
+        signature.send_keys('Test')
+        self.by_id('step_config_action_finish').click()
+        wait = WebDriverWait(self.driver, 30)
+        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
+        sys_message_text = element.text
+        sys_message_texts = sys_message_text.split('\n')
+        assert any("Authentication failed" in text for text in sys_message_texts), "Authentication failed message not found"
 
-    def smtp_del(self):
-        self.by_class('delete_smtp_connection').click()
-        self.confirm_alert()
-        self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Server deleted'
-        self.toggle_server_section('smtp')
-
-    def imap_add(self):
-        self.toggle_server_section('imap')
-        name = self.by_name('new_imap_name')
-        name.send_keys('Test')
-        addr = self.by_name('new_imap_address')
-        addr.send_keys('localhost')
-        port = self.by_name('new_imap_port')
-        port.clear()
-        port.send_keys(143)
-        self.by_id('imap_notls').click()
-        self.by_name('submit_imap_server').click()
-        self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Added server!' or self.by_class('sys_messages').text == 'Could not add server: Connection refused'
-
-    def imap_confirm(self):
-        user = self.by_id('imap_user_'+IMAP_ID)
-        user.send_keys('testuser')
-        passw = self.by_id('imap_pass_'+IMAP_ID)
-        passw.send_keys('testuser')
-        self.by_class('test_imap_connect').click()
-        self.wait_on_sys_message()
-        assert self.by_class('sys_messages').text == 'Successfully authenticated to the IMAP server'
-        self.toggle_server_section('imap')
+    def server_jmap_add(self):
+        jmap_checkbox = self.by_id('srv_setup_stepper_only_jmap')
+        jmap_checkbox.click()
+        jmap_address = self.by_name('srv_setup_stepper_jmap_address')
+        jmap_address.send_keys('jmap.server.com')
+        finish_button = self.by_id('step_config_action_finish')
+        self.driver.execute_script("arguments[0].click(); return false;", finish_button)
+        wait = WebDriverWait(self.driver, 30)
+        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
+        sys_message_text = element.text
+        sys_message_texts = sys_message_text.split('\n')
+        assert any("Authentication failed" in text for text in sys_message_texts), "Authentication failed message not found"
 
 if __name__ == '__main__':
 
     print("SERVERS TEST")
     test_runner(ServersTest, [
         'load_servers_page',
-        'smtp_add',
-        'smtp_del',
-        'imap_add',
-        #'imap_confirm'
+        'server_stmp_and_imap_add',
+        'server_jmap_add'
     ])
