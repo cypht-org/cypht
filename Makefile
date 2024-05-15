@@ -1,25 +1,19 @@
 
+# tag?=latest # default
+
 .PHONY: docker-up
 docker-up:  ## start docker stack in foreground
 	docker compose up --build || true # --abort-on-container-exit
 
 .PHONY: docker-push
 .ONESHELL:
-docker-push:  ## build, tag, and push image to dockerhub. presumes you are logged in
-	username=$$(docker info | sed '/Username:/!d;s/.* //')
-	tag=latest	# TODO: set from argument
-	docker buildx build . --platform linux/amd64 -t $${username}/cypht:$${tag} -f docker/Dockerfile --push
+docker-push:  ## build, tag, and push image to dockerhub. presumes you are logged in. run with a version like tag:1.2.3
+	@username=$$(docker info | sed '/Username:/!d;s/.* //')
+	@[ "$(tag)" = "" ] && (echo "Tag required. Example tag=1.2.3" ; exit 1)
+	@image=$${username}/cypht:$(tag)
+	@echo "Building image $${image}"
+	@docker buildx build . --platform linux/amd64 -t $${image} -f docker/Dockerfile --push
 	# TODO: build for arm architectures
-
-.PHONY: test-unit
-test-unit:	## locally run the unit tests
-	cd tests/phpunit/ && phpunit && cd ../../
-	# TODO: how are local tests supposed to run? see https://github.com/cypht-org/cypht/issues/1011
-
-.PHONY: run-local
-run-local:
-	php -S localhost:8002 index.php
-	# TODO: get this to work. "No module assignments found"
 
 .PHONY: setup
 .ONESHELL:

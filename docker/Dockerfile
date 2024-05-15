@@ -1,8 +1,5 @@
 FROM php:7.4.33-fpm-alpine
 
-
-# TODO: figure out verbose/debug logging at run time
-
 WORKDIR "/usr/local/share/cypht"
 
 RUN set -e \
