@@ -272,7 +272,7 @@ abstract class Hm_Session {
      */
     protected function set_key($request) {
         $this->enc_key = Hm_Crypt::unique_id();
-        $this->secure_cookie($request, 'hm_id', $this->enc_key);
+        $this->secure_cookie($request, 'hm_id', $this->enc_key, '', '', 'Lax');
     }
 
     /**
@@ -329,9 +329,9 @@ abstract class Hm_Session {
      * @param string $domain cookie domain
      * @return boolean
      */
-    public function secure_cookie($request, $name, $value, $path='', $domain='') {
+    public function secure_cookie($request, $name, $value, $path='', $domain='', $same_site = 'Strict') {
         list($path, $domain, $html_only) = $this->prep_cookie_params($request, $name, $path, $domain);
-        return Hm_Functions::setcookie($name, $value, $this->lifetime, $path, $domain, $request->tls, $html_only);
+        return Hm_Functions::setcookie($name, $value, $this->lifetime, $path, $domain, $request->tls, $html_only, $same_site);
     }
 
     /**

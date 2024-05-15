@@ -24,7 +24,7 @@ ini_set('session.use_strict_mode', 1);
 /* limit session cookie to HTTP only */
 ini_set('session.cookie_httponly', 1);
 if (version_compare(PHP_VERSION, 7.3, '>=')) {
-    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.cookie_samesite', 'Lax');
 }
 
 /* HTTPS required for session cookie */

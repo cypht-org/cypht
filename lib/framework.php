@@ -66,7 +66,7 @@ if (!class_exists('Hm_Functions')) {
          * @param string $value
          * @return boolean
          */
-        public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false) {
+        public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false, $same_site = 'Strict') {
             $prefix = ($lifetime != 0 && $lifetime < time()) ? 'Deleting' : 'Setting';
             Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
             if (version_compare(PHP_VERSION, '7.3', '>=')) {
@@ -76,7 +76,7 @@ if (!class_exists('Hm_Functions')) {
                         'domain' => $domain,
                         'secure' => $secure,
                         'httponly' => $html_only,
-                        'samesite' => 'Strict'
+                        'samesite' => $same_site
                     ]
                 );
             } else {
