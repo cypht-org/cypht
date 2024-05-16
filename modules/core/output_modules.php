@@ -1775,18 +1775,19 @@ class Hm_Output_home_password_dialogs extends Hm_Output_Module {
     protected function output() {
         $missing = $this->get('missing_pw_servers', array());
         if (count($missing) > 0) {
-            $res = '<div class="home_password_dialogs">';
-            $res .= '<div class="nux_title">Passwords</div>'.$this->trans('You have elected to not store passwords between logins.').
-                ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'<br /><br />';
+            $res = '<div class="home_password_dialogs mt-3 col-lg-6 col-md-5 col-sm-12">';
+            $res .= '<div class="card"><div class="card-body">';
+            $res .= '<div class="card_title"><h4>Passwords</h4></div><p>'.$this->trans('You have elected to not store passwords between logins.').
+                ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'</p>';
 
             foreach ($missing as $vals) {
                 $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
-                $res .= '<div class="div_'.$id.'" >'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
-                    ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <input placeholder="'.$this->trans('Password').
-                    '" type="password" class="pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update" data-id="'.$id.
-                    '" value="'.$this->trans('Update').'" /></div>';
+                $res .= '<div class="div_'.$id.' mt-3">'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
+                    ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <div class="input-group mt-2"><input placeholder="'.$this->trans('Password').
+                    '" type="password" class="form-control pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update btn btn-primary" data-id="'.$id.
+                    '" value="'.$this->trans('Update').'" /></div></div>';
             }
-            $res .= '</div>';
+            $res .= '</div></div></div>';
             return $res;
         }
     }
