@@ -38,3 +38,5 @@ Make changes to it and source it in to the docker-compose via 'env_file':
     env_file:
       - /etc/cypht-prod.env
 ```
+
+It is also recommended that you choose a specific version number tag instead of using 'latest' since 'latest' may represent master which may not be stable.
