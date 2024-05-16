@@ -330,7 +330,7 @@ class Hm_Output_service_details extends Hm_Output_Module {
  */
 class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
+        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Development Updates').'</h4></div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
@@ -351,7 +351,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
  */
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
-        return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Help').'</div>'.
+        return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Help').'</h4></div>'.
             $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
         '</div></div></div>';
     }
