@@ -1,9 +1,6 @@
-
-# tag?=latest # default
-
 .PHONY: docker-up
 docker-up:  ## start docker stack in foreground
-	docker compose up --build || true # --abort-on-container-exit
+	docker compose -f docker-compose.dev.yaml up --build || true # --abort-on-container-exit
 
 .PHONY: docker-push
 .ONESHELL:
@@ -12,8 +9,10 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 	@[ "$(tag)" = "" ] && (echo "Tag required. Example tag=1.2.3" ; exit 1)
 	@image=$${username}/cypht:$(tag)
 	@echo "Building image $${image}"
-	@docker buildx build . --platform linux/amd64 -t $${image} -f docker/Dockerfile --push
+	@docker buildx build . --platform linux/amd64 \
+		-t $${image} -f docker/Dockerfile --push
 	# TODO: build for arm architectures
+	# TODO: push docker/DOCKERHUB-README.md to dockerhub
 
 .PHONY: setup
 .ONESHELL:

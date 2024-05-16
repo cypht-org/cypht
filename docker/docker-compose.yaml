@@ -17,6 +17,8 @@ services:
     image: jonocodes/cypht:2.0.1-docker-wip
     ports:
       - "80:80"
+    # env_file:
+    #  - /etc/cypht-prod.env
     environment:
       - AUTH_USERNAME=admin
       - AUTH_PASSWORD=admin
