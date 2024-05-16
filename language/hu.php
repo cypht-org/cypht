@@ -633,4 +633,5 @@ return array(
     'Server capabilities' => false,
     'Capabilities' => false,
     'Screen %s first emails' => false,
+    'Yaml File' => false,
 );

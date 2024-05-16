@@ -1,2 +1,0 @@
-server_name;jmap_server;username;password;imap_port;imap_tls;imap_server;support_smtp;smtp_server;smtp_port;smtp_tls;sieve_host;sieve_port
-Migadu;FALSE;;;993;TRUE;;;;465;TRUE;tls://imap.migadu.com;4190
