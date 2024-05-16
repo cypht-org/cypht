@@ -1472,7 +1472,7 @@ if (!hm_exists('connect_to_imap_server')) {
             $context->user_config->get('enable_sieve_filter_setting', true)) {
             try {
 
-                include APP_PATH.'modules/sievefilters/hm-sieve.php';
+                include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
                 $client = $sieveClientFactory->init(null, $server);
 

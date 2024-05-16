@@ -50,8 +50,7 @@ add_output('home', 'nux_dev_news', true, 'nux', 'nux_help', 'after');
 
 add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list_start', 'before');
 
-setup_base_page('add_multiple_servers', 'core');
-add_handler('add_multiple_servers', 'process_import_accouts_servers', true, 'nux','load_user_data', 'after');
+add_handler('servers', 'process_import_accouts_servers', true, 'nux','load_smtp_servers_from_config', 'after');
 add_output('servers', 'quick_add_multiple_section', true, 'nux', 'server_config_stepper_accordion_end_part', 'after');
 add_output('servers', 'quick_add_multiple_dialog', true, 'nux', 'quick_add_multiple_section', 'after');
 
@@ -60,7 +59,6 @@ return array(
         'ajax_nux_service_select',
         'ajax_get_nux_service_details',
         'ajax_nux_add_service',
-        'add_multiple_servers',
     ),
     'allowed_get' => array(
         'code' => FILTER_DEFAULT,

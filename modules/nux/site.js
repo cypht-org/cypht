@@ -132,7 +132,7 @@ $(function() {
                 $('.nux_extra_fields').remove();
             }
         });
-        $('.browser_acc_csv').on("click", function(e) {
+        $('.browser_acc_file').on("click", function(e) {
             e.preventDefault();
             $(this).next().toggle();
         });
