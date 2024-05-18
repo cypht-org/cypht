@@ -11,8 +11,8 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 	@echo "Building image $${image}"
 	@docker buildx build . --platform linux/amd64 \
 		-t $${image} -f docker/Dockerfile --push
+	@docker pushrm --file docker/DOCKERHUB-README.md $${username}/cypht
 	# TODO: build for arm architectures
-	# TODO: push docker/DOCKERHUB-README.md to dockerhub
 
 .PHONY: setup
 .ONESHELL:
