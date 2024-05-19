@@ -10,6 +10,8 @@ This is the official docker image of [Cypht](https://cypht.org/).
 * All Cypht mods and configuration options can be set via environment variables
 * Automatic database setup (if configured to use database)
 
+It recommended that you choose a specific version number tag instead of using 'latest' since 'latest' may represent master which may not be stable.
+
 ## Example docker-compose
 
 See example file here:
@@ -39,4 +41,4 @@ Make changes to it and source it in to the docker-compose via 'env_file':
       - /etc/cypht-prod.env
 ```
 
-It is also recommended that you choose a specific version number tag instead of using 'latest' since 'latest' may represent master which may not be stable.
+In order to avoid confusion, it is best to use only the env file and not set addition env vars in the docker compose file if possilbe.
