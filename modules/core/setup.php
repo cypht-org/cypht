@@ -217,6 +217,8 @@ return array(
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
         'page_links' => array(FILTER_UNSAFE_RAW, false),
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
+        'nux_server_id' => array(FILTER_DEFAULT, false),
+        'nux_service_name' => array(FILTER_DEFAULT, false)
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_DEFAULT,
