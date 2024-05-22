@@ -981,7 +981,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_section_start() {
         $test = new Output_Test('content_section_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<main class="container-fluid content_cell" id="cypht-main"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
+        $this->assertEquals(array('<main class="container-fluid content_cell" id="cypht-main"><div class="offline">Offline</div><div class="row m-0">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

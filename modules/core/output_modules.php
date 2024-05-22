@@ -620,7 +620,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
             'var hm_mobile = function() { return '.($this->get('is_mobile') ? '1' : '0').'; };'.
-            'var hm_debug = function() { return "'.(DEBUG_MODE ? '1' : '0').'"; };'.
+            'var hm_debug = function() { return "' . ((DEBUG_MODE || DEFAULT_DEBUG_LOG) ? '1' : '0') . '"; };'.
             'var hm_mailto = function() { return '.($this->get('mailto_handler') ? '1' : '0').'; };'.
             'var hm_page_name = function() { return "'.$this->html_safe($this->get('router_page_name')).'"; };'.
             'var hm_language_direction = function() { return "'.$this->html_safe($this->dir).'"; };'.
@@ -1313,7 +1313,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        if (DEBUG_MODE) {
+        if (DEBUG_MODE or DEFAULT_DEBUG_LOG) {
             $res .= '<span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
@@ -1631,7 +1631,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="container-fluid content_cell" id="cypht-main"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
+        return '<main class="container-fluid content_cell" id="cypht-main"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0">';
     }
 }
 
