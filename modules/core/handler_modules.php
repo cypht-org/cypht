@@ -1103,8 +1103,9 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
 
                 Hm_Msgs::add("Server saved");
                 $this->out('just_saved_credentials', true);
-                $this->out('nux_server_id', $this->imap_server_id);
-                $this->out('nux_service_name', $provider);
+                $this->out('imap_server_id', $this->imap_server_id);
+                $this->out('imap_service_name', $provider);
+                $this->out('imap_folders_enabled', $this->module_is_supported('imap_folders'));
             }
         }
     }
