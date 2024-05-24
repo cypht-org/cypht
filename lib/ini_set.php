@@ -42,7 +42,7 @@ ini_set('session.use_trans_sid', 0);
 ini_set('session.cache_limiter', 'nocache');
 
 /* session hash mechanism */
-if (version_compare(PHP_VERSION, 7.4, '==')) {
+if (version_compare(PHP_VERSION, 8.1, '==')) {
     ini_set('session.hash_function', 1);
 } else {
     ini_set('session.hash_function', 'sha256');

@@ -1,15 +1,5 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage includeUncoveredFiles="false" processUncoveredFiles="false">
-    <include>
-      <directory suffix=".php">../../lib</directory>
-      <directory suffix=".php">../../modules/core/</directory>
-    </include>
-    <exclude>
-      <file>../../lib/framework.php</file>
-      <file>../../lib/sodium_compat.php</file>
-    </exclude>
-  </coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
   <testsuites>
     <testsuite name="session">
       <file>./session.php</file>
@@ -72,4 +62,14 @@
       <file>./modules/core/modules.php</file>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory suffix=".php">../../lib</directory>
+      <directory suffix=".php">../../modules/core/</directory>
+    </include>
+    <exclude>
+      <file>../../lib/framework.php</file>
+      <file>../../lib/sodium_compat.php</file>
+    </exclude>
+  </source>
 </phpunit>

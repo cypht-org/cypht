@@ -1,7 +1,7 @@
 Requirements
 ------------
 
-Cypht requires at least PHP 7.4, with the OpenSSL and cURL extensions. You will
+Cypht requires at least PHP 8.1, with the OpenSSL and cURL extensions. You will
 also need PDO support if using any database features. Testing is done on
 Debian and Ubuntu platforms with Nginx, Apache, standard PHP, and HHVM. We also
 use Composer to manage our few PHP dependencies.

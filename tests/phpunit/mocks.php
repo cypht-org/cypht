@@ -264,7 +264,7 @@ class Hm_Functions {
     public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }
     public static function function_exists($func) {
-        if ((float) substr(phpversion(), 0, 3) < 7.4) {
+        if ((float) substr(phpversion(), 0, 3) < 8.1) {
             return false;
         }
         return self::$exists;
