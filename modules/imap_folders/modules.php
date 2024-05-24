@@ -129,11 +129,6 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
  */
 class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
     public function process() {
-        
-        if (!$this->module_is_supported('imap_folders')) {
-            Hm_Msgs('ERRIMAP folders module is not enabled');
-            return;
-        }
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
         if ($success) {

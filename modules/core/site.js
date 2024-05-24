@@ -2188,7 +2188,7 @@ function submitSmtpImapServer() {
         Hm_Notices.show(res.router_user_msgs);
 
         if (res.just_saved_credentials) {
-            if (res.imap_server_id && res.imap_folders_enabled) {
+            if (res.imap_server_id) {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                     {'name': 'imap_server_id', value: res.imap_server_id},

@@ -219,7 +219,6 @@ return array(
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_DEFAULT, false),
         'imap_service_name' => array(FILTER_DEFAULT, false),
-        'imap_folders_enabled' => array(FILTER_VALIDATE_BOOLEAN, false)
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_DEFAULT,

@@ -68,7 +68,6 @@ return array(
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
         'nux_server_id' => array(FILTER_DEFAULT, false),
         'nux_service_name' => array(FILTER_DEFAULT, false),
-        'nux_imap_folders_enabled' => array(FILTER_VALIDATE_BOOLEAN, false)
     ),
     'allowed_post' => array(
         'nux_service' => FILTER_DEFAULT,
