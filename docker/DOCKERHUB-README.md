@@ -30,6 +30,10 @@ https://github.com/jonocodes/cypht/blob/docker-refresh/docker/docker-compose.yam
 See all the environment variables you can set here:
 https://github.com/cypht-org/cypht/blob/master/.env.example
 
+To see the meaning of what each variable see descriptions here:
+https://github.com/cypht-org/cypht/blob/master/config/app.php
+
+
 It is recommended that in production you instead make a copy of this file:
 ```
 cp .env.example /etc/cypht-prod.env
