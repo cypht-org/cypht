@@ -1,5 +1,5 @@
 .PHONY: docker-up
-docker-up:  ## start docker stack in foreground
+docker-up:  ## start docker stack in foreground for development
 	docker compose -f docker-compose.dev.yaml up --build || true # --abort-on-container-exit
 
 .PHONY: docker-push
@@ -11,8 +11,14 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 	@echo "Building image $${image}"
 	@docker buildx build . --platform linux/amd64 \
 		-t $${image} -f docker/Dockerfile --push
+	 TODO: build for arm architectures
+
+.PHONY: dockerhub-push-readme
+.ONESHELL:
+dockerhub-push-readme:  ## upload readme to dockerhub
+	@username=$$(docker info | sed '/Username:/!d;s/.* //')
 	@docker pushrm --file docker/DOCKERHUB-README.md $${username}/cypht
-	# TODO: build for arm architectures
+	@echo docker pushrm --file docker/DOCKERHUB-README.md $${username}/cypht
 
 .PHONY: setup
 .ONESHELL:
