@@ -11,7 +11,7 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 	@echo "Building image $${image}"
 	@docker buildx build . --platform linux/amd64 \
 		-t $${image} -f docker/Dockerfile --push
-	 TODO: build for arm architectures
+	# TODO: build for arm architectures
 
 .PHONY: dockerhub-push-readme
 .ONESHELL:
