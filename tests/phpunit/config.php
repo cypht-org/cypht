@@ -3,9 +3,9 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * tests for Hm_User_Config_File
+ * tests for Hm_Test_User_File_Config
  */
-class Hm_Test_User_Config_File extends TestCase {
+class Hm_Test_User_File_Config extends TestCase {
 
     public $config;
     public function setUp(): void {
@@ -158,9 +158,9 @@ class Hm_Test_User_Config_File extends TestCase {
 }
 
 /**
- * tests for Hm_Site_Config_File
+ * tests for Hm_Test_Site_File_Config
  */
-class Hm_Test_Site_Config_File extends TestCase {
+class Hm_Test_Site_File_Config extends TestCase {
 
     public $config;
     public function setUp(): void {

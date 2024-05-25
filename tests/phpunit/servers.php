@@ -3,9 +3,9 @@
 use PHPUnit\Framework\TestCase;
 
 /**
- * tests for the Hm_Server_List trait
+ * tests for the Hm_Servers trait
  */
-class Hm_Test_Server_List extends TestCase {
+class Hm_Test_Servers extends TestCase {
 
     protected $id;
 
