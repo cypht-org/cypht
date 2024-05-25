@@ -1,5 +1,4 @@
 /config/dynamic.php
-/config/app.php
 /site.js
 /site.css
 /site/
@@ -9,6 +8,8 @@
 /tests/selenium/remote_creds.py
 *.pyc
 /.env
+/.env.*
+!.env.example
 apigen4.sh
 testuser.txt
 website/docs
@@ -25,3 +26,4 @@ scripts/test.php
 composer.phar
 lib/hm3/users/
 .env
+/data/

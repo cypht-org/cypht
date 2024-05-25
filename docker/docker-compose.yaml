@@ -1,0 +1,32 @@
+
+# this is a demo of using the production cypht image
+
+services:
+  db:
+    image: mariadb:10
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=cypht
+      - MYSQL_USER=cypht
+      - MYSQL_PASSWORD=cypht_password
+  cypht:
+    image: jonocodes/cypht:2.0.1-docker-wip
+    ports:
+      - "80:80"
+    # env_file:
+    #  - /etc/cypht-prod.env
+    environment:
+      - AUTH_USERNAME=admin
+      - AUTH_PASSWORD=admin
+      - DB_CONNECTION_TYPE=host
+      - DB_DRIVER=mysql
+      - DB_HOST=db
+      - DB_NAME=cypht
+      - DB_USER=cypht
+      - DB_PASS=cypht_password
+      - SESSION_TYPE=DB
+      - USER_CONFIG_TYPE=DB

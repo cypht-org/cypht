@@ -132,6 +132,7 @@ class Hm_Auth_DB extends Hm_Auth {
         $result = 0;
         $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', [$user]);
         if (!empty($res)) {
+            print("user {$user} already exists\n");
             $result = 1;
         }
         else {

@@ -1,0 +1,44 @@
+
+# this file should be used for development, not production
+
+services:
+  db:
+    image: mariadb:10
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_DATABASE=cypht
+      - MYSQL_USER=cypht
+      - MYSQL_PASSWORD=cypht_password
+  cypht:
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      args:
+        WITH_DEBUG: true
+    volumes:
+      - ./data/users:/var/lib/hm3/users
+      - ./data/attachments:/var/lib/hm3/attachments
+      - ./data/app_data:/var/lib/hm3/app_data
+      - ./data/sqlite:/var/lib/hm3/sqlite
+      # The following allow for some live code updates during development
+      - ./lib:/usr/local/share/cypht/lib
+      - ./modules:/usr/local/share/cypht/modules
+    ports:
+      - "80:80"
+    environment:
+      - AUTH_USERNAME=admin
+      - AUTH_PASSWORD=admin
+      - DB_CONNECTION_TYPE=host
+      - DB_DRIVER=mysql
+      - DB_HOST=db
+      - DB_NAME=cypht
+      - DB_USER=cypht
+      - DB_PASS=cypht_password
+      - SESSION_TYPE=DB
+      - USER_CONFIG_TYPE=DB
+    extra_hosts:
+      host.docker.internal: host-gateway  # for xdebug

@@ -35,6 +35,8 @@ require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 require APP_PATH.'lib/webdav_formats.php';
 
+require_once APP_PATH.'modules/core/functions.php';
+
 /* load random bytes polyfill if needed */
 if (!function_exists('random_bytes')) {
     require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
