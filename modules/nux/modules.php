@@ -39,10 +39,10 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                     $msg = trim($c->commit->message);
                     $res[] = array(
                     'hash' => $c->sha,
-                    'shash' => substr($c->sha, 0, 8),
+                    'shash' => mb_substr($c->sha, 0, 8),
                     'name' => $c->commit->author->name,
                     'age' => date('D, M d', strtotime($c->commit->author->date)),
-                    'note' => (mb_strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                    'note' => (mb_strlen($msg) > 80 ? mb_substr($msg, 0, 80) . "..." : $msg)
                     );
                 }
             }

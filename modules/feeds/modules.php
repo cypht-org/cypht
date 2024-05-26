@@ -614,7 +614,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     continue;
                 }
                 if ($name != 'link' && $name != 'link_alternate' && !strstr($value, ' ') && mb_strlen($value) > 75) {
-                    $value = substr($value, 0, 75).'...';
+                    $value = mb_substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';

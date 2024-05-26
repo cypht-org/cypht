@@ -363,7 +363,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
         foreach ($msgs as $msg) {
             if (preg_match("/ERR/", $msg)) {
-                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(substr((string) $msg, 3)));
+                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
             }
             else {
                 $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
@@ -1834,7 +1834,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
             implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-        if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
+        if (!$this->get('is_mobile') && mb_substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
         $res .= '</div>';

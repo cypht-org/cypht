@@ -2069,7 +2069,7 @@ function server_from_compose_smtp_id($id) {
     if ($pos === false) {
         return $id;
     }
-    return substr($id, 0, $pos);
+    return mb_substr($id, 0, $pos);
 }}
 
 /**

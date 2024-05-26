@@ -39,7 +39,7 @@ build_config();
 function check_php() {
     $minVersion = 8.1;
     $version = phpversion();
-    if (substr($version, 0, 3) < $minVersion) {
+    if (mb_substr($version, 0, 3) < $minVersion) {
         die("Cypht requires PHP version $minVersion or greater");
     }
     if (!function_exists('mb_strpos')) {

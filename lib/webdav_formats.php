@@ -61,7 +61,7 @@ trait Hm_Card_Line_Parse {
      * @return boolean
      */
     private function invalid_prop($prop) {
-        if (strtolower(substr($prop, 0, 2)) == 'x-') {
+        if (strtolower(mb_substr($prop, 0, 2)) == 'x-') {
             return false;
         }
         foreach ($this->properties as $name => $value) {
@@ -314,13 +314,13 @@ class Hm_Card_Parse {
         if (count($lines) < 4) {
             $res = false;
         }
-        if (count($lines) > 0 && strtolower(substr($lines[0], 0, 5)) != 'begin') {
+        if (count($lines) > 0 && strtolower(mb_substr($lines[0], 0, 5)) != 'begin') {
             $res = false;
         }
-        if (count($lines) > 1 && strtolower(substr($lines[1], 0, 7)) != 'version') {
+        if (count($lines) > 1 && strtolower(mb_substr($lines[1], 0, 7)) != 'version') {
             $res = false;
         }
-        if (count($lines) && strtolower(substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
+        if (count($lines) && strtolower(mb_substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
             $res = false;
         }
         if (!$res) {
@@ -362,7 +362,7 @@ class Hm_Card_Parse {
             $res;
         }
         foreach ($vals as $val) {
-            $name = substr($name, 0, 2) == 'x-' ? $name : strtoupper($name);
+            $name = mb_substr($name, 0, 2) == 'x-' ? $name : strtoupper($name);
             $params = array_merge([$name], $this->build_vcard_params($val));
             $res[] = sprintf("%s:%s", implode(';', $params), $val['values']);
         }
@@ -575,9 +575,9 @@ class Hm_ICal extends Hm_Card_Parse {
     protected function parse_dt($vals) {
         foreach ($vals as $index => $dates) {
             $dt = $vals[0]['values'];
-            if (substr($dt, -1, 1) == 'Z') {
+            if (mb_substr($dt, -1, 1) == 'Z') {
                 $vals[0]['tzid'] = 'UTC';
-                $dt = substr($dt, 0, -1);
+                $dt = mb_substr($dt, 0, -1);
             }
             $vals[$index]['values'] = date_parse_from_format('Ymd\THis', $dt);
         }

@@ -39,13 +39,13 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         if ($package) {
             // Cypht is embedded
             $branch_name = str_replace(['dev-', '-dev'], '', $package['version']);
-            $commit_hash = substr($package['dist']['reference'], 0, 7);
+            $commit_hash = mb_substr($package['dist']['reference'], 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = $package['time'];
         } elseif (exec('git --version')) {
             // Standalone cypht
             $branch_name = trim(exec('git rev-parse --abbrev-ref HEAD'));
-            $commit_hash = substr(trim(exec('git log --pretty="%H" -n1 HEAD')), 0, 7);
+            $commit_hash = mb_substr(trim(exec('git log --pretty="%H" -n1 HEAD')), 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = trim(exec('git log -n1 --pretty=%ci HEAD'));
         }
@@ -208,7 +208,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
     }
     $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">Pages</div></td></tr>';
     foreach ($handlers as $page => $mods) {
-        if (substr($page, 0, 4) == 'ajax') {
+        if (mb_substr($page, 0, 4) == 'ajax') {
             continue;
         }
         $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
@@ -227,7 +227,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
     }
     $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">AJAX Requests</div></td></tr>';
     foreach ($handlers as $page => $mods) {
-        if (substr($page, 0, 4) != 'ajax') {
+        if (mb_substr($page, 0, 4) != 'ajax') {
             continue;
         }
         $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';

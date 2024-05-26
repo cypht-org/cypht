@@ -443,7 +443,7 @@ function build_contact_detail($output_mod, $contact, $id) {
             $all_fields = $val;
             continue;
         }
-        if (substr($name, 0, 8) == 'carddav_') {
+        if (mb_substr($name, 0, 8) == 'carddav_') {
             continue;
         }
         if (!trim($val)) {
