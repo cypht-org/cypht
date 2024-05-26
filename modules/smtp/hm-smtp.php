@@ -85,7 +85,7 @@ class Hm_SMTP {
     $this->scramAuthenticator = new ScramAuthenticator();
         $this->hostname = php_uname('n');
         if (preg_match("/:\d+$/", $this->hostname)) {
-            $this->hostname = mb_substr($this->hostname, 0, strpos($this->hostname, ':'));
+            $this->hostname = mb_substr($this->hostname, 0, mb_strpos($this->hostname, ':'));
         }
         $this->debug = array();
         if (isset($conf['server'])) {

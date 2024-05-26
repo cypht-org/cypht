@@ -86,7 +86,7 @@ class Hm_Handler_pgp_message_check extends Hm_Handler_Module {
         $pgp = false;
         $struct = $this->get('msg_struct', array());
         $text = $this->get('msg_text');
-        if (strpos($text, '----BEGIN PGP MESSAGE-----') !== false) {
+        if (mb_strpos($text, '----BEGIN PGP MESSAGE-----') !== false) {
             $pgp = true;
         }
         $part_struct = $this->get('msg_struct_current', array());
