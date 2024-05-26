@@ -182,7 +182,7 @@ function is_email_address($val, $allow_local=false) {
     if (!trim($val) || mb_strlen($val) > 320) {
         return false;
     }
-    if (strpos($val, '@') !== false) {
+    if (mb_strpos($val, '@') !== false) {
         $local = substr($val, 0, strrpos($val, '@'));
         $domain = substr($val, (strrpos($val, '@') + 1));
     }
@@ -212,7 +212,7 @@ function is_email_address($val, $allow_local=false) {
 if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
     /* check for a dot, max allowed length and standard ASCII characters */
-    if (strpos($val, '.') === false || mb_strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
+    if (mb_strpos($val, '.') === false || mb_strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
         $val[0] == '-' || $val[(mb_strlen($val) - 1)] == '-') {
         return false;
     }

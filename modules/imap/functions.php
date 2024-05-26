@@ -1333,7 +1333,7 @@ function parse_snooze_header($snooze_header)
     foreach (explode(';', $snooze_header) as $kv)
     {
         $kv = trim($kv);
-        $spacePos = strpos($kv, ' ');
+        $spacePos = mb_strpos($kv, ' ');
         if ($spacePos > 0) {
             $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
         } else {

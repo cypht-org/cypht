@@ -188,7 +188,7 @@ if (!hm_exists('save_main_script')) {
             'main_script',
             $main_script
         );
-        if (! $success && strpos($client->getErrorMessage(), 'failed to include') !== false) {
+        if (! $success && mb_strpos($client->getErrorMessage(), 'failed to include') !== false) {
             $main_script = '';
             foreach ($scripts as $scriptName) {
                 if ($scriptName == 'main_script') {
@@ -196,8 +196,8 @@ if (!hm_exists('save_main_script')) {
                     continue;
                 }
                 $script = $client->getScript($scriptName);
-                if (strpos($script, 'failed to include') !== false) {
-                    $script = substr($script, strpos($script, '#'));
+                if (mb_strpos($script, 'failed to include') !== false) {
+                    $script = substr($script, mb_strpos($script, '#'));
                     $client->putScript(
                         $scriptName,
                         $script

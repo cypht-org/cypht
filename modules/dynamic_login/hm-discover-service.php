@@ -62,7 +62,7 @@ class Hm_Discover_Services {
             }
         }
         elseif ($this->dyn_user || $domain == 'localhost') {
-            if (strpos($email, '@')) {
+            if (mb_strpos($email, '@')) {
                 $parts = explode('@', $email);
                 $domain = $parts[1];
             }

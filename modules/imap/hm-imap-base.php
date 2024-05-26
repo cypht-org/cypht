@@ -151,7 +151,7 @@ class Hm_IMAP_Base {
 
             /* IMAP literal */
             elseif ($line[$i] == '{') {
-                $end = strpos($line, '}');
+                $end = mb_strpos($line, '}');
                 if ($end !== false) {
                     $literal_size  = substr($line, ($i + 1), ($end - $i - 1));
                 }
@@ -172,7 +172,7 @@ class Hm_IMAP_Base {
 
                 /* don't include these three trailing chars in the atom */
                 foreach (array(' ', ')', ']') as $v) {
-                    $tmp_marker = strpos($line, $v, $i);
+                    $tmp_marker = mb_strpos($line, $v, $i);
                     if ($tmp_marker !== false && ($marker == -1 || $tmp_marker < $marker)) {
                         $marker = $tmp_marker;
                     }

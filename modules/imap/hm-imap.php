@@ -818,12 +818,12 @@ if (!class_exists('Hm_IMAP')) {
                             $last_header = false;
                             $lines = explode("\r\n", $vals[$i]);
                             foreach ($lines as $line) {
-                                $header = strtolower(substr($line, 0, strpos($line, ':')));
+                                $header = strtolower(substr($line, 0, mb_strpos($line, ':')));
                                 if (!$header || (!isset($flds[$header]) && $last_header)) {
                                     ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                                 }
                                 elseif (isset($flds[$header])) {
-                                    ${$flds[$header]} = substr($line, (strpos($line, ':') + 1));
+                                    ${$flds[$header]} = substr($line, (mb_strpos($line, ':') + 1));
                                     $last_header = $header;
                                 }
                             }
@@ -1205,7 +1205,7 @@ if (!class_exists('Hm_IMAP')) {
                             if (is_array($parts) && !empty($parts)) {
                                 $i = 0;
                                 foreach ($parts as $line) {
-                                    $split = strpos($line, ':');
+                                    $split = mb_strpos($line, ':');
                                     if (preg_match("/^from /i", $line)) {
                                         continue;
                                     }

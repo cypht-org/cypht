@@ -222,7 +222,7 @@ class Hm_Request {
      * @return string clean url path
      */
     private function get_clean_url_path($uri) {
-        if (strpos($uri, '?') !== false) {
+        if (mb_strpos($uri, '?') !== false) {
             $parts = explode('?', $uri, 2);
             $path = $parts[0];
         } else {

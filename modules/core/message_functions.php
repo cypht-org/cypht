@@ -404,17 +404,17 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
  */
 if (!hm_exists('decode_fld')) {
 function decode_fld($string) {
-    if (strpos($string, '=?') === false) {
+    if (mb_strpos($string, '=?') === false) {
         return $string;
     }
     $string = preg_replace("/\?=\s+=\?/", '?==?', $string);
     if (preg_match_all("/(=\?[^\?]+\?(q|b)\?[^\?]+\?=)/i", $string, $matches)) {
         foreach ($matches[1] as $v) {
             $fld = substr($v, 2, -2);
-            $charset = strtolower(substr($fld, 0, strpos($fld, '?')));
+            $charset = strtolower(substr($fld, 0, mb_strpos($fld, '?')));
             $fld = substr($fld, (mb_strlen($charset) + 1));
             $encoding = $fld[0];
-            $fld = substr($fld, (strpos($fld, '?') + 1));
+            $fld = substr($fld, (mb_strpos($fld, '?') + 1));
             if (strtoupper($encoding) == 'B') {
                 $fld = convert_to_utf8(base64_decode($fld), $charset);
             }
