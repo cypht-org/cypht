@@ -183,8 +183,8 @@ function is_email_address($val, $allow_local=false) {
         return false;
     }
     if (mb_strpos($val, '@') !== false) {
-        $local = substr($val, 0, mb_strrpos($val, '@'));
-        $domain = substr($val, (mb_strrpos($val, '@') + 1));
+        $local = mb_substr($val, 0, mb_strrpos($val, '@'));
+        $domain = mb_substr($val, (mb_strrpos($val, '@') + 1));
     }
     else {
         $local = $val;

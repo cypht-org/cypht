@@ -229,7 +229,7 @@ class Hm_Request {
             $path = $uri;
         }
         $path = str_replace('index.php', '', $path);
-        if (substr($path, -1) != '/') {
+        if (mb_substr($path, -1) != '/') {
             $path .= '/';
         }
         return $path;

@@ -29,9 +29,9 @@ class Hm_Crypt extends Hm_Crypt_Base {
         if (!$raw_string || mb_strlen($raw_string) < 60) {
             return false;
         }
-        list($salt, $crypt_key) = self::keygen($key, substr($raw_string, 0, 24));
-        $hmac = substr($raw_string, 24, 32);
-        $crypt_string = substr($raw_string, 56);
+        list($salt, $crypt_key) = self::keygen($key, mb_substr($raw_string, 0, 24));
+        $hmac = mb_substr($raw_string, 24, 32);
+        $crypt_string = mb_substr($raw_string, 56);
 
         if (Hm_Sodium_Compat::crypto_auth_verify($hmac, $crypt_string, $crypt_key)) {
             $res = Hm_Sodium_Compat::crypto_secretbox_open($crypt_string, $salt, $crypt_key);

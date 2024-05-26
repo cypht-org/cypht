@@ -89,8 +89,8 @@ class Hm_IMAP_Base {
             }
         }
         elseif ($size < mb_strlen($literal_data)) {
-            $left_over = substr($literal_data, $size);
-            $literal_data = substr($literal_data, 0, $size);
+            $left_over = mb_substr($literal_data, $size);
+            $literal_data = mb_substr($literal_data, 0, $size);
         }
         return array($literal_data, $left_over);
     }
@@ -143,8 +143,8 @@ class Hm_IMAP_Base {
 
             /* regex match a quoted string */
             elseif ($line[$i] == '"') {
-                if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", substr($line, $i), $matches)) {
-                    $chunk = substr($matches[1], 1, -1);
+                if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", mb_substr($line, $i), $matches)) {
+                    $chunk = mb_substr($matches[1], 1, -1);
                 }
                 $i += mb_strlen($chunk) + 1;
             }
@@ -153,7 +153,7 @@ class Hm_IMAP_Base {
             elseif ($line[$i] == '{') {
                 $end = mb_strpos($line, '}');
                 if ($end !== false) {
-                    $literal_size  = substr($line, ($i + 1), ($end - $i - 1));
+                    $literal_size  = mb_substr($line, ($i + 1), ($end - $i - 1));
                 }
                 $lit_result = $this->read_literal($literal_size, $max, $current_size, $line_length);
                 $chunk = $lit_result[0];
@@ -180,11 +180,11 @@ class Hm_IMAP_Base {
 
                 /* slice out the chunk */
                 if ($marker !== false && $marker !== -1) {
-                    $chunk = substr($line, $i, ($marker - $i));
+                    $chunk = mb_substr($line, $i, ($marker - $i));
                     $i += mb_strlen($chunk) - 1;
                 }
                 else {
-                    $chunk = rtrim(substr($line, $i));
+                    $chunk = rtrim(mb_substr($line, $i));
                     $i += mb_strlen($chunk);
                 }
             }
@@ -257,7 +257,7 @@ class Hm_IMAP_Base {
 
             /* if the line is longer than 8192 bytes keep appending more reads until we find
              * an end of line char. Keep checking the max read length as we go */
-            while(substr($result[$n], -2) != "\r\n" && substr($result[$n], -1) != "\n") {
+            while(mb_substr($result[$n], -2) != "\r\n" && mb_substr($result[$n], -1) != "\n") {
                 if (!is_resource($this->handle) || feof($this->handle)) {
                     break;
                 }
@@ -324,19 +324,19 @@ class Hm_IMAP_Base {
 
             /* check for untagged error condition. This represents a server problem but there is no reason
              * we can't attempt to recover with the partial response we received up until this point */
-            if (substr(strtoupper($result[$n]), 0, 6) == '* BYE ') {
+            if (mb_substr(strtoupper($result[$n]), 0, 6) == '* BYE ') {
                 break;
             }
 
             /* check for challenge strings */
-            if (substr($result[$n], 0, 1) == '+') {
+            if (mb_substr($result[$n], 0, 1) == '+') {
                 if (preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $result[$n], $matches)) {
                     break;
                 }
             }
 
         /* end outer loop when we receive the tagged response line */
-        } while (substr($result[$n], 0, mb_strlen('A'.$this->command_count)) != 'A'.$this->command_count);
+        } while (mb_substr($result[$n], 0, mb_strlen('A'.$this->command_count)) != 'A'.$this->command_count);
 
         /* return either raw or parsed result */
         $this->responses[] = $result;

@@ -81,13 +81,13 @@ class Hm_Crypt_Base {
         }
 
         /* get the payload and salt */
-        $crypt_string = substr($string, 192);
-        $salt = substr($string, 0, 128);
+        $crypt_string = mb_substr($string, 192);
+        $salt = mb_substr($string, 0, 128);
 
         /* check the signature. Temporarily allow the same key for hmac validation, eventually remove the $encryption_rounds
          * check and require the hmac_rounds check only! */
-        if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
-            !self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
+        if (!self::check_hmac($crypt_string, mb_substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
+            !self::check_hmac($crypt_string, mb_substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
             Hm_Debug::add('HMAC verification failed');
             return false;
         }
@@ -224,7 +224,7 @@ class Hm_Crypt_Base {
             }
             $result .= $res;
         }
-        return substr($result, 0, $length);
+        return mb_substr($result, 0, $length);
     }
 
     /**
@@ -258,7 +258,7 @@ class Hm_Crypt_Base {
      */
     public static function check_password($password, $hash) {
         $type = 'php';
-        if (substr($hash, 0, 6) === 'sha512') {
+        if (mb_substr($hash, 0, 6) === 'sha512') {
             $type = 'pbkdf2';
         }
         if (function_exists('password_verify') && $type === 'php') {

@@ -486,8 +486,8 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     private function get_user_defaults() {
         foreach ($this->config as $name => $val) {
-            if (substr($name, 0, 15) == 'default_setting') {
-                $this->user_defaults[substr($name, 16).'_setting'] = $val;
+            if (mb_substr($name, 0, 15) == 'default_setting') {
+                $this->user_defaults[mb_substr($name, 16).'_setting'] = $val;
             }
         }
     }

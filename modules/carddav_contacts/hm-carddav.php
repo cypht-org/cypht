@@ -206,7 +206,7 @@ class Hm_Carddav {
     }
 
     private function parse_xml($xml) {
-        if (substr((string) $this->api->last_status, 0, 1) != '2') {
+        if (mb_substr((string) $this->api->last_status, 0, 1) != '2') {
             Hm_Debug::add(sprintf('ERRUnable to access CardDav server (%d)', $this->api->last_status));
             return false;
         }

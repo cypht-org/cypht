@@ -197,7 +197,7 @@ if (!hm_exists('save_main_script')) {
                 }
                 $script = $client->getScript($scriptName);
                 if (mb_strpos($script, 'failed to include') !== false) {
-                    $script = substr($script, mb_strpos($script, '#'));
+                    $script = mb_substr($script, mb_strpos($script, '#'));
                     $client->putScript(
                         $scriptName,
                         $script

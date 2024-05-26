@@ -209,7 +209,7 @@ class Hm_Address_Field {
             if (is_email_address($token)) {
                 list($name, $marker) = self::find_name_field($string);
                 if ($marker > -1) {
-                    $string = substr($string, 0, $marker);
+                    $string = mb_substr($string, 0, $marker);
                 }
                 else {
                     $marker = false;
@@ -222,8 +222,8 @@ class Hm_Address_Field {
 
     private static function get_token($string) {
         $marker = mb_strrpos($string, ' ');
-        $token = trim(ltrim(substr($string, $marker)), '<>');
-        $string = substr($string, 0, $marker);
+        $token = trim(ltrim(mb_substr($string, $marker)), '<>');
+        $string = mb_substr($string, 0, $marker);
         return array($marker, $token, $string);
     }
 

@@ -1044,7 +1044,7 @@ function clear_existing_reply_details($session) {
     $msgs = array();
     $max = 20;
     foreach ($session->dump() as $name => $val) {
-        if (substr($name, 0, 19) == 'reply_details_imap_') {
+        if (mb_substr($name, 0, 19) == 'reply_details_imap_') {
             $msgs[$name] = $val['ts'];
         }
     }
@@ -1077,9 +1077,9 @@ function process_sort_arg($sort, $default = 'arrival') {
         return array($default, true);
     }
     $rev = false;
-    if (substr($sort, 0, 1) == '-') {
+    if (mb_substr($sort, 0, 1) == '-') {
         $rev = true;
-        $sort = substr($sort, 1);
+        $sort = mb_substr($sort, 1);
     }
     $sort = strtoupper($sort);
     if ($sort == 'ARRIVAL' || $sort == 'DATE') {
@@ -1111,7 +1111,7 @@ function get_list_headers($headers) {
         'list-subscribe', 'list-archive', 'list-post', 'list-help');
     foreach (lc_headers($headers) as $name => $val) {
         if (in_array($name, $list_headers, true)) {
-            $res[substr($name, 5)] = process_list_fld($val);
+            $res[mb_substr($name, 5)] = process_list_fld($val);
         }
     }
     return $res;
@@ -1130,7 +1130,7 @@ function process_list_fld($fld) {
             $res['links'][] = $val;
         }
         elseif (preg_match("/^mailto/", $val)) {
-            $res['email'][] = substr($val, 7);
+            $res['email'][] = mb_substr($val, 7);
         }
         else {
             $res['values'][] = $val;
@@ -1335,7 +1335,7 @@ function parse_snooze_header($snooze_header)
         $kv = trim($kv);
         $spacePos = mb_strpos($kv, ' ');
         if ($spacePos > 0) {
-            $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+            $result[rtrim(mb_substr($kv, 0, $spacePos), ':')] = trim(mb_substr($kv, $spacePos+1));
         } else {
             $result[$kv] = true;
         }

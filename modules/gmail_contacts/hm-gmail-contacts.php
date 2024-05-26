@@ -56,7 +56,7 @@ class Hm_Gmail_Contact_XML {
         }
         if ($tagname == 'GD:PHONENUMBER') {
             if (array_key_exists('URI', $attrs)) {
-                $this->results[$this->index]['phone_number'] = substr($attrs['URI'], 5);
+                $this->results[$this->index]['phone_number'] = mb_substr($attrs['URI'], 5);
             }
         }
         else {

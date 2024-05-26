@@ -272,7 +272,7 @@ if (!class_exists('Hm_IMAP')) {
                     $cram1 = 'AUTHENTICATE CRAM-MD5' . "\r\n";
                     $this->send_command($cram1);
                     $response = $this->get_response();
-                    $challenge = base64_decode(substr(trim($response[0]), 1));
+                    $challenge = base64_decode(mb_substr(trim($response[0]), 1));
                     $pass = str_repeat(chr(0x00), (64-mb_strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);
                     $opad = str_repeat(chr(0x5c), 64);
@@ -332,7 +332,7 @@ if (!class_exists('Hm_IMAP')) {
                 $response = $this->get_response();
                 if (!empty($response)) {
                     $end = array_pop($response);
-                    if (substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
+                    if (mb_substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
                         Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
                     }
                     else {
@@ -381,9 +381,9 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             foreach ($res as $row) {
                 foreach ($row as $atom) {
-                    if (in_array(strtolower(substr($atom, 1)), $types, true)) {
+                    if (in_array(strtolower(mb_substr($atom, 1)), $types, true)) {
                         $folder = array_pop($row);
-                        $name = strtolower(substr($atom, 1));
+                        $name = strtolower(mb_substr($atom, 1));
                         if ($type && $type == $name) {
                             return array($name => $folder);
                         }
@@ -618,7 +618,7 @@ if (!class_exists('Hm_IMAP')) {
                         if (trim(strtoupper($matches[$i])) == 'NIL') {
                             continue;
                         }
-                        $list = str_replace(') (', '),(', substr($matches[$i], 1, -1));
+                        $list = str_replace(') (', '),(', mb_substr($matches[$i], 1, -1));
                         $prefix = '';
                         $delim = '';
                         foreach (explode(',', $list) as $val) {
@@ -628,8 +628,8 @@ if (!class_exists('Hm_IMAP')) {
                                 $prefix = '';
                             }
                             else {
-                                $delim = substr($val, -1);
-                                $prefix = trim(substr($val, 0, -1));
+                                $delim = mb_substr($val, -1);
+                                $prefix = trim(mb_substr($val, 0, -1));
                             }
                             $this->namespace_count++;
                             $data[] = array('delim' => $delim, 'prefix' => $prefix, 'class' => $v);
@@ -818,12 +818,12 @@ if (!class_exists('Hm_IMAP')) {
                             $last_header = false;
                             $lines = explode("\r\n", $vals[$i]);
                             foreach ($lines as $line) {
-                                $header = strtolower(substr($line, 0, mb_strpos($line, ':')));
+                                $header = strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
                                 if (!$header || (!isset($flds[$header]) && $last_header)) {
                                     ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                                 }
                                 elseif (isset($flds[$header])) {
-                                    ${$flds[$header]} = substr($line, (mb_strpos($line, ':') + 1));
+                                    ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
                                     $last_header = $header;
                                 }
                             }
@@ -1080,8 +1080,8 @@ if (!class_exists('Hm_IMAP')) {
             if (!empty($terms)) {
                 $flds = array();
                 foreach ($terms as $vals) {
-                    if (substr($vals[1], 0, 4) == 'NOT ') {
-                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', substr($vals[1], 4)).'"';
+                    if (mb_substr($vals[1], 0, 4) == 'NOT ') {
+                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', mb_substr($vals[1], 4)).'"';
                     }
                     else {
                         $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
@@ -1214,8 +1214,8 @@ if (!class_exists('Hm_IMAP')) {
                                     }
                                     elseif ($split) {
                                         $i++;
-                                        $last = substr($line, 0, $split);
-                                        $headers[$i] = array($last, trim(substr($line, ($split + 1))));
+                                        $last = mb_substr($line, 0, $split);
+                                        $headers[$i] = array($last, trim(mb_substr($line, ($split + 1))));
                                     }
                                 }
                             }
@@ -1298,7 +1298,7 @@ if (!class_exists('Hm_IMAP')) {
         public function read_stream_line($size=1024) {
             if ($this->stream_size) {
                 $res = $this->fgets(1024);
-                while(substr($res, -2) != "\r\n") {
+                while(mb_substr($res, -2) != "\r\n") {
                     $res .= $this->fgets($size);
                 }
                 if ($res && $this->check_response(array($res), false, false)) {
@@ -1388,7 +1388,7 @@ if (!class_exists('Hm_IMAP')) {
                     if ($body) {
                         if ($v == ']' && isset($vals[$i + 1])) {
                             if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)]\r\n") {
-                                $sort_key = strtotime(trim(substr($vals[$i + 1], 5)));
+                                $sort_key = strtotime(trim(mb_substr($vals[$i + 1], 5)));
                             }
                             else {
                                 $sort_key = $vals[$i + 1];
@@ -1413,7 +1413,7 @@ if (!class_exists('Hm_IMAP')) {
                         }
                     }
                     if ($key == strtoupper($v)) {
-                        if (substr($key, 0, 4) == 'BODY') {
+                        if (mb_substr($key, 0, 4) == 'BODY') {
                             $body = 1;
                         }
                         elseif (isset($vals[($i + 1)])) {
@@ -1663,7 +1663,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $this->send_command($command);
             $result = $this->fgets();
-            if (substr($result, 0, 1) == '+') {
+            if (mb_substr($result, 0, 1) == '+') {
                 return true;
             }
             else {

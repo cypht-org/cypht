@@ -137,7 +137,7 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process() {
         $headers = array();
         if ($this->get('language')) {
-            $headers['Content-Language'] = substr($this->get('language'), 0, 2);
+            $headers['Content-Language'] = mb_substr($this->get('language'), 0, 2);
         }
         if ($this->request->tls) {
             $headers['Strict-Transport-Security'] = 'max-age=31536000';
