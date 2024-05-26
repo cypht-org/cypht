@@ -239,7 +239,7 @@ class Hm_Address_Field {
     private static function find_name_field($string) {
         $quote = false;
         $result = '';
-        for ($i = strlen($string) - 1;$i>-1; $i--) {
+        for ($i = mb_strlen($string) - 1;$i>-1; $i--) {
             $quote = self::is_quote($string, $i, $quote);
             if (self::delimiter_found($string, $i, $quote)) {
                 break;

@@ -85,7 +85,7 @@ class Hm_SMTP {
     $this->scramAuthenticator = new ScramAuthenticator();
         $this->hostname = php_uname('n');
         if (preg_match("/:\d+$/", $this->hostname)) {
-            $this->hostname = substr($this->hostname, 0, strpos($this->hostname, ':'));
+            $this->hostname = mb_substr($this->hostname, 0, strpos($this->hostname, ':'));
         }
         $this->debug = array();
         if (isset($conf['server'])) {
@@ -179,7 +179,7 @@ class Hm_SMTP {
                 break;
             }
             $cont = false;
-            if (strlen($result[$n]) > 3 && substr($result[$n], 3, 1) == '-') {
+            if (mb_strlen($result[$n]) > 3 && mb_substr($result[$n], 3, 1) == '-') {
                 $cont = true;
             }
         } while ($cont);
@@ -194,10 +194,10 @@ class Hm_SMTP {
     function parse_line($line) {
         $parts = array();
 
-        $code = substr($line, 0, 3);
+        $code = mb_substr($line, 0, 3);
         $parts[] = $code;
 
-        $remainder = explode(' ',substr($line, 4));
+        $remainder = explode(' ',mb_substr($line, 4));
         $parts[] = $remainder;
 
         return $parts;
@@ -232,13 +232,13 @@ class Hm_SMTP {
     function capabilities($ehlo_response) {
         foreach($ehlo_response as $line) {
             $feature = trim($line[1][0]);
-            switch(strtolower($feature)) {
+            switch(mb_strtolower($feature)) {
                 case 'starttls': // supports starttls
                     $this->supports_tls = true;
                     break;
                 case 'auth': // supported auth mechanisims
                     $auth_mecs = array_slice($line[1], 1);
-                    $this->supports_auth = array_map(function($v) { return strtolower($v); }, $auth_mecs);
+                    $this->supports_auth = array_map(function($v) { return mb_strtolower($v); }, $auth_mecs);
                     break;
                 case 'size': // advisary maximum message size
                     if(isset($line[1][1]) && is_numeric($line[1][1])) {
@@ -330,10 +330,10 @@ class Hm_SMTP {
         return trim($this->supports_auth[0]);
     }
     function authenticate($username, $password, $mech) {
-        $mech = strtolower($mech);
-        if (substr($mech, 0, 6) == 'scram-') {
+        $mech = mb_strtolower($mech);
+        if (mb_substr($mech, 0, 6) == 'scram-') {
             $result = $this->scramAuthenticator->authenticateScram(
-                strtoupper($mech),
+                mb_strtoupper($mech),
                 $username,
                 $password,
                 [$this, 'get_response'],
@@ -362,7 +362,7 @@ class Hm_SMTP {
                         $result = 'FATAL: SMTP server does not support AUTH CRAM-MD5';
                     } else {
                         $challenge = base64_decode(trim($response[0][1][0]));
-                        $password .= str_repeat(chr(0x00), (64-strlen($password)));
+                        $password .= str_repeat(chr(0x00), (64-mb_strlen($password, '8bit')));
                         $ipad = str_repeat(chr(0x36), 64);
                         $opad = str_repeat(chr(0x5c), 64);
                         $digest = bin2hex(pack('H*', md5(($password ^ $opad).pack('H*', md5(($password ^ $ipad).$challenge)))));
@@ -429,8 +429,8 @@ class Hm_SMTP {
     function parse_ntlm_type_two($bin_str) {
         $res = array();
         $res['vals'] = unpack('a8prefix/Vtype/vname_len/vname_space/Vname_offset/Vflags/A8challenge/A8context/vtarget_len/vtarget_space/Vtarget_offset', base64_decode($bin_str));
-        $res['name'] = unpack('A'.$res['vals']['name_len'].'name', substr(base64_decode($bin_str), $res['vals']['name_offset'], $res['vals']['name_len']));
-        $target = substr(base64_decode($bin_str), $res['vals']['target_offset'], $res['vals']['target_len']);
+        $res['name'] = unpack('A'.$res['vals']['name_len'].'name', mb_substr(base64_decode($bin_str), $res['vals']['name_offset'], $res['vals']['name_len'], '8bit'));
+        $target = mb_substr(base64_decode($bin_str), $res['vals']['target_offset'], $res['vals']['target_len'], '8bit');
         $flds = array(2 => 'domain', 1 => 'server', 4 => 'dns_domain', 3 => 'dns_server');
         $names = array('domain' => '', 'server' => '', 'dns_domain' => '', 'dns_server' => '');
         while ($target) {
@@ -438,11 +438,11 @@ class Hm_SMTP {
             if ($atts['fld'] == 0) {
                 break;
             }
-            $fld = unpack('A'.$atts['len'], substr($target, 4));
+            $fld = unpack('A'.$atts['len'], mb_substr($target, 4, null, '8bit'));
             if (isset($flds[$atts['fld']])) {
                 $names[$flds[$atts['fld']]] = $fld;
             }
-            $target = substr($target, (4 + $atts['len']));
+            $target = mb_substr($target, (4 + $atts['len']), null, '8bit');
         }
         $res['names'] = $names;
         return $res;
@@ -466,17 +466,17 @@ class Hm_SMTP {
         $lm_response = $this->build_lm_response($msg_data, $username, $password);
         $ntlm_response = $this->build_ntlm_response($msg_data, $username, $password);
         $flags = pack('V', 0x00000201);
-        $offset = strlen($pre.$type)+52;
-        $target_sec = $this->ntlm_security_buffer(strlen($target), $offset);
-        $offset += strlen($target);
-        $user_sec = $this->ntlm_security_buffer(strlen($username), $offset);
-        $offset += strlen($username);
-        $host_sec = $this->ntlm_security_buffer(strlen($host), $offset);
-        $offset += strlen($host);
-        $lm_sec = $this->ntlm_security_buffer(strlen($lm_response), $offset);
-        $offset += strlen($lm_response);
-        $ntlm_sec = $this->ntlm_security_buffer(strlen($ntlm_response), $offset);
-        $offset += strlen($ntlm_response);
+        $offset = mb_strlen($pre.$type, '8bit')+52;
+        $target_sec = $this->ntlm_security_buffer(mb_strlen($target, '8bit'), $offset);
+        $offset += mb_strlen($target, '8bit');
+        $user_sec = $this->ntlm_security_buffer(mb_strlen($username), $offset);
+        $offset += mb_strlen($username);
+        $host_sec = $this->ntlm_security_buffer(mb_strlen($host), $offset);
+        $offset += mb_strlen($host);
+        $lm_sec = $this->ntlm_security_buffer(mb_strlen($lm_response, '8bit'), $offset);
+        $offset += mb_strlen($lm_response, '8bit');
+        $ntlm_sec = $this->ntlm_security_buffer(mb_strlen($ntlm_response, '8bit'), $offset);
+        $offset += mb_strlen($ntlm_response, '8bit');
         $sess_sec = $this->ntlm_security_buffer(0, $offset);
         return base64_encode($pre.$type.$lm_sec.$ntlm_sec.$target_sec.$user_sec.$host_sec.$sess_sec.$flags.$target.$username.$host.$lm_response.$ntlm_response);
     }
@@ -488,17 +488,17 @@ class Hm_SMTP {
 
     /* build the NTLM lm hash then ecnrypt the challenge string with it */
     function build_lm_response($msg_data, $username, $password){
-        $pass = strtoupper($password);
-        while (strlen($pass) < 14) {
+        $pass = mb_strtoupper($password, '8bit');
+        while (mb_strlen($pass, '8bit') < 14) {
             $pass .= chr(0);
         }
-        if (strlen($pass) > 14) {
+        if (mb_strlen($pass, '8bit') > 14) {
             return str_repeat(chr(0), 16);
         }
-        $p1 = substr($pass, 0, 7);
-        $p2 = substr($pass, 7);
+        $p1 = mb_substr($pass, 0, 7, '8bit');
+        $p2 = mb_substr($pass, 7, null, '8bit');
         $lm_hash = $this->des_encrypt($p1).$this->des_encrypt($p2);
-        while (strlen($lm_hash) < 21) {
+        while (mb_strlen($lm_hash, '8bit') < 21) {
             $lm_hash .= chr(0);
         }
         return $this->apply_ntlm_hash($msg_data['vals']['challenge'], $lm_hash);
@@ -508,7 +508,7 @@ class Hm_SMTP {
     function build_ntlm_response($msg_data, $username, $password){
         $password = iconv('UTF-8', 'UTF-16LE', $password);
         $ntlm_hash = hash('md4', $password, true);
-        while (strlen($ntlm_hash) < 21) {
+        while (mb_strlen($ntlm_hash, '8bit') < 21) {
             $ntlm_hash .= chr(0);
         }
         return $this->apply_ntlm_hash($msg_data['vals']['challenge'], $ntlm_hash);
@@ -516,9 +516,9 @@ class Hm_SMTP {
 
     /* encrypt the challenge string with the lm/ntlm hash */
     function apply_ntlm_hash($challenge, $hash) {
-        $p1 = substr($hash, 0, 7);
-        $p2 = substr($hash, 7, 7);
-        $p3 = substr($hash, 14, 7);
+        $p1 = mb_substr($hash, 0, 7, '8bit');
+        $p2 = mb_substr($hash, 7, 7, '8bit');
+        $p3 = mb_substr($hash, 14, 7, '8bit');
         return $this->des_encrypt($p1, $challenge).
             $this->des_encrypt($p2, $challenge).
             $this->des_encrypt($p3, $challenge);
@@ -528,7 +528,7 @@ class Hm_SMTP {
     function des_encrypt($string, $challenge='KGS!@#$%') {
         $key = array();
         $tmp = array();
-        $len = strlen($string);
+        $len = mb_strlen($string, '8bit');
         for ($i=0; $i<7; ++$i)
             $tmp[] = $i < $len ? ord($string[$i]) : 0;
         $key[] = $tmp[0] & 254;

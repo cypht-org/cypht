@@ -69,11 +69,11 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
-        $lit_size = strlen($literal_data);
+        $lit_size = mb_strlen($literal_data);
         $current += $lit_size;
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
-            $chunk_size = strlen($chunk);
+            $chunk_size = mb_strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
             $literal_data .= $chunk;
@@ -85,10 +85,10 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
-                $lit_size += strlen($temp);
+                $lit_size += mb_strlen($temp);
             }
         }
-        elseif ($size < strlen($literal_data)) {
+        elseif ($size < mb_strlen($literal_data)) {
             $left_over = substr($literal_data, $size);
             $literal_data = substr($literal_data, 0, $size);
         }
@@ -117,7 +117,7 @@ class Hm_IMAP_Base {
         $line_cont = false;
 
         /* line size */
-        $len = strlen($line);
+        $len = mb_strlen($line);
 
         /* walk through the line */
         for ($i=0;$i<$len;$i++) {
@@ -146,7 +146,7 @@ class Hm_IMAP_Base {
                 if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", substr($line, $i), $matches)) {
                     $chunk = substr($matches[1], 1, -1);
                 }
-                $i += strlen($chunk) + 1;
+                $i += mb_strlen($chunk) + 1;
             }
 
             /* IMAP literal */
@@ -160,7 +160,7 @@ class Hm_IMAP_Base {
                 if (!isset($lit_result[1]) || $lit_result[1] != "\r\n") {
                     $line_cont = true;
                 }
-                if (isset($lit_result[1]) && $lit_result[1] != "\r\n" && strlen($lit_result[1]) > 0) {
+                if (isset($lit_result[1]) && $lit_result[1] != "\r\n" && mb_strlen($lit_result[1]) > 0) {
                     $this->literal_overflow = $lit_result[1];
                 }
                 $i = $len;
@@ -181,11 +181,11 @@ class Hm_IMAP_Base {
                 /* slice out the chunk */
                 if ($marker !== false && $marker !== -1) {
                     $chunk = substr($line, $i, ($marker - $i));
-                    $i += strlen($chunk) - 1;
+                    $i += mb_strlen($chunk) - 1;
                 }
                 else {
                     $chunk = rtrim(substr($line, $i));
-                    $i += strlen($chunk);
+                    $i += mb_strlen($chunk);
                 }
             }
 
@@ -249,7 +249,7 @@ class Hm_IMAP_Base {
             /* keep track of how much we have read and break out if we max out. This can
              * happen on large messages. We need this check to ensure we don't exhaust available
              * memory */
-            $current_size += strlen($result[$n]);
+            $current_size += mb_strlen($result[$n]);
             if ($max && $current_size > $max) {
                 $this->max_read = true;
                 break;
@@ -265,7 +265,7 @@ class Hm_IMAP_Base {
                 if ($result[$n] === false) {
                     break;
                 }
-                $current_size += strlen($result[$n]);
+                $current_size += mb_strlen($result[$n]);
                 if ($max && $current_size > $max) {
                     $this->max_read = true;
                     break 2;
@@ -295,7 +295,7 @@ class Hm_IMAP_Base {
                 while ($this->literal_overflow) {
                     $lit_text = $this->literal_overflow;
                     $this->literal_overflow = false;
-                    $current_size += strlen($lit_text);
+                    $current_size += mb_strlen($lit_text);
                     list($line_cont, $new_chunks) = $this->parse_line($lit_text, $current_size, $max, $line_length);
                     $chunks = array_merge($chunks, $new_chunks);
                 }
@@ -336,7 +336,7 @@ class Hm_IMAP_Base {
             }
 
         /* end outer loop when we receive the tagged response line */
-        } while (substr($result[$n], 0, strlen('A'.$this->command_count)) != 'A'.$this->command_count);
+        } while (substr($result[$n], 0, mb_strlen('A'.$this->command_count)) != 'A'.$this->command_count);
 
         /* return either raw or parsed result */
         $this->responses[] = $result;
