@@ -273,7 +273,7 @@ if (!class_exists('Hm_IMAP')) {
                     $this->send_command($cram1);
                     $response = $this->get_response();
                     $challenge = base64_decode(substr(trim($response[0]), 1));
-                    $pass = str_repeat(chr(0x00), (64 - strlen($password)));
+                    $pass = str_repeat(chr(0x00), (64-mb_strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);
                     $opad = str_repeat(chr(0x5c), 64);
                     $digest = bin2hex(pack("H*", md5(($pass ^ $opad) . pack("H*", md5(($pass ^ $ipad) . $challenge)))));
@@ -332,7 +332,7 @@ if (!class_exists('Hm_IMAP')) {
                 $response = $this->get_response();
                 if (!empty($response)) {
                     $end = array_pop($response);
-                    if (substr($end, 0, strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
+                    if (substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
                         Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
                     }
                     else {
@@ -623,7 +623,7 @@ if (!class_exists('Hm_IMAP')) {
                         $delim = '';
                         foreach (explode(',', $list) as $val) {
                             $val = trim($val, ")(\r\n ");
-                            if (strlen($val) == 1) {
+                            if (mb_strlen($val) == 1) {
                                 $delim = $val;
                                 $prefix = '';
                             }
@@ -1305,7 +1305,7 @@ if (!class_exists('Hm_IMAP')) {
                     $res = false;
                 }
                 if ($res) {
-                    $this->current_stream_size += strlen($res);
+                    $this->current_stream_size += mb_strlen($res);
                 }
                 if ($this->current_stream_size >= $this->stream_size) {
                     $this->stream_size = 0;

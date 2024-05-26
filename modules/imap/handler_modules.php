@@ -53,7 +53,7 @@ class Hm_Handler_imap_forward_attachments extends Hm_Handler_Module {
             'name' => 'mail.mime',
             'type' => 'message/rfc822',
             'no_encoding' => true,
-            'size' => strlen($content)
+            'size' => mb_strlen($content)
         );
         $draft_id = next_draft_key($this->session);
         // This needs to be replaced with something that works with the new attachment
@@ -329,7 +329,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
             }
             if ($sent_folder) {
                 Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-                if ($imap->append_start($sent_folder, strlen($msg), true)) {
+                if ($imap->append_start($sent_folder, mb_strlen($msg), true)) {
                     $imap->append_feed($msg."\r\n");
                     if (!$imap->append_end()) {
                         Hm_Msgs::add('ERRAn error occurred saving the sent message');
@@ -676,7 +676,7 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                             $attachment_id = get_attachment_id_for_mail_parser($imap, $uid, $this->request->get['imap_msg_part']);
                             if ($attachment_id !== false) {
                                 $msg = remove_attachment($attachment_id, $msg);
-                                if ($imap->append_start($folder, strlen($msg))) {
+                                if ($imap->append_start($folder, mb_strlen($msg))) {
                                     $imap->append_feed($msg."\r\n");
                                     if ($imap->append_end()) {
                                         if ($imap->message_action('DELETE', array($uid))) {

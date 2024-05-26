@@ -136,7 +136,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
             }
-            if (strlen($output_mod->html_safe($folder['basename']))>15) {
+            if (mb_strlen($output_mod->html_safe($folder['basename']))>15) {
                 $results .= '<a ' . $attrs .
                     ' title="'.$output_mod->html_safe($folder['basename']).
                     '">'.mb_substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
@@ -914,7 +914,7 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                         if (!$seen) {
                             $imap->message_action('UNREAD', array($msg_id));
                         }
-                        if ($dest_imap->append_start(hex2bin($dest_path[2]), strlen($msg), $seen)) {
+                        if ($dest_imap->append_start(hex2bin($dest_path[2]), mb_strlen($msg), $seen)) {
                             $dest_imap->append_feed($msg."\r\n");
                             if ($dest_imap->append_end()) {
                                 if ($action == 'move') {
@@ -1222,7 +1222,7 @@ function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
     if ($parent) {
         $folder = sprintf('%s%s%s', $parent, $ns['delim'], $folder);
     }
-    if ($folder && $ns['prefix'] && mb_substr($folder, 0, strlen($ns['prefix'])) !== $ns['prefix']) {
+    if ($folder && $ns['prefix'] && mb_substr($folder, 0, mb_strlen($ns['prefix'])) !== $ns['prefix']) {
         $folder = sprintf('%s%s', $ns['prefix'], $folder);
     }
     return $folder;
@@ -1297,7 +1297,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
         if (!count($imap->get_mailbox_status($snooze_folder))) {
             $imap->create_mailbox($snooze_folder);
         }
-        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, strlen($msg))) {
+        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
                 if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
@@ -1309,7 +1309,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     } else {
         $snooze_headers = parse_snooze_header($matches[0]);
         $original_folder = $snooze_headers['from'];
-        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, strlen($msg))) {
+        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
                 if ($imap->select_mailbox($snooze_folder) && $imap->message_action('DELETE', array($msg_id))) {

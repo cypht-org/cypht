@@ -26,7 +26,7 @@ class Hm_Crypt extends Hm_Crypt_Base {
         }
         $res = false;
         $raw_string = base64_decode($string);
-        if (!$raw_string || strlen($raw_string) < 60) {
+        if (!$raw_string || mb_strlen($raw_string) < 60) {
             return false;
         }
         list($salt, $crypt_key) = self::keygen($key, substr($raw_string, 0, 24));

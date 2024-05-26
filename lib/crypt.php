@@ -76,7 +76,7 @@ class Hm_Crypt_Base {
         $string = base64_decode($string);
 
         /* bail if the crypt text is invalid */
-        if (!$string || strlen($string) <= 200) {
+        if (!$string || mb_strlen($string) <= 200) {
             return false;
         }
 
@@ -160,7 +160,7 @@ class Hm_Crypt_Base {
     */
     private static function hash_equals($a, $b) {
         $res = 0;
-        $len = strlen($a);
+        $len = mb_strlen($a);
         for ($i = 0; $i < $len; $i++) {
             $res |= ord($a[$i]) ^ ord($b[$i]);
         }
@@ -176,7 +176,7 @@ class Hm_Crypt_Base {
      * @return bool
      */
     public static function hash_compare($a, $b) {
-        if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
+        if (!is_string($a) || !is_string($b) || mb_strlen($a) !== mb_strlen($b)) {
             return false;
         }
         /* requires PHP >= 7.4 */
@@ -212,7 +212,7 @@ class Hm_Crypt_Base {
         }
 
         /* manual version */
-        $size = strlen(hash($algo, '', true));
+        $size = mb_strlen(hash($algo, '', true));
         $len = ceil($length / $size);
         $result = '';
         for ($i = 1; $i <= $len; $i++) {

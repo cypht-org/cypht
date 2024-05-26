@@ -350,7 +350,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
-        if (is_array($this->get('compose_draft')) && strlen(trim(join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
+        if (is_array($this->get('compose_draft')) && mb_strlen(trim(join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
             $draft = array();
             foreach (parse_mailto($this->request->get['compose_to']) as $name => $val) {
                 if (!$val) {
@@ -1875,7 +1875,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
+    if ($imap->append_start($specials['draft'], mb_strlen($msg), false, true)) {
         $imap->append_feed($msg."\r\n");
         if (!$imap->append_end()) {
             Hm_Msgs::add('ERRAn error occurred saving the draft message');

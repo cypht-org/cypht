@@ -103,7 +103,7 @@ function format_reply_text($txt) {
         if (preg_match("/^(>\s*)+/", $line, $matches)) {
             $pre .= $matches[1];
         }
-        $wrap = 75 + strlen($pre);
+        $wrap = 75 + mb_strlen($pre);
         $new_lines[] = preg_replace("/$pre /", "$pre", "> ".wordwrap($line, $wrap, "\n$pre"));
     }
     return implode("\n", $new_lines);
@@ -412,7 +412,7 @@ function decode_fld($string) {
         foreach ($matches[1] as $v) {
             $fld = substr($v, 2, -2);
             $charset = strtolower(substr($fld, 0, strpos($fld, '?')));
-            $fld = substr($fld, (strlen($charset) + 1));
+            $fld = substr($fld, (mb_strlen($charset) + 1));
             $encoding = $fld[0];
             $fld = substr($fld, (strpos($fld, '?') + 1));
             if (strtoupper($encoding) == 'B') {
@@ -496,7 +496,7 @@ function trim_email($val) {
 if (!hm_exists('addr_split')) {
 function addr_split($str, $seps = array(',', ';')) {
     $str = preg_replace('/(\s){2,}/', ' ', $str);
-    $max = strlen($str);
+    $max = mb_strlen($str);
     $word = '';
     $words = array();
     $capture = false;

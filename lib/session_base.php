@@ -241,7 +241,7 @@ abstract class Hm_Session {
             return false;
         }
         $user = $this->get('username', '');
-        if (!strlen($user)) {
+        if (!mb_strlen($user)) {
             return false;
         }
         return in_array($user, $admins, true);

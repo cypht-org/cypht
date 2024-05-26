@@ -198,7 +198,7 @@ class Fake_Server {
         return true;
     }
     function stream_read($count) {
-        $this->position += strlen($this->response);
+        $this->position += mb_strlen($this->response);
         return $this->response;
     }
     function stream_write($data) {
@@ -212,7 +212,7 @@ class Fake_Server {
         }
         //print_r($this->response);
         rewind(Hm_Functions::$resource);
-        return (strlen($data)+2);
+        return (mb_strlen($data)+2);
     }
     function stream_tell() {
         return $this->position;
@@ -222,7 +222,7 @@ class Fake_Server {
         return true;
     }
     function stream_eof() {
-        $res = $this->position >= strlen($this->response);
+        $res = $this->position >= mb_strlen($this->response);
         return $res;
     }
     function error_resp($data) {
