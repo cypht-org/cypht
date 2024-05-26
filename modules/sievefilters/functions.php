@@ -246,14 +246,14 @@ if (!hm_exists('format_main_script')) {
 if (!hm_exists('generate_script_name')) {
     function generate_script_name($name, $priority)
     {
-        return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cypht';
+        return str_replace(' ', '_', mb_strtolower($name)).'-'.$priority.'-cypht';
     }
 }
 
 if (!hm_exists('generate_filter_name')) {
     function generate_filter_name($name, $priority)
     {
-        return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cyphtfilter';
+        return str_replace(' ', '_', mb_strtolower($name)).'-'.$priority.'-cyphtfilter';
     }
 }
 

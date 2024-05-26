@@ -175,7 +175,7 @@ function format_reply_address($fld, $excluded) {
     foreach ($addr as $v) {
         $skip = false;
         foreach ($excluded as $ex) {
-            if (strtolower($v['email']) == strtolower($ex['email'])) {
+            if (mb_strtolower($v['email']) == mb_strtolower($ex['email'])) {
                 $skip = true;
                 break;
             }
@@ -279,7 +279,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
     $msg = '';
     $type = 'textplain';
     if (array_key_exists('type', $struct) && array_key_exists('subtype', $struct)) {
-        $type = strtolower($struct['type']).strtolower($struct['subtype']);
+        $type = mb_strtolower($struct['type']).mb_strtolower($struct['subtype']);
     }
     if ($html == 1) {
         $msg = format_reply_as_html($body, $type, $reply_type, $lead_in);
@@ -411,7 +411,7 @@ function decode_fld($string) {
     if (preg_match_all("/(=\?[^\?]+\?(q|b)\?[^\?]+\?=)/i", $string, $matches)) {
         foreach ($matches[1] as $v) {
             $fld = mb_substr($v, 2, -2);
-            $charset = strtolower(mb_substr($fld, 0, mb_strpos($fld, '?')));
+            $charset = mb_strtolower(mb_substr($fld, 0, mb_strpos($fld, '?')));
             $fld = mb_substr($fld, (mb_strlen($charset) + 1));
             $encoding = $fld[0];
             $fld = mb_substr($fld, (mb_strpos($fld, '?') + 1));

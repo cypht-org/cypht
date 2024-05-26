@@ -3,7 +3,7 @@
 /**
  * CLI script to update a user password
  */
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 

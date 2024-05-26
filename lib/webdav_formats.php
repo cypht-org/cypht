@@ -61,11 +61,11 @@ trait Hm_Card_Line_Parse {
      * @return boolean
      */
     private function invalid_prop($prop) {
-        if (strtolower(mb_substr($prop, 0, 2)) == 'x-') {
+        if (mb_strtolower(mb_substr($prop, 0, 2)) == 'x-') {
             return false;
         }
         foreach ($this->properties as $name => $value) {
-            if (strtolower($prop) == strtolower($value)) {
+            if (mb_strtolower($prop) == mb_strtolower($value)) {
                 return false;
             }
         }
@@ -80,7 +80,7 @@ trait Hm_Card_Line_Parse {
      */
     private function invalid_param($param) {
         foreach ($this->parameters as $val) {
-            if (strtolower($param) == strtolower($val)) {
+            if (mb_strtolower($param) == mb_strtolower($val)) {
                 return false;
             }
         }
@@ -120,7 +120,7 @@ trait Hm_Card_Line_Parse {
                 if ($this->invalid_param($pair[0])) {
                     continue;
                 }
-                $res[strtolower($pair[0])] = $this->flatten(
+                $res[mb_strtolower($pair[0])] = $this->flatten(
                     $this->process_value($pair[1]));
             }
         }
@@ -258,7 +258,7 @@ class Hm_Card_Parse {
         }
         if (is_array($vals['type']) && in_array($type, $vals['type'])) {
             return true;
-        } elseif (strtolower($type) == strtolower($vals['type'])) {
+        } elseif (mb_strtolower($type) == mb_strtolower($vals['type'])) {
             return true;
         }
         return false;
@@ -293,10 +293,10 @@ class Hm_Card_Parse {
             $data['values'] = $this->flatten(
                 $this->process_value($vals[1], $prop['prop']));
             $data['id'] = $id;
-            if (array_key_exists(strtolower($prop['prop']), $this->data)) {
-                $this->data[strtolower($prop['prop'])][] = $data;
+            if (array_key_exists(mb_strtolower($prop['prop']), $this->data)) {
+                $this->data[mb_strtolower($prop['prop'])][] = $data;
             } else {
-                $this->data[strtolower($prop['prop'])] = [$data];
+                $this->data[mb_strtolower($prop['prop'])] = [$data];
             }
         }
         $this->data['raw'] = $this->raw_card;
@@ -314,13 +314,13 @@ class Hm_Card_Parse {
         if (count($lines) < 4) {
             $res = false;
         }
-        if (count($lines) > 0 && strtolower(mb_substr($lines[0], 0, 5)) != 'begin') {
+        if (count($lines) > 0 && mb_strtolower(mb_substr($lines[0], 0, 5)) != 'begin') {
             $res = false;
         }
-        if (count($lines) > 1 && strtolower(mb_substr($lines[1], 0, 7)) != 'version') {
+        if (count($lines) > 1 && mb_strtolower(mb_substr($lines[1], 0, 7)) != 'version') {
             $res = false;
         }
-        if (count($lines) && strtolower(mb_substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
+        if (count($lines) && mb_strtolower(mb_substr($lines[(count($lines) - 1)], 0, 3)) != 'end') {
             $res = false;
         }
         if (!$res) {
@@ -377,9 +377,9 @@ class Hm_Card_Parse {
     protected function build_vcard_params($fld_val) {
         $props = [];
         foreach ($this->parameters as $param) {
-            if (array_key_exists(strtolower($param), $fld_val)) {
+            if (array_key_exists(mb_strtolower($param), $fld_val)) {
                 $props[] = sprintf('%s=%s', strtoupper($param),
-                    $this->combine($fld_val[strtolower($param)]));
+                    $this->combine($fld_val[mb_strtolower($param)]));
             }
         }
         return $props;
@@ -461,7 +461,7 @@ class Hm_VCard extends Hm_Card_Parse {
     protected function format_addr($vals) {
         $name = 'address';
         if (array_key_exists('type', $vals)) {
-            $name = sprintf('%s_address', strtolower($vals['type']));
+            $name = sprintf('%s_address', mb_strtolower($vals['type']));
         }
         $vals = $vals['values'];
         $street = $vals['street'];

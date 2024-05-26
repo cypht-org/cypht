@@ -103,7 +103,7 @@ class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
         $headers = $this->get('msg_headers', array());
         $addresses = array();
         foreach ($headers as $name => $value) {
-            if (in_array(strtolower($name), $addr_headers, true)) {
+            if (in_array(mb_strtolower($name), $addr_headers, true)) {
                 foreach (Hm_Address_Field::parse($value) as $vals) {
                     if (!$existing->search(array('email_address' => $vals['email']))) {
                         $addresses[] = $vals;

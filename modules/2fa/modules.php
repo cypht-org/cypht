@@ -217,7 +217,7 @@ class Hm_Output_2fa_dialog extends Hm_Output_Module {
             $lang = 'en-us';
             $dir = 'ltr';
             if ($this->lang) {
-                $lang = strtolower(str_replace('_', '-', $this->lang));
+                $lang = mb_strtolower(str_replace('_', '-', $this->lang));
             }
             if ($this->dir) {
                 $dir = $this->dir;

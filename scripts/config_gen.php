@@ -4,7 +4,7 @@
  * CLI script to build the site configuration
  */
 
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 

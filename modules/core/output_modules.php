@@ -387,7 +387,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
         $lang = 'en';
         $dir = 'ltr';
         if ($this->lang) {
-            $lang = strtolower(str_replace('_', '-', $this->lang));
+            $lang = mb_strtolower(str_replace('_', '-', $this->lang));
         }
         if ($this->dir) {
             $dir = $this->dir;
@@ -1779,7 +1779,7 @@ class Hm_Output_home_password_dialogs extends Hm_Output_Module {
                 ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'</p>';
 
             foreach ($missing as $vals) {
-                $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
+                $id = $this->html_safe(sprintf('%s_%s', mb_strtolower($vals['type']), $vals['id']));
                 $res .= '<div class="div_'.$id.' mt-3">'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
                     ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <div class="input-group mt-2"><input placeholder="'.$this->trans('Password').
                     '" type="password" class="form-control pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update btn btn-primary" data-id="'.$id.
