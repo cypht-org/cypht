@@ -221,7 +221,7 @@ class Hm_Address_Field {
     }
 
     private static function get_token($string) {
-        $marker = strrpos($string, ' ');
+        $marker = mb_strrpos($string, ' ');
         $token = trim(ltrim(substr($string, $marker)), '<>');
         $string = substr($string, 0, $marker);
         return array($marker, $token, $string);
