@@ -1,6 +1,6 @@
 <?php
 
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 /* debug mode has to be set to something or include files will die() */

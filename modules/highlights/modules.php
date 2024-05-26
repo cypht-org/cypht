@@ -69,7 +69,7 @@ class Hm_Handler_highlight_process_form extends Hm_Handler_Module {
         if (!in_array($form['hl_source_type'], array('imap', 'feeds', 'github'))) {
             return;
         }
-        if (!preg_match("/^#[0-9abcdef]{6}$/", strtolower($form['hl_color']))) {
+        if (!preg_match("/^#[0-9abcdef]{6}$/", mb_strtolower($form['hl_color']))) {
             return;
         }
         foreach (array('hl_important', 'hl_imap_flags', 'hl_imap_sources', 'hl_feeds_sources', 'hl_github_sources') as $fld) {

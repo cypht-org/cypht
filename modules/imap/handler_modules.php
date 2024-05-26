@@ -484,7 +484,7 @@ class Hm_Handler_imap_show_message extends Hm_Handler_Module {
                             $part_struct = array_shift($struct);
                             $encoding = false;
                             if (array_key_exists('encoding', $part_struct)) {
-                                $encoding = trim(strtolower($part_struct['encoding']));
+                                $encoding = trim(mb_strtolower($part_struct['encoding']));
                             }
                             $stream_size = $imap->start_message_stream($uid, $msg_id);
                             if ($stream_size > 0) {
@@ -547,7 +547,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                             $part_struct = array_shift($struct);
                             $encoding = false;
                             if (array_key_exists('encoding', $part_struct)) {
-                                $encoding = trim(strtolower($part_struct['encoding']));
+                                $encoding = trim(mb_strtolower($part_struct['encoding']));
                             }
                             $stream_size = $imap->start_message_stream($uid, $msg_id);
                             if ($stream_size > 0) {
@@ -1903,11 +1903,11 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                             }
                         }
                     }
-                    if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
+                    if (isset($msg_struct_current['subtype']) && mb_strtolower($msg_struct_current['subtype'] == 'html')) {
                         $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
                     }
                     $save_reply_text = false;
-                    if ($part == 0 || (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text'))) {
+                    if ($part == 0 || (isset($msg_struct_current['type']) && mb_strtolower($msg_struct_current['type'] == 'text'))) {
                         $save_reply_text = true;
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);

@@ -3,7 +3,7 @@
 /**
  * CLI script to add a user account to the local DB
  */
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 

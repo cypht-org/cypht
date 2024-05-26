@@ -560,7 +560,7 @@ if (!hm_exists('get_mime_type')) {
     {
         $idx = explode('.', $filename);
         $count_explode = count($idx);
-        $idx = strtolower($idx[$count_explode - 1]);
+        $idx = mb_strtolower($idx[$count_explode - 1]);
 
         $mimet = array(
             'txt' => 'text/plain',

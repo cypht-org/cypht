@@ -740,7 +740,7 @@ function build_github_subject($event, $output_mod) {
     $pre = '['.$output_mod->html_safe(trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type']))))).']';
     $post = '';
     $max = 100;
-    switch (strtolower($event['type'])) {
+    switch (mb_strtolower($event['type'])) {
         case 'issuecommentevent':
             $post = $event['payload']['issue']['title'];
             break;

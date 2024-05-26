@@ -334,7 +334,7 @@ function setup_db($config) {
     $config->set('db_pass', 'cypht_test');
 }
 function flatten($str) {
-    return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
+    return mb_strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
 }
 function filters() {
     return array(

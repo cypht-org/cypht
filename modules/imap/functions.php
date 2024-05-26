@@ -416,7 +416,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'multipartmixed',
         'messagerfc822',
     );
-    $lc_type = strtolower($vals['type']).strtolower($vals['subtype']);
+    $lc_type = mb_strtolower($vals['type']).mb_strtolower($vals['subtype']);
     if ($simple_view) {
         if (filter_message_part($vals)) {
             return '';
@@ -442,8 +442,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     if ($use_icons && array_key_exists($lc_type, $icons)) {
         $icon = $icons[$lc_type];
     }
-    elseif ($use_icons && array_key_exists(strtolower($vals['type']), $icons)) {
-        $icon = $icons[strtolower($vals['type'])];
+    elseif ($use_icons && array_key_exists(mb_strtolower($vals['type']), $icons)) {
+        $icon = $icons[mb_strtolower($vals['type'])];
     }
     if ($icon) {
         $res .= '<i class="bi bi-file-plus-fill msg_part_icon"></i> ';
@@ -452,11 +452,11 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         $res .= '<i class="bi bi-file-plus-fill msg_part_icon msg_part_placeholder"></i> ';
     }
     if (in_array($lc_type, $allowed, true)) {
-        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
-            ' / '.$output_mod->html_safe(strtolower($vals['subtype'])).'</a>';
+        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(mb_strtolower($vals['type'])).
+            ' / '.$output_mod->html_safe(mb_strtolower($vals['subtype'])).'</a>';
     }
     else {
-        $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
+        $res .= $output_mod->html_safe(mb_strtolower($vals['type'])).' / '.$output_mod->html_safe(mb_strtolower($vals['subtype']));
     }
     if ($mobile) {
         $res .= '<div class="part_size">'.$output_mod->html_safe($size);
@@ -466,8 +466,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     else {
         $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
         if (!$simple_view) {
-            $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-                '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+            $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(mb_strtolower($vals['encoding'])) : '').
+                '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : '');
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
         $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
@@ -636,8 +636,8 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
 
             $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
             $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
-            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
+            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(mb_strtolower($vals['encoding'])) : '').
+            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : ''); */
 
             $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
         }
@@ -999,11 +999,11 @@ function get_imap_mime_extension($type, $subtype) {
  */
 if (!hm_exists('get_imap_part_name')) {
 function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
-    $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
+    $extension = get_imap_mime_extension(mb_strtolower($struct['type']), mb_strtolower($struct['subtype']));
     if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) &&
         array_key_exists('attachment', $struct['file_attributes']) && is_array($struct['file_attributes']['attachment'])) {
         for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
-            if (strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
+            if (mb_strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['file_attributes']['attachment'])) {
                     return trim($struct['file_attributes']['attachment'][($i+1)]);
                 }
@@ -1013,7 +1013,7 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
 
     if (array_key_exists('disposition', $struct) && is_array($struct['disposition']) && array_key_exists('attachment', $struct['disposition']) && is_array($struct['disposition']['attachment'])) {
         for ($i=0;$i<count($struct['disposition']['attachment']);$i++) {
-            if (strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
+            if (mb_strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['disposition']['attachment'])) {
                     return trim($struct['disposition']['attachment'][($i+1)]);
                 }

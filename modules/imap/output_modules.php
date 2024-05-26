@@ -96,7 +96,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
                 $txt .= format_imap_envelope($struct['envelope'], $this);
             }
-            if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
+            if (isset($struct['subtype']) && mb_strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
                 $msgText = $this->get('msg_text');
                 // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
@@ -110,8 +110,8 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
 
                 $txt .= format_msg_html($msgText, $allowed);
             }
-            elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
-                $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
+            elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
+                $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
                 if ($this->get('imap_msg_part') === "0") {
@@ -179,7 +179,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
-                    if ($fld == strtolower($name)) {
+                    if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
                             if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
@@ -285,7 +285,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }
                         }
                         else {
-                            if (strtolower($name) == 'flags') {
+                            if (mb_strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');
                                 $value = str_replace('\\', '', $value);
                                 $new_value = array();
@@ -302,7 +302,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             foreach ($headers as $name => $value) {
-                if (!in_array(strtolower($name), $small_headers)) {
+                if (!in_array(mb_strtolower($name), $small_headers)) {
                     if (is_array($value)) {
                         foreach ($value as $line) {
                             $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($line).'</td></tr>';
@@ -461,8 +461,8 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="' . strtolower($type) . '_server mb-3">';
-            $res .= '<form class="imap_connect" method="POST"><div class="row">';
+            $res .= '<div class="' . mb_strtolower($type) . '_server">';
+            $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
