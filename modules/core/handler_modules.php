@@ -1101,8 +1101,12 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
                 }
 
-                Hm_Msgs::add("Server saved");
+                if ($this->module_is_supported('imap_folders')) {
+                    $this->out('imap_server_id', $this->imap_server_id);
+                    $this->out('imap_service_name', $provider);
+                }
                 $this->out('just_saved_credentials', true);
+                Hm_Msgs::add("Server saved");
             }
         }
     }

@@ -2189,32 +2189,47 @@ function submitSmtpImapServer() {
         Hm_Notices.show(res.router_user_msgs);
 
         if (res.just_saved_credentials) {
-            $('#srv_setup_stepper_stepper').find('form').trigger('reset');
-            display_config_step(0);
-
-            //Initialize the form
-            $("#srv_setup_stepper_profile_reply_to").val('');
-            $("#srv_setup_stepper_profile_signature").val('');
-            $("#srv_setup_stepper_profile_name").val('');
-            $("#srv_setup_stepper_email").val('');
-            $("#srv_setup_stepper_password").val('');
-            $("#srv_setup_stepper_profile_is_default").prop('checked', true);
-            $("#srv_setup_stepper_is_sender").prop('checked', true);
-            $("#srv_setup_stepper_is_receiver").prop('checked', true);
-            $("#srv_setup_stepper_enable_sieve").prop('checked', false);
-            $("#srv_setup_stepper_only_jmap").prop('checked', false);
-            $('#step_config-imap_bloc').show();
-            $('#step_config-smtp_bloc').show();
-            $('#srv_setup_stepper_profile_bloc').show();
-
-            Hm_Utils.set_unsaved_changes(1);
-            Hm_Folders.reload_folders(true);
-            location.reload();
+            if (res.imap_server_id) {
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
+                    {'name': 'imap_server_id', value: res.imap_server_id},
+                    {'name': 'imap_service_name', value: res.imap_service_name}],
+                    function () {
+                        resetQuickSetupForm();
+                    }
+                );
+            } else {
+                resetQuickSetupForm();
+            }
         }
     }, null, null, function (res) {
         $('#srv_setup_stepper_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
     });
+}
+
+function resetQuickSetupForm() {
+    $('#srv_setup_stepper_stepper').find('form').trigger('reset');
+    display_config_step(0);
+
+    //Initialize the form
+    $("#srv_setup_stepper_profile_reply_to").val('');
+    $("#srv_setup_stepper_profile_signature").val('');
+    $("#srv_setup_stepper_profile_name").val('');
+    $("#srv_setup_stepper_email").val('');
+    $("#srv_setup_stepper_password").val('');
+    $("#srv_setup_stepper_profile_is_default").prop('checked', true);
+    $("#srv_setup_stepper_is_sender").prop('checked', true);
+    $("#srv_setup_stepper_is_receiver").prop('checked', true);
+    $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_only_jmap").prop('checked', false);
+    $('#step_config-imap_bloc').show();
+    $('#step_config-smtp_bloc').show();
+    $('#srv_setup_stepper_profile_bloc').show();
+
+    Hm_Utils.set_unsaved_changes(1);
+    Hm_Folders.reload_folders(true);
+    location.reload();
 }
 
 function handleCreateProfileCheckboxChange(checkbox) {

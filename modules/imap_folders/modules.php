@@ -129,6 +129,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
  */
 class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
     public function process() {
+
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
         if ($success) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
