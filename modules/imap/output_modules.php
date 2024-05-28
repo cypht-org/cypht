@@ -370,10 +370,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
-            $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
-            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            if ($this->get('sieve_filters_enabled')) {
+            $is_draft = isset($headers['Flags']) && stristr($headers['Flags'], 'draft');
+            if ($this->get('sieve_filters_enabled') && !$is_draft) {
+                $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
@@ -393,8 +393,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
+            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            if (isset($headers['Flags']) && stristr($headers['Flags'], 'draft')) {
+            if ($is_draft) {
                 $txt .= ' | <a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
             }
             $txt .= '<div class="move_to_location"></div></div>';
