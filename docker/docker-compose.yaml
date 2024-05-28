@@ -14,7 +14,7 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
   cypht:
-    image: jonocodes/cypht:2.0.1-docker-wip
+    image: cypht/cypht:2.0.1
     ports:
       - "80:80"
     # env_file:
