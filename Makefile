@@ -1,3 +1,6 @@
+
+DOCKERHUB_REPO=cypht/cypht
+
 .PHONY: docker-up
 docker-up:  ## start docker stack in foreground for development
 	docker compose -f docker-compose.dev.yaml up --build || true # --abort-on-container-exit
@@ -5,9 +8,8 @@ docker-up:  ## start docker stack in foreground for development
 .PHONY: docker-push
 .ONESHELL:
 docker-push:  ## build, tag, and push image to dockerhub. presumes you are logged in. run with a version like tag:1.2.3
-	@username=$$(docker info | sed '/Username:/!d;s/.* //')
 	@[ "$(tag)" = "" ] && (echo "Tag required. Example tag=1.2.3" ; exit 1)
-	@image=$${username}/cypht:$(tag)
+	@image=$(DOCKERHUB_REPO):$(tag)
 	@echo "Building image $${image}"
 	@docker buildx build . --platform linux/amd64 \
 		-t $${image} -f docker/Dockerfile --push
@@ -16,9 +18,7 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 .PHONY: dockerhub-push-readme
 .ONESHELL:
 dockerhub-push-readme:  ## upload readme to dockerhub
-	@username=$$(docker info | sed '/Username:/!d;s/.* //')
-	@docker pushrm --file docker/DOCKERHUB-README.md $${username}/cypht
-	@echo docker pushrm --file docker/DOCKERHUB-README.md $${username}/cypht
+	docker pushrm --file docker/DOCKERHUB-README.md $(DOCKERHUB_REPO)
 
 .PHONY: setup
 .ONESHELL:

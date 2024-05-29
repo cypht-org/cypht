@@ -15,7 +15,7 @@ It recommended that you choose a specific version number tag instead of using 'l
 ## Example docker-compose
 
 See example file here:
-https://github.com/jonocodes/cypht/blob/docker-refresh/docker/docker-compose.yaml
+https://github.com/cypht-org/cypht/blob/master/docker/docker-compose.yaml
 
 * Starts a database container to be for user authentication
 * Starts the Cypht container available on port 80 of the host with ...
