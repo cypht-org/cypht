@@ -498,6 +498,7 @@ function Message_List() {
         'flagged': 'formatted_flagged_data',
         'junk': 'formatted_junk_data',
         'trash': 'formatted_trash_data',
+        'sent': 'formatted_sent_data',
         'drafts': 'formatted_drafts_data'
     };
 
@@ -566,7 +567,6 @@ function Message_List() {
             id = ids[i];
             if ((id+'').search('_') != -1) {
                 parts = id.split('_', 2);
-                parts[0] -= 0;
                 re = new RegExp(parts[1]+'$');
                 parts[1] = re;
             }
