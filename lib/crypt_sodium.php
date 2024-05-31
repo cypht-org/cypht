@@ -26,12 +26,12 @@ class Hm_Crypt extends Hm_Crypt_Base {
         }
         $res = false;
         $raw_string = base64_decode($string);
-        if (!$raw_string || mb_strlen($raw_string) < 60) {
+        if (!$raw_string || mb_strlen($raw_string, '8bit') < 60) {
             return false;
         }
-        list($salt, $crypt_key) = self::keygen($key, mb_substr($raw_string, 0, 24));
-        $hmac = mb_substr($raw_string, 24, 32);
-        $crypt_string = mb_substr($raw_string, 56);
+        list($salt, $crypt_key) = self::keygen($key, mb_substr($raw_string, 0, 24, '8bit'));
+        $hmac = mb_substr($raw_string, 24, 32, '8bit');
+        $crypt_string = mb_substr($raw_string, 56, null, '8bit');
 
         if (Hm_Sodium_Compat::crypto_auth_verify($hmac, $crypt_string, $crypt_key)) {
             $res = Hm_Sodium_Compat::crypto_secretbox_open($crypt_string, $salt, $crypt_key);
