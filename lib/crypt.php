@@ -76,18 +76,18 @@ class Hm_Crypt_Base {
         $string = base64_decode($string);
 
         /* bail if the crypt text is invalid */
-        if (!$string || mb_strlen($string) <= 200) {
+        if (!$string || mb_strlen($string, '8bit') <= 200) {
             return false;
         }
 
         /* get the payload and salt */
-        $crypt_string = mb_substr($string, 192);
-        $salt = mb_substr($string, 0, 128);
+        $crypt_string = mb_substr($string, 192, null, '8bit');
+        $salt = mb_substr($string, 0, 128, null, '8bit');
 
         /* check the signature. Temporarily allow the same key for hmac validation, eventually remove the $encryption_rounds
          * check and require the hmac_rounds check only! */
-        if (!self::check_hmac($crypt_string, mb_substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
-            !self::check_hmac($crypt_string, mb_substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
+        if (!self::check_hmac($crypt_string, mb_substr($string, 128, 64, '8bit'), $salt, $key, self::$hmac_rounds) &&
+            !self::check_hmac($crypt_string, mb_substr($string, 128, 64, '8bit'), $salt, $key, self::$encryption_rounds)) {
             Hm_Debug::add('HMAC verification failed');
             return false;
         }
