@@ -1799,6 +1799,24 @@ var reset_default_value_checkbox = function() {
     }
 };
 
+var reset_default_value_input_webhook_token = function() {
+    let field = this.parentElement.parentElement.querySelector('input[type="text"]');
+    const defaultValue = field.getAttribute("data-default-value");
+
+    if (field.disabled == false) {
+        this.style.transform = "scaleX(1)";
+        this.parentElement.setAttribute("restore_aria_label", hm_trans("Restore current value"));
+        field.setAttribute("current_value", field.value);
+        field.value = defaultValue; // Use the default value (which is now an empty string)
+        field.disabled = true;
+    } else {
+        this.style.transform = "scaleX(-1)";
+        this.parentElement.setAttribute("restore_aria_label", hm_trans("Restore default value"));
+        field.value = field.getAttribute("current_value");
+        field.disabled = false;
+    }
+};
+
 var reset_default_value_select = function() {
     let field = this.parentElement.parentElement.firstChild;
     let tab_static_default_value = {"inline_message_style" : 0, "smtp_compose_type" : 0, "theme_setting" : 0,
@@ -1942,6 +1960,7 @@ $(function() {
         $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
+        $('.reset_default_value_input_webhook_token').on("click", reset_default_value_input_webhook_token);
     }
 
     if (hm_check_dirty_flag()) {
@@ -2602,7 +2621,7 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
                 if (mutation.addedNodes.length > 0) {
                     mutation.addedNodes.forEach(function (node) {
                         if (node.classList.contains('msg_text_inner')) {
-                            handleExternalResources(inline);                    
+                            handleExternalResources(inline);
                         }
                     });
                 }

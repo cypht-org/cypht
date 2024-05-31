@@ -1133,11 +1133,11 @@ class Hm_Output_webhook_token_setting extends Hm_Output_Module {
             $webhook_token = $settings['webhook_token'];
         }
         if (!empty($webhook_token)) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input" default-value=""></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input_webhook_token"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="imap_per_page">'.
+        return '<tr class="general_setting"><td><label for="webhook_token">'.
             $this->trans('Webhook telegram token').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="webhook_token" '.
-            'name="webhook_token" value="'.$this->html_safe($webhook_token).'" />'.$reset.'</td></tr>';
+            'name="webhook_token" value="'.$this->html_safe($webhook_token).'" data-default-value="" />'.$reset.'</td></tr>';
     }
 }
 
