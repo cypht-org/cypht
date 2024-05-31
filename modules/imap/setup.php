@@ -37,6 +37,7 @@ add_handler('settings', 'process_pagination_links', true, 'imap', 'date', 'after
 add_handler('settings', 'process_enable_simple_download_options', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_unread_on_open', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_webhook_token_setting', true, 'imap', 'save_user_settings', 'before');
 add_handler('settings', 'process_max_google_contacts_number', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_review_sent_email_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_auto_advance_email_setting', true, 'imap', 'date', 'after');
@@ -51,6 +52,7 @@ add_output('settings', 'imap_simple_msg_parts', true, 'imap', 'imap_msg_icons_se
 add_output('settings', 'imap_pagination_links', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_unread_on_open', true, 'imap', 'imap_msg_icons_setting', 'after');
 add_output('settings', 'imap_per_page_setting', true, 'imap', 'imap_pagination_links', 'after');
+add_output('settings', 'webhook_token_setting', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'enable_simple_download_options', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'max_google_contacts_number', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'review_sent_email', true, 'imap', 'imap_pagination_links', 'after');
@@ -416,6 +418,7 @@ return array(
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
         'imap_snooze_ids' => FILTER_DEFAULT,
         'imap_snooze_until' => FILTER_DEFAULT,
-        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN
+        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN,
+        'webhook_token' => FILTER_DEFAULT,
     )
 );

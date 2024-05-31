@@ -93,6 +93,16 @@ class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_process_webhook_token_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        function webhook_token_callback($val) { return $val; }
+        process_site_setting('webhook_token', $this, 'webhook_token_callback', false, true);
+    }
+}
+
 /**
  * Process input from the max google contacts input in the settings page
  * @subpackage imap/handler

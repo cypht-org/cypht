@@ -1124,6 +1124,23 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
     }
 }
 
+class Hm_Output_webhook_token_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $webhook_token = '';
+        $reset = '';
+        if (array_key_exists('webhook_token', $settings)) {
+            $webhook_token = $settings['webhook_token'];
+        }
+        if (!empty($webhook_token)) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input" default-value=""></i></span>';
+        }
+        return '<tr class="general_setting"><td><label for="imap_per_page">'.
+            $this->trans('Webhook telegram token').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="webhook_token" '.
+            'name="webhook_token" value="'.$this->html_safe($webhook_token).'" />'.$reset.'</td></tr>';
+    }
+}
+
 /**
  * Option to set number of google contacts
  * @subpackage imap/output
