@@ -324,7 +324,7 @@ class Hm_IMAP_Base {
 
             /* check for untagged error condition. This represents a server problem but there is no reason
              * we can't attempt to recover with the partial response we received up until this point */
-            if (mb_substr(strtoupper($result[$n]), 0, 6) == '* BYE ') {
+            if (mb_substr(mb_strtoupper($result[$n]), 0, 6) == '* BYE ') {
                 break;
             }
 
@@ -396,7 +396,7 @@ class Hm_IMAP_Base {
             if (!empty($data) && isset($data[(count($data) - 1)])) {
                 $vals = $data[(count($data) - 1)];
                 if ($vals[0] == 'A'.$this->command_count) {
-                    if (strtoupper($vals[1]) == 'OK') {
+                    if (mb_strtoupper($vals[1]) == 'OK') {
                         $result = true;
                     }
                 }
@@ -473,7 +473,7 @@ class Hm_IMAP_Base {
                 }
                 break;
             case 'charset':
-                if (!$val || in_array(strtoupper($val), $imap_search_charsets)) {
+                if (!$val || in_array(mb_strtoupper($val), $imap_search_charsets)) {
                     $valid = true;
                 }
                 break;
@@ -493,7 +493,7 @@ class Hm_IMAP_Base {
                 }
                 break;
             case 'keyword';
-                if (in_array(strtoupper($val), $imap_keywords)) {
+                if (in_array(mb_strtoupper($val), $imap_keywords)) {
                     $valid = true;
                 }
                 break;

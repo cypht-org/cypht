@@ -73,7 +73,7 @@ class Hm_Carddav {
         $card = array('BEGIN:VCARD', 'VERSION:3', sprintf('UID:%s', $uid));
         foreach ($this->card_flds as $name => $cname) {
             if (array_key_exists($name, $form) && trim($form[$name])) {
-                $card[] = sprintf('%s:%s', strtoupper($cname), $form[$name]);
+                $card[] = sprintf('%s:%s', mb_strtoupper($cname), $form[$name]);
             }
         }
         $card[] = 'END:VCARD';

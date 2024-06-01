@@ -415,10 +415,10 @@ function decode_fld($string) {
             $fld = mb_substr($fld, (mb_strlen($charset) + 1));
             $encoding = $fld[0];
             $fld = mb_substr($fld, (mb_strpos($fld, '?') + 1));
-            if (strtoupper($encoding) == 'B') {
+            if (mb_strtoupper($encoding) == 'B') {
                 $fld = convert_to_utf8(base64_decode($fld), $charset);
             }
-            elseif (strtoupper($encoding) == 'Q') {
+            elseif (mb_strtoupper($encoding) == 'Q') {
                 $fld = convert_to_utf8(quoted_printable_decode(str_replace('_', ' ', $fld)), $charset);
             }
             $string = str_replace($v, $fld, $string);

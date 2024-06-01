@@ -362,7 +362,7 @@ class Hm_Card_Parse {
             $res;
         }
         foreach ($vals as $val) {
-            $name = mb_substr($name, 0, 2) == 'x-' ? $name : strtoupper($name);
+            $name = mb_substr($name, 0, 2) == 'x-' ? $name : mb_strtoupper($name);
             $params = array_merge([$name], $this->build_vcard_params($val));
             $res[] = sprintf("%s:%s", implode(';', $params), $val['values']);
         }
@@ -378,7 +378,7 @@ class Hm_Card_Parse {
         $props = [];
         foreach ($this->parameters as $param) {
             if (array_key_exists(mb_strtolower($param), $fld_val)) {
-                $props[] = sprintf('%s=%s', strtoupper($param),
+                $props[] = sprintf('%s=%s', mb_strtoupper($param),
                     $this->combine($fld_val[mb_strtolower($param)]));
             }
         }
