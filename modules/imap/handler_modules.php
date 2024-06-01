@@ -778,7 +778,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 
         $filter = 'ALL';
         if ($this->get('list_filter')) {
-            $filter = strtoupper($this->get('list_filter'));
+            $filter = mb_strtoupper($this->get('list_filter'));
         }
         $keyword = $this->get('list_keyword', '');
         list($sort, $rev) = process_sort_arg($this->get('list_sort'), $this->user_config->get('default_sort_order_setting', 'arrival'));
@@ -1151,7 +1151,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                 }
                                 else {
-                                    if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
+                                    if (!$imap->message_action(mb_strtoupper($form['action_type']), $uids)) {
                                         $errs++;
                                     }
                                     else {

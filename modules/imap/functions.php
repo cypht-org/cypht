@@ -867,7 +867,7 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
-            if ($imap->message_action(strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+            if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                 }
@@ -1073,7 +1073,7 @@ function imap_authed($imap) {
 if (!hm_exists('process_sort_arg')) {
 function process_sort_arg($sort, $default = 'arrival') {
     if (!$sort) {
-        $default = strtoupper($default);
+        $default = mb_strtoupper($default);
         return array($default, true);
     }
     $rev = false;
@@ -1081,7 +1081,7 @@ function process_sort_arg($sort, $default = 'arrival') {
         $rev = true;
         $sort = mb_substr($sort, 1);
     }
-    $sort = strtoupper($sort);
+    $sort = mb_strtoupper($sort);
     if ($sort == 'ARRIVAL' || $sort == 'DATE') {
         $rev = $rev ? false : true;
     }
@@ -1096,7 +1096,7 @@ function imap_server_type($id) {
     $type = 'IMAP';
     $details = Hm_IMAP_List::dump($id);
     if (is_array($details) && array_key_exists('type', $details)) {
-        $type = strtoupper($details['type']);
+        $type = mb_strtoupper($details['type']);
     }
     return $type;
 }}
