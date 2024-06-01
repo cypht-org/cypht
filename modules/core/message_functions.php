@@ -15,7 +15,7 @@
  */
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
-    $str = str_ireplace('</body>', '', $str);
+    $str = mb_eregi_replace('</body>', '', $str);
 
     $config = HTMLPurifier_Config::createDefault();
     $config->set('HTML.DefinitionID', 'hm-message');
