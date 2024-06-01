@@ -529,7 +529,7 @@ abstract class Hm_Output_Module {
         if (!is_numeric($number) || !in_array($this->lang, ['fa'])) {
             return $number;
         }
-        $number_splitted = str_split($number);
+        $number_splitted = mb_str_split($number);
         $translated_number = "";
         foreach ($number_splitted as $number_splitted) {
             $translated_number .= $this->trans($number_splitted);
