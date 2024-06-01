@@ -82,7 +82,7 @@ class Hm_Crypt_Base {
 
         /* get the payload and salt */
         $crypt_string = mb_substr($string, 192, null, '8bit');
-        $salt = mb_substr($string, 0, 128, null, '8bit');
+        $salt = mb_substr($string, 0, 128, '8bit');
 
         /* check the signature. Temporarily allow the same key for hmac validation, eventually remove the $encryption_rounds
          * check and require the hmac_rounds check only! */

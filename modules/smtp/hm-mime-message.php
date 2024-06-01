@@ -134,7 +134,7 @@ class Hm_MIME_Msg {
     function split_val($val, $bsize) {
         $count = ceil($bsize/75);
         $size = round(mb_strlen($val)/$count);
-        return str_split($val, $size);
+        return mb_str_split($val, $size);
     }
 
     function encode_fld($val, $single=false) {
