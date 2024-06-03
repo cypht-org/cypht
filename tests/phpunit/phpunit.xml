@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+  <php>
+      <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
+  </php>
   <testsuites>
     <testsuite name="session">
       <file>./session.php</file>

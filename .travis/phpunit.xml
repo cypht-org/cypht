@@ -1,4 +1,7 @@
 <phpunit strict="false" colors="true">
+    <php>
+        <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
+    </php>
     <testsuite name="session">
         <file>./session.php</file>
     </testsuite>
