@@ -1,5 +1,4 @@
 <?php
-
 /**
  * IMAP modules
  * @package modules
@@ -7,7 +6,6 @@
  */
 
 if (!defined('DEBUG_MODE')) { die(); }
-
 
 /**
  * Check for attachments when forwarding a message
@@ -1316,6 +1314,12 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
     }
+
+
+
+
+
+
 }
 
 /**
