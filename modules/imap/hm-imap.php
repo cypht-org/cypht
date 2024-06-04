@@ -96,6 +96,9 @@ if (!class_exists('Hm_IMAP')) {
         /* convert folder names to utf7 */
         public $utf7_folders = true;
 
+        /* defaults to LOGIN, CRAM-MD5 also supported but experimental */
+        public $auth = false;
+
         /* search character set to use. can be US-ASCII, UTF-8, or '' */
         public $search_charset = '';
 
@@ -243,6 +246,20 @@ if (!class_exists('Hm_IMAP')) {
                 $this->starttls();
             }
             switch (strtolower($this->auth)) {
+
+                case 'cram-md5':
+                    $this->banner = $this->fgets(1024);
+                    $cram1 = 'AUTHENTICATE CRAM-MD5'."\r\n";
+                    $this->send_command($cram1);
+                    $response = $this->get_response();
+                    $challenge = base64_decode(substr(trim($response[0]), 1));
+                    $pass = str_repeat(chr(0x00), (64-strlen($password)));
+                    $ipad = str_repeat(chr(0x36), 64);
+                    $opad = str_repeat(chr(0x5c), 64);
+                    $digest = bin2hex(pack("H*", md5(($pass ^ $opad).pack("H*", md5(($pass ^ $ipad).$challenge)))));
+                    $challenge_response = base64_encode($username.' '.$digest);
+                    fputs($this->handle, $challenge_response."\r\n");
+                    break;
                 case 'xoauth2':
                     $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
                     $command = 'AUTHENTICATE XOAUTH2 '.base64_encode($challenge)."\r\n";

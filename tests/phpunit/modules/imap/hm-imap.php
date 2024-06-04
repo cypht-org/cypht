@@ -87,6 +87,17 @@ class Hm_Test_Hm_IMAP extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_authenticate_cram() {
+        $this->reset();
+        $this->config['auth'] = 'cram-md5';
+        $this->connect();
+        $res = $this->debug();
+        $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_authenticate_oauth() {
         $this->reset();
         $this->config['auth'] = 'xoauth2';
