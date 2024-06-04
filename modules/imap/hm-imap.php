@@ -142,6 +142,8 @@ if (!class_exists('Hm_IMAP')) {
         public $con_error_msg = '';
         public $con_error_num = 0;
 
+        public $banner = '';
+
         /* holds information about the currently selected mailbox */
         public $selected_mailbox = false;
 
