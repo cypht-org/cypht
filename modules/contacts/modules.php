@@ -410,7 +410,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
 
                 if (trim($contact->value('display_name'))) {
                     $suggestions[] = $this->html_safe(sprintf(
-                        '{"contact_id":%s, "contact": "%s %s", "type": "%s", "source": "%s"}',
+                        '{"contact_id": "%s", "contact": "%s %s", "type": "%s", "source": "%s"}',
                         $contact_id,
                         $contact->value('display_name'),
                         $contact->value('email_address'),
