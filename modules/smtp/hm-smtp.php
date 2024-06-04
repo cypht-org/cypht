@@ -108,7 +108,7 @@ class Hm_SMTP {
         if (!$this->tls) {
             $this->starttls = true;
         }
-        $this->request_auths = array('cram-md5', 'login', 'plain');
+        $this->request_auths = array('login', 'plain');
         if (isset($conf['auth'])) {
             array_unshift($this->request_auths, $conf['auth']);
         }
@@ -330,23 +330,6 @@ class Hm_SMTP {
                 $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
                 $command = 'AUTH XOAUTH2 '.base64_encode($challenge);
                 $this->send_command($command);
-                break;
-            case 'cram-md5':
-                $command = 'AUTH CRAM-MD5';
-                $this->send_command($command);
-                $response = $this->get_response();
-                if (empty($response) || !isset($response[0][1][0]) || $this->compare_response($response,'334') != 0) {
-                    $result = 'FATAL: SMTP server does not support AUTH CRAM-MD5';
-                }
-                else {
-                    $challenge = base64_decode(trim($response[0][1][0]));
-                    $password .= str_repeat(chr(0x00), (64-strlen($password)));
-                    $ipad = str_repeat(chr(0x36), 64);
-                    $opad = str_repeat(chr(0x5c), 64);
-                    $digest = bin2hex(pack('H*', md5(($password ^ $opad).pack('H*', md5(($password ^ $ipad).$challenge)))));
-                    $command = base64_encode($username.' '.$digest);
-                    $this->send_command($command);
-                }
                 break;
             case 'ntlm':
                 $command = 'AUTH NTLM '.$this->build_ntlm_type_one();
