@@ -419,6 +419,29 @@ var force_send_message = function() {
     }
 }
 
+var check_cc_exist_in_contacts_list = function(e) {
+        var compose_cc = $(".compose_cc").val().trim();
+        var list_cc = null;
+        var list_cc_not_exist_in_my_contact = [];
+        if (compose_cc.length > 0) {
+            list_cc = compose_cc.split(",");
+            var list_html = "<ol>";
+            list_cc.forEach(cc => {
+                cc = cc.trim().split(" ");
+                if (! list_emails.includes(cc.slice(-1)[0])) {
+                    list_cc_not_exist_in_my_contact.push(cc.slice(-1)[0])
+                    list_html += `<li>${cc.slice(-1)[0]}</li>`;
+                }
+            });
+            list_html += "</ol>";
+
+            if (list_cc_not_exist_in_my_contact) {
+                return list_html;
+            }
+        }
+    return "";
+};
+
 $(function () {
     if (!hm_is_logged()) {
         return;
@@ -467,6 +490,7 @@ $(function () {
 
             let modalContentHeadline = '';
             let dontWanValueInStorage = '';
+            let showBtnSendAnywayDontWarnFuture = true;
 
             // If the subject is empty, we should warn the user
             if (!subject) {
@@ -485,6 +509,17 @@ $(function () {
                 dontWanValueInStorage = 'dont_warn_empty_subject_body';
                 modalContentHeadline = "Your subject and body are empty!";
             }
+
+            // if contact_cc not exist in contact list for user
+            var checkInList = "";
+            if (list_emails) {
+                checkInList = check_cc_exist_in_contacts_list(e);
+                if (checkInList) {
+                    modalContentHeadline = "Adress mail not exist in your contact liste";
+                    showBtnSendAnywayDontWarnFuture = false;
+                }
+            }
+            
 
             // If the user has disabled the warning, we should send the message
             if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
@@ -508,9 +543,11 @@ $(function () {
             function showModal() {
                 if (! modal.modalContent.html()) {
                     modal.addFooterBtn(hm_trans('Send anyway'), 'btn-warning', handleSendAnyway);
-                    modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
+                    if (showBtnSendAnywayDontWarnFuture) {
+                        modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
+                    }
                 }
-                modal.setContent(modalContentHeadline + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
+                modal.setContent(modalContentHeadline + checkInList + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
                 modal.open();
             }
 
