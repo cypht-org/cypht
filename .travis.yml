@@ -14,9 +14,9 @@ php:
   #- '5.6'
   #- '7.0'
   #- '7.1'
-    - '7.2'
-    - '7.3'
-    - '7.4'
+  # - '7.2'
+  # - '7.3'
+  # - '7.4'
     - '8.0'
     - '8.1'
 
@@ -44,7 +44,7 @@ after_script:
 
 # unit test coverage reporting
 after_success:
-     - if [ "$TRAVIS_PHP_VERSION" = "7.4" ] && [ "$DB" = "mysql" ]; then php coveralls.phar -v; fi
+     - if [ "$TRAVIS_PHP_VERSION" = "8.1" ] && [ "$DB" = "mysql" ]; then php coveralls.phar -v; fi
 
 # use browserstack
 addons:

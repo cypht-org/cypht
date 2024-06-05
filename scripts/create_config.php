@@ -26,7 +26,7 @@ function read_config($source) {
 
 function check_php() {
     $version = phpversion();
-    if (substr($version, 0, 3) >= 7.4) {
+    if (substr($version, 0, 3) >= 8.1) {
         $version_class = 'yes';
     }
     else {

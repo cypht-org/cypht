@@ -1,27 +1,56 @@
 <?xml version="1.0"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
-  <coverage includeUncoveredFiles="false" processUncoveredFiles="false">
-    <include>
-      <directory suffix=".php">../../lib</directory>
-      <directory suffix=".php">../../modules/core/</directory>
-    </include>
-    <exclude>
-      <file>../../lib/framework.php</file>
-      <file>../../lib/sodium_compat.php</file>
-    </exclude>
-  </coverage>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" colors="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd" cacheDirectory=".phpunit.cache">
+  <php>
+      <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
+  </php>
   <testsuites>
     <testsuite name="session">
       <file>./session.php</file>
     </testsuite>
+    <testsuite name="redis_session">
+      <file>./redis_session.php</file>
+    </testsuite>
+    <testsuite name="memcached_session">
+      <file>./memcached_session.php</file>
+    </testsuite>
+    <testsuite name="db_session">
+      <file>./db_session.php</file>
+    </testsuite>
+    <testsuite name="session_functions">
+      <file>./session_functions.php</file>
+    </testsuite>
     <testsuite name="cache">
       <file>./cache.php</file>
+    </testsuite>
+    <testsuite name="memcache">
+      <file>./memcache.php</file>
+    </testsuite>
+    <testsuite name="redis">
+      <file>./redis.php</file>
+    </testsuite>
+    <testsuite name="hm_cache">
+      <file>./hm_cache.php</file>
     </testsuite>
     <testsuite name="crypt">
       <file>./crypt.php</file>
     </testsuite>
+    <testsuite name="crypt_base">
+      <file>./crypt_base.php</file>
+    </testsuite>
+    <testsuite name="request_key">
+      <file>./request_key.php</file>
+    </testsuite>
     <testsuite name="config">
       <file>./config.php</file>
+    </testsuite>
+    <testsuite name="site_file_config">
+      <file>./site_file_config.php</file>
+    </testsuite>
+    <testsuite name="user_config_db">
+      <file>./user_config_db.php</file>
+    </testsuite>
+    <testsuite name="user_config_functions">
+      <file>./user_config_functions.php</file>
     </testsuite>
     <testsuite name="environment">
       <file>./environment.php</file>
@@ -32,6 +61,9 @@
     <testsuite name="format">
       <file>./format.php</file>
     </testsuite>
+    <testsuite name="transform">
+      <file>./transform.php</file>
+    </testsuite>
     <testsuite name="auth">
       <file>./auth.php</file>
     </testsuite>
@@ -41,14 +73,44 @@
     <testsuite name="module">
       <file>./module.php</file>
     </testsuite>
+    <testsuite name="modules_output">
+      <file>./modules_output.php</file>
+    </testsuite>
+    <testsuite name="handler_module_debug">
+      <file>./handler_module_debug.php</file>
+    </testsuite>
+    <testsuite name="output_module">
+      <file>./output_module.php</file>
+    </testsuite>
     <testsuite name="modules">
       <file>./modules.php</file>
+    </testsuite>
+    <testsuite name="module_exec">
+      <file>./module_exec.php</file>
+    </testsuite>
+    <testsuite name="module_exec_debug">
+      <file>./module_exec_debug.php</file>
+    </testsuite>
+    <testsuite name="module_functions">
+      <file>./module_functions.php</file>
     </testsuite>
     <testsuite name="dispatch">
       <file>./dispatch.php</file>
     </testsuite>
+    <testsuite name="page_redirect">
+      <file>./page_redirect.php</file>
+    </testsuite>
     <testsuite name="output">
       <file>./output.php</file>
+    </testsuite>
+    <testsuite name="msgs">
+      <file>./msgs.php</file>
+    </testsuite>
+    <testsuite name="debug">
+      <file>./debug.php</file>
+    </testsuite>
+    <testsuite name="elog">
+      <file>./elog.php</file>
     </testsuite>
     <testsuite name="request">
       <file>./request.php</file>
@@ -69,7 +131,19 @@
       <file>./modules/core/functions.php</file>
       <file>./modules/core/message_functions.php</file>
       <file>./modules/core/message_list_functions.php</file>
-      <file>./modules/core/modules.php</file>
+      <file>./modules/core/handler_modules.php</file>
+      <file>./modules/core/output_modules.php</file>
+      <file>./modules/core/output_modules_debug.php</file>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory suffix=".php">../../lib</directory>
+      <directory suffix=".php">../../modules/core/</directory>
+    </include>
+    <exclude>
+      <file>../../lib/framework.php</file>
+      <file>../../lib/sodium_compat.php</file>
+    </exclude>
+  </source>
 </phpunit>

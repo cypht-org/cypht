@@ -37,7 +37,7 @@ build_config();
  * @return void
  * */
 function check_php() {
-    $minVersion = 7.4;
+    $minVersion = 8.1;
     $version = phpversion();
     if (substr($version, 0, 3) < $minVersion) {
         die("Cypht requires PHP version $minVersion or greater");
