@@ -2186,7 +2186,6 @@ function submitSmtpImapServer() {
     Hm_Ajax.request(requestData, function(res) {
         $('#srv_setup_stepper_form_loader').addClass('hide');
         $('.step_config-actions').removeClass('hide');
-        Hm_Notices.show(res.router_user_msgs);
 
         if (res.just_saved_credentials) {
             if (res.imap_server_id) {

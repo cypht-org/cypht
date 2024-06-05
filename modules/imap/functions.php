@@ -1449,6 +1449,10 @@ if (!hm_exists('connect_to_imap_server')) {
         }
 
         $imap_server_id = Hm_IMAP_List::add($imap_list);
+        if (! can_save_last_added_server('Hm_IMAP_List', $user)) {
+            return;
+        }
+
         $server = Hm_IMAP_List::get($imap_server_id, false);
 
         if ($enableSieve &&

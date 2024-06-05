@@ -546,6 +546,28 @@ function in_server_list($list, $id, $user) {
 }}
 
 /**
+ * Perform a check on last added server
+ * It gets deleted if already configured
+ * 
+ * @param string $list class to process on check
+ * @param string $user username to check for
+ * @return bool
+ */
+if (!hm_exists('can_save_last_added_server')) {
+function can_save_last_added_server($list, $user) {
+    $servers = $list::dump(false, true);
+    $ids = array_keys($servers);
+    $new_id = array_pop($ids);
+    if (in_server_list($list, $new_id, $user)) {
+        $list::del($new_id);
+        $type = explode('_', $list)[1];
+        Hm_Msgs::add('ERRThis ' . $type . ' server and username are already configured');
+        return false;
+    }
+    return true;
+}}
+
+/**
  * @subpackage core/functions
  */
 if (!hm_exists('profiles_by_smtp_id')) {
