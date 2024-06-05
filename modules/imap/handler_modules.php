@@ -7,6 +7,8 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require_once APP_PATH .'lib/telegram_webhook.php';
+
 /**
  * Check for attachments when forwarding a message
  * @subpackage imap/handler
@@ -1312,14 +1314,19 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('folder_status', $status);
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
+
+            $webhook_token = $this->user_config->get('webhook_token_setting');
+            if($webhook_token && !empty($webhook_token)) {
+                $extracted_msgs = array();
+                foreach ($msg_list as $msg) {
+                    $extracted_msgs['from'] = $msg['from'];
+                    $extracted_msgs['subject'] = $msg['subject'];
+                    $extracted_msgs['to'] = $msg['subject'];
+                    Hm_Telegram_Webhook::send($extracted_msgs,$webhook_token);
+                }
+            }
         }
     }
-
-
-
-
-
-
 }
 
 /**
