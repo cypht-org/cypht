@@ -17,8 +17,9 @@ It recommended that you choose a specific version number tag instead of using 'l
 See example file here:
 https://github.com/cypht-org/cypht/blob/master/docker/docker-compose.yaml
 
-* Starts a database container to be for user authentication
-* Starts the Cypht container available on port 80 of the host with ...
+* Copy it to where ever you want. It does not need to be in the repo.
+* Starts a database container to be for user authentication.
+* Starts the Cypht container available on port 80 of the host with:
   * A local volume declared for persisting user settings across container reboots
   * An initial user account for authentication
   * Environment variables for accessing the database container

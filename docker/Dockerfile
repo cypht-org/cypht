@@ -1,4 +1,4 @@
-FROM php:7.4.33-fpm-alpine
+FROM php:8.1-fpm-alpine
 
 WORKDIR "/usr/local/share/cypht"
 
