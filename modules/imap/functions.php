@@ -1444,7 +1444,7 @@ if (!hm_exists('connect_to_imap_server')) {
             $imap_list['tls'] = false;
         }
 
-        if (isset($imap_sieve_host) && $imap_sieve_host) {
+        if ($enableSieve && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
         }
 
@@ -1452,7 +1452,7 @@ if (!hm_exists('connect_to_imap_server')) {
         $server = Hm_IMAP_List::get($imap_server_id, false);
 
         if ($enableSieve &&
-            isset($imap_sieve_host) &&
+            $imap_sieve_host &&
             $context->module_is_supported('sievefilters') &&
             $context->user_config->get('enable_sieve_filter_setting', true)) {
             try {
