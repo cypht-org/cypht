@@ -25,6 +25,7 @@ customize the program without hacking the code.
 
 
 Installation instructions 
+* Cypht master: [https://cypht.org/install.html](https://cypht.org/install.html)
 * Version 1: [https://cypht.org/install-1x.html](https://cypht.org/install-1x.html)
 * Version 2: [https://cypht.org/install-2x.html](https://cypht.org/install-2x.html)
 
