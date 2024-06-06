@@ -53,7 +53,7 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
         }
     }
     else {
-        $('.expand_link', list).html('+');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill"></i>');
         $('ul', list).remove();
     }
     return false;
