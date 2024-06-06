@@ -15,6 +15,9 @@ if (!hm_exists('connect_to_smtp_server')) {
             'tls' => $tls);
 
         $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
+        if (! can_save_last_added_server('Hm_SMTP_List', $user)) {
+            return;
+        }
 
         $smtp = Hm_SMTP_List::connect($smtp_server_id, false);
         if (smtp_authed($smtp)) {
