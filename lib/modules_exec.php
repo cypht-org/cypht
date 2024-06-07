@@ -369,7 +369,7 @@ class Hm_Module_Exec {
     public function load_module_set_files($mods, $active_mods) {
         foreach ($mods as $name) {
             if (in_array($name, $active_mods, true) && is_readable(sprintf(APP_PATH.'modules/%s/modules.php', $name))) {
-                require sprintf(APP_PATH.'modules/%s/modules.php', $name);
+                require_once sprintf(APP_PATH.'modules/%s/modules.php', $name);
             }
         }
     }
