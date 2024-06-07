@@ -79,9 +79,10 @@ class Hm_SMTP {
     private $password;
     public $state;
     private $request_auths = array();
+    private $scramAuthenticator;
 
     function __construct($conf) {
-
+    $this->scramAuthenticator = new ScramAuthenticator();
         $this->hostname = php_uname('n');
         if (preg_match("/:\d+$/", $this->hostname)) {
             $this->hostname = substr($this->hostname, 0, strpos($this->hostname, ':'));
@@ -108,7 +109,20 @@ class Hm_SMTP {
         if (!$this->tls) {
             $this->starttls = true;
         }
-        $this->request_auths = array('cram-md5', 'login', 'plain');
+        $this->request_auths = array(
+            'scram-sha-1',
+            'scram-sha-1-plus',
+            'scram-sha-256',
+            'scram-sha-256-plus',
+            'scram-sha-224',
+            'scram-sha-224-plus',
+            'scram-sha-384',
+            'scram-sha-384-plus',
+            'scram-sha-512',
+            'scram-sha-512-plus',
+            'cram-md5',
+            'login',
+            'plain');
         if (isset($conf['auth'])) {
             array_unshift($this->request_auths, $conf['auth']);
         }
@@ -315,86 +329,93 @@ class Hm_SMTP {
         }
         return trim($this->supports_auth[0]);
     }
-
-    /**
-     * authenticate the username and password to the server
-     */
     function authenticate($username, $password, $mech) {
-        $result = false;
-        switch (strtolower($mech)) {
-            case 'external':
-                $command = 'AUTH EXTERNAL '.base64_encode($username);
-                $this->send_command($command);
-                break;
-            case 'xoauth2':
-                $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
-                $command = 'AUTH XOAUTH2 '.base64_encode($challenge);
-                $this->send_command($command);
-                break;
-            case 'cram-md5':
-                $command = 'AUTH CRAM-MD5';
-                $this->send_command($command);
-                $response = $this->get_response();
-                if (empty($response) || !isset($response[0][1][0]) || $this->compare_response($response,'334') != 0) {
-                    $result = 'FATAL: SMTP server does not support AUTH CRAM-MD5';
-                }
-                else {
-                    $challenge = base64_decode(trim($response[0][1][0]));
-                    $password .= str_repeat(chr(0x00), (64-strlen($password)));
-                    $ipad = str_repeat(chr(0x36), 64);
-                    $opad = str_repeat(chr(0x5c), 64);
-                    $digest = bin2hex(pack('H*', md5(($password ^ $opad).pack('H*', md5(($password ^ $ipad).$challenge)))));
-                    $command = base64_encode($username.' '.$digest);
+        $mech = strtolower($mech);
+        if (substr($mech, 0, 6) == 'scram-') {
+            $result = $this->scramAuthenticator->authenticateScram(
+                strtoupper($mech),
+                $username,
+                $password,
+                [$this, 'get_response'],
+                [$this, 'send_command']
+            );
+            if ($result) {
+                return 'Authentication successful';
+            }
+            return 'Authentication failed';
+        } else {
+            switch ($mech) {
+                case 'external':
+                    $command = 'AUTH EXTERNAL '.base64_encode($username);
                     $this->send_command($command);
-                }
-                break;
-            case 'ntlm':
-                $command = 'AUTH NTLM '.$this->build_ntlm_type_one();
-                $this->send_command($command);
-                $response = $this->get_response();
-                if (empty($response) || !isset($response[0][1][0]) || $this->compare_response($response,'334') != 0) {
-                    $result = 'FATAL: SMTP server does not support AUTH NTLM';
-                }
-                else {
-                    $ntlm_res = $this->parse_ntlm_type_two($response[0][1][0]);
-                    $command = $this->build_ntlm_type_three($ntlm_res, $username, $password);
+                    break;
+                case 'xoauth2':
+                    $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
+                    $command = 'AUTH XOAUTH2 '.base64_encode($challenge);
                     $this->send_command($command);
-                }
-                break;
-            case 'login':
-                $command = 'AUTH LOGIN';
-                $this->send_command($command);
-                $response = $this->get_response();
-                if (empty($response) || $this->compare_response($response,'334') != 0) {
-                    $result =  'FATAL: SMTP server does not support AUTH LOGIN';
-                }
-                else {
-                    $command = base64_encode($username);
+                    break;
+                case 'cram-md5':
+                    $command = 'AUTH CRAM-MD5';
+                    $this->send_command($command);
+                    $response = $this->get_response();
+                    if (empty($response) || !isset($response[0][1][0]) || $this->compare_response($response,'334') != 0) {
+                        $result = 'FATAL: SMTP server does not support AUTH CRAM-MD5';
+                    } else {
+                        $challenge = base64_decode(trim($response[0][1][0]));
+                        $password .= str_repeat(chr(0x00), (64-strlen($password)));
+                        $ipad = str_repeat(chr(0x36), 64);
+                        $opad = str_repeat(chr(0x5c), 64);
+                        $digest = bin2hex(pack('H*', md5(($password ^ $opad).pack('H*', md5(($password ^ $ipad).$challenge)))));
+                        $command = base64_encode($username.' '.$digest);
+                        $this->send_command($command);
+                    }
+                    break;
+                case 'ntlm':
+                    $command = 'AUTH NTLM '.$this->build_ntlm_type_one();
+                    $this->send_command($command);
+                    $response = $this->get_response();
+                    if (empty($response) || !isset($response[0][1][0]) || $this->compare_response($response,'334') != 0) {
+                        $result = 'FATAL: SMTP server does not support AUTH NTLM';
+                    } else {
+                        $ntlm_res = $this->parse_ntlm_type_two($response[0][1][0]);
+                        $command = $this->build_ntlm_type_three($ntlm_res, $username, $password);
+                        $this->send_command($command);
+                    }
+                    break;
+                case 'login':
+                    $command = 'AUTH LOGIN';
                     $this->send_command($command);
                     $response = $this->get_response();
                     if (empty($response) || $this->compare_response($response,'334') != 0) {
-                        $result = 'FATAL: SMTP server does not support AUTH LOGIN';
+                        $result =  'FATAL: SMTP server does not support AUTH LOGIN';
+                    } else {
+                        $command = base64_encode($username);
+                        $this->send_command($command);
+                        $response = $this->get_response();
+                        if (empty($response) || $this->compare_response($response,'334') != 0) {
+                            $result = 'FATAL: SMTP server does not support AUTH LOGIN';
+                        }
+                        $command = base64_encode($password);
+                        $this->send_command($command);
                     }
-                    $command = base64_encode($password);
+                    break;
+                case 'plain':
+                    $command = 'AUTH PLAIN '.base64_encode("\0".$username."\0".$password);
                     $this->send_command($command);
-                }
-                break;
-            case 'plain':
-                $command = 'AUTH PLAIN '.base64_encode("\0".$username."\0".$password);
-                $this->send_command($command);
-                break;
-            default:
-                $result = 'FATAL: Unknown SMTP AUTH mechanism: '.$mech;
-                break;
+                    break;
+                default:
+                    $result = 'FATAL: Unknown SMTP AUTH mechanism: '.$mech;
+                    break;
+            }
         }
+    
         if (!$result) {
             $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
                 $this->state = 'authed';
                 $result = false;
-            }
-            else {
+            } else {
                 $result = 'Authorization failure';
                 if (isset($res[0][1])) {
                     $result .= ': '.implode(' ', $res[0][1]);

@@ -164,11 +164,12 @@ if (!class_exists('Hm_IMAP')) {
 
         /* current selected mailbox status */
         public $folder_state = false;
-
+        private $scramAuthenticator;
         /**
          * constructor
          */
         public function __construct() {
+            $this->scramAuthenticator = new ScramAuthenticator();
         }
 
         /* ------------------ CONNECT/AUTH ------------------------------------- */
@@ -233,40 +234,57 @@ if (!class_exists('Hm_IMAP')) {
                 fclose($this->handle);
             }
         }
-
         /**
-         * authenticate the username/password
+         * Authenticate the username/password
          * @param string $username IMAP login name
          * @param string $password IMAP password
-         * @return bool true on sucessful login
+         * @return bool true on successful login
          */
         public function authenticate($username, $password) {
             $this->get_capability();
             if (!$this->tls) {
                 $this->starttls();
+            } 
+            $scramMechanisms = [
+                'scram-sha-1', 'scram-sha-1-plus',
+                'scram-sha-256', 'scram-sha-256-plus',
+                'scram-sha-224', 'scram-sha-224-plus',
+                'scram-sha-384', 'scram-sha-384-plus',
+                'scram-sha-512', 'scram-sha-512-plus'
+            ];
+            if (in_array(strtolower($this->auth), $scramMechanisms)) {
+                $scramAlgorithm = strtoupper($this->auth);
+                if ($this->scramAuthenticator->authenticateScram(
+                    $scramAlgorithm,
+                    $username,
+                    $password,
+                    [$this, 'get_response'],
+                    [$this, 'send_command']
+                )) {
+                    return true; // Authentication successful
+                }
             }
             switch (strtolower($this->auth)) {
-
                 case 'cram-md5':
                     $this->banner = $this->fgets(1024);
-                    $cram1 = 'AUTHENTICATE CRAM-MD5'."\r\n";
+                    $cram1 = 'AUTHENTICATE CRAM-MD5' . "\r\n";
                     $this->send_command($cram1);
                     $response = $this->get_response();
                     $challenge = base64_decode(substr(trim($response[0]), 1));
-                    $pass = str_repeat(chr(0x00), (64-strlen($password)));
+                    $pass = str_repeat(chr(0x00), (64 - strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);
                     $opad = str_repeat(chr(0x5c), 64);
-                    $digest = bin2hex(pack("H*", md5(($pass ^ $opad).pack("H*", md5(($pass ^ $ipad).$challenge)))));
-                    $challenge_response = base64_encode($username.' '.$digest);
-                    fputs($this->handle, $challenge_response."\r\n");
+                    $digest = bin2hex(pack("H*", md5(($pass ^ $opad) . pack("H*", md5(($pass ^ $ipad) . $challenge)))));
+                    $challenge_response = base64_encode($username . ' ' . $digest);
+                    fputs($this->handle, $challenge_response . "\r\n");
                     break;
                 case 'xoauth2':
-                    $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
-                    $command = 'AUTHENTICATE XOAUTH2 '.base64_encode($challenge)."\r\n";
+                    $challenge = 'user=' . $username . chr(1) . 'auth=Bearer ' . $password . chr(1) . chr(1);
+                    $command = 'AUTHENTICATE XOAUTH2 ' . base64_encode($challenge) . "\r\n";
                     $this->send_command($command);
                     break;
                 default:
-                    $login = 'LOGIN "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $username).'" "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $password). "\"\r\n";
+                    $login = 'LOGIN "' . str_replace(array('\\', '"'), array('\\\\', '\"'), $username) . '" "' . str_replace(array('\\', '"'), array('\\\\', '\"'), $password) . "\"\r\n";
                     $this->send_command($login);
                     break;
             }
@@ -282,26 +300,24 @@ if (!class_exists('Hm_IMAP')) {
                         $this->banner = $res[0];
                     }
                 }
-                if (stristr($response, 'A'.$this->command_count.' OK')) {
+                if (stristr($response, 'A' . $this->command_count . ' OK')) {
                     $authed = true;
                     $this->state = 'authenticated';
-                }
-                elseif (strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
+                } elseif (strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
                     $this->send_command("\r\n", true);
                     $this->get_response();
                 }
             }
             if ($authed) {
-                $this->debug[] = 'Logged in successfully as '.$username;
+                $this->debug[] = 'Logged in successfully as ' . $username;
                 $this->get_capability();
                 $this->enable();
-                //$this->enable_compression();
-            }
-            else {
-                $this->debug[] = 'Log in for '.$username.' FAILED';
+            } else {
+                $this->debug[] = 'Log in for ' . $username . ' FAILED';
             }
             return $authed;
         }
+        
 
         /**
          * attempt starttls
