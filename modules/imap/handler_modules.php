@@ -1316,13 +1316,16 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('imap_server_ids', $form['imap_server_ids']);
 
             $webhook_token = $this->user_config->get('webhook_token_setting');
-            if($webhook_token && !empty($webhook_token)) {
-                $extracted_msgs = array();
-                foreach ($msg_list as $msg) {
-                    $extracted_msgs['from'] = $msg['from'];
-                    $extracted_msgs['subject'] = $msg['subject'];
-                    $extracted_msgs['to'] = $msg['subject'];
-                    Hm_Telegram_Webhook::send($extracted_msgs,$webhook_token);
+            $msg_count = count($msg_list);
+            $email_to = $msg_list[0]['to'];
+            if ($msg_count > 0) {
+                $interval = 5 * 60;
+                set_time_limit(0);
+                while (true) {
+                    if($webhook_token && !empty($webhook_token)) {
+                        Hm_Telegram_Webhook::send($msg_count, $email_to, $webhook_token);
+                        sleep($interval);
+                    }
                 }
             }
         }

@@ -12,14 +12,16 @@ class Hm_Telegram_Webhook {
 
     /**
      * send telegram notiofication using curl
-     * @param array $extracted_msgs
+     * @param int $msg_count
+     * @param string $email_to
+     * @param string $webhook_token
      */
-    public static function send(array $extracted_msgs, $webhook_token) {
+    public static function send($msg_count, $email_to, $webhook_token) {
         self::delete_webhook($webhook_token);
         // Get the chat ID
         $chatId = self::get_chat_id($webhook_token);
         if (!empty($chatId)) {
-            $text = "New Message\nFrom: {$extracted_msgs['from']}\nSubject: {$extracted_msgs['subject']}\nTo: {$extracted_msgs['to']}";
+            $text = "You have received: $msg_count unread email.s\nTo: $email_to";
             $curl_handle = Hm_Functions::c_init();
             Hm_Functions::c_setopt($curl_handle, CURLOPT_URL, static::PREFIX_URI.'bot'.$webhook_token.'/sendMessage');
             Hm_Functions::c_setopt($curl_handle, CURLOPT_POST, true);
@@ -30,7 +32,7 @@ class Hm_Telegram_Webhook {
             if (trim($curl_result)) {
                 $response_data = json_decode($curl_result, true);
                 if (!$response_data['ok']) {
-                    
+
                 }
             }
         }
