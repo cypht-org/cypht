@@ -1409,7 +1409,11 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                     $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm me-2" />';
                 }
                 else {
-                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-primary btn-sm me-2" />';
+                    $keysToRemove = array('object', 'connected');
+                    $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
+
+                    $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2" data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="smtp" />';
+                    $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-primary btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-warning btn-sm me-2" />';
                 }

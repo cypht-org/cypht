@@ -1427,15 +1427,18 @@ function parse_sieve_config_host($host) {
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
-            'hide' => false,
+            'hide' => $hidden,
             'port' => $port,
             'user' => $user,
-            'pass' => $pass,
             'tls' => $tls);
+
+        if (!$server_id || ($server_id && $pass)) {
+            $imap_list['pass'] = $pass;
+        }
 
         if ($type === 'jmap') {
             $imap_list['type'] = 'jmap';
@@ -1448,9 +1451,17 @@ if (!hm_exists('connect_to_imap_server')) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
         }
 
-        $imap_server_id = Hm_IMAP_List::add($imap_list);
-        if (! can_save_last_added_server('Hm_IMAP_List', $user)) {
-            return;
+        if ($server_id) {
+            if (Hm_IMAP_List::edit($server_id, $imap_list)) {
+                $imap_server_id = $server_id;
+            } else {
+                return;
+            }
+        } else {
+            $imap_server_id = Hm_IMAP_List::add($imap_list);
+            if (! can_save_last_added_server('Hm_IMAP_List', $user)) {
+                return;
+            }
         }
 
         $server = Hm_IMAP_List::get($imap_server_id, false);

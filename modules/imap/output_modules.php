@@ -496,13 +496,19 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '</div></div></div><div class="col-xl-3 col-lg-3  d-flex justify-content-start align-items-center">';
 
             // Buttons
+            $disabled = isset($vals['default']) ? ' disabled': '';
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2" />';
             } else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-primary btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />';
+                $keysToRemove = array('object', 'connected', 'default', 'nopass');
+                $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
+
+                $type = $vals['type'] ?? 'imap';
+                $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2"'.$disabled.' />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
@@ -1299,12 +1305,6 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
                           <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
                           <span id="srv_setup_stepper_jmap_address-error" class="invalid-feedback"></span>
                       </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
-                        <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
-                          '.$this->trans('Hide From Combined Pages').'
-                        </label>
-                    </div>
                 </div>
         ';
     }
@@ -1363,7 +1363,23 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
                                         </div>';
                      }
-               $res .= '</div>';
+                $res .= '</div>';
+               
        return $res;
+    }
+}
+
+class Hm_Output_stepper_setup_server_jmap_imap_common extends Hm_Output_Module {
+    protected function output() {
+        $res = '
+            <div class="form-check" id="step_config_combined_view">
+                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_imap_hide_from_c_page" name="srv_setup_stepper_imap_hide_from_c_page">
+                <label class="form-check-label" for="srv_setup_stepper_imap_hide_from_c_page">
+                    '.$this->trans('Hide From Combined Pages').'
+                </label>
+            </div>
+        ';
+
+        return $res;
     }
 }

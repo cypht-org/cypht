@@ -991,8 +991,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             'srv_setup_stepper_profile_reply_to',
             'srv_setup_stepper_imap_sieve_host',
             'srv_setup_stepper_only_jmap',
-            'srv_setup_stepper_jmap_hide_from_c_page',
+            'srv_setup_stepper_imap_hide_from_c_page',
             'srv_setup_stepper_jmap_address',
+            'srv_setup_stepper_imap_server_id',
+            'srv_setup_stepper_smtp_server_id',
         ));
 
         if ($success) {
@@ -1017,8 +1019,10 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_profile_reply_to' => $profileReplyTo,
                 'srv_setup_stepper_imap_sieve_host' => $imapSieveHost,
                 'srv_setup_stepper_only_jmap' => $onlyJmap,
-                'srv_setup_stepper_jmap_hide_from_c_page' => $jmapHideFromCPage,
+                'srv_setup_stepper_imap_hide_from_c_page' => $hideFromCombinedView,
                 'srv_setup_stepper_jmap_address' => $jmapAddress,
+                'srv_setup_stepper_imap_server_id' => $imapServerId,
+                'srv_setup_stepper_smtp_server_id' => $smtpServerId
             ] = $form;
 
             /*
@@ -1041,30 +1045,37 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     false,
                     'jmap',
                     $this,
-                    $jmapHideFromCPage
+                    $hideFromCombinedView,
+                    $imapServerId
                 );
+
+                if(!isset($this->jmap_server_id)) {
+                    Hm_Msgs::add("ERRCould not save JMAP server");
+                    return;
+                };
 
                 Hm_Msgs::add("JMAP Server saved");
                 $this->out('just_saved_credentials', true);
+                return;
             } else {
                 /*
-                *  Connect to SMTP server if user wants to send emails
-                */
+                 *  Connect to SMTP server if user wants to send emails
+                 */
                 if($isSender){
                     if (!$this->module_is_supported('smtp')) {
                         Hm_Msgs::add("ERRSMTP module is not enabled");
                         return;
                     }
-
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $this);
+                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $smtpServerId);
                     if(!isset($this->smtp_server_id)){
+                        Hm_Msgs::add("ERRCould not save server");
                         return;
                     }
                 }
 
                 /*
-                *  Connect to IMAP server if user wants to receive emails
-                */
+                 *  Connect to IMAP server if user wants to receive emails
+                 */
                 if($isReceiver){
                     if (!$this->module_is_supported('imap')) {
                         Hm_Msgs::add("ERRIMAP module is not enabled");
@@ -1081,18 +1092,21 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         $imapSieveHost,
                         $enableSieve,
                         'imap',
-                        $this
+                        $this,
+                        $hideFromCombinedView,
+                        $imapServerId,
                     );
 
                     if(!isset($this->imap_server_id)) {
                         if($isSender && isset($this->smtp_server_id)){
                             delete_smtp_server($this->smtp_server_id, $this);
                         }
+                        Hm_Msgs::add("ERRCould not save server");
                         return;
                     };
                 }
 
-                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id)) {
+                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
                     if (!$this->module_is_supported('profiles')) {
                         Hm_Msgs::add("ERRProfiles module is not enabled");
                         return;
