@@ -1878,6 +1878,32 @@ var reset_default_value_input = function() {
     }
 };
 
+var reset_default_value_input_interval_webhook_notification = function() {
+    let field = this.parentElement.parentElement.firstChild;
+    const defaultValue = this.getAttribute("default-value");
+
+    if (this.style.transform == "scaleX(1)") {
+        this.style.transform = "scaleX(-1)";
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
+        field.value = field.getAttribute("current_value");
+        field.style.backgroundColor = "#fff";
+        field.style.pointerEvents = "auto";
+        field.style.touchAction = "auto";
+    }
+    else {
+        this.style.transform = "scaleX(1)";
+        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
+        field.setAttribute("current_value", field.value);
+        field.value = 5;
+        if(defaultValue) {
+            field.value = defaultValue;
+        }
+        field.style.backgroundColor = "#eee";
+        field.style.pointerEvents = "none";
+        field.style.touchAction = "none";
+    }
+};
+
 var decrease_servers = function(section) {
     const element = document.querySelector(`.server_count .${section}_server_count`);
     const value = parseInt(element.textContent);
@@ -1961,6 +1987,7 @@ $(function() {
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
         $('.reset_default_value_input_webhook_token').on("click", reset_default_value_input_webhook_token);
+        $('.reset_default_value_input_interval_webhook_notification').on("click", reset_default_value_input_interval_webhook_notification);
     }
 
     if (hm_check_dirty_flag()) {

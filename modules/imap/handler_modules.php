@@ -93,9 +93,26 @@ class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Process input from the interval webhook notification setting in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_interval_webhook_notification_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero
+     */
+    public function process() {
+        process_site_setting('interval_webhook_notification', $this, 'interval_webhook_notification_setting_callback', DEFAULT_INTERVAL_WEBHOOK_NOTIFICATION);
+    }
+}
+
+/**
+ * Process input from the webhook token setting in the settings page
+ * @subpackage imap/handler
+ */
 class Hm_Handler_process_webhook_token_setting extends Hm_Handler_Module {
     /**
-     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     * Allowed values for webhook token
      */
     public function process() {
         function webhook_token_callback($val) { return $val; }
@@ -1316,10 +1333,11 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('imap_server_ids', $form['imap_server_ids']);
 
             $webhook_token = $this->user_config->get('webhook_token_setting');
+            $interval_webhook_notification = $this->user_config->get('interval_webhook_notification_setting');
             $msg_count = count($msg_list);
             $email_to = $msg_list[0]['to'];
             if ($msg_count > 0) {
-                $interval = 5 * 60;
+                $interval = $interval_webhook_notification * 60;
                 set_time_limit(0);
                 while (true) {
                     if($webhook_token && !empty($webhook_token)) {

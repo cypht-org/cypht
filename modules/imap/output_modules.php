@@ -1124,6 +1124,31 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
     }
 }
 
+/**
+ * Option to set the interval webhook notification for the settings page
+ * @subpackage imap/output
+ */
+class Hm_Output_interval_webhook_notification_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $per_page = 5;
+        $reset = '';
+        if (array_key_exists('interval_webhook_notification', $settings)) {
+            $per_page = $settings['interval_webhook_notification'];
+        }
+        if ($per_page != 5) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input_interval_webhook_notification"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label for="interval_webhook_notification">'.
+            $this->trans('Interval webhook notification(minutes)').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="interval_webhook_notification" '.
+            'name="interval_webhook_notification" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option to set the webhook token for the settings page
+ * @subpackage imap/output
+ */
 class Hm_Output_webhook_token_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
