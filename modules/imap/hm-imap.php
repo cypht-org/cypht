@@ -353,7 +353,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
      */
     public function get_special_use_mailboxes($type=false) {
         $folders = array();
-        $types = array('trash', 'sent', 'flagged', 'all', 'junk');
+        $types = array('trash', 'sent', 'flagged', 'all', 'junk', 'archive', 'drafts');
         $command = 'LIST (SPECIAL-USE) "" "*"'."\r\n";
         $this->send_command($command);
         $res = $this->get_response(false, true);

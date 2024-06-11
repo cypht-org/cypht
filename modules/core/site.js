@@ -1559,6 +1559,12 @@ var Hm_Utils = {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_test'}],
             false, [], false, false, false);
+    },
+    redirect: function (path) {
+        if (! path) {
+            path = window.location.href;
+        }
+        window.location.href = path;
     }
 };
 
