@@ -44,3 +44,5 @@ For developers, get via Composer: [https://packagist.org/packages/jason-munro/cy
 Docker: [https://hub.docker.com/r/cypht/cypht](https://hub.docker.com/r/cypht/cypht)
 
 LinkedIn group: [https://www.linkedin.com/groups/13804559/](https://www.linkedin.com/groups/13804559/)
+
+An interview with the project's founder: https://github.com/cypht-org/cypht/wiki/AMA-Jason-Munro
