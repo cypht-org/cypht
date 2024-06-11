@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/jasonmunro/cypht.svg?branch=master)](https://travis-ci.org/jasonmunro/cypht)
 [![Coverage Status](https://coveralls.io/repos/github/jasonmunro/cypht/badge.svg?branch=master)](https://coveralls.io/github/jasonmunro/cypht?branch=master)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/127/badge)](https://bestpractices.coreinfrastructure.org/projects/127)
 
