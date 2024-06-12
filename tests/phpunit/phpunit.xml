@@ -64,6 +64,9 @@
     <testsuite name="transform">
       <file>./transform.php</file>
     </testsuite>
+    <testsuite name="webhook">
+      <file>./telegram_webhook.php</file>
+    </testsuite>
     <testsuite name="auth">
       <file>./auth.php</file>
     </testsuite>

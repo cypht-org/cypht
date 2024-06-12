@@ -24,6 +24,7 @@ require APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
+require APP_PATH.'lib/telegram_webhook.php';
 
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';
