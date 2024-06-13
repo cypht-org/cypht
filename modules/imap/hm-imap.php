@@ -11,6 +11,7 @@ require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
 require_once('hm-jmap.php');
+require_once('../scram/scram.php');
 
 /**
  * IMAP connection manager

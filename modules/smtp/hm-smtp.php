@@ -5,6 +5,7 @@
  * @package modules
  * @subpackage smtp
  */
+require_once('../scram/scram.php');
 
 /**
  * SMTP connection manager
@@ -51,7 +52,6 @@ class Hm_SMTP_List {
         return $addrs;
     }
 }
-
 /**
  * Connect to and interact with SMTP servers
  * @subpackage smtp/lib
