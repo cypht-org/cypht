@@ -471,7 +471,7 @@ class Hm_SMTP {
         $offset += mb_strlen($target, '8bit');
         $user_sec = $this->ntlm_security_buffer(mb_strlen($username), $offset);
         $offset += mb_strlen($username);
-        $host_sec = $this->ntlm_security_buffer(mb_strlen($host), $offset);
+        $host_sec = $this->ntlm_security_buffer(mb_strlen($host, '8bit'), $offset);
         $offset += mb_strlen($host);
         $lm_sec = $this->ntlm_security_buffer(mb_strlen($lm_response, '8bit'), $offset);
         $offset += mb_strlen($lm_response, '8bit');
