@@ -94,6 +94,123 @@ class Hm_Test_Hm_IMAP extends TestCase {
         $res = $this->debug();
         $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
     }
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_1() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-1';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_1_plus() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-1-plus';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_256() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-256';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_256_plus() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-256-plus';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_224_plus() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-224-plus';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_224() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-224';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_384_plus() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-384-plus';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_384() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-384';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_512() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-512';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+/**
+ * @preserveGlobalState disabled
+ * @runInSeparateProcess
+ */
+public function test_authenticate_scram_sha_512_plus() {
+    $this->reset();
+    $this->config['auth'] = 'scram-sha-512-plus';
+    $this->connect();
+    $res = $this->debug();
+    $this->assertEquals('Logged in successfully as testuser', $res['debug'][2]);
+}
+
+
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
