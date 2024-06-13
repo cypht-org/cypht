@@ -1866,10 +1866,81 @@ var decrease_servers = function(section) {
     if (value > 0) {
         element.innerHTML  = value - 1;
     }
+
+    if (value === 1) {
+        if ($(`.${section}_server`)) {
+            $(`.${section}_server`).prev().fadeOutAndRemove();
+        }
+    }
 };
 
 var err_msg = function(msg) {
     return "ERR"+hm_trans(msg);
+};
+
+var fillImapData = function(details) {
+    $('#srv_setup_stepper_imap_address').val(details.server);
+    $('#srv_setup_stepper_imap_port').val(details.port);
+    $('#srv_setup_stepper_imap_server_id').val(details.id);
+    $('#srv_setup_stepper_imap_hide_from_c_page').prop("checked", details.hide);
+    if (details.sieve_config_host) {
+        $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
+        $("#srv_setup_stepper_enable_sieve").trigger("click", false);
+    }
+
+    if(details.tls) {
+        $("input[name='srv_setup_stepper_imap_tls'][value='true']").prop("checked", true);
+    } else {
+        $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
+    }
+};
+
+var fillSmtpData = function(details) {
+    $('#srv_setup_stepper_smtp_server_id').val(details.id);
+    $('#srv_setup_stepper_smtp_address').val(details.server);
+    $('#srv_setup_stepper_smtp_port').val(details.port);
+};
+
+var fillJmapData = function(details) {
+    $('#srv_setup_stepper_imap_server_id').val(details.id);
+    $('#srv_setup_stepper_only_jmap').trigger('click');
+    $('#srv_setup_stepper_jmap_address').val(details.server);
+    $('#srv_setup_stepper_imap_hide_from_c_page').prop("checked", details.hide);
+};
+
+var imap_smtp_edit_action = function(event) {
+    resetQuickSetupForm();
+    event.preventDefault();
+    Hm_Notices.hide(true);
+    var details = $(this).data('server-details');
+
+    $('.imap-jmap-smtp-btn').trigger('click');
+    $('#srv_setup_stepper_profile_name').trigger('focus');
+    $('#srv_setup_stepper_profile_name').val(details.name);
+    $('#srv_setup_stepper_email').val(details.user);
+    $('#srv_setup_stepper_password').val('');
+    $('#srv_setup_stepper_profile_reply_to').val('');
+    $('#srv_setup_stepper_create_profile').trigger("click", true);
+
+    if ($(this).data('type') == 'jmap') {
+        fillJmapData(details);
+    } else if ($(this).data('type') == 'imap') {
+        fillImapData(details);
+        var smtpDetails = $('[data-type="smtp"][data-id="'+details.name+'"]');
+        if (smtpDetails.length) {
+            fillSmtpData(smtpDetails.data('server-details'));
+        } else {
+            $('#srv_setup_stepper_is_sender').trigger("click", true);
+        }
+    } else {
+        fillSmtpData(details);
+        var imapDetails = $('[data-type="imap"][data-id="'+details.name+'"]');
+        if (imapDetails.length) {
+            fillImapData(imapDetails.data('server-details'));
+        } else {
+            $('#srv_setup_stepper_is_receiver').trigger("click", true);
+        }
+    }
 };
 
 /* create a default message list object */
@@ -1881,7 +1952,7 @@ $(function() {
     $('.save_settings').on("click", function (e) {
         $('.general_setting input[type=checkbox]').each(function () {
             if (this.hasAttribute('disabled') && this.checked) {
-                this.removeAttribute('disabled');
+                this.removeAttr('disabled');
             }
         });
     })
@@ -1929,6 +2000,9 @@ $(function() {
     if (hm_page_name() == 'home') {
         $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
+    if (hm_page_name() == 'servers') {
+        $('.edit_server_connection').on('click', imap_smtp_edit_action);
+    } 
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -2154,9 +2228,14 @@ if(tableBody && !hm_mobile()) {
     observer.observe(folderList, config);
 }
 
+var resetStepperButtons = function() {
+    $('.step_config-actions button').removeAttr('disabled');
+    $('#stepper-action-finish').text($('#stepper-action-finish').text().slice(0, -3));
+};
+
 function submitSmtpImapServer() {
-    $('#srv_setup_stepper_form_loader').removeClass('hide');
-    $('.step_config-actions').addClass('hide');
+    $('.step_config-actions button').attr('disabled', true);
+    $('#stepper-action-finish').text($('#stepper-action-finish').text() + '...');
 
     var requestData = [
         { name: 'hm_ajax_hook', value: 'ajax_quick_servers_setup' },
@@ -2179,31 +2258,32 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
-        { name: 'srv_setup_stepper_jmap_hide_from_c_page', value: $('input[name="srv_setup_stepper_jmap_hide_from_c_page"]:checked').val() },
+        { name: 'srv_setup_stepper_imap_hide_from_c_page', value: $('input[name="srv_setup_stepper_imap_hide_from_c_page"]:checked').val() },
         { name: 'srv_setup_stepper_jmap_address', value: $('#srv_setup_stepper_jmap_address').val() },
+        { name: 'srv_setup_stepper_imap_server_id', value: $('#srv_setup_stepper_imap_server_id').val() },
+        { name: 'srv_setup_stepper_smtp_server_id', value: $('#srv_setup_stepper_smtp_server_id').val() }
     ];
 
     Hm_Ajax.request(requestData, function(res) {
-        $('#srv_setup_stepper_form_loader').addClass('hide');
-        $('.step_config-actions').removeClass('hide');
-
+        resetStepperButtons();
         if (res.just_saved_credentials) {
-            if (res.imap_server_id) {
+            if (!res.imap_server_id) {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                     {'name': 'imap_server_id', value: res.imap_server_id},
                     {'name': 'imap_service_name', value: res.imap_service_name}],
                     function () {
                         resetQuickSetupForm();
+                        Hm_Utils.redirect();
                     }
                 );
             } else {
                 resetQuickSetupForm();
+                Hm_Utils.redirect();
             }
         }
-    }, null, null, function (res) {
-        $('#srv_setup_stepper_form_loader').addClass('hide');
-        $('.step_config-actions').removeClass('hide');
+    }, null, null, undefined, function (res) {
+        resetStepperButtons();
     });
 }
 
@@ -2217,7 +2297,11 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_profile_name").val('');
     $("#srv_setup_stepper_email").val('');
     $("#srv_setup_stepper_password").val('');
+    $("#srv_setup_stepper_jmap_address").val('');
     $("#srv_setup_stepper_profile_is_default").prop('checked', true);
+    $("#srv_setup_stepper_create_profile").prop('checked', true);
+    $("#srv_setup_stepper_imap_server_id").val('');
+    $("#srv_setup_stepper_smtp_server_id").val('');
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
@@ -2228,7 +2312,6 @@ function resetQuickSetupForm() {
 
     Hm_Utils.set_unsaved_changes(1);
     Hm_Folders.reload_folders(true);
-    location.reload();
 }
 
 function handleCreateProfileCheckboxChange(checkbox) {
@@ -2247,11 +2330,18 @@ function handleSieveStatusChange (checkbox) {
     }
 }
 function handleSmtpImapCheckboxChange(checkbox) {
-    $(".step_config-smtp_imap_bloc").show();
-
     if (checkbox.id === 'srv_setup_stepper_is_receiver') {
-        if(checkbox.checked) $('#step_config-imap_bloc').show();
-        else $('#step_config-imap_bloc').hide();
+        if(checkbox.checked) {
+            $('#step_config-imap_bloc').show();
+            $('#step_config_combined_view').show();
+            $('#srv_setup_stepper_jmap_select_box').show();
+            $('#srv_setup_stepper_only_jmap').prop('checked', false);
+        } else {
+            $('#step_config-imap_bloc').hide();
+            $('#step_config-jmap_bloc').hide();
+            $('#step_config_combined_view').hide();
+            $('#srv_setup_stepper_jmap_select_box').hide();
+        }
     }
 
     if (checkbox.id === 'srv_setup_stepper_is_sender') {
@@ -2260,40 +2350,26 @@ function handleSmtpImapCheckboxChange(checkbox) {
         else $('#step_config-smtp_bloc').hide();
     }
 
-    if($('#srv_setup_stepper_is_sender').prop('checked') &&
-        $('#srv_setup_stepper_is_receiver').prop('checked')){
+    if ($('#srv_setup_stepper_is_sender').prop('checked') && $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').show();
         $('#srv_setup_stepper_profile_checkbox_bloc').show();
-        $('#srv_setup_stepper_jmap_select_box').show();
-        $("#srv_setup_stepper_only_jmap").show();
-    }else{
-        $("#srv_setup_stepper_only_jmap").prop('checked', false);
-
+        
+    } else if(! $('#srv_setup_stepper_is_sender').prop('checked') || ! $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').hide();
         $('#srv_setup_stepper_profile_checkbox_bloc').hide();
-        $('#srv_setup_stepper_jmap_select_box').hide();
-        $("#srv_setup_stepper_only_jmap").hide();
-
-        if(!$('#srv_setup_stepper_is_sender').prop('checked') &&
-            !$('#srv_setup_stepper_is_receiver').prop('checked')){
-            $(".step_config-smtp_imap_bloc").hide();
-        }
     }
 }
 
 function handleJmapCheckboxChange(checkbox) {
-    if(checkbox.checked){
+    if (checkbox.checked) {
         $('#step_config-jmap_bloc').show();
-        $('#step_config-smtp_bloc').hide();
         $('#step_config-imap_bloc').hide();
-        $('#srv_setup_stepper_profile_bloc').hide();
-        $('#srv_setup_stepper_profile_checkbox_bloc').hide();
-    }else {
+        if (! $('#srv_setup_stepper_enable_sieve').prop('checked')) {
+            $('#srv_setup_stepper_imap_sieve_host_bloc').hide();
+        }
+    } else {
         $('#step_config-jmap_bloc').hide();
-        $('#step_config-smtp_bloc').show();
         $('#step_config-imap_bloc').show();
-        $('#srv_setup_stepper_profile_bloc').show();
-        $('#srv_setup_stepper_profile_checkbox_bloc').show();
     }
 }
 
@@ -2322,11 +2398,17 @@ function display_config_step(stepNumber) {
         [   {key: 'srv_setup_stepper_profile_name', value: $('#srv_setup_stepper_profile_name').val()},
             {key: 'srv_setup_stepper_email', value: $('#srv_setup_stepper_email').val()},
             {key: 'srv_setup_stepper_password', value: $('#srv_setup_stepper_password').val()}].forEach((item) => {
-            if(!item.value) {
-                $(`#${item.key}-error`).text('Required');
-                isValid = false;
+            if (!item.value) {
+                if (item.key == 'srv_setup_stepper_password' && ($('#srv_setup_stepper_imap_server_id').val() || $('#srv_setup_stepper_smtp_server_id').val())) {
+                    $(`#${item.key}-error`).text('');
+                } else {
+                    $(`#${item.key}-error`).text('Required');
+                    isValid = false;
+                }
+                
+            } else {
+                $(`#${item.key}-error`).text('');
             }
-            else $(`#${item.key}-error`).text('');
         })
 
         if (!isValid) {

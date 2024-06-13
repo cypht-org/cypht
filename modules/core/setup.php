@@ -310,6 +310,8 @@ return array(
         'drafts_per_source' => FILTER_DEFAULT,
         'drafts_since' => FILTER_DEFAULT,
         'warn_for_unsaved_changes' => FILTER_VALIDATE_BOOLEAN,
+        'srv_setup_stepper_imap_server_id'  => FILTER_DEFAULT,
+        'srv_setup_stepper_smtp_server_id' => FILTER_DEFAULT,
         'srv_setup_stepper_profile_name'  => FILTER_DEFAULT,
         'srv_setup_stepper_email' => FILTER_DEFAULT,
         'srv_setup_stepper_password' => FILTER_UNSAFE_RAW,
@@ -330,6 +332,7 @@ return array(
         'srv_setup_stepper_imap_sieve_host' => FILTER_DEFAULT,
         'srv_setup_stepper_only_jmap' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
-        'srv_setup_stepper_jmap_address' => FILTER_DEFAULT
+        'srv_setup_stepper_jmap_address' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN
     )
 );
