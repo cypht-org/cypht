@@ -245,7 +245,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
 
         $flags = array();
-        if (!stristr($msg['flags'], 'seen')) {
+        if (!mb_stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';
             if ($icon != 'sent') {
                 $icon = 'env_closed';
@@ -259,7 +259,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $icon = 'sent';
         }
         foreach (array('attachment', 'deleted', 'flagged', 'answered', 'draft') as $flag) {
-            if (stristr($msg['flags'], $flag)) {
+            if (mb_stristr($msg['flags'], $flag)) {
                 $flags[] = $flag;
             }
         }
@@ -769,10 +769,10 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                         $msgs = array_slice($msgs, 0, $limit);
                     }
                     foreach ($imap->get_message_list($msgs) as $msg) {
-                        if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+                        if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                             $msg['flags'] .= ' \Attachment';
                         }
-                        if (stristr($msg['flags'], 'deleted')) {
+                        if (mb_stristr($msg['flags'], 'deleted')) {
                             continue;
                         }
                         $msg['server_id'] = $id;
@@ -900,7 +900,7 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                     foreach ($msg_ids as $msg_id) {
                         $detail = $imap->get_message_list(array($msg_id));
                         if (array_key_exists($msg_id, $detail)) {
-                            if (stristr($detail[$msg_id]['flags'], 'seen')) {
+                            if (mb_stristr($detail[$msg_id]['flags'], 'seen')) {
                                 $seen = true;
                             }
                             else {

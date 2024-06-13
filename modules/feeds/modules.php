@@ -382,7 +382,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                         else {
                             Hm_Msgs::add('Successfully connected to feed');
                             $found = true;
-                            if (stristr('<feed', $feed->xml_data)) {
+                            if (mb_stristr('<feed', $feed->xml_data)) {
                                 $type = 'application/atom+xml';
                             }
                             else {
@@ -973,7 +973,7 @@ function search_for_feeds($html) {
     $href = false;
     if (preg_match_all("/<link.+>/U", $html, $matches)) {
         foreach ($matches[0] as $link_tag) {
-            if (stristr($link_tag, 'alternate')) {
+            if (mb_stristr($link_tag, 'alternate')) {
                 if (preg_match("/type=(\"|'|)(.+)(\"|'|\>| )/U", $link_tag, $types)) {
                     $type = trim($types[2]);
                 }
@@ -1018,7 +1018,7 @@ function search_feed_item($item, $terms, $since, $fld) {
     }
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $item)) {
-            if (stristr($item[$fld], $terms) !== false) {
+            if (mb_stristr($item[$fld], $terms) !== false) {
                 return true;
             }
         }

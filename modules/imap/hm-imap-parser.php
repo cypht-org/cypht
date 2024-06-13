@@ -65,14 +65,14 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             case 'DRAFT':
             case 'DELETED':
             case 'FLAGGED':
-                $res = stristr($flags, $filter);
+                $res = mb_stristr($flags, $filter);
                 break;
             case 'UNSEEN':
             case 'UNDRAFT':
             case 'UNDELETED':
             case 'UNFLAGGED':
             case 'UNANSWERED':
-                $res = !stristr($flags, str_replace('UN', '', $filter));
+                $res = !mb_stristr($flags, str_replace('UN', '', $filter));
                 break;
         }
         return $res;

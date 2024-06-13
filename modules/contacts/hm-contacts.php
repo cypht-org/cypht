@@ -88,7 +88,7 @@ class Hm_Contact_Store {
     }
 
     protected function search_contact($contact, $fld, $term) {
-        if (stristr($contact->value($fld, ''), $term)) {
+        if (mb_stristr($contact->value($fld, ''), $term)) {
             return true;
         }
         return false;
