@@ -302,7 +302,7 @@ if (!class_exists('Hm_IMAP')) {
                         $this->banner = $res[0];
                     }
                 }
-                if (stristr($response, 'A' . $this->command_count . ' OK')) {
+                if (mb_stristr($response, 'A' . $this->command_count . ' OK')) {
                     $authed = true;
                     $this->state = 'authenticated';
                 } elseif (mb_strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
@@ -357,7 +357,7 @@ if (!class_exists('Hm_IMAP')) {
                 $this->send_command($command);
                 $response = $this->get_response();
                 foreach ($response as $line) {
-                    if (stristr($line, '* CAPABILITY')) {
+                    if (mb_stristr($line, '* CAPABILITY')) {
                         $this->capability = $line;
                         break;
                     }
@@ -510,7 +510,7 @@ if (!class_exists('Hm_IMAP')) {
                     /* special use mailbox extension */
                     if ($this->is_supported('SPECIAL-USE')) {
                         foreach ($this->special_use_mailboxes as $name => $value) {
-                            if (stristr($flags, $name)) {
+                            if (mb_stristr($flags, $name)) {
                                 $special = $name;
                             }
                         }
@@ -520,20 +520,20 @@ if (!class_exists('Hm_IMAP')) {
                     }
 
                     /* build properties from the flags string */
-                    if (stristr($flags, 'marked')) {
+                    if (mb_stristr($flags, 'marked')) {
                         $marked = true;
                     }
-                    if (stristr($flags, 'noinferiors')) {
+                    if (mb_stristr($flags, 'noinferiors')) {
                         $can_have_kids = false;
                     }
-                    if (($folder == $namespace && $namespace) || stristr($flags, 'hashchildren') || stristr($flags, 'haschildren')) {
+                    if (($folder == $namespace && $namespace) || mb_stristr($flags, 'hashchildren') || mb_stristr($flags, 'haschildren')) {
                         $has_kids = true;
                     }
-                    if ($folder != 'INBOX' && $folder != $namespace && stristr($flags, 'noselect')) {
+                    if ($folder != 'INBOX' && $folder != $namespace && mb_stristr($flags, 'noselect')) {
                         $no_select = true;
                     }
                     /* EIMS work-around */
-                    if ($this->eims_tweaks && !stristr($flags, 'noinferiors') && stristr($flags, 'noselect')) {
+                    if ($this->eims_tweaks && !mb_stristr($flags, 'noinferiors') && mb_stristr($flags, 'noselect')) {
                         $has_kids = true;
                     }
 
@@ -847,7 +847,7 @@ if (!class_exists('Hm_IMAP')) {
                     }
                     if ($uid) {
                         $cset = '';
-                        if (stristr($content_type, 'charset=')) {
+                        if (mb_stristr($content_type, 'charset=')) {
                             if (preg_match("/charset\=([^\s;]+)/", $content_type, $matches)) {
                                 $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
                             }
@@ -993,7 +993,7 @@ if (!class_exists('Hm_IMAP')) {
                         $res = trim(preg_replace("/\s*\)$/", '', $v));
                         break 2;
                     }
-                    if (stristr(mb_strtoupper($v), 'BODY')) {
+                    if (mb_stristr(mb_strtoupper($v), 'BODY')) {
                         $search = false;
                     }
                 }
@@ -1183,7 +1183,7 @@ if (!class_exists('Hm_IMAP')) {
                     $flag_search = false;
                     for ($j = 0; $j < count($vals); $j++) {
                         $v = $vals[$j];
-                        if (stristr(mb_strtoupper($v), 'INTERNALDATE')) {
+                        if (mb_stristr(mb_strtoupper($v), 'INTERNALDATE')) {
                             $internal_date = $vals[$j+1];
                             $j++;
                             continue;
@@ -1221,10 +1221,10 @@ if (!class_exists('Hm_IMAP')) {
                             }
                             break;
                         }
-                        if (stristr(mb_strtoupper($v), 'BODY')) {
+                        if (mb_stristr(mb_strtoupper($v), 'BODY')) {
                             $search = false;
                         }
-                        elseif (stristr(mb_strtoupper($v), 'FLAGS')) {
+                        elseif (mb_stristr(mb_strtoupper($v), 'FLAGS')) {
                             $flag_search = true;
                         }
                     }

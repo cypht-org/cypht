@@ -110,10 +110,10 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         }
         $server_details = Hm_IMAP_List::dump($this->imap_id);
         foreach ($imap->get_message_list($msgs) as $msg) {
-            if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+            if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                 $msg['flags'] .= ' \Attachment';
             }
-            if (stristr($msg['flags'], 'deleted')) {
+            if (mb_stristr($msg['flags'], 'deleted')) {
                 continue;
             }
             $msg['server_id'] = $this->imap_id;
