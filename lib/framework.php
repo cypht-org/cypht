@@ -29,6 +29,7 @@ require APP_PATH.'lib/output.php';
 require APP_PATH.'lib/crypt.php';
 require APP_PATH.'lib/crypt_sodium.php';
 require APP_PATH.'lib/sodium_compat.php';
+require APP_PATH.'lib/scram.php';
 require APP_PATH.'lib/environment.php';
 require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
