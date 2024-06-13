@@ -100,7 +100,7 @@ if (!hm_exists('get_mailbox_filters')) {
             $client = $factory->init($user_config, $mailbox);
             $scripts = [];
             foreach ($client->listScripts() as $script) {
-                if (strstr($script, 'cypht')) {
+                if (mb_strstr($script, 'cypht')) {
                     $scripts[] = $script;
                 }
             }
@@ -162,7 +162,7 @@ if (!hm_exists('generate_main_script')) {
                 continue;
             }
 
-            if (strstr($script_name, 'cypht')) {
+            if (mb_strstr($script_name, 'cypht')) {
                 $ex_name = explode('-', $script_name);
                 $sorted_list[$script_name] = $ex_name[1];
             }
@@ -484,7 +484,7 @@ if (!hm_exists('get_blocked_senders')){
                 }
                 $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <i class="bi bi-pencil-fill ms-3"></i></a>';
                 $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'"></i>';
-                if (!strstr($sender, '*')) {
+                if (!mb_strstr($sender, '*')) {
                     $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'"></i>';
                 }
                 $ret .= '</td></tr>';

@@ -373,7 +373,7 @@ class Hm_IMAP_Struct {
      */
     private function increment_part_number() {
         $part = $this->part_number;
-        if (!strstr($part, '.')) {
+        if (!mb_strstr($part, '.')) {
             $part++;
         }
         else {

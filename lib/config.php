@@ -512,7 +512,7 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    if (strstr($type, ':')) {
+    if (mb_strstr($type, ':')) {
         list($type, $class) = explode(':', $type);
     }
     switch ($type) {

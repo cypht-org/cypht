@@ -268,7 +268,7 @@ function output_modules($settings) {
     foreach ($mods as $mod) {
         echo '<tr><td>'.ucfirst(str_replace('_', ' ', $mod)).
             '</td><td><input type="checkbox" value="1" name="'.$mod.'" ';
-        if (strstr($mod_str, $mod)) {
+        if (mb_strstr($mod_str, $mod)) {
             echo 'checked="checked" ';
         }
         echo '/></td></tr>';

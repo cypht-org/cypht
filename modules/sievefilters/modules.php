@@ -34,7 +34,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
             $this->out('conditions', json_encode(base64_decode($base64_obj)));
             $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
             $this->out('actions', json_encode(base64_decode($base64_obj)));
-            if (strstr($script, 'allof')) {
+            if (mb_strstr($script, 'allof')) {
                 $this->out('test_type', 'ALLOF');
             } else {
                 $this->out('test_type', 'ANYOF');
@@ -223,7 +223,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             $blocked_wildcard = '@'.$domain;
             $new_blocked_list = [];
             foreach ($blocked_list as $idx => $blocked_sender) {
-                if (!strstr($blocked_sender, $blocked_wildcard)) {
+                if (!mb_strstr($blocked_sender, $blocked_wildcard)) {
                     $new_blocked_list[] = $blocked_sender;
                 }
             }
@@ -331,7 +331,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         $email_sender = $this->request->post['sender'];
-        if (strstr($email_sender, '*')) {
+        if (mb_strstr($email_sender, '*')) {
             $email_sender = str_replace('*', '', $email_sender);
         }
 

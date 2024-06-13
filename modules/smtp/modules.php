@@ -538,7 +538,7 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         $profiles = $this->user_config->get('profiles');
         $profile_value = $this->request->post['profile_value'];
 
-        if (!strstr($profile_value, '.')) {
+        if (!mb_strstr($profile_value, '.')) {
             Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
             return;
         }
@@ -1525,7 +1525,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
                     $res .= '<option ';
-                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
+                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! mb_strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
                         $res .= 'selected="selected" ';
                     }
                     $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
