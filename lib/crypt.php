@@ -160,7 +160,7 @@ class Hm_Crypt_Base {
     */
     private static function hash_equals($a, $b) {
         $res = 0;
-        $len = mb_strlen($a);
+        $len = mb_strlen($a, '8bit');
         for ($i = 0; $i < $len; $i++) {
             $res |= ord($a[$i]) ^ ord($b[$i]);
         }
@@ -176,7 +176,7 @@ class Hm_Crypt_Base {
      * @return bool
      */
     public static function hash_compare($a, $b) {
-        if (!is_string($a) || !is_string($b) || mb_strlen($a) !== mb_strlen($b)) {
+        if (!is_string($a) || !is_string($b) || mb_strlen($a, '8bit') !== mb_strlen($b, '8bit')) {
             return false;
         }
         /* requires PHP >= 7.4 */
@@ -212,7 +212,7 @@ class Hm_Crypt_Base {
         }
 
         /* manual version */
-        $size = mb_strlen(hash($algo, '', true));
+        $size = mb_strlen(hash($algo, '', true), '8bit');
         $len = ceil($length / $size);
         $result = '';
         for ($i = 1; $i <= $len; $i++) {
@@ -224,7 +224,7 @@ class Hm_Crypt_Base {
             }
             $result .= $res;
         }
-        return mb_substr($result, 0, $length);
+        return mb_substr($result, 0, $length, '8bit');
     }
 
     /**

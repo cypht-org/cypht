@@ -636,8 +636,8 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
 
             $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
             $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
-            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(mb_strtolower($vals['encoding'])) : '').
-            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : ''); */
+            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
+            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
 
             $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
         }

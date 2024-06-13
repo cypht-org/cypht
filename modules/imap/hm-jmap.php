@@ -199,7 +199,7 @@ class Hm_JMAP {
             return 0;
         }
         $this->streaming_msg = $this->get_raw_message_content($blob_id, $name);
-        return mb_strlen($this->streaming_msg);
+        return mb_strlen($this->streaming_msg, '8bit');
     }
 
     /**
