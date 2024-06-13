@@ -138,6 +138,19 @@
   background-color: inherit;
   color: inherit;
 }
+.header_links #dropdownMenuForward {
+  padding: 0;
+  border: unset;
+  font-variant: inherit;
+  text-transform: inherit;
+  font-size: inherit;
+  vertical-align: baseline;
+}
+
+.header_links #dropdownMenuForward:hover {
+  background-color: inherit;
+  color: inherit;
+}
 .overlay {
   position: fixed;
   height: 100%;

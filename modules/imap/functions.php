@@ -1415,6 +1415,21 @@ function snooze_dropdown($output, $unsnooze = false) {
 /**
  * @subpackage imap/functions
  */
+if (!hm_exists('forward_dropdown')) {
+    function forward_dropdown($output,$reply_args) {
+        $txt = '<div class="dropdown d-inline-block">
+                    <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
+        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '</ul></div>';
+        return $txt;
+    }
+}
+
+/**
+ * @subpackage imap/functions
+ */
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
