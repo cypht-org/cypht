@@ -613,7 +613,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                 if (in_array($name, array('server_id', 'server_name', 'guid', 'id', 'content'), true)) {
                     continue;
                 }
-                if ($name != 'link' && $name != 'link_alternate' && !strstr($value, ' ') && mb_strlen($value) > 75) {
+                if ($name != 'link' && $name != 'link_alternate' && !mb_strstr($value, ' ') && mb_strlen($value) > 75) {
                     $value = mb_substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {

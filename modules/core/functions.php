@@ -228,7 +228,7 @@ function validate_domain_full($val) {
 if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
     /* check length, "." rules, and for characters > ASCII 127 */
-    if (mb_strlen($val) > 64 || $val[0] == '.' || $val[(mb_strlen($val) -1)] == '.' || strstr($val, '..') ||
+    if (mb_strlen($val) > 64 || $val[0] == '.' || $val[(mb_strlen($val) -1)] == '.' || mb_strstr($val, '..') ||
         preg_match('/[^\x00-\x7F]/',$val)) {
         return false;
     }

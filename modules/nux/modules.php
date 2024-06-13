@@ -31,7 +31,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
             Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
             $curl_result = Hm_Functions::c_exec($ch);
             if (trim($curl_result)) {
-                if (strstr($curl_result, 'API rate limit exceeded')) {
+                if (mb_strstr($curl_result, 'API rate limit exceeded')) {
                     return;
                 }
                 $json_commits = json_decode($curl_result);

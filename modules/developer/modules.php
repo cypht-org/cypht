@@ -60,7 +60,7 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
                 Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
                 $curl_result = Hm_Functions::c_exec($ch);
                 if (trim($curl_result)) {
-                    if (!strstr($curl_result, 'No commit found for SHA')) {
+                    if (!mb_strstr($curl_result, 'No commit found for SHA')) {
                         $json_commit = json_decode($curl_result);
                         $commit_date = $json_commit->commit->author->date;
                     }

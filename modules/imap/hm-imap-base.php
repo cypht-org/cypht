@@ -375,7 +375,7 @@ class Hm_IMAP_Base {
         }
 
         /* save the command and time for the IMAP debug output option */
-        if (strstr($command, 'LOGIN')) {
+        if (mb_strstr($command, 'LOGIN')) {
             $command = 'LOGIN';
         }
         $this->commands[trim($command)] = microtime( true );

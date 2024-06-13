@@ -483,7 +483,7 @@ if (!class_exists('Hm_IMAP')) {
 
                     /* get each folder name part of the complete hierarchy */
                     $folder_parts = array();
-                    if ($delim && strstr($folder, $delim)) {
+                    if ($delim && mb_strstr($folder, $delim)) {
                         $temp_parts = explode($delim, $folder);
                         foreach ($temp_parts as $g) {
                             if (trim($g)) {
@@ -1098,7 +1098,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
             }
-            if (!strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
+            if (!mb_strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
                $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
@@ -1700,7 +1700,7 @@ if (!class_exists('Hm_IMAP')) {
         public function convert_sequence_to_array($sequence) {
             $res = array();
             foreach (explode(',', $sequence) as $atom) {
-                if (strstr($atom, ':')) {
+                if (mb_strstr($atom, ':')) {
                     $markers = explode(':', $atom);
                     if (ctype_digit($markers[0]) && ctype_digit($markers[1])) {
                         $res = array_merge($res, range($markers[0], $markers[1]));
