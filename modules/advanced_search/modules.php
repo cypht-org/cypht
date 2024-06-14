@@ -131,7 +131,7 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
     }
 
     private function validate_source($val) {
-        if (substr_count($val, '_') !== 2) {
+        if (mb_substr_count($val, '_') !== 2) {
             return false;
         }
         $source_parts = explode('_', $val);
