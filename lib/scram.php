@@ -22,7 +22,7 @@ private $hashes = array(
 );
 
 private function getHashAlgorithm($scramAlgorithm) {
-    $parts = explode('-', strtolower($scramAlgorithm));
+    $parts = explode('-', mb_strtolower($scramAlgorithm));
     return $this->hashes[$parts[1]] ?? 'sha1'; // Default to sha1 if the algorithm is not found
 }
 private function log($message) {
@@ -31,7 +31,7 @@ private function log($message) {
 }
 public function generateClientProof($username, $password, $salt, $clientNonce, $serverNonce, $algorithm) {
     $iterations = 4096;
-    $keyLength = strlen(hash($algorithm, '', true)); // Dynamically determine key length based on algorithm
+    $keyLength = mb_strlen(hash($algorithm, '', true), '8bit'); // Dynamically determine key length based on algorithm
 
     $passwordBytes = hash($algorithm, $password, true);
     $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, $iterations, $keyLength, true);
@@ -51,13 +51,13 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
     $scramCommand = 'AUTHENTICATE ' . $scramAlgorithm . "\r\n";
     $sendCommand($scramCommand);
     $response = $getServerResponse();
-    if (!empty($response) && substr($response[0], 0, 2) == '+ ') {
+    if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
         $this->log("Received server challenge: " . $response[0]);
         // Extract salt and server nonce from the server's challenge
-        $serverChallenge = base64_decode(substr($response[0], 2));
+        $serverChallenge = base64_decode(mb_substr($response[0], 2));
         $parts = explode(',', $serverChallenge);
-        $serverNonce = base64_decode(substr($parts[0], strpos($parts[0], "=") + 1));
-        $salt = base64_decode(substr($parts[1], strpos($parts[1], "=") + 1));
+        $serverNonce = base64_decode(mb_substr($parts[0], mb_strpos($parts[0], "=", 0, '8bit') + 1, null, '8bit'));
+        $salt = base64_decode(mb_substr($parts[1], mb_strpos($parts[1], "=", 0, '8bit') + 1, null, '8bit'));
 
         // Generate client nonce
         $clientNonce = base64_encode(random_bytes(32));
@@ -67,7 +67,7 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         $clientProof = $this->generateClientProof($username, $password, $salt, $clientNonce, $serverNonce, $algorithm);
 
         // Construct client final message
-        $channelBindingData = (stripos($scramAlgorithm, 'plus') !== false) ? 'c=' . base64_encode('tls-unique') . ',' : 'c=biws,';
+        $channelBindingData = (mb_stripos($scramAlgorithm, 'plus') !== false) ? 'c=' . base64_encode('tls-unique') . ',' : 'c=biws,';
         $clientFinalMessage = $channelBindingData . 'r=' . $serverNonce . $clientNonce . ',p=' . $clientProof;
         $clientFinalMessageEncoded = base64_encode($clientFinalMessage);
         $this->log("Sending client final message: " . $clientFinalMessageEncoded);
@@ -76,14 +76,14 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
 
         // Verify server's response
         $response = $getServerResponse();
-        if (!empty($response) && substr($response[0], 0, 2) == '+ ') {
-            $serverFinalMessage = base64_decode(substr($response[0], 2));
+        if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
+            $serverFinalMessage = base64_decode(mb_substr($response[0], 2));
             $parts = explode(',', $serverFinalMessage);
-            $serverProof = substr($parts[0], strpos($parts[0], "=") + 1);
+            $serverProof = mb_substr($parts[0], mb_strpos($parts[0], "=", 0, '8bit') + 1, null, '8bit');
 
             // Generate server key
             $passwordBytes = hash($algorithm, $password, true);
-            $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, 4096, strlen(hash($algorithm, '', true)), true);
+            $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, 4096, mb_strlen(hash($algorithm, '', true), '8bit'), true);
             $serverKey = hash_hmac($algorithm, "Server Key", $saltedPassword, true);
 
             // Calculate server signature
