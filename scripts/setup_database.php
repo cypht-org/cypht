@@ -8,6 +8,10 @@ define('VENDOR_PATH', APP_PATH.'vendor/');
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
 
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
+/* get config object */
 $config = new Hm_Site_Config_File();
 
 $session_type = $config->get('session_type');
