@@ -1188,20 +1188,20 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
                 $default_reject_message = $reject_messages[$idx];
             }
 
-            $default_behaviour_html = '<div class="col-sm-7 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-control" imap_account="'.$idx.'">'
+            $default_behaviour_html = '<div class="col-sm-7 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="'.$idx.'">'
             .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
             .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
             .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
             if ($default_behaviour == 'Reject') {
                 $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
             }
-            $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">Submit</button></div></div>';
+            $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">'.$this->trans('Submit').'</button></div></div>';
             $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
             $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
             $res .= '<div class="sievefilters_accounts_item">';
             $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between">' . $mailbox['name'];
             $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block px-5 py-3 d-none"><div class="filter_subblock">';
+            $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
             $res .=  $default_behaviour_html;
             $res .= '<table class="filter_details table"><tbody>';
             $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
