@@ -628,4 +628,5 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'You have %d scheduled messages that won\'t be executed if you quit' => false,
 );

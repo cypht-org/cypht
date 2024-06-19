@@ -607,3 +607,72 @@ function get_special_folders($mod, $id) {
     }
     return array();
 }
+
+/**
+ * @subpackage core/functions
+ */
+if (!hm_exists('get_nexter_date')) {
+function get_nexter_date($format, $only_label = false) {
+    if ($format == 'later_in_day') {
+        $date_string = 'today 18:00';
+        $label = 'Later in the day';
+    } elseif ($format == 'tomorrow') {
+        $date_string = '+1 day 08:00';
+        $label = 'Tomorrow';
+    } elseif ($format == 'next_weekend') {
+        $date_string = 'next Saturday 08:00';
+        $label = 'Next weekend';
+    } elseif ($format == 'next_week') {
+        $date_string = 'next week 08:00';
+        $label = 'Next week';
+    } elseif ($format == 'next_month') {
+        $date_string = 'next month 08:00';
+        $label = 'Next month';
+    } else {
+        $date_string = $format;
+        $label = 'Certain date';
+    }
+    $time = strtotime($date_string);
+    if ($only_label) {
+        return [$label, date('D, H:i', $time)];
+    }
+    return date('D, d M Y H:i', $time);
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('nexter_formats')) {
+function nexter_formats() {
+    $values = array(
+        'tomorrow',
+        'next_weekend',
+        'next_week',
+        'next_month'
+    );
+    if (date('H') <= 16) {
+        array_push($values, 'later_in_day');
+    }
+    return $values;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_nexter_header')) {
+    function parse_nexter_header($header, $name)
+    {
+        $header = str_replace("$name: ", '', $header);
+        $result = [];
+        foreach (explode(';', $header) as $kv)
+        {
+            $kv = trim($kv);
+            $spacePos = strpos($kv, ' ');
+            if ($spacePos > 0) {
+                $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+            } else {
+                $result[$kv] = true;
+            }
+        }
+        return $result;
+    }}

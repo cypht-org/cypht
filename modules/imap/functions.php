@@ -226,7 +226,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
         if ($is_snoozed) {
-            $snooze_header = parse_snooze_header('X-Snoozed: '.$msg['x_snoozed']);
+            $snooze_header = parse_nexter_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
             $timestamp = strtotime($date);
         } else {
@@ -1276,7 +1276,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
-        $old_folder = parse_snooze_header($matches[0])['from'];
+        $old_folder = parse_nexter_header($matches[0], 'X-Snoozed')['from'];
     }
     if ($snooze_tag) {
         $from = $old_folder ?? $folder;
@@ -1302,7 +1302,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
             }
         }
     } else {
-        $snooze_headers = parse_snooze_header($matches[0]);
+        $snooze_headers = parse_nexter_header($matches[0], 'X-Snoozed');
         $original_folder = $snooze_headers['from'];
         if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, strlen($msg))) {
             $imap->append_feed($msg."\r\n");
@@ -1320,92 +1320,23 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
 /**
  * @subpackage imap/functions
  */
-if (!hm_exists('parse_snooze_header')) {
-function parse_snooze_header($snooze_header)
-{
-    $snooze_header = str_replace('X-Snoozed: ', '', $snooze_header);
-    $result = [];
-    foreach (explode(';', $snooze_header) as $kv)
-    {
-        $kv = trim($kv);
-        $spacePos = strpos($kv, ' ');
-        if ($spacePos > 0) {
-            $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
-        } else {
-            $result[$kv] = true;
-        }
-    }
-    return $result;
-}}
-
-/**
- * @subpackage imap/functions
- */
-if (!hm_exists('get_snooze_date')) {
-function get_snooze_date($format, $only_label = false) {
-    if ($format == 'later_in_day') {
-        $date_string = 'today 18:00';
-        $label = 'Later in the day';
-    } elseif ($format == 'tomorrow') {
-        $date_string = '+1 day 08:00';
-        $label = 'Tomorrow';
-    } elseif ($format == 'next_weekend') {
-        $date_string = 'next Saturday 08:00';
-        $label = 'Next weekend';
-    } elseif ($format == 'next_week') {
-        $date_string = 'next week 08:00';
-        $label = 'Next week';
-    } elseif ($format == 'next_month') {
-        $date_string = 'next month 08:00';
-        $label = 'Next month';
-    } else {
-        $date_string = $format;
-        $label = 'Certain date';
-    }
-    $time = strtotime($date_string);
-    if ($only_label) {
-        return [$label, date('D, H:i', $time)];
-    }
-    return date('D, d M Y H:i', $time);
-}}
-
-/**
- * @subpackage imap/functions
- */
-if (!hm_exists('snooze_formats')) {
-function snooze_formats() {
-    $values = array(
-        'tomorrow',
-        'next_weekend',
-        'next_week',
-        'next_month'
-    );
-    if (date('H') <= 16) {
-        array_push($values, 'later_in_day');
-    }
-    return $values;
-}}
-
-/**
- * @subpackage imap/functions
- */
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
-    $values = snooze_formats();
+    $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
-        $labels = get_snooze_date($format, true);
-        $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
+        $labels = get_nexter_date($format, true);
+        $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';
-    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
-    $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="snooze_input" style="display:none;"></li>';
+    $txt .= '<li><label for="nexter_input_date" class="nexter_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<input id="nexter_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="nexter_input_date" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<input class="nexter_input" style="display:none;"></li>';
     if ($unsnooze) {
-        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
     $txt .= '</ul></div>';
 
@@ -1496,3 +1427,42 @@ if (!hm_exists('connect_to_imap_server')) {
         }
     }
 }
+
+if (!hm_exists('save_sent_msg')) {
+function save_sent_msg($handler, $imap_id, $imap, $imap_details, $msg, $msg_id, $show_errors = true) {
+    $specials = get_special_folders($handler, $imap_id);
+    if (array_key_exists('sent', $specials) && $specials['sent']) {
+        $sent_folder = $specials['sent'];
+    }
+
+    if (!$sent_folder) {
+        $auto_sent = $imap->get_special_use_mailboxes('sent');
+        if (!array_key_exists('sent', $auto_sent)) {
+            return;
+        }
+        $sent_folder = $auto_sent['sent'];
+    }
+    if (!$sent_folder) {
+        Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
+    }
+    $uid = null;
+    if ($sent_folder) {
+        Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
+        if ($imap->append_start($sent_folder, strlen($msg), true)) {
+            $imap->append_feed($msg."\r\n");
+            if (!$imap->append_end() && $show_errors) {
+                Hm_Msgs::add('ERRAn error occurred saving the sent message');
+            }
+        }
+        
+        $mailbox_page = $imap->get_mailbox_page($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
+        foreach ($mailbox_page[1] as $mail) {
+            $msg_header = $imap->get_message_headers($mail['uid']);
+            if ($msg_header['Message-Id'] === $msg_id) {
+                $uid = $mail['uid'];
+                break;
+            }
+        }
+    }
+    return $uid;
+}}

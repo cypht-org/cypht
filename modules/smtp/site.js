@@ -113,7 +113,7 @@ var send_archive = function() {
     document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
-var save_compose_state = function(no_files, notice) {
+var save_compose_state = function(no_files, notice, schedule, callback) {
     var no_icon = true;
     if (notice) {
         no_icon = false;
@@ -126,6 +126,7 @@ var save_compose_state = function(no_files, notice) {
     var cc = $('.compose_cc').val();
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
+    var delivery_receipt = $('#compose_delivery_receipt').prop('checked');
 
     var draft_id = $('.compose_draft_id').val();
     if (globals.draft_state == body+subject+to+smtp+cc+bcc+uploaded_files) {
@@ -138,7 +139,7 @@ var save_compose_state = function(no_files, notice) {
     }
 
     $('.smtp_send_placeholder').prop('disabled', true);
-    $('.smtp_send_placeholder').addClass('disabled_input');
+    $('.smtp_send_placeholder, .smtp_schedule_send').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
@@ -151,15 +152,20 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to},
+        {'name': 'schedule', 'value': schedule},
+        {'name': 'compose_delivery_receipt', 'value': delivery_receipt},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
             $('.smtp_send_placeholder').prop('disabled', false);
-            $('.smtp_send_placeholder').removeClass('disabled_input');
+            $('.smtp_send_placeholder, .smtp_schedule_send').removeClass('disabled_input');
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
             if (res.draft_subject) {
                 $('.draft_list .draft_'+draft_id+' a').text(res.draft_subject);
+            }
+            if (callback) {
+                callback(res);
             }
         },
         [],
@@ -188,7 +194,7 @@ if (hm_page_name() === 'servers') {
     }
 }
 
-var reset_smtp_form = function() {
+var reset_smtp_form = function(save = true) {
     $('.compose_body').val('');
     $('.compose_subject').val('');
     $('.compose_to').val('');
@@ -196,7 +202,10 @@ var reset_smtp_form = function() {
     $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
     $('.uploaded_files').html('');
-    save_compose_state(true);
+    $('#compose_delivery_receipt').prop('checked', false);
+    if (save) {
+        save_compose_state(true);
+    }
 };
 
 var replace_cursor_positon = function (txtElement) {
@@ -419,6 +428,16 @@ var force_send_message = function() {
     }
 }
 
+var send_scheduled_messages = function() { 
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_send_scheduled_messages'}],
+        function(res) {
+            scheduled_msg_count = res.scheduled_msg_count;
+        },
+    );
+}
+var scheduled_msg_count = 0;
+
 $(function () {
     if (!hm_is_logged()) {
         return;
@@ -437,6 +456,9 @@ $(function () {
     }
     if (hm_page_name() === 'compose') {
         init_resumable_upload()
+        setup_nexter_date(function() {
+            $('.smtp_send_placeholder').trigger('click');
+        });
 
         var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
         Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
@@ -516,7 +538,17 @@ $(function () {
 
             function handleSendAnyway() {
                 if (handleMissingAttachment()) {
-                    document.getElementsByClassName("smtp_send")[0].click();
+                    if ($('.nexter_input').val()) {
+                        save_compose_state(false, true, $('.nexter_input').val(), function(res) {
+                            if (!res.router_user_msgs[0].startsWith('ERR')) {
+                                reset_smtp_form(false);
+                                Hm_Folders.reload_folders(true);
+                                Hm_Utils.redirect();
+                            }
+                        });
+                    } else {
+                        document.getElementsByClassName("smtp_send")[0].click();
+                    }
                 } else {
                     e.preventDefault();
                 }
@@ -612,4 +644,13 @@ $(function () {
             $(this).parent().remove();
         });
     }
+    send_scheduled_messages();
+    setInterval(send_scheduled_messages, 60000);
+
+    window.onbeforeunload = () => {
+        if (scheduled_msg_count == 0) {
+          return;
+        }
+        return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
+      };
 });

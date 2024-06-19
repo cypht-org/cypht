@@ -312,38 +312,8 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $imap_details = Hm_IMAP_List::dump($imap_id);
         $sent_folder = false;
         if (imap_authed($imap)) {
-            $specials = get_special_folders($this, $imap_id);
-            if (array_key_exists('sent', $specials) && $specials['sent']) {
-                $sent_folder = $specials['sent'];
-            }
-
-            if (!$sent_folder) {
-                $auto_sent = $imap->get_special_use_mailboxes('sent');
-                if (!array_key_exists('sent', $auto_sent)) {
-                    return;
-                }
-                $sent_folder = $auto_sent['sent'];
-            }
-            if (!$sent_folder) {
-                Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
-            }
-            if ($sent_folder) {
-                Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-                if ($imap->append_start($sent_folder, strlen($msg), true)) {
-                    $imap->append_feed($msg."\r\n");
-                    if (!$imap->append_end()) {
-                        Hm_Msgs::add('ERRAn error occurred saving the sent message');
-                    }
-                }
-                $uid = null;
-                $mailbox_page = $imap->get_mailbox_page($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
-                foreach ($mailbox_page[1] as $mail) {
-                    $msg_header = $imap->get_message_headers($mail['uid']);
-                    if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
-                        $uid = $mail['uid'];
-                        break;
-                    }
-                }
+            $uid = save_sent_msg($this, $imap_id, $imap, $imap_details, $msg, $mime->get_headers()['Message-Id']);
+            if ($uid) {
                 if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
                     $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
                 }
@@ -996,7 +966,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
         $snooze_tag = null;
         if ($form['imap_snooze_until'] != 'unsnooze') {
             $at = date('D, d M Y H:i:s O');
-            $until = get_snooze_date($form['imap_snooze_until']);
+            $until = get_nexter_date($form['imap_snooze_until']);
             $snooze_tag = "X-Snoozed: at $at; until $until";
         }
         $ids = explode(',', $form['imap_snooze_ids']);
@@ -1048,7 +1018,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                     $msg_headers = $imap->get_message_headers($msg['uid']);
                     if (isset($msg_headers['X-Snoozed'])) {
                         try {
-                            $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
+                            $snooze_headers = parse_nexter_header($msg_headers['X-Snoozed'], 'X-Snoozed');
                             if (new DateTime($snooze_headers['until']) <= new DateTime()) {
                                 snooze_message($imap, $msg['uid'], $folder, null);
                             }

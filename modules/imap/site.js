@@ -1072,61 +1072,6 @@ var imap_folder_status = function() {
     }
 };
 
-var imap_setup_snooze = function() {
-    $(document).on('click', '.snooze_date_picker', function(e) {
-        document.querySelector('.snooze_input_date').showPicker();
-    });
-    $(document).on('click', '.snooze_helper', function(e) {
-        e.preventDefault();
-        $('.snooze_input').val($(this).attr('data-value')).trigger('change');
-    });
-    $(document).on('input', '.snooze_input_date', function(e) {
-        var now = new Date();
-        now.setMinutes(now.getMinutes() + 1);
-        $(this).attr('min', now.toJSON().slice(0, 16));
-        if (new Date($(this).val()).getTime() <= now.getTime()) {
-            $('.snooze_date_picker').css('border', '1px solid red');
-        } else {
-            $('.snooze_date_picker').css({'border': 'unset', 'border-top': '1px solid #ddd'});
-        }
-    });
-    $(document).on('change', '.snooze_input_date', function(e) {
-        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.snooze_input').val($(this).val()).trigger('change');
-        }
-    });
-    $(document).on('change', '.snooze_input', function(e) {
-        $('.snooze_dropdown').hide();
-        var ids = [];
-        if (hm_page_name() == 'message') {
-            var list_path = hm_list_path().split('_');
-            ids.push(list_path[1]+'_'+hm_msg_uid()+'_'+list_path[2]);
-        } else {
-            $('input[type=checkbox]').each(function() {
-                if (this.checked && this.id.search('imap') != -1) {
-                    var parts = this.id.split('_');
-                    ids.push(parts[1]+'_'+parts[2]+'_'+parts[3]);
-                }
-            });
-            if (ids.length == 0) {
-                return;
-            };
-        }
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
-            {'name': 'imap_snooze_ids', 'value': ids},
-            {'name': 'imap_snooze_until', 'value': $(this).val()}],
-            function(res) {
-                if (res.snoozed_messages > 0) {
-                    Hm_Folders.reload_folders(true);
-                    var path = hm_list_parent()? hm_list_parent(): hm_list_path();
-                    window.location.replace('?page=message_list&list_path='+path);
-                }
-            }
-        );
-    });
-}
-
 var imap_unsnooze_messages = function() {
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_unsnooze'}],
@@ -1184,7 +1129,36 @@ $(function() {
     }
 
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
-        imap_setup_snooze();
+        setup_nexter_date(function(e) {
+            $('.snooze_dropdown').hide();
+            var ids = [];
+            if (hm_page_name() == 'message') {
+                var list_path = hm_list_path().split('_');
+                ids.push(list_path[1]+'_'+hm_msg_uid()+'_'+list_path[2]);
+            } else {
+                $('input[type=checkbox]').each(function() {
+                    if (this.checked && this.id.search('imap') != -1) {
+                        var parts = this.id.split('_');
+                        ids.push(parts[1]+'_'+parts[2]+'_'+parts[3]);
+                    }
+                });
+                if (ids.length == 0) {
+                    return;
+                };
+            }
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
+                {'name': 'imap_snooze_ids', 'value': ids},
+                {'name': 'imap_snooze_until', 'value': $(this).val()}],
+                function(res) {
+                    if (res.snoozed_messages > 0) {
+                        Hm_Folders.reload_folders(true);
+                        var path = hm_list_parent()? hm_list_parent(): hm_list_path();
+                        window.location.replace('?page=message_list&list_path='+path);
+                    }
+                }
+            );
+        });
     }
 
     if (hm_is_logged()) {

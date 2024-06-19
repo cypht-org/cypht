@@ -19,6 +19,7 @@ add_output('compose', 'compose_form_end', true, 'smtp', 'compose_form_content', 
 add_output('compose', 'compose_form_attach', true, 'smtp', 'compose_form_end', 'after');
 add_handler('compose', 'load_smtp_is_imap_forward', true, 'smtp', 'load_user_data', 'after');
 
+
 add_handler('functional_api', 'default_smtp_server', true, 'smtp');
 
 add_handler('profiles', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
@@ -99,6 +100,13 @@ add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
 add_handler('ajax_clear_attachment_chunks', 'load_user_data',  true, 'core');
 add_handler('ajax_clear_attachment_chunks', 'clear_attachment_chunks',  true);
 
+/* send delayed emails */
+setup_base_ajax_page('ajax_send_scheduled_messages', 'core');
+add_handler('ajax_send_scheduled_messages', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_send_scheduled_messages', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('ajax_send_scheduled_messages', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_send_scheduled_messages', 'send_scheduled_messages', true, 'smtp');
+
 return array(
     'allowed_pages' => array(
         'ajax_clear_attachment_chunks',
@@ -108,7 +116,8 @@ return array(
         'ajax_profiles_status',
         'ajax_attachment_reminder_check',
         'ajax_get_test_chunk',
-        'ajax_upload_chunk'
+        'ajax_upload_chunk',
+        'ajax_send_scheduled_messages'
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -139,9 +148,15 @@ return array(
         'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
         'enable_attachment_reminder' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'scheduled_msg_count' => array(FILTER_VALIDATE_INT, false),
     ),
     'allowed_post' => array(
         'post_archive' => FILTER_VALIDATE_INT,
+        'send_tomorrow_morning' => FILTER_DEFAULT,
+        'send_today_afternoon' => FILTER_DEFAULT,
+        'schedule_sending' => FILTER_DEFAULT,
+        'send_date' => FILTER_DEFAULT,
+        'send_time' => FILTER_DEFAULT,
         'attachment_id' => FILTER_DEFAULT,
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_DEFAULT,
@@ -181,6 +196,7 @@ return array(
         'uploaded_files' => FILTER_DEFAULT,
         'send_uploaded_files' => FILTER_DEFAULT,
         'next_email_post' => FILTER_DEFAULT,
-        'enable_attachment_reminder' => FILTER_VALIDATE_INT
+        'enable_attachment_reminder' => FILTER_VALIDATE_INT,
+        'schedule' => FILTER_DEFAULT,
     )
 );
