@@ -21,10 +21,15 @@ class Hm_MIME_Msg {
     private $final_msg = '';
 
     /* build mime message data */
-    function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='') {
+    function __construct($to, $subject, $body, $from, $html=false, $cc='', $bcc='', $in_reply_to_id='', $from_name='', $reply_to='', $delivery_receipt='', $schedule='', $profile_id = '') {
         if ($cc) {
             $this->headers['Cc'] = $cc;
         }
+        if ($schedule) {
+            $this->headers['X-Schedule'] = $schedule;
+            $this->headers['X-Profile-ID'] = $profile_id;
+        }
+
         if ($in_reply_to_id) {
             $this->headers['In-Reply-To'] = $in_reply_to_id;
         }
@@ -40,6 +45,9 @@ class Hm_MIME_Msg {
         }
         else {
             $this->headers['Reply-To'] = $from;
+        }
+        if ($delivery_receipt) {
+            $this->headers['X-Delivery'] = $delivery_receipt;
         }
         $this->headers['To'] = $to;
         $this->headers['Subject'] = html_entity_decode($subject, ENT_QUOTES);
@@ -190,7 +198,7 @@ class Hm_MIME_Msg {
         return $this->encode_fld($val);
     }
 
-    function find_addresses($str) {
+    static function find_addresses($str) {
         $res = array();
         foreach (process_address_fld($str) as $vals) {
             $res[] = $vals['email'];
@@ -210,7 +218,7 @@ class Hm_MIME_Msg {
             else {
                 continue;
             }
-            $res = array_merge($res, $this->find_addresses($v));
+            $res = array_merge($res, self::find_addresses($v));
         }
         return $res;
     }
