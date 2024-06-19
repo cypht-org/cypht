@@ -81,7 +81,6 @@ return array(
         'nux_account_name' => FILTER_DEFAULT,
         'nux_all_inkl_login' => FILTER_DEFAULT,
         'accounts_source' => FILTER_DEFAULT,
-        'accounts_source' => FILTER_DEFAULT,
-        'accounts_csv' => FILTER_DEFAULT,
+        'accounts_sample' => FILTER_DEFAULT,
     )
 );

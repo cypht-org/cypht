@@ -151,7 +151,6 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module
                 Hm_Msgs::add('ERRAn Error Occurred');
             }
             $this->save_hm_msgs();
-            Hm_Dispatch::page_redirect('?page=servers');
         }
     }
 }
@@ -258,10 +257,8 @@ class Hm_Handler_process_nux_service extends Hm_Handler_Module
 /**
  * @subpackage nux/handler
  */
-class Hm_Handler_get_nux_service_details extends Hm_Handler_Module
-{
-    public function process()
-    {
+class Hm_Handler_get_nux_service_details extends Hm_Handler_Module {
+    public function process() {
         list($success, $form) = $this->process_form(array('nux_service'));
         if ($success) {
             if (Nux_Quick_Services::exists($form['nux_service'])) {
@@ -284,85 +281,166 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
         list($success, $form) = $this->process_form(array('accounts_source'));
 
         if ($success) {
-            if ($form['accounts_source'] == 'yaml') {
-                $file = $this->request->files['accounts_sample'];
-                if (!is_null($file) && $file['type'] == 'application/x-yaml') {
-                    try {
-                        $servers = Yaml::parseFile($file['tmp_name']);
-                    } catch (\Throwable $th) {
-                        Hm_Msgs::add('ERR' . $th->getMessage());
-                        $this->save_hm_msgs();
-                        Hm_Dispatch::page_redirect('?page=servers');
-                    }
-                    foreach ($servers as $key => $value) {
-                        if (empty($value['user']['username']) or empty($value['user']['password'])) {
-                            Hm_Msgs::add('ERRUsername and password are required for: ' . $key . ' server');
-                            return;
-                        }
-                        if ($value['jmap'] && !empty($value['jmap']['jmap_server'])) {
-                            if (!$this->module_is_supported('jmap')) {
-                                Hm_Msgs::add("ERRJMAP module is not enabled");
-                                return;
-                            }
-                            connect_to_imap_server(
-                                $value['imap']['imap_server'],
-                                $key,
-                                null,
-                                $value['user']['username'],
-                                $value['user']['password'],
-                                false,
-                                null,
-                                false,
-                                'jmap',
-                                $this,
-                                false
-                            );
-                            Hm_Msgs::add("JMAP Server " . $key . " saved");
-                        }
-                        if ($value['smtp'] && !empty($value['smtp']['smtp_server'])) {
-                            // Check if module is supported
-                            if (!$this->module_is_supported('smtp')) {
-                                Hm_Msgs::add("ERRSMTP module is not enabled");
-                            } else {
-                                //TO DO: check first if the smtp_server server is already configured before connecting. can use the in_server_list function or create a new one specifically for my case
-                                $smtp_server_id = connect_to_smtp_server(
-                                    $value['smtp']['smtp_server'],
-                                    $key,
-                                    $value['smtp']['smtp_port'],
-                                    $value['user']['username'],
-                                    $value['user']['password'],
-                                    $value['smtp']['smtp_tls'],
-                                    $this
-                                );
-                                Hm_Msgs::add("SMTP Server " . $key . " saved");
-                            }
-                        }
-
-                        if ($value['imap'] && !empty($value['imap']['imap_server'])) {
-                            // Check if module is supported
-                            if (!$this->module_is_supported('imap')) {
-                                Hm_Msgs::add("ERRIMAP module is not enabled");
-                                return;
-                            }
-                            //TO DO: check first if the imap_server server is already configured before connecting can use the in_server_list function or create a new one specifically for my case
-                            $imap_server_id = connect_to_imap_server(
-                                $value['imap']['imap_server'],
-                                $key,
-                                $value['imap']['port'],
-                                $value['user']['username'],
-                                $value['user']['password'],
-                                $value['imap']['tls'],
-                                $value['sieve']['sieve_host'],
-                                $value['sieve']['sieve_port'],
-                                'imap',
-                                $this
-                            );
-                            Hm_Msgs::add("Server " . $key . "  saved");
-                        }
-                    }
-
+            $file = $this->request->files['accounts_sample'];
+            if (!is_null($file) && $file['type'] == 'application/x-yaml') {
+                try {
+                    $servers = Yaml::parseFile($file['tmp_name']);
+                } catch (\Throwable $th) {
+                    Hm_Msgs::add('ERR' . $th->getMessage());
                     $this->save_hm_msgs();
                     Hm_Dispatch::page_redirect('?page=servers');
+                }
+                foreach ($servers as $key => $value) {
+                    if (empty($value['user']['username']) or empty($value['user']['password'])) {
+                        Hm_Msgs::add('ERRUsername and password are required for: ' . $key . ' server');
+                        return;
+                    }
+                    if ($value['jmap'] && !empty($value['jmap']['jmap_server'])) {
+                        if (!$this->module_is_supported('jmap')) {
+                            Hm_Msgs::add("ERRJMAP module is not enabled");
+                            return;
+                        }
+                        connect_to_imap_server(
+                            $value['jmap']['jmap_server'],
+                            $key,
+                            null,
+                            $value['user']['username'],
+                            $value['user']['password'],
+                            false,
+                            null,
+                            false,
+                            'jmap',
+                            $this,
+                            false
+                        );
+                        Hm_Msgs::add("JMAP Server " . $key . " saved");
+                    }
+                    if ($value['smtp'] && !empty($value['smtp']['smtp_server'])) {
+                        // Check if module is supported
+                        if (!$this->module_is_supported('smtp')) {
+                            Hm_Msgs::add("ERRSMTP module is not enabled");
+                        } else {
+                            //TO DO: check first if the smtp_server server is already configured before connecting. can use the in_server_list function or create a new one specifically for my case
+                            $smtp_server_id = connect_to_smtp_server(
+                                $value['smtp']['smtp_server'],
+                                $key,
+                                $value['smtp']['smtp_port'],
+                                $value['user']['username'],
+                                $value['user']['password'],
+                                $value['smtp']['smtp_tls'],
+                                false
+                            );
+                            Hm_Msgs::add("SMTP Server " . $key . " saved");
+                        }
+                    }
+
+                    if ($value['imap'] && !empty($value['imap']['imap_server'])) {
+                        // Check if module is supported
+                        if (!$this->module_is_supported('imap')) {
+                            Hm_Msgs::add("ERRIMAP module is not enabled");
+                            return;
+                        }
+                        //TO DO: check first if the imap_server server is already configured before connecting can use the in_server_list function or create a new one specifically for my case
+                        $imap_server_id = connect_to_imap_server(
+                            $value['imap']['imap_server'],
+                            $key,
+                            $value['imap']['port'],
+                            $value['user']['username'],
+                            $value['user']['password'],
+                            $value['imap']['tls'],
+                            $value['sieve']['sieve_host'],
+                            $value['sieve']['sieve_port'],
+                            'imap',
+                            $this
+                        );
+                        Hm_Msgs::add("Server " . $key . "  saved");
+                    }
+                }
+
+                $this->save_hm_msgs();
+            }elseif(!is_null($file) && $file['type'] == 'text/csv'){
+                try {
+                    $file = new SplFileObject($file['tmp_name']);
+                    // Set the file to read as CSV
+                    $file->setFlags(SplFileObject::READ_CSV);
+                    $is_first_line = true;
+                    // Loop through each line in the CSV file
+                    while (!$file->eof()) {
+                        $line = $file->fgetcsv();
+                        // Skip processing if it's the first line
+                        if ($is_first_line) {
+                            $is_first_line = false;
+                            continue;
+                        }
+                        // Check if line is not empty to avoid processing false empty line
+                        if ($line && !empty(array_filter($line))) {
+                            // Process the CSV line here
+                            $server_data = explode(';', $line[0]);
+                            //check jmap support and jmap host address data
+                            if ($server_data[1] && !empty($server_data[2])) {
+                                if (!$this->module_is_supported('jmap')) {
+                                    Hm_Msgs::add("ERRJMAP module is not enabled");
+                                }else {
+                                connect_to_imap_server(
+                                    $server_data[2],
+                                    $server_data[0],
+                                    null,
+                                    $server_data[3],
+                                    $server_data[4],
+                                    false,
+                                    null,
+                                    false,
+                                    'jmap',
+                                    $this,
+                                    false
+                                );
+                                Hm_Msgs::add("JMAP Server " . $server_data[0] . " saved");
+                                }
+                            }
+                            //check stmp support and stmp host address data
+                            if ($server_data[8] && !empty($server_data[9])) {
+                                if (!$this->module_is_supported('smtp')) {
+                                    Hm_Msgs::add("ERRSMTP module is not enabled");
+                                } else {
+                                    $smtp_server_id = connect_to_smtp_server(
+                                        $server_data[9],
+                                        $server_data[0],
+                                        $server_data[10],
+                                        $server_data[3],
+                                        $server_data[4],
+                                        $server_data[11],
+                                        false
+                                    );
+                                    Hm_Msgs::add("SMTP Server " . $server_data[0] . " saved");
+                                }
+                            }
+                            //check imap support and stmp host address data
+                            if ($server_data[6] && !empty($server_data[7])) {
+                                if (!$this->module_is_supported('imap')) {
+                                    Hm_Msgs::add("ERRIMAP module is not enabled");
+                                }else {
+                                $imap_server_id = connect_to_imap_server(
+                                    $server_data[7],
+                                    $server_data[0],
+                                    $server_data[5],
+                                    $server_data[3],
+                                    $server_data[4],
+                                    $server_data[6],
+                                    $server_data[12],
+                                    $server_data[13],
+                                    'imap',
+                                    $this
+                                );
+                                Hm_Msgs::add("Server " . $server_data[0] . "  saved");
+                                }
+                            }
+                        }
+                    }
+                    $this->save_hm_msgs();
+
+                } catch (\Exception $ex) {
+                    Hm_Msgs::add('ERR' . $ex->getMessage());
+                    $this->save_hm_msgs();
                 }
             }
         }
@@ -412,20 +490,28 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $title = $this->trans('Import from YAML file');
-        $notice = 'Please ensure your YAML  file follows the correct format';
-        $file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
+        $title = $this->trans('Import from YAML or CSV file');
+        $notice = 'Please ensure your YAML or CSV  file follows the correct format';
+        $yaml_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
+        $csv_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.csv';
 
         return '<div class="quick_add_multiple_section">' .
-            '<div class="row"><div class="col col-lg-4"><div class="form-floating mb-3">' .
+            '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .
             '<form class="quick_add_multiple_server_form" action="?page=servers" method="POST" enctype="multipart/form-data">' .
             '<button class="browser_acc_file mt-2 btn btn-light" title="' . $notice . '"><i class="bi bi-filetype-yml me-2"></i>' . $title . '</button>' .
-            '<div class="server_form">' .
-            '<div><a href="' . $file_sample_path . '">' . $this->trans('download a sample yaml file') . '</a></div><br />' .
+            '<div class="server_form"><br />' .
+            '<div class="row">' .
+            '<div class="col-md-6">' .
+            '<div><a href="' . $yaml_file_sample_path . '">' . $this->trans('download a sample yaml file') . '</a></div>' .
+            '</div>' .
+            '<div class="col-md-6">' .
+            '<div><a href="' . $csv_file_sample_path . '">' . $this->trans('download a sample csv file') . '</a></div><br />' .
+            '</div>' .
+            '</div>' .
             '<input type="hidden" name="hm_page_key" value="' . $this->html_safe(Hm_Request_Key::generate()) . '" />' .
             '<input type="hidden" name="accounts_source" value="yaml" />' .
-            '<label class="screen_reader" for="accounts_sample">' . $this->trans('Yaml File') . '</label>' .
-            '<input class="form-control" id="accounts_sample" type="file" name="accounts_sample" accept=".yaml"/> <br />' .
+            '<label class="screen_reader" for="accounts_sample">' . $this->trans('Yaml or csv File') . '</label>' .
+            '<input class="form-control" id="accounts_sample" type="file" name="accounts_sample" accept=".yaml,.csv"/> <br />' .
             '<input class="btn btn-primary add_multiple_server_submit" type="submit" name="import_contact" id="import_contact" value="' . $this->trans('Add') . '" /> <input type="button" class="btn btn-secondary reset_add_multiple_server" value="' .
             $this->trans('Cancel') . '" /></div></form></div></div></div></div></div>';
     }
@@ -610,7 +696,7 @@ class Hm_Output_quick_add_multiple_section extends Hm_Output_Module
         }
         return '<div class="nux_add_multiple_account"><div data-target=".quick_add_multiple_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto"><a href="#" class="pe-auto">' .
             '<i class="bi bi-filetype-yml me-3"></i>' .
-            '<b>' . $this->trans('Bulk-import accounts using yaml template') . '</b></a></div>';
+            '<b>' . $this->trans('Bulk-import accounts using yaml or csv template') . '</b></a></div>';
     }
 }
 
