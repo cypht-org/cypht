@@ -133,7 +133,16 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $profile['id'] = $form['profile_id'];
             Hm_Profiles::edit($form['profile_id'], $profile);
         } else {
+            $profiles = $this->get('profiles');
+
+        foreach ($profiles as $existing_profile) {
+            if ($existing_profile["smtp_id"] === $profile["smtp_id"]) {
+                Hm_Msgs::add("ERRA profile with the same email address already exists.");
+                return;
+            }
+        }
             Hm_Profiles::add($profile);
+            Hm_Msgs::add('Profile Created');
         }
 
         if ($default) {
