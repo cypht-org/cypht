@@ -1,36 +1,36 @@
-Migadu.com:
+Test1:
   jmap:
     jmap_server:
   user:
-    username: test@email.com
+    username: email@example.org
     password: secret
   imap:
     port: 993
     tls: true
-    imap_server: imap.migadu.com
+    imap_server: imap.example.org
   smtp:
     support_smtp: true
-    smtp_server: smtp.migadu.com
+    smtp_server: smtp.example.org
     smtp_port: 465
     smtp_tls: true
   sieve:
-    sieve_host: tls://imap.migadu.com
+    sieve_host: tls://imap.example.org
     sieve_port: 4190
-Postale.io:
+Test2:
   jmap:
     jmap_server: 
   user:
-    username: test@email.com
+    username: email@example.org
     password: secret
   imap:
     port: 993
     tls: true
-    imap_server: mail.postale.io
+    imap_server: mail.example.org
   smtp:
     support_smtp: true
-    smtp_server: mail.postale.io
+    smtp_server: mail.example.org
     smtp_port: 465
     smtp_tls: true
   sieve:
-    sieve_host: tls://mail.postale.io
+    sieve_host: tls://mail.example.org
     sieve_port: 4190
