@@ -367,6 +367,9 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                         break;
                     }
                 }
+            }
+            $uid = save_sent_msg($this, $imap_id, $imap, $imap_details, $msg, $mime->get_headers()['Message-Id']);
+            if ($uid) {
                 if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
                     $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
                 }
@@ -1062,7 +1065,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
         $snooze_tag = null;
         if ($form['imap_snooze_until'] != 'unsnooze') {
             $at = date('D, d M Y H:i:s O');
-            $until = get_snooze_date($form['imap_snooze_until']);
+            $until = get_nexter_date($form['imap_snooze_until']);
             $snooze_tag = "X-Snoozed: at $at; until $until";
         }
         $ids = explode(',', $form['imap_snooze_ids']);
@@ -1152,7 +1155,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                     $msg_headers = $imap->get_message_headers($msg['uid']);
                     if (isset($msg_headers['X-Snoozed'])) {
                         try {
-                            $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
+                            $snooze_headers = parse_nexter_header($msg_headers['X-Snoozed'], 'X-Snoozed');
                             if (new DateTime($snooze_headers['until']) <= new DateTime()) {
                                 snooze_message($imap, $msg['uid'], $folder, null);
                             }
