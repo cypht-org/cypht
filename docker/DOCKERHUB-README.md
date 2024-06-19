@@ -5,7 +5,7 @@ This is the official docker image of [Cypht](https://cypht.org/).
 ## Features of this image
 
 * Alpine linux based image
-* Bundled nginx and PHP 7 provides everything in one image
+* Bundled nginx and PHP provides everything in one image
 * Performs same install steps as found on [Cypht install page](https://cypht.org/install.html)
 * All Cypht mods and configuration options can be set via environment variables
 * Automatic database setup (if configured to use database)
