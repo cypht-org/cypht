@@ -146,10 +146,7 @@ abstract class Hm_Config {
         foreach ($this->config as $key => $vals) {
             if (in_array($key, $excluded, true)) {
                 foreach ($vals as $index => $server) {
-                    if (!empty($server['default'])) {
-                        $removed[$key][$index] = $server;
-                        unset($this->config[$key][$index]);
-                    } elseif (!array_key_exists('server', $server)) {
+                    if (!array_key_exists('server', $server)) {
                         $removed[$key][$index] = $server;
                         unset($this->config[$key][$index]);
                     } else {

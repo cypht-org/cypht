@@ -1532,7 +1532,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
      */
     public function process() {
         Hm_IMAP_List::init($this->user_config, $this->session);
-        $has_default = false;
+        $default_server_id = false;
         foreach (Hm_IMAP_List::getAll() as $id => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
@@ -1541,32 +1541,35 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 }
             }
             if (array_key_exists('default', $server) && $server['default']) {
-                $has_default = true;
+                $default_server_id = $id;
             }
         }
-        if (!$has_default) {
-            $auth_server = $this->session->get('imap_auth_server_settings', array());
-            if (!empty($auth_server)) {
-                if (array_key_exists('name', $auth_server)) {
-                    $name = $auth_server['name'];
-                }
-                else {
-                    $name = $this->config->get('imap_auth_name', 'Default');
-                }
-                $imap_details = array(
-                    'name' => $name,
-                    'default' => true,
-                    'server' => $auth_server['server'],
-                    'port' => $auth_server['port'],
-                    'tls' => $auth_server['tls'],
-                    'user' => $auth_server['username'],
-                    'pass' => $auth_server['password']
-                );
-                if (! empty($auth_server['sieve_config_host'])) {
-                    $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
-                }
-                Hm_IMAP_List::add($imap_details);
+        $auth_server = $this->session->get('imap_auth_server_settings', array());
+        if (!empty($auth_server)) {
+            if (array_key_exists('name', $auth_server)) {
+                $name = $auth_server['name'];
             }
+            else {
+                $name = $this->config->get('imap_auth_name', 'Default');
+            }
+            $imap_details = array(
+                'name' => $name,
+                'default' => true,
+                'server' => $auth_server['server'],
+                'port' => $auth_server['port'],
+                'tls' => $auth_server['tls'],
+                'user' => $auth_server['username'],
+                'pass' => $auth_server['password']
+            );
+            if (! empty($auth_server['sieve_config_host'])) {
+                $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
+            }
+        }
+        if (!$default_server_id) {
+            Hm_IMAP_List::add($imap_details);
+        } else {
+            // Perhaps something as changed
+            Hm_IMAP_List::edit($default_server_id, $imap_details);
         }
     }
 }
