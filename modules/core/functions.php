@@ -351,6 +351,20 @@ function max_source_setting_callback($val) {
 }}
 
 /**
+ * Sanitize a default value for interval webhook notifications
+ * @subpackage core/functions
+ * @param int $val request interval
+ * @return sanitized interval
+ */
+if (!hm_exists('interval_webhook_notification_setting_callback')) {
+function interval_webhook_notification_setting_callback($val) {
+    if ($val < 1) {
+        return DEFAULT_INTERVAL_WEBHOOK_NOTIFICATION;
+    }
+    return $val;
+}}
+
+/**
  * Save user settings from the session to permanent storage
  * @subpackage core/functions
  * @param object $handler hm handler module object
