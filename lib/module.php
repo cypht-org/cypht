@@ -339,7 +339,7 @@ abstract class Hm_Handler_Module {
      * @return string
      */
     private function invalid_ajax_key() {
-        if (DEBUG_MODE) {
+        if (DEBUG_MODE or $this->config->get('debug_log')) {
             Hm_Debug::add('REQUEST KEY check failed');
             Hm_Debug::load_page_stats();
             Hm_Debug::show();

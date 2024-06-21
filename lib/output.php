@@ -150,7 +150,7 @@ class Hm_Debug {
  * @return boolean|null
  */
 function elog($mixed) {
-    if (DEBUG_MODE) {
+    if (DEBUG_MODE or env('DEBUG_LOG', false)) {
         $bt = debug_backtrace();
         $caller = array_shift($bt);
         Hm_Debug::add(sprintf('ELOG called in %s at line %d', $caller['file'], $caller['line']));

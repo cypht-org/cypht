@@ -791,6 +791,8 @@ return [
     //     */
     //     'developer',
 
+        'debug_log' => env('DEBUG_LOG', false),
+
     //     /*
     //     | -------
     //     | Github

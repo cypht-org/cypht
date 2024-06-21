@@ -51,7 +51,7 @@ if (!$config->get('disable_ini_settings')) {
 new Hm_Dispatch($config);
 
 /* log some debug stats about the page */
-if (DEBUG_MODE) {
+if (DEBUG_MODE or $config->get('debug_log')) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show();
 }
