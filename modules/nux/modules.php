@@ -474,12 +474,12 @@ if (!hm_exists('credentials_form')) {
         $res .= '<div class="row"><div class="col col-lg-4">';
         // E-mail Address Field
         $res .= '<div class="form-floating mb-3 mt-3">';
-        $res .= '<input type="email" class="form-control" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
+        $res .= '<input type="email" class="form-control warn_on_paste" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
         $res .= '<label for="nux_email">'.$mod->trans('E-mail Address').'</label></div>';
 
         // E-mail Password Field
         $res .= '<div class="form-floating mb-3">';
-        $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
+        $res .= '<input type="password" class="form-control nux_password warn_on_paste" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
         $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
 
         // Connect Button
