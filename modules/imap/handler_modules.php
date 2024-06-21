@@ -1564,12 +1564,12 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             if (! empty($auth_server['sieve_config_host'])) {
                 $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
             }
-        }
-        if (!$default_server_id) {
-            Hm_IMAP_List::add($imap_details);
-        } else {
-            // Perhaps something as changed
-            Hm_IMAP_List::edit($default_server_id, $imap_details);
+            if (!$default_server_id) {
+                Hm_IMAP_List::add($imap_details);
+            } else {
+                // Perhaps something as changed
+                Hm_IMAP_List::edit($default_server_id, $imap_details);
+            }
         }
     }
 }
