@@ -1,6 +1,6 @@
 /* .nux_add_account { table-layout: fixed; width: 100%; display: table; background-color: #fff; } */
 /* .nux_subtitle { font-size: 80%; margin-left: 40px; display: inline; } */
-.quick_add_section { display: none; }
+.quick_add_section, .quick_add_multiple_section { display: none; }
 /* .nux_step_two_title { padding-top: 20px; font-size: 110%; padding-bottom: 10px; } */
 /* .nux_step_one, .nux_step_two { padding-left: 40px; max-width: 600px; } */
 /* .enable_auth2 { float: left; padding: 20px; padding-left: 0px; padding-bottom: 40px; font-size: 110%; } */
@@ -20,8 +20,10 @@
 /* .nux_try_out { display: block; text-align: center; margin: auto; margin-top: 10px; } */
 .nux_tz {  margin-top: 30px; }
 .nux_empty_combined_view { display: none; text-align: center; padding-top: 100px; color: #666; }
-
-.mobile .quick_add_section { padding-left: 0px; }
+.quick_add_multiple_server_form input { margin: 5px; margin-left: 0px; }
+.quick_add_multiple_server_form { padding-top: 10px; display: block; }
+/* .quick_add_multiple_server_form .server_form { display: none; } */
+.mobile .quick_add_section, .mobile .quick_add_multiple_section { padding-left: 0px; }
 .mobile .nux_dev_news, .mobile .nux_help, .mobile .nux_welcome { max-width: 90%; width: 90%; margin: 10px  auto; padding-left: 10px; padding-right: 5px; float: none; min-height: 200px; }
 .mobile .nux_dev_news { width: 90%; overflow: hidden; }
 .mobile .nux_welcome ul { padding-left: 10px; }

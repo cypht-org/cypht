@@ -635,4 +635,5 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Yaml or File' => false,
 );

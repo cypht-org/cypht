@@ -51,6 +51,7 @@
         "paragonie/random_compat": "^2.0.18",
         "php": ">=8.1",
         "symfony/dotenv": "^4.3 || 5.4",
+        "symfony/yaml": "~6.4.3",
         "thomaspark/bootswatch": "^5.3",
         "twbs/bootstrap": "^5.3",
         "twbs/bootstrap-icons": "^1.11",
