@@ -1533,6 +1533,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
     public function process() {
         Hm_IMAP_List::init($this->user_config, $this->session);
         $default_server_id = false;
+        $has_default = false;
         foreach (Hm_IMAP_List::getAll() as $id => $server) {
             if ($this->session->loaded) {
                 if (array_key_exists('expiration', $server)) {
@@ -1541,8 +1542,9 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 }
             }
             if (array_key_exists('default', $server) && $server['default']) {
-                $default_server_id = $id;
+                $has_default = true;
             }
+            $default_server_id = $id;
         }
         $auth_server = $this->session->get('imap_auth_server_settings', array());
         if (!empty($auth_server)) {
@@ -1554,7 +1556,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             }
             $imap_details = array(
                 'name' => $name,
-                'default' => true,
+                'default' => $has_default,
                 'server' => $auth_server['server'],
                 'port' => $auth_server['port'],
                 'tls' => $auth_server['tls'],
@@ -1564,12 +1566,12 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             if (! empty($auth_server['sieve_config_host'])) {
                 $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
             }
-        }
-        if (!$default_server_id) {
-            Hm_IMAP_List::add($imap_details);
-        } else {
-            // Perhaps something as changed
-            Hm_IMAP_List::edit($default_server_id, $imap_details);
+            if (!$default_server_id) {
+                Hm_IMAP_List::add($imap_details);
+            } else {
+                // Perhaps something as changed
+                Hm_IMAP_List::edit($default_server_id, $imap_details);
+            }
         }
     }
 }
