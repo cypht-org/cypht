@@ -86,12 +86,6 @@ var hm_sieve_possible_actions = function() {
             extra_field: false
         },
         {
-            name: 'stop',
-            description: 'Stop Filtering',
-            type: 'none',
-            extra_field: false
-        },
-        {
             name: 'copy',
             description: 'Copy email to mailbox',
             placeholder: 'Mailbox Name (Folder)',
@@ -434,6 +428,7 @@ $(function () {
                 Hm_Utils.add_sys_message(hm_trans('You must provide at least one action'), 'danger');
                 return false;
             }
+            
 
             idx = 0;
             actions_type.forEach(function (elem, key) {
@@ -455,6 +450,17 @@ $(function () {
                 )
                 idx = idx + 1;
             });
+
+            if ($('#stop_filtering').is(':checked')) {
+                actions_parsed.push(
+                    {
+                        'action': "stop",
+                        'value': "",
+                        'extra_option': "",
+                        'extra_option_value': "",
+                    }
+                )
+            }
 
             if ($('.modal_sieve_filter_name').val() == "") {
                 Hm_Utils.add_sys_message(hm_trans('Filter name is required'), 'danger');
@@ -525,6 +531,7 @@ $(function () {
             edit_filter_modal.setTitle('Add Filter');
             current_account = $(this).attr('account');
             edit_filter_modal.open();
+            $('#stop_filtering').prop('checked', false);
         });
         $('.add_script').on('click', function () {
             edit_script_modal.setTitle('Add Script');
@@ -642,13 +649,15 @@ $(function () {
             let possible_actions_html = '';
 
             hm_sieve_possible_actions().forEach(function (value) {
+                if (value.name === "stop") {
+                    return;
+                }
                 if (value.selected === true) {
                     possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                     return;
                 }
                 possible_actions_html += '<option value="'+value.name+'">' + value.description + '</option>';
             });
-
             let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_action_value form-control form-control-sm" name="sieve_selected_extra_action_value[]" /></td>';
             $('.filter_actions_modal_table').append(
                 '<tr class="border" default_value="'+default_value+'">' +
@@ -687,6 +696,10 @@ $(function () {
             let possible_actions_html = '';
 
             hm_sieve_possible_actions().forEach(function (value) {
+
+                if (value.name === "stop") {
+                    return;
+                }
                 if (value.selected === true) {
                     possible_actions_html += '<option selected value="'+value.name+'">' + value.description + '</option>';
                     return;
@@ -905,6 +918,7 @@ $(function () {
             is_editing_filter = true;
             current_editing_filter_name = $(this).attr('script_name');
             current_account = $(this).attr('imap_account');
+            $('#stop_filtering').prop('checked', false);
             $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
             $('.modal_sieve_filter_priority').val($(this).attr('priority'));
             $('.sieve_list_conditions_modal').html('');
@@ -930,15 +944,20 @@ $(function () {
                     });
 
                     actions.forEach(function (action) {
-                        add_filter_action(action.value);
-                        $(".sieve_actions_select").last().val(action.action);
-                        $(".sieve_actions_select").last().trigger('change');
-                        $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
-                        if ($("[name^=sieve_selected_action_value]").last().is('input')) {
-                            $("[name^=sieve_selected_action_value]").last().val(action.value);
-                        } else if ($("[name^=sieve_selected_action_value]").last().is('textarea')) {
-                            $("[name^=sieve_selected_action_value]").last().text(action.value);
+                        if (action.action === "stop") {
+                            $('#stop_filtering').prop('checked', true);
+                        } else {
+                            add_filter_action(action.value);
+                            $(".sieve_actions_select").last().val(action.action);
+                            $(".sieve_actions_select").last().trigger('change');
+                            $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
+                            if ($("[name^=sieve_selected_action_value]").last().is('input')) {
+                                $("[name^=sieve_selected_action_value]").last().val(action.value);
+                            } else if ($("[name^=sieve_selected_action_value]").last().is('textarea')) {
+                                $("[name^=sieve_selected_action_value]").last().text(action.value);
+                            }
                         }
+                        
                     });
                 }
             );
