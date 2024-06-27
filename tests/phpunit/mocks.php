@@ -325,13 +325,13 @@ class Hm_Functions {
     }
 }
 function setup_db($config) {
-    $config->set('db_connection_type', 'host');
-    $config->set('db_socket', '/tmp/test.db');
-    $config->set('db_driver', 'mysql');
-    $config->set('db_host', '127.0.0.1');
-    $config->set('db_name', 'cypht_test');
-    $config->set('db_user', 'cypht_test');
-    $config->set('db_pass', 'cypht_test');
+    $config->set('db_connection_type', env('DB_CONNECTION_TYPE', 'host'));
+    $config->set('db_socket', env('DB_SOCKET', '/tmp/test.db'));
+    $config->set('db_driver', env('DB_DRIVER', 'mysql'));
+    $config->set('db_host', env('DB_HOST', '127.0.0.1'));
+    $config->set('db_name', env('DB_NAME', 'cypht_test'));
+    $config->set('db_user', env('DB_USER', 'cypht_test'));
+    $config->set('db_pass', env('DB_PASS', 'cypht_test'));
 }
 function flatten($str) {
     return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
