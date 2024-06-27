@@ -879,67 +879,59 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
         foreach (array_keys($servers) as $server_id) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
             $imap = Hm_IMAP_List::connect($server_id, $cache);
-            $imap_details = Hm_IMAP_List::dump($server_id);
             if (imap_authed($imap)) {
                 $folder = 'Scheduled';
                 $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
-                    $msg_headers = $imap->get_message_headers($msg['uid']);
-                    try {
-                        if (!empty($msg_headers['X-Schedule'])) {
-                            $scheduled_msg_count++;
-                        } else {
-                            continue;
-                        }
-                        if (new DateTime($msg_headers['X-Schedule']) <= new DateTime()) {
-                            $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
-                            if (!$profile) {
-                                $profiles = Hm_Profiles::search('server', $imap_details['server']);
-
-                                if (!$profiles) {
-                                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with IMAP server: %s', $imap_details['server']));
-                                    continue;
-                                }
-                                $profile = $profiles[0];
-                            }
-                            
-                            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
-                            
-                            if (smtp_authed($smtp)) {
-                                if (isset($msg_headers['X-Delivery'])) {
-                                    $from_params = 'RET=HDRS';
-                                    $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
-                                } else {
-                                    $from_params = '';
-                                    $recipients_params = '';
-                                }
-                                $recipients = [];
-                                foreach (['To', 'Cc', 'Bcc'] as $fld) {
-                                    if (array_key_exists($fld, $msg_headers)) {
-                                        $recipients = array_merge($recipients, Hm_MIME_Msg::find_addresses($msg_headers[$fld]));
-                                    }
-                                }
-                                $msg_content = $imap->get_message_content($msg['uid'], 0);
-                                $from = process_address_fld($msg_headers['From']);
-                                
-                                $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $from_params, $recipients_params);
-
-                                if (!$err_msg) {
-                                    if ($imap->message_action('DELETE', [$msg['uid']])) {
-                                        $imap->message_action('EXPUNGE', [$msg['uid']]);
-                                    }
-                                    save_sent_msg($this, $server_id, $imap, $imap_details, $msg_content, $msg['uid'], false);
-                                    $scheduled_msg_count--;
-                                }
-                            }
-                        }
-                    } catch (Exception $e) {
-                        Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
+                    if (send_scheduled_message($this, $imap, $msg, $server_id)) {
+                        $scheduled_msg_count++;
                     }
                 }
             }
         }
         $this->out('scheduled_msg_count', $scheduled_msg_count);
+    }
+}
+
+/**
+ * Changes the schedule of the message
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
+    public function process() {
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            return;
+        }
+        list($success, $form) = $this->process_form(array('schedule_date', 'scheduled_msg_ids'));
+        if (!$success) {
+            return;
+        }
+        $scheduled_msg_count = 0;
+        if ($form['schedule_date'] != 'now') {
+            $new_schedule_date = get_nexter_date($form['schedule_date']);
+        }
+        $ids = explode(',', $form['scheduled_msg_ids']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if (imap_authed($imap)) {
+                $folder = hex2bin($folder);
+                if (reschedule_message_sending($this, $imap, $msg_id, $folder, $new_schedule_date, $imap_server_id)) {
+                    $scheduled_msg_count++;
+                }
+            }
+        }
+        $this->out('scheduled_msg_count', $scheduled_msg_count);
+        if ($scheduled_msg_count == count($ids)) {
+            $msg = 'Operation successful';
+        } elseif ($scheduled_msg_count > 0) {
+            $msg = 'Some messages have been scheduled for sending';
+        } else {
+            $msg = 'ERRFailed to schedule sending for messages';
+        }
+        Hm_Msgs::add($msg);
+        $this->save_hm_msgs();
     }
 }
 
@@ -1576,6 +1568,20 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                  </div>
            </div>
         ';
+    }
+}
+
+/**
+ * Add scheduled send to the message list controls
+ * @subpackage imap/output
+ */
+class Hm_Output_scheduled_send_msg_control extends Hm_Output_Module {
+    protected function output() {
+        $parts = explode('_', $this->get('list_path'));
+        if ($parts[0] == 'imap' && hex2bin($parts[2]) == 'Scheduled') {
+            $res = schedule_dropdown($this, true);
+            $this->concat('msg_controls_extra', $res);
+        }
     }
 }
 
@@ -2278,4 +2284,103 @@ function recip_count_check($headers, $omod) {
     if ($recip_count > MAX_RECIPIENT_WARNING) {
         Hm_Msgs::add('ERRMessage contains more than the maximum number of recipients, proceed with caution');
     }
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('send_scheduled_message')) {
+function send_scheduled_message($handler, $imap, $msg, $server_id) {
+    $msg_headers = $imap->get_message_headers($msg['uid']);
+    $imap_details = Hm_IMAP_List::dump($server_id);
+    if (empty($imap_details)) {
+        return;
+    }
+    try {
+        if (empty($msg_headers['X-Schedule'])) {
+            return;
+        }
+        if (new DateTime($msg_headers['X-Schedule']) <= new DateTime()) {
+            $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
+            if (!$profile) {
+                $profiles = Hm_Profiles::search('server', $imap_details['server']);
+
+                if (!$profiles) {
+                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with IMAP server: %s', $imap_details['server']));
+                    return;
+                }
+                $profile = $profiles[0];
+            }
+            
+            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
+            
+            if (smtp_authed($smtp)) {
+                if (isset($msg_headers['X-Delivery'])) {
+                    $from_params = 'RET=HDRS';
+                    $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
+                } else {
+                    $from_params = '';
+                    $recipients_params = '';
+                }
+                $recipients = [];
+                foreach (['To', 'Cc', 'Bcc'] as $fld) {
+                    if (array_key_exists($fld, $msg_headers)) {
+                        $recipients = array_merge($recipients, Hm_MIME_Msg::find_addresses($msg_headers[$fld]));
+                    }
+                }
+                $msg_content = $imap->get_message_content($msg['uid'], 0);
+                $from = process_address_fld($msg_headers['From']);
+                
+                $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $from_params, $recipients_params);
+
+                if (!$err_msg) {
+                    if ($imap->message_action('DELETE', [$msg['uid']])) {
+                        $imap->message_action('EXPUNGE', [$msg['uid']]);
+                    }
+                    save_sent_msg($handler, $server_id, $imap, $imap_details, $msg_content, $msg['uid'], false);
+                    return true;
+                }
+            }
+        }
+    } catch (Exception $e) {
+        Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
+    }
+    return;
+}}
+
+if (!hm_exists('reschedule_message_sending')) {
+function reschedule_message_sending($handler, $imap, $msg_id, $folder, $new_date, $server_id) {
+    if (!$imap->select_mailbox($folder)) {
+        return;
+    }
+    $msg = $imap->get_message_content($msg_id, 0);
+    if ($new_date == 'now') {
+        return send_scheduled_message($handler, $imap, $msg, $server_id);
+    }
+    preg_match("/^X-Schedule:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
+    if (count($matches)) {
+        $new_date = get_nexter_date($new_date);
+        $msg = str_replace($matches[0], "X-Schedule: {$new_date}\n", $msg);
+    } else {
+        return;
+    }
+    $msg = str_replace("\r\n", "\n", $msg);
+    $msg = str_replace("\n", "\r\n", $msg);
+    $msg = rtrim($msg)."\r\n";
+
+    $schedule_folder = 'Scheduled';
+    if (!count($imap->get_mailbox_status($schedule_folder))) {
+        return;
+    }
+    $res = false;
+    if ($imap->select_mailbox($schedule_folder) && $imap->append_start($schedule_folder, strlen($msg))) {
+        $imap->append_feed($msg."\r\n");
+        if ($imap->append_end()) {
+            if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
+                $imap->message_action('EXPUNGE', array($msg_id));
+                $res = true;
+            }
+        }
+    }
+    return $res;
 }}

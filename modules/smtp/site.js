@@ -647,10 +647,10 @@ $(function () {
     send_scheduled_messages();
     setInterval(send_scheduled_messages, 60000);
 
-    window.onbeforeunload = () => {
-        if (scheduled_msg_count == 0) {
-          return;
+    window.onbeforeunload = (e) => {
+        if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {
+            return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
         }
-        return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
-      };
+        return;
+    };
 });

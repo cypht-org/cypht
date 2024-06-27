@@ -2707,26 +2707,30 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
 };
 
 var setup_nexter_date = function(callback) {
+    var scopedElement = function (el, selector) {
+        return $(el).parent().parent().find(selector);
+    }
     $(document).on('click', '.nexter_date_picker', function(e) {
         document.querySelector('.nexter_input_date').showPicker();
     });
     $(document).on('click', '.nexter_date_helper', function(e) {
         e.preventDefault();
-        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+        scopedElement(this, '.nexter_input').val($(this).attr('data-value')).trigger('change');
     });
     $(document).on('input', '.nexter_input_date', function(e) {
         var now = new Date();
         now.setMinutes(now.getMinutes() + 1);
         $(this).attr('min', now.toJSON().slice(0, 16));
+        var date_picker = scopedElement(this, '.nexter_date_picker');
         if (new Date($(this).val()).getTime() <= now.getTime()) {
-            $('.nexter_date_picker').css('border', '1px solid red');
+            date_picker.css('border', '1px solid red');
         } else {
-            $('.nexter_date_picker').css({'border': 'unset', 'border-top': '1px solid #ddd'});
+            date_picker.css({'border': 'unset', 'border-top': '1px solid #ddd'});
         }
     });
     $(document).on('change', '.nexter_input_date', function(e) {
         if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.nexter_input').val($(this).val()).trigger('change');
+            scopedElement(this, '.nexter_input').val($(this).val()).trigger('change');
         }
     });
     $(document).on('change', '.nexter_input', callback);

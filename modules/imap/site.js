@@ -1130,7 +1130,7 @@ $(function() {
 
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
         setup_nexter_date(function(e) {
-            $('.snooze_dropdown').hide();
+            $('.nexter_dropdown').hide();
             var ids = [];
             if (hm_page_name() == 'message') {
                 var list_path = hm_list_path().split('_');
@@ -1146,18 +1146,34 @@ $(function() {
                     return;
                 };
             }
-            Hm_Ajax.request(
-                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
-                {'name': 'imap_snooze_ids', 'value': ids},
-                {'name': 'imap_snooze_until', 'value': $(this).val()}],
-                function(res) {
-                    if (res.snoozed_messages > 0) {
-                        Hm_Folders.reload_folders(true);
-                        var path = hm_list_parent()? hm_list_parent(): hm_list_path();
-                        window.location.replace('?page=message_list&list_path='+path);
+            var reload_and_redirect = function() {
+                Hm_Folders.reload_folders(true);
+                var path = hm_list_parent()? hm_list_parent(): hm_list_path();
+                window.location.replace('?page=message_list&list_path='+path);
+            }
+            if ($(this).parent().parent().is('.snooze_dropdown')) {
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
+                    {'name': 'imap_snooze_ids', 'value': ids},
+                    {'name': 'imap_snooze_until', 'value': $(this).val()}],
+                    function(res) {
+                        if (res.snoozed_messages > 0) {
+                            reload_and_redirect();
+                        }
                     }
-                }
-            );
+                );
+            } else {
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_re_schedule_message_sending'},
+                    {'name': 'scheduled_msg_ids', 'value': ids},
+                    {'name': 'schedule_date', 'value': $(this).val()}],
+                    function(res) {
+                        if (res.scheduled_msg_count > 0) {
+                            reload_and_redirect();
+                        }
+                    }
+                );
+            }
         });
     }
 

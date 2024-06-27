@@ -42,25 +42,6 @@ if (!hm_exists('connect_to_smtp_server')) {
     }
 }
 
-if (!hm_exists('schedule_dropdown')) {
-function schedule_dropdown($output) {
-    $values = nexter_formats();
-
-    $txt = '<ul class="dropdown-menu" aria-labelledby="dropdownMenuNexterDate">';
-    foreach ($values as $format) {
-        $labels = get_nexter_date($format, true);
-        $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
-    }
-    $txt .= '<li><hr class="dropdown-divider"></li>';
-    $txt .= '<li><label for="nexter_input_date" class="nexter_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
-    $txt .= '<input id="nexter_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="nexter_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="nexter_input" style="display:none;"></li>';
-    $txt .= '</ul>';
-
-    return $txt;
-}}
-
-
 if (!hm_exists('delete_smtp_server')) {
     function delete_smtp_server($smtp_server_id) {
        Hm_SMTP_List::del($smtp_server_id);

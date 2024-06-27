@@ -225,9 +225,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $nofrom = ' nofrom';
         }
         $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
+        $is_scheduled = !empty($msg['x_schedule']) && hex2bin($msg['folder']) == 'Scheduled';
         if ($is_snoozed) {
             $snooze_header = parse_nexter_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
+            $timestamp = strtotime($date);
+        } elseif ($is_scheduled) {
+            $date = $msg['x_schedule'];
             $timestamp = strtotime($date);
         } else {
             if ($list_sort == 'date') {
@@ -303,7 +307,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags),
-                    array('date_callback', $date, $timestamp, $is_snoozed),
+                    array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('icon_callback', $flags)
                 ),
                 $id,
@@ -1325,8 +1329,8 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuNexterDate">';
+                <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <ul class="dropdown-menu nexter_dropdown snooze_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
         $labels = get_nexter_date($format, true);
         $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';

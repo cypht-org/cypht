@@ -107,6 +107,14 @@ add_handler('ajax_send_scheduled_messages', 'load_smtp_servers_from_config', tru
 add_handler('ajax_send_scheduled_messages', 'compose_profile_data',  true, 'profiles');
 add_handler('ajax_send_scheduled_messages', 'send_scheduled_messages', true, 'smtp');
 
+setup_base_ajax_page('ajax_re_schedule_message_sending', 'core');
+add_handler('ajax_re_schedule_message_sending', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_re_schedule_message_sending', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
+add_handler('ajax_re_schedule_message_sending', 'compose_profile_data',  true, 'profiles');
+add_handler('ajax_re_schedule_message_sending', 're_schedule_message_sending', true, 'smtp');
+
+add_output('message_list', 'scheduled_send_msg_control', true, 'smtp', 'imap_custom_controls', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_clear_attachment_chunks',
@@ -117,7 +125,8 @@ return array(
         'ajax_attachment_reminder_check',
         'ajax_get_test_chunk',
         'ajax_upload_chunk',
-        'ajax_send_scheduled_messages'
+        'ajax_send_scheduled_messages',
+        'ajax_re_schedule_message_sending'
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -155,8 +164,6 @@ return array(
         'send_tomorrow_morning' => FILTER_DEFAULT,
         'send_today_afternoon' => FILTER_DEFAULT,
         'schedule_sending' => FILTER_DEFAULT,
-        'send_date' => FILTER_DEFAULT,
-        'send_time' => FILTER_DEFAULT,
         'attachment_id' => FILTER_DEFAULT,
         'smtp_compose_type' => FILTER_VALIDATE_INT,
         'new_smtp_name' => FILTER_DEFAULT,
@@ -198,5 +205,7 @@ return array(
         'next_email_post' => FILTER_DEFAULT,
         'enable_attachment_reminder' => FILTER_VALIDATE_INT,
         'schedule' => FILTER_DEFAULT,
+        'schedule_date' => FILTER_DEFAULT,
+        'scheduled_msg_ids' => FILTER_DEFAULT,
     )
 );
