@@ -166,7 +166,6 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                 $details = github_connect_details($this->config);
                 $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
                 $result = $oauth2->request_token($details['token_url'], $this->request->get['code'], array('Accept: application/json'));
-                
                 if (count($result) > 0 && array_key_exists('access_token', $result)) {
                     $this->load_repositories($result['access_token']);
                     Hm_Msgs::add('Github connection established');
@@ -193,7 +192,6 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
     }
 
     public function load_repositories($token) {
-        
         $repos = $this->user_config->get('github_repos', array());
         $url = sprintf('https://api.github.com/user/repos');
         $api = new Hm_API_Curl();
@@ -202,7 +200,7 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
             if (!in_array($value['full_name'], $repos)) {
                 $repos[] = $value['full_name'];
             }
-        } 
+        }
         $this->user_config->set('github_repos', $repos);
     }
 }
@@ -557,42 +555,31 @@ class Hm_Output_github_add_repo extends Hm_Output_Module {
         $res = '';
         $details = $this->get('github_connect_details', array());
         if (!empty($details)) {
-            $res = '<div class="configured_server">
+            $res = '<div class="configured_server col-12 col-lg-4 mb-4 mt-3">
                 <div class="subtitle">'.$this->trans('Add a Repository').'</div>'.
                 '<form method="POST">'.
                 '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
                 '<label class="screen_reader">'.$this->trans('Name').'</label>'.
-                '<input type="text" value="" class="form-control col-12 col-lg-4 mb-4" placeholder="'.$this->trans('Name').'" name="new_github_repo" />'.
+                '<input type="text" value="" class="form-control mb-4" placeholder="'.$this->trans('Name').'" name="new_github_repo" />'.
                 '<label class="screen_reader">'.$this->trans('Owner').'</label>'.
-                '<input type="text" value="" class="form-control col-12 col-lg-4 mb-4" placeholder="'.$this->trans('Owner').'" name="new_github_repo_owner" />'.
-                '<input type="submit" class="btn btn-secondary" name="github_add_repo" value="Add" />'.
+                '<input type="text" value="" class="form-control mb-4" placeholder="'.$this->trans('Owner').'" name="new_github_repo_owner" />'.
+                '<input type="submit" class="btn btn-primary" name="github_add_repo" value="Add" />'.
                 '</form></div>';
-            $res .= '<div class="configured_server"><h5><div class="server_title">'.$this->trans('Repositories').'</div></h5></div>
-                    <table class="table">    
-                    <thead></thead>
-                    <tbody>
-            ';
+            $res .= '<div class="configured_server mt-2"><h5 class="server_title">'.$this->trans('Repositories').'</h5></div>'.
+                '<table class="table">';
             foreach ($this->get('github_repos', array()) as $repo) {
-                $res .= '<div class="configured_repo">
-                        <form class="remove_repo" method="POST">'.
-                    '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
-                    '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />
-                    <tr>
-                        <td class="col-sm-1 col-md-2 col-2">
-                        <input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo btn btn-outline-danger" /> 
-                        </td>
-                        <td>
-                        <p class="">'.$this->html_safe($repo).'</p>
-                        </td>
-                    <tr>
-            
-                    </form>
-                    </div>';
+                $res .= '<tr>'.
+                    '<td class="col-sm-2 col-lg-1 py-2 align-middle">'.
+                        '<form class="remove_repo" method="POST">'.
+                            '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
+                            '<input type="hidden" name="github_repo" value="'.$this->html_safe($repo).'" />'.
+                            '<input type="submit" name="github_remove_repo" value="'.$this->trans('Remove').'" class="github_remove_repo btn btn-outline-danger btn-sm" />'.
+                        '</form>'.
+                    '</td>'.
+                    '<td>'.$this->html_safe($repo).'</td>'.
+                '<tr>';
             }
-            $res .= '
-            </tbody>
-            </table>
-            </div></div><div class="end_float"></div></div>';
+            $res .= '</table></div></div><div class="end_float"></div></div>';
         }
         return $res;
     }
@@ -668,7 +655,7 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
             $res .='<h6>'. $this->trans('Already connected').'</h6>';
             $res .= '<form id="github_disconnect_form" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="submit" name="github_disconnect" class="github_disconnect btn btn-outline-danger" value="'.$this->trans('Disconnect').'" />';
+            $res .= '<input type="submit" name="github_disconnect" class="github_disconnect btn btn-secondary" value="'.$this->trans('Disconnect').'" />';
             $res .= '</form>';
         }
         return $res.'</div>';
