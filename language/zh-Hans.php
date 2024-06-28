@@ -648,4 +648,5 @@ return array(
     'IMAP and JMAP Servers' => 'IMAP 服务器及 JMAP 服务器',
     'Junk' => '垃圾',
     'Trash' => '已删除',
+    'You have %d scheduled messages that won\'t be executed if you quit' => false,
 ); 
