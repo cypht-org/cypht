@@ -141,9 +141,9 @@ class Hm_Transform {
      * @return array|false
      */
     public static function convert($data) {
-        if (substr($data, 0, 2) === 'a:') {
+        if (mb_substr($data, 0, 2) === 'a:') {
             return @unserialize($data);
-        } elseif (substr($data, 0, 1) === '{' || substr($data, 0, 1) === '[') {
+        } elseif (mb_substr($data, 0, 1) === '{' || mb_substr($data, 0, 1) === '[') {
             return @json_decode($data, true);
         }
         return false;

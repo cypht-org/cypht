@@ -133,8 +133,8 @@ class Hm_MIME_Msg {
 
     function split_val($val, $bsize) {
         $count = ceil($bsize/75);
-        $size = round(strlen($val)/$count);
-        return str_split($val, $size);
+        $size = round(mb_strlen($val)/$count);
+        return mb_str_split($val, $size);
     }
 
     function encode_fld($val, $single=false) {
@@ -148,7 +148,7 @@ class Hm_MIME_Msg {
         $prior = false;
         foreach ($parts as $v) {
             if (preg_match('/(?:[^\x00-\x7F])/',$v) === 1) {
-                $bsize = round(((strlen($v)*4)/3)+13);
+                $bsize = round(((mb_strlen($v)*4)/3)+13);
                 if ($bsize > 75) {
                     foreach ($this->split_val($v, $bsize) as $slice) {
                         $res[] = $this->encode_fld($slice);

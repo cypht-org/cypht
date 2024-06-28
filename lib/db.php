@@ -112,7 +112,7 @@ class Hm_DB {
      * @return string
      */
     static private function execute_type($sql) {
-        switch(substr($sql, 0, 1)) {
+        switch(mb_substr($sql, 0, 1)) {
             case 'd':
             case 'u':
             case 'i':

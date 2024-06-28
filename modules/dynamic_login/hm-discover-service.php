@@ -57,12 +57,12 @@ class Hm_Discover_Services {
     private function get_domain($email, $host) {
         $domain = 'localhost';
         if ($this->dyn_host) {
-            if (substr($host, 0, strlen($this->host_pre)) == $this->host_pre) {
-                $domain = substr($host, strlen($this->host_pre));
+            if (mb_substr($host, 0, mb_strlen($this->host_pre)) == $this->host_pre) {
+                $domain = mb_substr($host, mb_strlen($this->host_pre));
             }
         }
         elseif ($this->dyn_user || $domain == 'localhost') {
-            if (strpos($email, '@')) {
+            if (mb_strpos($email, '@')) {
                 $parts = explode('@', $email);
                 $domain = $parts[1];
             }

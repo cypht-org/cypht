@@ -81,10 +81,10 @@ class Hm_Cal_Output {
         $res = '<div class="event_details">'.
             '<div class="event_title d-flex flex-column border-bottom mb-2"><span class="fs-5">'.$this->output_mod->html_safe($event['title']).'</span>'.
             '<small class="event_date fw-lighter">'.$this->output_mod->html_safe(date('H:i A', $event['ts'])).'</small></div>';
-        if (strlen(trim($event['description']))) {
+        if (mb_strlen(trim($event['description']))) {
             $res .= '<div class="event_detail mb-2">'.$this->output_mod->html_safe($event['description']).'</div>';
         }
-        if (strlen(trim($event['repeat_interval']))) {
+        if (mb_strlen(trim($event['repeat_interval']))) {
             $res .= '<div class="event_repeat"><small class="fw-lighter fst-italic">'.$this->output_mod->trans(sprintf('Repeats every %s', $event['repeat_interval'])).'</small></div>';
         }
             $res .= '<form method="post"><input type="hidden" name="delete_ts" value="'.$this->output_mod->html_safe($event['ts']).'" />'.

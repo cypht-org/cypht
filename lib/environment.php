@@ -98,8 +98,8 @@ if (!function_exists('merge_config_files')) {
                 // Check if values are boolean and convert if necessary
                 $fileArray = array_map(function ($value) {
                     return is_array($value) ? $value : (
-                        is_string($value) && strtolower($value) === 'true' ? true : (
-                            is_string($value) && strtolower($value) === 'false' ? false : $value
+                        is_string($value) && mb_strtolower($value) === 'true' ? true : (
+                            is_string($value) && mb_strtolower($value) === 'false' ? false : $value
                         )
                     );
                 }, $fileArray);
@@ -131,8 +131,8 @@ if (!function_exists('config')) {
         // Check if values are boolean and convert if necessary
         return array_map(function ($value) {
             return is_array($value) ? $value : (
-                is_string($value) && strtolower($value) === 'true' ? true : (
-                    is_string($value) && strtolower($value) === 'false' ? false : $value
+                is_string($value) && mb_strtolower($value) === 'true' ? true : (
+                    is_string($value) && mb_strtolower($value) === 'false' ? false : $value
                 )
             );
         }, $fileArray);

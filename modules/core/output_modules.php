@@ -363,7 +363,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
         foreach ($msgs as $msg) {
             if (preg_match("/ERR/", $msg)) {
-                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(substr((string) $msg, 3)));
+                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
             }
             else {
                 $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
@@ -387,7 +387,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
         $lang = 'en';
         $dir = 'ltr';
         if ($this->lang) {
-            $lang = strtolower(str_replace('_', '-', $this->lang));
+            $lang = mb_strtolower(str_replace('_', '-', $this->lang));
         }
         if ($this->dir) {
             $dir = $this->dir;
@@ -1779,7 +1779,7 @@ class Hm_Output_home_password_dialogs extends Hm_Output_Module {
                 ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'</p>';
 
             foreach ($missing as $vals) {
-                $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
+                $id = $this->html_safe(sprintf('%s_%s', mb_strtolower($vals['type']), $vals['id']));
                 $res .= '<div class="div_'.$id.' mt-3">'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
                     ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <div class="input-group mt-2"><input placeholder="'.$this->trans('Password').
                     '" type="password" class="form-control pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update btn btn-primary" data-id="'.$id.
@@ -1834,7 +1834,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
             implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-        if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
+        if (!$this->get('is_mobile') && mb_substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
         $res .= '</div>';

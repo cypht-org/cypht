@@ -65,14 +65,14 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             case 'DRAFT':
             case 'DELETED':
             case 'FLAGGED':
-                $res = stristr($flags, $filter);
+                $res = mb_stristr($flags, $filter);
                 break;
             case 'UNSEEN':
             case 'UNDRAFT':
             case 'UNDELETED':
             case 'UNFLAGGED':
             case 'UNANSWERED':
-                $res = !stristr($flags, str_replace('UN', '', $filter));
+                $res = !mb_stristr($flags, str_replace('UN', '', $filter));
                 break;
         }
         return $res;
@@ -85,8 +85,8 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
     protected function parse_extensions_from_capability() {
         $extensions = array();
         foreach (explode(' ', $this->capability) as $word) {
-            if (!in_array(strtolower($word), array('*', 'ok', 'completed', 'imap4rev1', 'capability'), true)) {
-                $extensions[] = strtolower($word);
+            if (!in_array(mb_strtolower($word), array('*', 'ok', 'completed', 'imap4rev1', 'capability'), true)) {
+                $extensions[] = mb_strtolower($word);
             }
         }
         $this->supported_extensions = $extensions;
@@ -273,7 +273,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             $delim = $nsvals['delim'];
             $ns_class = $nsvals['class'];
             $mailbox = $this->utf7_encode(str_replace('"', '\"', $mailbox));
-            if (strtoupper(substr($namespace, 0, 5)) == 'INBOX') {
+            if (mb_strtoupper(mb_substr($namespace, 0, 5)) == 'INBOX') {
                 $namespace = '';
             }
 

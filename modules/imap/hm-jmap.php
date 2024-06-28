@@ -94,7 +94,7 @@ class Hm_JMAP {
     public function get_special_use_mailboxes($type=false) {
         $res = array();
         foreach ($this->folder_list as $name => $vals) {
-            if ($type && strtolower($vals['role']) == strtolower($type)) {
+            if ($type && mb_strtolower($vals['role']) == mb_strtolower($type)) {
                 return array($type => $name);
             }
             elseif ($vals['role']) {
@@ -199,7 +199,7 @@ class Hm_JMAP {
             return 0;
         }
         $this->streaming_msg = $this->get_raw_message_content($blob_id, $name);
-        return strlen($this->streaming_msg);
+        return mb_strlen($this->streaming_msg, '8bit');
     }
 
     /**
@@ -1101,7 +1101,7 @@ class Hm_JMAP {
     private function build_imap_folders($data) {
         $result = array();
         foreach ($data as $vals) {
-            if (strtolower($vals['name']) == 'inbox') {
+            if (mb_strtolower($vals['name']) == 'inbox') {
                 $vals['name'] = 'INBOX';
             }
             $result[$vals['name']] = array(

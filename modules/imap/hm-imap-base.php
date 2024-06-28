@@ -69,11 +69,11 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
-        $lit_size = strlen($literal_data);
+        $lit_size = mb_strlen($literal_data);
         $current += $lit_size;
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
-            $chunk_size = strlen($chunk);
+            $chunk_size = mb_strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
             $literal_data .= $chunk;
@@ -85,12 +85,12 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
-                $lit_size += strlen($temp);
+                $lit_size += mb_strlen($temp);
             }
         }
-        elseif ($size < strlen($literal_data)) {
-            $left_over = substr($literal_data, $size);
-            $literal_data = substr($literal_data, 0, $size);
+        elseif ($size < mb_strlen($literal_data)) {
+            $left_over = mb_substr($literal_data, $size);
+            $literal_data = mb_substr($literal_data, 0, $size);
         }
         return array($literal_data, $left_over);
     }
@@ -117,7 +117,7 @@ class Hm_IMAP_Base {
         $line_cont = false;
 
         /* line size */
-        $len = strlen($line);
+        $len = mb_strlen($line);
 
         /* walk through the line */
         for ($i=0;$i<$len;$i++) {
@@ -143,24 +143,24 @@ class Hm_IMAP_Base {
 
             /* regex match a quoted string */
             elseif ($line[$i] == '"') {
-                if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", substr($line, $i), $matches)) {
-                    $chunk = substr($matches[1], 1, -1);
+                if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", mb_substr($line, $i), $matches)) {
+                    $chunk = mb_substr($matches[1], 1, -1);
                 }
-                $i += strlen($chunk) + 1;
+                $i += mb_strlen($chunk) + 1;
             }
 
             /* IMAP literal */
             elseif ($line[$i] == '{') {
-                $end = strpos($line, '}');
+                $end = mb_strpos($line, '}');
                 if ($end !== false) {
-                    $literal_size  = substr($line, ($i + 1), ($end - $i - 1));
+                    $literal_size  = mb_substr($line, ($i + 1), ($end - $i - 1));
                 }
                 $lit_result = $this->read_literal($literal_size, $max, $current_size, $line_length);
                 $chunk = $lit_result[0];
                 if (!isset($lit_result[1]) || $lit_result[1] != "\r\n") {
                     $line_cont = true;
                 }
-                if (isset($lit_result[1]) && $lit_result[1] != "\r\n" && strlen($lit_result[1]) > 0) {
+                if (isset($lit_result[1]) && $lit_result[1] != "\r\n" && mb_strlen($lit_result[1]) > 0) {
                     $this->literal_overflow = $lit_result[1];
                 }
                 $i = $len;
@@ -172,7 +172,7 @@ class Hm_IMAP_Base {
 
                 /* don't include these three trailing chars in the atom */
                 foreach (array(' ', ')', ']') as $v) {
-                    $tmp_marker = strpos($line, $v, $i);
+                    $tmp_marker = mb_strpos($line, $v, $i);
                     if ($tmp_marker !== false && ($marker == -1 || $tmp_marker < $marker)) {
                         $marker = $tmp_marker;
                     }
@@ -180,12 +180,12 @@ class Hm_IMAP_Base {
 
                 /* slice out the chunk */
                 if ($marker !== false && $marker !== -1) {
-                    $chunk = substr($line, $i, ($marker - $i));
-                    $i += strlen($chunk) - 1;
+                    $chunk = mb_substr($line, $i, ($marker - $i));
+                    $i += mb_strlen($chunk) - 1;
                 }
                 else {
-                    $chunk = rtrim(substr($line, $i));
-                    $i += strlen($chunk);
+                    $chunk = rtrim(mb_substr($line, $i));
+                    $i += mb_strlen($chunk);
                 }
             }
 
@@ -249,7 +249,7 @@ class Hm_IMAP_Base {
             /* keep track of how much we have read and break out if we max out. This can
              * happen on large messages. We need this check to ensure we don't exhaust available
              * memory */
-            $current_size += strlen($result[$n]);
+            $current_size += mb_strlen($result[$n]);
             if ($max && $current_size > $max) {
                 $this->max_read = true;
                 break;
@@ -257,7 +257,7 @@ class Hm_IMAP_Base {
 
             /* if the line is longer than 8192 bytes keep appending more reads until we find
              * an end of line char. Keep checking the max read length as we go */
-            while(substr($result[$n], -2) != "\r\n" && substr($result[$n], -1) != "\n") {
+            while(mb_substr($result[$n], -2) != "\r\n" && mb_substr($result[$n], -1) != "\n") {
                 if (!is_resource($this->handle) || feof($this->handle)) {
                     break;
                 }
@@ -265,7 +265,7 @@ class Hm_IMAP_Base {
                 if ($result[$n] === false) {
                     break;
                 }
-                $current_size += strlen($result[$n]);
+                $current_size += mb_strlen($result[$n]);
                 if ($max && $current_size > $max) {
                     $this->max_read = true;
                     break 2;
@@ -295,7 +295,7 @@ class Hm_IMAP_Base {
                 while ($this->literal_overflow) {
                     $lit_text = $this->literal_overflow;
                     $this->literal_overflow = false;
-                    $current_size += strlen($lit_text);
+                    $current_size += mb_strlen($lit_text);
                     list($line_cont, $new_chunks) = $this->parse_line($lit_text, $current_size, $max, $line_length);
                     $chunks = array_merge($chunks, $new_chunks);
                 }
@@ -324,19 +324,19 @@ class Hm_IMAP_Base {
 
             /* check for untagged error condition. This represents a server problem but there is no reason
              * we can't attempt to recover with the partial response we received up until this point */
-            if (substr(strtoupper($result[$n]), 0, 6) == '* BYE ') {
+            if (mb_substr(mb_strtoupper($result[$n]), 0, 6) == '* BYE ') {
                 break;
             }
 
             /* check for challenge strings */
-            if (substr($result[$n], 0, 1) == '+') {
+            if (mb_substr($result[$n], 0, 1) == '+') {
                 if (preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $result[$n], $matches)) {
                     break;
                 }
             }
 
         /* end outer loop when we receive the tagged response line */
-        } while (substr($result[$n], 0, strlen('A'.$this->command_count)) != 'A'.$this->command_count);
+        } while (mb_substr($result[$n], 0, mb_strlen('A'.$this->command_count)) != 'A'.$this->command_count);
 
         /* return either raw or parsed result */
         $this->responses[] = $result;
@@ -375,7 +375,7 @@ class Hm_IMAP_Base {
         }
 
         /* save the command and time for the IMAP debug output option */
-        if (strstr($command, 'LOGIN')) {
+        if (mb_strstr($command, 'LOGIN')) {
             $command = 'LOGIN';
         }
         $this->commands[trim($command)] = microtime( true );
@@ -396,7 +396,7 @@ class Hm_IMAP_Base {
             if (!empty($data) && isset($data[(count($data) - 1)])) {
                 $vals = $data[(count($data) - 1)];
                 if ($vals[0] == 'A'.$this->command_count) {
-                    if (strtoupper($vals[1]) == 'OK') {
+                    if (mb_strtoupper($vals[1]) == 'OK') {
                         $result = true;
                     }
                 }
@@ -473,7 +473,7 @@ class Hm_IMAP_Base {
                 }
                 break;
             case 'charset':
-                if (!$val || in_array(strtoupper($val), $imap_search_charsets)) {
+                if (!$val || in_array(mb_strtoupper($val), $imap_search_charsets)) {
                     $valid = true;
                 }
                 break;
@@ -493,7 +493,7 @@ class Hm_IMAP_Base {
                 }
                 break;
             case 'keyword';
-                if (in_array(strtoupper($val), $imap_keywords)) {
+                if (in_array(mb_strtoupper($val), $imap_keywords)) {
                     $valid = true;
                 }
                 break;

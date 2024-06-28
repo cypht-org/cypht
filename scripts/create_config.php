@@ -1,6 +1,6 @@
 <?php
 
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 /* debug mode has to be set to something or include files will die() */
@@ -26,7 +26,7 @@ function read_config($source) {
 
 function check_php() {
     $version = phpversion();
-    if (substr($version, 0, 3) >= 8.1) {
+    if (mb_substr($version, 0, 3) >= 8.1) {
         $version_class = 'yes';
     }
     else {
@@ -268,7 +268,7 @@ function output_modules($settings) {
     foreach ($mods as $mod) {
         echo '<tr><td>'.ucfirst(str_replace('_', ' ', $mod)).
             '</td><td><input type="checkbox" value="1" name="'.$mod.'" ';
-        if (strstr($mod_str, $mod)) {
+        if (mb_strstr($mod_str, $mod)) {
             echo 'checked="checked" ';
         }
         echo '/></td></tr>';

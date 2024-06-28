@@ -105,7 +105,7 @@ class Hm_IMAP_Struct {
         $len = count($vals);
         for ($i = 0; $i < $len; $i++) {
             if (isset($vals[$i + 1])) {
-                $res[strtolower($vals[$i])] = $this->set_value($vals[$i + 1]);
+                $res[mb_strtolower($vals[$i])] = $this->set_value($vals[$i + 1]);
                 $i++;
             }
         }
@@ -162,7 +162,7 @@ class Hm_IMAP_Struct {
         }
         elseif (!is_array($val)) {
             if ($type == 'type' || $type == 'subtype') {
-                $val = strtolower($val);
+                $val = mb_strtolower($val);
             }
             return $this->imap->decode_fld($val);
         }
@@ -193,8 +193,8 @@ class Hm_IMAP_Struct {
      */
     private function get_part_type($vals) {
         if (count($vals) > 1 && is_string($vals[0]) && is_string($vals[1])) {
-            $type = strtolower($vals[0]);
-            $subtype = strtolower($vals[1]);
+            $type = mb_strtolower($vals[0]);
+            $subtype = mb_strtolower($vals[1]);
             if ($type == 'message' && !in_array($subtype, $this->readable_message_types, true)) {
                 return 'message';
             }
@@ -309,7 +309,7 @@ class Hm_IMAP_Struct {
     private function id_single_part($vals) {
         $res = array();
         $single_format = false;
-        if (isset($vals[0]) && strtolower($vals[0]) == 'text') {
+        if (isset($vals[0]) && mb_strtolower($vals[0]) == 'text') {
             $flds = $this->text_format;
         }
         else {
@@ -373,7 +373,7 @@ class Hm_IMAP_Struct {
      */
     private function increment_part_number() {
         $part = $this->part_number;
-        if (!strstr($part, '.')) {
+        if (!mb_strstr($part, '.')) {
             $part++;
         }
         else {
@@ -403,7 +403,7 @@ class Hm_IMAP_Struct {
                 }
             }
             foreach ($flds as $name => $fld_val) {
-                if (isset($vals[$name]) && stristr($vals[$name], $fld_val)) {
+                if (isset($vals[$name]) && mb_stristr($vals[$name], $fld_val)) {
                     $matches++;
                 }
             }

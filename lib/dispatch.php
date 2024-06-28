@@ -74,7 +74,7 @@ trait Hm_Dispatch_Redirect {
         if (array_key_exists('scheme', $parts)) {
             return '/';
         }
-        if ($parts === false || !array_key_exists('path', $parts) || strpos($parts['path'], '..') !== false) {
+        if ($parts === false || !array_key_exists('path', $parts) || mb_strpos($parts['path'], '..') !== false) {
             return '/';
         }
         return $uri;

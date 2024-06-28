@@ -191,7 +191,7 @@ trait Hm_Handler_Validate {
      * @return bool
      */
     public function validate_method($session, $request) {
-        if (!in_array(strtolower($request->method), ['get', 'post'], true)) {
+        if (!in_array(mb_strtolower($request->method), ['get', 'post'], true)) {
             if ($session->loaded) {
                 $session->destroy($request);
                 Hm_Debug::add(sprintf('LOGGED OUT: invalid method %s', $request->method));
@@ -427,7 +427,7 @@ abstract class Hm_Handler_Module {
      * @return bool
      */
     public function module_is_supported($name) {
-        return in_array(strtolower($name), $this->config->get_modules(true), true);
+        return in_array(mb_strtolower($name), $this->config->get_modules(true), true);
     }
 
     public function save_hm_msgs() {
@@ -529,7 +529,7 @@ abstract class Hm_Output_Module {
         if (!is_numeric($number) || !in_array($this->lang, ['fa'])) {
             return $number;
         }
-        $number_splitted = str_split($number);
+        $number_splitted = mb_str_split($number);
         $translated_number = "";
         foreach ($number_splitted as $number_splitted) {
             $translated_number .= $this->trans($number_splitted);

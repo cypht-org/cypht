@@ -198,7 +198,7 @@ class Fake_Server {
         return true;
     }
     function stream_read($count) {
-        $this->position += strlen($this->response);
+        $this->position += mb_strlen($this->response);
         return $this->response;
     }
     function stream_write($data) {
@@ -212,7 +212,7 @@ class Fake_Server {
         }
         //print_r($this->response);
         rewind(Hm_Functions::$resource);
-        return (strlen($data)+2);
+        return (mb_strlen($data)+2);
     }
     function stream_tell() {
         return $this->position;
@@ -222,7 +222,7 @@ class Fake_Server {
         return true;
     }
     function stream_eof() {
-        $res = $this->position >= strlen($this->response);
+        $res = $this->position >= mb_strlen($this->response);
         return $res;
     }
     function error_resp($data) {
@@ -264,7 +264,7 @@ class Hm_Functions {
     public static function c_status() { return 200; }
     public static function c_exec() { return self::$exec_res; }
     public static function function_exists($func) {
-        if ((float) substr(phpversion(), 0, 3) < 8.1) {
+        if ((float) mb_substr(phpversion(), 0, 3) < 8.1) {
             return false;
         }
         return self::$exists;
@@ -334,7 +334,7 @@ function setup_db($config) {
     $config->set('db_pass', 'cypht_test');
 }
 function flatten($str) {
-    return strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
+    return mb_strtolower(str_replace(array("\n", "\t", "\r", " "), '', $str));
 }
 function filters() {
     return array(

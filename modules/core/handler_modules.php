@@ -137,7 +137,7 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
     public function process() {
         $headers = array();
         if ($this->get('language')) {
-            $headers['Content-Language'] = substr($this->get('language'), 0, 2);
+            $headers['Content-Language'] = mb_substr($this->get('language'), 0, 2);
         }
         if ($this->request->tls) {
             $headers['Strict-Transport-Security'] = 'max-age=31536000';
@@ -680,7 +680,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
-        if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
+        if (!mb_strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
             if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {
                 $this->out('redirect_url', '?'.$start_page);

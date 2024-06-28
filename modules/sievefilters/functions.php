@@ -100,7 +100,7 @@ if (!hm_exists('get_mailbox_filters')) {
             $client = $factory->init($user_config, $mailbox);
             $scripts = [];
             foreach ($client->listScripts() as $script) {
-                if (strstr($script, 'cypht')) {
+                if (mb_strstr($script, 'cypht')) {
                     $scripts[] = $script;
                 }
             }
@@ -162,7 +162,7 @@ if (!hm_exists('generate_main_script')) {
                 continue;
             }
 
-            if (strstr($script_name, 'cypht')) {
+            if (mb_strstr($script_name, 'cypht')) {
                 $ex_name = explode('-', $script_name);
                 $sorted_list[$script_name] = $ex_name[1];
             }
@@ -188,7 +188,7 @@ if (!hm_exists('save_main_script')) {
             'main_script',
             $main_script
         );
-        if (! $success && strpos($client->getErrorMessage(), 'failed to include') !== false) {
+        if (! $success && mb_strpos($client->getErrorMessage(), 'failed to include') !== false) {
             $main_script = '';
             foreach ($scripts as $scriptName) {
                 if ($scriptName == 'main_script') {
@@ -196,8 +196,8 @@ if (!hm_exists('save_main_script')) {
                     continue;
                 }
                 $script = $client->getScript($scriptName);
-                if (strpos($script, 'failed to include') !== false) {
-                    $script = substr($script, strpos($script, '#'));
+                if (mb_strpos($script, 'failed to include') !== false) {
+                    $script = mb_substr($script, mb_strpos($script, '#'));
                     $client->putScript(
                         $scriptName,
                         $script
@@ -246,14 +246,14 @@ if (!hm_exists('format_main_script')) {
 if (!hm_exists('generate_script_name')) {
     function generate_script_name($name, $priority)
     {
-        return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cypht';
+        return str_replace(' ', '_', mb_strtolower($name)).'-'.$priority.'-cypht';
     }
 }
 
 if (!hm_exists('generate_filter_name')) {
     function generate_filter_name($name, $priority)
     {
-        return str_replace(' ', '_', strtolower($name)).'-'.$priority.'-cyphtfilter';
+        return str_replace(' ', '_', mb_strtolower($name)).'-'.$priority.'-cyphtfilter';
     }
 }
 
@@ -484,7 +484,7 @@ if (!hm_exists('get_blocked_senders')){
                 }
                 $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <i class="bi bi-pencil-fill ms-3"></i></a>';
                 $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'"></i>';
-                if (!strstr($sender, '*')) {
+                if (!mb_strstr($sender, '*')) {
                     $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'"></i>';
                 }
                 $ret .= '</td></tr>';
