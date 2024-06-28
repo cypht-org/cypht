@@ -634,4 +634,5 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'The copied text has leading or trailing spaces' => false,
 );
