@@ -185,7 +185,6 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
             else {
                 Hm_Msgs::add('ERRAn Error Occurred');
             }
-            $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
         }
     }
