@@ -1364,7 +1364,7 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                         </div>';
                      }
                 $res .= '</div>';
-               
+
        return $res;
     }
 }

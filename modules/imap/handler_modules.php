@@ -722,6 +722,20 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_NUMERIC));
             }
             $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            if (imap_authed($imap)) {
+                $quota_root = $imap->get_quota_root($folder ? $folder : 'INBOX');
+                $quota = $imap->get_quota($quota_root[0]['name']);
+                if ($quota) {
+                    $current = floatval($quota[0]['current']);
+                    $max = floatval($quota[0]['max']);
+                    if ($max > 0) {
+                        $this->out('quota', ceil(($current / $max) * 100));
+                        $this->out('quota_max', $max / 1024);
+                    }
+                }
+            }
             if ($page_cache) {
                 $this->out('imap_expanded_folder_data', $page_cache);
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
@@ -729,8 +743,6 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('with_input', $with_subscription);
                 return;
             }
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
                 $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
                 if ($with_subscription) {
