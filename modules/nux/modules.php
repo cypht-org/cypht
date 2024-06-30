@@ -196,7 +196,6 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     Hm_Msgs::add('E-mail account successfully added');
-                    $this->save_hm_msgs();
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
