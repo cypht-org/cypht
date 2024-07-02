@@ -44,6 +44,15 @@ add_handler('ajax_sieve_delete_filter', 'settings_load_imap',  true);
 add_handler('ajax_sieve_delete_filter', 'sieve_delete_filter',  true);
 add_output('ajax_sieve_delete_filter', 'sieve_delete_output',  true);
 
+/**
+ * toggle fliter
+ */
+setup_base_ajax_page('ajax_sieve_toggle_script_state', 'core');
+add_handler('ajax_sieve_toggle_script_state', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_sieve_toggle_script_state', 'settings_load_imap', true);
+add_handler('ajax_sieve_toggle_script_state', 'sieve_toggle_script_state', true);
+
+
 /* save script */
 setup_base_ajax_page('ajax_sieve_save_script', 'core');
 add_handler('ajax_sieve_save_script', 'settings_load_imap',  true);
@@ -110,6 +119,7 @@ return array(
         'ajax_sieve_save_filter',
         'ajax_sieve_edit_filter',
         'ajax_sieve_delete_filter',
+        'ajax_sieve_toggle_script_state',
         'ajax_sieve_block_unblock',
         'ajax_sieve_unblock_sender',
         'ajax_sieve_get_mailboxes',
@@ -130,6 +140,7 @@ return array(
     'allowed_get' => array(),
     'allowed_post' => array(
         'imap_account' => FILTER_DEFAULT,
+        'script_state' => FILTER_DEFAULT,
         'sieve_script_name' => FILTER_DEFAULT,
         'sieve_script_priority' => FILTER_VALIDATE_INT,
         'sieve_filter_name' => FILTER_DEFAULT,
