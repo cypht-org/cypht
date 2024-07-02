@@ -1545,6 +1545,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             }
         }
         $auth_server = $this->session->get('imap_auth_server_settings', array());
+        $imap_details = array();
         if (!empty($auth_server)) {
             if (array_key_exists('name', $auth_server)) {
                 $name = $auth_server['name'];

@@ -192,7 +192,7 @@ class Hm_Request {
      * @return void
      */
     private function is_tls() {
-        if (array_key_exists('HTTPS', $this->server) && strtolower($this->server['HTTPS']) == 'on') {
+        if (array_key_exists('HTTPS', $this->server) && !is_null($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') {
             $this->tls = true;
         } elseif (array_key_exists('REQUEST_SCHEME', $this->server) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
             $this->tls = true;
@@ -218,7 +218,9 @@ class Hm_Request {
      * @return bool true if the request is from an AJAX call
      */
     public function is_ajax() {
-        return array_key_exists('HTTP_X_REQUESTED_WITH', $this->server) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return array_key_exists('HTTP_X_REQUESTED_WITH', $this->server)
+        && !is_null($this->server['HTTP_X_REQUESTED_WITH'])
+        && strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**

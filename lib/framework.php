@@ -211,7 +211,11 @@ if (!class_exists('Hm_Functions')) {
             if ($type === INPUT_SERVER) {
                 $value = array();
                 foreach ($filters as $var => $flag) {
-                    $value[$var] = filter_var($_SERVER[$var], $flag);
+                    if (isset($_SERVER[$var])) {
+                        $value[$var] = filter_var($_SERVER[$var], $flag);
+                    } else {
+                        $value[$var] = null;
+                    }
                 }
                 return $value;
             }
