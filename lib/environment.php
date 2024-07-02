@@ -24,17 +24,12 @@ class Hm_Environment {
         if (method_exists($dotenvLoader, 'usePutenv')) {
             $dotenvLoader->usePutenv(true);
         }
-        $envDistFile = APP_PATH . '.env';
-        if (!file_exists($envDistFile)) {
-            Hm_Msgs::add('ERR.env file not found at: "' . $envDistFile . '"');
+        $envFile = static::get('CYPHT_DOTENV');
+        if (!file_exists($envFile)) {
+            Hm_Msgs::add('ERR.env file not found at: "' . $envFile . '"');
             return;
         }
-
-        $envFile = static::get('CYPHT_DOTENV');
-        $dotenvLoader->load($envDistFile);
-        if ($envFile) {
-            $dotenvLoader->loadEnv($envFile);
-        }
+        $dotenvLoader->load($envFile);
     }
 
     public static function get($key, $default = null) {
@@ -91,22 +86,8 @@ if (!function_exists('merge_config_files')) {
         $files = glob($folder_path . '/*.php');
 
         foreach ($files as $file) {
-            // Use require to include the file
-            $fileArray = require $file;
-
-            if(is_array($fileArray)) {
-                // Check if values are boolean and convert if necessary
-                $fileArray = array_map(function ($value) {
-                    return is_array($value) ? $value : (
-                        is_string($value) && strtolower($value) === 'true' ? true : (
-                            is_string($value) && strtolower($value) === 'false' ? false : $value
-                        )
-                    );
-                }, $fileArray);
-
-                // Merge the arrays
-                $configArray = array_merge($configArray, $fileArray);
-            }
+            $fileArray = process_config_array($file);
+            $configArray = array_merge($configArray, $fileArray);
         }
         return $configArray;
     }
@@ -114,27 +95,30 @@ if (!function_exists('merge_config_files')) {
 
 if (!function_exists('config')) {
     /**
-     * Merge configuration arrays from PHP files in the specified folder.
+     * Get configuration data for a single file
      *
-     * This function includes each PHP file in the specified folder and retrieves its array.
-     * It then merges these arrays into a single configuration array, applying boolean conversion
-     * for values that are represented as "true" or "false" strings.
+     * @param string $file_name The path to PHP configuration file.
      *
-     * @param string $folder_path The path to the folder containing PHP configuration files.
-     *
-     * @return array The merged configuration array.
+     * @return array The configuration array.
      */
     function config($file_name) {
-        // Use require to include the file
-        $fileArray = require CONFIG_PATH.$file_name.'.php';
+        $path = CONFIG_PATH.$file_name.'.php';
+        return process_config_array($path);
+    }
+}
 
-        // Check if values are boolean and convert if necessary
-        return array_map(function ($value) {
-            return is_array($value) ? $value : (
-                is_string($value) && strtolower($value) === 'true' ? true : (
-                    is_string($value) && strtolower($value) === 'false' ? false : $value
-                )
-            );
-        }, $fileArray);
+if (!function_exists('process_config_array')) {
+    function process_config_array($filename) {
+        $array = require $filename;
+        if (is_array($array)) {
+            return array_map(function ($value) {
+                return is_array($value) ? $value : (
+                    is_string($value) && strtolower($value) === 'true' ? true : (
+                        is_string($value) && strtolower($value) === 'false' ? false : $value
+                    )
+                );
+            }, $array);
+        }
+        return [];
     }
 }

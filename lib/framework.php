@@ -72,19 +72,14 @@ if (!class_exists('Hm_Functions')) {
         public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false, $same_site = 'Strict') {
             $prefix = ($lifetime != 0 && $lifetime < time()) ? 'Deleting' : 'Setting';
             Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
-            if (version_compare(PHP_VERSION, '7.3', '>=')) {
-                return setcookie($name, $value, [
-                        'expires' => $lifetime,
-                        'path' => $path,
-                        'domain' => $domain,
-                        'secure' => $secure,
-                        'httponly' => $html_only,
-                        'samesite' => $same_site
-                    ]
-                );
-            } else {
-                return setcookie($name, $value, $lifetime, $path, $domain, $secure, $html_only);
-            }
+            return setcookie($name, $value, [
+                'expires' => $lifetime,
+                'path' => $path,
+                'domain' => $domain,
+                'secure' => $secure,
+                'httponly' => $html_only,
+                'samesite' => $same_site
+            ]);
         }
 
         /**
@@ -211,7 +206,11 @@ if (!class_exists('Hm_Functions')) {
             if ($type === INPUT_SERVER) {
                 $value = array();
                 foreach ($filters as $var => $flag) {
-                    $value[$var] = filter_var($_SERVER[$var], $flag);
+                    if (isset($_SERVER[$var])) {
+                        $value[$var] = filter_var($_SERVER[$var], $flag);
+                    } else {
+                        $value[$var] = null;
+                    }
                 }
                 return $value;
             }

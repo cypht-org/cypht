@@ -301,18 +301,21 @@ class Hm_Dispatch {
      * @return boolean
      */
     public function validate_ajax_request($request, $filters) {
-        if (array_key_exists('hm_ajax_hook', $request->get)) {
-            if (in_array($request->get['hm_ajax_hook'], $this->get_pages($filters), true)) {
+        return $this->validate_hook($request->get, $filters) || $this->validate_hook($request->post, $filters);
+    }
+
+    /**
+     * Validates ajax hook
+     * @param array $input POST or GET data
+     * @param array $filters list of filters
+     * @return boolean
+     */
+    private function validate_hook($input, $filters) {
+        if (array_key_exists('hm_ajax_hook', $input)) {
+            if (in_array($input['hm_ajax_hook'], $this->get_pages($filters), true)) {
                 return true;
             } else {
-                Hm_Functions::cease(json_encode(['status' => 'not callable']));;
-            }
-        }
-        if (array_key_exists('hm_ajax_hook', $request->post)) {
-            if (in_array($request->post['hm_ajax_hook'], $this->get_pages($filters), true)) {
-                return true;
-            } else {
-                Hm_Functions::cease(json_encode(['status' => 'not callable']));;
+                Hm_Functions::cease(json_encode(['status' => 'not callable']));
             }
         }
         return false;
