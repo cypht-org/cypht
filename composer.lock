@@ -423,16 +423,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.3",
+            "version": "v1.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "601cb7dad4b39fd225273a01357b5a71163a96b7"
+                "reference": "d013d044059ea7141ad69b874eba5fb577f3da11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/601cb7dad4b39fd225273a01357b5a71163a96b7",
-                "reference": "601cb7dad4b39fd225273a01357b5a71163a96b7",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/d013d044059ea7141ad69b874eba5fb577f3da11",
+                "reference": "d013d044059ea7141ad69b874eba5fb577f3da11",
                 "shasum": ""
             },
             "require": {
@@ -451,12 +451,28 @@
             "authors": [
                 {
                     "name": "Henrique Borba",
-                    "email": "henrique.borba.dev@gmail.com"
+                    "email": "henrique.borba.dev@gmail.com",
+                    "role": "Initial developer, no longer active"
+                },
+                {
+                    "name": "Victor Emanouilov",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Josaphat Imani",
+                    "role": "Maintainer"
+                },
+                {
+                    "name": "Marc Laporte",
+                    "homepage": "https://MarcLaporte.com",
+                    "role": "Maintainer"
                 }
             ],
-            "description": "PHP library to create and manage Sieve filters through the ManageSieve protocol (RFC5228)",
+            "description": "A modern (started in 2022) PHP library for the ManageSieve protocol (RFC5804) to create/edit Sieve scripts (RFC5228). Used by Cypht Webmail.",
+            "homepage": "https://github.com/cypht-org/php-sieve-manager",
             "keywords": [
                 "RFC5228",
+                "RFC5804",
                 "cypht",
                 "email",
                 "filters",
@@ -467,10 +483,12 @@
                 "sieve"
             ],
             "support": {
+                "chat": "https://gitter.im/cypht-org/community",
                 "issues": "https://github.com/cypht-org/php-sieve-manager/issues",
-                "source": "https://github.com/cypht-org/php-sieve-manager/tree/v1.0.3"
+                "source": "https://github.com/cypht-org/php-sieve-manager",
+                "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki"
             },
-            "time": "2024-05-02T06:55:04+00:00"
+            "time": "2024-06-17T21:00:27+00:00"
         },
         {
             "name": "league/commonmark",
