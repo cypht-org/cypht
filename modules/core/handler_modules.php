@@ -679,6 +679,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
+        $this->out('telegram_webhook_interval', $this->user_config->get('interval_webhook_notification_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
         if (!strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);

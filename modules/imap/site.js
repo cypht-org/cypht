@@ -1134,6 +1134,15 @@ var imap_unsnooze_messages = function() {
     );
 }
 
+var imap_send_telegram_webhook = function() {
+    Hm_Ajax.request(
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_send_telegram_webhook'},
+            {'name': 'unread_message_count', 'value': Number.parseInt($('.total_unread_count').text())}
+        ],
+        function() {},
+    );
+}
+
 if (hm_list_path() == 'sent') {
     Hm_Message_List.page_caches.sent = 'formatted_sent_data';
 }
@@ -1190,6 +1199,7 @@ $(function() {
     if (hm_is_logged()) {
         imap_unsnooze_messages();
         setInterval(imap_unsnooze_messages, 60000);
+        setInterval(imap_send_telegram_webhook, 60000 * hm_telegram_webhook_interval());
     }
 
     if ($('.imap_move').length > 0) {

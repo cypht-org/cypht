@@ -32,7 +32,7 @@ class Hm_Telegram_Webhook {
             if (trim($curl_result)) {
                 $response_data = json_decode($curl_result, true);
                 if (!$response_data['ok']) {
-
+                    Hm_Debug::add("ERRMessage not sent: ".$response_data['description']);
                 }
             }
         }
@@ -52,7 +52,7 @@ class Hm_Telegram_Webhook {
             if(!empty($chatId = $response_data['result'][0]['message']['chat']['id'])){
                 return $chatId;
             } else {
-                Hm_Msgs::add('ERRNo messages found. Please send a message to your bot first.<br>');
+                Hm_Debug::add('ERRNo messages found. Please send a message to your bot first.<br>');
                 return '';
             }
         }
