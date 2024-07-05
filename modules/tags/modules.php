@@ -8,6 +8,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require_once APP_PATH . 'modules/tags/functions.php';
 require_once APP_PATH . 'modules/tags/hm-tags.php';
 
 /**
@@ -58,22 +59,21 @@ class Hm_Handler_process_tag_update extends Hm_Handler_Module {
         if (array_key_exists('tag_delete', $this->request->post)) {
             return;
         }
-        list($success, $form) = $this->process_form(array('tag_name'));// 'tag_id', parent_tag
-        return ['form' => $form];
+        list($success, $form) = $this->process_form(array('tag_name','parent_tag','tag_id'));// 'tag_id', parent_tag
         if (!$success) {
             return;
         }
-        // var_dump($form);die();
-        return ['form' => $form];
         $tag = array(
             'name' => html_entity_decode($form['tag_name'], ENT_QUOTES),
-            'parent' => $form['parent'] ?? null
+            'parent' => $form['parent_tag'] ?? null
         );
-        if (Hm_Tags::get($form['tag_id'])) {
+        if (!is_null($form['tag_id']) AND Hm_Tags::get($form['tag_id'])) {
             $tag['id'] = $form['tag_id'];
             Hm_Tags::edit($form['tag_id'], $tag);
+            Hm_Msgs::add('Tag Created');
         } else {
             Hm_Tags::add($tag);
+            Hm_Msgs::add('Tag Edited');
         }
     }
 }
@@ -115,96 +115,38 @@ class Hm_Output_tags_heading extends Hm_Output_Module {
         return '<div class="content_title">'.$this->trans('Tags').'</div>';
     }
 }
-class Hm_Output_tags_table extends Hm_Output_Module {
+class Hm_Output_tags_tree extends Hm_Output_Module {
     /**
      */
     protected function output() {
         if ($this->format == 'HTML5') {
-        $count = count($this->get('tags', array()));
-        $count = sprintf($this->trans('%d configured'), $count);
-        $tag = $this->get('tag_profile');
-        $id = $this->get('edit_tag_id');
-        return '<div class="tags_table mt-3 col-lg-8 col-md-8 col-sm-12">
+            $folders = $this->get('tag_folders', array());
+            $tag = $this->get('tag_profile');
+            $id = $this->get('edit_tag_id');
+            
+            // Organize folders into a tree structure
+            $folderTree = [];
+            foreach ($folders as $folderId => $folder) {
+                if (isset($folder['parent']) && $folder['parent']) {
+                    $folders[$folder['parent']]['children'][$folderId] = &$folders[$folderId];
+                } else {
+                    $folderTree[$folderId] = &$folders[$folderId];
+                }
+            }               
+        
+            // Generate the tree view HTML
+            $treeViewHtml = generate_tree_view($folderTree);
+        
+            return '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
                     <div class="card m-3 mr-0">
                         <div class="card-body">
-                            <div class="table-responsive-lg">
-                                <table class="table table-striped">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">First</th>
-                                            <th scope="col">Last</th>
-                                            <th scope="col">Handle</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row">1</th>
-                                            <td>Mark</td>
-                                            <td>Otto</td>
-                                            <td>@mdo</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">2</th>
-                                            <td>Jacob</td>
-                                            <td>Thornton</td>
-                                            <td>@fat</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry</td>
-                                            <td>the Bird</td>
-                                            <td>@twitter</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry</td>
-                                            <td>the Bird</td>
-                                            <td>@twitter</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry</td>
-                                            <td>the Bird</td>
-                                            <td>@twitter</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row">3</th>
-                                            <td>Larry</td>
-                                            <td>the Bird</td>
-                                            <td>@twitter</td>
-                                            <th scope="row">
-                                                <a href="" class="btn btn-primary btn-sm tags_action_btn"><i class="bi bi-pencil-square"></i></a>
-                                                <a href="" class="btn btn-danger btn-sm tags_action_btn"><i class="bi bi-trash3-fill"></i></a>
-                                            </th>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <div class="tree-view">
+                                ' . $treeViewHtml . '
                             </div>
                         </div>
                     </div>
                 </div>';
+        
         }
     }
 }
@@ -219,7 +161,11 @@ class Hm_Output_tags_form extends Hm_Output_Module {
         $tag = $this->get('tag_profile');
         $id = $this->get('edit_tag_id');
         $parent_tag = $this->get('parent_tag');
-        return '<div class="tags_table mt-3 col-lg-4 col-md-4 col-sm-12">
+        $options = '';
+        foreach ($this->get('tag_folders', array()) as $index => $folder) {
+            $options .= '<option value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
+        }
+        return '<div class="tags_tree mt-3 col-lg-4 col-md-4 col-sm-12">
                     <div class="card m-4">
                         <div class="card-body">
                             <form class="add_tag me-0" method="POST" action="?page=tags">
@@ -230,9 +176,15 @@ class Hm_Output_tags_form extends Hm_Output_Module {
                                 <div class="form-floating mb-3">
                                     <input type="hidden" id="hm_ajax_hook" name="hm_ajax_hook" class="txt_fld form-control" value="ajax_process_tag_update">
                                     <input type="hidden" id="tag_id" name="tag_id" class="txt_fld form-control" value="'.$this->html_safe($id).'" placeholder="'.$this->trans('Tag id').'">
-                                    <input type="hidden" id="parent_tag" name="parent_tag" class="txt_fld form-control" value="'.$this->html_safe($parent_tag).'" placeholder="'.$this->trans('Pare t Tag id').'">
                                     <input required type="text" id="tag_name" name="tag_name" class="txt_fld form-control" value="'.$this->html_safe($tag['name']).'" placeholder="'.$this->trans('Tag name').'">
                                     <label class="" for="tag_name">'.$this->trans('Tag name').'</label>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <select id="parent_tag" name="parent_tag" class="form-select form-select-lg mb-3" aria-label="">
+                                        <option value="" selected>None</option>
+                                        '.$options.'
+                                    </select>
+                                    <label class="" for="parent_tag">'.$this->trans('Parent Tag name').'</label>
                                 </div>
 
                                 <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_tag" />
@@ -250,35 +202,42 @@ class Hm_Output_tags_form extends Hm_Output_Module {
 class Hm_Output_tag_folders extends hm_output_module {
     protected function output() {
         $res = '';
-        $folders = [
-            'EvoluData',
-            'Notes',
-            'Personal',
-        ];
-        // $folders = $this->get('tag_folders', array());
-        // var_dump($folders);die();
+        $folders = $this->get('tag_folders', array());
         if (is_array($folders) && !empty($folders)) {
-            if(count($this->get('tags', array()))  > 1) {
-                $res .= '<li class="menu_tags"><a class="unread_link" href="?page=message_list&amp;list_path=tags">';
+            if(count($this->get('tag_folders', array()))  > 1) {
+                $res .= '<li class="menu_tags"><a class="unread_link" href="?page=tags">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
                 $res .= $this->trans('All');
-                $res .= '</a> <span class="unread_tag_count"></span></li>';
+                $res .= '<span class="unread_tag_count">('.count($folders).')</span></a></li>';
             }
-            foreach ($folders as $id => $folder) {
-                $res .= '<li class="tags_'.$this->html_safe($id).'">'.
-                    '<a data-id="tags_'.$this->html_safe($id).'" href="?page=message_list&list_path=tags_'.$this->html_safe($id).'">';
-                if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-folder-fill fs-5 me-2"></i>';
+            $folderTree = [];
+            foreach ($folders as $folderId => $folder) {
+                if (isset($folder['parent']) && $folder['parent']) {
+                    $folders[$folder['parent']]['children'][$folderId] = &$folders[$folderId];
+                } else {
+                    $folderTree[$folderId] = &$folders[$folderId];
                 }
-                $res .= $this->html_safe($folder).'</a>';
-                $res .= '<button class="btn btn-sm btn-tag-options" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-three-dots"></i> </button>';
-                $res .= '<ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMicroProcessorTrigger">';
-                $res .= '<li><a href="?page=servers#tags_section" class="dropdown-item"> <i class="bi bi-pencil"></i> Edit </a></li>';
-                $res .= '<li><a href="?page=servers#tags_section" class="dropdown-item"> <i class="bi bi-plus"></i> Add sublabel</a></li>';
-                $res .= '<li><a href="?page=servers#tags_section" class="dropdown-item"> <i class="bi bi-trash"></i> Delete</a></li>';
-                $res .= '</ul>';
+            }
+            foreach ($folderTree as $id => $folder) {
+                $hasChild = isset($folder['children']) && !empty($folder['children']);
+                $res .= '<li class="tags_'.$this->html_safe($id).'">';
+                if (!$this->get('hide_folder_icons')) {
+                    $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-folder-fill fs-5 me-2"></i>';
+                }
+                $res .= '<a data-id="tags_'.$this->html_safe($id).'" href="?page=message_list&list_path=tags_'.$this->html_safe($id).'">';
+                $res .= $this->html_safe($folder['name']).'</a>';
+                if($hasChild) {
+                    $res .= '<ul>';
+                    foreach ($folder['children'] as $key => $child) {
+                        $res .= '<li class="tags_'.$this->html_safe($child['id']).'">';
+                        $res .= '<a data-id="tags_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tags_'.$this->html_safe($child['id']).'">';
+                        $res .= $this->html_safe($folder['name']).'</a>';
+                        $res .= '</li>';
+                    }
+                    $res .= '</ul>';
+                }
                 $res .= '</li>';
             }
         }
@@ -302,44 +261,6 @@ class Hm_Output_tag_bar extends hm_output_module {
         }
     }
 }
-
-// class Hm_Output_add_tag_dialog extends Hm_Output_Module {
-//     protected function output() {
-//         if ($this->format == 'HTML5') {
-//             $count = count($this->get('tags', array()));
-//             $count = sprintf($this->trans('%d configured'), $count);
-//             $tag = $this->get('tag_profile');
-//             $id = $this->get('edit_tag_id');
-
-//             return '<div class="tag_server_setup">
-//                         <div data-target=".tags_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
-//                             <a href="#" class="pe-auto">
-//                                 <i class="bi bi-tag-fill me-3"></i>
-//                                 <b> '.$this->trans('Tags').'</b>
-//                             </a>
-//                             <div class="server_count">'.$count.'</div>
-//                         </div>
-
-//                         <div class="tags_section px-4 pt-3 me-0">
-//                             <div class="row">
-//                                 <div class="col-12 col-lg-4 mb-4">
-//                                     <form class="add_tag me-0" method="POST" action="?page=servers">
-//                                         <input type="hidden" name="hm_page_key" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
-
-//                                         <div class="subtitle mt-4">'.$this->trans('Add an tag/label').'</div>
-
-//                                         <div class="form-floating mb-3">
-//                                             <input type="hidden" id="tag_id" name="tag_id" class="txt_fld form-control" value="'.$this->html_safe($id).'" placeholder="'.$this->trans('Tag id').'">
-//                                             <input required type="text" id="tag_name" name="tag_name" class="txt_fld form-control" value="'.$this->html_safe($tag['name']).'" placeholder="'.$this->trans('Tag name').'">
-//                                             <label class="" for="tag_name">'.$this->trans('Tag name').'</label>
-//                                         </div>
-
-//                                         <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_tag" />
-//                                     </form>
-//                                 </div>';
-//         }
-//     }
-// }
 
 class Hm_Output_display_configured_tags extends Hm_Output_Module {
     protected function output() {

@@ -7,8 +7,8 @@ output_source('tags');
 
 setup_base_page('tags');
 add_output('tags', 'tags_heading', true, 'core', 'content_section_start', 'after');
-add_output('tags', 'tags_table', true, 'core', 'tags_heading', 'after');
-add_output('tags', 'tags_form', true, 'core', 'tags_table', 'after');
+add_output('tags', 'tags_tree', true, 'core', 'tags_heading', 'after');
+add_output('tags', 'tags_form', true, 'core', 'tags_tree', 'after');
 
 
 add_module_to_all_pages('handler', 'mod_env', true, 'tags', 'load_user_data', 'after');
