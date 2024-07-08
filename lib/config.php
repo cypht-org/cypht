@@ -464,16 +464,14 @@ class Hm_Site_Config_File extends Hm_Config {
     public $user_defaults = [];
 
     /**
-     * Load data based on source
-     * @param string $source source location for site configuration
+     * @param array $all_configs
      */
     public function __construct($all_configs = []) {
         $this->load(empty($all_configs) ? merge_config_files(APP_PATH.'config') : $all_configs, false);
     }
 
     /**
-     * Load site data from a file
-     * @param string $source file path to the site configuration
+     * @param string $all_configs
      * @param string $key encryption key (unsued in this class)
      * @return void
      */

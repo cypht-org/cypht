@@ -286,8 +286,9 @@ class Hm_Module_Exec {
             'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
         $modules = $this->site_config->get_modules();
         foreach ($modules as $name) {
-            if (is_readable(sprintf(APP_PATH."modules/%s/setup.php", $name))) {
-                $filters = self::merge_filters($filters, require sprintf(APP_PATH."modules/%s/setup.php", $name));
+            $path = sprintf(APP_PATH."modules/%s/setup.php", $name);
+            if (is_readable($path)) {
+                $filters = self::merge_filters($filters, require $path);
             }
         }
         $this->filters = $filters;
