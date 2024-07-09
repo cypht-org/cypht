@@ -307,7 +307,8 @@ td {
   margin-right: 20px;
 }
 .disabled_link {
-  color: #bbb;
+  pointer-events: none;
+  opacity: 0.5;
 }
 input,
 option,

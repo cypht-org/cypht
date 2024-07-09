@@ -504,7 +504,7 @@ var expand_imap_mailbox = function(res) {
     if (res.imap_expanded_folder_path) {
         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.email_folders')).append(res.imap_expanded_folder_formatted);
         $('.imap_folder_link', $('.email_folders')).off('click');
-        $('.imap_folder_link', $('.email_folders')).on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.imap_folder_link', $('.email_folders')).on("click", function() { return expand_imap_folders($(this)); });
         Hm_Folders.update_unread_counts();
     }
 };
@@ -535,20 +535,28 @@ var prefetch_imap_folders = function() {
 
 };
 
-var expand_imap_folders = function(path) {
+var expand_imap_folders = function(element) {
+    var path = element.data('target');
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
         $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
         if (detail) {
+            element.addClass('disabled_link');
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
                 {'name': 'folder', 'value': detail.folder}],
-                expand_imap_mailbox,
+                function (res) {
+                    element.removeClass('disabled_link');
+                    expand_imap_mailbox(res);
+                },
                 [],
                 false,
-                Hm_Folders.save_folder_list
+                Hm_Folders.save_folder_list,
+                function() {
+                    element.removeClass('disabled_link');
+                }
             );
         }
     }
