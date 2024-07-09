@@ -1078,19 +1078,33 @@ var imap_folder_status = function() {
 
 var imap_setup_labels = function() {
     $(document).on('click', '.label-checkbox', function() {
-        var folderId = $(this).data('id');
-        var imap_server_id = $(this).data('server');
-        var isChecked = $(this).is(':checked');
-        console.log("Checkbox clicked for folder ID:", folderId, "Checked:", isChecked);
+        var folder_id = $(this).data('id');
+        var ids = [];
+        if (hm_page_name() == 'message') {
+            var list_path = hm_list_path().split('_');
+            ids.push(list_path[1]+'_'+hm_msg_uid()+'_'+list_path[2]);
+        } else {
+            $('input[type=checkbox]').each(function() {
+                if (this.checked && this.id.search('imap') != -1) {
+                    var parts = this.id.split('_');
+                    ids.push(parts[1]+'_'+parts[2]+'_'+parts[3]);
+                }
+            });
+            if (ids.length == 0) {
+                return;
+            };
+        }
 
-        // Your additional logic here
         Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'imap_add_label_message'},
-            {'name': 'tag_ids', 'value': folderId},
-            {'name': 'imap_server_id', 'value': imap_server_id}],
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_label'},
+            {'name': 'tag_id', 'value': folder_id},
+            {'name': 'imap_server_ids', 'value': ids}],
             function(res) {
-                if (res.snoozed_messages > 0) {
-                    console.log("Label added to message");
+                if (!res.router_user_msgs[0].startsWith('ERR')) {
+                    Hm_Utils.seach_from_local_storage("/^\d+_imap_.+/")?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+                    Hm_Folders.reload_folders(true);
+                    var path = hm_list_parent()? hm_list_parent(): hm_list_path();
+                    window.location.replace('?page=message_list&list_path='+path);
                 }
             }
         );

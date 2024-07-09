@@ -373,7 +373,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
             $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
             if($this->get('tag_folders')){
-                $txt .= ' | '. tags_dropdown($this, $imap_server_id);
+                $txt .= ' | '. tags_dropdown($this, $headers);
             }
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');

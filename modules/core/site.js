@@ -1574,6 +1574,19 @@ var Hm_Utils = {
         return res;
     },
 
+    seach_from_local_storage: function(pattern) {
+        const results = [];
+        const key_pattern = new RegExp(pattern);
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key_pattern.test(key)) {
+                const value = get_from_local_storage(key);
+                results.push({ key: key, value: value });
+            }
+        }
+        return results;
+    },
+
     save_to_local_storage: function(key, val) {
         var prefix = window.location.pathname;
         key = prefix+key;
