@@ -31,7 +31,7 @@ private function log($message) {
 }
 public function generateClientProof($username, $password, $salt, $clientNonce, $serverNonce, $algorithm) {
     $iterations = 4096;
-    $keyLength = mb_strlen(hash($algorithm, '', true), '8bit'); // Dynamically determine key length based on algorithm
+    $keyLength = strlen(hash($algorithm, '', true)); // Dynamically determine key length based on algorithm
 
     $passwordBytes = hash($algorithm, $password, true);
     $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, $iterations, $keyLength, true);
@@ -56,8 +56,8 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         // Extract salt and server nonce from the server's challenge
         $serverChallenge = base64_decode(mb_substr($response[0], 2));
         $parts = explode(',', $serverChallenge);
-        $serverNonce = base64_decode(mb_substr($parts[0], mb_strpos($parts[0], "=", 0, '8bit') + 1, null, '8bit'));
-        $salt = base64_decode(mb_substr($parts[1], mb_strpos($parts[1], "=", 0, '8bit') + 1, null, '8bit'));
+        $serverNonce = base64_decode(substr($parts[0], strpos($parts[0], "=") + 1));
+        $salt = base64_decode(substr($parts[1], strpos($parts[1], "=") + 1));
 
         // Generate client nonce
         $clientNonce = base64_encode(random_bytes(32));
@@ -79,11 +79,11 @@ public function authenticateScram($scramAlgorithm, $username, $password, $getSer
         if (!empty($response) && mb_substr($response[0], 0, 2) == '+ ') {
             $serverFinalMessage = base64_decode(mb_substr($response[0], 2));
             $parts = explode(',', $serverFinalMessage);
-            $serverProof = mb_substr($parts[0], mb_strpos($parts[0], "=", 0, '8bit') + 1, null, '8bit');
+            $serverProof = substr($parts[0], strpos($parts[0], "=") + 1);
 
             // Generate server key
             $passwordBytes = hash($algorithm, $password, true);
-            $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, 4096, mb_strlen(hash($algorithm, '', true), '8bit'), true);
+            $saltedPassword = hash_pbkdf2($algorithm, $passwordBytes, $salt, 4096, strlen(hash($algorithm, '', true)), true);
             $serverKey = hash_hmac($algorithm, "Server Key", $saltedPassword, true);
 
             // Calculate server signature

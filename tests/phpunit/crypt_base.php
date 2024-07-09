@@ -17,7 +17,7 @@ class Hm_Test_Crypt_Base extends TestCase {
      */
     public function test_random() {
         $bytes = Hm_Crypt::random(10);
-        $this->assertTrue(mb_strlen($bytes, '8bit') == 10);
+        $this->assertTrue(strlen($bytes) == 10);
         Hm_Functions::$rand_bytes = 'bad';
         try {
             Hm_Crypt::random(10);
@@ -104,8 +104,8 @@ class Hm_Test_Crypt_Base extends TestCase {
      * @runInSeparateProcess
      */
     public function test_unique_id() {
-        $this->assertEquals(24, mb_strlen(base64_decode(Hm_Crypt::unique_id(24)), '8bit'));
-        $this->assertEquals(48, mb_strlen(base64_decode(Hm_Crypt::unique_id(48)), '8bit'));
-        $this->assertEquals(128, mb_strlen(base64_decode(Hm_Crypt::unique_id()), '8bit'));
+        $this->assertEquals(24, strlen(base64_decode(Hm_Crypt::unique_id(24))));
+        $this->assertEquals(48, strlen(base64_decode(Hm_Crypt::unique_id(48))));
+        $this->assertEquals(128, strlen(base64_decode(Hm_Crypt::unique_id())));
     }
 }

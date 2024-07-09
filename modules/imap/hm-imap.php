@@ -272,8 +272,8 @@ if (!class_exists('Hm_IMAP')) {
                     $cram1 = 'AUTHENTICATE CRAM-MD5' . "\r\n";
                     $this->send_command($cram1);
                     $response = $this->get_response();
-                    $challenge = base64_decode(mb_substr(trim($response[0]), 1, null, '8bit'));
-                    $pass = str_repeat(chr(0x00), (64-mb_strlen($password, '8bit')));
+                    $challenge = base64_decode(substr(trim($response[0]), 1));
+                    $pass = str_repeat(chr(0x00), (64-strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);
                     $opad = str_repeat(chr(0x5c), 64);
                     $digest = bin2hex(pack("H*", md5(($pass ^ $opad) . pack("H*", md5(($pass ^ $ipad) . $challenge)))));

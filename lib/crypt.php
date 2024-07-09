@@ -76,18 +76,18 @@ class Hm_Crypt_Base {
         $string = base64_decode($string);
 
         /* bail if the crypt text is invalid */
-        if (!$string || mb_strlen($string, '8bit') <= 200) {
+        if (!$string || strlen($string) <= 200) {
             return false;
         }
 
         /* get the payload and salt */
-        $crypt_string = mb_substr($string, 192, null, '8bit');
-        $salt = mb_substr($string, 0, 128, '8bit');
+        $crypt_string = substr($string, 192);
+        $salt = substr($string, 0, 128);
 
         /* check the signature. Temporarily allow the same key for hmac validation, eventually remove the $encryption_rounds
          * check and require the hmac_rounds check only! */
-        if (!self::check_hmac($crypt_string, mb_substr($string, 128, 64, '8bit'), $salt, $key, self::$hmac_rounds) &&
-            !self::check_hmac($crypt_string, mb_substr($string, 128, 64, '8bit'), $salt, $key, self::$encryption_rounds)) {
+        if (!self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$hmac_rounds) &&
+            !self::check_hmac($crypt_string, substr($string, 128, 64), $salt, $key, self::$encryption_rounds)) {
             Hm_Debug::add('HMAC verification failed');
             return false;
         }
@@ -160,7 +160,7 @@ class Hm_Crypt_Base {
     */
     private static function hash_equals($a, $b) {
         $res = 0;
-        $len = mb_strlen($a, '8bit');
+        $len = strlen($a);
         for ($i = 0; $i < $len; $i++) {
             $res |= ord($a[$i]) ^ ord($b[$i]);
         }
@@ -176,7 +176,7 @@ class Hm_Crypt_Base {
      * @return bool
      */
     public static function hash_compare($a, $b) {
-        if (!is_string($a) || !is_string($b) || mb_strlen($a, '8bit') !== mb_strlen($b, '8bit')) {
+        if (!is_string($a) || !is_string($b) || strlen($a) !== strlen($b)) {
             return false;
         }
         /* requires PHP >= 7.4 */
@@ -212,7 +212,7 @@ class Hm_Crypt_Base {
         }
 
         /* manual version */
-        $size = mb_strlen(hash($algo, '', true), '8bit');
+        $size = strlen(hash($algo, '', true));
         $len = ceil($length / $size);
         $result = '';
         for ($i = 1; $i <= $len; $i++) {
@@ -224,7 +224,7 @@ class Hm_Crypt_Base {
             }
             $result .= $res;
         }
-        return mb_substr($result, 0, $length, '8bit');
+        return substr($result, 0, $length);
     }
 
     /**

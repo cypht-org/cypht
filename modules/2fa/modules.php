@@ -320,9 +320,9 @@ function check_2fa_pin($pin, $secret, $pass_len=6) {
     $time = pack('N', $time);
     $time = str_pad($time, 8, chr(0), STR_PAD_LEFT);
     $hash = hash_hmac('sha1', $time, $secret, true);
-    $offset = ord(mb_substr($hash,-1, null, '8bit')) & 0xF;
-    $input = mb_substr($hash, $offset, mb_strlen($hash, '8bit') - $offset, '8bit');
-    $input = unpack("N",mb_substr($input, 0, 4, '8bit'));
+    $offset = ord(substr($hash,-1)) & 0xF;
+    $input = substr($hash, $offset, strlen($hash) - $offset);
+    $input = unpack("N",substr($input, 0, 4));
     $inthash = $input[1] & 0x7FFFFFFF;
     return $pin === str_pad($inthash % $pin_mod, 6, "0", STR_PAD_LEFT);
 }}
