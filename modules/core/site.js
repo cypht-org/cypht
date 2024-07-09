@@ -1943,6 +1943,10 @@ var imap_smtp_edit_action = function(event) {
     }
 };
 
+var hasLeadingOrTrailingSpaces = function(str) {
+    return str !== str.trim();
+};
+
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
@@ -2021,6 +2025,13 @@ $(function() {
     if (hm_check_dirty_flag()) {
         $('form:not(.search_terms)').areYouSure();
     }
+
+    $(document).on('paste', '.warn_on_paste', function (e) {
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        if (hasLeadingOrTrailingSpaces(paste)) {
+            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+        }
+    });
 
     fixLtrInRtl()
 });

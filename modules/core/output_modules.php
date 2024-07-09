@@ -288,7 +288,7 @@ class Hm_Output_login extends Hm_Output_Module {
                         <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.WEB_ROOT.'?page=save">'.$this->trans('More info').'</a></p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="'.$this->trans('Password').'">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="'.$this->trans('Password').'">
                             <label for="logout_password" class="form-label screen-reader">'.$this->trans('Password').'</label>
                         </div>
                     </div>
@@ -1474,7 +1474,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
-            'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="'.$this->trans('Password').'" />'.
+            'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2 warn_on_paste" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
             '<input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
@@ -2159,12 +2159,12 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                             <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control" value="" placeholder="'.$this->trans('Password').'">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                             <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>
