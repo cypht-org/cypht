@@ -298,6 +298,10 @@ add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_label', 'core');
+add_handler('ajax_imap_label', 'imap_add_label_message',  true, 'core');
+
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
 add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);

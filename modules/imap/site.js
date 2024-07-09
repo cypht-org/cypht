@@ -1076,6 +1076,27 @@ var imap_folder_status = function() {
     }
 };
 
+var imap_setup_labels = function() {
+    $(document).on('click', '.label-checkbox', function() {
+        var folderId = $(this).data('id');
+        var imap_server_id = $(this).data('server');
+        var isChecked = $(this).is(':checked');
+        console.log("Checkbox clicked for folder ID:", folderId, "Checked:", isChecked);
+
+        // Your additional logic here
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'imap_add_label_message'},
+            {'name': 'tag_ids', 'value': folderId},
+            {'name': 'imap_server_id', 'value': imap_server_id}],
+            function(res) {
+                if (res.snoozed_messages > 0) {
+                    console.log("Label added to message");
+                }
+            }
+        );
+    });
+}
+
 var imap_setup_snooze = function() {
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
@@ -1189,6 +1210,7 @@ $(function() {
 
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
         imap_setup_snooze();
+        imap_setup_labels();
     }
 
     if (hm_is_logged()) {

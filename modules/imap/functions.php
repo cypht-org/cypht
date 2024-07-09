@@ -1321,6 +1321,11 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     }
     return $res;
 }}
+if (!hm_exists('add_label_to_message')) {
+function add_label_to_message($imap, $msg_id, $folder, $tag) {
+    //TODO: add label to message
+    return '';
+}}
 
 /**
  * @subpackage imap/functions
@@ -1411,6 +1416,24 @@ function snooze_dropdown($output, $unsnooze = false) {
     $txt .= '<input class="snooze_input" style="display:none;"></li>';
     if ($unsnooze) {
         $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
+    }
+    $txt .= '</ul></div>';
+
+    return $txt;
+}}
+
+if (!hm_exists('tags_dropdown')) {
+function tags_dropdown($context, $server) {
+    $folders = $context->get('tag_folders', array());
+    $txt = '<div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Labels').'</button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+    foreach ($folders as $folder) {
+        $label = $folder['name'];
+        $txt .= '<li class="d-flex dropdown-item gap-2">';
+        $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" data-server="'.$server.'">';
+        $txt .= '<span>'.$context->trans($label).'</span>';
+        $txt .= '</li>';
     }
     $txt .= '</ul></div>';
 

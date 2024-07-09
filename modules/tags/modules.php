@@ -35,13 +35,12 @@ class Hm_Handler_tag_edit_data extends Hm_Handler_Module {
             $id = $this->request->get['tag_id'];
         }
         $folders = $this->get('tag_folders');
-
-        foreach ($folders as $folder) {
-            if ($folder['id'] == $id) {
-                $folder = $folder;
+        $folder = null;
+        foreach ($folders as $f) {
+            if ($f['id'] === $id) {
+                $folder = $f;
             }
         }
-
         if ($id !== false) {
             $this->out('edit_tag', $folder);
             $this->out('edit_tag_id', $id);
@@ -121,7 +120,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
     protected function output() {
         if ($this->format == 'HTML5') {
             $folders = $this->get('tag_folders', array());
-            $tag = $this->get('tag_profile');
+            $tag = $this->get('edit_tag');
             $id = $this->get('edit_tag_id');
             
             // Organize folders into a tree structure
@@ -158,20 +157,23 @@ class Hm_Output_tags_form extends Hm_Output_Module {
         if ($this->format == 'HTML5') {
         $count = count($this->get('tags', array()));
         $count = sprintf($this->trans('%d configured'), $count);
-        $tag = $this->get('tag_profile');
-        $id = $this->get('edit_tag_id');
-        $parent_tag = $this->get('parent_tag');
+        $tag = $this->get('edit_tag', null);
+        $id = $this->get('edit_tag_id', null);
+        $parent_tag = !empty($tag) ? $tag['parent'] : null;
         $options = '';
+        
         foreach ($this->get('tag_folders', array()) as $index => $folder) {
-            $options .= '<option value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
+            $option_selected = !is_null($id) && $folder['id'] === $parent_tag ? 'selected' : '';
+            $options .= '<option '. $option_selected.' value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
         }
+        $form_title = !is_null($id) ? $this->trans('Edit tag/label').': '.$tag['name'] : $this->trans('Add an tag/label');
         return '<div class="tags_tree mt-3 col-lg-4 col-md-4 col-sm-12">
                     <div class="card m-4">
                         <div class="card-body">
                             <form class="add_tag me-0" method="POST" action="?page=tags">
                                 <input type="hidden" name="hm_page_key" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
 
-                                <div class="subtitle mt-4">'.$this->trans('Add an tag/label').'</div>
+                                <div class="subtitle mt-4">'.$form_title.'</div>
 
                                 <div class="form-floating mb-3">
                                     <input type="hidden" id="hm_ajax_hook" name="hm_ajax_hook" class="txt_fld form-control" value="ajax_process_tag_update">

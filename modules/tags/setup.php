@@ -15,8 +15,7 @@ add_module_to_all_pages('handler', 'mod_env', true, 'tags', 'load_user_data', 'a
 add_handler('ajax_hm_folders', 'tag_data',  true, 'tags', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'tag_folders',  true, 'tags', 'folder_list_content_start', 'before');
 
-// add_output('servers', 'add_tag_dialog', true, 'tags', 'server_content_end', 'before');
-// add_output('servers', 'display_configured_tags', true, 'tags', 'add_tag_dialog', 'after');
+add_handler('ajax_imap_message_content', 'tag_data', true, 'tags', 'load_user_data', 'after');
 
 add_handler('tags', 'tag_data', true, 'tags', 'load_user_data', 'after');
 add_handler('tags', 'tag_edit_data', true, 'tags', 'tag_data', 'after');
@@ -39,5 +38,8 @@ return array(
         'tag_name' => FILTER_DEFAULT,
         'tag_id' => FILTER_DEFAULT,
         'parent_tag' => FILTER_DEFAULT
+    ),
+    'allowed_get' => array(
+        'tag_id' => FILTER_DEFAULT,
     )
 );

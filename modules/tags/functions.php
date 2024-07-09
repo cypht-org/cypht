@@ -34,7 +34,7 @@ if (!hm_exists('generate_tree_view')) {
             $html .= '</span>';
             $html .= '</span>';
             
-            $html .= '<a href="#" class="float-end"><i class="bi bi-pencil-square"></i></a>';
+            $html .= '<a href="?page=tags&tag_id='.$folder['id'].'" class="float-end"><i class="bi bi-pencil-square"></i></a>';
             
             if ($hasChildren) {
                 $html .= '<div class="collapse" id="collapse-' . $counter . '">';
