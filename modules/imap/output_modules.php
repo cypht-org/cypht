@@ -370,8 +370,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
-            $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
-            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
             if($this->get('tag_folders')){
                 $txt .= ' | '. tags_dropdown($this, $headers);
             }

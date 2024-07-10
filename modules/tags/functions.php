@@ -1,5 +1,7 @@
 <?php
 
+use PhpParser\Node\Expr\AssignOp\Div;
+
 if (!defined('DEBUG_MODE')) { die(); }
 
 if (!hm_exists('add_label')) {
@@ -14,14 +16,14 @@ if (!hm_exists('add_label')) {
 }
 
 if (!hm_exists('generate_tree_view')) {
-    function generate_tree_view($folders, $parentId = null) {
+    function generate_tree_view($folders, $request_Key, $parentId = null) {
         static $counter = 0;
         $ulClass = $parentId !== null ? 'list-group pt-2' : 'list-group';
         $html = '<ul class="' . $ulClass . '">';
         foreach ($folders as $folderId => $folder) {
             $counter++;
             $hasChildren = isset($folder['children']) && !empty($folder['children']);
-            $toggleIcon = $hasChildren ? '<i class="bi bi-caret-right"></i>' : '<i class="bi bi-folder"></i>';
+            $toggleIcon = $hasChildren ? '<i class="bi bi-caret-right"></i>' : '<i class="bi bi-tags"></i>';
 
             $html .= '<li class="list-group-item justify-content-between align-items-center">';
             $html .= '<span>';
@@ -33,12 +35,20 @@ if (!hm_exists('generate_tree_view')) {
             }
             $html .= '</span>';
             $html .= '</span>';
-            
-            $html .= '<a href="?page=tags&tag_id='.$folder['id'].'" class="float-end"><i class="bi bi-pencil-square"></i></a>';
+            $html .= '<div class="float-end">';
+            $html .= '<button href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></button>';
+            $html .= '<form method="POST" action="?page=tags" style="display:inline;">';
+            $html .= '<input type="hidden" name="tag_delete" value="1">';
+            $html .= '<input type="hidden" name="tag_id" value="'.$folder['id'].'">';
+            $html .= '<input type="hidden" name="hm_page_key" value="'.$request_Key.'" />';
+
+            $html .= '<button type="submit" class=""><i class="bi bi-trash"></i></button>';
+            $html .= '</form>';
+            $html .= '</div>';
             
             if ($hasChildren) {
                 $html .= '<div class="collapse" id="collapse-' . $counter . '">';
-                $html .= generate_tree_view($folder['children'], $counter);
+                $html .= generate_tree_view($folder['children'], $request_Key, $counter);
                 $html .= '</div>';
             }
             $html .= '</li>';

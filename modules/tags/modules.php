@@ -86,9 +86,8 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-
         if (($tag = Hm_Tags::get($form['tag_id']))) {
-            Hm_Tags::del($form['tag_id']);
+            Hm_Tags::del($tag['id']);
             Hm_Msgs::add('Tag Deleted');
         } else {
             Hm_Msgs::add('ERRTag ID not found');
@@ -134,7 +133,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
             }               
         
             // Generate the tree view HTML
-            $treeViewHtml = generate_tree_view($folderTree);
+            $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()));
         
             return '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
                     <div class="card m-3 mr-0">
@@ -226,7 +225,7 @@ class Hm_Output_tag_folders extends hm_output_module {
                 $hasChild = isset($folder['children']) && !empty($folder['children']);
                 $res .= '<li class="tags_'.$this->html_safe($id).'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-folder-fill fs-5 me-2"></i>';
+                    $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
                 $res .= '<a data-id="tags_'.$this->html_safe($id).'" href="?page=message_list&list_path=tags_'.$this->html_safe($id).'">';
                 $res .= $this->html_safe($folder['name']).'</a>';

@@ -16,6 +16,7 @@ add_handler('ajax_hm_folders', 'tag_data',  true, 'tags', 'load_user_data', 'aft
 add_output('ajax_hm_folders', 'tag_folders',  true, 'tags', 'folder_list_content_start', 'before');
 
 add_handler('ajax_imap_message_content', 'tag_data', true, 'tags', 'load_user_data', 'after');
+add_handler('message_list', 'tag_data', true, 'tags', 'load_user_data', 'after');
 
 add_handler('tags', 'tag_data', true, 'tags', 'load_user_data', 'after');
 add_handler('tags', 'tag_edit_data', true, 'tags', 'tag_data', 'after');
@@ -37,7 +38,8 @@ return array(
     'allowed_post' => array(
         'tag_name' => FILTER_DEFAULT,
         'tag_id' => FILTER_DEFAULT,
-        'parent_tag' => FILTER_DEFAULT
+        'parent_tag' => FILTER_DEFAULT,
+        'tag_delete' => FILTER_DEFAULT
     ),
     'allowed_get' => array(
         'tag_id' => FILTER_DEFAULT,

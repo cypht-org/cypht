@@ -374,6 +374,9 @@ function message_controls($output_mod) {
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
     }
+    if(!empty($output_mod->get('tag_folders'))) {
+        $res .= tags_dropdown($output_mod, []);
+    }
     $res .= '</div>';
     return $res;
 }}

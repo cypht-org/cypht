@@ -1,3 +1,4 @@
 .tag_icon { position: absolute; right: 50px; top: 18px; }
 .mobile .tag_icon { display: none; }
 .tags_action_btn { width: 30px !important; height: 30px !important; }
+.mr-4 { margin-right: 4px !important; }
