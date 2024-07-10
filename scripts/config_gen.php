@@ -4,7 +4,7 @@
  * CLI script to build the site configuration
  */
 
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
@@ -39,7 +39,7 @@ build_config();
 function check_php() {
     $minVersion = 8.1;
     $version = phpversion();
-    if (substr($version, 0, 3) < $minVersion) {
+    if (mb_substr($version, 0, 3) < $minVersion) {
         die("Cypht requires PHP version $minVersion or greater");
     }
     if (!function_exists('mb_strpos')) {

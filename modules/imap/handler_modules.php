@@ -53,7 +53,7 @@ class Hm_Handler_imap_forward_attachments extends Hm_Handler_Module {
             'name' => 'mail.mime',
             'type' => 'message/rfc822',
             'no_encoding' => true,
-            'size' => strlen($content)
+            'size' => mb_strlen($content)
         );
         $draft_id = next_draft_key($this->session);
         // This needs to be replaced with something that works with the new attachment
@@ -329,7 +329,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
             }
             if ($sent_folder) {
                 Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-                if ($imap->append_start($sent_folder, strlen($msg), true)) {
+                if ($imap->append_start($sent_folder, mb_strlen($msg), true)) {
                     $imap->append_feed($msg."\r\n");
                     if (!$imap->append_end()) {
                         Hm_Msgs::add('ERRAn error occurred saving the sent message');
@@ -484,7 +484,7 @@ class Hm_Handler_imap_show_message extends Hm_Handler_Module {
                             $part_struct = array_shift($struct);
                             $encoding = false;
                             if (array_key_exists('encoding', $part_struct)) {
-                                $encoding = trim(strtolower($part_struct['encoding']));
+                                $encoding = trim(mb_strtolower($part_struct['encoding']));
                             }
                             $stream_size = $imap->start_message_stream($uid, $msg_id);
                             if ($stream_size > 0) {
@@ -547,7 +547,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                             $part_struct = array_shift($struct);
                             $encoding = false;
                             if (array_key_exists('encoding', $part_struct)) {
-                                $encoding = trim(strtolower($part_struct['encoding']));
+                                $encoding = trim(mb_strtolower($part_struct['encoding']));
                             }
                             $stream_size = $imap->start_message_stream($uid, $msg_id);
                             if ($stream_size > 0) {
@@ -676,7 +676,7 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                             $attachment_id = get_attachment_id_for_mail_parser($imap, $uid, $this->request->get['imap_msg_part']);
                             if ($attachment_id !== false) {
                                 $msg = remove_attachment($attachment_id, $msg);
-                                if ($imap->append_start($folder, strlen($msg))) {
+                                if ($imap->append_start($folder, mb_strlen($msg))) {
                                     $imap->append_feed($msg."\r\n");
                                     if ($imap->append_end()) {
                                         if ($imap->message_action('DELETE', array($uid))) {
@@ -778,7 +778,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 
         $filter = 'ALL';
         if ($this->get('list_filter')) {
-            $filter = strtoupper($this->get('list_filter'));
+            $filter = mb_strtoupper($this->get('list_filter'));
         }
         $keyword = $this->get('list_keyword', '');
         list($sort, $rev) = process_sort_arg($this->get('list_sort'), $this->user_config->get('default_sort_order_setting', 'arrival'));
@@ -1151,7 +1151,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                 }
                                 else {
-                                    if (!$imap->message_action(strtoupper($form['action_type']), $uids)) {
+                                    if (!$imap->message_action(mb_strtoupper($form['action_type']), $uids)) {
                                         $errs++;
                                     }
                                     else {
@@ -1903,11 +1903,11 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                             }
                         }
                     }
-                    if (isset($msg_struct_current['subtype']) && strtolower($msg_struct_current['subtype'] == 'html')) {
+                    if (isset($msg_struct_current['subtype']) && mb_strtolower($msg_struct_current['subtype'] == 'html')) {
                         $msg_text = add_attached_images($msg_text, $form['imap_msg_uid'], $msg_struct, $imap);
                     }
                     $save_reply_text = false;
-                    if ($part == 0 || (isset($msg_struct_current['type']) && strtolower($msg_struct_current['type'] == 'text'))) {
+                    if ($part == 0 || (isset($msg_struct_current['type']) && mb_strtolower($msg_struct_current['type'] == 'text'))) {
                         $save_reply_text = true;
                     }
                     $msg_headers = $imap->get_message_headers($form['imap_msg_uid']);

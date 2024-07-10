@@ -101,7 +101,7 @@ function message_list_meta($input, $output_mod) {
     if (!$since) {
         $since = DEFAULT_SINCE;
     }
-    $date = sprintf('%s', strtolower($output_mod->trans($times[$since])));
+    $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta d-flex align-items-center fs-6">'.

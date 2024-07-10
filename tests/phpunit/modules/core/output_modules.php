@@ -722,10 +722,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_timezone_setting() {
         $test = new Output_Test('timezone_setting', 'core');
         $res = $test->run();
-        $this->assertTrue(strlen($res->output_response[0]) > 0);
+        $this->assertTrue(mb_strlen($res->output_response[0]) > 0);
         $test->handler_response = array('user_settings' => array('timezone' => 'America/Chicago'));
         $res = $test->run();
-        $this->assertTrue(strlen($res->output_response[0]) > 0);
+        $this->assertTrue(mb_strlen($res->output_response[0]) > 0);
     }
     /**
      * @preserveGlobalState disabled

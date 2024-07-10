@@ -136,7 +136,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
             }
-            if (strlen($output_mod->html_safe($folder['basename']))>15) {
+            if (mb_strlen($output_mod->html_safe($folder['basename']))>15) {
                 $results .= '<a ' . $attrs .
                     ' title="'.$output_mod->html_safe($folder['basename']).
                     '">'.mb_substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
@@ -245,7 +245,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
 
         $flags = array();
-        if (!stristr($msg['flags'], 'seen')) {
+        if (!mb_stristr($msg['flags'], 'seen')) {
             $flags[] = 'unseen';
             if ($icon != 'sent') {
                 $icon = 'env_closed';
@@ -259,7 +259,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $icon = 'sent';
         }
         foreach (array('attachment', 'deleted', 'flagged', 'answered', 'draft') as $flag) {
-            if (stristr($msg['flags'], $flag)) {
+            if (mb_stristr($msg['flags'], $flag)) {
                 $flags[] = $flag;
             }
         }
@@ -416,7 +416,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         'multipartmixed',
         'messagerfc822',
     );
-    $lc_type = strtolower($vals['type']).strtolower($vals['subtype']);
+    $lc_type = mb_strtolower($vals['type']).mb_strtolower($vals['subtype']);
     if ($simple_view) {
         if (filter_message_part($vals)) {
             return '';
@@ -442,8 +442,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     if ($use_icons && array_key_exists($lc_type, $icons)) {
         $icon = $icons[$lc_type];
     }
-    elseif ($use_icons && array_key_exists(strtolower($vals['type']), $icons)) {
-        $icon = $icons[strtolower($vals['type'])];
+    elseif ($use_icons && array_key_exists(mb_strtolower($vals['type']), $icons)) {
+        $icon = $icons[mb_strtolower($vals['type'])];
     }
     if ($icon) {
         $res .= '<i class="bi bi-file-plus-fill msg_part_icon"></i> ';
@@ -452,11 +452,11 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         $res .= '<i class="bi bi-file-plus-fill msg_part_icon msg_part_placeholder"></i> ';
     }
     if (in_array($lc_type, $allowed, true)) {
-        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(strtolower($vals['type'])).
-            ' / '.$output_mod->html_safe(strtolower($vals['subtype'])).'</a>';
+        $res .= '<a href="#" class="msg_part_link" data-message-part="'.$output_mod->html_safe($id).'">'.$output_mod->html_safe(mb_strtolower($vals['type'])).
+            ' / '.$output_mod->html_safe(mb_strtolower($vals['subtype'])).'</a>';
     }
     else {
-        $res .= $output_mod->html_safe(strtolower($vals['type'])).' / '.$output_mod->html_safe(strtolower($vals['subtype']));
+        $res .= $output_mod->html_safe(mb_strtolower($vals['type'])).' / '.$output_mod->html_safe(mb_strtolower($vals['subtype']));
     }
     if ($mobile) {
         $res .= '<div class="part_size">'.$output_mod->html_safe($size);
@@ -466,8 +466,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     else {
         $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
         if (!$simple_view) {
-            $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-                '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : '');
+            $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(mb_strtolower($vals['encoding'])) : '').
+                '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : '');
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
         $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
@@ -769,10 +769,10 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                         $msgs = array_slice($msgs, 0, $limit);
                     }
                     foreach ($imap->get_message_list($msgs) as $msg) {
-                        if (array_key_exists('content-type', $msg) && stristr($msg['content-type'], 'multipart/mixed')) {
+                        if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                             $msg['flags'] .= ' \Attachment';
                         }
-                        if (stristr($msg['flags'], 'deleted')) {
+                        if (mb_stristr($msg['flags'], 'deleted')) {
                             continue;
                         }
                         $msg['server_id'] = $id;
@@ -867,7 +867,7 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
-            if ($imap->message_action(strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+            if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                 }
@@ -900,7 +900,7 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                     foreach ($msg_ids as $msg_id) {
                         $detail = $imap->get_message_list(array($msg_id));
                         if (array_key_exists($msg_id, $detail)) {
-                            if (stristr($detail[$msg_id]['flags'], 'seen')) {
+                            if (mb_stristr($detail[$msg_id]['flags'], 'seen')) {
                                 $seen = true;
                             }
                             else {
@@ -914,7 +914,7 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                         if (!$seen) {
                             $imap->message_action('UNREAD', array($msg_id));
                         }
-                        if ($dest_imap->append_start(hex2bin($dest_path[2]), strlen($msg), $seen)) {
+                        if ($dest_imap->append_start(hex2bin($dest_path[2]), mb_strlen($msg), $seen)) {
                             $dest_imap->append_feed($msg."\r\n");
                             if ($dest_imap->append_end()) {
                                 if ($action == 'move') {
@@ -999,11 +999,11 @@ function get_imap_mime_extension($type, $subtype) {
  */
 if (!hm_exists('get_imap_part_name')) {
 function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
-    $extension = get_imap_mime_extension(strtolower($struct['type']), strtolower($struct['subtype']));
+    $extension = get_imap_mime_extension(mb_strtolower($struct['type']), mb_strtolower($struct['subtype']));
     if (array_key_exists('file_attributes', $struct) && is_array($struct['file_attributes']) &&
         array_key_exists('attachment', $struct['file_attributes']) && is_array($struct['file_attributes']['attachment'])) {
         for ($i=0;$i<count($struct['file_attributes']['attachment']);$i++) {
-            if (strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
+            if (mb_strtolower(trim($struct['file_attributes']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['file_attributes']['attachment'])) {
                     return trim($struct['file_attributes']['attachment'][($i+1)]);
                 }
@@ -1013,7 +1013,7 @@ function get_imap_part_name($struct, $uid, $part_id, $no_default=false) {
 
     if (array_key_exists('disposition', $struct) && is_array($struct['disposition']) && array_key_exists('attachment', $struct['disposition']) && is_array($struct['disposition']['attachment'])) {
         for ($i=0;$i<count($struct['disposition']['attachment']);$i++) {
-            if (strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
+            if (mb_strtolower(trim($struct['disposition']['attachment'][$i])) == 'filename') {
                 if (array_key_exists(($i+1), $struct['disposition']['attachment'])) {
                     return trim($struct['disposition']['attachment'][($i+1)]);
                 }
@@ -1044,7 +1044,7 @@ function clear_existing_reply_details($session) {
     $msgs = array();
     $max = 20;
     foreach ($session->dump() as $name => $val) {
-        if (substr($name, 0, 19) == 'reply_details_imap_') {
+        if (mb_substr($name, 0, 19) == 'reply_details_imap_') {
             $msgs[$name] = $val['ts'];
         }
     }
@@ -1073,15 +1073,15 @@ function imap_authed($imap) {
 if (!hm_exists('process_sort_arg')) {
 function process_sort_arg($sort, $default = 'arrival') {
     if (!$sort) {
-        $default = strtoupper($default);
+        $default = mb_strtoupper($default);
         return array($default, true);
     }
     $rev = false;
-    if (substr($sort, 0, 1) == '-') {
+    if (mb_substr($sort, 0, 1) == '-') {
         $rev = true;
-        $sort = substr($sort, 1);
+        $sort = mb_substr($sort, 1);
     }
-    $sort = strtoupper($sort);
+    $sort = mb_strtoupper($sort);
     if ($sort == 'ARRIVAL' || $sort == 'DATE') {
         $rev = $rev ? false : true;
     }
@@ -1096,7 +1096,7 @@ function imap_server_type($id) {
     $type = 'IMAP';
     $details = Hm_IMAP_List::dump($id);
     if (is_array($details) && array_key_exists('type', $details)) {
-        $type = strtoupper($details['type']);
+        $type = mb_strtoupper($details['type']);
     }
     return $type;
 }}
@@ -1111,7 +1111,7 @@ function get_list_headers($headers) {
         'list-subscribe', 'list-archive', 'list-post', 'list-help');
     foreach (lc_headers($headers) as $name => $val) {
         if (in_array($name, $list_headers, true)) {
-            $res[substr($name, 5)] = process_list_fld($val);
+            $res[mb_substr($name, 5)] = process_list_fld($val);
         }
     }
     return $res;
@@ -1130,7 +1130,7 @@ function process_list_fld($fld) {
             $res['links'][] = $val;
         }
         elseif (preg_match("/^mailto/", $val)) {
-            $res['email'][] = substr($val, 7);
+            $res['email'][] = mb_substr($val, 7);
         }
         else {
             $res['values'][] = $val;
@@ -1222,7 +1222,7 @@ function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
     if ($parent) {
         $folder = sprintf('%s%s%s', $parent, $ns['delim'], $folder);
     }
-    if ($folder && $ns['prefix'] && mb_substr($folder, 0, strlen($ns['prefix'])) !== $ns['prefix']) {
+    if ($folder && $ns['prefix'] && mb_substr($folder, 0, mb_strlen($ns['prefix'])) !== $ns['prefix']) {
         $folder = sprintf('%s%s', $ns['prefix'], $folder);
     }
     return $folder;
@@ -1297,7 +1297,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
         if (!count($imap->get_mailbox_status($snooze_folder))) {
             $imap->create_mailbox($snooze_folder);
         }
-        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, strlen($msg))) {
+        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
                 if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
@@ -1309,7 +1309,7 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     } else {
         $snooze_headers = parse_snooze_header($matches[0]);
         $original_folder = $snooze_headers['from'];
-        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, strlen($msg))) {
+        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
                 if ($imap->select_mailbox($snooze_folder) && $imap->message_action('DELETE', array($msg_id))) {
@@ -1333,9 +1333,9 @@ function parse_snooze_header($snooze_header)
     foreach (explode(';', $snooze_header) as $kv)
     {
         $kv = trim($kv);
-        $spacePos = strpos($kv, ' ');
+        $spacePos = mb_strpos($kv, ' ');
         if ($spacePos > 0) {
-            $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+            $result[rtrim(mb_substr($kv, 0, $spacePos), ':')] = trim(mb_substr($kv, $spacePos+1));
         } else {
             $result[$kv] = true;
         }

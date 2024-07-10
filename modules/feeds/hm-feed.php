@@ -251,7 +251,7 @@ class Hm_Feed {
                 case 'MODIFIED':
                 case 'ID':
                 case 'NAME':
-                    $this->collect = strtolower($tagname);
+                    $this->collect = mb_strtolower($tagname);
                     break;
                 case 'LINK':
                     if (isset($attrs['REL'])) {
@@ -270,7 +270,7 @@ class Hm_Feed {
                 case 'UPDATED':
                 case 'LANGUAGE':
                 case 'ID':
-                    $this->collect = strtolower($tagname);
+                    $this->collect = mb_strtolower($tagname);
                     break;
                 case 'LINK':
                     if (isset($attrs['REL'])) {
@@ -345,7 +345,7 @@ class Hm_Feed {
                 case 'DC:DATE':
                 case 'DC:CREATOR':
                 case 'AUTHOR':
-                    $this->collect = strtolower($tagname);
+                    $this->collect = mb_strtolower($tagname);
                     break;
             }
         }
@@ -356,7 +356,7 @@ class Hm_Feed {
                 case 'LANGUAGE':
                 case 'DESCRIPTION':
                 case 'LINK':
-                    $this->collect = strtolower($tagname);
+                    $this->collect = mb_strtolower($tagname);
                     break;
 
             }

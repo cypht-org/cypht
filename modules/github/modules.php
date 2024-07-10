@@ -133,13 +133,13 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
             $details = $this->user_config->get('github_connect_details', array());
             $repos = $this->user_config->get('github_repos', array());
             $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
-            $repo = substr($form['list_path'], 7);
+            $repo = mb_substr($form['list_path'], 7);
             if (in_array($repo, $repos, true)) {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $repo);
                 $api = new Hm_API_Curl();
                 $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 $event = array();
-                $uid = substr($form['github_uid'], 9);
+                $uid = mb_substr($form['github_uid'], 9);
                 if (is_array($data)) {
                     foreach ($data as $item) {
                         if ($item['id'] == $uid) {
@@ -373,7 +373,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     }
                 }
                 else {
-                    $repo = substr($path, 7);
+                    $repo = mb_substr($path, 7);
                     $this->out('list_parent', $parent, false);
                     if ($parent == 'github_all') {
                         $this->out('mailbox_list_title', array(urldecode($repo)));
@@ -396,7 +396,7 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
             }
             elseif ($this->page == 'message' && preg_match("/^github_(.+)$/", $path)) {
                 if (!$parent) {
-                    $repo = substr($path, 7);
+                    $repo = mb_substr($path, 7);
                     $this->out('mailbox_list_title', array('Github', urldecode($repo)));
                 }
             }
@@ -740,7 +740,7 @@ function build_github_subject($event, $output_mod) {
     $pre = '['.$output_mod->html_safe(trim(str_replace('Event', '', trim(preg_replace("/([A-Z])/", " $1", $event['type']))))).']';
     $post = '';
     $max = 100;
-    switch (strtolower($event['type'])) {
+    switch (mb_strtolower($event['type'])) {
         case 'issuecommentevent':
             $post = $event['payload']['issue']['title'];
             break;
@@ -754,7 +754,7 @@ function build_github_subject($event, $output_mod) {
             else {
                 $post .= sprintf($output_mod->trans('%d commit: '), count($event['payload']['commits']));
             }
-            $post .= substr($event['payload']['commits'][0]['message'], 0, $max);
+            $post .= mb_substr($event['payload']['commits'][0]['message'], 0, $max);
             break;
         case 'watchevent':
             if ($event['payload']['action'] == 'started') {
@@ -771,13 +771,13 @@ function build_github_subject($event, $output_mod) {
             $post = sprintf($output_mod->trans("%s repository created"), $event['repo']['name']);
             break;
         case 'pullrequestevent':
-            $post = substr($event['payload']['pull_request']['body'], 0, $max);
+            $post = mb_substr($event['payload']['pull_request']['body'], 0, $max);
             break;
         case 'commitcommentevent':
-            $post = substr($event['payload']['comment']['body'], 0, $max);
+            $post = mb_substr($event['payload']['comment']['body'], 0, $max);
             break;
         case 'releaseevent':
-            $post = substr($event['payload']['release']['name'], 0, $max);
+            $post = mb_substr($event['payload']['release']['name'], 0, $max);
         default:
             break;
     }

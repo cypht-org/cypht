@@ -88,7 +88,7 @@ class Hm_Contact_Store {
     }
 
     protected function search_contact($contact, $fld, $term) {
-        if (stristr($contact->value($fld, ''), $term)) {
+        if (mb_stristr($contact->value($fld, ''), $term)) {
             return true;
         }
         return false;
@@ -209,7 +209,7 @@ class Hm_Address_Field {
             if (is_email_address($token)) {
                 list($name, $marker) = self::find_name_field($string);
                 if ($marker > -1) {
-                    $string = substr($string, 0, $marker);
+                    $string = mb_substr($string, 0, $marker);
                 }
                 else {
                     $marker = false;
@@ -221,9 +221,9 @@ class Hm_Address_Field {
     }
 
     private static function get_token($string) {
-        $marker = strrpos($string, ' ');
-        $token = trim(ltrim(substr($string, $marker)), '<>');
-        $string = substr($string, 0, $marker);
+        $marker = mb_strrpos($string, ' ');
+        $token = trim(ltrim(mb_substr($string, $marker)), '<>');
+        $string = mb_substr($string, 0, $marker);
         return array($marker, $token, $string);
     }
 
@@ -239,7 +239,7 @@ class Hm_Address_Field {
     private static function find_name_field($string) {
         $quote = false;
         $result = '';
-        for ($i = strlen($string) - 1;$i>-1; $i--) {
+        for ($i = mb_strlen($string) - 1;$i>-1; $i--) {
             $quote = self::is_quote($string, $i, $quote);
             if (self::delimiter_found($string, $i, $quote)) {
                 break;

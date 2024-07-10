@@ -96,7 +96,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
                 $txt .= format_imap_envelope($struct['envelope'], $this);
             }
-            if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
+            if (isset($struct['subtype']) && mb_strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
                 $msgText = $this->get('msg_text');
                 // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
@@ -110,8 +110,8 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
 
                 $txt .= format_msg_html($msgText, $allowed);
             }
-            elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
-                $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
+            elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
+                $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
                 if ($this->get('imap_msg_part') === "0") {
@@ -179,10 +179,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
-                    if ($fld == strtolower($name)) {
+                    if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
-                            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+                            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                                 $txt .= ' <i class="bi bi-star-half account_icon"></i> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
@@ -285,7 +285,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }
                         }
                         else {
-                            if (strtolower($name) == 'flags') {
+                            if (mb_strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');
                                 $value = str_replace('\\', '', $value);
                                 $new_value = array();
@@ -302,7 +302,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             foreach ($headers as $name => $value) {
-                if (!in_array(strtolower($name), $small_headers)) {
+                if (!in_array(mb_strtolower($name), $small_headers)) {
                     if (is_array($value)) {
                         foreach ($value as $line) {
                             $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($line).'</td></tr>';
@@ -340,7 +340,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
-            if (!isset($headers['Flags']) || !stristr($headers['Flags'], 'draft')) {
+            if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
                 $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
                     $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
@@ -356,7 +356,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             else {
                 $txt .= ' | <a class="raw_link hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             }
-            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
@@ -371,7 +371,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
 
-            $is_draft = isset($headers['Flags']) && stristr($headers['Flags'], 'draft');
+            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
@@ -461,8 +461,8 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="' . strtolower($type) . '_server mb-3">';
-            $res .= '<form class="imap_connect" method="POST"><div class="row">';
+            $res .= '<div class="' . mb_strtolower($type) . '_server">';
+            $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
@@ -943,7 +943,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         $res = array();
         if ($this->get('imap_mailbox_page')) {
             $details = $this->get('imap_folder_detail');
-            $type = stripos($details['name'], 'Sent') !== false ? 'sent' : false;
+            $type = mb_stripos($details['name'], 'Sent') !== false ? 'sent' : false;
             prepare_imap_message_list($this->get('imap_mailbox_page'), $this, $type);
             if ($details['offset'] == 0) {
                 $page_num = 1;
@@ -1004,7 +1004,7 @@ class Hm_Output_imap_unflag_on_send_controls extends Hm_Output_Module {
         $flagged = false;
         $details = $this->get('reply_details', array());
         if (is_array($details) && array_key_exists('msg_headers', $details) && array_key_exists('Flags', $details['msg_headers'])) {
-            if (stristr($details['msg_headers']['Flags'], 'flagged')) {
+            if (mb_stristr($details['msg_headers']['Flags'], 'flagged')) {
                 $flagged = true;
             }
         }

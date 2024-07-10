@@ -350,7 +350,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
-        if (is_array($this->get('compose_draft')) && strlen(trim(join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
+        if (is_array($this->get('compose_draft')) && mb_strlen(trim(join('', $this->get('compose_draft')))) == 0 && array_key_exists('compose_to', $this->request->get)) {
             $draft = array();
             foreach (parse_mailto($this->request->get['compose_to']) as $name => $val) {
                 if (!$val) {
@@ -538,7 +538,7 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         $profiles = $this->user_config->get('profiles');
         $profile_value = $this->request->post['profile_value'];
 
-        if (!strstr($profile_value, '.')) {
+        if (!mb_strstr($profile_value, '.')) {
             Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
             return;
         }
@@ -560,7 +560,7 @@ if (!hm_exists('get_mime_type')) {
     {
         $idx = explode('.', $filename);
         $count_explode = count($idx);
-        $idx = strtolower($idx[$count_explode - 1]);
+        $idx = mb_strtolower($idx[$count_explode - 1]);
 
         $mimet = array(
             'txt' => 'text/plain',
@@ -844,7 +844,7 @@ class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
                 continue;
             }
             if (is_dir($file->getPath()) && $file->getPath() != $attachment_dir){
-                if (strpos($file->getPath(), 'chunks-') !== False) {
+                if (mb_strpos($file->getPath(), 'chunks-') !== False) {
                     rrmdir($file->getPath());
                 }
             }
@@ -870,7 +870,7 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
             if ($file->isDir()){
                 continue;
             }
-            if (strpos($file->getPathname(), '.part') !== False) {
+            if (mb_strpos($file->getPathname(), '.part') !== False) {
                 $num_chunks++;
                 $size_in_kbs += filesize($file->getPathname());
                 $files[] = $file->getPathname();
@@ -1068,7 +1068,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             $imap_server = Hm_IMAP_List::get($imap_server_id, false);
             $reply_from = process_address_fld($reply['msg_headers']['From']);
 
-            if ($reply_type == 'reply_all' && $reply_from[0]['email'] != $imap_server['user'] && strpos($to, $reply_from[0]['email']) === false) {
+            if ($reply_type == 'reply_all' && $reply_from[0]['email'] != $imap_server['user'] && mb_strpos($to, $reply_from[0]['email']) === false) {
                 $to .= ', '.$reply_from[0]['label'].' '.$reply_from[0]['email'];
             }
         }
@@ -1525,7 +1525,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
                     $res .= '<option ';
-                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
+                    if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! mb_strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
                         $res .= 'selected="selected" ';
                     }
                     $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
@@ -1875,7 +1875,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($imap->append_start($specials['draft'], strlen($msg), false, true)) {
+    if ($imap->append_start($specials['draft'], mb_strlen($msg), false, true)) {
         $imap->append_feed($msg."\r\n");
         if (!$imap->append_end()) {
             Hm_Msgs::add('ERRAn error occurred saving the draft message');
@@ -1994,7 +1994,7 @@ function get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $hmod)
             $from = $profile['address'];
         }
     }
-    if ($from == $smtp_details['user'] && strpos($from, '@') === false) {
+    if ($from == $smtp_details['user'] && mb_strpos($from, '@') === false) {
         if (array_key_exists('HTTP_HOST', $hmod->request->server)) {
             $from .= sprintf('@%s', $hmod->request->server['HTTP_HOST']);
         }
@@ -2030,13 +2030,13 @@ function outbound_address_check($mod, $from, $reply_to) {
         }
     }
     if ($domain) {
-        if (strpos($from, '@') === false) {
+        if (mb_strpos($from, '@') === false) {
             $from = $from.'@'.$domain;
         }
         if (!trim($reply_to)) {
             $reply_to = $from;
         }
-        elseif (strpos($reply_to, '@') === false) {
+        elseif (mb_strpos($reply_to, '@') === false) {
             $reply_to = $reply_to.'@'.$domain;
         }
     }
@@ -2065,11 +2065,11 @@ function repopulate_compose_form($draft, $handler_mod) {
  */
 if (!hm_exists('server_from_compose_smtp_id')) {
 function server_from_compose_smtp_id($id) {
-    $pos = strpos($id, '.');
+    $pos = mb_strpos($id, '.');
     if ($pos === false) {
         return $id;
     }
-    return substr($id, 0, $pos);
+    return mb_substr($id, 0, $pos);
 }}
 
 /**
@@ -2077,7 +2077,7 @@ function server_from_compose_smtp_id($id) {
  */
 if (!hm_exists('profile_from_compose_smtp_id')) {
 function profile_from_compose_smtp_id($profiles, $id) {
-    if (strpos($id, '.') === false) {
+    if (mb_strpos($id, '.') === false) {
         return false;
     }
     $smtp_id = server_from_compose_smtp_id($id);

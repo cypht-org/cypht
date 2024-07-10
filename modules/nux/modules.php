@@ -31,7 +31,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
             Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
             $curl_result = Hm_Functions::c_exec($ch);
             if (trim($curl_result)) {
-                if (strstr($curl_result, 'API rate limit exceeded')) {
+                if (mb_strstr($curl_result, 'API rate limit exceeded')) {
                     return;
                 }
                 $json_commits = json_decode($curl_result);
@@ -39,10 +39,10 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                     $msg = trim($c->commit->message);
                     $res[] = array(
                     'hash' => $c->sha,
-                    'shash' => substr($c->sha, 0, 8),
+                    'shash' => mb_substr($c->sha, 0, 8),
                     'name' => $c->commit->author->name,
                     'age' => date('D, M d', strtotime($c->commit->author->date)),
-                    'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                    'note' => (mb_strlen($msg) > 80 ? mb_substr($msg, 0, 80) . "..." : $msg)
                     );
                 }
             }
@@ -388,18 +388,18 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
             }
 
             if ($server_data[$proto] === NULL) {
-                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto_dsp));
+                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), mb_strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
-                $res .= sprintf($this->trans('You don\'t have any %s sources'), strtoupper($proto_dsp));
+                $res .= sprintf($this->trans('You don\'t have any %s sources'), mb_strtoupper($proto_dsp));
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
-                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 else {
-                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
             }

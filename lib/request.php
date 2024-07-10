@@ -187,9 +187,9 @@ class Hm_Request {
      * @return void
      */
     private function is_tls() {
-        if (!empty($this->server['HTTPS']) && strtolower($this->server['HTTPS']) == 'on') {
+        if (!empty($this->server['HTTPS']) && mb_strtolower($this->server['HTTPS']) == 'on') {
             $this->tls = true;
-        } elseif (!empty($this->server['REQUEST_SCHEME']) && strtolower($this->server['REQUEST_SCHEME']) == 'https') {
+        } elseif (!empty($this->server['REQUEST_SCHEME']) && mb_strtolower($this->server['REQUEST_SCHEME']) == 'https') {
             $this->tls = true;
         }
     }
@@ -213,7 +213,7 @@ class Hm_Request {
      * @return bool true if the request is from an AJAX call
      */
     public function is_ajax() {
-        return !empty($this->server['HTTP_X_REQUESTED_WITH']) && strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
+        return !empty($this->server['HTTP_X_REQUESTED_WITH']) && mb_strtolower($this->server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     /**
@@ -222,14 +222,14 @@ class Hm_Request {
      * @return string clean url path
      */
     private function get_clean_url_path($uri) {
-        if (strpos($uri, '?') !== false) {
+        if (mb_strpos($uri, '?') !== false) {
             $parts = explode('?', $uri, 2);
             $path = $parts[0];
         } else {
             $path = $uri;
         }
         $path = str_replace('index.php', '', $path);
-        if (substr($path, -1) != '/') {
+        if (mb_substr($path, -1) != '/') {
             $path .= '/';
         }
         return $path;

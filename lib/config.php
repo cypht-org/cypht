@@ -486,8 +486,8 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     private function get_user_defaults() {
         foreach ($this->config as $name => $val) {
-            if (substr($name, 0, 15) == 'default_setting') {
-                $this->user_defaults[substr($name, 16).'_setting'] = $val;
+            if (mb_substr($name, 0, 15) == 'default_setting') {
+                $this->user_defaults[mb_substr($name, 16).'_setting'] = $val;
             }
         }
     }
@@ -512,7 +512,7 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    if (strstr($type, ':')) {
+    if (mb_strstr($type, ':')) {
         list($type, $class) = explode(':', $type);
     }
     switch ($type) {

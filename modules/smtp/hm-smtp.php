@@ -85,7 +85,7 @@ class Hm_SMTP {
     $this->scramAuthenticator = new ScramAuthenticator();
         $this->hostname = php_uname('n');
         if (preg_match("/:\d+$/", $this->hostname)) {
-            $this->hostname = substr($this->hostname, 0, strpos($this->hostname, ':'));
+            $this->hostname = mb_substr($this->hostname, 0, mb_strpos($this->hostname, ':'));
         }
         $this->debug = array();
         if (isset($conf['server'])) {
@@ -179,7 +179,7 @@ class Hm_SMTP {
                 break;
             }
             $cont = false;
-            if (strlen($result[$n]) > 3 && substr($result[$n], 3, 1) == '-') {
+            if (mb_strlen($result[$n]) > 3 && mb_substr($result[$n], 3, 1) == '-') {
                 $cont = true;
             }
         } while ($cont);
@@ -194,10 +194,10 @@ class Hm_SMTP {
     function parse_line($line) {
         $parts = array();
 
-        $code = substr($line, 0, 3);
+        $code = mb_substr($line, 0, 3);
         $parts[] = $code;
 
-        $remainder = explode(' ',substr($line, 4));
+        $remainder = explode(' ',mb_substr($line, 4));
         $parts[] = $remainder;
 
         return $parts;
@@ -232,13 +232,13 @@ class Hm_SMTP {
     function capabilities($ehlo_response) {
         foreach($ehlo_response as $line) {
             $feature = trim($line[1][0]);
-            switch(strtolower($feature)) {
+            switch(mb_strtolower($feature)) {
                 case 'starttls': // supports starttls
                     $this->supports_tls = true;
                     break;
                 case 'auth': // supported auth mechanisims
                     $auth_mecs = array_slice($line[1], 1);
-                    $this->supports_auth = array_map(function($v) { return strtolower($v); }, $auth_mecs);
+                    $this->supports_auth = array_map(function($v) { return mb_strtolower($v); }, $auth_mecs);
                     break;
                 case 'size': // advisary maximum message size
                     if(isset($line[1][1]) && is_numeric($line[1][1])) {
@@ -330,10 +330,10 @@ class Hm_SMTP {
         return trim($this->supports_auth[0]);
     }
     function authenticate($username, $password, $mech) {
-        $mech = strtolower($mech);
-        if (substr($mech, 0, 6) == 'scram-') {
+        $mech = mb_strtolower($mech);
+        if (mb_substr($mech, 0, 6) == 'scram-') {
             $result = $this->scramAuthenticator->authenticateScram(
-                strtoupper($mech),
+                mb_strtoupper($mech),
                 $username,
                 $password,
                 [$this, 'get_response'],
@@ -469,10 +469,10 @@ class Hm_SMTP {
         $offset = strlen($pre.$type)+52;
         $target_sec = $this->ntlm_security_buffer(strlen($target), $offset);
         $offset += strlen($target);
-        $user_sec = $this->ntlm_security_buffer(strlen($username), $offset);
-        $offset += strlen($username);
+        $user_sec = $this->ntlm_security_buffer(mb_strlen($username), $offset);
+        $offset += mb_strlen($username);
         $host_sec = $this->ntlm_security_buffer(strlen($host), $offset);
-        $offset += strlen($host);
+        $offset += mb_strlen($host);
         $lm_sec = $this->ntlm_security_buffer(strlen($lm_response), $offset);
         $offset += strlen($lm_response);
         $ntlm_sec = $this->ntlm_security_buffer(strlen($ntlm_response), $offset);

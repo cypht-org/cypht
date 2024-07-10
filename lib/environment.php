@@ -113,8 +113,8 @@ if (!function_exists('process_config_array')) {
         if (is_array($array)) {
             return array_map(function ($value) {
                 return is_array($value) ? $value : (
-                    is_string($value) && strtolower($value) === 'true' ? true : (
-                        is_string($value) && strtolower($value) === 'false' ? false : $value
+                    is_string($value) && mb_strtolower($value) === 'true' ? true : (
+                        is_string($value) && mb_strtolower($value) === 'false' ? false : $value
                     )
                 );
             }, $array);
