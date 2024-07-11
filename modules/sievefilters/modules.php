@@ -1104,7 +1104,7 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $res = '<li class="menu_filters"><a class="unread_link" href="?page=sieve_filters">';
+        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
         }
