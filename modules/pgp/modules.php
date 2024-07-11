@@ -209,7 +209,7 @@ class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=pgp">';
+        $res = '<li class="menu_pgp"><a class="unread_link" href="?page=pgp">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-lock-fill account_icon"></i> ';
         }
