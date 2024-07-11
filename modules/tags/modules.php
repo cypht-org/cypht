@@ -34,7 +34,7 @@ class Hm_Handler_tag_edit_data extends Hm_Handler_Module {
         if (array_key_exists('tag_id', $this->request->get)) {
             $id = $this->request->get['tag_id'];
         }
-        $folders = $this->get('tag_folders');
+        $folders = $this->get('tags');
         $folder = null;
         foreach ($folders as $f) {
             if ($f['id'] === $id) {
@@ -99,10 +99,131 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
 /**
  * @subpackage tags/handler
  */
+class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        if ($success) {
+            $limit = $this->user_config->get('tag_per_source_setting', DEFAULT_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('tag_since_setting', DEFAULT_SINCE));
+            $tag_id = $this->request->get['tag_id'];
+            $ids = explode(',', $form['imap_server_ids']);
+            $folder = bin2hex('INBOX');
+            if (array_key_exists('folder', $this->request->post)) {
+                $folder = $this->request->post['folder'];
+            }
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date), array('HEADER X-Cypht-Labels', $tag_id)));
+            $this->out('folder_status', $status);
+            $this->out('imap_tag_data', $msg_list);
+            $this->out('imap_server_ids', $form['imap_server_ids']);
+        }
+    }
+}
+
+/**
+ * Process "tag_per_source" setting for the tag page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_tag_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('tag_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
 class Hm_Handler_tag_data extends Hm_Handler_Module {
     public function process() {
         Hm_Tags::init($this);
-        $this->out('tag_folders', Hm_Tags::getAll());
+        $this->out('tags', Hm_Tags::getAll());
+    }
+}
+
+class Hm_Output_filter_tag_data extends Hm_Output_Module {
+    /**
+     * Build ajax response for the tag message list
+     */
+    protected function output() {
+        if ($this->get('imap_tag_data')) {
+            prepare_imap_message_list($this->get('imap_tag_data'), $this, 'tag');
+        }
+        elseif (!$this->get('formatted_message_list')) {
+            $this->out('formatted_message_list', array());
+        }
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_tag_per_source_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_tag_source_max_setting
+     */
+    protected function output() {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', array());
+        $reset = '';
+        if (array_key_exists('tag_per_source', $settings)) {
+            $sources = $settings['tag_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="tag_setting"><td><label for="tag_per_source">'.
+            $this->trans('Max messages per source').'</label></td>'.
+            '<td class="d-flex"><input type="text" size="2" class="form-control form-control-sm w-auto" id="tag_per_source" name="tag_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Starts the Tag section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_tag_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the tag messages view
+     */
+    protected function output() {
+        $res = '<tr><td data-target=".tag_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-tags fs-5 me-2"></i>'.
+            $this->trans('Tags').'</td></tr>';
+            print_r($res);
+        return $res;
+    }
+}
+
+/**
+ * Process "since" setting for the junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_tag_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('tag_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Option for the "junk since" date range for the Junk page
+ * @subpackage core/output
+ */
+class Hm_Output_tag_since_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_tag_since_setting
+     */
+    protected function output() {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('tag_since', $settings) && $settings['tag_since']) {
+            $since = $settings['tag_since'];
+        }
+        return '<tr class="tag_setting"><td><label for="tag_since">'.
+            $this->trans('Show junk messages since').'</label></td>'.
+            '<td>'.message_since_dropdown($since, 'tag_since', $this).'</td></tr>';
     }
 }
 
@@ -118,7 +239,7 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->format == 'HTML5') {
-            $folders = $this->get('tag_folders', array());
+            $folders = $this->get('tags', array());
             $tag = $this->get('edit_tag');
             $id = $this->get('edit_tag_id');
             
@@ -161,7 +282,7 @@ class Hm_Output_tags_form extends Hm_Output_Module {
         $parent_tag = !empty($tag) ? $tag['parent'] : null;
         $options = '';
         
-        foreach ($this->get('tag_folders', array()) as $index => $folder) {
+        foreach ($this->get('tags', array()) as $index => $folder) {
             $option_selected = !is_null($id) && $folder['id'] === $parent_tag ? 'selected' : '';
             $options .= '<option '. $option_selected.' value="'.$this->html_safe($folder['id']).'">'.$this->html_safe($folder['name']).'</option>';
         }
@@ -200,12 +321,12 @@ class Hm_Output_tags_form extends Hm_Output_Module {
 /**
  * @subpackage tags/output
  */
-class Hm_Output_tag_folders extends hm_output_module {
+class Hm_Output_tags extends hm_output_module {
     protected function output() {
         $res = '';
-        $folders = $this->get('tag_folders', array());
+        $folders = $this->get('tags', array());
         if (is_array($folders) && !empty($folders)) {
-            if(count($this->get('tag_folders', array()))  > 1) {
+            if(count($this->get('tags', array()))  > 1) {
                 $res .= '<li class="menu_tags"><a class="unread_link" href="?page=tags">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-tags fs-5 me-2"></i>';
@@ -227,13 +348,13 @@ class Hm_Output_tag_folders extends hm_output_module {
                 if (!$this->get('hide_folder_icons')) {
                     $res .= $hasChild ? '<i class="bi bi-caret-down"></i>' : '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
-                $res .= '<a data-id="tags_'.$this->html_safe($id).'" href="?page=message_list&list_path=tags_'.$this->html_safe($id).'">';
+                $res .= '<a data-id="tag_'.$this->html_safe($id).'" href="?page=message_list&list_path=tag&tag_id='.$this->html_safe($id).'">';
                 $res .= $this->html_safe($folder['name']).'</a>';
                 if($hasChild) {
                     $res .= '<ul>';
                     foreach ($folder['children'] as $key => $child) {
-                        $res .= '<li class="tags_'.$this->html_safe($child['id']).'">';
-                        $res .= '<a data-id="tags_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tags_'.$this->html_safe($child['id']).'">';
+                        $res .= '<li class="tag_'.$this->html_safe($child['id']).'">';
+                        $res .= '<a data-id="tag_'.$this->html_safe($child['id']).'" href="?page=message_list&list_path=tag&tag_id='.$this->html_safe($child['id']).'">';
                         $res .= $this->html_safe($folder['name']).'</a>';
                         $res .= '</li>';
                     }

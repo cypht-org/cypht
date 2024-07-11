@@ -499,7 +499,8 @@ function Message_List() {
         'junk': 'formatted_junk_data',
         'trash': 'formatted_trash_data',
         'sent': 'formatted_sent_data',
-        'drafts': 'formatted_drafts_data'
+        'drafts': 'formatted_drafts_data',
+        'tag': 'formatted_tag_data'
     };
 
     this.run_callbacks = function (completed) {
@@ -1155,6 +1156,7 @@ function Message_List() {
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
+    this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };
 };
 
 /* folder list */
@@ -1545,7 +1547,7 @@ var Hm_Utils = {
         var results = {}
         var i;
         var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting'];
+        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {
@@ -1574,7 +1576,7 @@ var Hm_Utils = {
         return res;
     },
 
-    seach_from_local_storage: function(pattern) {
+    search_from_local_storage: function(pattern) {
         const results = [];
         const key_pattern = new RegExp(pattern);
         for (let i = 0; i < sessionStorage.length; i++) {

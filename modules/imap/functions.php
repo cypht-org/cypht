@@ -1321,12 +1321,11 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     }
     return $res;
 }}
-if (!hm_exists('add_label_to_message')) {
-function add_label_to_message($imap, $msg_id, $folder, $tag) {
+if (!hm_exists('add_tag_to_message')) {
+function add_tag_to_message($imap, $msg_id, $folder, $tag) {
     if (!$imap->select_mailbox($folder)) {
         return false;
     }
-
     $msg = $imap->get_message_content($msg_id, 0);
     preg_match("/^X-Cypht-Labels:(.+)\r?\n/i", $msg, $matches);
 
@@ -1334,28 +1333,24 @@ function add_label_to_message($imap, $msg_id, $folder, $tag) {
         $msg = str_replace($matches[0], '', $msg);
         $tags = explode(',', $matches[1]);
         if(in_array($tag, $tags)) {
-            unset($tags[array_search($tag, $tags)]);
+            unset($tags[array_search(trim($tag), $tags)]);
         }else{
-            $tags[] = $tag;
+            $tags[] = trim($tag);
         }
     }else {
         $tags = array($tag);
     }
-    $msg = "X-Cypht-Labels:".implode(',', $tags)."\n".$msg;
 
+    $msg = "X-Cypht-Labels:".implode(',',$tags)."\n".$msg;
     $msg = str_replace("\r\n", "\n", $msg);
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
     $res = false;
-
-    if (!count($imap->get_mailbox_status($folder))) {
-        $imap->create_mailbox($folder);
-    }
-    if ($imap->select_mailbox($folder) && $imap->append_start($folder, strlen($msg))) {
+    if ($imap->append_start($folder, strlen($msg))) {
         $imap->append_feed($msg."\r\n");
         if ($imap->append_end()) {
-            if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
+            if ($imap->message_action('DELETE', array($msg_id))) {
                 $imap->message_action('EXPUNGE', array($msg_id));
                 $res = true;
             }
@@ -1462,18 +1457,18 @@ function snooze_dropdown($output, $unsnooze = false) {
 
 if (!hm_exists('tags_dropdown')) {
 function tags_dropdown($context, $headers) {
-    $folders = $context->get('tag_folders', array());
+    $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Labels').'</button>
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
 
-    $labels =  !empty($headers['X-Cypht-Labels']) ? explode(',', $headers['X-Cypht-Labels']) : array();
+    $tags =  !empty($headers['X-Cypht-Labels']) ? explode(',', $headers['X-Cypht-Labels']) : array();
     foreach ($folders as $folder) {
-        $label = $folder['name'];
-        $is_checked = in_array($folder['id'], $labels);
+        $tag = $folder['name'];
+        $is_checked = in_array($folder['id'], array_map('trim', $tags));
         $txt .= '<li class="d-flex dropdown-item gap-2">';
         $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" '.($is_checked ? 'checked' : '').'>';
-        $txt .= '<span>'.$context->trans($label).'</span>';
+        $txt .= '<span>'.$context->trans($tag).'</span>';
         $txt .= '</li>';
     }
     $txt .= '</ul></div>';

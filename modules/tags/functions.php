@@ -1,11 +1,9 @@
 <?php
 
-use PhpParser\Node\Expr\AssignOp\Div;
-
 if (!defined('DEBUG_MODE')) { die(); }
 
-if (!hm_exists('add_label')) {
-    function add_label($name, $parent = null) {
+if (!hm_exists('add_tag')) {
+    function add_tag($name, $parent = null) {
         $tag = array(
             'name' => $name,
             'parent' => $parent,
@@ -36,7 +34,7 @@ if (!hm_exists('generate_tree_view')) {
             $html .= '</span>';
             $html .= '</span>';
             $html .= '<div class="float-end">';
-            $html .= '<button href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></button>';
+            $html .= '<a href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></a>';
             $html .= '<form method="POST" action="?page=tags" style="display:inline;">';
             $html .= '<input type="hidden" name="tag_delete" value="1">';
             $html .= '<input type="hidden" name="tag_id" value="'.$folder['id'].'">';

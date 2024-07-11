@@ -299,12 +299,11 @@ add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
 /* add label email */
-setup_base_ajax_page('ajax_imap_label', 'core');
-add_handler('ajax_imap_label', 'load_imap_servers_from_config',  true);
-// add_handler('ajax_imap_label', 'imap_oauth2_token_check', true);
-add_handler('ajax_imap_label', 'close_session_early',  true, 'core');
-add_handler('ajax_imap_label', 'save_imap_cache',  true);
-add_handler('ajax_imap_label', 'imap_add_label_message',  true, 'core');
+setup_base_ajax_page('ajax_imap_tag', 'core');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'save_imap_cache',  true);
+add_handler('ajax_imap_tag', 'imap_add_tag_message',  true, 'core');
 
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
@@ -338,7 +337,7 @@ return array(
         'ajax_imap_move_copy_action',
         'ajax_imap_folder_status',
         'ajax_imap_snooze',
-        'ajax_imap_label',
+        'ajax_imap_tag',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
