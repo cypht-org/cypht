@@ -622,13 +622,11 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
+                $folder = hex2bin($parts[2]);
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
-                    }
-                    else {
-                        $folder = hex2bin($parts[2]);
                     }
                     $title = array('IMAP', $details['name'], $folder);
                     if ($this->get('list_page', 0)) {
@@ -636,6 +634,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                     $this->out('mailbox_list_title', $title);
                 }
+                $this->out('folder', $folder);
+                $this->out('first_time_screen_emails', $this->user_config->get('first_time_screen_emails_setting', DEFAULT_PER_SOURCE));
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
@@ -804,7 +804,11 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
                 $this->out('imap_mailbox_page_path', $path);
-                list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                if (isset($this->request->get['screen_emails']) && hex2bin($form['folder']) == 'INBOX') {
+                    // list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                } else {
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
@@ -2073,5 +2077,18 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
             $this->out('imap_'.$path.'_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
+    }
+}
+
+/**
+ * Process first-time screen emails per page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_first_time_screen_emails_per_page_setting extends Hm_Handler_Module {
+    public function process() {
+        function process_first_time_screen_emails_callback($val) {
+            return $val;
+        }
+        process_site_setting('first_time_screen_emails', $this, 'process_first_time_screen_emails_callback');
     }
 }

@@ -630,4 +630,5 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Screen %s first emails' => false,
 );
