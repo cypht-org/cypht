@@ -940,7 +940,15 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             if ($this->user_config->get('original_folder_setting', false)) {
                 $archive_folder .= '/'.$form_folder;
                 if (!count($imap->get_mailbox_status($archive_folder))) {
-                    $imap->create_mailbox($archive_folder);
+                    if (! $imap->create_mailbox($archive_folder)) {
+                        $debug = $imap->show_debug(true, true, true);
+                        if (! empty($debug['debug'])) {
+                            Hm_Msgs::add('ERR' . array_pop($debug['debug']));
+                        } else {
+                            Hm_Msgs::add('ERRCould not create configured archive folder for the original folder of the message');
+                        }
+                        $errors++;
+                    }
                 }
             }
 
