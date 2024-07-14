@@ -1332,19 +1332,17 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
 
+        }
+    }
+}
+
+class Hm_Handler_send_telegram_webhook extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('unread_message_count'));
+        if ($success) {
             $webhook_token = $this->user_config->get('webhook_token_setting');
-            $interval_webhook_notification = $this->user_config->get('interval_webhook_notification_setting');
-            $msg_count = count($msg_list);
-            $email_to = $msg_list[0]['to'];
-            if ($msg_count > 0) {
-                $interval = $interval_webhook_notification * 60;
-                set_time_limit(0);
-                while (true) {
-                    if($webhook_token && !empty($webhook_token)) {
-                        Hm_Telegram_Webhook::send($msg_count, $email_to, $webhook_token);
-                        sleep($interval);
-                    }
-                }
+            if ($form['unread_message_count'] && !empty($webhook_token)) {
+                Hm_Telegram_Webhook::send($form['unread_message_count'], $this->config->get('app_name'), $webhook_token);
             }
         }
     }

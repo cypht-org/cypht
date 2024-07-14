@@ -176,6 +176,9 @@ add_handler('ajax_imap_unread', 'imap_unread',  true);
 add_handler('ajax_imap_unread', 'save_imap_cache',  true);
 add_output('ajax_imap_unread', 'filter_unread_data', true);
 
+setup_base_ajax_page('ajax_send_telegram_webhook', 'core');
+add_handler('ajax_send_telegram_webhook', 'send_telegram_webhook', true, 'imap');
+
 /* ajax add/remove to combined view */
 setup_base_ajax_page('ajax_imap_update_combined_source', 'core');
 add_handler('ajax_imap_update_combined_source', 'load_imap_servers_from_config',  true);
@@ -335,6 +338,7 @@ return array(
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
+        'ajax_send_telegram_webhook',
     ),
 
     'allowed_output' => array(
@@ -423,5 +427,6 @@ return array(
         'auto_advance_email' => FILTER_VALIDATE_BOOLEAN,
         'webhook_token' => FILTER_DEFAULT,
         'interval_webhook_notification' => FILTER_VALIDATE_INT,
+        'unread_message_count' => FILTER_VALIDATE_INT,
     )
 );
