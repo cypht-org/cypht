@@ -20,9 +20,6 @@ class Hm_Telegram_Webhook {
         self::delete_webhook($webhook_token);
         // Get the chat ID
         $chatId = self::get_chat_id($webhook_token);
-        // var_dump($chatId);
-        // print_r('chatId response: ');
-        // print_r($chatId);
         if (!empty($chatId)) {
             $text = "You have received: $msg_count unread email.s\nTo: $email_to";
             $curl_handle = Hm_Functions::c_init();
@@ -61,9 +58,7 @@ class Hm_Telegram_Webhook {
 
         curl_close($ch);
         if (trim($curl_result)) {
-            $response_data = json_decode($curl_result, true);
-            file_put_contents('./debug.log', 'Raw cURL result: ' . $response_data['result'] . "\n", FILE_APPEND);
-    
+            $response_data = json_decode($curl_result, true);    
             // Log the decoded response data for debugging    
             if (isset($response_data['result'][0]['message']['chat']['id']) && !empty($response_data['result'][0]['message']['chat']['id'])) {
                 $chatId = $response_data['result'][0]['message']['chat']['id'];
@@ -73,35 +68,6 @@ class Hm_Telegram_Webhook {
                 return '';
             }
         }
-
-
-
-
-
-        // $curl_handle = Hm_Functions::c_init();
-        // Hm_Functions::c_setopt($curl_handle, CURLOPT_URL, static::PREFIX_URI . 'bot' . $webhook_token . '/getUpdates');
-        // Hm_Functions::c_setopt($curl_handle, CURLOPT_RETURNTRANSFER, true);
-        // $curl_result = Hm_Functions::c_exec($curl_handle);
-        // file_put_contents('./debug.log', 'Raw cURL result: ' . $curl_result . "\n", FILE_APPEND);
-
-        // if ($curl_result === false) {
-        //     // Hm_Msgs::add('cURL Error: ' . Hm_Functions::c_error($curl_handle) . '<br>');
-        //     // Hm_Functions::c_close($curl_handle);
-        //     return '';
-        // }
-    
-        // // Hm_Functions::c_close($curl_handle);
-    
-        // if (trim($curl_result)) {
-        //     $response_data = json_decode($curl_result, true);
-        //     if (isset($response_data['result'][0]['message']['chat']['id']) && !empty($response_data['result'][0]['message']['chat']['id'])) {
-        //         $chatId = $response_data['result'][0]['message']['chat']['id'];
-        //         return $chatId;
-        //     } else {
-        //         Hm_Msgs::add('ERRNo messages found. Please send a message to your bot first.<br>');
-        //         return '';
-        //     }
-        // }
     }
 
     /**
