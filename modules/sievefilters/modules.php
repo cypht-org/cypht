@@ -1176,7 +1176,8 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res = get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         $res .= '<div class="p-3">';
-        foreach($mailboxes as $idx => $mailbox) {
+        
+        foreach ($mailboxes as $idx => $mailbox) {
             $behaviours = $this->get('sieve_block_default_behaviour');
             $reject_messages = $this->get('sieve_block_default_reject_message');
             $default_behaviour = 'Discard';
@@ -1209,7 +1210,6 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $res .= '</tbody></table>';
             $res .= '</div></div></div>';
         }
-        $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
         $res .= '</div></div>';
         return $res;
     }
