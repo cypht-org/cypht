@@ -683,7 +683,8 @@ function Message_List() {
                 }
             });
         }
-        if (element) {
+        // apply JS pagination only on aggregate folders; imap ones already have the messages sorted
+        if (hm_list_path().substring(0, 5) != 'imap_' && element) {
             $(row, msg_rows).insertBefore(element);
         }
         else {
