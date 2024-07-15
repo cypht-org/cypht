@@ -42,5 +42,20 @@ if ($config->get('auth_type') != 'DB') {
 $auth = new Hm_Auth_DB($config);
 
 if ($user && $pass) {
-    $auth->create($user, $pass);
+    try {
+        if ($auth->create($user, $pass) === 2) {
+            die("User '" . $user . "' created\n\n");
+        }
+    } catch(Exception $e) {
+        print_r(Hm_Debug::get());
+        print_r(Hm_Msgs::get());
+        print("An error occured when creating user '" . $user . "'\n\n");
+        exit(2);    # TODO: since php cant die with an error code ??
+    }
+    // if ($auth->create($user, $pass) === 2) {
+    //     die("User '" . $user . "' created\n\n");
+    // }
+    // else {
+        
+    // }
 }

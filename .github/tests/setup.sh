@@ -17,13 +17,13 @@ setup_cypht() {
     cp .github/tests/.env .
     if [ "$DB" = "postgres" ]; then
         # .env
-        sed -i 's/db_driver=mysql/db_driver=pgsql/' .env
+        sed -i 's/DB_DRIVER=mysql/DB_DRIVER=pgsql/' .env
         # mocks.php
         sed -i 's/mysql/pgsql/' tests/phpunit/mocks.php
     fi
     if [ "$DB" = "sqlite" ]; then
         # .env
-        sed -i 's/db_driver=mysql/db_driver=sqlite/' .env
+        sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
         # mocks.php
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
@@ -107,6 +107,7 @@ setup_postfix() {
 		exit 1
 	fi
 }
+
 #config site
 setup_site() {
 	STATUS_TITLE "Setup php${PHP_V}-fpm"
@@ -124,62 +125,14 @@ setup_site() {
 	sudo cp .github/tests/selenium/nginx/php_fastcgi.conf /etc/nginx/nginxconfig/php_fastcgi.conf
 	sudo sed -e "s?%VERSION%?${PHP_V}?g" --in-place /etc/nginx/sites-available/default
 	sudo ln -sf "$(pwd)" /var/www/cypht
-	sudo systemctl start nginx.service
-    STATUS_TITLE "Checking Nginx after Setup"
-    sudo systemctl status nginx.service
-    sudo nginx -t
-    echo "Nginx error log:"
-    sudo tail -n 20 /var/log/nginx/error.log
-	# if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://localhost')" -eq 200 ]; then
-	# 	STATUS_DONE
-	# else
-	# 	STATUS_ERROR
-	# 	exit 1
-	# fi
-}
-
-#config php
-setup_php() {
-	STATUS_TITLE "Setup php${PHP_V}-fpm"
-	sudo systemctl start php"${PHP_V}"-fpm.service
-	if [ "$(sudo systemctl is-active php"${PHP_V}"-fpm.service)" == "active" ]; then
+	sudo systemctl start nginx
+	if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
 		STATUS_DONE
 	else
 		STATUS_ERROR
 		exit 1
 	fi
-}
-#config nginx
-setup_nginx() {
-	STATUS_TITLE "Setup Nginx"
-    
-    # Call the script to setup Nginx
-    echo "Running Nginx setup script..."
-    sudo bash .github/tests/scripts/nginx.sh
-    echo "Nginx setup script completed successfully."
-    
-    if [ "$(sudo systemctl is-active nginx.service)" == "active" ]; then
-        echo "Nginx is running."
-        #add host to /etc/hosts
-        STATUS_DONE
-    else
-        echo "Nginx is not running."
-        STATUS_ERROR
-        exit 1
-    fi
-    
-    # # Check if Nginx is running by sending a request
-    # echo "Checking if Nginx is running..."
-    # RESPONSE_CODE=$(curl -s -o /dev/null -w '%{http_code}' '127.0.0.1')
-    # echo "Response code: $RESPONSE_CODE"
-	# # if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
-    # STATUS_TITLE "Check Nginx response code"
-    # if [ "$RESPONSE_CODE" -eq 200 ]; then
-	# 	STATUS_DONE
-	# else
-	# 	STATUS_ERROR
-	# 	exit 1
-	# fi
+    sudo php scripts/create_account.php test133 test331
 }
 
 ##### UI END #####
@@ -197,8 +150,6 @@ setup_ui_tests() {
     setup_dovecot
     setup_postfix
     setup_site
-    # setup_php
-    # setup_nginx
 }
 
 # Main
