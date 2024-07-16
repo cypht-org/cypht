@@ -327,6 +327,7 @@ abstract class Hm_Session {
      * @param string $value cookie value
      * @param string $path cookie path
      * @param string $domain cookie domain
+     * @param string $same_site cookie SameSite
      * @return boolean
      */
     public function secure_cookie($request, $name, $value, $path='', $domain='', $same_site = 'Strict') {
