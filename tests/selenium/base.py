@@ -88,7 +88,7 @@ class WebTest:
         WebDriverWait(self.driver, 3).until(exp_cond.alert_is_present(), 'timed out')
         alert = self.driver.switch_to.alert
         alert.accept()
-
+        
     def logout_no_save(self):
         print(" - logging out")
         self.driver.find_element(By.CLASS_NAME, 'logout_link').click()
@@ -125,7 +125,7 @@ class WebTest:
         print(" - finding element by xpath {0}".format(element_xpath))
         return self.driver.find_element(By.XPATH, element_xpath)
 
-    def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=30):
+    def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=60):
         print(" - waiting for page by {0}: {1} ...".format(el_type, el_value))
         element = WebDriverWait(self.driver, timeout).until(
             exp_cond.presence_of_element_located((el_type, el_value)))

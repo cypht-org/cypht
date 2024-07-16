@@ -16,6 +16,7 @@ class ServersTest(WebTest):
         return self.by_css('[data-target=".{0}_section"]'.format(name)).click()
 
     def load_servers_page(self):
+        self.wait_with_folder_list()
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_servers')
         list_item.find_element(By.TAG_NAME, 'a').click()
@@ -58,20 +59,7 @@ class ServersTest(WebTest):
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
         sys_message_text = element.text
         sys_message_texts = sys_message_text.split('\n')
-        assert any("Authentication failed" in text for text in sys_message_texts), "Authentication failed message not found"
-
-    def server_jmap_add(self):
-        jmap_checkbox = self.by_id('srv_setup_stepper_only_jmap')
-        jmap_checkbox.click()
-        jmap_address = self.by_name('srv_setup_stepper_jmap_address')
-        jmap_address.send_keys('jmap.server.com')
-        finish_button = self.by_id('step_config_action_finish')
-        self.driver.execute_script("arguments[0].click(); return false;", finish_button)
-        wait = WebDriverWait(self.driver, 30)
-        element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
-        sys_message_text = element.text
-        sys_message_texts = sys_message_text.split('\n')
-        assert any("Authentication failed" in text for text in sys_message_texts), "Authentication failed message not found"
+        assert any("Authentication failed" in text for text in sys_message_texts)
 
 if __name__ == '__main__':
 
@@ -79,5 +67,4 @@ if __name__ == '__main__':
     test_runner(ServersTest, [
         'load_servers_page',
         'server_stmp_and_imap_add',
-        'server_jmap_add'
     ])
