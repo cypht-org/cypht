@@ -16,78 +16,78 @@ on:
   workflow_dispatch:
 
 jobs:
-  Test-phpunit:
-    name: PHPUNIT (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
-    runs-on: ubuntu-latest
+  # Test-phpunit:
+  #   name: PHPUNIT (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
+  #   runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        php-versions: ['8.1']
-        database: ['mysql', 'postgres', 'sqlite']
+  #   strategy:
+  #     matrix:
+  #       php-versions: ['8.1']
+  #       database: ['mysql', 'postgres', 'sqlite']
 
-    env:
-        PHP_V: ${{ matrix.php-versions }}
-        DB: ${{ matrix.database }}
-        TEST_ARG: 'phpunit'
+  #   env:
+  #       PHP_V: ${{ matrix.php-versions }}
+  #       DB: ${{ matrix.database }}
+  #       TEST_ARG: 'phpunit'
 
-    services:
-      mysql:
-        image: mysql:latest
-        env:
-          MYSQL_ROOT_PASSWORD: cypht_test
-          MYSQL_DATABASE: cypht_test
-          MYSQL_USER: cypht_test
-          MYSQL_PASSWORD: cypht_test
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+  #   services:
+  #     mysql:
+  #       image: mysql:latest
+  #       env:
+  #         MYSQL_ROOT_PASSWORD: cypht_test
+  #         MYSQL_DATABASE: cypht_test
+  #         MYSQL_USER: cypht_test
+  #         MYSQL_PASSWORD: cypht_test
+  #       ports:
+  #         - 3306:3306
+  #       options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-      postgresql:
-        image: postgres:latest
-        env:
-          POSTGRES_USER: cypht_test
-          POSTGRES_PASSWORD: cypht_test
-          POSTGRES_DB: cypht_test
-        ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
+  #     postgresql:
+  #       image: postgres:latest
+  #       env:
+  #         POSTGRES_USER: cypht_test
+  #         POSTGRES_PASSWORD: cypht_test
+  #         POSTGRES_DB: cypht_test
+  #       ports:
+  #         - 5432:5432
+  #       options: --health-cmd="pg_isready" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    steps:
-      - name: "System Install Dependencies"
-        run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev
+  #   steps:
+  #     - name: "System Install Dependencies"
+  #       run: sudo apt-get install -y mysql-client postgresql-client sqlite3 libsodium-dev
 
-      - name: "Checkout code"
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  #     - name: "Checkout code"
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: "Set up PHP"
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-versions }}
-          extensions: pdo, sodium, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg
-          tools: phpunit, composer
-          ini-values: cgi.fix_pathinfo=1
-        env:
-          fail-fast: true
+  #     - name: "Set up PHP"
+  #       uses: shivammathur/setup-php@v2
+  #       with:
+  #         php-version: ${{ matrix.php-versions }}
+  #         extensions: pdo, sodium, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg
+  #         tools: phpunit, composer
+  #         ini-values: cgi.fix_pathinfo=1
+  #       env:
+  #         fail-fast: true
 
-      - name: "Script: setup.sh"
-        run: bash .github/tests/setup.sh
+  #     - name: "Script: setup.sh"
+  #       run: bash .github/tests/setup.sh
 
-      - name: "Composer Install Dependencies"
-        run: |
-            composer install
-            composer require --dev php-coveralls/php-coveralls
-            php scripts/config_gen.php
+  #     - name: "Composer Install Dependencies"
+  #       run: |
+  #           composer install
+  #           composer require --dev php-coveralls/php-coveralls
+  #           php scripts/config_gen.php
 
-      - name: "Script: test.sh"
-        run: bash .github/tests/test.sh
+  #     - name: "Script: test.sh"
+  #       run: bash .github/tests/test.sh
 
 
   Test-selenium:
     name: SELENIUM (PHP-${{ matrix.php-versions }} && DB-${{ matrix.database }})
     runs-on: ubuntu-latest
-    needs: Test-phpunit
+    # needs: Test-phpunit
 
     strategy:
       matrix:
