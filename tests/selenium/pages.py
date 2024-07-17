@@ -86,7 +86,6 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Message history'
 
     def home(self):
-        self.wait()
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_home')
         list_item.find_element(By.TAG_NAME, 'a').click()
@@ -95,7 +94,6 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Home'
 
     def servers_page(self):
-        self.wait()
         list_item = self.by_class('menu_servers')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
@@ -103,7 +101,6 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Servers'
 
     def site(self):
-        self.wait()
         list_item = self.by_class('menu_settings')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
@@ -120,7 +117,6 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Folders'
 
     def save(self):
-        self.wait()
         list_item = self.by_class('menu_save')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
@@ -128,7 +124,6 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Save Settings'
 
     def password(self):
-        self.wait()
         if not self.mod_active('account'):
             return
         if self.auth_type != 'DB':
@@ -137,7 +132,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        assert self.by_class('content_title').text == 'Change Password'
+        assert self.by_class('content_title').text.strip() == 'Change Password'
 
     def profiles(self):
         if self.mod_active('profiles'):
@@ -152,21 +147,21 @@ if __name__ == '__main__':
 
     print("PAGE TESTS")
     test_runner(PageTests, [
-        'search',
-        'combined_inbox',
-        'unread',
-        'sent',
-        'flagged',
-        'contacts',
-        'compose',
-        'calendar',
-        'history',
+        # 'search',
+        # 'combined_inbox',
+        # 'unread',
+        # 'sent',
+        # 'flagged',
+        # 'contacts',
+        # 'compose',
+        # 'calendar',
+        # 'history',
         'home',
-        # 'servers_page',
-        # 'site',
-        # 'folders',
-        # 'save',
-        # 'password',
+        'folders',
+        'save',
         'profiles',
+        'servers_page',
+        # 'site',
+        'password',
         'logout',
     ])

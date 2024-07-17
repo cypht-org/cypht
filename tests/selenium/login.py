@@ -46,7 +46,7 @@ class LoginTests(WebTest):
     def good_logout(self):
         self.logout()
         self.wait()
-        assert 'Session destroyed on logout' in self.by_class('sys_messages').text
+        assert self.by_class('sys_messages').text == 'Session destroyed on logout'
 
 
 
