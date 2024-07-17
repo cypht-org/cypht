@@ -8,7 +8,16 @@ chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 chrome_options.BinaryLocation = "/usr/bin/google-chrome"
-chrome_options.add_argument("--window-size=2200,2800")
+chrome_options.add_argument("--window-size=3200,3800")
+
+chrome_options.headless = False
+chrome_options.add_argument("start-maximized")
+# options.add_experimental_option("detach", True)
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
+chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
+chrome_options.add_experimental_option('useAutomationExtension', False)
+chrome_options.add_argument('--disable-blink-features=AutomationControlled')
 
 RECIP='testuser@localhost.org'
 IMAP_ID='0'
@@ -23,3 +32,4 @@ def get_driver(cap):
 
 def success(driver):
     pass
+

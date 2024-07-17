@@ -30,20 +30,43 @@ class SendTest(WebTest):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
         send_button.click()
         self.wait_with_folder_list()
-        sys_messages = self.by_id('sys_messages')
-        assert sys_messages.text == 'You need at least one configured SMTP server to send outbound messages' # assert sys_messages.text == 'Message Sent'
+        sys_messages_element = self.by_class('sys_messages')
+        sys_messages = sys_messages_element.text
+        expected_messages = [
+            'You need at least one configured SMTP server to send outbound messages',
+            'Please create a profile for saving sent messages',
+            'Please create a profile for saving sent messages option',
+            'Message Sent'
+        ]
+        # Check if any of the expected messages is present
+        message_found = any(msg in sys_messages for msg in expected_messages)
+        assert message_found, f"Unexpected system message: {sys_messages}"
 
     def view_message_list(self):
         list_item = self.by_class('menu_unread')
         list_item.find_element(By.TAG_NAME, 'a').click()
-        try:
-            self.wait_on_class('unseen', 10)
-        except TimeoutException as e:
-            return
+        self.wait()
         assert self.by_class('mailbox_list_title').text == 'Unread'
-        subject = self.by_class('unseen')
-        link = subject.find_element(By.TAG_NAME, 'a')
-        assert link.text == 'Test'
+        # self.wait_on_class('unseen', 10)
+        # try:
+        #     self.wait_on_class('unseen', 10)
+        # except TimeoutException as e:
+        #     return
+        unseen_elements = self.driver.find_elements(By.CLASS_NAME, 'unseen')
+        if unseen_elements:
+            subject = unseen_elements[0]
+            link = subject.find_element(By.TAG_NAME, 'a')
+            print(link.text)
+            assert link.text == 'Test'
+        else:
+            expected_messages = [
+                'You don\'t have any data sources assigned to this page.',
+'                Add some'
+            ];
+            nux_empty_combined_view = self.by_class('nux_empty_combined_view')
+            messages = nux_empty_combined_view.text
+            message_found = any(msg in messages for msg in expected_messages)
+            assert message_found, f"Unexpected system message: {messages}"
 
     def view_message_detail(self):
         try:

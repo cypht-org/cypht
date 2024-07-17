@@ -129,11 +129,8 @@ class Hm_Auth_DB extends Hm_Auth {
      */
     public function create($user, $pass) {
         $this->connect();
-
         $result = 0;
-        try {
         $res = Hm_DB::execute($this->dbh, 'select username from hm_user where username = ?', [$user]);
-        
         if (!empty($res)) {
             //this var will prevent showing print in phpuni tests
             if(!defined('CYPHT_PHPUNIT_TEST_MODE')) {
@@ -147,11 +144,7 @@ class Hm_Auth_DB extends Hm_Auth {
                 $result = 2;
             }
         }
-        
-    } catch (Exception $e) {
-        Hm_Debug::add($e->getMessage());
-    }
-    return $result;
+        return $result;
     }
 }
 

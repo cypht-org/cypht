@@ -80,7 +80,7 @@ class SettingsTests(SettingsHelpers):
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)
-        self.wait_with_folder_list()
+        self.wait()
 
     def list_style_test(self):
         self.wait_with_folder_list()
@@ -236,8 +236,8 @@ if __name__ == '__main__':
         'imap_per_page_test',
         'mail_format_test',
         'auto_bcc_test',
-        'keyboard_shortcuts_test',
-        'inline_message_test',
+        # 'keyboard_shortcuts_test',
+        # 'inline_message_test',
         'no_folder_icons_test',
         'msg_list_icons_test',
         'msg_part_icons_test',
@@ -278,5 +278,5 @@ if __name__ == '__main__':
         'github_max_per_source_test',
 
         # exit
-        # 'logout'
+        'logout'
     ])

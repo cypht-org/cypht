@@ -314,7 +314,6 @@ class Hm_Output_server_content_start extends Hm_Output_Module {
      */
     protected function output() {
         return '<div class="content_title">'.$this->trans('Servers').
-            // '<div class="list_controls"></div>'.
             '</div><div class="server_content">';
     }
 }

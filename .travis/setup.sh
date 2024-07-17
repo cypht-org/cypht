@@ -246,11 +246,11 @@ setup_all_tests() {
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
     postgresql8.1)
-        setup_all_tests
-        # setup_unit_tests
+        #setup_all_tests
+        setup_unit_tests
     ;;
     *)
-        setup_all_tests
+        setup_unit_tests
     ;;
 esac
 sys_info

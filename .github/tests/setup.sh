@@ -132,7 +132,6 @@ setup_site() {
 		STATUS_ERROR
 		exit 1
 	fi
-    sudo php scripts/create_account.php test133 test331
 }
 
 ##### UI END #####
