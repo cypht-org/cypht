@@ -1435,7 +1435,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() == 0) {
+        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
             document.getElementById('logout_without_saving').click();
         }
         else {

@@ -44,10 +44,9 @@ class LoginTests(WebTest):
         assert self.by_class('content_title') != None
 
     def good_logout(self):
-        self.wait(By.CLASS_NAME, "logout_link")
-        self.logout_no_save()
+        self.logout()
         self.wait()
-        assert self.by_id('sys_messages').text == 'Session destroyed on logout'
+        assert 'Session destroyed on logout' in self.by_class('sys_messages').text
 
 
 
@@ -61,5 +60,5 @@ if __name__ == '__main__':
         'missing_username_and_password',
         'bad_login_key',
         'good_login',
-        # 'good_logout'
+        'good_logout'
     ])

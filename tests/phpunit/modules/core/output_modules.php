@@ -332,7 +332,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('msgs', 'core');
         $test->handler_response = array('router_login_state' => false);
         $res = $test->run();
-        $this->assertEquals(array('<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages logged_out"><div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger" id="sys_messages">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div><div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info" id="sys_messages">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages logged_out"><div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div><div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
