@@ -1610,7 +1610,7 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
         $updated = 0;
         foreach ($active as $server_id) {
             $server = Hm_IMAP_List::dump($server_id, true);
-            if (array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
+            if ( $server && array_key_exists('auth', $server) && $server['auth'] == 'xoauth2') {
                 $results = imap_refresh_oauth2_token($server, $this->config);
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
