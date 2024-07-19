@@ -142,13 +142,66 @@ class Hm_Contact_Store {
         $this->data = array();
     }
 
-    public function page($page, $size) {
+    public function page($page, $size, $data = null) {
         if ($page < 1) {
             return array();
         }
-        return array_slice($this->data, (($page - 1)*$size), $size, true);
+        if ($data === null) {
+            $data = $this->data;
+        }
+        return array_slice($data, (($page - 1)*$size), $size, true);
     }
 
+    public function group_by($column = 'group') {
+        if (!is_string($column) && !is_int($column) && !is_float($column) && !is_callable($column) ) {
+            trigger_error('group_by(): The key should be a string, an integer, or a callback', E_USER_ERROR);
+            return null;
+        }
+        $func = (!is_string($column) && is_callable($column) ? $column : null);
+        $_key = $column;
+        // Load the new array, splitting by the target key
+        $grouped = [];
+        foreach ($this->data as $value) {
+            
+            $column = null;
+            if (is_callable($func)) {
+                $column = call_user_func($func, $value);
+            } elseif (is_object($value)) {
+                $reflection = new ReflectionClass($value);
+                $property = $reflection->getProperty('data');
+                $property->setAccessible(true); // Make the private property accessible
+                // Get the value of the data property
+                $contact = $property->getValue($value);
+                $column = isset($contact[$_key]) ? $contact[$_key] : 'Personal Addresses';
+            } elseif (isset($value[$_key])) {
+                $column = $value[$_key];
+            }
+            if ($column === null) {
+                continue;
+            }
+            $grouped[$column][] = $value;
+        }
+        // Recursively build a nested grouping if more parameters are supplied
+        // Each grouped array value is grouped according to the next sequential key
+        if (func_num_args() > 2) {
+            $args = func_get_args();
+            foreach ($grouped as $key => $value) {
+                $params = array_merge([ $value ], array_slice($args, 2, func_num_args()));
+                $grouped[$key] = call_user_func_array('group_by', $params);
+            }
+        }
+        return $grouped;
+    }
+
+    public function paginate_grouped($column, $page, $size) {
+        $grouped = $this->group_by($column);
+        $paginated = [];
+        foreach ($grouped as $key => $group) {
+            $paginated[$key] = $this->page($page, $size, $group);
+        }
+        return $paginated;
+    }
+    
     public function sort($fld) {
         $this->sort_fld = $fld;
         uasort($this->data, array($this, 'sort_callback'));
