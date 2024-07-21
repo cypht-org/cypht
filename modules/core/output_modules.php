@@ -650,7 +650,13 @@ class Hm_Output_loading_icon extends Hm_Output_Module {
      * Sort of ugly loading icon animated with js/css
      */
     protected function output() {
-        return '<div class="loading_icon"></div>';
+        return '
+        <div class="loading_icon"></div>
+        <div class="loading_spinner text-center">
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>';
     }
 }
 

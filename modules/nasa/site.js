@@ -20,7 +20,9 @@ var nasa_connect = function(event) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_nasa_connect'},
             {'name': 'api_key', 'value': key}],
-            nasa_connect_result
+            nasa_connect_result,
+            [],
+            true
         );
     }
     return false;

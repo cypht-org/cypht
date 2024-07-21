@@ -54,7 +54,9 @@ var display_final_nux_step = function(res) {
                 {'name': 'imap_service_name', value: res.nux_service_name}],
                 function () {
                     Hm_Utils.redirect();
-                }
+                },
+                [],
+                true
             );
         } else {
             Hm_Utils.redirect();

@@ -99,7 +99,7 @@ var Hm_Ajax = {
         return;
     },
 
-    request: function(args, callback, extra, no_icon, batch_callback, on_failure) {
+    request: function(args, callback, extra, on_loading = false, batch_callback, on_failure) {
         var bcb = false;
         if (typeof batch_callback != 'undefined' && $.inArray(batch_callback, this.batch_callbacks) === -1) {
             bcb = batch_callback.toString();
@@ -111,34 +111,27 @@ var Hm_Ajax = {
                 Hm_Ajax.batch_callbacks[bcb] = 1;
             }
         }
-        var name = Hm_Ajax.get_ajax_hook_name(args);
+        var name = Hm_Ajax.get_ajax_hook_name(args)
         var ajax = new Hm_Ajax_Request();
-        if (!no_icon) {
-            Hm_Ajax.show_loading_icon();
-            $('body').addClass('wait');
-        }
         Hm_Ajax.active_reqs++;
-        return ajax.make_request(args, callback, extra, name, on_failure, batch_callback);
+        return ajax.make_request(args, callback, extra, name, on_failure, batch_callback, on_loading);
     },
 
     show_loading_icon: function() {
-        if (Hm_Ajax.icon_loading_id !== false) {
-            return;
-        }
-        var hm_loading_pos = $('.loading_icon').width()/40;
-        $('.loading_icon').show();
-        function move_background_image() {
-            hm_loading_pos = hm_loading_pos + 50;
-            $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
-            Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
-        }
-        move_background_image();
+        Hm_Ajax.icon_loading_id = true;
+        $('.loading_bar').show();
+        $('.loading_spinner').show();
+        $('body').addClass('wait');
+        let width_nav_folder_cell= $('nav[class="folder_cell"]').css('width');
+        $('.loading_spinner').css('left', width_nav_folder_cell);
+
     },
 
     stop_loading_icon : function(loading_id) {
-        clearTimeout(loading_id);
-        $('.loading_icon').hide();
         Hm_Ajax.icon_loading_id = false;
+        $('.loading_bar').hide();
+        $('.loading_spinner').hide();
+        $('body').removeClass('wait');
     },
 
     process_callback_hooks: function(name, res) {
@@ -172,26 +165,35 @@ var Hm_Ajax_Request = function() { return {
     on_failure: false,
     start_time: 0,
 
-    xhr_fetch: function(config) {
+    xhr_fetch: function(config, on_loading) {
         var xhr = new XMLHttpRequest();
         var data = '';
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
         xhr.open('POST', window.location.href)
+        Hm_Ajax.stop_loading_icon();
+        xhr.addEventListener('loadstart', function () {
+            if (!on_loading) {
+                Hm_Ajax.show_loading_icon(); 
+            }
+        });
         xhr.addEventListener('load', function() {
             config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
         });
         xhr.addEventListener('error', function() {
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            Hm_Ajax.stop_loading_icon();
             config.callback.fail(xhr);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
         });
         xhr.addEventListener('abort', function() {
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            Hm_Ajax.stop_loading_icon();
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
 
+        });
+        xhr.addEventListener('loadend',function () {
+            Hm_Ajax.stop_loading_icon();
         });
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
@@ -206,7 +208,7 @@ var Hm_Ajax_Request = function() { return {
         return res.join('&');
     },
 
-    make_request: function(args, callback, extra, request_name, on_failure, batch_callback) {
+    make_request: function(args, callback, extra, request_name, on_failure, batch_callback, on_loading) {
         var name;
         var arg;
         this.batch_callback = batch_callback;
@@ -232,7 +234,7 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        this.xhr_fetch({url: '', data: args, callback: this});
+        this.xhr_fetch({url: '', data: args, callback: this},on_loading);
         return false;
     },
 
@@ -297,7 +299,7 @@ var Hm_Ajax_Request = function() { return {
         if (this.batch_callback) {
             if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
                 batch_count = --Hm_Ajax.batch_callbacks[this.batch_callback.toString()];
-            }
+           }
         }
         Hm_Message_List.set_row_events();
         if (batch_count === 0) {
@@ -306,11 +308,11 @@ var Hm_Ajax_Request = function() { return {
             Hm_Ajax.p_callbacks = [];
             this.batch_callback(res);
             this.batch_callback = false;
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            Hm_Ajax.stop_loading_icon(); 
             $('body').removeClass('wait');
         }
         if (Hm_Ajax.active_reqs == 0) {
-            Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
+            Hm_Ajax.stop_loading_icon();
             $('body').removeClass('wait');
         }
         res = null;
@@ -1321,7 +1323,9 @@ var Hm_Folders = {
             $('.search_terms').val(hm_search_terms());
         }
         $('.search_terms').on('search', function() {
-            Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}]);
+            Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_reset_search'}],function () {
+                
+            },[],true);
         });
     },
 
@@ -1673,7 +1677,7 @@ var Hm_Utils = {
         $('.offline').hide();
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_test'}],
-            false, [], false, false, false);
+            false, [], true, false, false);
     },
 
     is_element_visible: function (elem) {
@@ -2535,7 +2539,7 @@ function getServiceDetails(providerKey){
                 }
             },
             [],
-            false
+            true
         );
     }
 }

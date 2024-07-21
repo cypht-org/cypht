@@ -255,6 +255,22 @@ td {
   height: 6px;
   z-index: 1001;
 }
+.loading_spinner {
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  display: none;
+  position: fixed;
+  right: 0px;
+  top: 0px;
+  left: 12%;
+  z-index: 1001;
+  min-height: 100%;
+  padding-top: 20%;
+  color: #ccc;
+  width: 100%;
+  z-index: 1001;
+}
+
 .logout {
   margin: 2px;
   margin-left: 5px;
