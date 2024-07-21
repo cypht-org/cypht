@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
    language       ：Chinese_simplified
    languageNative ：简体中文（中国）
    translators    ：PJ568
@@ -473,6 +473,7 @@ return array(
     'Current password is incorrect' => '当前密码错误',
     'Details' => '详情',
     'Don\'t save account passwords between logins' => '不要保存登录密码',
+    'Do you want to log out?' => '您是否要退出？',
     'Drafts' => '草稿',
     'Enter your passwords below to gain access to these services during this session.' => '在下方键入密码以获得在本次会话中对这些服务的使用权限。',
     'Failed to authenticate to the SMTP server' => '验证 SMTP 服务器失败',
@@ -649,4 +650,4 @@ return array(
     'Junk' => '垃圾',
     'Trash' => '已删除',
     'Pasted text has leading or trailing spaces' => false,
-); 
+);

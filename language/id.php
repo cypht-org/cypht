@@ -463,6 +463,7 @@ return array(
     'Details' => 'Rincian',
     'Don\'t save account passwords between logins' => 'Jangan menyimpan kata sandi akun diantara sesi masuk',
     'Drafts' => 'Konsep',
+    'Do you want to log out?' => 'Apakah Anda ingin keluar?',
     'Enter your passwords below to gain access to these services during this session.' => 'Masukkan kata sandi Anda di bawah untuk mendapatkan akses ke layanan berikut selama sesi ini.',
     'Failed to authenticate to the SMTP server' => 'Gagal untuk meng-otentikasi ke server SMTP',
     'Feed deleted' => 'Feed dihapus',

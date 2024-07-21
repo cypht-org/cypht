@@ -455,6 +455,7 @@ return array(
     'Current password is incorrect' => 'Huidige wachtwoord is fout',
     'Details' => 'Details',
     'Don\'t save account passwords between logins' => 'Account wachtwoord niet opslaan tussen logins',
+    'Do you want to log out?' => 'Wilt u uitloggen?',
     'Drafts' => false,
     'Enter your passwords below to gain access to these services during this session.' => 'Geef uw wachtwoord hieronder in om toegang tot deze services te krijgen tijdens de sessie',
     'Failed to authenticate to the SMTP server' => 'Authenticatie met de SMPT-server mislukt',

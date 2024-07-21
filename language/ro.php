@@ -454,6 +454,7 @@ return array(
     'Current password is incorrect' => false,
     'Details' => false,
     'Don\'t save account passwords between logins' => 'Nu salvați parolele între conectări',
+    'Do you want to log out?' => 'Doriți să vă deconectați?',
     'Drafts' => 'Ciorne',
     'Enter your passwords below to gain access to these services during this session.' => false,
     'Failed to authenticate to the SMTP server' => 'Eroare de autentificare la serverul SMTP',

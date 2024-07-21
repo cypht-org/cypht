@@ -250,6 +250,7 @@ return array(
     "Hide From Combined Pages"=>"پنهان کردن از صفحات ترکیبی",
     "Save Settings"=>"تنظیمات را ذخیره کن",
     "Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently."=>"تنظیمات برای همیشه در سرور ذخیره نمی شوند ، مگر اینکه صریحاً اجازه آن را بدهید. اگر تنظیمات خود را ذخیره نکنید ، با اتمام جلسه یا خارج شدن از سیستم ، هر تغییری که از آخرین ورود به سیستم انجام داده اید ، حذف خواهد شد. برای ذخیره تنظیمات خود باید دوباره رمز ورود خود را برای اهداف امنیتی وارد کنید.",
+    "Do you want to log out?" => "می‌خواهید خارج شوید؟",
     "Add a Repository"=>"مخزن اضافه کنید",
     "Disconnect"=>"قطع شدن",
     "Already connected"=>"قبلاً متصل شده اید",
