@@ -455,6 +455,7 @@ return array(
     'Current password is incorrect' => 'La password attuale non è corretta',
     'Details' => 'Dettagli',
     'Don\'t save account passwords between logins' => 'Non salvare le password degli account tra un accesso e l\'altro',
+    'Do you want to log out?' => 'Vuoi uscire?',
     'Drafts' => 'Bozze',
     'Enter your passwords below to gain access to these services during this session.' => 'Inserisci le tue password di seguito per accedere a questi servizi durante questa sessione.',
     'Failed to authenticate to the SMTP server' => 'Impossibile autenticarsi al server SMTP',
