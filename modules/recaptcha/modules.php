@@ -54,9 +54,8 @@ class Hm_Output_recaptcha_script extends Hm_Output_Module {
  */
 class Hm_Output_recaptcha_form extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('router_login_state')) {
-            $rconf = $this->get('recaptcha_config');
-            return '<div class="g-recaptcha" data-sitekey="'.$this->html_safe($rconf['site_key']).'"></div>';
+        if (!$this->get('router_login_state') && $this->get('recaptcha_config')) {
+            return '<div class="g-recaptcha" data-sitekey="'.$this->html_safe($this->get('recaptcha_config')['site_key']).'"></div>';
         }
     }
 }
