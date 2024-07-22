@@ -528,7 +528,11 @@ var prefetch_imap_folders = function() {
         {'name': 'imap_server_id', 'value': id},
         {'name': 'imap_prefetch', 'value': true},
         {'name': 'folder', 'value': ''}],
-        function(res) { $('#imap_prefetch_ids').val(ids.join(',')); prefetch_imap_folders(); },
+        function(res) { 
+            $('#imap_prefetch_ids').val(ids.join(',')); 
+            prefetch_imap_folders();
+            expand_imap_mailbox(res);
+        },
         [],
         true
     );
