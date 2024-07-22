@@ -1177,6 +1177,9 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res .= get_script_modal_content();
         $res .= '<div class="p-3">';
         foreach($mailboxes as $idx => $mailbox) {
+            if (empty($mailbox['sieve_config_host'])) {
+                continue;
+            }
             $behaviours = $this->get('sieve_block_default_behaviour');
             $reject_messages = $this->get('sieve_block_default_reject_message');
             $default_behaviour = 'Discard';
@@ -1228,6 +1231,9 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         $res .= get_script_modal_content();
         $sieve_supported = 0;
         foreach($mailboxes as $mailbox) {
+            if (empty($mailbox['sieve_config_host'])) {
+                continue;
+            }
             $sieve_supported++;
             $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
             $res .= '<div class="sievefilters_accounts_item">';
