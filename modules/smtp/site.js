@@ -611,5 +611,37 @@ $(function () {
             $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });
+
+        var selectedOption = $('#compose_smtp_id option[selected]');
+        var selectedEmail = selectedOption.data('email');
+        var selectedVal = selectedOption.val();
+
+        var recipientsInput = $('#compose_cc');
+        var excludedEmail = null;
+
+        const excludeEmail = function () {
+            var newRecipients = recipientsInput.val().split(',').filter(function(email) {
+                if (email.includes(selectedEmail)) {
+                    excludedEmail = email;
+                    return false;
+                }
+                return true;
+            }).join(', ');
+            recipientsInput.val(newRecipients);
+        };
+
+        if (recipientsInput.val().includes(selectedEmail)) {
+            excludeEmail();
+            $(document).on('change', '#compose_smtp_id', function() {
+                if ($(this).val() !== selectedVal) {
+                    if (!recipientsInput.val().includes(selectedEmail)) {
+                        recipientsInput.val(recipientsInput.val() + ', ' + excludedEmail);
+                    }
+                } else {
+                    excludeEmail();
+                }
+            });
+        }
+
     }
 });

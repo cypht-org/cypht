@@ -1524,7 +1524,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             $smtp_profiles = profiles_by_smtp_id($profiles, $vals['id']);
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
-                    $res .= '<option ';
+                    $res .= '<option data-email="'.$profile['address'].'"';
                     if ((string) $selected === sprintf('%s.%s', $vals['id'], ($index + 1)) || (! mb_strstr(strval($selected), '.') && strval($selected) === strval($vals['id']))) {
                         $res .= 'selected="selected" ';
                     }
@@ -1534,7 +1534,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                 }
             }
             else {
-                $res .= '<option ';
+                $res .= '<option data-email="'.$vals['user'].'"';
                 if ($selected === $id) {
                     $res .= 'selected="selected" ';
                 }
