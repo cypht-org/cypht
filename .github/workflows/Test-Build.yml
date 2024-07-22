@@ -133,6 +133,7 @@ jobs:
       - name: "Composer Install Dependencies"
         run: |
             composer install
+            php scripts/config_gen.php
 
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh

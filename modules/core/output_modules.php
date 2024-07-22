@@ -314,7 +314,6 @@ class Hm_Output_server_content_start extends Hm_Output_Module {
      */
     protected function output() {
         return '<div class="content_title">'.$this->trans('Servers').
-            '<div class="list_controls"></div>'.
             '</div><div class="server_content">';
     }
 }
@@ -2172,7 +2171,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                             </div>
                             <div class="step_config-actions mt-4 d-flex justify-content-between">
                                 <button class="btn btn-primary px-5" onclick="display_config_step(0);resetQuickSetupForm();">'.$this->trans('Cancel').'</button>
-                                <button class="btn btn-primary px-5" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
+                                <button class="btn btn-primary px-5" id="step_config_action_next" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
                             </div>
                         </div>
                         <div id="step_config_2" class="step step_config">
@@ -2241,11 +2240,11 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
             <div class="step_config-actions mt-4 d-flex justify-content-between">
                 <button class="btn btn-danger px-3" onclick="display_config_step(0);resetQuickSetupForm();">'.$this->trans('Cancel').'</button>
                 <button class="btn btn-primary px-4" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
-                <button class="btn btn-primary px-3" onclick="display_config_step(3)" id="stepper-action-finish">'.$this->trans('Finish').'</button>
+                <button class="btn btn-primary px-3" id="step_config_action_finish" onclick="display_config_step(3)" id="stepper-action-finish">'.$this->trans('Finish').'</button>
             </div>
         </div>
         <div id="step_config_0" class="step_config current_config_step">
-            <button class="imap-jmap-smtp-btn btn btn-primary px-4" onclick="display_config_step(1)"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>
+            <button class="imap-jmap-smtp-btn btn btn-primary px-4" id="add_new_server_button" onclick="display_config_step(1)"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>
         </div>
     </div>
 </div>

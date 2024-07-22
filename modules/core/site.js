@@ -1435,7 +1435,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() == 0) {
+        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -1980,6 +1980,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
+    
+    /* show any pending notices */
+    Hm_Utils.show_sys_messages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {

@@ -302,7 +302,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_server_content_start() {
         $test = new Output_Test('server_content_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="content_title">Servers<div class="list_controls"></div></div><div class="server_content">'), $res->output_response);
+        $this->assertEquals(array('<div class="content_title">Servers</div><div class="server_content">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
