@@ -34,13 +34,13 @@ if (!hm_exists('generate_tree_view')) {
             $html .= '</span>';
             $html .= '</span>';
             $html .= '<div class="float-end">';
-            $html .= '<a href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></a>';
+            $html .= '<a id="edit_tag" href="?page=tags&tag_id='.$folder['id'].'" class="mr-4"><i class="bi bi-pencil-square"></i></a>';
             $html .= '<form method="POST" action="?page=tags" style="display:inline;">';
             $html .= '<input type="hidden" name="tag_delete" value="1">';
             $html .= '<input type="hidden" name="tag_id" value="'.$folder['id'].'">';
             $html .= '<input type="hidden" name="hm_page_key" value="'.$request_Key.'" />';
 
-            $html .= '<button type="submit" class=""><i class="bi bi-trash"></i></button>';
+            $html .= '<button type="submit" id="destroy_tag" class=""><i class="bi bi-trash"></i></button>';
             $html .= '</form>';
             $html .= '</div>';
             

@@ -356,7 +356,7 @@ button {
   margin-bottom: 10px;
 }
 .folders a,
-.unread_link {
+.unread_link,.all_tags {
   color: rgba(var(--bs-body-color-rgb), 0.7);
   text-decoration: none;
   line-height: 1.25em;

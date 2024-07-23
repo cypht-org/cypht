@@ -1327,7 +1327,7 @@ function add_tag_to_message($imap, $msg_id, $folder, $tag) {
         return false;
     }
     $msg = $imap->get_message_content($msg_id, 0);
-    preg_match("/^X-Cypht-Labels:(.+)\r?\n/i", $msg, $matches);
+    preg_match("/^X-Cypht-Tags:(.+)\r?\n/i", $msg, $matches);
 
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
@@ -1341,7 +1341,7 @@ function add_tag_to_message($imap, $msg_id, $folder, $tag) {
         $tags = array($tag);
     }
 
-    $msg = "X-Cypht-Labels:".implode(',',$tags)."\n".$msg;
+    $msg = "X-Cypht-Tags:".implode(',',$tags)."\n".$msg;
     $msg = str_replace("\r\n", "\n", $msg);
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
@@ -1462,7 +1462,7 @@ function tags_dropdown($context, $headers) {
                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
 
-    $tags =  !empty($headers['X-Cypht-Labels']) ? explode(',', $headers['X-Cypht-Labels']) : array();
+    $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
     foreach ($folders as $folder) {
         $tag = $folder['name'];
         $is_checked = in_array($folder['id'], array_map('trim', $tags));

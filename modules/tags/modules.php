@@ -69,10 +69,10 @@ class Hm_Handler_process_tag_update extends Hm_Handler_Module {
         if (!is_null($form['tag_id']) AND Hm_Tags::get($form['tag_id'])) {
             $tag['id'] = $form['tag_id'];
             Hm_Tags::edit($form['tag_id'], $tag);
-            Hm_Msgs::add('Tag Created');
+            Hm_Msgs::add('Tag Edited');
         } else {
             Hm_Tags::add($tag);
-            Hm_Msgs::add('Tag Edited');
+            Hm_Msgs::add('Tag Created');
         }
     }
 }
@@ -111,7 +111,7 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date), array('HEADER X-Cypht-Labels', $tag_id)));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date), array('HEADER X-Cypht-Tags', $tag_id)));
             $this->out('folder_status', $status);
             $this->out('imap_tag_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -255,12 +255,12 @@ class Hm_Output_tags_tree extends Hm_Output_Module {
         
             // Generate the tree view HTML
             $treeViewHtml = generate_tree_view($folderTree, $this->html_safe(Hm_Request_Key::generate()));
-        
+            $treeContent = count($folderTree) > 0 ? $treeViewHtml : '<p>'. $this->trans('No tags available yet.') .'</p>';
             return '<div class="tags_tree mt-3 col-lg-8 col-md-8 col-sm-12">
                     <div class="card m-3 mr-0">
                         <div class="card-body">
                             <div class="tree-view">
-                                ' . $treeViewHtml . '
+                                ' . $treeContent . '
                             </div>
                         </div>
                     </div>
@@ -327,12 +327,12 @@ class Hm_Output_tags extends hm_output_module {
         $folders = $this->get('tags', array());
         if (is_array($folders) && !empty($folders)) {
             if(count($this->get('tags', array()))  > 1) {
-                $res .= '<li class="menu_tags"><a class="unread_link" href="?page=tags">';
+                $res .= '<li class="menu_tags"><a class="all_tags" href="?page=tags">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-tags fs-5 me-2"></i>';
                 }
                 $res .= $this->trans('All');
-                $res .= '<span class="unread_tag_count">('.count($folders).')</span></a></li>';
+                $res .= '<span class="tags_count">('.count($folders).')</span></a></li>';
             }
             $folderTree = [];
             foreach ($folders as $folderId => $folder) {
