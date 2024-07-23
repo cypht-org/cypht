@@ -1008,6 +1008,7 @@ class Hm_IMAP extends Hm_IMAP_Cache {
                 }
             }
         }
+        $original_uids_order = $uids;
         if (!empty($uids)) {
             if (is_array($uids)) {
                 $uids = implode(',', $uids);
@@ -1087,6 +1088,17 @@ class Hm_IMAP extends Hm_IMAP_Cache {
             }
             if ($esearch_enabled) {
                 $res = $esearch_res;
+            }
+            // keep original sort order of UIDS as fetch command might not return in requested order
+            // this is needed for pagination to work
+            if (! empty($original_uids_order)) {
+                $unordered = $res;
+                $res = [];
+                foreach ($original_uids_order as $uid) {
+                    if (in_array($uid, $unordered)) {
+                        $res[] = $uid;
+                    }
+                }
             }
             return $this->cache_return_val($res, $cache_command);
         }
