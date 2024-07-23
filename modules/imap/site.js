@@ -1038,9 +1038,13 @@ var imap_background_unread_content = function(id, folder) {
         imap_background_unread_content_result,
         [],
         false,
-        function() {
+        function(r) {
+            var total_unread_count = $('.total_unread_count').text()
             var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
-            Hm_Message_List.adjust_unread_total($('tr', cache).length, true);
+            const formatted_message_list_length = Object.keys(r.formatted_message_list).length;
+            if(parseInt(total_unread_count) !== parseInt(formatted_message_list_length)) {
+                Hm_Message_List.adjust_unread_total(formatted_message_list_length, true);
+            }
         }
     );
     return false;
