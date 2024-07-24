@@ -1292,7 +1292,7 @@ var Hm_Folders = {
     },
 
     folder_list_events: function() {
-        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
         $('.src_name').on("click", function() {
             var class_name = $(this).data('source');
             var icon_element = $(this).find('.bi');
