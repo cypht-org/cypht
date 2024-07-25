@@ -264,6 +264,7 @@ return array(
         'filter' => FILTER_DEFAULT,
         'sort' => FILTER_DEFAULT,
         'keyword' => FILTER_DEFAULT,
+        'screen_emails' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(

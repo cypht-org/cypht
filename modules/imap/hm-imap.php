@@ -2140,7 +2140,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array()) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2159,6 +2159,16 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($keyword) {
                 $uids = $this->search($filter, $uids, array(array('TEXT', $keyword)));
+            }
+            if ($trusted_senders && is_array($trusted_senders)) {
+                $terms = array();
+                if ($keyword) {
+                    $terms[] = array('TEXT', $keyword);
+                }
+                foreach ($trusted_senders as $sender) {
+                    $terms[] = array('FROM', 'NOT '. $sender);
+                }
+                $uids = $this->search($filter, $uids, $terms);
             }
             $total = count($uids);
 

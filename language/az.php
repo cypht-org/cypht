@@ -633,4 +633,5 @@ return array(
     'Trash' => false,
     'Pasted text has leading or trailing spaces' => false,
     'No tags available yet.' => false,
+    'Screen %s first emails' => false,
 );
