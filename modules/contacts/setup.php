@@ -23,6 +23,8 @@ add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_d
 add_handler('compose', 'load_contacts', true, 'contacts', 'process_compose_form_submit', 'after');
 add_handler('compose', 'store_contact_message', true, 'contacts', 'load_contacts', 'after');
 
+add_handler('ajax_imap_folder_display', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
+
 add_handler('ajax_imap_message_content', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('ajax_imap_message_content', 'find_message_contacts', true, 'contacts', 'imap_message_content', 'after');
 add_output('ajax_imap_message_content', 'add_message_contacts', true, 'contacts', 'filter_message_headers', 'after');
@@ -31,6 +33,7 @@ add_handler('ajax_imap_message_content', 'store_contact_allow_images', true, 'co
 setup_base_ajax_page('ajax_add_contact', 'core');
 add_handler('ajax_add_contact', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('ajax_add_contact', 'save_user_data', true, 'core', 'language', 'after');
+add_handler('ajax_add_contact', 'save_contact',  true);
 
 
 setup_base_ajax_page('ajax_autocomplete_contact', 'core');
@@ -81,8 +84,8 @@ return array(
         'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_auto_collect' => FILTER_VALIDATE_BOOLEAN,
-        'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT
-
+        'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT,
+        'email_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

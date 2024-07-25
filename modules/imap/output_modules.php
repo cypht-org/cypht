@@ -75,6 +75,20 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                     '" href=""><i class="bi bi-x-circle-fill refresh_list"></i></a><a class="add_source" title="'.$this->trans('Add this folder to combined pages').
                     '" href=""><i class="bi bi-check-circle-fill refresh_list"></i></a>';
             }
+            if ($this->get('folder')) {
+                if ($this->get('screen_emails')) {
+                    $custom .= '<a title="Disike" href="#" class="screen-email-unlike"><i class="bi bi-hand-thumbs-down-fill"></i></a><a title="Like" href="#" class="screen-email-like"></i><i class="bi bi-hand-thumbs-up-fill"></i></a>';
+                    if ($this->get('move_messages_in_screen_email')) {
+                        $custom .= '<input type="hidden" value="1" id="move_messages_in_screen_email"/>';
+                    } else {
+                        $custom .= '<input type="hidden" value="0" id="move_messages_in_screen_email"/>';
+                    }
+                } else {
+                    $path = sprintf('?page=message_list&list_path=%s&screen_emails=1', $this->html_safe($this->get('list_path')));
+                    $custom .= '<a title="'.sprintf($this->trans('Screen %s first emails'), $this->get('first_time_screen_emails')).
+                    '" href="'. $path .'"><i class="bi bi-hand-thumbs-up-fill"></i></a>';
+                }                
+            }
             $this->out('custom_list_controls', $custom);
         }
     }
@@ -1406,6 +1420,42 @@ class Hm_Output_stepper_setup_server_jmap_imap_common extends Hm_Output_Module {
                 </label>
             </div>
         ';
+
+        return $res;
+    }
+}
+
+/**
+ * Option to set the per page count for IMAP folder views
+ * @subpackage imap/output
+ */
+class Hm_Output_first_time_screen_emails_per_page_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $per_page = 20;
+        $reset = '';
+        if (array_key_exists('first_time_screen_emails', $settings) && $settings['first_time_screen_emails']) {
+            $per_page = $settings['first_time_screen_emails'];
+        }
+        if ($per_page != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label for="first_time_screen_emails">'.
+            $this->trans('First-time screen senders').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.
+            'name="first_time_screen_emails" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
+    }
+}
+class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "";
+        if (array_key_exists('move_messages_in_screen_email', $settings) && $settings['move_messages_in_screen_email']) {
+            if ($settings['move_messages_in_screen_email']) {
+                $checked = "checked";
+            }
+        }
+        $res = '<tr class="general_setting"><td><label for="move_messages_in_screen_email">'.
+            $this->trans('Move all messages in Screen Email folder if dislike email').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></td></tr>';
 
         return $res;
     }

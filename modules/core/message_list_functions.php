@@ -206,7 +206,18 @@ function message_list_row($values, $id, $style, $output_mod, $row_class='') {
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
     }
-    $res .= '">';
+    $data_uid = "";
+    if ($uids = explode("_", $id)) {
+        if (isset($uids[2])) {
+            $data_uid = 'data-uid="'. $uids[2] .'"';
+        }
+    }
+    if (!empty($data_uid)) {
+        $res .= '" '.$data_uid.'>';
+    } else {
+        $res .= '">';
+    }
+    
     if ($style == 'news') {
         $res .= '<td class="news_cell checkbox_cell">';
     }
