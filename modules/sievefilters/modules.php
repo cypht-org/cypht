@@ -946,51 +946,45 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             }
             if ($action->action == 'redirect') {
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction(['address' => $action->value])
                 );
             }
             if ($action->action == 'flag') {
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FlagFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\FlagFilterAction(['flags' => [$action->value]])
                 );
             }
-            if ($action->action == 'addflag') {
-                $filter->addRequirement('imap4flags');
+            if ($action->action == 'addflag') {                
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\AddFlagFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\AddFlagFilterAction(['flags' => [$action->value]])
                 );
             }
             if ($action->action == 'removeflag') {
-                $filter->addRequirement('imap4flags');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RemoveFlagFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\RemoveFlagFilterAction(['flags' => [$action->value]])
                 );
             }
             if ($action->action == 'move') {
-                $filter->addRequirement('fileinto');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => [$action->value]])
                 );
             }
             if ($action->action == 'reject') {
-                $filter->addRequirement('reject');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $action->value])
                 );
             }
             if ($action->action == 'copy') {
-                $filter->addRequirement('fileinto');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
                 );
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
                 );
             }
             if ($action->action == 'autoreply') {
-                $filter->addRequirement('vacation');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\VacationFilterAction([$action->extra_option_value, $action->value])
+                    new \PhpSieveManager\Filters\Actions\VacationFilterAction(['reason' => $action->value, 'subject' => $action->extra_option_value])
                 );
             }
         }
