@@ -56,6 +56,7 @@ add_handler('settings', 'process_drafts_since_setting', true, 'core', 'date', 'a
 add_handler('settings', 'process_drafts_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_delete_attachment_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_start_page_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_default_sort_order_setting', true, 'core', 'date', 'after');
@@ -75,7 +76,8 @@ add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_s
 add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
-add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
+add_output('settings', 'delete_attachment_setting', true, 'core', 'delete_prompt_setting', 'after');
+add_output('settings', 'no_password_setting', true, 'core', 'delete_attachment_setting', 'after');
 add_output('settings', 'start_page_setting', true, 'core', 'no_password_setting', 'after');
 add_output('settings', 'default_sort_order_setting', true, 'core', 'start_page_setting', 'after');
 add_output('settings', 'start_unread_settings', true, 'core', 'default_sort_order_setting', 'after');
@@ -293,6 +295,7 @@ return array(
         'list_style' => FILTER_DEFAULT,
         'timezone' => FILTER_DEFAULT,
         'disable_delete_prompt' => FILTER_VALIDATE_INT,
+        'allow_delete_attachment' => FILTER_VALIDATE_INT,
         'section_state' => FILTER_DEFAULT,
         'section_class' => FILTER_DEFAULT,
         'message_ids' => FILTER_DEFAULT,

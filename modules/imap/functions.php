@@ -475,7 +475,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
             $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'"></a></td>';
         }
     }
-    if (isset($vals['file_attributes']['attachment'])) {
+    if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
         $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
     }
     $res .= '</tr>';
@@ -639,7 +639,10 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
             /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
             '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
 
-            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+            if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
+                $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td></tr>';
+            }
         }
 
         if(is_array($vals) && isset($vals['subs'])) {

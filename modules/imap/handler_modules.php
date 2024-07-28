@@ -1925,6 +1925,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('imap_msg_part', "$part");
                     $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
                     $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', true));
+                    $this->out('allow_delete_attachment', $this->user_config->get('allow_delete_attachment_setting', false));
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
                     }

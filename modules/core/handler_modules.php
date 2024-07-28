@@ -343,6 +343,22 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the disable delete attachment setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_delete_attachment_setting extends Hm_Handler_Module {
+    /**
+     * Allowed vals are bool true/false
+     */
+    public function process() {
+        function delete_attachment_callback($val) {
+            return $val;
+        }
+        process_site_setting('allow_delete_attachment', $this, 'delete_attachment_callback', true, true);
+    }
+}
+
+/**
  * Process input from the max per source setting for the Everything page in the settings page
  * @subpackage core/handler
  */
