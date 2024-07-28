@@ -858,6 +858,25 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage core/output
+ */
+class Hm_Output_delete_attachment_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $reset = '';
+        $settings = $this->get('user_settings');
+        if (array_key_exists('allow_delete_attachment', $settings) && $settings['allow_delete_attachment']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Starts the Flagged section on the settings page
  * @subpackage core/output
  */
