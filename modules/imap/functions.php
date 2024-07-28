@@ -1469,7 +1469,7 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         }
 
-        $server = Hm_IMAP_List::get($imap_server_id, false);
+        $server = Hm_IMAP_List::get($imap_server_id, true);
 
         if ($enableSieve &&
             $imap_sieve_host &&
