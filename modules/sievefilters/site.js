@@ -137,6 +137,13 @@ var hm_sieve_possible_actions = function() {
             extra_field: false
         },
         {
+            name: 'forward',
+            description: 'Forward',
+            placeholder: 'mail@example.org',
+            type: 'string',
+            extra_field: false
+        },
+        {
             name: 'reject',
             description: 'Reject',
             placeholder: 'Reject message',

@@ -912,6 +912,14 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                     new \PhpSieveManager\Filters\Actions\RedirectFilterAction(['address' => $action->value])
                 );
             }
+            if ($action->action == 'forward') {
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction(['address' => $action->value])
+                );
+                $custom_condition->addAction(
+                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                );
+            }
             if ($action->action == 'flag') {
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\FlagFilterAction(['flags' => [$action->value]])
