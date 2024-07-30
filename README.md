@@ -4,11 +4,9 @@
 #### Cypht
 [https://cypht.org](https://cypht.org)
 
-All your E-mail, from all your accounts, in one place. Cypht is not your
-father's webmail. Unless you are one of my daughters, in which case it is your
-father's webmail. Cypht is like a news reader, but for E-mail. Cypht does not
-replace your existing accounts - it combines them into one. And it's also a
-news reader.
+All your E-mail, from all your accounts, in one place. Cypht is like a news 
+reader, but for E-mail. Cypht does not replace your existing accounts - it 
+combines them into one. And it's also a news reader.
 
 ![screenshot](https://github.com/cypht-org/cypht-website/blob/master/img/Inbox.PNG "Inbox View").
 
