@@ -40,6 +40,7 @@ add_handler('settings', 'attachment_dir', true, 'smtp', 'save_user_settings', 'a
 add_output('settings', 'attachment_setting', true, 'smtp', 'compose_type_setting', 'after');
 
 add_output('settings', 'enable_attachment_reminder_setting', true, 'smtp', 'attachment_setting', 'after');
+add_output('settings', 'delete_attachment_setting', true, 'smtp', 'enable_attachment_reminder_setting', 'after');
 add_handler('settings', 'process_enable_attachment_reminder_setting', true, 'smtp', 'save_user_settings', 'before');
 
 /* ajax server setup callback data */

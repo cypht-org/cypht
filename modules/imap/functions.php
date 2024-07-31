@@ -471,9 +471,6 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
         $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
-        if ($lc_type == "textplain" || $lc_type == "multipartmixed") {
-            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'"></a></td>';
-        }
     }
     if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
         $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
@@ -605,28 +602,28 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $at_link
     if(!$simple_view){
         foreach ($struct as $id => $vals) {
             if (is_array($vals) && isset($vals['type'])) {
-                $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
+                $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $at_link, $use_icons, $simple_view, $mobile);
                 if (!$row) {
                     $level--;
                 }
                 $res .= $row;
                 if (isset($vals['subs'])) {
-                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, ($level + 1));
                 }
             }
             else {
                 if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, $level);
                 }
             }
         }
     }else{
-        $res = format_attachment($struct,  $output_mod, $part, $dl_link);
+        $res = format_attachment($struct, $output_mod, $part, $dl_link, $at_link);
     }
     return $res;
 }}
 
-function format_attachment ($struct,  $output_mod, $part, $dl_args) {
+function format_attachment($struct,  $output_mod, $part, $dl_args, $at_args) {
     $res = '';
 
     foreach ($struct as $id => $vals) {
@@ -636,8 +633,6 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
 
             $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
             $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
-            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
 
             $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
             if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
@@ -646,7 +641,7 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
         }
 
         if(is_array($vals) && isset($vals['subs'])) {
-            $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args);
+            $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args, $at_args);
             $res =$sub_res;
         }
     }
@@ -1472,7 +1467,7 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         }
 
-        $server = Hm_IMAP_List::get($imap_server_id, false);
+        $server = Hm_IMAP_List::get($imap_server_id, true);
 
         if ($enableSieve &&
             $imap_sieve_host &&

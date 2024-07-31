@@ -76,8 +76,7 @@ add_output('settings', 'mailto_handler_setting', true, 'core', 'no_folder_icon_s
 add_output('settings', 'list_style_setting', true, 'core', 'mailto_handler_setting', 'after');
 add_output('settings', 'msg_list_icons_setting', true, 'core', 'list_style_setting', 'before');
 add_output('settings', 'delete_prompt_setting', true, 'core', 'list_style_setting', 'after');
-add_output('settings', 'delete_attachment_setting', true, 'core', 'delete_prompt_setting', 'after');
-add_output('settings', 'no_password_setting', true, 'core', 'delete_attachment_setting', 'after');
+add_output('settings', 'no_password_setting', true, 'core', 'delete_prompt_setting', 'after');
 add_output('settings', 'start_page_setting', true, 'core', 'no_password_setting', 'after');
 add_output('settings', 'default_sort_order_setting', true, 'core', 'start_page_setting', 'after');
 add_output('settings', 'start_unread_settings', true, 'core', 'default_sort_order_setting', 'after');
