@@ -342,7 +342,7 @@ return array(
         'imap_connect_time' => array(FILTER_DEFAULT, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_status_display' => array(FILTER_UNSAFE_RAW, false),
-        'imap_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_status_server_id' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_path' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_DEFAULT, false),
