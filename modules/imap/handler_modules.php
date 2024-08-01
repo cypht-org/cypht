@@ -1,5 +1,4 @@
 <?php
-
 /**
  * IMAP modules
  * @package modules
@@ -8,6 +7,7 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+require_once APP_PATH .'lib/telegram_webhook.php';
 
 /**
  * Check for attachments when forwarding a message
@@ -90,6 +90,33 @@ class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('imap_per_page', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+    }
+}
+
+/**
+ * Process input from the interval webhook notification setting in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_interval_webhook_notification_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero
+     */
+    public function process() {
+        process_site_setting('interval_webhook_notification', $this, 'interval_webhook_notification_setting_callback', DEFAULT_INTERVAL_WEBHOOK_NOTIFICATION);
+    }
+}
+
+/**
+ * Process input from the webhook token setting in the settings page
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_webhook_token_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values for webhook token
+     */
+    public function process() {
+        function webhook_token_callback($val) { return $val; }
+        process_site_setting('webhook_token', $this, 'webhook_token_callback', false, true);
     }
 }
 
@@ -1324,6 +1351,19 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             $this->out('folder_status', $status);
             $this->out('imap_unread_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
+
+        }
+    }
+}
+
+class Hm_Handler_send_telegram_webhook extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('unread_message_count'));
+        if ($success) {
+            $webhook_token = $this->user_config->get('webhook_token_setting');
+            if ($form['unread_message_count'] && !empty($webhook_token)) {
+                Hm_Telegram_Webhook::send($form['unread_message_count'], $this->config->get('app_name'), $webhook_token);
+            }
         }
     }
 }
