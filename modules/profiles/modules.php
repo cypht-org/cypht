@@ -133,7 +133,19 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $profile['id'] = $form['profile_id'];
             Hm_Profiles::edit($form['profile_id'], $profile);
         } else {
+            $profiles = $this->get('profiles');
+
+            foreach ($profiles as $existing_profile) {
+                if (
+                    ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
+                    ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
+                ) {
+                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    return;
+                }
+            }
             Hm_Profiles::add($profile);
+            Hm_Msgs::add('Profile Created');
         }
 
         if ($default) {
