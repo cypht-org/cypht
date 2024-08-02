@@ -32,3 +32,4 @@ $mock_config = new Hm_Mock_Config();
 $user_config = new Hm_User_Config_File($mock_config);
 $session = new Hm_PHP_Session($mock_config, 'Hm_Auth_DB');
 Hm_Server_Wrapper::init($user_config, $session);
+Hm_Tags_Wrapper::init($user_config, $session);

@@ -561,7 +561,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
 
                                         <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_feed" />
                                     </form>
-                                </div>';
+                                </div></div>';
         }
     }
 }

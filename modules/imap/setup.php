@@ -298,6 +298,13 @@ add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_tag', 'core');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'save_imap_cache',  true);
+add_handler('ajax_imap_tag', 'imap_add_tag_message',  true, 'core');
+
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
 add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);
@@ -330,6 +337,7 @@ return array(
         'ajax_imap_move_copy_action',
         'ajax_imap_folder_status',
         'ajax_imap_snooze',
+        'ajax_imap_tag',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
@@ -418,6 +426,8 @@ return array(
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
         'imap_snooze_ids' => FILTER_DEFAULT,
         'imap_snooze_until' => FILTER_DEFAULT,
-        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN
+        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN,
+        'imap_server_ids' => FILTER_DEFAULT,
+        'tag_id' => FILTER_DEFAULT
     )
 );

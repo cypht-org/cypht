@@ -650,4 +650,5 @@ return array(
     'Junk' => '垃圾',
     'Trash' => '已删除',
     'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
 );
