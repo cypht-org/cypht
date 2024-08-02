@@ -637,4 +637,5 @@ return array(
     'Junk' => false,
     'Trash' => false,
     'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
 );

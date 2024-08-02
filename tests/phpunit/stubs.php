@@ -71,6 +71,16 @@ class Hm_Server_Wrapper {
     }
 }
 
+class Hm_Tags_Wrapper {
+    use Hm_Repository;
+
+    private static $data = array();
+
+    public static function init($user_config, $session) {
+        self::initRepo('tags', $user_config, $session, self::$data);
+    }
+}
+
 if (!defined("IMAP_TEST")) {
     class Hm_IMAP {
         static public $allow_connection = true;

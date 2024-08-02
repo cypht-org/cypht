@@ -372,6 +372,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             if (isset($headers['X-Schedule'])) {
                 $txt .= ' | ' . schedule_dropdown($this, true);
+            if($this->get('tags')){
+                $txt .= ' | '. tags_dropdown($this, $headers);
             }
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');

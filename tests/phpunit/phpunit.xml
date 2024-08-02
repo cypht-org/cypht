@@ -124,6 +124,9 @@
     <testsuite name="api">
       <file>./api.php</file>
     </testsuite>
+    <testsuite name="tags">
+      <file>./tags.php</file>
+    </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
         </testsuite>-->

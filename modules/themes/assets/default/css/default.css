@@ -29,3 +29,7 @@
   --bs-btn-disabled-bg: teal;
   --bs-btn-disabled-border-color: teal;
 }
+.text-bg-primary {
+  color: #fff !important;
+  background-color: teal !important;
+}

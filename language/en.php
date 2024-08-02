@@ -647,4 +647,5 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
 );

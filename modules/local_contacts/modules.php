@@ -240,7 +240,6 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="btn btn-primary edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        // var_dump($group);die();
         return '<div class="add_contact kokokoko"><form class="" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.

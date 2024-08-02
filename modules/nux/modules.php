@@ -17,6 +17,9 @@ require_once APP_PATH.'modules/profiles/hm-profiles.php';
  */
 class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
     public function process() {
+        if (!DEBUG_MODE) {
+            return;
+        }
         $cache = $this->cache->get('nux_dev_news', array());
         if ($cache) {
             $this->out('nux_dev_news', $cache);
@@ -322,6 +325,9 @@ class Hm_Output_service_details extends Hm_Output_Module {
  */
 class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
+        if (!$this->get('nux_dev_news')) {
+            return '';
+        }
         $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Development Updates').'</h4></div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
