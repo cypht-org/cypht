@@ -2183,12 +2183,12 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" autocomplete="username" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                             <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" autocomplete="current-password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                             <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>

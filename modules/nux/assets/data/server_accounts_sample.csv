@@ -1,2 +1,2 @@
-server_name;support_jmap;jmap_server;username;password;imap_port;imap_tls;imap_server;support_smtp;smtp_server;smtp_port;smtp_tls;sieve_host;sieve_port
-Exemple;FALSE;;email@exemple.org;secret;993;TRUE;imap.exemple.org;TRUE;smtp.exemple.org;465;TRUE;tls://imap.exemple.org;4190
+server_name;jmap_server;jmap_hide_from_combined_view;username;password;imap_port;imap_tls;imap_hide_from_combined_view;imap_server;smtp_server;smtp_port;smtp_tls;sieve_host;sieve_port
+Exemple;;FALSE;email@exemple.org;secret;993;TRUE;FALSE;imap.exemple.org;smtp.exemple.org;465;TRUE;tls://imap.exemple.org;4190
