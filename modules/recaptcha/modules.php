@@ -43,7 +43,7 @@ class Hm_Handler_process_recaptcha extends Hm_Handler_Module {
  */
 class Hm_Output_recaptcha_script extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('router_login_state')) {
+        if (!$this->get('router_login_state') && $this->get('recaptcha_config')) {
             return "<script src='https://www.google.com/recaptcha/api.js'></script>";
         }
     }
@@ -54,8 +54,8 @@ class Hm_Output_recaptcha_script extends Hm_Output_Module {
  */
 class Hm_Output_recaptcha_form extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('router_login_state') && $this->get('recaptcha_config')) {
-            return '<div class="g-recaptcha" data-sitekey="'.$this->html_safe($this->get('recaptcha_config')['site_key']).'"></div>';
+        if (!$this->get('router_login_state') && $recaptcha_config = $this->get('recaptcha_config')) {
+            return '<div class="g-recaptcha" data-sitekey="'.$this->html_safe($recaptcha_config['site_key']).'"></div>';
         }
     }
 }
