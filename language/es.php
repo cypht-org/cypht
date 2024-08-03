@@ -631,4 +631,5 @@ return array(
     'Pasted text has leading or trailing spaces' => false,
     'No tags available yet.' => false,
     'Yaml File' => false,
+    'Please ensure your YAML or CSV  file follows the correct format' => false,
 );
