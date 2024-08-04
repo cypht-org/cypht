@@ -1,6 +1,6 @@
 # Cypht
 
-This is the official docker image of [Cypht](https://cypht.org/).
+This is the official docker image of [Cypht](https://cypht.org/). It replaces [sailfrog/cypht-docker](https://hub.docker.com/r/sailfrog/cypht-docker)
 
 ## Features of this image
 
