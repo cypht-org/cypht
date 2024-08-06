@@ -273,6 +273,7 @@ var imap_status_update = function() {
                 var id = res.imap_status_server_id;
                 $('.imap_status_'+id).html(res.imap_status_display);
                 $('.imap_detail_'+id).html(res.sieve_detail_display);
+                $('.imap_capabilities_'+id).html(res.imap_extensions_display);
             };
             for (i=0;i<ids.length;i++) {
                 id=ids[i];

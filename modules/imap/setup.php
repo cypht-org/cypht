@@ -15,6 +15,7 @@ add_module_to_all_pages('output', 'prefetch_imap_folder_ids', true, 'imap', 'con
 
 /* add stuff to the info page */
 add_output('info', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
+add_output('info', 'display_imap_capability', true, 'imap', 'server_capabilities_start', 'after');
 add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
@@ -345,6 +346,7 @@ return array(
 
     'allowed_output' => array(
         'imap_connect_status' => array(FILTER_DEFAULT, false),
+        'imap_capabilities_list' => array(FILTER_DEFAULT, false),
         'connect_status' => array(FILTER_DEFAULT, false),
         'auto_sent_folder' => array(FILTER_DEFAULT, false),
         'imap_connect_time' => array(FILTER_DEFAULT, false),

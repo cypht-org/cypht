@@ -720,6 +720,24 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
 }
 
 /**
+ * Format the IMAP status output on the info page
+ * @subpackage imap/output
+ */
+class Hm_Output_display_imap_capability extends Hm_Output_Module {
+    /**
+     * Build the HTML for the status rows. Will be populated by an ajax call per server
+     */
+    protected function output() {
+        $res = '';
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
+                '<td class="imap_capabilities_'.$vals['id'].'"></td></tr>';
+        }
+        return $res;
+    }
+}
+
+/**
  * Output a hidden field with all the IMAP server ids
  * @subpackage imap/output
  */
@@ -796,6 +814,12 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
             $res .= '<span class="sieve_extensions">'.implode(', ', $capabilities).'</span>';
         }
         $this->out('sieve_detail_display', $res);
+        $res = '';
+        $extensions = $this->get('imap_capabilities_list', "");
+        if ($extensions) {
+            $res .= '<span class="imap_extensions">'.$extensions.'</span>';
+        }
+        $this->out('imap_extensions_display', $res);
     }
 }
 

@@ -651,4 +651,6 @@ return array(
     'Trash' => '已删除',
     'Pasted text has leading or trailing spaces' => false,
     'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

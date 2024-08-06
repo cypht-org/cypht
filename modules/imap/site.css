@@ -255,7 +255,7 @@
 .online {
   color: var(--bs-primary);
 }
-.sieve_extensions {
+.sieve_extensions,.imap_extensions {
   font-size: 75%;
   white-space: normal;
 }
