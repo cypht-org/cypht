@@ -532,6 +532,12 @@ $(function () {
             edit_filter_modal.setTitle('Add Filter');
             current_account = $(this).attr('account');
             edit_filter_modal.open();
+
+            // Reset the form fields when opening the modal
+            $(".modal_sieve_filter_name").val('');
+            $(".modal_sieve_script_priority").val('');
+            $(".sieve_list_conditions_modal").empty();
+            $(".filter_actions_modal_table").empty();
         });
         $('.add_script').on('click', function () {
             edit_script_modal.setTitle('Add Script');
