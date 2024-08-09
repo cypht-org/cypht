@@ -130,7 +130,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
 class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
-        if ($success) {            
+        if ($success) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
 
@@ -141,17 +141,23 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
 
             $specials = $this->user_config->get('special_imap_folders', array());
             if ($exposed = $imap->get_special_use_mailboxes()) {
-                $specials[$form['imap_server_id']] = array('sent' => $exposed['sent'], 'draft' => '', 'trash' => $exposed['trash'], 'archive' => '', 'junk' => '');
+                $specials[$form['imap_server_id']] = array(
+                    'sent' => $exposed['sent'] ?? '',
+                    'draft' => $exposed['drafts'] ?? '',
+                    'trash' => $exposed['trash'] ?? '',
+                    'archive' => $exposed['archive'] ?? '',
+                    'junk' => $exposed['junk'] ?? ''
+                );
             } else if ($form['imap_service_name'] == 'gandi') {
                 $specials[$form['imap_server_id']] = array('sent' => 'Sent', 'draft' => 'Drafts', 'trash' => 'Trash', 'archive' => 'Archive', 'junk' => 'Junk');
             } else {
                 $specials[$form['imap_server_id']] = array('sent' => '', 'draft' => '', 'trash' => '', 'archive' => '', 'junk' => '');
-            }     
+            }
             $this->user_config->set('special_imap_folders', $specials);
 
             $user_data = $this->user_config->dump();
             $this->session->set('user_data', $user_data);
-            
+
             Hm_Msgs::add('Special folders assigned');
             $this->session->record_unsaved('Special folders assigned');
             $this->session->close_early();
@@ -225,7 +231,6 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                                 foreach ($script_names as $script_name) {
                                     $script_parsed = $client->getScript($script_name);
                                     $script_parsed = str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $script_parsed);
-                                    
                                     $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
                                     $new_actions = base64_encode(str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $old_actions));
                                     $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
@@ -269,7 +274,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
                         return;
-                    }   
+                    }
                 }
                 if ($del_folder && $imap->delete_mailbox($del_folder)) {
                     Hm_Msgs::add('Folder deleted');
@@ -639,6 +644,6 @@ if (!hm_exists('is_mailbox_linked_with_filters')) {
             $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $module);
             return in_array($mailbox, $linked_mailboxes);
         }
-        return false;  
+        return false;
     }
 }
