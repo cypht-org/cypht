@@ -257,8 +257,12 @@ var Hm_Ajax_Request = function() { return {
                 Hm_Ajax.err_condition = false;
                 Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
-                Hm_Notices.show(res.router_user_msgs);
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
+                var hm_msg = Hm_Utils.json_encode(res.router_user_msgs);
+                if (! Hm_Notices.displayed_messages.includes(hm_msg)) {
+                    Hm_Notices.displayed_messages.push(hm_msg)
+                    Hm_Notices.show(res.router_user_msgs);
+                }
             }
             if (res.folder_status) {
                 for (var name in res.folder_status) {
@@ -399,6 +403,7 @@ function Hm_Modal(options) {
 /* user notification manager */
 var Hm_Notices = {
     hide_id: false,
+    displayed_messages: [],
 
     show: function(msgs) {
         var message = '';
