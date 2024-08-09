@@ -1,0 +1,36 @@
+Test1:
+  jmap:
+    server:
+    hide_from_combined_view: false
+  user:
+    username: email@example.org
+    password: secret
+  imap:
+    port: 993
+    tls: true
+    hide_from_combined_view: false
+    server: imap.example.org
+  smtp:
+    server: smtp.example.org
+    port: 465
+    tls: true
+  sieve:
+    host: tls://imap.example.org
+    port: 4190
+Test2:
+  jmap:
+    server: 
+  user:
+    username: email@example.org
+    password: secret
+  imap:
+    port: 993
+    tls: true
+    server: mail.example.org
+  smtp:
+    server: mail.example.org
+    port: 465
+    tls: true
+  sieve:
+    host: tls://mail.example.org
+    port: 4190

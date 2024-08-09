@@ -1,4 +1,5 @@
 <?php
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * NUX modules
@@ -9,8 +10,9 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-require_once APP_PATH.'modules/nux/services.php';
-require_once APP_PATH.'modules/profiles/hm-profiles.php';
+require_once APP_PATH.'modules/nux/functions.php';
+require_once APP_PATH . 'modules/nux/services.php';
+require_once APP_PATH . 'modules/profiles/hm-profiles.php';
 
 /**
  * @subpackage nux/handler
@@ -264,6 +266,197 @@ class Hm_Handler_get_nux_service_details extends Hm_Handler_Module {
 }
 
 /**
+ * @subpackage nux/handler
+ */
+class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
+{
+    public function process()
+    {
+        list($success, $form) = $this->process_form(array('accounts_source'));
+
+        if ($success) {
+            if (!is_array($this->request->files) || !array_key_exists('accounts_sample', $this->request->files)) {
+                return;
+            }
+            if (!is_array($this->request->files['accounts_sample']) || !array_key_exists('tmp_name', $this->request->files['accounts_sample'])) {
+                return;
+            }
+
+            if ($this->request->files['accounts_sample']['type'] == 'application/x-yaml') {
+                try {
+                    $servers = Yaml::parseFile($this->request->files['accounts_sample']['tmp_name']);
+                    foreach ($servers as $key => $value) {
+                        if (empty($value['user']['username']) or empty($value['user']['password'])) {
+                            Hm_Msgs::add('ERRUsername and password are required for: ' . $key . ' server');
+                            return;
+                        }
+                        if ($value['jmap'] && !empty($value['jmap']['jmap_server'])) {
+                            if (!$this->module_is_supported('jmap')) {
+                                Hm_Msgs::add("ERRJMAP module is not enabled");
+                            }else {
+                                $jmap_server_id = connect_to_imap_server(
+                                    $value['jmap']['server'],
+                                    $key,
+                                    null,
+                                    $value['user']['username'],
+                                    $value['user']['password'],
+                                    false,
+                                    null,
+                                    false,
+                                    'jmap',
+                                    $this,
+                                    $value['imap']['hide_from_combined_view']
+                                );
+                                if ($jmap_server_id !== null) {
+                                    Hm_Msgs::add("JMAP Server " . $key . " saved");
+                                }
+                            }
+                        }elseif ($value['imap'] && !empty($value['imap']['imap_server'])) {
+                            // Check if module is supported
+                            if (!$this->module_is_supported('imap')) {
+                                Hm_Msgs::add("ERRIMAP module is not enabled");
+                            }else {
+                                //TO DO: check first if the imap_server server is already configured before connecting can use the in_server_list function or create a new one specifically for my case
+                                $imap_server_id = connect_to_imap_server(
+                                    $value['imap']['server'],
+                                    $key,
+                                    $value['imap']['port'],
+                                    $value['user']['username'],
+                                    $value['user']['password'],
+                                    $value['imap']['tls'],
+                                    $value['sieve']['host'].':'.$value['sieve']['port'],
+                                    !empty($value['sieve']['sieve_port']) && !empty($value['sieve']['sieve_host']) ? true : false,
+                                    'imap',
+                                    $this,
+                                    $value['imap']['hide_from_combined_view']
+                                );
+                                if ($imap_server_id !== null) {
+                                    Hm_Msgs::add("Server " . $key . "  saved");
+                                }
+                            }
+                        }
+                        if ($value['smtp'] && !empty($value['smtp']['smtp_server'])) {
+                            // Check if module is supported
+                            if (!$this->module_is_supported('smtp')) {
+                                Hm_Msgs::add("ERRSMTP module is not enabled");
+                            } else {
+                                //TO DO: check first if the smtp_server server is already configured before connecting. can use the in_server_list function or create a new one specifically for my case
+                                $smtp_server_id = connect_to_smtp_server(
+                                    $value['smtp']['server'],
+                                    $key,
+                                    $value['smtp']['port'],
+                                    $value['user']['username'],
+                                    $value['user']['password'],
+                                    $value['smtp']['tls'],
+                                    false
+                                );
+                                if ($smtp_server_id !== null) {
+                                    Hm_Msgs::add("SMTP Server " . $key . " saved");
+                                }
+                            }
+                        }
+                        // Verify connection requirements
+                        if (($jmap_server_id === null && $imap_server_id === null) || $smtp_server_id === null) {
+                            if ($jmap_server_id !== null) {
+                                Hm_IMAP_List::del($jmap_server_id);
+                            }
+                            if ($imap_server_id !== null) {
+                                Hm_IMAP_List::del($imap_server_id);
+                            }
+                            if ($smtp_server_id !== null) {
+                                Hm_SMTP_List::del($smtp_server_id);
+                            }
+                        }
+                    }
+                } catch (\Throwable $th) {
+                    Hm_Msgs::add('ERR' . $th->getMessage());
+                }
+            }elseif($this->request->files['accounts_sample']['type'] == 'text/csv'){
+                try {
+                    $server_data = parse_csv_with_headers($this->request->files['accounts_sample']['tmp_name']);
+                    if ($server_data['jmap_server'] && !empty($server_data['jmap_server'])) {
+                        if (!$this->module_is_supported('jmap')) {
+                            Hm_Msgs::add("ERRJMAP module is not enabled");
+                        }else {
+                            $jmap_server_id = connect_to_imap_server(
+                                $server_data['jmap_server'],
+                                $server_data['server_name'],
+                                null,
+                                $server_data['username'],
+                                $server_data['password'],
+                                false,
+                                null,
+                                false,
+                                'jmap',
+                                $this,
+                                $server_data['hide_from_combined_view'] === "TRUE"
+                            );
+                            if ($jmap_server_id !== null) {
+                                Hm_Msgs::add("JMAP Server " . $server_data['server_name'] . " saved");
+                            }
+                        }
+                    }elseif($server_data['imap_server'] && !empty($server_data['imap_server'])) {
+                        if (!$this->module_is_supported('imap')) {
+                            Hm_Msgs::add("ERRIMAP module is not enabled");
+                        }else {
+                            $imap_server_id = connect_to_imap_server(
+                                $server_data['imap_server'],
+                                $server_data['server_name'],
+                                $server_data['imap_port'],
+                                $server_data['username'],
+                                $server_data['password'],
+                                $server_data['imap_tls'] === "TRUE",
+                                $server_data['sieve_host'].':'.$server_data['sieve_port'],
+                                !empty($server_data['sieve_port']) &&  !empty($server_data['sieve_host']) ? true : false,
+                                'imap',
+                                $this,
+                                $server_data['imap_hide_from_combined_view'] === "TRUE"
+                            );
+                            if ($imap_server_id !== null) {
+                                Hm_Msgs::add("Server " . $server_data['server_name'] . "  saved");
+                            }
+                        }
+                    }
+                    if ($server_data['smtp_server'] && !empty($server_data['smtp_server'])) {
+                        if (!$this->module_is_supported('smtp')) {
+                            Hm_Msgs::add("ERRSMTP module is not enabled");
+                        } else {
+                            $smtp_server_id = connect_to_smtp_server(
+                                $server_data['smtp_server'],
+                                $server_data['server_name'],
+                                $server_data['smtp_port'],
+                                $server_data['username'],
+                                $server_data['password'],
+                                $server_data['smtp_tls'] === "TRUE",
+                                false
+                            );
+                            if ($smtp_server_id !== null) {
+                                Hm_Msgs::add("SMTP Server " . $server_data['server_name'] . " saved");
+                            }
+                        }
+                    }
+                    // Verify connection requirements
+                    if (($jmap_server_id === null && $imap_server_id === null) || $smtp_server_id === null) {
+                        if ($jmap_server_id !== null) {
+                            Hm_IMAP_List::del($jmap_server_id);
+                        }
+                        if ($imap_server_id !== null) {
+                            Hm_IMAP_List::del($imap_server_id);
+                        }
+                        if ($smtp_server_id !== null) {
+                            Hm_SMTP_List::del($smtp_server_id);
+                        }
+                    } 
+                } catch (\Exception $ex) {
+                    Hm_Msgs::add('ERR' . $ex->getMessage());
+                }
+            }
+        }
+    }
+}
+
+
+/**
  * @subpackage nux/output
  */
 class Hm_Output_quick_add_dialog extends Hm_Output_Module {
@@ -290,6 +483,41 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
 
             '<input type="button" class="nux_next_button btn btn-primary btn-md px-5" value="'.$this->trans('Next').'">'.
             '</div></div></div><div class="nux_step_two px-4 pt-3"></div></div>';
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
+class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $title = $this->trans('Import from YAML or CSV file');
+        $notice = 'Please ensure your YAML or CSV  file follows the correct format';
+        $yaml_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
+        $csv_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.csv';
+
+        return '<div class="quick_add_multiple_section">' .
+            '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .
+            '<form class="quick_add_multiple_server_form" action="?page=servers" method="POST" enctype="multipart/form-data">' .
+            '<button class="browser_acc_file mt-2 btn btn-light" title="' . $notice . '"><i class="bi bi-filetype-yml me-2"></i>' . $title . '</button>' .
+            '<div class="server_form"><br />' .
+            '<div class="row">' .
+            '<div class="col-md-6">' .
+            '<div><a href="' . $yaml_file_sample_path . '">' . $this->trans('download a sample yaml file') . '</a></div>' .
+            '</div>' .
+            '<div class="col-md-6">' .
+            '<div><a href="' . $csv_file_sample_path . '">' . $this->trans('download a sample csv file') . '</a></div><br />' .
+            '</div>' .
+            '</div>' .
+            '<input type="hidden" name="hm_page_key" value="' . $this->html_safe(Hm_Request_Key::generate()) . '" />' .
+            '<input type="hidden" name="accounts_source" value="yaml" />' .
+            '<label class="screen_reader" for="accounts_sample">' . $this->trans('Yaml or csv File') . '</label>' .
+            '<input class="form-control" id="accounts_sample" type="file" name="accounts_sample" accept=".yaml,.csv"/> <br />' .
+            '<input class="btn btn-primary add_multiple_server_submit" type="submit" name="import_contact" id="import_contact" value="' . $this->trans('Add') . '" /> <input type="button" class="btn btn-secondary reset_add_multiple_server" value="' .
+            $this->trans('Cancel') . '" /></div></form></div></div></div></div></div>';
     }
 }
 
@@ -450,66 +678,19 @@ class Hm_Output_quick_add_section extends Hm_Output_Module {
             '<b>'.$this->trans('Add an E-mail Account').'</b></a></div>';
     }
 }
-
 /**
- * @subpackage nux/functions
+ * @subpackage nux/output
  */
-if (!hm_exists('oauth2_form')) {
-function oauth2_form($details, $mod) {
-    $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-    $url = $oauth2->request_authorization_url($details['auth_uri'], $details['scope'], 'nux_authorization', $details['email']);
-    $res = '<input type="hidden" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-    $res .= '<div class="nux_step_two_title fw-bold">'.$mod->html_safe($details['name']).'</div><div class="mb-3">';
-    $res .= $mod->trans('This provider supports Oauth2 access to your account.');
-    $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
-    $res .= '</div><div class="mb-3"><a class="enable_auth2 btn btn-sm btn-success me-2" href="'.$url.'">'.$mod->trans('Enable').'</a>';
-    $res .= '<a href="" class="reset_nux_form btn btn-sm btn-secondary">Reset</a></div>';
-    return $res;
-}}
-
-/**
- * @subpackage nux/functions
- */
-if (!hm_exists('credentials_form')) {
-    function credentials_form($details, $mod) {
-        $res = '<input type="hidden" id="nux_service" name="nux_service" value="'.$mod->html_safe($details['id']).'" />';
-        $res .= '<input type="hidden" name="nux_name" class="nux_name" value="'.$mod->html_safe($details['name']).'" />';
-        $res .= '<div class="nux_step_two_title"><b>'.$mod->html_safe($details['name']).'</b></div>';
-        $res .= $mod->trans('Enter your password for this E-mail provider to complete the connection process');
-
-        $res .= '<div class="row"><div class="col col-lg-4">';
-        // E-mail Address Field
-        $res .= '<div class="form-floating mb-3 mt-3">';
-        $res .= '<input type="email" class="form-control warn_on_paste" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
-        $res .= '<label for="nux_email">'.$mod->trans('E-mail Address').'</label></div>';
-
-        // E-mail Password Field
-        $res .= '<div class="form-floating mb-3">';
-        $res .= '<input type="password" class="form-control nux_password warn_on_paste" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
-        $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
-
-        // Connect Button
-        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary me-3" value="'.$mod->trans('Connect').'">';
-
-        // Reset Link
-        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';
-
-        $res .= '</div></div>';
-
-        return $res;
+class Hm_Output_quick_add_multiple_section extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        return '<div data-target=".quick_add_multiple_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto"><a href="#" class="pe-auto">' .
+            '<i class="bi bi-filetype-yml me-3"></i>' .
+            '<b>' . $this->trans('Bulk-import accounts using yaml or csv template') . '</b></a></div>';
     }
 }
-
-/**
- * @subpackage nux/functions
- */
-if (!hm_exists('data_source_available')) {
-function data_source_available($mods, $types) {
-    if (!is_array($types)) {
-        $types = array($types);
-    }
-    return count( array_intersect($types, $mods) ) == count( $types );
-}}
 
 /**
  * @subpackage nux/lib
