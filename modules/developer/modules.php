@@ -277,3 +277,31 @@ class Hm_Output_server_status_end extends Hm_Output_Module {
         return '</tbody></table></div></div>';
     }
 }
+
+/**
+ * Starts a capabilities table used on the info page
+ * @subpackage developer/output
+ */
+class Hm_Output_server_capabilities_start extends Hm_Output_Module {
+    /**
+     * Modules populate this table to run a status check from the info page
+     */
+    protected function output() {
+        $res = '<div class="content_title px-3">'.$this->trans('Capabilities').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
+                $this->trans('Server capabilities').'</th></tr></thead><tbody>';
+        return $res;
+    }
+}
+
+/**
+ * Close the capabilities table used on the info page
+ * @subpackage developer/output
+ */
+class Hm_Output_server_capabilities_end extends Hm_Output_Module {
+    /**
+     * Close the table opened in Hm_Output_server_capabilities_start
+     */
+    protected function output() {
+        return '</tbody></table></div></div>';
+    }
+}

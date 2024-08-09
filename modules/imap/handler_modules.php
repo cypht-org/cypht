@@ -1327,10 +1327,12 @@ class Hm_Handler_imap_status extends Hm_Handler_Module {
                 $imap = Hm_IMAP_List::connect($id, $cache);
                 $this->out('imap_connect_time', microtime(true) - $start_time);
                 if (imap_authed($imap)) {
+                    $this->out('imap_capabilities_list', $imap->get_capability());
                     $this->out('imap_connect_status', $imap->get_state());
                     $this->out('imap_status_server_id', $id);
                 }
                 else {
+                    $this->out('imap_capabilities_list', "");
                     $this->out('imap_connect_status', 'disconnected');
                     $this->out('imap_status_server_id', $id);
                 }

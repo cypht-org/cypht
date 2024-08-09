@@ -125,6 +125,7 @@ return array(
         'test_type' => array(FILTER_UNSAFE_RAW, false),
         'mailboxes' => array(FILTER_UNSAFE_RAW, false),
         'sieve_detail_display' => array(FILTER_UNSAFE_RAW, false),
+        'imap_extensions_display' => array(FILTER_UNSAFE_RAW, false),
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     ),
     'allowed_get' => array(),
