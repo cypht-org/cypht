@@ -11,8 +11,8 @@ use Symfony\Component\Yaml\Yaml;
 if (!defined('DEBUG_MODE')) { die(); }
 
 require_once APP_PATH.'modules/nux/functions.php';
-require_once APP_PATH . 'modules/nux/services.php';
-require_once APP_PATH . 'modules/profiles/hm-profiles.php';
+require_once APP_PATH.'modules/nux/services.php';
+require_once APP_PATH.'modules/profiles/hm-profiles.php';
 
 /**
  * @subpackage nux/handler
@@ -276,181 +276,129 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
 
         if ($success) {
             if (!is_array($this->request->files) || !array_key_exists('accounts_sample', $this->request->files)) {
+                Hm_Msgs::add('ERRError while uploading, key accounts_sample doesn\'t exist');
                 return;
             }
             if (!is_array($this->request->files['accounts_sample']) || !array_key_exists('tmp_name', $this->request->files['accounts_sample'])) {
+                Hm_Msgs::add('ERRError while uploading, can\'t access to tmp_name');
                 return;
             }
 
-            if ($this->request->files['accounts_sample']['type'] == 'application/x-yaml') {
-                try {
-                    $servers = Yaml::parseFile($this->request->files['accounts_sample']['tmp_name']);
-                    foreach ($servers as $key => $value) {
-                        if (empty($value['user']['username']) or empty($value['user']['password'])) {
-                            Hm_Msgs::add('ERRUsername and password are required for: ' . $key . ' server');
-                            return;
-                        }
-                        if ($value['jmap'] && !empty($value['jmap']['server'])) {
-                            if (!$this->module_is_supported('jmap')) {
-                                Hm_Msgs::add("ERRJMAP module is not enabled");
-                            }else {
-                                $jmap_server_id = connect_to_imap_server(
-                                    $value['jmap']['server'],
-                                    $key,
-                                    null,
-                                    $value['user']['username'],
-                                    $value['user']['password'],
-                                    false,
-                                    null,
-                                    false,
-                                    'jmap',
-                                    $this,
-                                    $value['imap']['hide_from_combined_view']
-                                );
-                                if ($jmap_server_id !== null) {
-                                    Hm_Msgs::add("JMAP Server " . $key . " saved");
-                                }
-                            }
-                        }elseif ($value['imap'] && !empty($value['imap']['server'])) {
-                            // Check if module is supported
-                            if (!$this->module_is_supported('imap')) {
-                                Hm_Msgs::add("ERRIMAP module is not enabled");
-                            }else {
-                                //TO DO: check first if the imap_server server is already configured before connecting can use the in_server_list function or create a new one specifically for my case
-                                $imap_server_id = connect_to_imap_server(
-                                    $value['imap']['server'],
-                                    $key,
-                                    $value['imap']['port'],
-                                    $value['user']['username'],
-                                    $value['user']['password'],
-                                    $value['imap']['tls'],
-                                    $value['sieve']['host'].':'.$value['sieve']['port'],
-                                    !empty($value['sieve']['sieve_port']) && !empty($value['sieve']['sieve_host']) ? true : false,
-                                    'imap',
-                                    $this,
-                                    $value['imap']['hide_from_combined_view']
-                                );
-                                if ($imap_server_id !== null) {
-                                    Hm_Msgs::add("Server " . $key . "  saved");
-                                }
-                            }
-                        }
-                        if ($value['smtp'] && !empty($value['smtp']['server'])) {
-                            // Check if module is supported
-                            if (!$this->module_is_supported('smtp')) {
-                                Hm_Msgs::add("ERRSMTP module is not enabled");
+            try {
+                if ($this->request->files['accounts_sample']['type'] == 'application/x-yaml') {
+                        $servers = Yaml::parseFile($this->request->files['accounts_sample']['tmp_name']);
+                }elseif($this->request->files['accounts_sample']['type'] == 'text/csv'){
+                    $servers= [];
+                        $server_data = parse_csv_with_headers($this->request->files['accounts_sample']['tmp_name']);
+                        foreach ($server_data as $key => $value) {
+                            if (strpos($key, '_') !== false) {
+                            list($prefix, $suffix) = explode('_', $key, 2);
+                            $servers[$prefix][$suffix] = $value;
                             } else {
-                                //TO DO: check first if the smtp_server server is already configured before connecting. can use the in_server_list function or create a new one specifically for my case
-                                $smtp_server_id = connect_to_smtp_server(
-                                    $value['smtp']['server'],
-                                    $key,
-                                    $value['smtp']['port'],
-                                    $value['user']['username'],
-                                    $value['user']['password'],
-                                    $value['smtp']['tls'],
-                                    false
-                                );
-                                if ($smtp_server_id !== null) {
-                                    Hm_Msgs::add("SMTP Server " . $key . " saved");
-                                }
+                            $servers[$key] = $value;
                             }
-                        }
-                        // Verify connection requirements
-                        if (($jmap_server_id === null && $imap_server_id === null) || $smtp_server_id === null) {
-                            if ($jmap_server_id !== null) {
-                                Hm_IMAP_List::del($jmap_server_id);
-                            }
-                            if ($imap_server_id !== null) {
-                                Hm_IMAP_List::del($imap_server_id);
-                            }
-                            if ($smtp_server_id !== null) {
-                                Hm_SMTP_List::del($smtp_server_id);
-                            }
-                        }
-                    }
-                } catch (\Throwable $th) {
-                    Hm_Msgs::add('ERR' . $th->getMessage());
+                        }   
                 }
-            }elseif($this->request->files['accounts_sample']['type'] == 'text/csv'){
-                try {
-                    $server_data = parse_csv_with_headers($this->request->files['accounts_sample']['tmp_name']);
-                    foreach ($server_data as $server) {
-                        if ($server['jmap_server'] && !empty($server['jmap_server'])) {
-                            if (!$this->module_is_supported('jmap')) {
-                                Hm_Msgs::add("ERRJMAP module is not enabled");
-                            }else {
-                                $jmap_server_id = connect_to_imap_server(
-                                    $server['jmap_server'],
-                                    $server['server_name'],
-                                    null,
-                                    $server['username'],
-                                    $server['password'],
-                                    false,
-                                    null,
-                                    false,
-                                    'jmap',
-                                    $this,
-                                    $server['hide_from_combined_view'] === "TRUE"
-                                );
-                                if ($jmap_server_id !== null) {
-                                    Hm_Msgs::add("JMAP Server " . $server['server_name'] . " saved");
-                                }
-                            }
-                        }elseif($server['imap_server'] && !empty($server['imap_server'])) {
-                            if (!$this->module_is_supported('imap')) {
-                                Hm_Msgs::add("ERRIMAP module is not enabled");
-                            }else {
-                                $imap_server_id = connect_to_imap_server(
-                                    $server['imap_server'],
-                                    $server['server_name'],
-                                    $server['imap_port'],
-                                    $server['username'],
-                                    $server['password'],
-                                    $server['imap_tls'] === "TRUE",
-                                    $server['sieve_host'].':'.$server['sieve_port'],
-                                    !empty($server['sieve_port']) &&  !empty($server['sieve_host']) ? true : false,
-                                    'imap',
-                                    $this,
-                                    $server['imap_hide_from_combined_view'] === "TRUE"
-                                );
-                                if ($imap_server_id !== null) {
-                                    Hm_Msgs::add("Server " . $server['server_name'] . "  saved");
-                                }
-                            }
-                        }
-                        if ($server['smtp_server'] && !empty($server['smtp_server'])) {
-                            if (!$this->module_is_supported('smtp')) {
-                                Hm_Msgs::add("ERRSMTP module is not enabled");
-                            } else {
-                                $smtp_server_id = connect_to_smtp_server(
-                                    $server['smtp_server'],
-                                    $server['server_name'],
-                                    $server['smtp_port'],
-                                    $server['username'],
-                                    $server['password'],
-                                    $server['smtp_tls'] === "TRUE",
-                                    false
-                                );
-                                if ($smtp_server_id !== null) {
-                                    Hm_Msgs::add("SMTP Server " . $server['server_name'] . " saved");
-                                }
-                            }
-                        }
-                        // Verify connection requirements
-                        if (($jmap_server_id === null && $imap_server_id === null) || $smtp_server_id === null) {
+            } catch (\Exception $ex) {
+                Hm_Msgs::add('ERR' . $ex->getMessage());
+                return;
+            }
+            if(!empty($servers)){
+                foreach ($servers as $server) {
+                    if ($server['jmap_server'] && !empty($server['jmap_server'])) {
+                        if (!$this->module_is_supported('jmap')) {
+                            Hm_Msgs::add("ERRJMAP module is not enabled");
+                        }else {
+                            $jmap_server_id = connect_to_imap_server(
+                                $server['jmap_server'],
+                                $server['server_name'],
+                                null,
+                                $server['username'],
+                                $server['password'],
+                                false,
+                                null,
+                                false,
+                                'jmap',
+                                $this,
+                                $server['hide_from_combined_view'] === "TRUE"
+                            );
                             if ($jmap_server_id !== null) {
-                                Hm_IMAP_List::del($jmap_server_id);
+                                Hm_Msgs::add("JMAP Server " . $server['server_name'] . " saved");
                             }
+                        }
+                    }elseif($server['imap_server'] && !empty($server['imap_server'])) {
+                        if (!$this->module_is_supported('imap')) {
+                            Hm_Msgs::add("ERRIMAP module is not enabled");
+                        }else {
+                            $imap_server_id = connect_to_imap_server(
+                                $server['imap_server'],
+                                $server['server_name'],
+                                $server['imap_port'],
+                                $server['username'],
+                                $server['password'],
+                                $server['imap_tls'] === "TRUE",
+                                $server['sieve_host'].':'.$server['sieve_port'],
+                                !empty($server['sieve_port']) &&  !empty($server['sieve_host']) ? true : false,
+                                'imap',
+                                $this,
+                                $server['imap_hide_from_combined_view'] === "TRUE"
+                            );
                             if ($imap_server_id !== null) {
-                                Hm_IMAP_List::del($imap_server_id);
+                                Hm_Msgs::add("Server " . $server['server_name'] . "  saved");
                             }
-                            if ($smtp_server_id !== null) {
-                                Hm_SMTP_List::del($smtp_server_id);
-                            }
-                        } 
+                        }
                     }
-                } catch (\Exception $ex) {
-                    Hm_Msgs::add('ERR' . $ex->getMessage());
+                    if ($server['smtp_server'] && !empty($server['smtp_server'])) {
+                        if (!$this->module_is_supported('smtp')) {
+                            Hm_Msgs::add("ERRSMTP module is not enabled");
+                        } else {
+                            $smtp_server_id = connect_to_smtp_server(
+                                $server['smtp_server'],
+                                $server['server_name'],
+                                $server['smtp_port'],
+                                $server['username'],
+                                $server['password'],
+                                $server['smtp_tls'] === "TRUE",
+                                false
+                            );
+                            if ($smtp_server_id !== null) {
+                                Hm_Msgs::add("SMTP Server " . $server['server_name'] . " saved");
+                            }
+                        }
+                    }
+                    // Verify connection requirements
+                    if (($jmap_server_id === null || $imap_server_id === null) || $smtp_server_id === null) {
+                        if ($jmap_server_id !== null) {
+                            Hm_IMAP_List::del($jmap_server_id);
+                        }
+                        if ($imap_server_id !== null) {
+                            Hm_IMAP_List::del($imap_server_id);
+                        }
+                        if ($smtp_server_id !== null) {
+                            Hm_SMTP_List::del($smtp_server_id);
+                        }
+                    }else {
+                        if($server['profile_reply_to'] && !empty($server['profile_reply_to']) && (!empty($imap_server_id) || !empty($jmap_server_id)) && !empty($smtp_server_id)) {
+                            if (!$this->module_is_supported('profiles')) {
+                                Hm_Msgs::add("ERRProfiles module is not enabled");
+                                return;
+                            }
+        
+                            $profile = array(
+                                'name' => $server['server_name'],
+                                'sig' => null,
+                                'smtp_id' => $smtp_server_id,
+                                'replyto' => $server['profile_reply_to'],
+                                'default' => false,
+                                'address' => $server['username'],
+                                'server' =>  $server['imap_server'],
+                                'user' => $email,
+                                'type' => 'imap'
+                            );
+                    
+                            Hm_Profiles::add($profile);
+                        }
+                    }
                 }
             }
         }

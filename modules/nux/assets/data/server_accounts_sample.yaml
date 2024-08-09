@@ -1,10 +1,9 @@
 Test1:
+  username: email@example.org
+  password: secret
   jmap:
     server:
     hide_from_combined_view: false
-  user:
-    username: email@example.org
-    password: secret
   imap:
     port: 993
     tls: true
@@ -18,11 +17,10 @@ Test1:
     host: tls://imap.example.org
     port: 4190
 Test2:
+  username: email@example.org
+  password: secret
   jmap:
     server: 
-  user:
-    username: email@example.org
-    password: secret
   imap:
     port: 993
     tls: true
@@ -34,3 +32,4 @@ Test2:
   sieve:
     host: tls://mail.example.org
     port: 4190
+  profile_reply_to:
