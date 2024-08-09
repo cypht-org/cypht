@@ -1,5 +1,4 @@
 <?php
-use SplFileObject;
 
 /**
  * NUX modules
@@ -47,11 +46,25 @@ function parse_csv_with_headers($file_path, $delimiter = ';') {
             // Ensure that the number of fields matches the header count
             if (count($fields) === count($header)) {
                 // Combine the header and fields into an associative array
-                $rows[] = array_combine($header, $fields);
+                $line_data = array_combine($header, $fields);
+                foreach ($line_data as $key => $value) {
+                    $line_data[$key] = convert_to_boolean($value);
+                }
+                $rows[] = $line_data;
             }
         }
     }
     return $rows;
+}}
+
+if (!hm_exists('convert_to_boolean')) {
+function convert_to_boolean($value) {
+    if (in_array($value, ['true', '1', 'yes'])) {
+        return true;
+    } elseif (in_array($value, ['false', '0', 'no'])) {
+        return false;
+    }
+    return $value;
 }}
 
 /**

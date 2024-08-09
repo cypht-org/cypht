@@ -1518,7 +1518,7 @@ function parse_sieve_config_host($host) {
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $show_errors = true) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
@@ -1567,11 +1567,16 @@ if (!hm_exists('connect_to_imap_server')) {
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
                 $client = $sieveClientFactory->init(null, $server);
 
-                if (!$client) {
+                if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                 }
             } catch (Exception $e) {
-                Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                if ($show_errors) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                }
+                if (! $server_id) {
+                    Hm_IMAP_List::del($imap_server_id);
+                }
                 return;
             }
         }
@@ -1580,9 +1585,11 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if (imap_authed($imap)) {
             return $imap_server_id;
-        }else {
+        } else {
             Hm_IMAP_List::del($imap_server_id);
-            Hm_Msgs::add('ERRAuthentication failed');
+            if ($show_errors) {
+                Hm_Msgs::add('ERRAuthentication failed');
+            }
             return null;
         }
     }

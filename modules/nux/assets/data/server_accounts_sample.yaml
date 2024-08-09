@@ -1,15 +1,14 @@
-Test1:
+Mailbox 1:
+  username: email@example.org
+  password: secret
   jmap:
     server:
-    hide_from_combined_view: false
-  user:
-    username: email@example.org
-    password: secret
+    hide_from_combined_view:
   imap:
+    server: imap.example.org
     port: 993
     tls: true
     hide_from_combined_view: false
-    server: imap.example.org
   smtp:
     server: smtp.example.org
     port: 465
@@ -17,20 +16,29 @@ Test1:
   sieve:
     host: tls://imap.example.org
     port: 4190
-Test2:
+  profile:
+    reply_to: email@example.org
+    signature:
+    is_default: false
+Mailbox 2:
+  username: test@example2.org
+  password: secret2
   jmap:
-    server: 
-  user:
-    username: email@example.org
-    password: secret
+    server: jmap.example2.org
+    hide_from_combined_view: false
   imap:
-    port: 993
-    tls: true
-    server: mail.example.org
+    server:
+    port:
+    tls:
+    hide_from_combined_view:
   smtp:
-    server: mail.example.org
+    server: smtp.example2.org
     port: 465
     tls: true
   sieve:
-    host: tls://mail.example.org
+    host: tls://jmap.example2.org
     port: 4190
+  profile:
+    reply_to: test@example2.org
+    signature: my-signature
+    is_default: true

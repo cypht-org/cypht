@@ -132,9 +132,6 @@ $(function() {
                 $('.nux_extra_fields').remove();
             }
         });
-        $('.reset_add_multiple_server').on("click", function() {
-            Hm_Utils.redirect('?page=servers');
-        });
     }
     else if (hm_page_name() === 'message_list') {
         var list_path = hm_list_path();
