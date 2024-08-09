@@ -398,6 +398,45 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_save_contact extends Hm_Handler_Module
+{
+    public function process()
+    {
+        list($success, $form ) = $this->process_form(array('email_address'));
+        if ($success) {
+            $contacts = $this->get('contact_store');
+            $contact_list = $contacts->getAll();
+            $existingEmails = array_column($contact_list, 'email_address');
+
+            $list_mails = array_unique(explode(",", $form['email_address']));
+
+            foreach ($list_mails as $addr) {
+                $addresses = process_address_fld($addr);
+                $newEmails = array_column($addresses, 'email');
+
+                if (!empty($newEmails)) {
+                    $newContacts = array_filter($newEmails, function ($email) use ($existingEmails) {
+                        return !in_array($email, $existingEmails);
+                    });
+
+                    if (!empty($newContacts)) {
+                        $newContacts = array_map(function ($email) {
+                            return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => 'Trusted Senders'];
+                        }, $newContacts);
+                        $contacts->add_contact($newContacts[0]);
+                    }
+                }
+            }
+            $this->session->record_unsaved('Contacts added to  Trusted Contacts list');
+            Hm_Msgs::add('Contacts added to  Trusted Contacts list');
+        }
+
+    }
+}
+
+/**
  * @subpackage contacts/output
  */
 class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
