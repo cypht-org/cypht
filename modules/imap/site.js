@@ -110,7 +110,8 @@ var imap_test_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         false,
-        {'imap_connect': 1}
+        {'imap_connect': 1},
+        true
     );
 }
 
@@ -1057,7 +1058,7 @@ var imap_background_unread_content = function(id, folder) {
         {'name': 'imap_server_ids', 'value': id}],
         imap_background_unread_content_result,
         [],
-        false,
+        true,
         function() {
             var cache = $('<tbody></tbody>').append($(Hm_Utils.get_from_local_storage('formatted_unread_data')));
             Hm_Message_List.adjust_unread_total($('tr', cache).length, true);

@@ -7,7 +7,8 @@ var feed_test_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function() {},
-        {'feed_connect': 1}
+        {'feed_connect': 1},
+        true
     );
 };
 
