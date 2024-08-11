@@ -1144,7 +1144,7 @@ return [
     | Timezone for date displays
     | Defaults to UTC
     */
-    // 'default_setting_timezone' => env('DEFAULT_SETTING_TIMEZONE', 'UTC'),
+    'default_setting_timezone' => env('DEFAULT_SETTING_TIMEZONE', 'UTC'),
 
     /*
     |

@@ -570,6 +570,19 @@ class Hm_Handler_language extends Hm_Handler_Module {
 }
 
 /**
+ * Setup the current language
+ * @subpackage core/handler
+ */
+class Hm_Handler_default_timezone extends Hm_Handler_Module {
+    /**
+     * output the default timezone
+     */
+    public function process() {
+        $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
+    }
+}
+
+/**
  * Setup the date
  * @subpackage core/handler
  */

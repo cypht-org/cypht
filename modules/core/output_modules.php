@@ -635,6 +635,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '    }'.
             '    return key;'.
             '};';
+        $res .= 'window.hm_default_timezone = "'.$this->get('default_timezone','UTC').'";';
         $res .= '</script>';
         return $res;
     }
@@ -1194,7 +1195,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             $myzone = $settings['timezone'];
         }
         else {
-            $myzone = false;
+            $myzone = $this->get('default_timezone','UTC');
         }
         $res = '<tr class="general_setting"><td><label for="timezone">'.
             $this->trans('Timezone').'</label></td><td><select class="w-auto form-select form-select-sm" id="timezone" name="timezone">';
@@ -1202,8 +1203,8 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             $res .= '<option ';
             if ($zone == $myzone) {
                 $res .= 'selected="selected" ';
-                if ($zone != 'Africa/Abidjan') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                if ($zone != $this->get('default_timezone','UTC')) {
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_timezone"></i></span>';
                 }
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';

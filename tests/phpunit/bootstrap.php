@@ -12,6 +12,7 @@ if (!defined('DEBUG_MODE')) {
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+define('CONFIG_PATH', APP_PATH.'config/');
 
 /* random id */
 define('SITE_ID', 'randomid');

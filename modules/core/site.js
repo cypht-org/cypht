@@ -1815,6 +1815,10 @@ var reset_default_value_checkbox = function() {
     }
 };
 
+var reset_default_timezone = function() {
+    var hm_default_timezone = window.hm_default_timezone;
+    $('#timezone').val(hm_default_timezone);
+}
 var reset_default_value_select = function() {
     let field = this.parentElement.parentElement.firstChild;
     let tab_static_default_value = {"inline_message_style" : 0, "smtp_compose_type" : 0, "theme_setting" : 0,
@@ -2039,6 +2043,7 @@ $(function() {
         $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
+        $('.reset_default_timezone').on("click", reset_default_timezone);
     }
 
     if (hm_check_dirty_flag()) {
