@@ -136,7 +136,7 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
 
             if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-                Hm_Msgs('ERRUnable to connect to the selected IMAP server');
+                Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
                 return;
             }
             $specials = $this->user_config->get('special_imap_folders', array());
