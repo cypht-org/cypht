@@ -148,7 +148,12 @@ if (!class_exists('Hm_Functions')) {
          * @param resource $handle
          */
         public static function c_exec($handle) {
-            return curl_exec($handle);
+            $response = curl_exec($handle);
+            if ($response === false) {
+                $error = curl_error($handle);
+                Hm_Msgs::add('ERRcURL error: '.$error);
+            }
+            return $response;
         }
 
         /**
