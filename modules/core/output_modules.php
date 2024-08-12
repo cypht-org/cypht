@@ -18,7 +18,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         $res = '<li class="menu_search"><form method="get">';
         $res .= '<div class="d-flex align-items-center">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="'.WEB_ROOT.'?page=search">';
+            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
             $res .= '<i class="bi bi-search"></i></a></div>';
         }
         $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
@@ -70,7 +70,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="'.WEB_ROOT.'?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
         }
         return '';
     }
@@ -285,7 +285,7 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.WEB_ROOT.'?page=save">'.$this->trans('More info').'</a></p>
+                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="?page=save">'.$this->trans('More info').'</a></p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
                             <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="'.$this->trans('Password').'">
@@ -439,7 +439,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
         if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
-            $res .= '<a class="unsaved_icon" href="'.WEB_ROOT.'?page=save" title="'.$this->trans('Unsaved Changes').
+            $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
         return $res;
@@ -1322,33 +1322,33 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
         if ($total_accounts > 1) {
-            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=combined_inbox">';
+            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'.WEB_ROOT.'?page=message_list&amp;list_path=unread">';
+        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
-        $res .= '<li class="menu_flagged"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=flagged">';
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
-        $res .= '<li class="menu_junk"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=junk">';
+        $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Junk').'</a></li>';
-        $res .= '<li class="menu_trash"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=trash">';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Trash').'</a></li>';
-        $res .= '<li class="menu_drafts"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=drafts">';
+        $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pencil-square fs-5 me-2"></i>';
         }
@@ -1423,7 +1423,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             }
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
-                $res .= '<li class="menu_email"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=email">';
+                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
                 }
@@ -1450,7 +1450,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
             '</div><ul style="display: none;" class="settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="'.WEB_ROOT.'?page=home">';
+        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
         }
@@ -1513,7 +1513,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
      * Outputs links to the Servers settings pages
      */
     protected function output() {
-        $res = '<li class="menu_servers"><a class="unread_link" href="'.WEB_ROOT.'?page=servers">';
+        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
         }
@@ -1531,7 +1531,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
      * Outputs links to the Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_settings"><a class="unread_link" href="'.WEB_ROOT.'?page=settings">';
+        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
         }
@@ -1552,7 +1552,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return;
         }
-        $res = '<li class="menu_save"><a class="unread_link" href="'.WEB_ROOT.'?page=save">';
+        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-download fs-5 me-2"></i>';
         }
@@ -1663,20 +1663,20 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="'.WEB_ROOT.'?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {
                     unset($mb_title[$key]);
                 }
                 $title .= '<i class="bi bi-caret-right-fill path_delim"></i>'.
-                    '<a href="'.WEB_ROOT.'?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
+                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
                     implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                     array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
-            $url = WEB_ROOT.'?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
+            $url = '?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
             if ($this->get('list_page', 0)) {
                 $url .= '&list_page='.$this->html_safe($this->get('list_page'));
             }
@@ -1833,7 +1833,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $path = $this->get('list_path');
             }
-            $config_link = '<a title="'.$this->trans('Configure').'" href="'.WEB_ROOT.'?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
+            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
             //$search_field = '<form method="GET">
             //<input type="hidden" name="page" value="message_list" />
