@@ -1099,7 +1099,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
             }
-            if (!mb_strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
+            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
                $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
@@ -2212,6 +2212,54 @@ if (!class_exists('Hm_IMAP')) {
                 }
             }
             return $result;
+        }
+
+        /**
+         * Test if the server supports searching by custom headers.
+         * 
+         * This function sends a test search command to check if the server supports 
+         * searching by custom headers (e.g., X-Auto-Bcc). If the server does not support 
+         * this feature, it will return false.
+         *
+         * Reference: Stalwart's current limitation on searching by custom headers 
+         * discussed in the following GitHub thread:
+         * https://github.com/stalwartlabs/mail-server/discussions/477
+         * 
+         * Note: This function should be removed once Stalwart starts supporting custom headers.
+         *
+         * @return boolean true if the server supports searching by custom headers.
+         */
+        protected function server_supports_custom_headers() {
+            $test_command = 'UID SEARCH HEADER "X-NonExistent-Header" "test"'."\r\n";
+            $this->send_command($test_command);
+            $response = $this->get_response(false, true);
+            $status = $this->check_response($response, true);
+
+            // Keywords that indicate the header search is not supported
+            $keywords = ['is', 'not', 'supported.'];
+
+            if (!$status) {
+                return false;
+            }
+
+            // Flatten the response array to a single array of strings
+            $flattened_response = array_reduce($response, 'array_merge', []);
+
+            // Check if all keywords are present in the flattened response
+            $sequence_match = true;
+            foreach ($keywords as $keyword) {
+                if (!in_array($keyword, $flattened_response)) {
+                    $sequence_match = false;
+                    break;
+                }
+            }
+
+            // If all keywords are found, the header search is not supported
+            if ($sequence_match) {
+                return false;
+            }
+
+            return true;
         }
     }
 }
