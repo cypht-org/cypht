@@ -67,6 +67,7 @@ function interface_langs() {
         'pt-BR' => 'Brazilian Portuguese',
         'az' => 'Azerbaijani',
         'zh-Hans' => 'Chinese Simplified',
+        'zh-TW' => 'Traditional Chinese',
     );
 }}
 
