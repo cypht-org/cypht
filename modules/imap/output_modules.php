@@ -348,7 +348,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 else {
                     $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
                 }
-                $txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
+                $txt .= ' | ' . forward_dropdown($this, $reply_args);
             }
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
