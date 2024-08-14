@@ -37,7 +37,7 @@ class FolderListTests(WebTest):
         assert link.is_displayed() == False
 
     def show_folders(self):
-        self.by_css('[data-source=".settings"]').click()
+        self.by_class('folder_toggle').click()
         list_item = self.by_class('menu_home')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

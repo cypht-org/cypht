@@ -23,7 +23,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         }
         $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" '.
-            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></div></li>';
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1449,7 +1449,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '</div><ul style="display: none;" class="settings folders">';
+            '<ul style="display: none;" class="settings folders">';
         $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';

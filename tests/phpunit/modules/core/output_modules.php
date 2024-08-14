@@ -18,7 +18,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->run();
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></form></div></li>', $res->output_data['formatted_folder_list']);
+        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></div></form></li>', $res->output_data['formatted_folder_list']);
     }
     /**
      * @preserveGlobalState disabled
@@ -844,10 +844,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
