@@ -167,6 +167,7 @@ if (!class_exists('Hm_IMAP')) {
         /* current selected mailbox status */
         public $folder_state = false;
         private $scramAuthenticator;
+        private $namespace_count = 0;
         /**
          * constructor
          */
