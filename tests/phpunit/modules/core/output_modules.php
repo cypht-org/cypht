@@ -758,7 +758,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_start() {
         $test = new Output_Test('folder_list_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
+        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<i class="bi bi-list fs-5"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -910,10 +910,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

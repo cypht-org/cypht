@@ -31,7 +31,7 @@ class FolderListTests(WebTest):
         assert link.is_displayed() == False
 
     def hide_folders(self):
-        self.by_css('[data-source=".settings"]').click()
+        self.by_class('hide_folders').click()
         list_item = self.by_class('menu_home')
         link = list_item.find_element(By.TAG_NAME, 'a');
         assert link.is_displayed() == False

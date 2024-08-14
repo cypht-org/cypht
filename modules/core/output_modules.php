@@ -1259,7 +1259,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a>'.
+        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-list fs-5"></i></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -1588,7 +1588,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-down-fill"'.'" alt="'.$this->trans('Collapse').'></i></a>';
+        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-left-fill fs-5"></i></a>';
         if ($this->format == 'HTML5') {
             return $res;
         }

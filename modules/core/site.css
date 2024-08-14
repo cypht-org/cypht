@@ -612,11 +612,11 @@ button {
 .folder_toggle {
   font-size: 0px;
   float: left;
-  margin: 10px 15px;
+  margin: 15px 15px 10px 15px;
   display: none;
 }
-.folder_toggle img {
-  opacity: 0.5;
+.folder_toggle i {
+  color: var(--bs-body-color);
 }
 .prevnext {
   font-size: 1.3rem;
@@ -651,11 +651,11 @@ button {
   font-size: 0px;
   float: left;
   clear: none;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-left: 23px;
 }
-.hide_folders img {
-  opacity: 0.4;
+.hide_folders i {
+  color: var(--bs-body-color);
 }
 .section_caret {
   opacity: 0.15;
@@ -990,9 +990,8 @@ div.unseen,
   display: block;
   top: 0px;
   left: -3px;
-  font-size: 20px;
   font-weight: bold;
-  margin-top: 17px !important;
+  margin-top: 15px !important;
   position: fixed;
   z-index: 101;
 }
