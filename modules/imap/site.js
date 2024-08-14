@@ -835,6 +835,9 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     else {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
+        $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+        $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+
         $('.reply_link, .reply_all_link, .forward_link').each(function() {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
             $(this).addClass('disabled_link');
