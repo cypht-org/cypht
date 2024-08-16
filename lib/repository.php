@@ -118,9 +118,23 @@ trait Hm_Repository {
         }
         if (! empty($config['special_imap_folders'])) {
             foreach ($config['special_imap_folders'] as $id => $special) {
-                if (is_numeric($id) && isset($replacements['imap'][$id])) {
-                    $config['special_imap_folders'][$replacements['imap'][$id]] = $special;
+                if (is_numeric($id)) {
+                    if (isset($replacements['imap'][$id])) {
+                        $config['special_imap_folders'][$replacements['imap'][$id]] = $special;
+                    }
                     unset($config['special_imap_folders'][$id]);
+                    $changed = true;
+                }
+            }
+        }
+        if (! empty($config['custom_imap_sources'])) {
+            foreach ($config['custom_imap_sources'] as $id => $val) {
+                if (preg_match('/^imap_(\d+)_([0-9a-z]+)$/', $id, $m)) {
+                    $old_id = $m[1];
+                    if (isset($replacements['imap'][$old_id])) {
+                        $config['custom_imap_sources']['imap_' . $replacements['imap'][$old_id] . '_' . $m[2]] = $val;
+                    }
+                    unset($config['custom_imap_sources'][$id]);
                     $changed = true;
                 }
             }
