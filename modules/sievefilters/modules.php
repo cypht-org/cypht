@@ -34,7 +34,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
             $this->out('conditions', json_encode(base64_decode($base64_obj)));
             $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
             $this->out('actions', json_encode(base64_decode($base64_obj)));
-            if (mb_strstr($script, 'allof')) {
+            if (strstr($script, 'allof')) {
                 $this->out('test_type', 'ALLOF');
             } else {
                 $this->out('test_type', 'ANYOF');
@@ -160,6 +160,45 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
     }
 }
 
+/**
+ * @subpackage sievefilterstoggle/handler
+ */
+class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_account', 'script_state', 'sieve_script_name'));
+        $status='';
+        if (!$success) {
+            $this->out($status, 'ERROR');
+            return;
+        }
+        $imap_account = Hm_IMAP_List::dump($form['imap_account']);
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $state = $form['script_state'] ? 'enabled' : 'disabled';
+            $scripts = $client->listScripts();
+            foreach ($scripts as $key => $script) {
+                if ($script == 'main_script') {
+                    $client->removeScripts('main_script');
+                }
+                if ($script == $form['sieve_script_name']) {
+                    if (!$form['script_state']) {
+                        unset($scripts[$key]);
+                    }
+                    $client->renameScript($script, "s{$state}_");
+                }
+            }
+            $scripts = $client->listScripts();
+            $main_script = generate_main_script($scripts);
+            save_main_script($client, $main_script, $scripts);
+            $client->activateScript('main_script');
+            $client->close();
+            $this->out($status, 'OK');
+        } catch (Exception $e) {
+            Hm_Msgs::add('ERRSieve: {$e->getMessage()}');
+        }
+    }
+}
 
 /**
  * @subpackage sievefilters/handler
@@ -331,7 +370,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         $email_sender = $this->request->post['sender'];
-        if (mb_strstr($email_sender, '*')) {
+        if (strstr($email_sender, '*')) {
             $email_sender = str_replace('*', '', $email_sender);
         }
 
@@ -890,7 +929,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
                 $custom_condition->addCriteria($cond);
             }
         }
-        
+
         foreach ($actions as $action) {
             if ($action->action == 'discard') {
                 $custom_condition->addAction(
@@ -909,53 +948,51 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             }
             if ($action->action == 'redirect') {
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction(['address' => $action->value])
-                );
-            }
-            if ($action->action == 'forward') {
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction(['address' => $action->value])
-                );
-                $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\KeepFilterAction()
+                    new \PhpSieveManager\Filters\Actions\RedirectFilterAction([$action->value])
                 );
             }
             if ($action->action == 'flag') {
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FlagFilterAction(['flags' => [$action->value]])
+                    new \PhpSieveManager\Filters\Actions\FlagFilterAction([$action->value])
                 );
             }
-            if ($action->action == 'addflag') {                
+            if ($action->action == 'addflag') {
+                $filter->addRequirement('imap4flags');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\AddFlagFilterAction(['flags' => [$action->value]])
+                    new \PhpSieveManager\Filters\Actions\AddFlagFilterAction([$action->value])
                 );
             }
             if ($action->action == 'removeflag') {
+                $filter->addRequirement('imap4flags');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RemoveFlagFilterAction(['flags' => [$action->value]])
+                    new \PhpSieveManager\Filters\Actions\RemoveFlagFilterAction([$action->value])
                 );
             }
             if ($action->action == 'move') {
+                $filter->addRequirement('fileinto');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => [$action->value]])
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
                 );
             }
             if ($action->action == 'reject') {
+                $filter->addRequirement('reject');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\RejectFilterAction(['reason' => $action->value])
+                    new \PhpSieveManager\Filters\Actions\RejectFilterAction([$action->value])
                 );
             }
             if ($action->action == 'copy') {
+                $filter->addRequirement('fileinto');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction([$action->value])
                 );
                 $custom_condition->addAction(
                     new \PhpSieveManager\Filters\Actions\KeepFilterAction()
                 );
             }
             if ($action->action == 'autoreply') {
+                $filter->addRequirement('vacation');
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\VacationFilterAction(['reason' => $action->value, 'subject' => $action->extra_option_value])
+                    new \PhpSieveManager\Filters\Actions\VacationFilterAction([$action->extra_option_value, $action->value])
                 );
             }
         }
@@ -1106,7 +1143,7 @@ class Hm_Output_sievefilters_settings_link extends Hm_Output_Module {
         if (!$this->get('sieve_filters_enabled')) {
             return '';
         }
-        $res = '<li class="menu_sieve_filters"><a class="unread_link" href="?page=sieve_filters">';
+        $res = '<li class="menu_filters"><a class="unread_link" href="?page=sieve_filters">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-journal-bookmark-fill fs-5 me-2"></i>';
         }
@@ -1179,9 +1216,6 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         $res .= get_script_modal_content();
         $res .= '<div class="p-3">';
         foreach($mailboxes as $idx => $mailbox) {
-            if (empty($mailbox['sieve_config_host'])) {
-                continue;
-            }
             $behaviours = $this->get('sieve_block_default_behaviour');
             $reject_messages = $this->get('sieve_block_default_reject_message');
             $default_behaviour = 'Discard';
@@ -1193,20 +1227,21 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
                 $default_reject_message = $reject_messages[$idx];
             }
 
-            $default_behaviour_html = '<div class="col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="'.$idx.'">'
+            $default_behaviour_html = '<div class="col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="'.$idx.'">'.
+            $default_behaviour_html = '<div class="col-sm-7 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-control" imap_account="'.$idx.'">'
             .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
             .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
             .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
             if ($default_behaviour == 'Reject') {
                 $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
             }
-            $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">'.$this->trans('Submit').'</button></div></div>';
+            $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">Submit</button></div></div>';
             $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
             $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
             $res .= '<div class="sievefilters_accounts_item">';
             $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between">' . $mailbox['name'];
             $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
+            $res .= '<div class="sievefilters_accounts filter_block px-5 py-3 d-none"><div class="filter_subblock">';
             $res .=  $default_behaviour_html;
             $res .= '<table class="filter_details table"><tbody>';
             $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
@@ -1233,9 +1268,6 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
         $res .= get_script_modal_content();
         $sieve_supported = 0;
         foreach($mailboxes as $mailbox) {
-            if (empty($mailbox['sieve_config_host'])) {
-                continue;
-            }
             $sieve_supported++;
             $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
             $num_filters = $result['count'];
