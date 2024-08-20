@@ -923,12 +923,22 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
 /**
  * @subpackage smtp/output
  */
+class Hm_Output_compose_title extends Hm_Output_Module {
+    protected function output() {
+        return'<div class="content_title px-3">'.$this->trans('Compose').'</div>';
+    }
+}
+
+/**
+ * @subpackage smtp/output
+ */
 class Hm_Output_compose_form_start extends Hm_Output_Module {
     protected function output() {
-        return'<div class="compose_page p-0"><div class="content_title px-3">'.$this->trans('Compose').'</div>'.
-            '<div class="container"><div class="row justify-content-md-center">'.
-            '<div class="col col-lg-8">'.
-            '<form class="compose_form p-4" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        $res = '<div class="container">';
+        $res .= '<div class="row justify-content-md-center">';
+        $res .= '<div class="col col-lg-8">';
+        $res .= '<form class="compose_form p-4" method="post" action="?page=compose" data-reminder="' . $this->get('enable_attachment_reminder', 0) . '">';
+        return $res;
     }
 }
 
