@@ -15,7 +15,7 @@
  */
 if (!hm_exists('format_msg_html')) {
 function format_msg_html($str, $images=false) {
-    $str = str_ireplace('</body>', '', $str);
+    $str = mb_eregi_replace('</body>', '', $str);
 
     $config = HTMLPurifier_Config::createDefault();
     $config->set('HTML.DefinitionID', 'hm-message');
@@ -103,7 +103,7 @@ function format_reply_text($txt) {
         if (preg_match("/^(>\s*)+/", $line, $matches)) {
             $pre .= $matches[1];
         }
-        $wrap = 75 + strlen($pre);
+        $wrap = 75 + mb_strlen($pre);
         $new_lines[] = preg_replace("/$pre /", "$pre", "> ".wordwrap($line, $wrap, "\n$pre"));
     }
     return implode("\n", $new_lines);
@@ -175,7 +175,7 @@ function format_reply_address($fld, $excluded) {
     foreach ($addr as $v) {
         $skip = false;
         foreach ($excluded as $ex) {
-            if (strtolower($v['email']) == strtolower($ex['email'])) {
+            if (mb_strtolower($v['email']) == mb_strtolower($ex['email'])) {
                 $skip = true;
                 break;
             }
@@ -279,7 +279,7 @@ function reply_format_body($headers, $body, $lead_in, $reply_type, $struct, $htm
     $msg = '';
     $type = 'textplain';
     if (array_key_exists('type', $struct) && array_key_exists('subtype', $struct)) {
-        $type = strtolower($struct['type']).strtolower($struct['subtype']);
+        $type = mb_strtolower($struct['type']).mb_strtolower($struct['subtype']);
     }
     if ($html == 1) {
         $msg = format_reply_as_html($body, $type, $reply_type, $lead_in);
@@ -404,21 +404,21 @@ function format_reply_fields($body, $headers, $struct, $html, $output_mod, $type
  */
 if (!hm_exists('decode_fld')) {
 function decode_fld($string) {
-    if (strpos($string, '=?') === false) {
+    if (mb_strpos($string, '=?') === false) {
         return $string;
     }
     $string = preg_replace("/\?=\s+=\?/", '?==?', $string);
     if (preg_match_all("/(=\?[^\?]+\?(q|b)\?[^\?]+\?=)/i", $string, $matches)) {
         foreach ($matches[1] as $v) {
-            $fld = substr($v, 2, -2);
-            $charset = strtolower(substr($fld, 0, strpos($fld, '?')));
-            $fld = substr($fld, (strlen($charset) + 1));
+            $fld = mb_substr($v, 2, -2);
+            $charset = mb_strtolower(mb_substr($fld, 0, mb_strpos($fld, '?')));
+            $fld = mb_substr($fld, (mb_strlen($charset) + 1));
             $encoding = $fld[0];
-            $fld = substr($fld, (strpos($fld, '?') + 1));
-            if (strtoupper($encoding) == 'B') {
+            $fld = mb_substr($fld, (mb_strpos($fld, '?') + 1));
+            if (mb_strtoupper($encoding) == 'B') {
                 $fld = convert_to_utf8(base64_decode($fld), $charset);
             }
-            elseif (strtoupper($encoding) == 'Q') {
+            elseif (mb_strtoupper($encoding) == 'Q') {
                 $fld = convert_to_utf8(quoted_printable_decode(str_replace('_', ' ', $fld)), $charset);
             }
             $string = str_replace($v, $fld, $string);
@@ -449,7 +449,8 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        $doc->loadHTML(htmlentities($html, ENT_QUOTES, 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }
@@ -496,7 +497,7 @@ function trim_email($val) {
 if (!hm_exists('addr_split')) {
 function addr_split($str, $seps = array(',', ';')) {
     $str = preg_replace('/(\s){2,}/', ' ', $str);
-    $max = strlen($str);
+    $max = mb_strlen($str);
     $word = '';
     $words = array();
     $capture = false;

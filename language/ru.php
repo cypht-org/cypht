@@ -456,6 +456,7 @@ return array(
     'Current password is incorrect' => 'Текущий пароль не верен',
     'Details' => 'Детали',
     'Don\'t save account passwords between logins' => 'Не сохранять пароль аккаунта между входами',
+    'Do you want to log out?' => 'Вы хотите выйти?',
     'Drafts' => 'Черновики',
     'Enter your passwords below to gain access to these services during this session.' => 'Введите Ваш пароль ниже чтобы получить пароль к этим службам во время этого сеанса',
     'Failed to authenticate to the SMTP server' => 'Невозможно аутентифицироваться на SMTP сервере',
@@ -628,4 +629,8 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

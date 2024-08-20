@@ -166,7 +166,7 @@ if (!hm_exists('custom_themes')) {
             return $themes;
         }
         foreach ($custom['theme'] as $val) {
-            if (strpos($val, '|') === false) {
+            if (mb_strpos($val, '|') === false) {
                 continue;
             }
             $parts = explode('|', $val, 2);

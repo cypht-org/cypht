@@ -258,7 +258,7 @@ class Hm_Crypt_Base {
      */
     public static function check_password($password, $hash) {
         $type = 'php';
-        if (substr($hash, 0, 6) === 'sha512') {
+        if (mb_substr($hash, 0, 6) === 'sha512') {
             $type = 'pbkdf2';
         }
         if (function_exists('password_verify') && $type === 'php') {

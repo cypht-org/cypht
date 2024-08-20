@@ -39,13 +39,13 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         if ($package) {
             // Cypht is embedded
             $branch_name = str_replace(['dev-', '-dev'], '', $package['version']);
-            $commit_hash = substr($package['dist']['reference'], 0, 7);
+            $commit_hash = mb_substr($package['dist']['reference'], 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = $package['time'];
         } elseif (exec('git --version')) {
             // Standalone cypht
             $branch_name = trim(exec('git rev-parse --abbrev-ref HEAD'));
-            $commit_hash = substr(trim(exec('git log --pretty="%H" -n1 HEAD')), 0, 7);
+            $commit_hash = mb_substr(trim(exec('git log --pretty="%H" -n1 HEAD')), 0, 7);
             $commit_url = COMMITS_URL.$commit_hash;
             $commit_date = trim(exec('git log -n1 --pretty=%ci HEAD'));
         }
@@ -60,7 +60,7 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
                 Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
                 $curl_result = Hm_Functions::c_exec($ch);
                 if (trim($curl_result)) {
-                    if (!strstr($curl_result, 'No commit found for SHA')) {
+                    if (!mb_strstr($curl_result, 'No commit found for SHA')) {
                         $json_commit = json_decode($curl_result);
                         $commit_date = $json_commit->commit->author->date;
                     }
@@ -208,7 +208,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
     }
     $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">Pages</div></td></tr>';
     foreach ($handlers as $page => $mods) {
-        if (substr($page, 0, 4) == 'ajax') {
+        if (mb_substr($page, 0, 4) == 'ajax') {
             continue;
         }
         $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
@@ -227,7 +227,7 @@ class Hm_Output_config_map extends Hm_Output_Module {
     }
     $res .= '<tr><td colspan="3"><div class="settings_subtitle mt-3">AJAX Requests</div></td></tr>';
     foreach ($handlers as $page => $mods) {
-        if (substr($page, 0, 4) != 'ajax') {
+        if (mb_substr($page, 0, 4) != 'ajax') {
             continue;
         }
         $res .= '<tr><td colspan="3" class="config_map_page" data-target="c'.$page.'">'.$page.'</td></tr>';
@@ -272,6 +272,34 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
 class Hm_Output_server_status_end extends Hm_Output_Module {
     /**
      * Close the table opened in Hm_Output_server_status_start
+     */
+    protected function output() {
+        return '</tbody></table></div></div>';
+    }
+}
+
+/**
+ * Starts a capabilities table used on the info page
+ * @subpackage developer/output
+ */
+class Hm_Output_server_capabilities_start extends Hm_Output_Module {
+    /**
+     * Modules populate this table to run a status check from the info page
+     */
+    protected function output() {
+        $res = '<div class="content_title px-3">'.$this->trans('Capabilities').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
+                $this->trans('Server capabilities').'</th></tr></thead><tbody>';
+        return $res;
+    }
+}
+
+/**
+ * Close the capabilities table used on the info page
+ * @subpackage developer/output
+ */
+class Hm_Output_server_capabilities_end extends Hm_Output_Module {
+    /**
+     * Close the table opened in Hm_Output_server_capabilities_start
      */
     protected function output() {
         return '</tbody></table></div></div>';

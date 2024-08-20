@@ -82,7 +82,7 @@ class Hm_Handler_history_record_github_message extends Hm_Handler_Module {
             $from = $data['actor']['login'];
         }
         $history[$url] = array(
-            'source' => substr($this->request->post['list_path'], 7),
+            'source' => mb_substr($this->request->post['list_path'], 7),
             'subject' => $subject,
             'date' => $date,
             'id' => $id,

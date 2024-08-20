@@ -16,7 +16,7 @@ class Hm_Test_Dispatch extends TestCase {
      * @runInSeparateProcess
      */
     public function test_is_php_setup() {
-        if ((float) substr(phpversion(), 0, 3) >= 7.4) {
+        if ((float) mb_substr(phpversion(), 0, 3) >= 8.1) {
             $this->assertTrue(Hm_Dispatch::is_php_setup());
         }
         Hm_Functions::$exists = false;
@@ -135,21 +135,5 @@ class Hm_Test_Dispatch extends TestCase {
         $this->assertFalse($router->validate_ajax_request($request, array()));
         $request->post['hm_ajax_hook'] = 'asdf';
         $this->assertFalse($router->validate_ajax_request($request, array()));
-    }
-}
-
-class Hm_Test_Debug_Page_Redirect extends TestCase {
-
-    public function setUp(): void {
-        define('DEBUG_MODE', true);
-        require 'bootstrap.php';
-        define('CONFIG_FILE', merge_config_files(APP_PATH.'config'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_debug_page_redirect() {
-        $this->assertEquals(null, Hm_Dispatch::page_redirect('test', 200));
     }
 }

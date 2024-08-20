@@ -102,12 +102,12 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
 
         if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-            Hm_Msgs('ERRUnable to connect to the selected IMAP server');
+            Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
             return;
         }
         $new_folder = prep_folder_name($imap, $form['folder'], true);
         if (!$new_folder || !$imap->select_mailbox($new_folder)) {
-            Hm_Msgs('ERRSelected folder not found');
+            Hm_Msgs::add('ERRSelected folder not found');
             return;
         }
         $specials = $this->user_config->get('special_imap_folders', array());
@@ -129,13 +129,14 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
  */
 class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
     public function process() {
+
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
         if ($success) {
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
 
             if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-                Hm_Msgs('ERRUnable to connect to the selected IMAP server');
+                Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
                 return;
             }
             $specials = $this->user_config->get('special_imap_folders', array());

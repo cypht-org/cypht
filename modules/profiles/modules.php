@@ -133,7 +133,19 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $profile['id'] = $form['profile_id'];
             Hm_Profiles::edit($form['profile_id'], $profile);
         } else {
+            $profiles = $this->get('profiles');
+
+            foreach ($profiles as $existing_profile) {
+                if (
+                    ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
+                    ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
+                ) {
+                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    return;
+                }
+            }
             Hm_Profiles::add($profile);
+            Hm_Msgs::add('Profile Created');
         }
 
         if ($default) {
@@ -158,7 +170,7 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
 class Hm_Output_profile_edit_form extends Hm_Output_Module {
     protected function output() {
         $new_id = $this->get('new_profile_id', -1);
-        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span>'.$this->trans('Profiles').'</span>';
+        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span class="profile_content_title">'.$this->trans('Profiles').'</span>';
         $smtp_servers = $this->get('smtp_servers', array());
         $imap_servers = $this->get('imap_servers', array());
         if ($this->get('edit_profile')) {
@@ -219,7 +231,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                     if (in_array($smtp_vals['id'], $used, true)) {
                         continue;
                     }
-                    if (strlen(trim($smtp_vals['sig']))) {
+                    if (mb_strlen(trim($smtp_vals['sig']))) {
                         $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $smtp_vals['smtp_id'].'.'.($index+1), $this->html_safe(str_replace("\r\n", "\\n", $smtp_vals['sig'])));
                         $used[] = $smtp_vals['id'];
                     }
@@ -229,7 +241,7 @@ class Hm_Output_compose_signature_values extends Hm_Output_Module {
                 if (in_array($vals['id'], $used, true)) {
                     continue;
                 }
-                if (strlen(trim($vals['sig']))) {
+                if (mb_strlen(trim($vals['sig']))) {
                     $sigs[] = sprintf("\"%s\": \"\\n%s\\n\"", $vals['smtp_id'], $this->html_safe(str_replace("\r\n", "\\n", $vals['sig'])));
                     $used[] = $vals['id'];
                 }
@@ -273,8 +285,8 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['address']).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($profile['replyto']).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.$this->html_safe($smtp).'</td>'.
-                    '<td class="d-none d-sm-table-cell">'.(strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
-                    '<td class="d-none d-sm-table-cell">'.(strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['sig']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
+                    '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
                     '<i class="bi bi-gear-fill"></i></a></td>'.

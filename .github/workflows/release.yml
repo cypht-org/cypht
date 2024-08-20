@@ -1,0 +1,40 @@
+name: Build and Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: curl, fileinfo, iconv, json, mbstring, openssl, session, pdo, sodium, xml, sqlite, pdo_mysql, pdo_pgsql, memcached, redis, gd, gnupg, imagick, bcmath, tidy, soap, xdebug
+          tools: phpunit, composer
+          ini-values: cgi.fix_pathinfo=1
+
+      - name: Copy .env.example to .env
+        run: cp .env.example .env
+
+      - name: Install Composer dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: Create tarball
+        run: tar -czvf cypht.tar.gz ./*
+
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./cypht.tar.gz
+          asset_name: cypht.tar.gz
+          asset_content_type: application/gzip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

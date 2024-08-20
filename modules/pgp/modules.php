@@ -86,7 +86,7 @@ class Hm_Handler_pgp_message_check extends Hm_Handler_Module {
         $pgp = false;
         $struct = $this->get('msg_struct', array());
         $text = $this->get('msg_text');
-        if (strpos($text, '----BEGIN PGP MESSAGE-----') !== false) {
+        if (mb_strpos($text, '----BEGIN PGP MESSAGE-----') !== false) {
             $pgp = true;
         }
         $part_struct = $this->get('msg_struct_current', array());
@@ -149,7 +149,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
         $res .= '<div class="mb-2"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         $res .= '<label class="form-label" for="public_email">For</label>';
         $res .= '<input required id="public_email" name="public_key_email" placeholder="'.$this->trans('E-mail Address');
-        $res .= '" type="email" class="form-control"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-primary">';
+        $res .= '" type="email" class="form-control warn_on_paste"></div> <input type="submit" value="'.$this->trans('Import').'" class="btn btn-primary">';
         $res .= '</form>';
         $res .= '<table class="pgp_keys table mt-3"><thead><tr><th>'.$this->trans('Fingerprint').'</th>';
         $res .= '<th>'.$this->trans('E-mail').'</th><th></th></tr>';
@@ -209,7 +209,7 @@ class Hm_Output_pgp_msg_controls extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     protected function output() {
-        $res = '<li class="menu_profiles"><a class="unread_link" href="?page=pgp">';
+        $res = '<li class="menu_pgp"><a class="unread_link" href="?page=pgp">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-lock-fill account_icon"></i> ';
         }

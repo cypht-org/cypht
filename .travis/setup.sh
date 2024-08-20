@@ -23,8 +23,8 @@ setup_memcached() {
 
 # PHP tweaks based on versions
 setup_php() {
-    if [ "$TRAVIS_PHP_VERSION" = "7.4" ]; then
-        sudo apt-get install php7.4-gd
+    if [ "$TRAVIS_PHP_VERSION" = "8.1" ]; then
+        sudo apt-get install php8.1-gd
     fi
 }
 
@@ -245,7 +245,7 @@ setup_all_tests() {
 
 BUILD="$DB$TRAVIS_PHP_VERSION"
 case "$BUILD" in
-    postgresql7.4)
+    postgresql8.1)
         #setup_all_tests
         setup_unit_tests
     ;;

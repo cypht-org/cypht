@@ -62,6 +62,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('drafts_per_source_setting', DEFAULT_PER_SOURCE);
         $mailbox_list_title = array('Drafts');
     }
+    elseif ($path == 'tag' && $handler->module_is_supported('tags')) {
+        $list_path = 'tag';
+        $message_list_since = $handler->user_config->get('tag_since_setting', DEFAULT_SINCE);
+        $per_source_limit = $handler->user_config->get('tag_per_source_setting', DEFAULT_PER_SOURCE);
+        $mailbox_list_title = array('Tag');
+    }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
 }}
 
@@ -101,7 +107,7 @@ function message_list_meta($input, $output_mod) {
     if (!$since) {
         $since = DEFAULT_SINCE;
     }
-    $date = sprintf('%s', strtolower($output_mod->trans($times[$since])));
+    $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
     return '<div class="list_meta d-flex align-items-center fs-6">'.
@@ -373,6 +379,9 @@ function message_controls($output_mod) {
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');
+    }
+    if(!empty($output_mod->get('tags'))) {
+        $res .= tags_dropdown($output_mod, []);
     }
     $res .= '</div>';
     return $res;

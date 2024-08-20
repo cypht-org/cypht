@@ -455,6 +455,7 @@ return array(
     'Current password is incorrect' => false,
     'Details' => false,
     'Don\'t save account passwords between logins' => 'ログインパスワードを保存しない',
+    'Do you want to log out?' => 'ログアウトしますか？',
     'Drafts' => false,
     'Enter your passwords below to gain access to these services during this session.' => false,
     'Failed to authenticate to the SMTP server' => 'SMTPサーバーの認証に失敗しました',
@@ -627,4 +628,8 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

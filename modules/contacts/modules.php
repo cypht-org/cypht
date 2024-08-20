@@ -41,7 +41,7 @@ class Hm_Handler_store_contact_message extends Hm_Handler_Module {
 
                 if (!empty($newContacts)) {
                     $newContacts = array_map(function ($email) {
-                        return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => $this->trans('Collected Recipients')];
+                        return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => 'Collected Recipients'];
                     }, $newContacts);
                     $contacts->add_contact($newContacts[0]);
                     $this->session->record_unsaved('Contact Added');
@@ -64,7 +64,7 @@ class Hm_Handler_store_contact_allow_images extends Hm_Handler_Module {
             $contact_list = $contacts->getAll();
             $existingEmails = array_column($contact_list, 'email_address');
             if (!in_array($email, $existingEmails)) {
-                $contacts->add_contact(['source' => 'local', 'email_address' => $email, 'display_name' => $name, 'group' => $this->trans('Trusted Senders')]);
+                $contacts->add_contact(['source' => 'local', 'email_address' => $email, 'display_name' => $name, 'group' => 'Trusted Senders']);
                 $this->session->record_unsaved('Contact Added');
                 Hm_Msgs::add('Contact Added');
             }
@@ -103,7 +103,7 @@ class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
         $headers = $this->get('msg_headers', array());
         $addresses = array();
         foreach ($headers as $name => $value) {
-            if (in_array(strtolower($name), $addr_headers, true)) {
+            if (in_array(mb_strtolower($name), $addr_headers, true)) {
                 foreach (Hm_Address_Field::parse($value) as $vals) {
                     if (!$existing->search(array('email_address' => $vals['email']))) {
                         $addresses[] = $vals;
@@ -410,7 +410,7 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
 
                 if (trim($contact->value('display_name'))) {
                     $suggestions[] = $this->html_safe(sprintf(
-                        '{"contact_id":%s, "contact": "%s %s", "type": "%s", "source": "%s"}',
+                        '{"contact_id": "%s", "contact": "%s %s", "type": "%s", "source": "%s"}',
                         $contact_id,
                         $contact->value('display_name'),
                         $contact->value('email_address'),
@@ -443,7 +443,7 @@ function build_contact_detail($output_mod, $contact, $id) {
             $all_fields = $val;
             continue;
         }
-        if (substr($name, 0, 8) == 'carddav_') {
+        if (mb_substr($name, 0, 8) == 'carddav_') {
             continue;
         }
         if (!trim($val)) {

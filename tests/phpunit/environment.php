@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * tests for Hm_Environment
  */
-class Hm_Test_Environment_Variable extends TestCase {
+class Hm_Test_Environment extends TestCase {
 
     public function setUp(): void {
         require 'bootstrap.php';

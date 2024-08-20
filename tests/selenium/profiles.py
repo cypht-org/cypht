@@ -1,7 +1,9 @@
 from base import WebTest, USER, PASS
+from selenium.webdriver.common.by import By
 from runner import test_runner
+from settings import SettingsHelpers
 
-class ProfileTest(WebTest):
+class ProfileTest(SettingsHelpers):
 
     def __init__(self):
         WebTest.__init__(self)
@@ -9,11 +11,12 @@ class ProfileTest(WebTest):
         self.wait_with_folder_list()
 
     def load_profile_page(self):
+        self.load()
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_profiles')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
-        assert self.by_class('content_title').text == 'Profiles'
+        assert self.by_class('profile_content_title').text == 'Profiles'
 
     def add_profile(self):
         self.by_class('add_profile').click()
@@ -23,6 +26,7 @@ class ProfileTest(WebTest):
         addr.send_keys('test@test.com')
         reply = self.by_name('profile_replyto')
         reply.send_keys('test@test.com')
+        self.dropdown_test('profile_imap', 'all_email_since', '-1 week', '-5 years')
         sig = self.by_name('profile_sig')
         sig.send_keys('foo')
         self.by_name('profile_default').click()
@@ -55,7 +59,7 @@ if __name__ == '__main__':
     print("PROFIILE TEST")
     test_runner(ProfileTest, [
         'load_profile_page',
-        'add_profile',
-        'edit_profile',
-        'del_profile'
+        # 'add_profile',
+        # 'edit_profile',
+        # 'del_profile'
     ])

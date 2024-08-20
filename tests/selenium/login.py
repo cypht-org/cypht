@@ -2,14 +2,14 @@
 
 from base import WebTest, USER, PASS
 from runner import test_runner
-
+from selenium.webdriver.common.by import By
 class LoginTests(WebTest):
 
     def bad_login_values(self):
         self.login('asdf', 'asdf')
         self.wait()
         self.safari_workaround()
-        assert self.by_class('err') != None
+        assert self.by_class('sys_messages') != None
 
     def missing_password(self):
         self.load()

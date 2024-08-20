@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from base import WebTest, USER, PASS
+from selenium.webdriver.common.by import By
 from runner import test_runner
 
 class FolderListTests(WebTest):
@@ -19,26 +20,26 @@ class FolderListTests(WebTest):
     def expand_section(self):
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_home')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text == 'Home'
 
     def collapse_section(self):
         self.by_css('[data-source=".main"]').click()
         list_item = self.by_class('menu_unread')
-        link = list_item.find_element_by_tag_name('a')
+        link = list_item.find_element(By.TAG_NAME, 'a')
         assert link.is_displayed() == False
 
     def hide_folders(self):
         self.by_class('hide_folders').click()
         list_item = self.by_class('menu_home')
-        link = list_item.find_element_by_tag_name('a');
+        link = list_item.find_element(By.TAG_NAME, 'a');
         assert link.is_displayed() == False
 
     def show_folders(self):
         self.by_class('folder_toggle').click()
         list_item = self.by_class('menu_home')
-        list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         assert self.by_class('content_title').text == 'Home'
         self.by_css('[data-source=".main"]').click()

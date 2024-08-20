@@ -24,7 +24,7 @@ define('CSS_HASH', '');
 
 /* show all warnings in debug mode */
 if (DEBUG_MODE) {
-    error_reporting(E_ALL | E_STRICT);
+    error_reporting(E_ALL);
 }
 
 /* don't let anything output content until we are ready */

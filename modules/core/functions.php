@@ -67,6 +67,7 @@ function interface_langs() {
         'pt-BR' => 'Brazilian Portuguese',
         'az' => 'Azerbaijani',
         'zh-Hans' => 'Chinese Simplified',
+        'zh-TW' => 'Traditional Chinese',
     );
 }}
 
@@ -179,12 +180,12 @@ function is_email_address($val, $allow_local=false) {
     $val = trim($val, "<>");
     $domain = false;
     $local = false;
-    if (!trim($val) || strlen($val) > 320) {
+    if (!trim($val) || mb_strlen($val) > 320) {
         return false;
     }
-    if (strpos($val, '@') !== false) {
-        $local = substr($val, 0, strrpos($val, '@'));
-        $domain = substr($val, (strrpos($val, '@') + 1));
+    if (mb_strpos($val, '@') !== false) {
+        $local = mb_substr($val, 0, mb_strrpos($val, '@'));
+        $domain = mb_substr($val, (mb_strrpos($val, '@') + 1));
     }
     else {
         $local = $val;
@@ -212,8 +213,8 @@ function is_email_address($val, $allow_local=false) {
 if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
     /* check for a dot, max allowed length and standard ASCII characters */
-    if (strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
-        $val[0] == '-' || $val[(strlen($val) - 1)] == '-') {
+    if (mb_strpos($val, '.') === false || mb_strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
+        $val[0] == '-' || $val[(mb_strlen($val) - 1)] == '-') {
         return false;
     }
     return true;
@@ -228,7 +229,7 @@ function validate_domain_full($val) {
 if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
     /* check length, "." rules, and for characters > ASCII 127 */
-    if (strlen($val) > 64 || $val[0] == '.' || $val[(strlen($val) -1)] == '.' || strstr($val, '..') ||
+    if (mb_strlen($val) > 64 || $val[0] == '.' || $val[(mb_strlen($val) -1)] == '.' || mb_strstr($val, '..') ||
         preg_match('/[^\x00-\x7F]/',$val)) {
         return false;
     }
@@ -543,6 +544,28 @@ function in_server_list($list, $id, $user) {
         }
     }
     return $exists;
+}}
+
+/**
+ * Perform a check on last added server
+ * It gets deleted if already configured
+ * 
+ * @param string $list class to process on check
+ * @param string $user username to check for
+ * @return bool
+ */
+if (!hm_exists('can_save_last_added_server')) {
+function can_save_last_added_server($list, $user) {
+    $servers = $list::dump(false, true);
+    $ids = array_keys($servers);
+    $new_id = array_pop($ids);
+    if (in_server_list($list, $new_id, $user)) {
+        $list::del($new_id);
+        $type = explode('_', $list)[1];
+        Hm_Msgs::add('ERRThis ' . $type . ' server and username are already configured');
+        return false;
+    }
+    return true;
 }}
 
 /**

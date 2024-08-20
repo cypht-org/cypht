@@ -146,10 +146,7 @@ abstract class Hm_Config {
         foreach ($this->config as $key => $vals) {
             if (in_array($key, $excluded, true)) {
                 foreach ($vals as $index => $server) {
-                    if (!empty($server['default'])) {
-                        $removed[$key][$index] = $server;
-                        unset($this->config[$key][$index]);
-                    } elseif (!array_key_exists('server', $server)) {
+                    if (!array_key_exists('server', $server)) {
                         $removed[$key][$index] = $server;
                         unset($this->config[$key][$index]);
                     } else {
@@ -467,16 +464,14 @@ class Hm_Site_Config_File extends Hm_Config {
     public $user_defaults = [];
 
     /**
-     * Load data based on source
-     * @param string $source source location for site configuration
+     * @param array $all_configs
      */
     public function __construct($all_configs = []) {
         $this->load(empty($all_configs) ? merge_config_files(APP_PATH.'config') : $all_configs, false);
     }
 
     /**
-     * Load site data from a file
-     * @param string $source file path to the site configuration
+     * @param string $all_configs
      * @param string $key encryption key (unsued in this class)
      * @return void
      */
@@ -491,8 +486,8 @@ class Hm_Site_Config_File extends Hm_Config {
      */
     private function get_user_defaults() {
         foreach ($this->config as $name => $val) {
-            if (substr($name, 0, 15) == 'default_setting') {
-                $this->user_defaults[substr($name, 16).'_setting'] = $val;
+            if (mb_substr($name, 0, 15) == 'default_setting') {
+                $this->user_defaults[mb_substr($name, 16).'_setting'] = $val;
             }
         }
     }
@@ -517,7 +512,7 @@ class Hm_Site_Config_File extends Hm_Config {
  */
 function load_user_config_object($config) {
     $type = $config->get('user_config_type', 'file');
-    if (strstr($type, ':')) {
+    if (mb_strstr($type, ':')) {
         list($type, $class) = explode(':', $type);
     }
     switch ($type) {

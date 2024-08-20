@@ -13,7 +13,7 @@ class Hm_Test_Core_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_interface_langs() {
-        $this->assertEquals(16, count(interface_langs()));
+        $this->assertEquals(17, count(interface_langs()));
     }
     /**
      * @preserveGlobalState disabled

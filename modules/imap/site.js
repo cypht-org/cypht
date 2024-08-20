@@ -273,6 +273,7 @@ var imap_status_update = function() {
                 var id = res.imap_status_server_id;
                 $('.imap_status_'+id).html(res.imap_status_display);
                 $('.imap_detail_'+id).html(res.sieve_detail_display);
+                $('.imap_capabilities_'+id).html(res.imap_extensions_display);
             };
             for (i=0;i<ids.length;i++) {
                 id=ids[i];
@@ -324,7 +325,7 @@ var add_auto_folder = function(folder) {
 };
 
 var cache_folder_data = function() {
-    if (['sent', 'drafts', 'junk', 'trash'].includes(hm_list_path())) {
+    if (['sent', 'drafts', 'junk', 'trash','tag'].includes(hm_list_path())) {
         Hm_Message_List.set_message_list_state('formatted_'+hm_list_path()+'_data');
     }
 };
@@ -385,6 +386,10 @@ var imap_combined_inbox_content = function(id, folder) {
 
 var imap_folder_content = function(id, folder) {
     return imap_message_list_content(id, folder, 'ajax_imap_folder_data', cache_folder_data);
+};
+
+var imap_tag_content = function(id, folder) {
+    return imap_message_list_content(id, folder, 'ajax_imap_tag_data', cache_folder_data);
 };
 
 var cache_imap_page = function() {
@@ -504,7 +509,7 @@ var expand_imap_mailbox = function(res) {
     if (res.imap_expanded_folder_path) {
         $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.email_folders')).append(res.imap_expanded_folder_formatted);
         $('.imap_folder_link', $('.email_folders')).off('click');
-        $('.imap_folder_link', $('.email_folders')).on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.imap_folder_link', $('.email_folders')).on("click", function() { return expand_imap_folders($(this)); });
         Hm_Folders.update_unread_counts();
     }
 };
@@ -528,27 +533,39 @@ var prefetch_imap_folders = function() {
         {'name': 'imap_server_id', 'value': id},
         {'name': 'imap_prefetch', 'value': true},
         {'name': 'folder', 'value': ''}],
-        function(res) { $('#imap_prefetch_ids').val(ids.join(',')); prefetch_imap_folders(); },
+        function(res) { 
+            $('#imap_prefetch_ids').val(ids.join(',')); 
+            prefetch_imap_folders();
+            expand_imap_mailbox(res);
+        },
         [],
         true
     );
 
 };
 
-var expand_imap_folders = function(path) {
+var expand_imap_folders = function(element) {
+    var path = element.data('target');
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
     if ($('li', list).length === 0) {
         $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
         if (detail) {
+            element.addClass('disabled_link');
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
                 {'name': 'folder', 'value': detail.folder}],
-                expand_imap_mailbox,
+                function (res) {
+                    element.removeClass('disabled_link');
+                    expand_imap_mailbox(res);
+                },
                 [],
                 false,
-                Hm_Folders.save_folder_list
+                Hm_Folders.save_folder_list,
+                function() {
+                    element.removeClass('disabled_link');
+                }
             );
         }
     }
@@ -700,6 +717,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         else if (hm_list_parent() === 'drafts') {
             Hm_Message_List.prev_next_links('formatted_drafts_data', class_name);
         }
+        else if (hm_list_parent() === 'tag') {
+            Hm_Message_List.prev_next_links('formatted_tag_data', class_name);
+        }
         else {
             var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
             Hm_Message_List.prev_next_links(key, class_name);
@@ -815,6 +835,9 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     else {
         $('.msg_text').html(msg_content);
         document.title = $('.header_subject th').text();
+        $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+        $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+
         $('.reply_link, .reply_all_link, .forward_link').each(function() {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
             $(this).addClass('disabled_link');
@@ -1072,6 +1095,41 @@ var imap_folder_status = function() {
     }
 };
 
+var imap_setup_tags = function() {
+    $(document).on('click', '.label-checkbox', function() {
+        var folder_id = $(this).data('id');
+        var ids = [];
+        if (hm_page_name() == 'message') {
+            var list_path = hm_list_path().split('_');
+            ids.push(list_path[1]+'_'+hm_msg_uid()+'_'+list_path[2]);
+        } else {
+            $('input[type=checkbox]').each(function() {
+                if (this.checked && this.id.search('imap') != -1) {
+                    var parts = this.id.split('_');
+                    ids.push(parts[1]+'_'+parts[2]+'_'+parts[3]);
+                }
+            });
+            if (ids.length == 0) {
+                return;
+            };
+        }
+
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_tag'},
+            {'name': 'tag_id', 'value': folder_id},
+            {'name': 'imap_server_ids', 'value': ids}],
+            function(res) {
+                if (!res.router_user_msgs[0].startsWith('ERR')) {
+                    Hm_Utils.search_from_local_storage("/^\d+_imap_.+/")?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+                    Hm_Folders.reload_folders(true);
+                    var path = hm_list_parent()? hm_list_parent(): hm_list_path();
+                    window.location.replace('?page=message_list&list_path='+path);
+                }
+            }
+        );
+    });
+}
+
 var imap_setup_snooze = function() {
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
@@ -1185,6 +1243,7 @@ $(function() {
 
     if (hm_page_name() === 'message_list' || hm_page_name() === 'message') {
         imap_setup_snooze();
+        imap_setup_tags();
     }
 
     if (hm_is_logged()) {
@@ -1265,122 +1324,7 @@ var imap_hide_add_contact_popup = function(event) {
     popup.classList.toggle("show");
 };
 
-/**
- * Allow external resources for the provided element.
- *
- * @param {HTMLElement} element - The element containing the allow button.
- * @param {string} messagePart - The message part associated with the resource.
- * @returns {void}
- */
-function handleAllowResource(element, messagePart) {
-    element.querySelector('a').addEventListener('click', function (e) {
-        e.preventDefault();
-        $('.msg_text_inner').remove();
-        const externalSources = $(this).data('src').split(',');
-        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
-        return get_message_content(messagePart, false, false, false, false, false);
-    });
-}
-
-/**
- * Create and insert in the DOM an element containing a message and a button to allow the resource.
- *
- * @param {HTMLElement} element - The element having the blocked resource.
- * @returns {void}
- */
-function handleInvisibleResource(element) {
-    const dataSrc = element.dataset.src;
-
-    const allowResource = document.createElement('div');
-    // allowResource.classList.add('allow_image_link');
-    allowResource.classList.add('alert', 'alert-warning', 'p-1');
-
-    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
-    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
-    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
-    Allow</a></div>
-    `;
-
-    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
-    handleAllowResource(allowResource, element.dataset.messagePart);
-}
-
-const mutation = new MutationObserver(function (mutations) {
-    mutations.forEach(function (mutation) {
-        if (mutation.addedNodes.length > 0) {
-            mutation.addedNodes.forEach(function (node) {
-                if (node.classList.contains('msg_text_inner')) {
-
-                    //  Extarnal resources notice boxes container
-                    document.querySelector('.msg_text_inner').insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
-
-                    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
-                    const elements = node.querySelectorAll('[data-src]');
-                    const blockedResources = [];
-                    elements.forEach(function (element) {
-
-                        const dataSrc = element.dataset.src;
-                        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
-                        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
-
-                        switch (Number(allowed) || Number(senderAllowed)) {
-                            case 1:
-                                element.src = dataSrc;
-                                break;
-                            default:
-                                if ((allowed || senderAllowed) === null) {
-                                    Hm_Utils.save_to_local_storage(dataSrc, 0);
-                                }
-                                handleInvisibleResource(element);
-                                blockedResources.push(dataSrc);
-                                break;
-                        }
-                    });
-
-                    const noticesElement = document.createElement('div');
-                    noticesElement.classList.add('notices');
-
-                    if(blockedResources.length) {
-                        const allowAll = document.createElement('div');
-                        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
-                        allowAll.textContent = 'For security reasons, external resources have been blocked.';
-                        if (blockedResources.length > 1) {
-                            const allowAllLink = document.createElement('a');
-                            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
-                            allowAllLink.href = '#';
-                            allowAllLink.dataset.src = blockedResources.join(',');
-                            allowAllLink.textContent = 'Allow all';
-                            allowAll.appendChild(allowAllLink);
-                            handleAllowResource(allowAll, elements[0].dataset.messagePart);
-                        }
-                        noticesElement.appendChild(allowAll);
-
-                        const button = document.createElement('a');
-                        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
-                        button.textContent = 'Always allow from this sender';
-                        noticesElement.appendChild(button);
-
-                        button.addEventListener('click', function (e) {
-                            e.preventDefault();
-                            Hm_Utils.save_to_local_storage(sender, 1);
-                            $('.msg_text_inner').remove();
-                            get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-                        });
-                    }
-
-                    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
-                }
-            });
-        }
-    });
-});
-
-const message = document.querySelector('.msg_text');
-if (message) {
-    mutation.observe(document.querySelector('.msg_text'), {
-        childList: true
-    });
-}
+observeMessageTextMutationAndHandleExternalResources();
 
 const handleDownloadMsgSource = function() {
     const messageSource = document.querySelector('pre.msg_source');
