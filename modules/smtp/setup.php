@@ -102,6 +102,9 @@ add_handler('ajax_clear_attachment_chunks', 'login', false, 'core');
 add_handler('ajax_clear_attachment_chunks', 'load_user_data',  true, 'core');
 add_handler('ajax_clear_attachment_chunks', 'clear_attachment_chunks',  true);
 
+add_handler('settings', 'process_enable_compose_delivery_receipt_setting', true, 'core', 'save_user_settings', 'before');
+add_output('settings', 'enable_compose_delivery_receipt_setting', true, 'core', 'start_general_settings', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_clear_attachment_chunks',
@@ -170,6 +173,7 @@ return array(
         'compose_cc' => FILTER_UNSAFE_RAW,
         'compose_bcc' => FILTER_UNSAFE_RAW,
         'compose_delivery_receipt' => FILTER_VALIDATE_BOOLEAN,
+        'enable_compose_delivery_receipt' => FILTER_VALIDATE_INT,
         'compose_smtp_id' => FILTER_DEFAULT,
         'draft_id' => FILTER_VALIDATE_INT,
         'draft_body' => FILTER_UNSAFE_RAW,
