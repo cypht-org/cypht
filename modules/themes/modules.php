@@ -65,7 +65,7 @@ class Hm_Output_theme_css extends Hm_Output_Module
     {
         if ($this->get('theme') && in_array($this->get('theme'), array_keys($this->get('themes', array())), true)) {
             $theme_name = $this->html_safe($this->get('theme'));
-            return '<link href="' . WEB_ROOT . 'modules/themes/assets/' . $theme_name . '/css/' . $theme_name . '.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+            return '<link href="' . ASSETS_THEMES_ROOT . 'modules/themes/assets/' . $theme_name . '/css/' . $theme_name . '.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         }
     }
 }
