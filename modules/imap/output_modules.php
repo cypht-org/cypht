@@ -185,7 +185,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                                 $txt .= ' <i class="bi bi-star-half account_icon"></i> ';
                             }
-                            $txt .= $this->html_safe($value).'</th></tr>';
+                            $txt .= $this->html_safe($value);
+                            $txt .= get_unsubscribe_link($this).'</th></tr>';
                         }
                         elseif ($fld == 'x-snoozed') {
                             $snooze_header = parse_snooze_header($value);

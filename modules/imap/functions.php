@@ -1573,3 +1573,46 @@ if (!hm_exists('connect_to_imap_server')) {
         }
     }
 }
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('get_unsubscribe_link')) {
+    function get_unsubscribe_link($mod, $label = "Unsubscribe") {
+        $txt = '';
+        $link = '';
+        $headers = $mod->get('msg_headers', array());
+        $from = $headers['From'] ?? '';
+        if (isset($mod->get('list_headers')['unsubscribe'])) {
+            $vals = $mod->get('list_headers')['unsubscribe'];
+            if (isset($vals['links'])) {
+                foreach ($vals['links'] as $v) {
+                    $link = $mod->html_safe($v);
+                    $txt = '<a href="#" class="p-1 btn btn-info" data-bs-toggle="modal" data-bs-target="#unsubscribeModal">'.$label.'</a>';
+                } 
+            }
+        }
+        if (!empty($txt)) {
+            $txt .= '<div class="modal fade" id="unsubscribeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="'.$modal_id.'Label" aria-hidden="true">
+                <div class="modal-dialog modal-md ">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="unsubscribeModalLabel">'.$label.'</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div>
+                                Do you want to stop receiving messages from '.$from.'
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <input class="btn btn-secondary" data-bs-dismiss="modal" type="button" value="Cancel" />
+                            <a href="'.$link.'" class="btn btn-primary" data-bs-dismiss="modal" type="button">'.$label.'</a>
+                        </div>
+                    </div>
+                </div>
+            </div>';
+        }
+        return $txt;
+    }
+}
