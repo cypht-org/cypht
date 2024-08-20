@@ -403,7 +403,8 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         }
 
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
-        $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
+        $settings = $this->user_config;
+        $compose_type = $settings->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
@@ -418,6 +419,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $this->out('compose_draft', $draft);
         }
         $this->out('smtp_compose_type', $compose_type);
+        $this->out('enable_compose_delivery_receipt_setting', $settings->get('enable_compose_delivery_receipt_setting'));
     }
 }
 
@@ -737,7 +739,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
-        if (!empty($this->request->post['compose_delivery_receipt'])) {
+        if ($this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt'])) {
             $from_params      = 'RET=HDRS';
             $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
         }
@@ -907,6 +909,34 @@ class Hm_Handler_clear_attachment_chunks extends Hm_Handler_Module {
             }
         }
         Hm_Msgs::add('Attachment chunks cleaned');
+    }
+}
+
+/**
+ * @subpackage keyboard_shortcuts/handler
+ */
+class Hm_Handler_process_enable_compose_delivery_receipt_setting extends Hm_Handler_Module {
+    public function process() {
+        function compose_delivery_receipt_enabled_callback($val) { return $val; }
+        process_site_setting('enable_compose_delivery_receipt', $this, 'compose_delivery_receipt_enabled_callback', false, true);
+    }
+}
+
+class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('enable_compose_delivery_receipt', $settings) && $settings['enable_compose_delivery_receipt']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        else {
+            $checked = '';
+            $reset = '';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_compose_delivery_receipt">'.
+            $this->trans('Enable delivery receipt').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1207,8 +1237,10 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<div class="form-floating mb-3">'.
                     '<textarea id="compose_body" name="compose_body" class="compose_body form-control" placeholder="'.$this->trans('Message').'">'.$this->html_safe($body).'</textarea>'.
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
-                '</div>'.
-                '<div class="form-check mb-3"><input value="0" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                '</div>';
+                if($this->get('enable_compose_delivery_receipt_setting')) {
+                    $res .= '<div class="form-check mb-3"><input value="0" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
                 '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.js"></script>'.
