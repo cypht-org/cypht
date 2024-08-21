@@ -55,7 +55,7 @@ trait Hm_Repository {
 
     public static function edit($id, $entity) {
         if (array_key_exists($id, self::$entities)) {
-            self::$entities[$id] = $entity;
+            self::$entities[$id] = array_merge(self::$entities[$id], $entity);
             self::save();
             return true;
         }

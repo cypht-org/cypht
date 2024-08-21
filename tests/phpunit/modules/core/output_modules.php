@@ -2,559 +2,6 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Hm_Test_Core_Handler_Modules extends TestCase {
-
-    public function setUp(): void {
-        require __DIR__.'/../../bootstrap.php';
-        require __DIR__.'/../../helpers.php';
-        require APP_PATH.'modules/core/modules.php';
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_check_folder_icon_setting() {
-        $test = new Handler_Test('check_folder_icon_setting', 'core');
-        $res = $test->run();
-        $this->assertFalse($res->handler_response['hide_folder_icons']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcesM#s
-     */
-    public function test_process_pw_update() {
-        $test = new Handler_Test('process_pw_update', 'core');
-        $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-
-        $test->post = array('server_pw_id' => 'a1', 'password' => 'foo');
-        $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-
-        Hm_SMTP_List::add(array('user' => 'testuser', 'nopass' => 1, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
-
-        $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'SMTP')));
-        $res = $test->run();
-        $this->assertEquals(array('ERRUnable to authenticate to the SMTP server'), Hm_Msgs::get());
-        $this->assertFalse($res->handler_response['connect_status']);
-        Hm_Msgs::flush();
-
-        Hm_SMTP_List::change_state('authed');
-        $res = $test->run();
-        $this->assertEquals(array('Password Updated'), Hm_Msgs::get());
-        $this->assertTrue($res->handler_response['connect_status']);
-        Hm_Msgs::flush();
-
-        Hm_IMAP_List::add(array('user' => 'testuser', 'nopass' => 1, 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1, 'id' => 'a1'));
-
-        $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'IMAP')));
-        $res = $test->run();
-        $this->assertEquals(array('ERRUnable to authenticate to the IMAP server'), Hm_Msgs::get());
-        $this->assertFalse($res->handler_response['connect_status']);
-        Hm_Msgs::flush();
-
-        Hm_IMAP_List::change_state('authed');
-        $res = $test->run();
-        $this->assertEquals(array('Password Updated'), Hm_Msgs::get());
-        $this->assertTrue($res->handler_response['connect_status']);
-        Hm_Msgs::flush();
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_check_missing_passwords() {
-        $test = new Handler_Test('check_missing_passwords', 'core');
-        $res = $test->run();
-        $this->assertFalse(array_key_exists('missing_pw_servers', $res->handler_response));
-        $test->modules = array('imap', 'smtp');
-        $test->user_config = array('no_password_save_setting' => true);
-        Hm_IMAP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
-        Hm_SMTP_List::add(array('nopass' => 1, 'user' => 'testuser', 'pass' => 'testpass', 'name' => 'test', 'server' => 'test', 'port' => 0, 'tls' => 1));
-        $res = $test->run();
-        $this->assertEquals(4, count($res->handler_response['missing_pw_servers']));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_close_session_early() {
-        $test = new Handler_Test('close_session_early', 'core');
-        $res = $test->run();
-        $this->assertFalse($res->session->is_active());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_http_headers() {
-        $test = new Handler_Test('http_headers', 'core');
-        $test->tls = true;
-        $test->rtype = 'AJAX';
-        $test->input = array('language' => 'English');
-        $res = $test->run();
-		$out = array(
-			'Content-Language' => 'En',
-            'Strict-Transport-Security' => 'max-age=31536000',
-            'X-Frame-Options' => 'SAMEORIGIN',
-            'X-XSS-Protection' => '1; mode=block',
-            'X-Content-Type-Options' => 'nosniff',
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-            'Content-Type' => 'application/json',
-		);
-        foreach ($out as $key => $val) {
-            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
-        }
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_http_headers_allow_images() {
-        $test = new Handler_Test('http_headers', 'core');
-        $test->tls = true;
-        $test->rtype = 'AJAX';
-        $test->input = array('language' => 'English');
-        $test->config['allow_external_image_sources'] = true;
-        $res = $test->run();
-		$out = array(
-            'Content-Security-Policy' => "default-src 'none'; script-src 'self' 'unsafe-inline'; connect-src 'self'; font-src 'self' https://fonts.gstatic.com; img-src * data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;",
-		);
-        foreach ($out as $key => $val) {
-            $this->assertEquals($out[$key], $res->handler_response['http_headers'][$key]);
-        }
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_list_style_setting_passed() {
-        $test = new Handler_Test('process_list_style_setting', 'core');
-        $test->post = array('save_settings' => true, 'list_style' => 'news_style');
-        $res = $test->run();
-        $this->assertEquals('news_style', $res->handler_response['new_user_settings']['list_style_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_list_style_setting_failed() {
-        $test = new Handler_Test('process_list_style_setting', 'core');
-        $test->post = array('save_settings' => true, 'list_style' => 'blah');
-        $res = $test->run();
-        $this->assertEquals('email_style', $res->handler_response['new_user_settings']['list_style_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_start_page_setting_passed() {
-        $test = new Handler_Test('process_start_page_setting', 'core');
-        $test->post = array('save_settings' => true, 'start_page' => 'page=message_list&list_path=unread');
-        $res = $test->run();
-        $this->assertEquals('page=message_list&list_path=unread', $res->handler_response['new_user_settings']['start_page_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_start_page_setting_failed() {
-        $test = new Handler_Test('process_start_page_setting', 'core');
-        $test->post = array('save_settings' => true, 'start_page' => 'blah');
-        $res = $test->run();
-        $this->assertEquals('', $res->handler_response['new_user_settings']['start_page_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_hide_folder_icons_setting_failed() {
-        $test = new Handler_Test('process_hide_folder_icons', 'core');
-        $test->post = array('save_settings' => true, 'no_folder_icons' => false);
-        $res = $test->run();
-        $this->assertFalse($res->handler_response['new_user_settings']['no_folder_icons_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_mailto_handler() {
-        $test = new Handler_Test('process_mailto_handler_setting', 'core');
-        $test->post = array('save_settings' => true, 'mailto_handler' => true);
-        $res = $test->run();
-        $this->assertTrue($res->handler_response['new_user_settings']['mailto_handler_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_show_list_icons() {
-        $test = new Handler_Test('process_show_list_icons', 'core');
-        $test->post = array('save_settings' => true, 'show_list_icons' => false);
-        $res = $test->run();
-        $this->assertFalse($res->handler_response['new_user_settings']['show_list_icons_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_unread_source_max_setting() {
-        $test = new Handler_Test('process_unread_source_max_setting', 'core');
-        $test->post = array('save_settings' => true, 'unread_per_source' => 10);
-        $res = $test->run();
-        $this->assertEquals(10, $res->handler_response['new_user_settings']['unread_per_source_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_all_email_source_max_setting() {
-        $test = new Handler_Test('process_all_email_source_max_setting', 'core');
-        $test->post = array('save_settings' => true, 'all_email_per_source' => 10);
-        $res = $test->run();
-        $this->assertEquals(10, $res->handler_response['new_user_settings']['all_email_per_source_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_no_password_setting() {
-        $test = new Handler_Test('process_no_password_setting', 'core');
-        $test->post = array('save_settings' => true, 'no_password_save' => true);
-        $res = $test->run();
-        $this->assertTrue($res->handler_response['new_user_settings']['no_password_save_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_delete_prompt_setting() {
-        $test = new Handler_Test('process_delete_prompt_setting', 'core');
-        $test->post = array('save_settings' => true, 'disable_delete_prompt' => true);
-        $res = $test->run();
-        $this->assertTrue($res->handler_response['new_user_settings']['disable_delete_prompt_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_all_source_max_setting() {
-        $test = new Handler_Test('process_all_source_max_setting', 'core');
-        $test->post = array('save_settings' => true, 'all_per_source' => 10);
-        $res = $test->run();
-        $this->assertEquals(10, $res->handler_response['new_user_settings']['all_per_source_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_flagged_source_max_setting() {
-        $test = new Handler_Test('process_flagged_source_max_setting', 'core');
-        $test->post = array('save_settings' => true, 'flagged_per_source' => 10);
-        $res = $test->run();
-        $this->assertEquals(10, $res->handler_response['new_user_settings']['flagged_per_source_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_flagged_since_setting() {
-        $test = new Handler_Test('process_flagged_since_setting', 'core');
-        $test->post = array('save_settings' => true, 'flagged_since' => 'foo');
-        $res = $test->run();
-        $this->assertEquals('today', $res->handler_response['new_user_settings']['flagged_since_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_all_since_setting() {
-        $test = new Handler_Test('process_all_since_setting', 'core');
-        $test->post = array('save_settings' => true, 'all_since' => 'foo');
-        $res = $test->run();
-        $this->assertEquals('today', $res->handler_response['new_user_settings']['all_since_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_all_email_since_setting() {
-        $test = new Handler_Test('process_all_email_since_setting', 'core');
-        $test->post = array('save_settings' => true, 'all_email_since' => 'foo');
-        $res = $test->run();
-        $this->assertEquals('today', $res->handler_response['new_user_settings']['all_email_since_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_unread_since_setting() {
-        $test = new Handler_Test('process_unread_since_setting', 'core');
-        $test->post = array('save_settings' => true, 'unread_since' => 'foo');
-        $res = $test->run();
-        $this->assertEquals('today', $res->handler_response['new_user_settings']['unread_since_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_language_setting_passed() {
-        $test = new Handler_Test('process_language_setting', 'core');
-        $test->post = array('save_settings' => true, 'language' => 'en');
-        $res = $test->run();
-        $this->assertEquals('en', $res->handler_response['new_user_settings']['language_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_language_setting_failed() {
-        $test = new Handler_Test('process_language_setting', 'core');
-        $test->post = array('save_settings' => true, 'language' => 'foo');
-        $res = $test->run();
-        $this->assertEquals('en', $res->handler_response['new_user_settings']['language_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_timezone_setting_passed() {
-        $test = new Handler_Test('process_timezone_setting', 'core');
-        $test->post = array('save_settings' => true, 'timezone' => 'America/Chicago');
-        $res = $test->run();
-        $this->assertEquals('America/Chicago', $res->handler_response['new_user_settings']['timezone_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_timezone_setting_failed() {
-        $test = new Handler_Test('process_timezone_setting', 'core');
-        $test->post = array('save_settings' => true, 'timezone' => 'foo');
-        $res = $test->run();
-        $this->assertFalse($res->handler_response['new_user_settings']['timezone_setting']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_save_form() {
-        $test = new Handler_Test('process_save_form', 'core');
-        $test->session = array('username' => 'foo');
-        $test->run();
-        $test->post = array('save_settings' => true, 'password' => 'foo');
-        $this->assertEquals(array(), Hm_Msgs::get());
-        $test->run();
-        $test->post = array('save_settings_permanently' => 1, 'save_settings' => true, 'password' => 'foo');
-        $test->run();
-        $this->assertEquals(array('Settings saved'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-        $test->post = array('save_settings_permanently_then_logout' => 1, 'save_settings' => true, 'password' => 'foo');
-        $test->run();
-        $this->assertEquals(array('Saved user data on logout', 'Session destroyed on logout'), Hm_Msgs::get());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_save_user_settings() {
-        $test = new Handler_Test('save_user_settings', 'core');
-        $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-        $test->post = array('save_settings' => true);
-        $test->input = array('new_user_settings' => array('foo' => 'bar'));
-        $test->run();
-        $this->assertEquals(array('Settings updated'), Hm_Msgs::get());
-	}
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_title() {
-        $test = new Handler_Test('title', 'core');
-        $res = $test->run();
-        $this->assertEquals('', $res->handler_response['title']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_language() {
-        $test = new Handler_Test('language', 'core');
-        $res = $test->run();
-        $this->assertEquals('en', $res->handler_response['language']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_date() {
-        $test = new Handler_Test('date', 'core');
-        $res = $test->run();
-        $this->assertTrue(array_key_exists('date', $res->handler_response));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_stay_logged_in() {
-        $test = new Handler_Test('stay_logged_in', 'core');
-        $res = $test->run();
-        $this->assertFalse(array_key_exists('allow_long_session', $res->handler_response));
-        $test->post = array('stay_logged_in' => true);
-        $test->config = array('allow_long_session' => true);
-        $res = $test->run();
-        $this->assertTrue($res->session->lifetime > 0);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_login() {
-        $test = new Handler_Test('login', 'core');
-        $test->input = array('create_username' => true);
-        $res = $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-        $test->input = array();
-        $res = $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-        $test->post = array('username' => 'foo', 'password' => 'bar');
-        $test->run();
-        #$this->assertEquals(array('ERRInvalid username or password'), Hm_Msgs::get());
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_default_page_data() {
-        $test = new Handler_Test('default_page_data', 'core');
-        $test->config = array('auth_type' => 'IMAP', 'single_server_mode' => true);
-        $res = $test->run();
-        $this->assertEquals(array(), $res->handler_response['data_sources']);
-        $this->assertEquals('', $res->handler_response['encrypt_ajax_requests']);
-        $this->assertEquals('', $res->handler_response['encrypt_local_storage']);
-        $this->assertTrue($res->handler_response['single_server_mode']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_load_user_data() {
-        $test = new Handler_Test('load_user_data', 'core');
-        $test->user_config = array('start_page_setting' => 'page=message_list&list_path=unread', 'saved_pages' => 'foo');
-        $res = $test->run();
-        $test->session = array('user_data' => array('foo' => 'bar'));
-        $res = $test->run();
-        $this->assertEquals(array('start_page_setting' => 'page=message_list&list_path=unread', 'saved_pages' => 'foo'), $test->user_config);
-        $test->post = array('username' => 'foo', 'password' => 'bar');
-        $res = $test->run();
-        $this->assertFalse($res->handler_response['disable_delete_prompt']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_save_user_data() {
-        $test = new Handler_Test('save_user_data', 'core');
-        $res = $test->run();
-        $this->assertEquals(array('user_settings_dir' => APP_PATH.'tests/phpunit/data', 'default_language' => 'es', 'default_setting_inline_message' => true), $res->session->get('user_data'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_logout() {
-        $test = new Handler_Test('logout', 'core');
-        $test->post = array('logout' => true);
-        $test->prep();
-        $test->ses_obj->loaded = false;
-        $test->run_only();
-        $this->assertEquals(array('Session destroyed on logout'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-
-        $test->post = array('password' => 'foo', 'save_and_logout' => true);
-        $test->run();
-        $this->assertEquals(array(), Hm_Msgs::get());
-        Hm_Msgs::flush();
-
-        $test->config = array('user_settings_dir' => './data');
-        $test->session = array('username' => 'foo');
-        $test->prep();
-        $test->ses_obj->auth_state = false;
-        $test->run_only();
-        $this->assertEquals(array('ERRIncorrect password, could not save settings to the server'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-        $test->prep();
-        $test->ses_obj->auth_state = true;
-        $test->run_only();
-        $this->assertEquals(array('Saved user data on logout, Session destroyed on logout'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-
-        $test->post = array('save_and_logout' => true);
-        $test->run();
-        $this->assertEquals(array('ERRYour password is required to save your settings to the server'), Hm_Msgs::get());
-        Hm_Msgs::flush();
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_message_list_type() {
-        $test = new Handler_Test('message_list_type', 'core');
-        $test->get = array('uid' => 1, 'list_parent' => 'unread', 'list_page' => 1, 'list_path' => 'unread');
-        $test->input = array('is_mobile' => true);
-        $res = $test->run();
-		$this->assertEquals(1, $res->handler_response['uid']);
-		$this->assertEquals(1, $res->handler_response['news_list_style']);
-		$this->assertEquals(1, $res->handler_response['list_page']);
-		$this->assertEquals(1, $res->handler_response['is_mobile']);
-		$this->assertEquals(1, $res->handler_response['list_meta']);
-        $test->get = array('list_parent' => 'unread', 'list_path' => 'unread');
-        $res = $test->run();
-		$this->assertEquals('', $res->handler_response['uid']);
-		$this->assertEquals(1, $res->handler_response['news_list_style']);
-		$this->assertEquals(1, $res->handler_response['list_page']);
-		$this->assertEquals(1, $res->handler_response['is_mobile']);
-		$this->assertEquals(1, $res->handler_response['list_meta']);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_reload_folder_cookie() {
-        $test = new Handler_Test('reload_folder_cookie', 'core');
-        $test->input = array('reload_folders' => true);
-        $res = $test->run();
-        $this->assertTrue($res->session->cookie_set);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_reset_search() {
-        $test = new Handler_Test('reset_search', 'core');
-        $res = $test->run();
-        $this->assertEquals('', $res->session->get('search_terms'));
-        $this->assertEquals(DEFAULT_SINCE, $res->session->get('search_since'));
-        $this->assertEquals(DEFAULT_SEARCH_FLD, $res->session->get('search_fld'));
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_process_search_terms() {
-        $test = new Handler_Test('process_search_terms', 'core');
-        $test->get = array('search_terms' => 'foo', 'search_since' => '-1 week', 'search_fld' => 'BODY');
-        $res = $test->run();
-		$this->assertEquals('foo', $res->handler_response['search_terms']);
-		$this->assertEquals('-1 week', $res->handler_response['search_since']);
-		$this->assertEquals('BODY', $res->handler_response['search_fld']);
-    }
-}
-/**
- * TODO: add assertions to all tests
- */
-
 class Hm_Test_Core_Output_Modules extends TestCase {
 
     public function setUp(): void {
@@ -571,7 +18,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->run();
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></form></div></li>', $res->output_data['formatted_folder_list']);
+        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></div></form></li>', $res->output_data['formatted_folder_list']);
     }
     /**
      * @preserveGlobalState disabled
@@ -720,7 +167,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                         <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
                     </div>
@@ -770,7 +217,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                         <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
                     </div>
@@ -803,7 +250,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                         <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
                     </div>
@@ -835,7 +282,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
                         <p class="text-wrap">Unsaved changes will be lost! Re-enter your password to save and exit. <a href="?page=save">More info</a></p>
                         <input type="text" value="cypht_user" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="Password">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="Password">
                             <label for="logout_password" class="form-label screen-reader">Password</label>
                         </div>
                     </div>
@@ -855,7 +302,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_server_content_start() {
         $test = new Output_Test('server_content_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="content_title">Servers<div class="list_controls"></div></div><div class="server_content">'), $res->output_response);
+        $this->assertEquals(array('<div class="content_title">Servers</div><div class="server_content">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -885,7 +332,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('msgs', 'core');
         $test->handler_response = array('router_login_state' => false);
         $res = $test->run();
-        $this->assertEquals(array('<div class="d-none z-3 position-fixed top-0 end-0 mt-3 me-3 sys_messages logged_out"><div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">foo</span>,<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages logged_out"><div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div><div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">foo</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1266,7 +713,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1275,10 +722,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_timezone_setting() {
         $test = new Output_Test('timezone_setting', 'core');
         $res = $test->run();
-        $this->assertTrue(strlen($res->output_response[0]) > 0);
+        $this->assertTrue(mb_strlen($res->output_response[0]) > 0);
         $test->handler_response = array('user_settings' => array('timezone' => 'America/Chicago'));
         $res = $test->run();
-        $this->assertTrue(strlen($res->output_response[0]) > 0);
+        $this->assertTrue(mb_strlen($res->output_response[0]) > 0);
     }
     /**
      * @preserveGlobalState disabled
@@ -1311,7 +758,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_start() {
         $test = new Output_Test('folder_list_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
+        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<i class="bi bi-list fs-5"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1397,10 +844,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1409,10 +856,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_save_form() {
         $test = new Output_Test('save_form', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>No changes need to be saved</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2 warn_on_paste" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_settings_page p-0"><div class="content_title px-3">Save Settings</div><div class="save_details p-3">Settings are not saved permanently on the server unless you explicitly allow it. If you don\'t save your settings, any changes made since you last logged in will be deleted when your session expires or you logout. You must re-enter your password for security purposes to save your settings permanently.<div class="save_subtitle mt-3"><b>Unsaved Changes</b></div><ul class="unsaved_settings"><li>foo (1X)</li></ul></div><div class="save_perm_form px-3"><form method="post"><input type="hidden" name="hm_page_key" value="" /><input type="text" value="cypht_user" autocomplete="username" style="display: none;"/><label class="screen_reader" for="password">Password</label><input required id="password" name="password" autocomplete="current-password" class="save_settings_password form-control mb-2 warn_on_paste" type="password" placeholder="Password" /><input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="Save" /><input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="Save and Logout" /></form><form method="post"><input type="hidden" name="hm_page_key" value="" /><input class="save_settings btn btn-outline-secondary" type="submit" name="logout" value="Just Logout" /></form></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1463,10 +910,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1578,7 +1025,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array(), $res->output_response);
         $test->handler_response = array('missing_pw_servers' => array(array('server' => 'host', 'user' => 'test', 'type' => 'foo', 'id' => 1, 'name' => 'bar')));
         $res = $test->run();
-        $this->assertEquals(array('<div class="home_password_dialogs"><div class="nux_title">Passwords</div>You have elected to not store passwords between logins. Enter your passwords below to gain access to these services during this session.<br /><br /><div class="div_foo_1" >foo bar test host <input placeholder="Password" type="password" class="pw_input" id="update_pw_foo_1" /> <input type="button" class="pw_update" data-id="foo_1" value="Update" /></div></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="home_password_dialogs mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>Passwords</h4></div><p>You have elected to not store passwords between logins. Enter your passwords below to gain access to these services during this session.</p><div class="div_foo_1 mt-3">foo bar test host <div class="input-group mt-2"><input placeholder="Password" type="password" class="form-control pw_input" id="update_pw_foo_1" /> <input type="button" class="pw_update btn btn-primary" data-id="foo_1" value="Update" /></div></div></div></div></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1622,48 +1069,5 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('message_list_end', 'core');
         $res = $test->run();
         $this->assertEquals(array('</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>'), $res->output_response);
-    }
-}
-class Hm_Test_Core_Output_Modules_Debug extends TestCase {
-    public function setUp(): void {
-        define('DEBUG_MODE', true);
-        require __DIR__.'/../../bootstrap.php';
-        require __DIR__.'/../../helpers.php';
-        require APP_PATH.'modules/core/modules.php';
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_header_css_debug() {
-        $test = new Output_Test('header_css', 'core');
-        $test->handler_response = array('router_module_list' => array('core'));
-        $res = $test->run();
-        $this->assertEquals(array('<link href="modules/themes/assets/default/css/default.css?v=asdf" media="all" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_page_js_debug() {
-        $test = new Output_Test('page_js', 'core');
-        $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('foo', 'core'));
-        $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
-        $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('imap'));
-        $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script>'), $res->output_response);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_main_menu_start_debug() {
-        $test = new Output_Test('main_menu_start', 'core');
-        $res = $test->run();
-        $this->assertEquals(array('<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
-        $test->rtype = 'AJAX';
-        $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
     }
 }

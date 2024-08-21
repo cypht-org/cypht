@@ -4,7 +4,7 @@
  * CLI script to build the site configuration
  */
 
-if (strtolower(php_sapi_name()) !== 'cli') {
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
@@ -37,9 +37,9 @@ build_config();
  * @return void
  * */
 function check_php() {
-    $minVersion = 7.4;
+    $minVersion = 8.1;
     $version = phpversion();
-    if (substr($version, 0, 3) < $minVersion) {
+    if (mb_substr($version, 0, 3) < $minVersion) {
         die("Cypht requires PHP version $minVersion or greater");
     }
     if (!function_exists('mb_strpos')) {
@@ -308,7 +308,7 @@ function append_bootstrap_icons_files() {
         mkdir('site/fonts', 0755);
     }
     $source_folder = 'vendor/twbs/bootstrap-icons/font/fonts/';
-    $files = glob("$source_folder*.*");
+    $files = glob(VENDOR_PATH . "$source_folder*.*");
     foreach($files as $file){
         $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
         copy($file, $dest_forlder);
@@ -326,15 +326,16 @@ function process_bootswatch_files() {
             if (is_dir($src . '/' . $folder) && $folder != 'fonts') {
                 $target = $src . '/' . $folder . '/css/' . $folder . '.css';
                 if ($folder == 'default') {
-                    $content = file_get_contents('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
-                    // Append customization done to the default theme
-                    $custom = file_get_contents($target);
-                    $custom = preg_replace('/^@import.+/m', '', $custom);
-                    $custom = preg_replace('/^@charset.+/m', '', $custom);
-                    $content .= "\n" . $custom;
+                    $content = file_get_contents(VENDOR_PATH . 'twbs/bootstrap/dist/css/bootstrap.min.css');
                 } else {
-                    $content = file_get_contents('vendor/thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
+                    $content = file_get_contents(VENDOR_PATH . 'thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
                 }
+                // Append customization done to the default theme
+                $custom = file_get_contents($target);
+                $custom = preg_replace('/^@import.+/m', '', $custom);
+                $custom = preg_replace('/^@charset.+/m', '', $custom);
+                $content .= "\n" . $custom;
+
                 file_put_contents($target, $content);
             }
         }

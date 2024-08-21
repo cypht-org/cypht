@@ -42,6 +42,9 @@ class Hm_API_Curl {
         if ($body) {
             Hm_Functions::c_setopt($ch, CURLOPT_POSTFIELDS, $body);
         }
+        if (env('WIN_CACERT_DIR')) {
+            Hm_Functions::c_setopt($ch, CURLOPT_CAINFO, env('WIN_CACERT_DIR'));
+        }
         return $this->curl_result($ch);
     }
 

@@ -269,7 +269,7 @@ class Hm_Output_carddav_auth_settings extends Hm_Output_Module {
             }
             $res .= '<tr class="carddav_settings"><td>'.$this->html_safe($name).'</td><td>';
             $res .= '<input autocomplete="username" type="text" value="'.$user.'" name="carddav_usernames['.$this->html_safe($name).']" ';
-            $res .= 'placeholder="'.$this->trans('Username').'" class="form-control" /> <input type="password" class="form-control"';
+            $res .= 'placeholder="'.$this->trans('Username').'" class="form-control warn_on_paste" /> <input type="password" class="form-control warn_on_paste"';
             if ($pass) {
                 $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
                 $res .= 'name="carddav_passwords['.$this->html_safe($name).']" /> <input type="button" ';

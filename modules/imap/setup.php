@@ -15,6 +15,7 @@ add_module_to_all_pages('output', 'prefetch_imap_folder_ids', true, 'imap', 'con
 
 /* add stuff to the info page */
 add_output('info', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
+add_output('info', 'display_imap_capability', true, 'imap', 'server_capabilities_start', 'after');
 add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
@@ -23,8 +24,10 @@ add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_ima
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'server_config_stepper_accordion_end_part', 'before');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
+
 add_output('servers', 'stepper_setup_server_jmap', true, 'imap', 'server_config_stepper_end_part', 'before');
 add_output('servers', 'stepper_setup_server_imap', true, 'imap', 'server_config_stepper_end_part', 'before');
+add_output('servers', 'stepper_setup_server_jmap_imap_common', true, 'imap', 'server_config_stepper_end_part', 'before');
 
 /* settings page data */
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
@@ -296,6 +299,13 @@ add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_tag', 'core');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'save_imap_cache',  true);
+add_handler('ajax_imap_tag', 'imap_add_tag_message',  true, 'core');
+
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
 add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);
@@ -328,6 +338,7 @@ return array(
         'ajax_imap_move_copy_action',
         'ajax_imap_folder_status',
         'ajax_imap_snooze',
+        'ajax_imap_tag',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
@@ -335,12 +346,13 @@ return array(
 
     'allowed_output' => array(
         'imap_connect_status' => array(FILTER_DEFAULT, false),
+        'imap_capabilities_list' => array(FILTER_DEFAULT, false),
         'connect_status' => array(FILTER_DEFAULT, false),
         'auto_sent_folder' => array(FILTER_DEFAULT, false),
         'imap_connect_time' => array(FILTER_DEFAULT, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_status_display' => array(FILTER_UNSAFE_RAW, false),
-        'imap_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_status_server_id' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_path' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_DEFAULT, false),
@@ -416,6 +428,8 @@ return array(
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
         'imap_snooze_ids' => FILTER_DEFAULT,
         'imap_snooze_until' => FILTER_DEFAULT,
-        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN
+        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN,
+        'imap_server_ids' => FILTER_DEFAULT,
+        'tag_id' => FILTER_DEFAULT
     )
 );

@@ -18,12 +18,12 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         $res = '<li class="menu_search"><form method="get">';
         $res .= '<div class="d-flex align-items-center">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="'.WEB_ROOT.'?page=search">';
+            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
             $res .= '<i class="bi bi-search"></i></a></div>';
         }
         $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" '.
-            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></div></li>';
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -70,7 +70,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="'.WEB_ROOT.'?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
         }
         return '';
     }
@@ -285,10 +285,10 @@ class Hm_Output_login extends Hm_Output_Module {
                     </div>
                     <div class="modal-body">
                         <input type="hidden" name="hm_page_key" value="'.Hm_Request_Key::generate().'" />
-                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="'.WEB_ROOT.'?page=save">'.$this->trans('More info').'</a></p>
+                        <p class="text-wrap">'.$this->trans('Unsaved changes will be lost! Re-enter your password to save and exit.').' <a href="?page=save">'.$this->trans('More info').'</a></p>
                         <input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>
                         <div class="my-3 form-floating">
-                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control" type="password" placeholder="'.$this->trans('Password').'">
+                            <input id="logout_password" autocomplete="current-password" name="password" class="form-control warn_on_paste" type="password" placeholder="'.$this->trans('Password').'">
                             <label for="logout_password" class="form-label screen-reader">'.$this->trans('Password').'</label>
                         </div>
                     </div>
@@ -314,7 +314,6 @@ class Hm_Output_server_content_start extends Hm_Output_Module {
      */
     protected function output() {
         return '<div class="content_title">'.$this->trans('Servers').
-            '<div class="list_controls"></div>'.
             '</div><div class="server_content">';
     }
 }
@@ -360,16 +359,14 @@ class Hm_Output_msgs extends Hm_Output_Module {
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="d-none z-3 position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
-        if (!empty($msgs)) {
-            $res .= implode(',', array_map(function($v) {
-                if (preg_match("/ERR/", $v)) {
-                    return sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(substr((string) $v, 3)));
-                }
-                else {
-                    return sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($v));
-                }
-            }, $msgs));
+        $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
+        foreach ($msgs as $msg) {
+            if (preg_match("/ERR/", $msg)) {
+                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
+            }
+            else {
+                $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
+            }
             $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
         }
         $res .= '</div>';
@@ -389,7 +386,7 @@ class Hm_Output_header_start extends Hm_Output_Module {
         $lang = 'en';
         $dir = 'ltr';
         if ($this->lang) {
-            $lang = strtolower(str_replace('_', '-', $this->lang));
+            $lang = mb_strtolower(str_replace('_', '-', $this->lang));
         }
         if ($this->dir) {
             $dir = $this->dir;
@@ -442,7 +439,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<input type="hidden" id="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
         }
         if (!$this->get('single_server_mode') && count($this->get('changed_settings', array())) > 0) {
-            $res .= '<a class="unsaved_icon" href="'.WEB_ROOT.'?page=save" title="'.$this->trans('Unsaved Changes').
+            $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
         return $res;
@@ -861,6 +858,25 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage core/output
+ */
+class Hm_Output_delete_attachment_setting extends Hm_Output_Module {
+    protected function output() {
+        $checked = '';
+        $reset = '';
+        $settings = $this->get('user_settings');
+        if (array_key_exists('allow_delete_attachment', $settings) && $settings['allow_delete_attachment']) {
+            $checked = ' checked="checked"';
+        }
+        else {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Starts the Flagged section on the settings page
  * @subpackage core/output
  */
@@ -1243,7 +1259,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a>'.
+        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-list fs-5"></i></a>'.
             '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
@@ -1306,33 +1322,33 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $total_accounts = count($this->get('imap_servers', array())) + count($this->get('feeds', array()));
         if ($total_accounts > 1) {
-            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=combined_inbox">';
+            $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
             }
             $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
         }
-        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="'.WEB_ROOT.'?page=message_list&amp;list_path=unread">';
+        $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
-        $res .= '<li class="menu_flagged"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=flagged">';
+        $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
-        $res .= '<li class="menu_junk"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=junk">';
+        $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Junk').'</a></li>';
-        $res .= '<li class="menu_trash"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=trash">';
+        $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill fs-5 me-2"></i>';
         }
         $res .= $this->trans('Trash').'</a></li>';
-        $res .= '<li class="menu_drafts"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=drafts">';
+        $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pencil-square fs-5 me-2"></i>';
         }
@@ -1407,7 +1423,7 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             }
             $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
-                $res .= '<li class="menu_email"><a class="unread_link" href="'.WEB_ROOT.'?page=message_list&amp;list_path=email">';
+                $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
                 }
@@ -1433,8 +1449,8 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '</div><ul style="display: none;" class="settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="'.WEB_ROOT.'?page=home">';
+            '<ul style="display: none;" class="settings folders">';
+        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
         }
@@ -1476,7 +1492,7 @@ class Hm_Output_save_form extends Hm_Output_Module {
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<input type="text" value="'.$this->html_safe($this->get('username', 'cypht_user')).'" autocomplete="username" style="display: none;"/>'.
             '<label class="screen_reader" for="password">Password</label><input required id="password" '.
-            'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2" type="password" placeholder="'.$this->trans('Password').'" />'.
+            'name="password" autocomplete="current-password" class="save_settings_password form-control mb-2 warn_on_paste" type="password" placeholder="'.$this->trans('Password').'" />'.
             '<input class="save_settings btn btn-primary me-2" type="submit" name="save_settings_permanently" value="'.$this->trans('Save').'" />'.
             '<input class="save_settings btn btn-outline-secondary me-2" type="submit" name="save_settings_permanently_then_logout" value="'.$this->trans('Save and Logout').'" />'.
             '</form><form method="post"><input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
@@ -1497,7 +1513,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
      * Outputs links to the Servers settings pages
      */
     protected function output() {
-        $res = '<li class="menu_servers"><a class="unread_link" href="'.WEB_ROOT.'?page=servers">';
+        $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
         }
@@ -1515,7 +1531,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
      * Outputs links to the Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_settings"><a class="unread_link" href="'.WEB_ROOT.'?page=settings">';
+        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
         }
@@ -1536,7 +1552,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return;
         }
-        $res = '<li class="menu_save"><a class="unread_link" href="'.WEB_ROOT.'?page=save">';
+        $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-download fs-5 me-2"></i>';
         }
@@ -1572,7 +1588,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-down-fill"'.'" alt="'.$this->trans('Collapse').'></i></a>';
+        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-left-fill fs-5"></i></a>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1647,20 +1663,20 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="'.WEB_ROOT.'?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {
                     unset($mb_title[$key]);
                 }
                 $title .= '<i class="bi bi-caret-right-fill path_delim"></i>'.
-                    '<a href="'.WEB_ROOT.'?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
+                    '<a href="?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path')).'">'.
                     implode('<i class="bi bi-caret-right-fill path_delim"></i>',
                     array_map( function($v) { return $this->trans($v); }, $mb_title)).'</a>';
             }
         }
         elseif ($this->get('mailbox_list_title')) {
-            $url = WEB_ROOT.'?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
+            $url = '?page=message_list&amp;list_path='.$this->html_safe($this->get('list_path'));
             if ($this->get('list_page', 0)) {
                 $url .= '&list_page='.$this->html_safe($this->get('list_page'));
             }
@@ -1775,18 +1791,19 @@ class Hm_Output_home_password_dialogs extends Hm_Output_Module {
     protected function output() {
         $missing = $this->get('missing_pw_servers', array());
         if (count($missing) > 0) {
-            $res = '<div class="home_password_dialogs">';
-            $res .= '<div class="nux_title">Passwords</div>'.$this->trans('You have elected to not store passwords between logins.').
-                ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'<br /><br />';
+            $res = '<div class="home_password_dialogs mt-3 col-lg-6 col-md-5 col-sm-12">';
+            $res .= '<div class="card"><div class="card-body">';
+            $res .= '<div class="card_title"><h4>Passwords</h4></div><p>'.$this->trans('You have elected to not store passwords between logins.').
+                ' '.$this->trans('Enter your passwords below to gain access to these services during this session.').'</p>';
 
             foreach ($missing as $vals) {
-                $id = $this->html_safe(sprintf('%s_%s', strtolower($vals['type']), $vals['id']));
-                $res .= '<div class="div_'.$id.'" >'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
-                    ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <input placeholder="'.$this->trans('Password').
-                    '" type="password" class="pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update" data-id="'.$id.
-                    '" value="'.$this->trans('Update').'" /></div>';
+                $id = $this->html_safe(sprintf('%s_%s', mb_strtolower($vals['type']), $vals['id']));
+                $res .= '<div class="div_'.$id.' mt-3">'.$this->html_safe($vals['type']).' '.$this->html_safe($vals['name']).
+                    ' '.$this->html_safe($vals['user']).' '.$this->html_safe($vals['server']).' <div class="input-group mt-2"><input placeholder="'.$this->trans('Password').
+                    '" type="password" class="form-control pw_input" id="update_pw_'.$id.'" /> <input type="button" class="pw_update btn btn-primary" data-id="'.$id.
+                    '" value="'.$this->trans('Update').'" /></div></div>';
             }
-            $res .= '</div>';
+            $res .= '</div></div></div>';
             return $res;
         }
     }
@@ -1816,7 +1833,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             else {
                 $path = $this->get('list_path');
             }
-            $config_link = '<a title="'.$this->trans('Configure').'" href="'.WEB_ROOT.'?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
+            $config_link = '<a title="'.$this->trans('Configure').'" href="?page=settings#'.$path.'_setting"><i class="bi bi-gear-wide refresh_list"></i></a>';
             $refresh_link = '<a class="refresh_link" title="'.$this->trans('Refresh').'" href="#"><i class="bi bi-arrow-clockwise refresh_list"></i></a>';
             //$search_field = '<form method="GET">
             //<input type="hidden" name="page" value="message_list" />
@@ -1835,7 +1852,7 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
         $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
             implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
-        if (!$this->get('is_mobile') && substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
+        if (!$this->get('is_mobile') && mb_substr((string) $this->get('list_path'), 0, 5) != 'imap_') {
             $res .= combined_sort_dialog($this);
         }
         $res .= '</div>';
@@ -2152,26 +2169,28 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                             <div>
                                 <form class=" me-0" method="POST">
                                         <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                                        <input type="hidden" name="srv_setup_stepper_imap_server_id" id="srv_setup_stepper_imap_server_id" />
+                                        <input type="hidden" name="srv_setup_stepper_smtp_server_id" id="srv_setup_stepper_smtp_server_id" />
                                         <div class="form-floating mb-3">
                                             <input required type="text" id="srv_setup_stepper_profile_name" name="srv_setup_stepper_profile_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Name').'">
                                             <label class="" for="srv_setup_stepper_profile_name">'.$this->trans('Name').'</label>
                                             <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                             <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control" value="" placeholder="'.$this->trans('Password').'">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                             <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>
                                 </form>
                             </div>
                             <div class="step_config-actions mt-4 d-flex justify-content-between">
-                                <button class="btn btn-primary px-5" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
-                                <button class="btn btn-primary px-5" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
+                                <button class="btn btn-primary px-5" onclick="display_config_step(0);resetQuickSetupForm();">'.$this->trans('Cancel').'</button>
+                                <button class="btn btn-primary px-5" id="step_config_action_next" onclick="display_config_step(2)">'.$this->trans('Next').'</button>
                             </div>
                         </div>
                         <div id="step_config_2" class="step step_config">
@@ -2237,19 +2256,14 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
 
         $res .= '</form>
             </div>
-            <div class="srv_setup_stepper_form_loader hide" id="srv_setup_stepper_form_loader">
-                <div class="spinner-border text-dark" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
             <div class="step_config-actions mt-4 d-flex justify-content-between">
-                <button class="btn btn-danger px-3" onclick="display_config_step(0)">'.$this->trans('Cancel').'</button>
+                <button class="btn btn-danger px-3" onclick="display_config_step(0);resetQuickSetupForm();">'.$this->trans('Cancel').'</button>
                 <button class="btn btn-primary px-4" onclick="display_config_step(1)">'.$this->trans('Previous').'</button>
-                <button class="btn btn-primary px-3" onclick="display_config_step(3)">'.$this->trans('Finish').'</button>
+                <button class="btn btn-primary px-3" id="step_config_action_finish" onclick="display_config_step(3)" id="stepper-action-finish">'.$this->trans('Finish').'</button>
             </div>
         </div>
         <div id="step_config_0" class="step_config current_config_step">
-            <button class="btn btn-primary px-4" onclick="display_config_step(1)"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>
+            <button class="imap-jmap-smtp-btn btn btn-primary px-4" id="add_new_server_button" onclick="display_config_step(1)"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>
         </div>
     </div>
 </div>

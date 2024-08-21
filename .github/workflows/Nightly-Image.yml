@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         arch: ['x64', 'aarch64']
 
     steps:

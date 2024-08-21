@@ -381,7 +381,6 @@ function Hm_Modal(options) {
         }
 
         btn.addEventListener('click', callback);
-        btn.addEventListener('click', this.hide);
 
         this.modalFooter.append(btn);
     };
@@ -499,7 +498,9 @@ function Message_List() {
         'flagged': 'formatted_flagged_data',
         'junk': 'formatted_junk_data',
         'trash': 'formatted_trash_data',
-        'drafts': 'formatted_drafts_data'
+        'sent': 'formatted_sent_data',
+        'drafts': 'formatted_drafts_data',
+        'tag': 'formatted_tag_data'
     };
 
     this.run_callbacks = function (completed) {
@@ -567,7 +568,6 @@ function Message_List() {
             id = ids[i];
             if ((id+'').search('_') != -1) {
                 parts = id.split('_', 2);
-                parts[0] -= 0;
                 re = new RegExp(parts[1]+'$');
                 parts[1] = re;
             }
@@ -1156,6 +1156,7 @@ function Message_List() {
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
+    this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };
 };
 
 /* folder list */
@@ -1293,7 +1294,7 @@ var Hm_Folders = {
     },
 
     folder_list_events: function() {
-        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
         $('.src_name').on("click", function() {
             var class_name = $(this).data('source');
             var icon_element = $(this).find('.bi');
@@ -1436,7 +1437,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() == 0) {
+        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -1546,7 +1547,7 @@ var Hm_Utils = {
         var results = {}
         var i;
         var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting'];
+        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {
@@ -1573,6 +1574,19 @@ var Hm_Utils = {
             res = sessionStorage.getItem(key);
         }
         return res;
+    },
+
+    search_from_local_storage: function(pattern) {
+        const results = [];
+        const key_pattern = new RegExp(pattern);
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key_pattern.test(key)) {
+                const value = get_from_local_storage(key);
+                results.push({ key: key, value: value });
+            }
+        }
+        return results;
     },
 
     save_to_local_storage: function(key, val) {
@@ -1868,10 +1882,85 @@ var decrease_servers = function(section) {
     if (value > 0) {
         element.innerHTML  = value - 1;
     }
+
+    if (value === 1) {
+        if ($(`.${section}_server`)) {
+            $(`.${section}_server`).prev().fadeOutAndRemove();
+        }
+    }
 };
 
 var err_msg = function(msg) {
     return "ERR"+hm_trans(msg);
+};
+
+var fillImapData = function(details) {
+    $('#srv_setup_stepper_imap_address').val(details.server);
+    $('#srv_setup_stepper_imap_port').val(details.port);
+    $('#srv_setup_stepper_imap_server_id').val(details.id);
+    $('#srv_setup_stepper_imap_hide_from_c_page').prop("checked", details.hide);
+    if (details.sieve_config_host) {
+        $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
+        $("#srv_setup_stepper_enable_sieve").trigger("click", false);
+    }
+
+    if(details.tls) {
+        $("input[name='srv_setup_stepper_imap_tls'][value='true']").prop("checked", true);
+    } else {
+        $("input[name='srv_setup_stepper_imap_tls'][value='false']").prop("checked", true);
+    }
+};
+
+var fillSmtpData = function(details) {
+    $('#srv_setup_stepper_smtp_server_id').val(details.id);
+    $('#srv_setup_stepper_smtp_address').val(details.server);
+    $('#srv_setup_stepper_smtp_port').val(details.port);
+};
+
+var fillJmapData = function(details) {
+    $('#srv_setup_stepper_imap_server_id').val(details.id);
+    $('#srv_setup_stepper_only_jmap').trigger('click');
+    $('#srv_setup_stepper_jmap_address').val(details.server);
+    $('#srv_setup_stepper_imap_hide_from_c_page').prop("checked", details.hide);
+};
+
+var imap_smtp_edit_action = function(event) {
+    resetQuickSetupForm();
+    event.preventDefault();
+    Hm_Notices.hide(true);
+    var details = $(this).data('server-details');
+
+    $('.imap-jmap-smtp-btn').trigger('click');
+    $('#srv_setup_stepper_profile_name').trigger('focus');
+    $('#srv_setup_stepper_profile_name').val(details.name);
+    $('#srv_setup_stepper_email').val(details.user);
+    $('#srv_setup_stepper_password').val('');
+    $('#srv_setup_stepper_profile_reply_to').val('');
+    $('#srv_setup_stepper_create_profile').trigger("click", true);
+
+    if ($(this).data('type') == 'jmap') {
+        fillJmapData(details);
+    } else if ($(this).data('type') == 'imap') {
+        fillImapData(details);
+        var smtpDetails = $('[data-type="smtp"][data-id="'+details.name+'"]');
+        if (smtpDetails.length) {
+            fillSmtpData(smtpDetails.data('server-details'));
+        } else {
+            $('#srv_setup_stepper_is_sender').trigger("click", true);
+        }
+    } else {
+        fillSmtpData(details);
+        var imapDetails = $('[data-type="imap"][data-id="'+details.name+'"]');
+        if (imapDetails.length) {
+            fillImapData(imapDetails.data('server-details'));
+        } else {
+            $('#srv_setup_stepper_is_receiver').trigger("click", true);
+        }
+    }
+};
+
+var hasLeadingOrTrailingSpaces = function(str) {
+    return str !== str.trim();
 };
 
 /* create a default message list object */
@@ -1883,7 +1972,7 @@ $(function() {
     $('.save_settings').on("click", function (e) {
         $('.general_setting input[type=checkbox]').each(function () {
             if (this.hasAttribute('disabled') && this.checked) {
-                this.removeAttribute('disabled');
+                this.removeAttr('disabled');
             }
         });
     })
@@ -1906,6 +1995,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
+    
+    /* show any pending notices */
+    Hm_Utils.show_sys_messages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -1931,6 +2023,9 @@ $(function() {
     if (hm_page_name() == 'home') {
         $('.pw_update').on("click", function() { update_password($(this).data('id')); });
     }
+    if (hm_page_name() == 'servers') {
+        $('.edit_server_connection').on('click', imap_smtp_edit_action);
+    } 
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -1949,6 +2044,13 @@ $(function() {
     if (hm_check_dirty_flag()) {
         $('form:not(.search_terms)').areYouSure();
     }
+
+    $(document).on('paste', '.warn_on_paste', function (e) {
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        if (hasLeadingOrTrailingSpaces(paste)) {
+            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+        }
+    });
 
     fixLtrInRtl()
 });
@@ -2017,6 +2119,7 @@ if(tableBody && !hm_mobile()) {
         sort: false,
         group: 'messages',
         ghostClass: 'drag_target',
+        draggable: ':not(.inline_msg)',
 
         onMove: (sortableEvent) => {
             movingElement = sortableEvent.dragged;
@@ -2155,9 +2258,14 @@ if(tableBody && !hm_mobile()) {
     observer.observe(folderList, config);
 }
 
+var resetStepperButtons = function() {
+    $('.step_config-actions button').removeAttr('disabled');
+    $('#stepper-action-finish').text($('#stepper-action-finish').text().slice(0, -3));
+};
+
 function submitSmtpImapServer() {
-    $('#srv_setup_stepper_form_loader').removeClass('hide');
-    $('.step_config-actions').addClass('hide');
+    $('.step_config-actions button').attr('disabled', true);
+    $('#stepper-action-finish').text($('#stepper-action-finish').text() + '...');
 
     var requestData = [
         { name: 'hm_ajax_hook', value: 'ajax_quick_servers_setup' },
@@ -2180,42 +2288,60 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_profile_reply_to', value: $('#srv_setup_stepper_profile_reply_to').val() },
         { name: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val() },
         { name: 'srv_setup_stepper_only_jmap', value: $('input[name="srv_setup_stepper_only_jmap"]:checked').val() },
-        { name: 'srv_setup_stepper_jmap_hide_from_c_page', value: $('input[name="srv_setup_stepper_jmap_hide_from_c_page"]:checked').val() },
+        { name: 'srv_setup_stepper_imap_hide_from_c_page', value: $('input[name="srv_setup_stepper_imap_hide_from_c_page"]:checked').val() },
         { name: 'srv_setup_stepper_jmap_address', value: $('#srv_setup_stepper_jmap_address').val() },
+        { name: 'srv_setup_stepper_imap_server_id', value: $('#srv_setup_stepper_imap_server_id').val() },
+        { name: 'srv_setup_stepper_smtp_server_id', value: $('#srv_setup_stepper_smtp_server_id').val() }
     ];
 
     Hm_Ajax.request(requestData, function(res) {
-        $('#srv_setup_stepper_form_loader').addClass('hide');
-        $('.step_config-actions').removeClass('hide');
-        Hm_Notices.show(res.router_user_msgs);
-
+        resetStepperButtons();
         if (res.just_saved_credentials) {
-            $('#srv_setup_stepper_stepper').find('form').trigger('reset');
-            display_config_step(0);
-
-            //Initialize the form
-            $("#srv_setup_stepper_profile_reply_to").val('');
-            $("#srv_setup_stepper_profile_signature").val('');
-            $("#srv_setup_stepper_profile_name").val('');
-            $("#srv_setup_stepper_email").val('');
-            $("#srv_setup_stepper_password").val('');
-            $("#srv_setup_stepper_profile_is_default").prop('checked', true);
-            $("#srv_setup_stepper_is_sender").prop('checked', true);
-            $("#srv_setup_stepper_is_receiver").prop('checked', true);
-            $("#srv_setup_stepper_enable_sieve").prop('checked', false);
-            $("#srv_setup_stepper_only_jmap").prop('checked', false);
-            $('#step_config-imap_bloc').show();
-            $('#step_config-smtp_bloc').show();
-            $('#srv_setup_stepper_profile_bloc').show();
-
-            Hm_Utils.set_unsaved_changes(1);
-            Hm_Folders.reload_folders(true);
-            location.reload();
+            if (!res.imap_server_id) {
+                Hm_Ajax.request(
+                    [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
+                    {'name': 'imap_server_id', value: res.imap_server_id},
+                    {'name': 'imap_service_name', value: res.imap_service_name}],
+                    function () {
+                        resetQuickSetupForm();
+                        Hm_Utils.redirect();
+                    }
+                );
+            } else {
+                resetQuickSetupForm();
+                Hm_Utils.redirect();
+            }
         }
-    }, null, null, function (res) {
-        $('#srv_setup_stepper_form_loader').addClass('hide');
-        $('.step_config-actions').removeClass('hide');
+    }, null, null, undefined, function (res) {
+        resetStepperButtons();
     });
+}
+
+function resetQuickSetupForm() {
+    $('#srv_setup_stepper_stepper').find('form').trigger('reset');
+    display_config_step(0);
+
+    //Initialize the form
+    $("#srv_setup_stepper_profile_reply_to").val('');
+    $("#srv_setup_stepper_profile_signature").val('');
+    $("#srv_setup_stepper_profile_name").val('');
+    $("#srv_setup_stepper_email").val('');
+    $("#srv_setup_stepper_password").val('');
+    $("#srv_setup_stepper_jmap_address").val('');
+    $("#srv_setup_stepper_profile_is_default").prop('checked', true);
+    $("#srv_setup_stepper_create_profile").prop('checked', true);
+    $("#srv_setup_stepper_imap_server_id").val('');
+    $("#srv_setup_stepper_smtp_server_id").val('');
+    $("#srv_setup_stepper_is_sender").prop('checked', true);
+    $("#srv_setup_stepper_is_receiver").prop('checked', true);
+    $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_only_jmap").prop('checked', false);
+    $('#step_config-imap_bloc').show();
+    $('#step_config-smtp_bloc').show();
+    $('#srv_setup_stepper_profile_bloc').show();
+
+    Hm_Utils.set_unsaved_changes(1);
+    Hm_Folders.reload_folders(true);
 }
 
 function handleCreateProfileCheckboxChange(checkbox) {
@@ -2234,11 +2360,18 @@ function handleSieveStatusChange (checkbox) {
     }
 }
 function handleSmtpImapCheckboxChange(checkbox) {
-    $(".step_config-smtp_imap_bloc").show();
-
     if (checkbox.id === 'srv_setup_stepper_is_receiver') {
-        if(checkbox.checked) $('#step_config-imap_bloc').show();
-        else $('#step_config-imap_bloc').hide();
+        if(checkbox.checked) {
+            $('#step_config-imap_bloc').show();
+            $('#step_config_combined_view').show();
+            $('#srv_setup_stepper_jmap_select_box').show();
+            $('#srv_setup_stepper_only_jmap').prop('checked', false);
+        } else {
+            $('#step_config-imap_bloc').hide();
+            $('#step_config-jmap_bloc').hide();
+            $('#step_config_combined_view').hide();
+            $('#srv_setup_stepper_jmap_select_box').hide();
+        }
     }
 
     if (checkbox.id === 'srv_setup_stepper_is_sender') {
@@ -2247,40 +2380,26 @@ function handleSmtpImapCheckboxChange(checkbox) {
         else $('#step_config-smtp_bloc').hide();
     }
 
-    if($('#srv_setup_stepper_is_sender').prop('checked') &&
-        $('#srv_setup_stepper_is_receiver').prop('checked')){
+    if ($('#srv_setup_stepper_is_sender').prop('checked') && $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').show();
         $('#srv_setup_stepper_profile_checkbox_bloc').show();
-        $('#srv_setup_stepper_jmap_select_box').show();
-        $("#srv_setup_stepper_only_jmap").show();
-    }else{
-        $("#srv_setup_stepper_only_jmap").prop('checked', false);
-
+        
+    } else if(! $('#srv_setup_stepper_is_sender').prop('checked') || ! $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').hide();
         $('#srv_setup_stepper_profile_checkbox_bloc').hide();
-        $('#srv_setup_stepper_jmap_select_box').hide();
-        $("#srv_setup_stepper_only_jmap").hide();
-
-        if(!$('#srv_setup_stepper_is_sender').prop('checked') &&
-            !$('#srv_setup_stepper_is_receiver').prop('checked')){
-            $(".step_config-smtp_imap_bloc").hide();
-        }
     }
 }
 
 function handleJmapCheckboxChange(checkbox) {
-    if(checkbox.checked){
+    if (checkbox.checked) {
         $('#step_config-jmap_bloc').show();
-        $('#step_config-smtp_bloc').hide();
         $('#step_config-imap_bloc').hide();
-        $('#srv_setup_stepper_profile_bloc').hide();
-        $('#srv_setup_stepper_profile_checkbox_bloc').hide();
-    }else {
+        if (! $('#srv_setup_stepper_enable_sieve').prop('checked')) {
+            $('#srv_setup_stepper_imap_sieve_host_bloc').hide();
+        }
+    } else {
         $('#step_config-jmap_bloc').hide();
-        $('#step_config-smtp_bloc').show();
         $('#step_config-imap_bloc').show();
-        $('#srv_setup_stepper_profile_bloc').show();
-        $('#srv_setup_stepper_profile_checkbox_bloc').show();
     }
 }
 
@@ -2309,11 +2428,17 @@ function display_config_step(stepNumber) {
         [   {key: 'srv_setup_stepper_profile_name', value: $('#srv_setup_stepper_profile_name').val()},
             {key: 'srv_setup_stepper_email', value: $('#srv_setup_stepper_email').val()},
             {key: 'srv_setup_stepper_password', value: $('#srv_setup_stepper_password').val()}].forEach((item) => {
-            if(!item.value) {
-                $(`#${item.key}-error`).text('Required');
-                isValid = false;
+            if (!item.value) {
+                if (item.key == 'srv_setup_stepper_password' && ($('#srv_setup_stepper_imap_server_id').val() || $('#srv_setup_stepper_smtp_server_id').val())) {
+                    $(`#${item.key}-error`).text('');
+                } else {
+                    $(`#${item.key}-error`).text('Required');
+                    isValid = false;
+                }
+                
+            } else {
+                $(`#${item.key}-error`).text('');
             }
-            else $(`#${item.key}-error`).text('');
         })
 
         if (!isValid) {
@@ -2470,3 +2595,131 @@ function getEmailProviderKey(email) {
 
     return "";
 }
+
+/**
+ * Allow external resources for the provided element.
+ *
+ * @param {HTMLElement} element - The element containing the allow button.
+ * @param {string} messagePart - The message part associated with the resource.
+ * * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
+ * @returns {void}
+ */
+function handleAllowResource(element, messagePart, inline = false) {
+    element.querySelector('a').addEventListener('click', function (e) {
+        e.preventDefault();
+        $('.msg_text_inner').remove();
+        const externalSources = $(this).data('src').split(',');
+        externalSources?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
+        if (inline) {
+            return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+        }
+        return get_message_content(messagePart, false, false, false, false, false);
+    });
+}
+
+/**
+ * Create and insert in the DOM an element containing a message and a button to allow the resource.
+ *
+ * @param {HTMLElement} element - The element having the blocked resource.
+ * @param {Boolean} inline - true if the message is displayed in inline mode, false otherwise.
+ * @returns {void}
+ */
+function handleInvisibleResource(element, inline = false) {
+    const dataSrc = element.dataset.src;
+
+    const allowResource = document.createElement('div');
+    allowResource.classList.add('alert', 'alert-warning', 'p-1');
+
+    const source = dataSrc.substring(0, 40) + (dataSrc.length > 40 ? '...' : '');
+    allowResource.innerHTML = `Source blocked: ${element.alt ? element.alt : source}
+    <a href="#" data-src="${dataSrc}" class="btn btn-light btn-sm">
+    Allow</a></div>
+    `;
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforeend', allowResource);
+    handleAllowResource(allowResource, element.dataset.messagePart, inline);
+}
+
+const handleExternalResources = (inline) => {
+    const messageContainer = document.querySelector('.msg_text_inner');
+    messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
+
+    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+    const elements = messageContainer.querySelectorAll('[data-src]');
+    const blockedResources = [];
+    elements.forEach(function (element) {
+
+        const dataSrc = element.dataset.src;
+        const senderAllowed = Hm_Utils.get_from_local_storage(sender);
+        const allowed = Hm_Utils.get_from_local_storage(dataSrc);
+
+        switch (Number(allowed) || Number(senderAllowed)) {
+            case 1:
+                element.src = dataSrc;
+                break;
+            default:
+                if ((allowed || senderAllowed) === null) {
+                    Hm_Utils.save_to_local_storage(dataSrc, 0);
+                }
+                handleInvisibleResource(element, inline);
+                blockedResources.push(dataSrc);
+                break;
+        }
+    });
+
+    const noticesElement = document.createElement('div');
+    noticesElement.classList.add('notices');
+
+    if (blockedResources.length) {
+        const allowAll = document.createElement('div');
+        allowAll.classList.add('allow_image_link', 'all', 'fw-bold');
+        allowAll.textContent = 'For security reasons, external resources have been blocked.';
+        if (blockedResources.length > 1) {
+            const allowAllLink = document.createElement('a');
+            allowAllLink.classList.add('btn', 'btn-light', 'btn-sm');
+            allowAllLink.href = '#';
+            allowAllLink.dataset.src = blockedResources.join(',');
+            allowAllLink.textContent = 'Allow all';
+            allowAll.appendChild(allowAllLink);
+            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+        }
+        noticesElement.appendChild(allowAll);
+
+        const button = document.createElement('a');
+        button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
+        button.textContent = 'Always allow from this sender';
+        noticesElement.appendChild(button);
+
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            Hm_Utils.save_to_local_storage(sender, 1);
+            $('.msg_text_inner').remove();
+            if (inline) {
+                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+            } else {
+                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+            }
+        });
+    }
+
+    document.querySelector('.external_notices').insertAdjacentElement('beforebegin', noticesElement);
+};
+
+const observeMessageTextMutationAndHandleExternalResources = (inline) => {
+    const message = document.querySelector('.msg_text');
+    if (message) {
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.addedNodes.length > 0) {
+                    mutation.addedNodes.forEach(function (node) {
+                        if (node.classList.contains('msg_text_inner')) {
+                            handleExternalResources(inline);                    
+                        }
+                    });
+                }
+            });
+        }).observe(message, {
+            childList: true
+        });
+    }
+};

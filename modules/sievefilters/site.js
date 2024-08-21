@@ -137,6 +137,13 @@ var hm_sieve_possible_actions = function() {
             extra_field: false
         },
         {
+            name: 'forward',
+            description: 'Forward',
+            placeholder: 'mail@example.org',
+            type: 'string',
+            extra_field: false
+        },
+        {
             name: 'reject',
             description: 'Reject',
             placeholder: 'Reject message',
@@ -310,8 +317,7 @@ $(function () {
          **************************************************************************************/
         var edit_script_modal = new Hm_Modal({
             size: 'xl',
-            modalId: 'myEditScriptModal',
-            btnSize: 'lg'
+            modalId: 'myEditScript'
         });
 
         // set content
@@ -340,7 +346,7 @@ $(function () {
         edit_filter_modal.addFooterBtn('Save', 'btn-primary ms-auto', async function () {
             let result = save_filter(current_account);
             if (result) {
-                edit_filter_modal.close();
+                edit_filter_modal.hide();
             }
         });
 
@@ -348,7 +354,7 @@ $(function () {
         edit_filter_modal.addFooterBtn('Convert to code', 'btn-warning', async function () {
             let result = save_filter(current_account, true);
             if (result) {
-                edit_filter_modal.close();
+                edit_filter_modal.hide();
             }
         });
 
@@ -526,6 +532,12 @@ $(function () {
             edit_filter_modal.setTitle('Add Filter');
             current_account = $(this).attr('account');
             edit_filter_modal.open();
+
+            // Reset the form fields when opening the modal
+            $(".modal_sieve_filter_name").val('');
+            $(".modal_sieve_script_priority").val('');
+            $(".sieve_list_conditions_modal").empty();
+            $(".filter_actions_modal_table").empty();
         });
         $('.add_script').on('click', function () {
             edit_script_modal.setTitle('Add Script');
@@ -908,6 +920,8 @@ $(function () {
             current_account = $(this).attr('imap_account');
             $('.modal_sieve_filter_name').val($(this).attr('script_name_parsed'));
             $('.modal_sieve_filter_priority').val($(this).attr('priority'));
+            $('.sieve_list_conditions_modal').html('');
+            $('.filter_actions_modal_table').html('');
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_edit_filter'},
                     {'name': 'imap_account', 'value': $(this).attr('imap_account')},
@@ -935,6 +949,8 @@ $(function () {
                         $("[name^=sieve_selected_extra_action_value]").last().val(action.extra_option_value);
                         if ($("[name^=sieve_selected_action_value]").last().is('input')) {
                             $("[name^=sieve_selected_action_value]").last().val(action.value);
+                        } else if ($("[name^=sieve_selected_action_value]").last().is('textarea')) {
+                            $("[name^=sieve_selected_action_value]").last().text(action.value);
                         }
                     });
                 }

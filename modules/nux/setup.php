@@ -6,7 +6,7 @@ handler_source('nux');
 output_source('nux');
 
 /* servers page */
-add_output('servers', 'quick_add_section', true, 'nux', 'server_config_stepper_accordion_end_part', 'after');
+add_output('servers', 'quick_add_section', true, 'nux', 'server_content_start', 'after');
 add_output('servers', 'quick_add_dialog', true, 'nux', 'quick_add_section', 'after');
 
 add_handler('ajax_nux_service_select', 'login', false, 'core');
@@ -66,8 +66,8 @@ return array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
         'service_details' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'nux_server_id' => array(FILTER_VALIDATE_INT, false),
-        'nux_service_name' => array(FILTER_DEFAULT, false)
+        'nux_server_id' => array(FILTER_DEFAULT, false),
+        'nux_service_name' => array(FILTER_DEFAULT, false),
     ),
     'allowed_post' => array(
         'nux_service' => FILTER_DEFAULT,

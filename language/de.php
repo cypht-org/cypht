@@ -455,6 +455,7 @@ return array(
     'Current password is incorrect' => 'Aktuelles Passwort ist falsch',
     'Details' => 'Details',
     'Don\'t save account passwords between logins' => 'Passwort nicht speichern zwischen den Logins',
+    'Do you want to log out?' => 'Möchten Sie sich abmelden?',
     'Drafts' => 'Entwürfe',
     'Enter your passwords below to gain access to these services during this session.' => 'Gebe dein Passwort ein um Zugriff auf die Dienste während dieser Sitzung zu erhalten',
     'Failed to authenticate to the SMTP server' => 'Authentifizierung am SMTP Server fehlgeschlagen',
@@ -627,4 +628,8 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

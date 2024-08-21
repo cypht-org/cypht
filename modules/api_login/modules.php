@@ -20,8 +20,8 @@ class Hm_Handler_api_login_step_two extends Hm_Handler_login {
             return;
         }
         list($secure, $path, $domain) = $this->session->set_session_params($this->request);
-        Hm_Functions::setcookie('hm_id', stripslashes($form['hm_id']), 0, $path, $domain, $secure, true);
-        Hm_Functions::setcookie('hm_session', stripslashes($form['hm_session']), 0, $path, $domain, $secure, true);
+        Hm_Functions::setcookie('hm_id', stripslashes($form['hm_id']), 0, $path, $domain, $secure, true, 'Lax');
+        Hm_Functions::setcookie('hm_session', stripslashes($form['hm_session']), 0, $path, $domain, $secure, true, 'Lax');
         Hm_Dispatch::page_redirect('?page=home');
     }
 }

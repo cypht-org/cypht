@@ -96,7 +96,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
                 $txt .= format_imap_envelope($struct['envelope'], $this);
             }
-            if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
+            if (isset($struct['subtype']) && mb_strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
                 $msgText = $this->get('msg_text');
                 // Everything in the message starting with src="http:// or src="https:// or src='http:// or src='https://
@@ -110,8 +110,8 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
 
                 $txt .= format_msg_html($msgText, $allowed);
             }
-            elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
-                $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
+            elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
+                $txt .= format_msg_image($this->get('msg_text'), mb_strtolower($struct['subtype']));
             }
             else {
                 if ($this->get('imap_msg_part') === "0") {
@@ -179,10 +179,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
-                    if ($fld == strtolower($name)) {
+                    if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
                             $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
-                            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+                            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                                 $txt .= ' <i class="bi bi-star-half account_icon"></i> ';
                             }
                             $txt .= $this->html_safe($value).'</th></tr>';
@@ -285,7 +285,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }
                         }
                         else {
-                            if (strtolower($name) == 'flags') {
+                            if (mb_strtolower($name) == 'flags') {
                                 $name = $this->trans('Tags');
                                 $value = str_replace('\\', '', $value);
                                 $new_value = array();
@@ -302,7 +302,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
             foreach ($headers as $name => $value) {
-                if (!in_array(strtolower($name), $small_headers)) {
+                if (!in_array(mb_strtolower($name), $small_headers)) {
                     if (is_array($value)) {
                         foreach ($value as $line) {
                             $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($line).'</td></tr>';
@@ -340,7 +340,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="msg_move_to">'.
                 '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
                 '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
-            if (!isset($headers['Flags']) || !stristr($headers['Flags'], 'draft')) {
+            if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
                 $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
                     $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
@@ -348,7 +348,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 else {
                     $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
                 }
-                $txt .= ' | <a class="forward_link hlink" href="?page=compose&amp;forward=1'.$reply_args.'">'.$this->trans('Forward').'</a>';
+                $txt .= ' | ' . forward_dropdown($this, $reply_args);
             }
             if ($msg_part === '0') {
                 $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
@@ -356,7 +356,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             else {
                 $txt .= ' | <a class="raw_link hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
             }
-            if (isset($headers['Flags']) && stristr($headers['Flags'], 'flagged')) {
+            if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
@@ -370,10 +370,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
             $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
             $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
-            $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
-            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
+            if($this->get('tags')){
+                $txt .= ' | '. tags_dropdown($this, $headers);
+            }
 
-            if ($this->get('sieve_filters_enabled')) {
+            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
+            if ($this->get('sieve_filters_enabled') && !$is_draft) {
+                $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
@@ -393,8 +396,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
+            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            if (isset($headers['Flags']) && stristr($headers['Flags'], 'draft')) {
+            if ($is_draft) {
                 $txt .= ' | <a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
             }
             $txt .= '<div class="move_to_location"></div></div>';
@@ -460,28 +464,29 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $disabled = '';
                 $pass_value = '';
             }
-            $res .= '<div class="' . strtolower($type) . '_server">';
+            $res .= '<div class="' . mb_strtolower($type) . '_server mb-3">';
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
-            $res .= '<div class="row"><div class="col-sm-2">';
+            $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
             $res .= sprintf('
                 <div class="text-muted"><strong>%s</strong></div>
                 <div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
-            $res .= '</div><div class="col-sm-2">';
+
+            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-xl-4 col-lg-4 col-md-6  ">';
 
             // IMAP Username
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('IMAP username').'</label></div>';
-            $res .= '</div><div class="col-sm-2">';
+            $res .= '</div><div class="col-xl-4 col-lg-4 col-md-6">';
             // IMAP Password
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('IMAP password').'</label></div>';
-            $res .= '</div><div class="col-sm-2">';
+            $res .= '</div><div class="col-xl-4 col-lg-4 col-md-6">';
 
             // Sieve Host (Conditional)
 
@@ -491,16 +496,22 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
-            $res .= '</div><div class="col-sm-4 text-end">';
+            $res .= '</div></div></div><div class="col-xl-3 col-lg-3  d-flex justify-content-start align-items-center">';
 
             // Buttons
+            $disabled = isset($vals['default']) ? ' disabled': '';
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2" />';
             } else {
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-primary btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />';
+                $keysToRemove = array('object', 'connected', 'default', 'nopass');
+                $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
+
+                $type = $vals['type'] ?? 'imap';
+                $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2"'.$disabled.' />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
@@ -509,7 +520,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
-            $res .= '</div></div></form></div>';
+            $res .= '</div></div></div></form>';
         }
         $res .= '';
         return $res;
@@ -656,7 +667,7 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
 
             // JMAP Username
-            $res .= '<div class="form-floating">';
+            $res .= '<div class="form-floating mb-2">';
             $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('JMAP username').'</label></div>';
 
@@ -703,6 +714,24 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
             $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
                 '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
+        }
+        return $res;
+    }
+}
+
+/**
+ * Format the IMAP status output on the info page
+ * @subpackage imap/output
+ */
+class Hm_Output_display_imap_capability extends Hm_Output_Module {
+    /**
+     * Build the HTML for the status rows. Will be populated by an ajax call per server
+     */
+    protected function output() {
+        $res = '';
+        foreach ($this->get('imap_servers', array()) as $index => $vals) {
+            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
+                '<td class="imap_capabilities_'.$vals['id'].'"></td></tr>';
         }
         return $res;
     }
@@ -785,6 +814,12 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
             $res .= '<span class="sieve_extensions">'.implode(', ', $capabilities).'</span>';
         }
         $this->out('sieve_detail_display', $res);
+        $res = '';
+        $extensions = $this->get('imap_capabilities_list', "");
+        if ($extensions) {
+            $res .= '<span class="imap_extensions">'.$extensions.'</span>';
+        }
+        $this->out('imap_extensions_display', $res);
     }
 }
 
@@ -935,7 +970,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         $res = array();
         if ($this->get('imap_mailbox_page')) {
             $details = $this->get('imap_folder_detail');
-            $type = stripos($details['name'], 'Sent') !== false ? 'sent' : false;
+            $type = mb_stripos($details['name'], 'Sent') !== false ? 'sent' : false;
             prepare_imap_message_list($this->get('imap_mailbox_page'), $this, $type);
             if ($details['offset'] == 0) {
                 $page_num = 1;
@@ -996,7 +1031,7 @@ class Hm_Output_imap_unflag_on_send_controls extends Hm_Output_Module {
         $flagged = false;
         $details = $this->get('reply_details', array());
         if (is_array($details) && array_key_exists('msg_headers', $details) && array_key_exists('Flags', $details['msg_headers'])) {
-            if (stristr($details['msg_headers']['Flags'], 'flagged')) {
+            if (mb_stristr($details['msg_headers']['Flags'], 'flagged')) {
                 $flagged = true;
             }
         }
@@ -1297,12 +1332,6 @@ class Hm_Output_stepper_setup_server_jmap extends Hm_Output_Module {
                           <label class="" for="srv_setup_stepper_jmap_address">'.$this->trans('Address').'</label>
                           <span id="srv_setup_stepper_jmap_address-error" class="invalid-feedback"></span>
                       </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_jmap_hide_from_c_page" name="srv_setup_stepper_jmap_hide_from_c_page">
-                        <label class="form-check-label" style="font-size: 12px;" for="srv_setup_stepper_jmap_hide_from_c_page">
-                          '.$this->trans('Hide From Combined Pages').'
-                        </label>
-                    </div>
                 </div>
         ';
     }
@@ -1332,13 +1361,13 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                         </div>
                         <div class="p-2 flex-fill">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls">
+                                <input class="form-check-input" type="radio" id="imap_tls" name="srv_setup_stepper_imap_tls" value="true">
                                 <label class="form-check-label" style="font-size: 12px;" for="imap_tls">
                                   '.$this->trans('Use TLS').'
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" checked>
+                                <input class="form-check-input" type="radio" id="imap_start_tls" name="srv_setup_stepper_imap_tls" value="false" checked>
                                 <label class="form-check-label" style="font-size: 12px;" for="imap_start_tls">
                                   '.$this->trans('STARTTLS or unencrypted').'
                                 </label>
@@ -1361,7 +1390,23 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
                                         </div>';
                      }
-               $res .= '</div>';
+                $res .= '</div>';
+
        return $res;
+    }
+}
+
+class Hm_Output_stepper_setup_server_jmap_imap_common extends Hm_Output_Module {
+    protected function output() {
+        $res = '
+            <div class="form-check" id="step_config_combined_view">
+                <input class="form-check-input" type="checkbox" role="switch" id="srv_setup_stepper_imap_hide_from_c_page" name="srv_setup_stepper_imap_hide_from_c_page">
+                <label class="form-check-label" for="srv_setup_stepper_imap_hide_from_c_page">
+                    '.$this->trans('Hide From Combined Pages').'
+                </label>
+            </div>
+        ';
+
+        return $res;
     }
 }

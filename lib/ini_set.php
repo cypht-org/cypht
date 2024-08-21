@@ -24,7 +24,7 @@ ini_set('session.use_strict_mode', 1);
 /* limit session cookie to HTTP only */
 ini_set('session.cookie_httponly', 1);
 if (version_compare(PHP_VERSION, 7.3, '>=')) {
-    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.cookie_samesite', 'Lax');
 }
 
 /* HTTPS required for session cookie */
@@ -42,7 +42,7 @@ ini_set('session.use_trans_sid', 0);
 ini_set('session.cache_limiter', 'nocache');
 
 /* session hash mechanism */
-if (version_compare(PHP_VERSION, 7.4, '==')) {
+if (version_compare(PHP_VERSION, 8.1, '==')) {
     ini_set('session.hash_function', 1);
 } else {
     ini_set('session.hash_function', 'sha256');

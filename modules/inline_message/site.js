@@ -138,6 +138,9 @@ var capture_subject_click = function() {
                 return false;
             }
             else if (details['type'] == 'imap') {
+                // store the details and uid on the window object for later use when external resources are handled
+                window.inline_msg_details = details;
+                window.inline_msg_uid = uid;
                 inline_imap_msg(details, uid, list_path, inline_msg_loaded_callback);
                 return false;
             }
@@ -173,3 +176,34 @@ $(function() {
         }
     }
 });
+
+const messagesListMutation = new MutationObserver(function (mutations) {
+    mutations.forEach(function (mutation) {
+        if (mutation.addedNodes.length > 0) {
+            mutation.addedNodes.forEach(function (node) {
+                if (node.classList.contains('msg_text') || node.classList.contains('inline_msg')) {
+                    observeMessageTextMutationAndHandleExternalResources(true);
+                    if(node.querySelector('.msg_text_inner') && !document.querySelector('.external_notices')) {
+                        handleExternalResources(true);
+                    }
+                }
+            });
+        }
+    });
+});
+
+// for inline-right style, we observe the message_list element
+const messagesList = document.querySelector('.message_list');
+if (messagesList) {
+    messagesListMutation.observe(messagesList, {
+        childList: true
+    });
+}
+
+// for inline style, we observe the message_table_body element
+const messageTableBody = document.querySelector('.message_table_body');
+if (messageTableBody) {
+    messagesListMutation.observe(messageTableBody, {
+        childList: true
+    });
+}

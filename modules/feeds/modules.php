@@ -382,7 +382,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                         else {
                             Hm_Msgs::add('Successfully connected to feed');
                             $found = true;
-                            if (stristr('<feed', $feed->xml_data)) {
+                            if (mb_stristr('<feed', $feed->xml_data)) {
                                 $type = 'application/atom+xml';
                             }
                             else {
@@ -561,7 +561,7 @@ class Hm_Output_add_feed_dialog extends Hm_Output_Module {
 
                                         <input type="submit" class="btn btn-primary px-5" value="'.$this->trans('Add').'" name="submit_feed" />
                                     </form>
-                                </div>';
+                                </div></div>';
         }
     }
 }
@@ -613,8 +613,8 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                 if (in_array($name, array('server_id', 'server_name', 'guid', 'id', 'content'), true)) {
                     continue;
                 }
-                if ($name != 'link' && $name != 'link_alternate' && !strstr($value, ' ') && strlen($value) > 75) {
-                    $value = substr($value, 0, 75).'...';
+                if ($name != 'link' && $name != 'link_alternate' && !mb_strstr($value, ' ') && mb_strlen($value) > 75) {
+                    $value = mb_substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {
                     $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
@@ -721,7 +721,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 else {
                     $icon = 'rss_alt';
                     $flags = array('unseen');
-                    if (strpos($row_style, 'unseen') === false) {
+                    if (mb_strpos($row_style, 'unseen') === false) {
                         $row_style .= ' unseen';
                     }
                 }
@@ -973,7 +973,7 @@ function search_for_feeds($html) {
     $href = false;
     if (preg_match_all("/<link.+>/U", $html, $matches)) {
         foreach ($matches[0] as $link_tag) {
-            if (stristr($link_tag, 'alternate')) {
+            if (mb_stristr($link_tag, 'alternate')) {
                 if (preg_match("/type=(\"|'|)(.+)(\"|'|\>| )/U", $link_tag, $types)) {
                     $type = trim($types[2]);
                 }
@@ -1018,7 +1018,7 @@ function search_feed_item($item, $terms, $since, $fld) {
     }
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $item)) {
-            if (stristr($item[$fld], $terms) !== false) {
+            if (mb_stristr($item[$fld], $terms) !== false) {
                 return true;
             }
         }

@@ -142,6 +142,8 @@ if (!class_exists('Hm_IMAP')) {
         public $con_error_msg = '';
         public $con_error_num = 0;
 
+        public $banner = '';
+
         /* holds information about the currently selected mailbox */
         public $selected_mailbox = false;
 
@@ -164,11 +166,13 @@ if (!class_exists('Hm_IMAP')) {
 
         /* current selected mailbox status */
         public $folder_state = false;
-
+        private $scramAuthenticator;
+        private $namespace_count = 0;
         /**
          * constructor
          */
         public function __construct() {
+            $this->scramAuthenticator = new ScramAuthenticator();
         }
 
         /* ------------------ CONNECT/AUTH ------------------------------------- */
@@ -233,40 +237,57 @@ if (!class_exists('Hm_IMAP')) {
                 fclose($this->handle);
             }
         }
-
         /**
-         * authenticate the username/password
+         * Authenticate the username/password
          * @param string $username IMAP login name
          * @param string $password IMAP password
-         * @return bool true on sucessful login
+         * @return bool true on successful login
          */
         public function authenticate($username, $password) {
             $this->get_capability();
             if (!$this->tls) {
                 $this->starttls();
+            } 
+            $scramMechanisms = [
+                'scram-sha-1', 'scram-sha-1-plus',
+                'scram-sha-256', 'scram-sha-256-plus',
+                'scram-sha-224', 'scram-sha-224-plus',
+                'scram-sha-384', 'scram-sha-384-plus',
+                'scram-sha-512', 'scram-sha-512-plus'
+            ];
+            if (in_array(mb_strtolower($this->auth), $scramMechanisms)) {
+                $scramAlgorithm = mb_strtoupper($this->auth);
+                if ($this->scramAuthenticator->authenticateScram(
+                    $scramAlgorithm,
+                    $username,
+                    $password,
+                    [$this, 'get_response'],
+                    [$this, 'send_command']
+                )) {
+                    return true; // Authentication successful
+                }
             }
-            switch (strtolower($this->auth)) {
-
+            switch (mb_strtolower($this->auth)) {
                 case 'cram-md5':
                     $this->banner = $this->fgets(1024);
-                    $cram1 = 'AUTHENTICATE CRAM-MD5'."\r\n";
+                    $cram1 = 'AUTHENTICATE CRAM-MD5' . "\r\n";
                     $this->send_command($cram1);
                     $response = $this->get_response();
                     $challenge = base64_decode(substr(trim($response[0]), 1));
                     $pass = str_repeat(chr(0x00), (64-strlen($password)));
                     $ipad = str_repeat(chr(0x36), 64);
                     $opad = str_repeat(chr(0x5c), 64);
-                    $digest = bin2hex(pack("H*", md5(($pass ^ $opad).pack("H*", md5(($pass ^ $ipad).$challenge)))));
-                    $challenge_response = base64_encode($username.' '.$digest);
-                    fputs($this->handle, $challenge_response."\r\n");
+                    $digest = bin2hex(pack("H*", md5(($pass ^ $opad) . pack("H*", md5(($pass ^ $ipad) . $challenge)))));
+                    $challenge_response = base64_encode($username . ' ' . $digest);
+                    fputs($this->handle, $challenge_response . "\r\n");
                     break;
                 case 'xoauth2':
-                    $challenge = 'user='.$username.chr(1).'auth=Bearer '.$password.chr(1).chr(1);
-                    $command = 'AUTHENTICATE XOAUTH2 '.base64_encode($challenge)."\r\n";
+                    $challenge = 'user=' . $username . chr(1) . 'auth=Bearer ' . $password . chr(1) . chr(1);
+                    $command = 'AUTHENTICATE XOAUTH2 ' . base64_encode($challenge) . "\r\n";
                     $this->send_command($command);
                     break;
                 default:
-                    $login = 'LOGIN "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $username).'" "'.str_replace(array('\\', '"'), array('\\\\', '\"'), $password). "\"\r\n";
+                    $login = 'LOGIN "' . str_replace(array('\\', '"'), array('\\\\', '\"'), $username) . '" "' . str_replace(array('\\', '"'), array('\\\\', '\"'), $password) . "\"\r\n";
                     $this->send_command($login);
                     break;
             }
@@ -282,26 +303,24 @@ if (!class_exists('Hm_IMAP')) {
                         $this->banner = $res[0];
                     }
                 }
-                if (stristr($response, 'A'.$this->command_count.' OK')) {
+                if (mb_stristr($response, 'A' . $this->command_count . ' OK')) {
                     $authed = true;
                     $this->state = 'authenticated';
-                }
-                elseif (strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
+                } elseif (mb_strtolower($this->auth) == 'xoauth2' && preg_match("/^\+ ([a-zA-Z0-9=]+)$/", $response, $matches)) {
                     $this->send_command("\r\n", true);
                     $this->get_response();
                 }
             }
             if ($authed) {
-                $this->debug[] = 'Logged in successfully as '.$username;
+                $this->debug[] = 'Logged in successfully as ' . $username;
                 $this->get_capability();
                 $this->enable();
-                //$this->enable_compression();
-            }
-            else {
-                $this->debug[] = 'Log in for '.$username.' FAILED';
+            } else {
+                $this->debug[] = 'Log in for ' . $username . ' FAILED';
             }
             return $authed;
         }
+        
 
         /**
          * attempt starttls
@@ -314,7 +333,7 @@ if (!class_exists('Hm_IMAP')) {
                 $response = $this->get_response();
                 if (!empty($response)) {
                     $end = array_pop($response);
-                    if (substr($end, 0, strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
+                    if (mb_substr($end, 0, mb_strlen('A'.$this->command_count.' OK')) == 'A'.$this->command_count.' OK') {
                         Hm_Functions::stream_socket_enable_crypto($this->handle, get_tls_stream_type());
                     }
                     else {
@@ -339,7 +358,7 @@ if (!class_exists('Hm_IMAP')) {
                 $this->send_command($command);
                 $response = $this->get_response();
                 foreach ($response as $line) {
-                    if (stristr($line, '* CAPABILITY')) {
+                    if (mb_stristr($line, '* CAPABILITY')) {
                         $this->capability = $line;
                         break;
                     }
@@ -363,9 +382,9 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             foreach ($res as $row) {
                 foreach ($row as $atom) {
-                    if (in_array(strtolower(substr($atom, 1)), $types, true)) {
+                    if (in_array(mb_strtolower(mb_substr($atom, 1)), $types, true)) {
                         $folder = array_pop($row);
-                        $name = strtolower(substr($atom, 1));
+                        $name = mb_strtolower(mb_substr($atom, 1));
                         if ($type && $type == $name) {
                             return array($name => $folder);
                         }
@@ -465,7 +484,7 @@ if (!class_exists('Hm_IMAP')) {
 
                     /* get each folder name part of the complete hierarchy */
                     $folder_parts = array();
-                    if ($delim && strstr($folder, $delim)) {
+                    if ($delim && mb_strstr($folder, $delim)) {
                         $temp_parts = explode($delim, $folder);
                         foreach ($temp_parts as $g) {
                             if (trim($g)) {
@@ -492,7 +511,7 @@ if (!class_exists('Hm_IMAP')) {
                     /* special use mailbox extension */
                     if ($this->is_supported('SPECIAL-USE')) {
                         foreach ($this->special_use_mailboxes as $name => $value) {
-                            if (stristr($flags, $name)) {
+                            if (mb_stristr($flags, $name)) {
                                 $special = $name;
                             }
                         }
@@ -502,25 +521,25 @@ if (!class_exists('Hm_IMAP')) {
                     }
 
                     /* build properties from the flags string */
-                    if (stristr($flags, 'marked')) {
+                    if (mb_stristr($flags, 'marked')) {
                         $marked = true;
                     }
-                    if (stristr($flags, 'noinferiors')) {
+                    if (mb_stristr($flags, 'noinferiors')) {
                         $can_have_kids = false;
                     }
-                    if (($folder == $namespace && $namespace) || stristr($flags, 'hashchildren') || stristr($flags, 'haschildren')) {
+                    if (($folder == $namespace && $namespace) || mb_stristr($flags, 'hashchildren') || mb_stristr($flags, 'haschildren')) {
                         $has_kids = true;
                     }
-                    if ($folder != 'INBOX' && $folder != $namespace && stristr($flags, 'noselect')) {
+                    if ($folder != 'INBOX' && $folder != $namespace && mb_stristr($flags, 'noselect')) {
                         $no_select = true;
                     }
                     /* EIMS work-around */
-                    if ($this->eims_tweaks && !stristr($flags, 'noinferiors') && stristr($flags, 'noselect')) {
+                    if ($this->eims_tweaks && !mb_stristr($flags, 'noinferiors') && mb_stristr($flags, 'noselect')) {
                         $has_kids = true;
                     }
 
                     /* store the results in the big folder list struct */
-                    if (strtolower($folder) == 'inbox') {
+                    if (mb_strtolower($folder) == 'inbox') {
                         $inbox = true;
                         $special = true;
                     }
@@ -562,10 +581,10 @@ if (!class_exists('Hm_IMAP')) {
          * Sort a folder list with the inbox at the top
          */
         function fsort($a, $b) {
-            if (strtolower($a) == 'inbox') {
+            if (mb_strtolower($a) == 'inbox') {
                 return -1;
             }
-            if (strtolower($b) == 'inbox') {
+            if (mb_strtolower($b) == 'inbox') {
                 return 1;
             }
             return strcasecmp($a, $b);
@@ -597,21 +616,21 @@ if (!class_exists('Hm_IMAP')) {
                 if (preg_match("/\* namespace (\(.+\)|NIL) (\(.+\)|NIL) (\(.+\)|NIL)/i", $res[0], $matches)) {
                     $classes = array(1 => 'personal', 2 => 'other_users', 3 => 'shared');
                     foreach ($classes as $i => $v) {
-                        if (trim(strtoupper($matches[$i])) == 'NIL') {
+                        if (trim(mb_strtoupper($matches[$i])) == 'NIL') {
                             continue;
                         }
-                        $list = str_replace(') (', '),(', substr($matches[$i], 1, -1));
+                        $list = str_replace(') (', '),(', mb_substr($matches[$i], 1, -1));
                         $prefix = '';
                         $delim = '';
                         foreach (explode(',', $list) as $val) {
                             $val = trim($val, ")(\r\n ");
-                            if (strlen($val) == 1) {
+                            if (mb_strlen($val) == 1) {
                                 $delim = $val;
                                 $prefix = '';
                             }
                             else {
-                                $delim = substr($val, -1);
-                                $prefix = trim(substr($val, 0, -1));
+                                $delim = mb_substr($val, -1);
+                                $prefix = trim(mb_substr($val, 0, -1));
                             }
                             $this->namespace_count++;
                             $data[] = array('delim' => $delim, 'prefix' => $prefix, 'class' => $v);
@@ -794,34 +813,34 @@ if (!class_exists('Hm_IMAP')) {
                     for ($i=0;$i<$count;$i++) {
                         if ($vals[$i] == 'BODY[HEADER.FIELDS') {
                             $i++;
-                            while(isset($vals[$i]) && in_array(strtoupper($vals[$i]), $junk)) {
+                            while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
                             }
                             $last_header = false;
                             $lines = explode("\r\n", $vals[$i]);
                             foreach ($lines as $line) {
-                                $header = strtolower(substr($line, 0, strpos($line, ':')));
+                                $header = mb_strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
                                 if (!$header || (!isset($flds[$header]) && $last_header)) {
                                     ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                                 }
                                 elseif (isset($flds[$header])) {
-                                    ${$flds[$header]} = substr($line, (strpos($line, ':') + 1));
+                                    ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
                                     $last_header = $header;
                                 }
                             }
                         }
-                        elseif (isset($tags[strtoupper($vals[$i])])) {
+                        elseif (isset($tags[mb_strtoupper($vals[$i])])) {
                             if (isset($vals[($i + 1)])) {
-                                if (($tags[strtoupper($vals[$i])] == 'flags' || $tags[strtoupper($vals[$i])] == 'google_labels' ) && $vals[$i + 1] == '(') {
+                                if (($tags[mb_strtoupper($vals[$i])] == 'flags' || $tags[mb_strtoupper($vals[$i])] == 'google_labels' ) && $vals[$i + 1] == '(') {
                                     $n = 2;
                                     while (isset($vals[$i + $n]) && $vals[$i + $n] != ')') {
-                                        ${$tags[strtoupper($vals[$i])]} .= $vals[$i + $n];
+                                        ${$tags[mb_strtoupper($vals[$i])]} .= $vals[$i + $n];
                                         $n++;
                                     }
                                     $i += $n;
                                 }
                                 else {
-                                    ${$tags[strtoupper($vals[$i])]} = $vals[($i + 1)];
+                                    ${$tags[mb_strtoupper($vals[$i])]} = $vals[($i + 1)];
                                     $i++;
                                 }
                             }
@@ -829,9 +848,9 @@ if (!class_exists('Hm_IMAP')) {
                     }
                     if ($uid) {
                         $cset = '';
-                        if (stristr($content_type, 'charset=')) {
+                        if (mb_stristr($content_type, 'charset=')) {
                             if (preg_match("/charset\=([^\s;]+)/", $content_type, $matches)) {
-                                $cset = trim(strtolower(str_replace(array('"', "'"), '', $matches[1])));
+                                $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
                             }
                         }
                         $headers[(string) $uid] = array('uid' => $uid, 'flags' => $flags, 'internal_date' => $internal_date, 'size' => $size,
@@ -891,7 +910,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $this->send_command($command);
             $result = $this->get_response(false, true);
-            while (isset($result[0][0]) && isset($result[0][1]) && $result[0][0] == '*' && strtoupper($result[0][1]) == 'OK') {
+            while (isset($result[0][0]) && isset($result[0][1]) && $result[0][0] == '*' && mb_strtoupper($result[0][1]) == 'OK') {
                 array_shift($result);
             }
             $status = $this->check_response($result, true);
@@ -911,10 +930,10 @@ if (!class_exists('Hm_IMAP')) {
          */
         private function parse_bodystructure_response($result) {
             $response = array();
-            if (array_key_exists(6, $result[0]) && strtoupper($result[0][6]) == 'MODSEQ')  {
+            if (array_key_exists(6, $result[0]) && mb_strtoupper($result[0][6]) == 'MODSEQ')  {
                 $response = array_slice($result[0], 11, -1);
             }
-            elseif (array_key_exists(4, $result[0]) && strtoupper($result[0][4]) == 'UID')  {
+            elseif (array_key_exists(4, $result[0]) && mb_strtoupper($result[0][4]) == 'UID')  {
                 $response = array_slice($result[0], 7, -1);
             }
             else {
@@ -975,7 +994,7 @@ if (!class_exists('Hm_IMAP')) {
                         $res = trim(preg_replace("/\s*\)$/", '', $v));
                         break 2;
                     }
-                    if (stristr(strtoupper($v), 'BODY')) {
+                    if (mb_stristr(mb_strtoupper($v), 'BODY')) {
                         $search = false;
                     }
                 }
@@ -989,10 +1008,10 @@ if (!class_exists('Hm_IMAP')) {
             }
             if (is_array($struct)) {
                 if (isset($struct['encoding']) && $struct['encoding']) {
-                    if (strtolower($struct['encoding']) == 'quoted-printable') {
+                    if (mb_strtolower($struct['encoding']) == 'quoted-printable') {
                         $res = quoted_printable_decode($res);
                     }
-                    elseif (strtolower($struct['encoding']) == 'base64') {
+                    elseif (mb_strtolower($struct['encoding']) == 'base64') {
                         $res = base64_decode($res);
                     }
                 }
@@ -1055,7 +1074,7 @@ if (!class_exists('Hm_IMAP')) {
                 $uids = 'ALL';
             }
             if ($this->search_charset) {
-                $charset = 'CHARSET '.strtoupper($this->search_charset).' ';
+                $charset = 'CHARSET '.mb_strtoupper($this->search_charset).' ';
             }
             else {
                 $charset = '';
@@ -1063,8 +1082,8 @@ if (!class_exists('Hm_IMAP')) {
             if (!empty($terms)) {
                 $flds = array();
                 foreach ($terms as $vals) {
-                    if (substr($vals[1], 0, 4) == 'NOT ') {
-                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', substr($vals[1], 4)).'"';
+                    if (mb_substr($vals[1], 0, 4) == 'NOT ') {
+                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', mb_substr($vals[1], 4)).'"';
                     }
                     else {
                         $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
@@ -1081,7 +1100,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
             }
-            if (!strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
+            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
                $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
@@ -1177,7 +1196,7 @@ if (!class_exists('Hm_IMAP')) {
                     $flag_search = false;
                     for ($j = 0; $j < count($vals); $j++) {
                         $v = $vals[$j];
-                        if (stristr(strtoupper($v), 'INTERNALDATE')) {
+                        if (mb_stristr(mb_strtoupper($v), 'INTERNALDATE')) {
                             $internal_date = $vals[$j+1];
                             $j++;
                             continue;
@@ -1199,7 +1218,7 @@ if (!class_exists('Hm_IMAP')) {
                             if (is_array($parts) && !empty($parts)) {
                                 $i = 0;
                                 foreach ($parts as $line) {
-                                    $split = strpos($line, ':');
+                                    $split = mb_strpos($line, ':');
                                     if (preg_match("/^from /i", $line)) {
                                         continue;
                                     }
@@ -1208,17 +1227,17 @@ if (!class_exists('Hm_IMAP')) {
                                     }
                                     elseif ($split) {
                                         $i++;
-                                        $last = substr($line, 0, $split);
-                                        $headers[$i] = array($last, trim(substr($line, ($split + 1))));
+                                        $last = mb_substr($line, 0, $split);
+                                        $headers[$i] = array($last, trim(mb_substr($line, ($split + 1))));
                                     }
                                 }
                             }
                             break;
                         }
-                        if (stristr(strtoupper($v), 'BODY')) {
+                        if (mb_stristr(mb_strtoupper($v), 'BODY')) {
                             $search = false;
                         }
-                        elseif (stristr(strtoupper($v), 'FLAGS')) {
+                        elseif (mb_stristr(mb_strtoupper($v), 'FLAGS')) {
                             $flag_search = true;
                         }
                     }
@@ -1292,14 +1311,14 @@ if (!class_exists('Hm_IMAP')) {
         public function read_stream_line($size=1024) {
             if ($this->stream_size) {
                 $res = $this->fgets(1024);
-                while(substr($res, -2) != "\r\n") {
+                while(mb_substr($res, -2) != "\r\n") {
                     $res .= $this->fgets($size);
                 }
                 if ($res && $this->check_response(array($res), false, false)) {
                     $res = false;
                 }
                 if ($res) {
-                    $this->current_stream_size += strlen($res);
+                    $this->current_stream_size += mb_strlen($res);
                 }
                 if ($this->current_stream_size >= $this->stream_size) {
                     $this->stream_size = 0;
@@ -1382,7 +1401,7 @@ if (!class_exists('Hm_IMAP')) {
                     if ($body) {
                         if ($v == ']' && isset($vals[$i + 1])) {
                             if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)]\r\n") {
-                                $sort_key = strtotime(trim(substr($vals[$i + 1], 5)));
+                                $sort_key = strtotime(trim(mb_substr($vals[$i + 1], 5)));
                             }
                             else {
                                 $sort_key = $vals[$i + 1];
@@ -1390,7 +1409,7 @@ if (!class_exists('Hm_IMAP')) {
                             $body = false;
                         }
                     }
-                    if (strtoupper($v) == 'FLAGS') {
+                    if (mb_strtoupper($v) == 'FLAGS') {
                         $index = $i + 2;
                         $flag_string = '';
                         while (isset($vals[$index]) && $vals[$index] != ')') {
@@ -1401,13 +1420,13 @@ if (!class_exists('Hm_IMAP')) {
                             continue 2;
                         }
                     }
-                    if (strtoupper($v) == 'UID') {
+                    if (mb_strtoupper($v) == 'UID') {
                         if (isset($vals[($i + 1)])) {
                             $uid = $vals[$i + 1];
                         }
                     }
-                    if ($key == strtoupper($v)) {
-                        if (substr($key, 0, 4) == 'BODY') {
+                    if ($key == mb_strtoupper($v)) {
+                        if (mb_substr($key, 0, 4) == 'BODY') {
                             $body = 1;
                         }
                         elseif (isset($vals[($i + 1)])) {
@@ -1657,7 +1676,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $this->send_command($command);
             $result = $this->fgets();
-            if (substr($result, 0, 1) == '+') {
+            if (mb_substr($result, 0, 1) == '+') {
                 return true;
             }
             else {
@@ -1694,7 +1713,7 @@ if (!class_exists('Hm_IMAP')) {
         public function convert_sequence_to_array($sequence) {
             $res = array();
             foreach (explode(',', $sequence) as $atom) {
-                if (strstr($atom, ':')) {
+                if (mb_strstr($atom, ':')) {
                     $markers = explode(':', $atom);
                     if (ctype_digit($markers[0]) && ctype_digit($markers[1])) {
                         $res = array_merge($res, range($markers[0], $markers[1]));
@@ -1765,7 +1784,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return bool true if the extension is supported
          */
         public function is_supported( $extension ) {
-            return in_array(strtolower($extension), array_diff($this->supported_extensions, $this->blacklisted_extensions));
+            return in_array(mb_strtolower($extension), array_diff($this->supported_extensions, $this->blacklisted_extensions));
         }
 
         /**
@@ -2001,10 +2020,10 @@ if (!class_exists('Hm_IMAP')) {
             $status = $this->check_response($res, true);
             $uids = array();
             foreach ($res as $vals) {
-                if ($vals[0] == '*' && strtoupper($vals[1]) == 'ESEARCH') {
+                if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'ESEARCH') {
                     $esort_res = $this->parse_esearch_response($vals);
                 }
-                if ($vals[0] == '*' && strtoupper($vals[1]) == 'SORT') {
+                if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'SORT') {
                     array_shift($vals);
                     array_shift($vals);
                     $uids = array_merge($uids, $vals);
@@ -2194,6 +2213,54 @@ if (!class_exists('Hm_IMAP')) {
                 }
             }
             return $result;
+        }
+
+        /**
+         * Test if the server supports searching by custom headers.
+         * 
+         * This function sends a test search command to check if the server supports 
+         * searching by custom headers (e.g., X-Auto-Bcc). If the server does not support 
+         * this feature, it will return false.
+         *
+         * Reference: Stalwart's current limitation on searching by custom headers 
+         * discussed in the following GitHub thread:
+         * https://github.com/stalwartlabs/mail-server/discussions/477
+         * 
+         * Note: This function should be removed once Stalwart starts supporting custom headers.
+         *
+         * @return boolean true if the server supports searching by custom headers.
+         */
+        protected function server_supports_custom_headers() {
+            $test_command = 'UID SEARCH HEADER "X-NonExistent-Header" "test"'."\r\n";
+            $this->send_command($test_command);
+            $response = $this->get_response(false, true);
+            $status = $this->check_response($response, true);
+
+            // Keywords that indicate the header search is not supported
+            $keywords = ['is', 'not', 'supported.'];
+
+            if (!$status) {
+                return false;
+            }
+
+            // Flatten the response array to a single array of strings
+            $flattened_response = array_reduce($response, 'array_merge', []);
+
+            // Check if all keywords are present in the flattened response
+            $sequence_match = true;
+            foreach ($keywords as $keyword) {
+                if (!in_array($keyword, $flattened_response)) {
+                    $sequence_match = false;
+                    break;
+                }
+            }
+
+            // If all keywords are found, the header search is not supported
+            if ($sequence_match) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

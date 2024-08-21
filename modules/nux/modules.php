@@ -17,6 +17,9 @@ require_once APP_PATH.'modules/profiles/hm-profiles.php';
  */
 class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
     public function process() {
+        if (!DEBUG_MODE) {
+            return;
+        }
         $cache = $this->cache->get('nux_dev_news', array());
         if ($cache) {
             $this->out('nux_dev_news', $cache);
@@ -31,7 +34,7 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
             Hm_Functions::c_setopt($ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
             $curl_result = Hm_Functions::c_exec($ch);
             if (trim($curl_result)) {
-                if (strstr($curl_result, 'API rate limit exceeded')) {
+                if (mb_strstr($curl_result, 'API rate limit exceeded')) {
                     return;
                 }
                 $json_commits = json_decode($curl_result);
@@ -39,10 +42,10 @@ class Hm_Handler_nux_dev_news extends Hm_Handler_Module {
                     $msg = trim($c->commit->message);
                     $res[] = array(
                     'hash' => $c->sha,
-                    'shash' => substr($c->sha, 0, 8),
+                    'shash' => mb_substr($c->sha, 0, 8),
                     'name' => $c->commit->author->name,
                     'age' => date('D, M d', strtotime($c->commit->author->date)),
-                    'note' => (strlen($msg) > 80 ? substr($msg, 0, 80) . "..." : $msg)
+                    'note' => (mb_strlen($msg) > 80 ? mb_substr($msg, 0, 80) . "..." : $msg)
                     );
                 }
             }
@@ -172,13 +175,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
                 }
-                Hm_IMAP_List::add($imap_list);
-                $servers = Hm_IMAP_List::dump(false, true);
-                $ids = array_keys($servers);
-                $new_id = array_pop($ids);
-                if (in_server_list('Hm_IMAP_List', $new_id, $form['nux_email'])) {
-                    Hm_IMAP_List::del($new_id);
-                    Hm_Msgs::add('ERRThis IMAP server and username are already configured');
+                $new_id = Hm_IMAP_List::add($imap_list);
+                if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
                     return;
                 }
                 $imap = Hm_IMAP_List::connect($new_id, false);
@@ -192,13 +190,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                             'user' => $form['nux_email'],
                             'pass' => $form['nux_pass']
                         ));
-                        $this->session->record_unsaved('SMTP server added');
-                        $smtp_servers = Hm_SMTP_List::dump(false, true);
-                        $ids = array_keys($servers);
-                        $new_smtp_id = array_pop($ids);
-                        if (in_server_list('Hm_SMTP_List', $new_smtp_id, $form['nux_email'])) {
-                            Hm_SMTP_List::del($new_smtp_id);
-                            Hm_Msgs::add('ERRThis SMTP server and username are already configured');
+                        if (can_save_last_added_server('Hm_SMTP_List', $form['nux_email'])) {
+                            $this->session->record_unsaved('SMTP server added');
                         }
                     }
                     Hm_IMAP_List::clean_up();
@@ -209,8 +202,10 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->save_hm_msgs();
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
-                    $this->out('nux_server_id', $new_id);
-                    $this->out('nux_service_name', $form['nux_service']);
+                    if ($this->module_is_supported('imap_folders')) {
+                        $this->out('nux_server_id', $new_id);
+                        $this->out('nux_service_name', $form['nux_service']);
+                    }
                 }
                 else {
                     Hm_IMAP_List::del($new_id);
@@ -330,7 +325,10 @@ class Hm_Output_service_details extends Hm_Output_Module {
  */
 class Hm_Output_nux_dev_news extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Development Updates').'</div><table>';
+        if (!$this->get('nux_dev_news')) {
+            return '';
+        }
+        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Development Updates').'</h4></div><table>';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
@@ -351,7 +349,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
  */
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
-        return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="nux_title">'.$this->trans('Help').'</div>'.
+        return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Help').'</h4></div>'.
             $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
         '</div></div></div>';
     }
@@ -396,18 +394,18 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
             }
 
             if ($server_data[$proto] === NULL) {
-                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), strtoupper($proto_dsp));
+                $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), mb_strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
-                $res .= sprintf($this->trans('You don\'t have any %s sources'), strtoupper($proto_dsp));
+                $res .= sprintf($this->trans('You don\'t have any %s sources'), mb_strtoupper($proto_dsp));
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
-                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 else {
-                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
             }
@@ -482,12 +480,12 @@ if (!hm_exists('credentials_form')) {
         $res .= '<div class="row"><div class="col col-lg-4">';
         // E-mail Address Field
         $res .= '<div class="form-floating mb-3 mt-3">';
-        $res .= '<input type="email" class="form-control" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
+        $res .= '<input type="email" class="form-control warn_on_paste" id="nux_email" name="nux_email" placeholder="'.$mod->trans('E-mail Address').'" value="'.$mod->html_safe($details['email']).'">';
         $res .= '<label for="nux_email">'.$mod->trans('E-mail Address').'</label></div>';
 
         // E-mail Password Field
         $res .= '<div class="form-floating mb-3">';
-        $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
+        $res .= '<input type="password" class="form-control nux_password warn_on_paste" id="nux_password" name="nux_password" placeholder="'.$mod->trans('E-Mail Password').'">';
         $res .= '<label for="nux_password">'.$mod->trans('E-mail Password').'</label></div>';
 
         // Connect Button

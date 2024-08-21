@@ -459,6 +459,7 @@ return array(
     'Current password is incorrect' => 'Praegune salasõna ei ole õige',
     'Details' => 'Detailne teave',
     'Don\'t save account passwords between logins' => 'Ära salvesta salasõnu sisselogimiste vahel',
+    'Do you want to log out?' => 'Kas soovite välja logida?',
     'Drafts' => 'Kavandid',
     'Enter your passwords below to gain access to these services during this session.' => 'Selleks et saada selles sessioonis ligipääsu nendele teenustele sisesta alljärgnevalt oma salasõna',
     'Failed to authenticate to the SMTP server' => 'Autentimine SMTP serveris ebaõnnestus',
@@ -635,4 +636,8 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

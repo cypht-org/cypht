@@ -29,6 +29,7 @@ class Hm_Carddav {
         'carddav_phone' => 'tel',
         'carddav_fn' => 'fn'
     );
+    private $api;
 
     public function __construct($src, $url, $user, $pass) {
         $this->user = $user;
@@ -73,7 +74,7 @@ class Hm_Carddav {
         $card = array('BEGIN:VCARD', 'VERSION:3', sprintf('UID:%s', $uid));
         foreach ($this->card_flds as $name => $cname) {
             if (array_key_exists($name, $form) && trim($form[$name])) {
-                $card[] = sprintf('%s:%s', strtoupper($cname), $form[$name]);
+                $card[] = sprintf('%s:%s', mb_strtoupper($cname), $form[$name]);
             }
         }
         $card[] = 'END:VCARD';
@@ -206,7 +207,7 @@ class Hm_Carddav {
     }
 
     private function parse_xml($xml) {
-        if (substr((string) $this->api->last_status, 0, 1) != '2') {
+        if (mb_substr((string) $this->api->last_status, 0, 1) != '2') {
             Hm_Debug::add(sprintf('ERRUnable to access CardDav server (%d)', $this->api->last_status));
             return false;
         }

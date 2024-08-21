@@ -458,6 +458,7 @@ return array(
     'Current password is incorrect' => 'Cari parol doğru deyil',
     'Details' => 'Detallar',
     'Don\'t save account passwords between logins' => 'Girişlərin arasında hesabın şifrəni saxlamamaq',
+    'Do you want to log out?' => 'Çıxmaq istəyirsiniz?',
     'Drafts' => 'Layihələr',
     'Enter your passwords below to gain access to these services during this session.' => 'Seansın zamanı bu xidmətlərə giriş əldə etmək üçün şifrəni daxil edin.',
     'Failed to authenticate to the SMTP server' => 'SMTP-serverdə əslliyin yoxlamasını yerinə yetirmək müvəffəq olmadı',
@@ -630,4 +631,8 @@ return array(
     'IMAP and JMAP Servers' => false,
     'Junk' => false,
     'Trash' => false,
+    'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
 );

@@ -22,7 +22,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         database: ['mysql', 'postgres', 'sqlite']
 
     env:
@@ -91,7 +91,7 @@ jobs:
 
     strategy:
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.1']
         database: ['sqlite']
 
     env:
@@ -133,6 +133,7 @@ jobs:
       - name: "Composer Install Dependencies"
         run: |
             composer install
+            php scripts/config_gen.php
 
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh

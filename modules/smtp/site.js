@@ -454,6 +454,14 @@ $(function () {
         });
 
         $('.smtp_send_placeholder').on("click", function (e) {
+            if (window.kindEditor) {
+                kindEditor.sync();
+            }
+
+            if (window.mdEditor) {
+                mdEditor.codemirror.save();
+            }
+
             const body = $('.compose_body').val().trim();
             const subject = $('.compose_subject').val().trim();
 
@@ -603,5 +611,37 @@ $(function () {
             $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });
+
+        var selectedOption = $('#compose_smtp_id option[selected]');
+        var selectedEmail = selectedOption.data('email');
+        var selectedVal = selectedOption.val();
+
+        var recipientsInput = $('#compose_cc');
+        var excludedEmail = null;
+
+        const excludeEmail = function () {
+            var newRecipients = recipientsInput.val().split(',').filter(function(email) {
+                if (email.includes(selectedEmail)) {
+                    excludedEmail = email;
+                    return false;
+                }
+                return true;
+            }).join(', ');
+            recipientsInput.val(newRecipients);
+        };
+
+        if (recipientsInput.val().includes(selectedEmail)) {
+            excludeEmail();
+            $(document).on('change', '#compose_smtp_id', function() {
+                if ($(this).val() !== selectedVal) {
+                    if (!recipientsInput.val().includes(selectedEmail)) {
+                        recipientsInput.val(recipientsInput.val() + ', ' + excludedEmail);
+                    }
+                } else {
+                    excludeEmail();
+                }
+            });
+        }
+
     }
 });

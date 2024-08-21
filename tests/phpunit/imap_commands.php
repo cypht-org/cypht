@@ -2,7 +2,7 @@
 return array(
 
     'A1 CAPABILITY' =>
-        "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN AUTH=CRAM-MD5\r\n",
+        "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE AUTH=PLAIN AUTH=CRAM-MD5 AUTH=SCRAM-SHA-256-PLUS\r\n",
 
     'A3 CAPABILITY' =>
         "* CAPABILITY IMAP4rev1 LITERAL+ SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=".
@@ -32,7 +32,18 @@ return array(
 
     'dGVzdHVzZXIgMGYxMzE5YmIxMzMxOWViOWU4ZDdkM2JiZDJiZDJlOTQ=' =>
         "A2 OK authentication successful\r\n",
+    
+    'A2 AUTHENTICATE SCRAM-SHA-256' =>
+        "+ r=fyko+d2lbbFgONRv9qkxdawL,z=SCRAM-SHA-256,c=biws,n,,\r\n",
 
+    'c=biws,r=fyko+d2lbbFgONRv9qkxdawL1qkxdawL,p=YzQxNmVmY2ViMDAxYzdmNTkxOWFlZDIyNTgzM2NlZDBlZjBiNTNkZjUxNTQ1ZmZmNmY5NTlkOGZjNjYxYWEyNQ==' =>
+        "A2 OK authentication successful\r\n",
+
+    'A2 AUTHENTICATE SCRAM-SHA-256-PLUS' =>
+        "+ r=fyko+d2lbbFgONRv9qkxdawL,z=SCRAM-SHA-256-PLUS,c=tls-unique,n,,\r\n",
+    
+    'c=tls-unique,r=fyko+d2lbbFgONRv9qkxdawL1qkxdawL,p=YzQxNmVmY2ViMDAxYzdmNTkxOWFlZDIyNTgzM2NlZDBlZjBiNTNkZjUxNTQ1ZmZmNmY5NTlkOGZjNjYxYWEyNQ==' =>
+        "A2 OK authentication successful\r\n",
     'A2 AUTHENTICATE XOAUTH2 dXNlcj10ZXN0dXNlcgFhdXRoPUJlYXJlciB0ZXN0cGFzcwEB' =>
         "+ V1WTI5dENnPT0BAQ==\r\n",
 

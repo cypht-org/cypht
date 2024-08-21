@@ -2,7 +2,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class Hm_Test_API_Curl extends TestCase {
+class Hm_Test_API extends TestCase {
 
     public function setUp(): void {
         require 'bootstrap.php';

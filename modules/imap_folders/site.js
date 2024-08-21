@@ -53,7 +53,7 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
         }
     }
     else {
-        $('.expand_link', list).html('+');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill"></i>');
         $('ul', list).remove();
     }
     return false;
@@ -62,8 +62,8 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
 var set_folders_page_value = function(id, container, target, id_dest) {
     var list = $('.'+container);
     var list_item = $('.'+Hm_Utils.clean_selector(id), list);
-    var link = $('a', list_item).first().text();
-    if (link == '+' || link == '-') {
+    var link = $('a', list_item).not('.expand_link').first().text();
+    if (! link) {
         link = $('a', list_item).eq(1).text();
     }
     $('.'+target).html(link);
