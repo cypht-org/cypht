@@ -311,7 +311,7 @@ $(function() {
         if (($('#pgp_encrypt option').length + $('#pgp_sign option').length) == 0) {
             $('.pgp_section').hide();
         }
-        $('.pgp_apply').on("click", function() { Hm_Pgp.process_settings(); return false; });
+        $('.smtp_send_placeholder').on("click", function() { Hm_Pgp.process_settings(); return false; });
     }
     else if (hm_page_name() == 'message') {
         Hm_Ajax.add_callback_hook('ajax_imap_message_content', Hm_Pgp.check_pgp_msg);
