@@ -8,7 +8,6 @@ chrome_options = Options()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--disable-gpu')
 chrome_options.BinaryLocation = "/usr/bin/google-chrome"
-chrome_options.add_argument("--window-size=3200,3800")
 
 chrome_options.headless = False
 chrome_options.add_argument("start-maximized")
