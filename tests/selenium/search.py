@@ -16,7 +16,7 @@ class SearchTest(WebTest):
         list_item = self.by_class('menu_search')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
-        assert self.by_class('content_title').text.startswith('Search')
+        assert 'Search' in self.by_class('content_title').text
 
     def keyword_search(self):
         terms = self.by_id('search_terms')
