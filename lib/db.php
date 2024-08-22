@@ -143,6 +143,7 @@ class Hm_DB {
             return self::$dbh[$key];
         } catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());
+            Hm_Msgs::add('ERRUnable to connect to the database. Please check your configuration settings and try again.');
             self::$dbh[$key] = false;
             return false;
         }
