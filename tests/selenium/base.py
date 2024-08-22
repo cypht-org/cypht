@@ -34,14 +34,12 @@ class WebTest:
         self.modules = []
         self.servers = 1
         self.auth_type = ''
-        config_files = glob.glob('../../config/*.php')
-        for file_path in config_files:
-            result = subprocess.run(['php', 'get_config.php'], stdout=subprocess.PIPE)
-            config_dict = json.loads(result.stdout.decode())
-            if 'modules' in config_dict and isinstance(config_dict['modules'], list):
-                self.modules += config_dict['modules']
-            if 'auth_type' in config_dict:
-                self.auth_type = config_dict['auth_type']
+        result = subprocess.run(['php', 'get_config.php'], stdout=subprocess.PIPE)
+        config_dict = json.loads(result.stdout.decode())
+        if 'modules' in config_dict and isinstance(config_dict['modules'], list):
+            self.modules += config_dict['modules']
+        if 'auth_type' in config_dict:
+            self.auth_type = config_dict['auth_type']
 
     def load(self):
         print(" - loading site")

@@ -917,6 +917,9 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
     protected function output() {
         $size_in_kbs = 0;
         $num_chunks = 0;
+        if (!is_dir($this->get('attachment_dir'))) {
+            return;
+        }
         $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($this->get('attachment_dir')));
         $files = array();
 

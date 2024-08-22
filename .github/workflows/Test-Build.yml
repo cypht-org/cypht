@@ -78,7 +78,6 @@ jobs:
         run: |
             composer install
             composer require --dev php-coveralls/php-coveralls
-            php scripts/config_gen.php
 
       - name: "Script: test.sh"
         run: bash .github/tests/test.sh
@@ -133,7 +132,6 @@ jobs:
       - name: "Composer Install Dependencies"
         run: |
             composer install
-            php scripts/config_gen.php
 
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh

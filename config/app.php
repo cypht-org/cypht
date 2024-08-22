@@ -625,7 +625,7 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
     // 'modules' => [
     //     /*
     //     |  ----
@@ -1274,7 +1274,7 @@ return [
     | Max per source for Github notifications
     | Defaults to 20
     */
-    'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 weeks'),
+    'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 week'),
 
     /*
     |
