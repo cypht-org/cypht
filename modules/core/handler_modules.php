@@ -974,7 +974,7 @@ class Hm_Handler_process_warn_for_unsaved_changes_setting extends Hm_Handler_Mod
         function warn_for_unsaved_changes_callback($val) {
             return $val;
         }
-        process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback');
+        process_site_setting('warn_for_unsaved_changes', $this, 'warn_for_unsaved_changes_callback', false, true);
     }
 }
 
