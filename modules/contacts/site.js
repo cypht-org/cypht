@@ -43,9 +43,8 @@ var add_contact_from_popup = function(event) {
 
 
     if (contact) {
-        var emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
-        var email = contact.match(emailRegex)[0];
-        var name = contact.replace(emailRegex, "");
+        var email = contact.match(EMAIL_REGEX)[0];
+        var name = contact.replace(EMAIL_REGEX, "");
 
         var saveContactContent = `<div><table>
                                             <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${name}</td></tr>

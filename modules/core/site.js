@@ -1,5 +1,13 @@
 'use strict';
 
+// Constants. To be used anywhere in the app via the window object.
+const globalVars = {
+    EMAIL_REGEX: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+}
+Object.keys(globalVars).forEach(key => {
+    window[key] = globalVars[key];
+});
+
 /* extend cash.js with some useful bits */
 $.inArray = function(item, list) {
     for (var i in list) {
@@ -2644,7 +2652,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {

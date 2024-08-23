@@ -87,6 +87,15 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                         </table>
                     </div>
                 </div>
+                <hr/>
+                <div class="p-3">
+                    <div class="d-flex">
+                        <div class="col-sm-10">
+                            <input type="checkbox" id="stop_filtering"/>
+                            <label for="stop_filtering" class="form-label">Stop filtering</label>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>';
     }

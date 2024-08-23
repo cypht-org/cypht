@@ -52,7 +52,7 @@ if __name__ == '__main__':
         #'reload_folder_list',
         'expand_section',
         'collapse_section',
-        'hide_folders',
-        'show_folders',
-        'logout'
+        # 'hide_folders',
+        # 'show_folders',
+        # 'logout'
     ])
