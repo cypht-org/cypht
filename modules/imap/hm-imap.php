@@ -168,6 +168,8 @@ if (!class_exists('Hm_IMAP')) {
         public $folder_state = false;
         private $scramAuthenticator;
         private $namespace_count = 0;
+
+        private $last_processed_message_number = 0;
         /**
          * constructor
          */
@@ -315,13 +317,136 @@ if (!class_exists('Hm_IMAP')) {
                 $this->debug[] = 'Logged in successfully as ' . $username;
                 $this->get_capability();
                 $this->enable();
+
+                // Check if the server supports IMAP IDLE
+                if ($this->supports_idle()) {
+                    $this->start_idle(); // Start IMAP IDLE command after successful authentication
+                } else {
+                    $this->debug[] = 'IMAP IDLE not supported by the server.';
+                    //TO DO: Implement polling mechanism
+                }
             } else {
                 $this->debug[] = 'Log in for ' . $username . ' FAILED';
             }
             return $authed;
         }
-        
 
+        /**
+         * Check if the server supports the IMAP IDLE extension.
+         *
+         * @return bool True if IDLE is supported, false otherwise.
+         */
+        private function supports_idle() {
+            // Check if the CAPABILITY response includes "IDLE"
+            return stripos($this->capability, 'IDLE') !== false;
+        }
+        
+        /**
+         * Start the IMAP IDLE process to listen for real-time updates from the server.
+         */
+        private function start_idle() {
+            // Send the IDLE command to the server
+            $this->send_command("IDLE\r\n");
+            
+            // Keep listening for server responses while in IDLE mode
+            while (true) {
+                $lines = $this->get_response();  // Get server response
+                
+                // Iterate through each line to check for new message indications
+                foreach ($lines as $line) {
+                    // Check for a new message indication from the server
+                    if (strpos($line, 'EXISTS') !== false) {
+                        // A new message has arrived, fetch and handle it
+                        $this->fetch_and_handle_new_messages();
+                    }
+                    
+                    // Exit IDLE mode if necessary
+                    if ($this->should_exit_idle()) {
+                        // Send the DONE command to exit the IDLE state
+                        $this->send_command("DONE\r\n");
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Fetch and handle new messages
+        private function fetch_and_handle_new_messages() {
+            // Get the current number of messages in the mailbox
+            $current_message_count = $this->get_message_count();
+            
+            // Determine the range of message numbers to check
+            $start_message_number = $this->last_processed_message_number + 1;
+            
+            // Fetch and process each new message
+            for ($message_number = $start_message_number; $message_number <= $current_message_count; $message_number++) {
+                $uid = $this->get_message_uid($message_number); // Fetch UID for the message number
+                $this->fetch_and_handle_message($uid);
+                $this->last_processed_message_number = $message_number; // Update the last processed message number
+            }
+        }
+
+        /**
+         * Fetch and handle the new message by its number.
+         */
+        private function fetch_and_handle_message($uid) {
+            // Fetch the full message content
+            $message_content = $this->get_message_content($uid, '1'); // Fetch the entire message body
+            // Process the message (e.g., parse content, send notifications)
+            $this->handle_new_message($message_content);
+        }
+
+        // Get the UID of a message by its number
+        private function get_message_uid($message_number) {
+            // Use the FETCH command to get the UID of the message
+            $fetchCommand = "FETCH $message_number (UID)\r\n";
+            $this->send_command($fetchCommand);
+            $response = $this->get_response();
+            
+            foreach ($response as $line) {
+                if (preg_match('/UID (\d+)/', $line, $matches)) {
+                    return $matches[1];
+                }
+            }
+            
+            return ''; // Return an empty string if UID is not found
+        }
+
+        // Get the current number of messages in the mailbox
+        private function get_message_count() {
+            // Use the STATUS command to get the number of messages in the selected mailbox
+            $this->send_command("STATUS INBOX (MESSAGES)\r\n");
+            $response = $this->get_response();
+            
+            foreach ($response as $line) {
+                if (preg_match('/MESSAGES (\d+)/', $line, $matches)) {
+                    return (int)$matches[1];
+                }
+            }
+            
+            return 0; // Fallback to 0 if unable to determine message count
+        }
+
+        /**
+         * Determine if the client should exit the IDLE state.
+         *
+         * @return bool True if the client should exit IDLE, false otherwise.
+         */
+        private function should_exit_idle() {
+            // Placeholder function to determine when to exit the IDLE state
+            // Implement logic to decide when to break out of the IDLE command
+            return false;
+        }
+
+        /**
+         * Handle the event when a new message arrives while in IDLE mode.
+         */
+        private function handle_new_message($messageData) {
+            // Process the new message data
+            // Example: Extract headers, body, etc.
+            // Notify via Telegram, SMS, etc.
+        }
+        
         /**
          * attempt starttls
          * @return void
