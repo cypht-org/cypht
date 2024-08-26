@@ -946,8 +946,10 @@ var imap_move_copy = function(e, action, context) {
     return false;
 };
 
-var imap_perform_move_copy = function(dest_id, context) {
-    var action = $('.move_to_type').val();
+var imap_perform_move_copy = function(dest_id, context, action = null) {
+    if (!action) {
+        action = $('.move_to_type').val();
+    }
     var ids = [];
     var page = hm_page_name();
     $('.move_to_location').html('');
@@ -983,7 +985,7 @@ var imap_perform_move_copy = function(dest_id, context) {
                 var index;
                 if (hm_page_name() == 'message_list') {
                     Hm_Message_List.reset_checkboxes();
-                    if (action == 'move') {
+                    if (action == 'move' || action == 'screen_mail') {
                         for (index in res.move_count) {
                             $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
                         }
@@ -1345,3 +1347,48 @@ const handleCopyMsgSource = function(e) {
     navigator.clipboard.writeText(messageSource.textContent);
     Hm_Notices.show(['Copied to clipboard']);
 }
+
+var imap_screen_email = function() {
+    var list_msg_uid = [];
+    
+    $('input[type=checkbox]').each(function() {
+        if (this.checked && this.id.search('imap') != -1) {
+            list_msg_uid.push($(this).parent().parent().attr("data-uid"));
+        }
+    });
+    if ($("#move_messages_in_screen_email").val() == 1) {
+        imap_perform_move_copy("Screen email", "list", 'screen_mail');
+    }
+    list_msg_uid.forEach(function(msg_uid) {
+        block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(hm_list_path()), 'sender', 'blocked');
+    })
+};
+
+var add_email_in_contact_trusted = function(list_email) {
+    if (list_email) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'email_address', value: list_email.join(',') },
+        ],
+        function (res) {
+          window.location.reload();
+        }
+      );
+    }
+  };
+
+$('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
+
+$('.screen-email-like').on("click", function() {
+    var list_email = [];
+    $('input[type=checkbox]').each(function() {
+        if (this.checked && this.id.search('imap') != -1) {
+            let email = $('.'+ this.id +' .from').attr("data-title")
+            if (email = email.trim()) {
+                list_email.push(email);
+            }
+        }
+    });
+    add_email_in_contact_trusted(list_email); return false;
+});

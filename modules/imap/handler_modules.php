@@ -252,10 +252,25 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_move_to', 'imap_move_page', 'imap_move_action', 'imap_move_ids'));
         if ($success) {
+            $screen = false;
+            $parts = explode("_", $this->request->get['list_path']);
+            $imap_server_id = $parts[1] ?? '';
+            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
+            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
+            if ($form['imap_move_action'] == "screen_mail") {
+                $form['imap_move_action'] = "move";
+                $screen = true;
+                $screen_folder = 'Screen emails';
+                if (!count($imap->get_mailbox_status($screen_folder))) {
+                    $imap->create_mailbox($screen_folder);
+                }
+                $form['imap_move_to'] = $parts[0] ."_". $parts[1] ."_".bin2hex($screen_folder);
+            }
+
             list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
             $moved = array();
             if (count($same_server_ids) > 0) {
-                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path));
+                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path, $screen));
             }
             if (count($other_server_ids) > 0) {
                 $moved = array_merge($moved, imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->cache));
@@ -263,7 +278,11 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             }
             if (count($moved) > 0 && count($moved) == count($msg_ids)) {
                 if ($form['imap_move_action'] == 'move') {
-                    Hm_Msgs::add('Messages moved');
+                    if ($screen) {
+                        Hm_Msgs::add('Emails moved to Screen email folder');
+                    } else {
+                        Hm_Msgs::add('Messages moved');
+                    }
                 }
                 else {
                     Hm_Msgs::add('Messages copied');
@@ -271,7 +290,11 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             }
             elseif (count($moved) > 0) {
                 if ($form['imap_move_action'] == 'move') {
-                    Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+                    if ($screen) {
+                        Hm_Msgs::add('Some Emails moved to Screen email folder');
+                    } else {
+                        Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+                    }
                 }
                 else {
                     Hm_Msgs::add('Some messages copied (only IMAP message types can be copied)');
@@ -622,6 +645,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
+                $folder = hex2bin($parts[2]);
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
@@ -635,6 +659,13 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
                     $this->out('mailbox_list_title', $title);
+                }
+
+                if ($this->module_is_supported("contacts") && $folder == 'INBOX') {
+                    $this->out('folder', $folder);
+                    $this->out('screen_emails', isset($this->request->get['screen_emails']));
+                    $this->out('first_time_screen_emails', $this->user_config->get('first_time_screen_emails_setting', DEFAULT_PER_SOURCE));
+                    $this->out('move_messages_in_screen_email', $this->user_config->get('move_messages_in_screen_email_setting', DEFAULT_PER_SOURCE));
                 }
             }
             elseif ($path == 'sent') {
@@ -804,7 +835,17 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
                 $this->out('imap_mailbox_page_path', $path);
-                list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                if (isset($this->request->get['screen_emails']) && hex2bin($form['folder']) == 'INBOX' && $this->module_is_supported("contacts")) {
+                    $contacts = $this->get('contact_store');
+                    $contact_list = $contacts->getAll();
+
+                    $existingEmails = array_map(function($c){
+                        return $c->value('email_address');
+                    },$contact_list);
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails);
+                } else {
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
@@ -2126,5 +2167,25 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
             $this->out('imap_'.$path.'_data', $msg_list);
             $this->out('imap_server_ids', $form['imap_server_ids']);
         }
+    }
+}
+
+/**
+ * Process first-time screen emails per page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_first_time_screen_emails_per_page_setting extends Hm_Handler_Module {
+    public function process() {
+        function process_first_time_screen_emails_callback($val) {
+            return $val;
+        }
+        process_site_setting('first_time_screen_emails', $this, 'process_first_time_screen_emails_callback');
+    }
+}
+
+class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handler_Module {
+    public function process() {
+        function process_move_messages_in_screen_email_enabled_callback($val) { return $val; }
+        process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
