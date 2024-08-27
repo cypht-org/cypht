@@ -75,6 +75,8 @@ class Hm_Feed {
     var $init_cache;
     var $cache_limit;
     var $sort;
+    var $status_code;
+    var $feed_type;
 
     /**
      * Setup defaults
