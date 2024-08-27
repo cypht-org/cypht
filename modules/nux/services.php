@@ -240,7 +240,8 @@ Nux_Quick_Services::add('migadu', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'tls://imap.migadu.com'
+        'host' => 'imap.migadu.com',
+        'tls' => true
     )
 ));
 
@@ -258,7 +259,8 @@ Nux_Quick_Services::add('postale', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'tls://mail.postale.io'
+        'host' => 'mail.postale.io',
+        'tls' => true
     )
 ));
 

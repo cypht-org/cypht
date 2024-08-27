@@ -1412,10 +1412,20 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                            <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
                                            <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
                                         </div>
-                                        <div class="form-floating hide" id="srv_setup_stepper_imap_sieve_host_bloc">
-                                            <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
-                                            <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                                            <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
+                                        <div id="srv_setup_stepper_imap_sieve_host_bloc" class="hide">
+                                            <div class="form-floating">
+                                                <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
+                                                <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
+                                                <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
+                                            </div>
+                                            <div class="form-floating">
+                                                <div class="form-check" id="srv_setup_stepper_imap_sieve_mode_tls_bloc">
+                                                    <input class="form-check-input" type="checkbox" role="switch" value="1" id="srv_setup_stepper_imap_sieve_mode_tls" name="srv_setup_stepper_imap_sieve_mode_tls">
+                                                    <label class="form-check-label" for="srv_setup_stepper_imap_sieve_mode_tls">
+                                                        '.$this->trans('Sieve TLS Mode').'
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>';
                      }
                 $res .= '</div>';

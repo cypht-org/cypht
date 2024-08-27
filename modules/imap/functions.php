@@ -1516,18 +1516,15 @@ if (!hm_exists('forward_dropdown')) {
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
-    $host = $url['host'] ?? $url['path'];
-    $port = $url['port'] ?? '4190';
-    $scheme = $url['scheme'] ?? '';
-    $tls = $scheme === 'tls';
-    if (!empty($scheme)) {
-        $host = $scheme . '://' . $host;
+    if(!isset($url['host'])) {
+        $host = $url['path'];
     }
-    return [$host, $port, $tls];
+    $port = $url['port'] ?? '4190';
+    return [$host, $port];
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $show_errors = true) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
@@ -1550,7 +1547,6 @@ if (!hm_exists('connect_to_imap_server')) {
         if ($enableSieve && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
         }
-
         if ($server_id) {
             if (Hm_IMAP_List::edit($server_id, $imap_list)) {
                 $imap_server_id = $server_id;
@@ -1574,7 +1570,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
                 include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
-                $client = $sieveClientFactory->init(null, $server);
+                $client = $sieveClientFactory->init(null, $server, $sieve_tls);
 
                 if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
