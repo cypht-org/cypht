@@ -1400,7 +1400,7 @@ if (!class_exists('Hm_IMAP')) {
                 foreach ($vals as $i => $v) {
                     if ($body) {
                         if ($v == ']' && isset($vals[$i + 1])) {
-                            if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)]\r\n") {
+                            if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)])\r\n") {
                                 $sort_key = strtotime(trim(mb_substr($vals[$i + 1], 5)));
                             }
                             else {
