@@ -307,8 +307,8 @@ function append_bootstrap_icons_files() {
     if (!is_dir("site/fonts")) {
         mkdir('site/fonts', 0755);
     }
-    $source_folder = 'vendor/twbs/bootstrap-icons/font/fonts/';
-    $files = glob(VENDOR_PATH . "$source_folder*.*");
+    $source_folder = VENDOR_PATH.'twbs/bootstrap-icons/font/fonts/';
+    $files = glob("$source_folder*.*");
     foreach($files as $file){
         $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
         copy($file, $dest_forlder);
