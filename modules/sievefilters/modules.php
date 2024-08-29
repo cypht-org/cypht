@@ -1237,7 +1237,8 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
                 continue;
             }
             $sieve_supported++;
-            $num_filters = sizeof(get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), false));
+            $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
+            $num_filters = $result['count'];
             $res .= '<div class="sievefilters_accounts_item">';
             $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
             $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
@@ -1245,7 +1246,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
             $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
             $res .= '<table class="filter_details table my-3"><tbody>';
             $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
-            $res .= get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'), true);
+            $res .= $result['list'];
             $res .= '</tbody></table>';
             $res .= '<div class="mb-3 d-none">
                             <div class="d-block">
