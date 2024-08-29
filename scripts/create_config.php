@@ -138,10 +138,6 @@ function attachment_dir_setting($current) {
     return '<tr><td>Attachment storage directory</td><td><input type="text" value="'.$current.'" name="attachment_dir" /></td></tr>';
 }
 
-function app_data_dir_setting($current) {
-    return '<tr><td>Application storage directory</td><td><input type="text" value="'.$current.'" name="app_data_dir" /></td></tr>';
-}
-
 function user_settings_dir_setting($current) {
     return '<tr><td>User settings storage directory</td><td><input type="text" value="'.$current.'" name="user_settings_dir" /></td></tr>';
 }
@@ -220,7 +216,6 @@ function setting_defaults() {
             'auth_type' => 'DB',
             'default_language' => 'en',
             'user_config_type' => 'file',
-            'app_data_dir' => '/var/lib/hm3',
             'user_settings_dir' => '/var/lib/hm3/users',
             'attachment_dir' => '/var/lib/hm3/attachments',
             'disable_tls' => 'false',

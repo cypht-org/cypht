@@ -6,10 +6,6 @@ return [
     | Custom themes available in Cypht
     | --------------------------------
     |
-    | Once you edit this file, you must move it to the directory defined by
-    | app_data_dir in your config/app.php file. You will also need to re-run the
-    | cconfig_gen.php script.
-    |
     | SECURITY ALERT ! MAKE SURE THAT THIS FILE IS NOT ACCESSIBLE BY THE BROWSER !
     |
     | Define one theme per line, with a pipe character between the filename and UI name.
