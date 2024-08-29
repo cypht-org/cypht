@@ -102,7 +102,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 }
 
 if (!hm_exists('get_mailbox_filters')) {
-    function get_mailbox_filters($mailbox, $site_config, $user_config, $html=false)
+    function get_mailbox_filters($mailbox, $site_config, $user_config)
     {
         $factory = get_sieve_client_factory($site_config);
         try {
@@ -115,11 +115,7 @@ if (!hm_exists('get_mailbox_filters')) {
             }
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
-            return !$html ? []: '';
-        }
-
-        if ($html == false) {
-            return $scripts;
+            return ['count' => 0, 'list' => ''];
         }
 
         $scripts_sorted = [];
@@ -158,7 +154,7 @@ if (!hm_exists('get_mailbox_filters')) {
             </tr>
             ';
         }
-        return $script_list;
+        return ['count' => count($scripts), 'list' => $script_list];
     }
 }
 
