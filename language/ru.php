@@ -633,4 +633,5 @@ return array(
     'No tags available yet.' => false,
     'Server capabilities' => false,
     'Capabilities' => false,
+    'Screen %s first emails' => false,
 );
