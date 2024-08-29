@@ -34,3 +34,8 @@ $user_config = new Hm_User_Config_File($mock_config);
 $session = new Hm_PHP_Session($mock_config, 'Hm_Auth_DB');
 Hm_Server_Wrapper::init($user_config, $session);
 Hm_Tags_Wrapper::init($user_config, $session);
+
+$environment = Hm_Environment::getInstance();
+$environment->load('.env.example');
+/* set the default since and per_source values */
+$environment->define_default_constants($mock_config);

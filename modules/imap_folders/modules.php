@@ -216,7 +216,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                 $old_folder = prep_folder_name($imap, $form['folder'], true);
                 $new_folder = prep_folder_name($imap, $form['new_folder'], false, $parent_str);
                 if ($new_folder && $old_folder && $imap->rename_mailbox($old_folder, $new_folder)) {
-                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
+                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                         $imap_servers = $this->user_config->get('imap_servers');
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
@@ -275,7 +275,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (is_object($imap) && $imap->get_state() == 'authenticated') {
                 $del_folder = prep_folder_name($imap, $form['folder'], true);
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
                         return;
@@ -822,13 +822,13 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" value="1" class="form-check-input" />'.$reset.'</td></tr>';
+            '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" class="form-check-input" />'.$reset.'</td></tr>';
     }
 }
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
     function get_sieve_linked_mailbox ($imap_account, $module) {
-        if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', true)) {
+        if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
             return;
         }
         list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);

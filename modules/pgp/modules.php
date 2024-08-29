@@ -72,7 +72,7 @@ class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
  */
 class Hm_Handler_pgp_compose_data extends Hm_Handler_Module {
     public function process() {
-        $this->out('html_mail', $this->user_config->get('smtp_compose_type_setting', 0));
+        $this->out('html_mail', $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE));
         $this->out('pgp_public_keys', $this->user_config->get('pgp_public_keys', array()));
     }
 }

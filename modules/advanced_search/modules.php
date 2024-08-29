@@ -16,7 +16,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_advanced_search_prepare extends Hm_Handler_Module {
 
     public function process() {
-        $this->out('msg_list_icons', $this->user_config->get('show_list_icons_setting', false));
+        $this->out('msg_list_icons', $this->user_config->get('show_list_icons_setting', DEFAULT_SHOW_LIST_ICONS));
         $this->out('imap_supported', $this->module_is_supported('imap'));
         $this->out('list_parent', 'advanced_search');
     }

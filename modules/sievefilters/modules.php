@@ -52,7 +52,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
-        $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', true));
+        $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
     }
 }
 
@@ -62,7 +62,7 @@ class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
 class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module {
     public function process() {
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
-        $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', true);
+        $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
         if ($sieve_filters_enabled) {
             $factory = get_sieve_client_factory($this->config);
             try {
@@ -1282,7 +1282,7 @@ class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
 class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
     public function process() {
         function sieve_enabled_callback($val) { return $val; }
-        process_site_setting('enable_sieve_filter', $this, 'sieve_enabled_callback', true, true);
+        process_site_setting('enable_sieve_filter', $this, 'sieve_enabled_callback', DEFAULT_ENABLE_SIEVE_FILTER, true);
     }
 }
 
@@ -1292,18 +1292,22 @@ class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
 class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
-        if (array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) {
+        // exit(var_dump($settings['enable_sieve_filter']));
+        if ((array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) || DEFAULT_ENABLE_SIEVE_FILTER) {
             $checked = ' checked="checked"';
             $reset = '';
         }
         else {
             $checked = '';
+        }
+        
+        if($settings['enable_sieve_filter'] != DEFAULT_ENABLE_SIEVE_FILTER) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
             $this->trans('Enable sieve filter').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" />'.$reset.'</td></tr>';
+            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" data-default-value="'.(DEFAULT_ENABLE_SIEVE_FILTER ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
     }
 }
 

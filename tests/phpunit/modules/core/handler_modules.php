@@ -535,7 +535,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test = new Handler_Test('reset_search', 'core');
         $res = $test->run();
         $this->assertEquals('', $res->session->get('search_terms'));
-        $this->assertEquals(DEFAULT_SINCE, $res->session->get('search_since'));
+        $this->assertEquals(DEFAULT_SEARCH_SINCE, $res->session->get('search_since'));
         $this->assertEquals(DEFAULT_SEARCH_FLD, $res->session->get('search_fld'));
     }
     /**

@@ -987,14 +987,14 @@ class Hm_Output_sent_since_setting extends Hm_Output_Module {
         if (!email_is_active($this->get('router_module_list'))) {
             return '';
         }
-        $since = DEFAULT_SINCE;
+        $since = DEFAULT_SENT_SINCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('sent_since', $settings) && $settings['sent_since']) {
             $since = $settings['sent_since'];
         }
         return '<tr class="sent_setting"><td><label for="sent_since">'.
             $this->trans('Show messages received since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'sent_since', $this).'</td></tr>';
+            '<td>'.message_since_dropdown($since, 'sent_since', $this, DEFAULT_SENT_SINCE).'</td></tr>';
     }
 }
 
@@ -1034,7 +1034,7 @@ class Hm_Output_imap_unread_on_open extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="unread_on_open">'.
             $this->trans('Don\'t flag a message as read on open').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" value="1" /></td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" data-default-value="false" value="1" /></td></tr>';
     }
 }
 
@@ -1054,7 +1054,7 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1069,12 +1069,13 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (!array_key_exists('pagination_links', $settings) || (array_key_exists('pagination_links', $settings) && $settings['pagination_links'])) {
             $checked = ' checked="checked"';
-        } else {
+        }
+        if($settings['pagination_links'] !== DEFAULT_PAGINATION_LINKS) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
             $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links"  data-default-value="'.(DEFAULT_PAGINATION_LINKS ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
         return $res;
     }
 }
@@ -1095,7 +1096,7 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
             $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" data-default-value="true" value="1" />'.$reset.'</td></tr>';
         return $res;
     }
 }
@@ -1121,17 +1122,17 @@ class Hm_Output_prefetch_imap_folder_ids extends Hm_Output_Module {
 class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
-        $per_page = 20;
+        $per_page = DEFAULT_IMAP_PER_PAGE;
         $reset = '';
         if (array_key_exists('imap_per_page', $settings)) {
             $per_page = $settings['imap_per_page'];
         }
-        if ($per_page != 20) {
+        if ($per_page != DEFAULT_IMAP_PER_PAGE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
-            $this->trans('Messages per page for IMAP folder views').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
-            'name="imap_per_page" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
+            $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
+            'name="imap_per_page" value="'.$this->html_safe($per_page).'" data-default-value="'.DEFAULT_IMAP_PER_PAGE.'"/>'.$reset.'</td></tr>';
     }
 }
 
@@ -1171,7 +1172,7 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1186,11 +1187,13 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('text_only', $settings) && $settings['text_only']) {
             $checked = ' checked="checked"';
+        }
+        if($settings['text_only'] !== DEFAULT_TEXT_ONLY) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" data-default-value="'.(DEFAULT_TEXT_ONLY ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1200,18 +1203,18 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
  */
 class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
     protected function output() {
-        $sources = DEFAULT_PER_SOURCE;
+        $sources = DEFAULT_SENT_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         $reset = '';
         if (array_key_exists('sent_per_source', $settings)) {
             $sources = $settings['sent_per_source'];
         }
-        if ($sources != 20) {
+        if ($sources != DEFAULT_SENT_PER_SOURCE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td><input class="form-control form-control-sm w-auto" type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="sent_per_source" name="sent_per_source" value="'.$this->html_safe($sources).'" data-default-value="'.DEFAULT_SENT_PER_SOURCE.'" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1230,7 +1233,7 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1248,7 +1251,7 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="false" value="1" />'.$reset.'</td></tr>';
     }
 }
 

@@ -14,7 +14,7 @@ if (!defined('DEBUG_MODE')) { die(); }
 class Hm_Handler_load_keyboard_shortcuts extends Hm_Handler_Module {
     public function process() {
         $this->out('keyboard_shortcut_data', shortcut_defaults($this->user_config));
-        $this->out('shortcuts_enabled', $this->user_config->get('enable_keyboard_shortcuts_setting', false));
+        $this->out('shortcuts_enabled', $this->user_config->get('enable_keyboard_shortcuts_setting', DEFAULT_ENABLE_KEYBOARD_SHORTCUTS));
     }
 }
 
@@ -23,7 +23,7 @@ class Hm_Handler_load_keyboard_shortcuts extends Hm_Handler_Module {
  */
 class Hm_Handler_get_shortcut_setting extends Hm_Handler_Module {
     public function process() {
-        $this->out('shortcuts_enabled', $this->user_config->get('enable_keyboard_shortcuts_setting', false));
+        $this->out('shortcuts_enabled', $this->user_config->get('enable_keyboard_shortcuts_setting', DEFAULT_ENABLE_KEYBOARD_SHORTCUTS));
     }
 }
 
@@ -87,7 +87,7 @@ class Hm_Handler_load_edit_id extends Hm_Handler_Module {
 class Hm_Handler_process_enable_shortcut_setting extends Hm_Handler_Module {
     public function process() {
         function shortcut_enabled_callback($val) { return $val; }
-        process_site_setting('enable_keyboard_shortcuts', $this, 'shortcut_enabled_callback', false, true);
+        process_site_setting('enable_keyboard_shortcuts', $this, 'shortcut_enabled_callback', DEFAULT_ENABLE_KEYBOARD_SHORTCUTS, true);
     }
 }
 
@@ -99,7 +99,9 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_keyboard_shortcuts', $settings) && $settings['enable_keyboard_shortcuts']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+            if($settings['enable_keyboard_shortcuts'] !== DEFAULT_ENABLE_KEYBOARD_SHORTCUTS) {
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+            }
         }
         else {
             $checked = '';
@@ -108,7 +110,7 @@ class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_keyboard_shortcuts">'.
             $this->trans('Enable keyboard shortcuts').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" />'.$reset.'</td></tr>';
+            ' value="1" id="enable_keyboard_shortcuts" name="enable_keyboard_shortcuts" data-default-value="'.(DEFAULT_ENABLE_KEYBOARD_SHORTCUTS ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
     }
 }
 
