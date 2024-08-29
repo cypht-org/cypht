@@ -857,7 +857,7 @@ function imap_refresh_oauth2_token($server, $config) {
  * @return int count of messages moved
  */
 if (!hm_exists('imap_move_same_server')) {
-function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
+function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_emails=false) {
     $moved = array();
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
@@ -865,11 +865,25 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
-            if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+            if ($screen_emails) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                    $email = current(array_column(process_address_fld($imap->get_message_headers($msg)['From']), "email"));
+                    $uids = $imap->search('ALL', false, array(array('FROM', $email)));
+                    foreach ($uids as $uid) {
+                        if ($imap->message_action(mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
+                            $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $uid, $folder);
+                        }
+                    }
+                }
+            } else {
+                if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+                    foreach ($msgs as $msg) {
+                        $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                    }
                 }
             }
+            
         }
     }
     return $moved;
