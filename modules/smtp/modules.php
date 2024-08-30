@@ -377,7 +377,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        if (file_exists($this->config->get('attachment_dir')) && is_dir($this->config->get('attachment_dir'))) {
+        if (is_dir($this->config->get('attachment_dir'))) {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
