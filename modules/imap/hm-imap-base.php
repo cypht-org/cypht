@@ -69,11 +69,12 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
-        $lit_size = mb_strlen($literal_data);
+        $lit_size = strlen($literal_data);
         $current += $lit_size;
+        // We need to use non-multibyte string lengths, since "$size" is in bytes
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
-            $chunk_size = mb_strlen($chunk);
+            $chunk_size = strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
             $literal_data .= $chunk;
@@ -85,12 +86,12 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
-                $lit_size += mb_strlen($temp);
+                $lit_size += strlen($temp);
             }
         }
-        elseif ($size < mb_strlen($literal_data)) {
-            $left_over = mb_substr($literal_data, $size);
-            $literal_data = mb_substr($literal_data, 0, $size);
+        elseif ($size < strlen($literal_data)) {
+            $left_over = substr($literal_data, $size);
+            $literal_data = substr($literal_data, 0, $size);
         }
         return array($literal_data, $left_over);
     }
@@ -153,7 +154,9 @@ class Hm_IMAP_Base {
             elseif ($line[$i] == '{') {
                 $end = mb_strpos($line, '}');
                 if ($end !== false) {
+                    // https://www.rfc-editor.org/rfc/rfc3501#section-4.3
                     $literal_size  = mb_substr($line, ($i + 1), ($end - $i - 1));
+                    //$literal_size  = substr($line, ($i + 1), ($end - $i - 1));
                 }
                 $lit_result = $this->read_literal($literal_size, $max, $current_size, $line_length);
                 $chunk = $lit_result[0];
