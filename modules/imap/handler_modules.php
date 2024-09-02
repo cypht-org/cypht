@@ -774,6 +774,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
                 $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
                 return;
             }
             if (imap_authed($imap)) {
@@ -790,6 +791,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
                 $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
             }
             else {
                 Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
@@ -1926,7 +1928,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
-        
+
         if ($success) {
             $this->out('msg_text_uid', $form['imap_msg_uid']);
             $this->out('msg_server_id', $form['imap_server_id']);
