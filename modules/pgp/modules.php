@@ -124,7 +124,7 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
             }
             $res .= '</select>';
         }
-        $res .= '</di></di></di></di>';
+        $res .= '</div></div></div></div>';
         return $res;
     }
 }

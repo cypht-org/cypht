@@ -1005,7 +1005,7 @@ class Hm_Output_compose_form_attach extends Hm_Output_Module {
         return '<form enctype="multipart/form-data" class="compose_attach_form">'.
             '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
             '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
-            '</form></div>';
+            '</form>';
     }
 }
 
