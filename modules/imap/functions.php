@@ -114,8 +114,7 @@ if (!hm_exists('format_imap_folder_section')) {
 function format_imap_folder_section($folders, $id, $output_mod, $with_input = false) {
     $results = '<ul class="inner_list">';
     $manage = $output_mod->get('imap_folder_manage_link');
-    $quota = $output_mod->get('quota');
-    $quota_max = $output_mod->get('quota_max');
+
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
         $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
@@ -156,9 +155,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
     if ($manage) {
         $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a></li>';
     }
-    if ($quota) {
-        $results .= '<li class="manage_folders_li"><div class="progress bg-secondary border"><div class="progress-bar bg-light" style="width:'.$quota.'%"></div></div>'.$quota.'% used on '.$quota_max.' MB</li>';
-    }
+
     $results .= '</ul>';
     return $results;
 }}
@@ -883,7 +880,7 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                     }
                 }
             }
-            
+
         }
     }
     return $moved;
