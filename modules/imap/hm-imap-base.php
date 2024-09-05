@@ -154,7 +154,6 @@ class Hm_IMAP_Base {
             elseif ($line[$i] == '{') {
                 $end = mb_strpos($line, '}');
                 if ($end !== false) {
-                    // https://www.rfc-editor.org/rfc/rfc3501#section-4.3
                     $literal_size  = mb_substr($line, ($i + 1), ($end - $i - 1));
                 }
                 $lit_result = $this->read_literal($literal_size, $max, $current_size, $line_length);
