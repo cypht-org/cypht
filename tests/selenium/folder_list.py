@@ -15,7 +15,6 @@ class FolderListTests(WebTest):
         assert self.by_class('main_menu').text.startswith('Main')
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
-        self.wait_with_folder_list()
         assert self.by_class('main_menu').text.startswith('Main')
 
     def expand_section(self):
