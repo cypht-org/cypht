@@ -377,7 +377,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         if ($reply_type) {
             $this->out('reply_type', $reply_type);
         }
-        if (file_exists($this->config->get('attachment_dir')) && is_dir($this->config->get('attachment_dir'))) {
+        if (is_dir($this->config->get('attachment_dir'))) {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
@@ -1005,7 +1005,7 @@ class Hm_Output_compose_form_attach extends Hm_Output_Module {
         return '<form enctype="multipart/form-data" class="compose_attach_form">'.
             '<input class="compose_attach_file" type="file" name="compose_attach_file" />'.
             '<input type="hidden" name="compose_attach_page_id" value="ajax_smtp_attach_file" />'.
-            '</form></div>';
+            '</form>';
     }
 }
 

@@ -757,13 +757,15 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             if (imap_authed($imap)) {
                 $quota_root = $imap->get_quota_root($folder ? $folder : 'INBOX');
-                $quota = $imap->get_quota($quota_root[0]['name']);
-                if ($quota) {
-                    $current = floatval($quota[0]['current']);
-                    $max = floatval($quota[0]['max']);
-                    if ($max > 0) {
-                        $this->out('quota', ceil(($current / $max) * 100));
-                        $this->out('quota_max', $max / 1024);
+                if ($quota_root && isset($quota_root[0]['name'])) {
+                    $quota = $imap->get_quota($quota_root[0]['name']);
+                    if ($quota) {
+                        $current = floatval($quota[0]['current']);
+                        $max = floatval($quota[0]['max']);
+                        if ($max > 0) {
+                            $this->out('quota', ceil(($current / $max) * 100));
+                            $this->out('quota_max', $max / 1024);
+                        }
                     }
                 }
             }

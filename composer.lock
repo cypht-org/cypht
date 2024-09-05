@@ -423,16 +423,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.7",
+            "version": "v1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "3590d0fdb708b8daaf6056347dbc7644a8b4b335"
+                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/3590d0fdb708b8daaf6056347dbc7644a8b4b335",
-                "reference": "3590d0fdb708b8daaf6056347dbc7644a8b4b335",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4",
+                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4",
                 "shasum": ""
             },
             "require": {
@@ -488,7 +488,7 @@
                 "source": "https://github.com/cypht-org/php-sieve-manager",
                 "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki"
             },
-            "time": "2024-08-03T14:54:15+00:00"
+            "time": "2024-08-29T06:33:14+00:00"
         },
         {
             "name": "league/commonmark",

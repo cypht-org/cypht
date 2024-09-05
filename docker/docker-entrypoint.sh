@@ -11,7 +11,6 @@ cd ${APP_DIR}
 USER_CONFIG_TYPE="${USER_CONFIG_TYPE:-file}"
 USER_SETTINGS_DIR="${USER_SETTINGS_DIR:-/var/lib/hm3/users}"
 ATTACHMENT_DIR="${ATTACHMENT_DIR:-/var/lib/hm3/attachments}"
-APP_DATA_DIR="${APP_DATA_DIR:-/var/lib/hm3/app_data}"
 
 # Wait for database to be ready then setup tables
 ./scripts/setup_database.php
@@ -28,7 +27,6 @@ fi
 
 chown www-data:www-data ${ATTACHMENT_DIR}
 chown -R www-data:www-data /var/lib/nginx
-chown www-data:www-data ${APP_DATA_DIR}
 
 rm -r /var/www
 ln -s $(pwd)/site /var/www

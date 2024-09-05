@@ -223,24 +223,11 @@ return [
     | Attachment Location
     | -------------------
     |
-    | If user_config_type is set to file, this must be set to an existing directory
-    | that the webserver software can read and write to. If settings storage is set
-    | to DB, this is ignored. It should not be inside the webserver document root.
+    | This must be set to an existing directory that the webserver software
+    | can read and write to. It should not be inside the webserver document root.
     |
     */
     'attachment_dir' => env('ATTACHMENT_DIR', '/var/lib/hm3/attachments'),
-
-    /*
-    | -------------------------
-    | Application Data Location
-    | -------------------------
-    |
-    | Some Cypht module sets have their own ini files that need to be readable by
-    | the webserver software, but not writable, and definitely not inside the
-    | webserver document root.
-    |
-    */
-    'app_data_dir' => env('APP_DATA_DIR', '/var/lib/hm3/app_data'),
 
     /*
     | --------------------
@@ -663,9 +650,7 @@ return [
     //     'local_contacts',
 
     //     /*
-    //     | LDAP contact support. Use an LDAP server to store contacts. This module
-    //     | uses its own ini file in modules/ldap_contacts/. This file must be edited
-    //     | and moved to your app_data_dir to configure LDAP access.
+    //     | LDAP contact support. Use an LDAP server to store contacts.
     //     */
     //     'ldap_contacts',
 
@@ -698,9 +683,7 @@ return [
     //     | IMAP
     //     | -----
     //     |
-    //     | IMAP email account support. If you want to use OAuth2 over IMAP (currently
-    //     | only supported by Gmail and Outlook.com), you will need to edit the oauth2.php
-    //     | ffile in modules/imap/, and move it to your app_data_dir location.
+    //     | IMAP email account support.
     //     */
     //     'imap',
 
@@ -710,8 +693,7 @@ return [
     //     | -----------------------
     //     |
     //     | This module enables 2 factor authentication using TOTP (compatible with
-    //     | Google Authenticator). You must edit the ini file in modules/2fa/ to
-    //     | configure a shared secret, then move that file to your app_data_dir.
+    //     | Google Authenticator).
     //     */
     //     // '2fa',
 
@@ -796,9 +778,7 @@ return [
     //     | Github
     //     | -------
     //     |
-    //     | Github repository tracking. This module has its own ini file located in
-    //     | modules/github/. You must edit this file, and move it to your app_data_dir
-    //     | to establish communication with github.
+    //     | Github repository tracking.
     //     */
     //     // 'github',
 
@@ -807,9 +787,7 @@ return [
     //     | reCAPTCHA
     //     | ---------
     //     |
-    //     | Use the reCAPTCHA server on login. This module has its own ini file in
-    //     | modules/recaptcha/. You must edit this file, and move it to the location
-    //     | defined in app_data_dir to gain access to the WordPress notification API.
+    //     | Use the reCAPTCHA server on login.
     //     */
     //     // 'recaptcha',
 
@@ -818,9 +796,7 @@ return [
     //     | WordPress
     //     | ---------
     //     |
-    //     | WordPress.com notifications. This module has its own ini file in
-    //     | modules/wordpress/. You must edit this file, and move it to the location
-    //     | defined in app_data_dir to gain access to the WordPress notification API.
+    //     | WordPress.com notifications.
     //     */
     //     // 'wordpress',
 
