@@ -1,6 +1,6 @@
 html,
 body {
-  background: var(--bs-secondary-bg) !important;
+  background-color: var(--bs-secondary-bg) !important;
   font-family: var(--bs-font-sans-serif);
   color: var(--bs-body-color) !important;
 }
@@ -73,7 +73,6 @@ html,
 body {
   max-width: 100%;
   min-height: 100%;
-  background-color: #fff;
 }
 body {
   font-size: 1em;
