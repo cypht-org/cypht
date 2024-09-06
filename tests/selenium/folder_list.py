@@ -20,17 +20,15 @@ class FolderListTests(WebTest):
         assert main_menu.text.startswith('Main')
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
-        #self.wait.until.staleness_of(main_menu)
-        #self.wait.until(ExpectedConditions.refreshed(main_menu));
-        # Explicitly wait for element to become stale
+        # update_message_list triggers site reload, so we explicitly wait for element to become stale
         WebDriverWait(self.driver, 20).until(EC.staleness_of(main_menu))
-        # WebDriverWait(self.driver, 20).until(EC.refreshed(main_menu))
         ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
-        # ... And then wait for it to become available again.
+        # And once it is stale, we can now wait for it to become available again.
         main_menu = WebDriverWait(self.driver, 10,ignored_exceptions=ignored_exceptions).until(
         EC.presence_of_element_located((By.CLASS_NAME, 'main_menu'))
         )
         main_menu = self.by_class('main_menu')
+        #and finally perform our test on the actual, refreshed element.
         assert main_menu.text.startswith('Main')
 
     def expand_section(self):
