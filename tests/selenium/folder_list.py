@@ -23,7 +23,6 @@ class FolderListTests(WebTest):
         main_menu = WebDriverWait(self.driver, 10,ignored_exceptions=ignored_exceptions).until(
         EC.presence_of_element_located((By.CLASS_NAME, 'main_menu'))
         )
-        # main_menu = self.by_class('main_menu')
         assert main_menu.text.startswith('Main')
 
     def expand_section(self):
