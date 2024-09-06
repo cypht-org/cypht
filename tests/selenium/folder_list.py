@@ -3,6 +3,9 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from runner import test_runner
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 class FolderListTests(WebTest):
 
@@ -15,6 +18,9 @@ class FolderListTests(WebTest):
         assert self.by_class('main_menu').text.startswith('Main')
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
+        WebDriverWait(self.driver, 10).until(
+        EC.presence_of_element_located((By.CLASS_NAME, 'main_menu'))
+        )
         main_menu = self.by_class('main_menu')
         assert main_menu.text.startswith('Main')
 
