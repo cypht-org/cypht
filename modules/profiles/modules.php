@@ -319,7 +319,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     }
     $res .= '</div>';
 
-    $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-5">';
+    $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
     $res .= '<form method="post" action="?page=profiles">';
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
