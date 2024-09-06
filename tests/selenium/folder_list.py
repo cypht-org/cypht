@@ -22,7 +22,7 @@ class FolderListTests(WebTest):
         self.safari_workaround(3)
         #self.wait.until.staleness_of(main_menu)
         #self.wait.until(ExpectedConditions.refreshed(main_menu));
-        WebDriverWait(self.driver, 20).until(EC.stalenessOf(main_menu))
+        # WebDriverWait(self.driver, 20).until(EC.stalenessOf(main_menu))
         WebDriverWait(self.driver, 20).until(EC.refreshed(main_menu))
         #ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
         #main_menu = WebDriverWait(self.driver, 10,ignored_exceptions=ignored_exceptions).until(
