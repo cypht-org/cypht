@@ -16,7 +16,7 @@ class FolderListTests(WebTest):
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
         main_menu = self.by_class('main_menu')
-        assert main_menu.text.startswith == 'Main'
+        assert main_menu.text.startswith('Main')
 
     def expand_section(self):
         self.by_css('[data-source=".settings"]').click()
