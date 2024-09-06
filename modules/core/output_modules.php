@@ -2159,7 +2159,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                       <div class="server_count">'.$configuredText.'</div>
                   </div>
              <div class="server_config_section px-4 pt-3 me-0">
-                <div class="stepper col-12 col-lg-4 mb-4" id="srv_setup_stepper_stepper">
+                <div class="stepper col-12 col-xl-7 mb-4" id="srv_setup_stepper_stepper">
                     <div class="step-container">
                         <div id="step_config_1" class="step step_config">
                             <div class="step_config-title">
