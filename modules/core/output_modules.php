@@ -16,12 +16,12 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<li class="menu_search"><form method="get">';
-        $res .= '<div class="d-flex align-items-center">';
+        $res .= '<div class="d-flex bd-highlight">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
             $res .= '<i class="bi bi-search"></i></a></div>';
         }
-        $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
+        $res .= '<div class="flex-fill bd-highlight"><input type="hidden" name="page" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" '.
             'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
         if ($this->format == 'HTML5') {

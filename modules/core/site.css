@@ -726,7 +726,7 @@ button {
   padding-left: 5px;
 }
 .folder_list .search_terms {
-  width: 80%;
+  width: 100%;
 }
 .search_content {
   display: table;
