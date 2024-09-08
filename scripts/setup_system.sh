@@ -10,8 +10,6 @@ SCRIPT_DIR=$(dirname $(realpath "$0"))
 USER_CONFIG_TYPE="${USER_CONFIG_TYPE:-file}"
 USER_SETTINGS_DIR="${USER_SETTINGS_DIR:-/var/lib/hm3/users}"
 ATTACHMENT_DIR="${ATTACHMENT_DIR:-/var/lib/hm3/attachments}"
-APP_DATA_DIR="${APP_DATA_DIR:-/var/lib/hm3/app_data}"
-
 
 if [ "${USER_CONFIG_TYPE}" = "file" ]
 then
@@ -21,9 +19,6 @@ fi
 
 echo "Creating directory for attachments ${ATTACHMENT_DIR}"
 mkdir -p ${ATTACHMENT_DIR}
-
-echo "Creating directory for application data ${APP_DATA_DIR}"
-mkdir -p ${APP_DATA_DIR}
 
 # TODO: should a user be created if USER_CONFIG_TYPE=file  ?
 if [[ "${USER_CONFIG_TYPE}" = "DB" && -n "${AUTH_USERNAME}" ]]

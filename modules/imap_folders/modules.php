@@ -380,7 +380,7 @@ class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Modu
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', '');
-        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-lg-5 col-sm-12"><form id="form_folder_imap" method="get">';
+        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get">';
         $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';

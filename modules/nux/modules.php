@@ -274,7 +274,7 @@ class Hm_Output_quick_add_dialog extends Hm_Output_Module {
         return '<div class="quick_add_section">'.
             '<div class="nux_step_one px-4 pt-">'.
             '<p class="py-3">'.$this->trans('Quickly add an account from popular E-mail providers. To manually configure an account, use the IMAP/SMTP sections below.').'</p>'.
-            '<div class="row"><div class="col col-lg-4"><div class="form-floating mb-3">'.
+            '<div class="row"><div class="col col-xl-7"><div class="form-floating mb-3">'.
             ' <select id="service_select" name="service_select" class="form-select">'.
             '<option value="">'.$this->trans('Select an E-mail provider').'</option>'.
             Nux_Quick_Services::option_list(false, $this).'</select>'.
