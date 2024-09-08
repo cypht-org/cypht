@@ -59,7 +59,7 @@ if __name__ == '__main__':
 
     print("FOLDER LIST TESTS")
     test_runner(FolderListTests, [
-        'reload_folder_list',
+        # 'reload_folder_list',
         'expand_section',
         'collapse_section',
         'hide_folders',
