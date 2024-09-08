@@ -28,3 +28,4 @@ lib/hm3/users/
 .env
 /data/
 /docker/data/
+/docker/site/

@@ -1,12 +1,11 @@
 'use strict';
 
-// Constants. To be used anywhere in the app via the window object.
-const globalVars = {
-    EMAIL_REGEX: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
-}
-Object.keys(globalVars).forEach(key => {
-    window[key] = globalVars[key];
-});
+/**
+ * NOTE: Tiki-Cypht integration dynamically removes everything from the begining of this file
+ * up to swipe_event function definition as it uses jquery (over cash.js) and has bootstrap
+ * framework already included. If you add code here that you wish to be included in Tiki-Cypht
+ * integration, add it below swipe_event function definition.
+ */
 
 /* extend cash.js with some useful bits */
 $.inArray = function(item, list) {
@@ -85,6 +84,15 @@ var swipe_event = function(el, callback, direction) {
         }
     }, false);
 };
+
+// Constants. To be used anywhere in the app via the window object.
+const globalVars = {
+    EMAIL_REGEX: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+}
+Object.keys(globalVars).forEach(key => {
+    window[key] = globalVars[key];
+});
+
 
 /* ajax multiplexer */
 var Hm_Ajax = {

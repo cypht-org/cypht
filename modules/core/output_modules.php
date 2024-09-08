@@ -16,12 +16,12 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<li class="menu_search"><form method="get">';
-        $res .= '<div class="d-flex align-items-center">';
+        $res .= '<div class="d-flex bd-highlight">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
             $res .= '<i class="bi bi-search"></i></a></div>';
         }
-        $res .= '<div class=""><input type="hidden" name="page" value="search" />'.
+        $res .= '<div class="flex-fill bd-highlight"><input type="hidden" name="page" value="search" />'.
             '<input type="search" class="search_terms form-control form-control-sm" '.
             'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
         if ($this->format == 'HTML5') {
@@ -2159,7 +2159,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                       <div class="server_count">'.$configuredText.'</div>
                   </div>
              <div class="server_config_section px-4 pt-3 me-0">
-                <div class="stepper col-12 col-lg-4 mb-4" id="srv_setup_stepper_stepper">
+                <div class="stepper col-12 col-xl-7 mb-4" id="srv_setup_stepper_stepper">
                     <div class="step-container">
                         <div id="step_config_1" class="step step_config">
                             <div class="step_config-title">

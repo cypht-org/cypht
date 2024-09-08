@@ -60,7 +60,7 @@ class Hm_Auth_DB extends Hm_Auth {
     /* bool flag indicating this is an internal user setup */
     static public $internal_users = true;
 
-    /* database conneciton handle */
+    /* database connection handle */
     public $dbh;
 
     /**

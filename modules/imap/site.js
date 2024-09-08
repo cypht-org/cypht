@@ -536,7 +536,9 @@ var prefetch_imap_folders = function() {
         function(res) { 
             $('#imap_prefetch_ids').val(ids.join(',')); 
             prefetch_imap_folders();
-            expand_imap_mailbox(res);
+            if ($('.email_folders ul.folders li').length == 1) {
+                expand_imap_mailbox(res);
+            }
         },
         [],
         true

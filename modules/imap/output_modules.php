@@ -489,18 +489,18 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
 
-            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-xl-4 col-lg-4 col-md-6  ">';
+            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4  ">';
 
             // IMAP Username
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
             $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('IMAP username').'</label></div>';
-            $res .= '</div><div class="col-xl-4 col-lg-4 col-md-6">';
+            $res .= '</div><div class="col-md-6 col-lg-4">';
             // IMAP Password
             $res .= '<div class="form-floating">';
             $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
             $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('IMAP password').'</label></div>';
-            $res .= '</div><div class="col-xl-4 col-lg-4 col-md-6">';
+            $res .= '</div><div class="col-md-6 col-lg-4">';
 
             // Sieve Host (Conditional)
 
@@ -510,7 +510,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
-            $res .= '</div></div></div><div class="col-xl-3 col-lg-3  d-flex justify-content-start align-items-center">';
+            $res .= '</div></div></div><div class="col-lg-3 d-flex justify-content-start align-items-center">';
 
             // Buttons
             $disabled = isset($vals['default']) ? ' disabled': '';
