@@ -69,11 +69,11 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
-        $lit_size = mb_strlen($literal_data);
+        $lit_size = strlen($literal_data);
         $current += $lit_size;
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
-            $chunk_size = mb_strlen($chunk);
+            $chunk_size = strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
             $literal_data .= $chunk;
@@ -85,10 +85,10 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
-                $lit_size += mb_strlen($temp);
+                $lit_size += strlen($temp);
             }
         }
-        elseif ($size < mb_strlen($literal_data)) {
+        elseif ($size < strlen($literal_data)) {
             $left_over = mb_substr($literal_data, $size);
             $literal_data = mb_substr($literal_data, 0, $size);
         }

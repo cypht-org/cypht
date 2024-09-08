@@ -497,7 +497,7 @@ function trim_email($val) {
 if (!hm_exists('addr_split')) {
 function addr_split($str, $seps = array(',', ';')) {
     $str = preg_replace('/(\s){2,}/', ' ', $str);
-    $max = mb_strlen($str);
+    $max = strlen($str);
     $word = '';
     $words = array();
     $capture = false;

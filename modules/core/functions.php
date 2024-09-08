@@ -180,7 +180,7 @@ function is_email_address($val, $allow_local=false) {
     $val = trim($val, "<>");
     $domain = false;
     $local = false;
-    if (!trim($val) || mb_strlen($val) > 320) {
+    if (!trim($val) || strlen($val) > 320) {
         return false;
     }
     if (mb_strpos($val, '@') !== false) {
@@ -213,8 +213,8 @@ function is_email_address($val, $allow_local=false) {
 if (!hm_exists('validate_domain_full')) {
 function validate_domain_full($val) {
     /* check for a dot, max allowed length and standard ASCII characters */
-    if (mb_strpos($val, '.') === false || mb_strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
-        $val[0] == '-' || $val[(mb_strlen($val) - 1)] == '-') {
+    if (mb_strpos($val, '.') === false || strlen($val) > 255 || preg_match("/[^A-Z0-9\-\.]/i", $val) ||
+        $val[0] == '-' || $val[(strlen($val) - 1)] == '-') {
         return false;
     }
     return true;
@@ -229,7 +229,7 @@ function validate_domain_full($val) {
 if (!hm_exists('validate_local_full')) {
 function validate_local_full($val) {
     /* check length, "." rules, and for characters > ASCII 127 */
-    if (mb_strlen($val) > 64 || $val[0] == '.' || $val[(mb_strlen($val) -1)] == '.' || mb_strstr($val, '..') ||
+    if (strlen($val) > 64 || $val[0] == '.' || $val[(strlen($val) -1)] == '.' || mb_strstr($val, '..') ||
         preg_match('/[^\x00-\x7F]/',$val)) {
         return false;
     }
