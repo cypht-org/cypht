@@ -267,7 +267,6 @@
     margin: 0;
     padding: 0;
     width: 100%;
-    table-layout: fixed;
 }
 
 
@@ -277,7 +276,6 @@ table.sieve_list_conditions_modal caption {
 }
 
 table.sieve_list_conditions_modal tr {
-    background-color: #f8f8f8;
     border: 1px solid #ddd;
     padding: .35em;
 }
@@ -332,7 +330,6 @@ table.filter_actions_modal_table caption {
 }
 
 table.filter_actions_modal_table tr {
-    background-color: #f8f8f8;
     border: 1px solid #ddd;
     padding: .35em;
 }

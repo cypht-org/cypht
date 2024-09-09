@@ -645,7 +645,7 @@ $(function () {
                 '                                    <input type="text" name="sieve_selected_option_value[]" class="form-control form-control-sm" />' +
                 '                                </td>' +
                 '                                <td class="col-sm-1 text-end align-middle">' +
-                '                                    <a href="#" class="delete_condition_modal_button">Delete</a>' +
+                '                                    <a href="#" class="delete_condition_modal_button btn btn-sm btn-secondary">Delete</a>' +
                 '                                </td>' +
                 '                            </tr>'
             );
@@ -686,7 +686,7 @@ $(function () {
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td class="col-sm-1 text-end align-middle">' +
-                '           <a href="#" class="delete_action_modal_button">Delete</a>' +
+                '           <a href="#" class="delete_action_modal_button btn btn-sm btn-secondary">Delete</a>' +
                 '    </td>' +
                 '</tr>'
             );
