@@ -69,11 +69,11 @@ class Hm_IMAP_Base {
     private function read_literal($size, $max, $current, $line_length) {
         $left_over = false;
         $literal_data = $this->fgets($line_length);
-        $lit_size = mb_strlen($literal_data);
+        $lit_size = strlen($literal_data);
         $current += $lit_size;
         while ($lit_size < $size) {
             $chunk = $this->fgets($line_length);
-            $chunk_size = mb_strlen($chunk);
+            $chunk_size = strlen($chunk);
             $lit_size += $chunk_size;
             $current += $chunk_size;
             $literal_data .= $chunk;
@@ -85,12 +85,12 @@ class Hm_IMAP_Base {
         if ($this->max_read) {
             while ($lit_size < $size) {
                 $temp = $this->fgets($line_length);
-                $lit_size += mb_strlen($temp);
+                $lit_size += strlen($temp);
             }
         }
-        elseif ($size < mb_strlen($literal_data)) {
-            $left_over = mb_substr($literal_data, $size);
-            $literal_data = mb_substr($literal_data, 0, $size);
+        elseif ($size < strlen($literal_data)) {
+            $left_over = substr($literal_data, $size);
+            $literal_data = substr($literal_data, 0, $size);
         }
         return array($literal_data, $left_over);
     }
@@ -122,27 +122,29 @@ class Hm_IMAP_Base {
         /* walk through the line */
         for ($i=0;$i<$len;$i++) {
 
+            $char = mb_substr($line, $i, 1);
+
             /* this will hold one "atom" from the parsed line */
             $chunk = '';
 
             /* if we hit a newline exit the loop */
-            if ($line[$i] == "\r" || $line[$i] == "\n") {
+            if ($char == "\r" || $char == "\n") {
                 $line_cont = false;
                 break;
             }
 
             /* skip spaces */
-            if ($line[$i] == ' ') {
+            if ($char == ' ') {
                 continue;
             }
 
             /* capture special chars as "atoms" */
-            elseif ($line[$i] == '*' || $line[$i] == '[' || $line[$i] == ']' || $line[$i] == '(' || $line[$i] == ')') {
-                $chunk = $line[$i];
+            elseif ($char == '*' || $char == '[' || $char == ']' || $char == '(' || $char == ')') {
+                $chunk = $char;
             }
 
             /* regex match a quoted string */
-            elseif ($line[$i] == '"') {
+            elseif ($char == '"') {
                 if (preg_match("/^(\"[^\"\\\]*(?:\\\.[^\"\\\]*)*\")/", mb_substr($line, $i), $matches)) {
                     $chunk = mb_substr($matches[1], 1, -1);
                 }
@@ -150,7 +152,7 @@ class Hm_IMAP_Base {
             }
 
             /* IMAP literal */
-            elseif ($line[$i] == '{') {
+            elseif ($char == '{') {
                 $end = mb_strpos($line, '}');
                 if ($end !== false) {
                     $literal_size  = mb_substr($line, ($i + 1), ($end - $i - 1));
@@ -218,13 +220,14 @@ class Hm_IMAP_Base {
      * loop through "lines" returned from imap and parse them with parse_line() and read_literal.
      * it can return the lines in a raw format, or parsed into atoms. It also supports a maximum
      * number of lines to return, in case we did something stupid like list a loaded unix homedir
+     * used by scram lib, so keep it public
      * @param int $max max size of response allowed
      * @param bool $chunked flag to parse the data into IMAP "atoms"
      * @param int $line_length chunk size to read in literals using fgets
      * @param bool $sort flag for non-compliant sort result parsing speed up
      * @return array of parsed or raw results
      */
-    protected function get_response($max=false, $chunked=false, $line_length=8192, $sort=false) {
+    public function get_response($max=false, $chunked=false, $line_length=8192, $sort=false) {
         /* defaults and results containers */
         $result = array();
         $current_size = 0;
@@ -356,11 +359,12 @@ class Hm_IMAP_Base {
 
     /**
      * put a prefix on a command and send it to the server
+     * used by scram lib, so keep it public
      * @param mixed $command IMAP command
      * @param bool $no_prefix flag to skip adding the prefix
      * @return void
      */
-    protected function send_command($command, $no_prefix=false) {
+    public function send_command($command, $no_prefix=false) {
         $this->cached_response = false;
         if (!$no_prefix) {
             $command = 'A'.$this->command_number().' '.$command;

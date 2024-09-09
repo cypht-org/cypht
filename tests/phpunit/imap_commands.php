@@ -116,7 +116,7 @@ return array(
     'A5 NOOP' =>
         "* 23 EXISTS\r\n".
         "A5 OK NOOP Completed\r\n",
-    'A8 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)])' =>
+    'A8 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)])' =>
         "* 92 FETCH (UID 1731 FLAGS (\Seen) INTERNALDATE \"02-May-2017 16:32:24 -0500\" RFC822.SIZE 1940 BODY[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)] {240}\r\n".
         "Subject: =?utf-8?q?apt-listchanges=3A_news_for_shop?=\r\n".
         "To: root@shop.jackass.com\r\n".
@@ -137,7 +137,7 @@ return array(
         ")\r\n".
         "A5 OK Fetch completed (0.001 + 0.000 secs).\r\n",
 
-    'A5 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)])' =>
+    'A5 UID FETCH 1731,1732 (FLAGS INTERNALDATE RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)])' =>
         "* 92 FETCH (UID 1731 FLAGS (\Seen) INTERNALDATE \"02-May-2017 16:32:24 -0500\" RFC822.SIZE 1940 BODY[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID)] {240}\r\n".
         "Subject: =?utf-8?q?apt-listchanges=3A_news_for_shop?=\r\n".
         "To: root@shop.jackass.com\r\n".
@@ -194,7 +194,7 @@ return array(
         "* SEARCH 1680 1682\r\n".
         "A5 OK Search completed (0.007 + 0.000 + 0.006 secs).\r\n",
 
-    'A5 UID FETCH 1731 (FLAGS BODY[HEADER])' =>
+    'A5 UID FETCH 1731 (FLAGS INTERNALDATE BODY[HEADER])' =>
         "* 92 FETCH (UID 1731 FLAGS (\Seen) BODY[HEADER] {623}\r\n".
         "Return-path: <root@shop.jackass.com>\r\n".
         "Envelope-to: root@shop.jackass.com\r\n".
@@ -316,4 +316,10 @@ return array(
 
     'A5 COMPRESS DEFLATE' =>
         "A5 OK DEFLATE active\r\n",
+
+    'A5 TEST MULTIBYTE' =>
+        "A1 OK {12}\r\n".
+        "Literäääl\r\n".
+        "A2 OK {7}\r\n".
+        "Literal\r\n",
 );
