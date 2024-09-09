@@ -233,17 +233,17 @@ $(function () {
             );
         });
 
-        $(document).on('click', '#edit_blocked_behavior', function(e) {
+        $(document).on('click', '.edit_blocked_behavior', function(e) {
             e.preventDefault();
             let parent = $(this).closest('tr');
-            let elem = parent.find('#block_action');
+            let elem = parent.find('.block_action');
             let sender = $(this).closest('tr').children().first().html();
             let scope = sender.startsWith('*@') ? 'domain': 'sender';
 
             Hm_Ajax.request(
                 [
                     {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_unblock'},
-                    {'name': 'imap_server_id', 'value': $(this).data('mailbox-id')},
+                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
                     {'name': 'block_action', 'value': elem.val()},
                     {'name': 'scope', 'value': scope},
                     {'name': 'sender', 'value': sender},
@@ -276,7 +276,7 @@ $(function () {
             let elem = $(this);
             Hm_Ajax.request(
                 [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
-                    {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
+                    {'name': 'imap_server_id', 'value': $(this).attr('data-mailbox_id')},
                     {'name': 'sender', 'value': sender}
                 ],
                 function(res) {
