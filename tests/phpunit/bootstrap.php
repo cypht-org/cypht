@@ -12,6 +12,7 @@ if (!defined('DEBUG_MODE')) {
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
 define('WEB_ROOT', '');
+define('CONFIG_PATH', APP_PATH.'config/');
 
 /* random id */
 define('SITE_ID', 'randomid');
@@ -33,3 +34,8 @@ $user_config = new Hm_User_Config_File($mock_config);
 $session = new Hm_PHP_Session($mock_config, 'Hm_Auth_DB');
 Hm_Server_Wrapper::init($user_config, $session);
 Hm_Tags_Wrapper::init($user_config, $session);
+
+$environment = Hm_Environment::getInstance();
+$environment->load('.env.example');
+/* set the default since and per_source values */
+$environment->define_default_constants($mock_config);

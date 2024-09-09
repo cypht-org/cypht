@@ -89,7 +89,7 @@ class Hm_Handler_process_imap_per_page_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('imap_per_page', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('imap_per_page', $this, 'max_source_setting_callback', DEFAULT_IMAP_PER_PAGE);
     }
 }
 
@@ -115,7 +115,7 @@ class Hm_Handler_process_sent_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('sent_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('sent_per_source', $this, 'max_source_setting_callback', DEFAULT_SENT_PER_SOURCE);
     }
 }
 
@@ -163,7 +163,7 @@ class Hm_Handler_process_simple_msg_parts extends Hm_Handler_Module {
         function simple_msg_view_callback($val) {
             return $val;
         }
-        process_site_setting('simple_msg_parts', $this, 'simple_msg_view_callback', true, true);
+        process_site_setting('simple_msg_parts', $this, 'simple_msg_view_callback', DEFAULT_SIMPLE_MSG_PARTS, true);
     }
 }
 
@@ -179,7 +179,7 @@ class Hm_Handler_process_pagination_links extends Hm_Handler_Module {
         function pagination_links_callback($val) {
             return $val;
         }
-        process_site_setting('pagination_links', $this, 'pagination_links_callback', true, true);
+        process_site_setting('pagination_links', $this, 'pagination_links_callback', DEFAULT_PAGINATION_LINKS, true);
     }
 }
 
@@ -211,7 +211,7 @@ class Hm_Handler_process_msg_part_icons extends Hm_Handler_Module {
         function msg_part_icons_callback($val) {
             return $val;
         }
-        process_site_setting('msg_part_icons', $this, 'msg_part_icons_callback', false, true);
+        process_site_setting('msg_part_icons', $this, 'msg_part_icons_callback', DEFAULT_MSG_PART_ICONS, true);
     }
 }
 
@@ -227,7 +227,7 @@ class Hm_Handler_process_text_only_setting extends Hm_Handler_Module {
         function text_only_callback($val) {
             return $val;
         }
-        process_site_setting('text_only', $this, 'text_only_callback', false, true);
+        process_site_setting('text_only', $this, 'text_only_callback', DEFAULT_TEXT_ONLY, true);
     }
 }
 
@@ -240,7 +240,7 @@ class Hm_Handler_process_sent_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('sent_since', $this, 'since_setting_callback');
+        process_site_setting('sent_since', $this, 'since_setting_callback',DEFAULT_SENT_SINCE);
     }
 }
 
@@ -670,8 +670,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
             }
             elseif ($path == 'sent') {
                 $this->out('mailbox_list_title', array('Sent'));
-                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_PER_SOURCE));
-                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_SENT_PER_SOURCE));
+                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SENT_SINCE));
                 $this->out('custom_list_controls_type', 'add');
                 if (array_key_exists('keyword', $this->request->get)) {
                     $this->out('list_keyword', $this->request->get['keyword']);
@@ -1278,7 +1278,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $terms = $this->session->get('search_terms', false);
-            $since = $this->session->get('search_since', DEFAULT_SINCE);
+            $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
             $fld = $this->session->get('search_fld', 'TEXT');
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($since);
@@ -1306,12 +1306,12 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
-                $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
+                $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_ALL_EMAIL_SINCE));
             }
             else {
-                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
             }
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
@@ -1337,9 +1337,9 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
+            $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
-            $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_SINCE));
+            $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
@@ -1395,8 +1395,8 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
+            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $msg_list = array();
             $folder = bin2hex('INBOX');
@@ -1789,7 +1789,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
 
             $sieve_enabled = false;
-            if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', true)) {
+            if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                 if (!isset($this->request->post['imap_sieve_host'])) {
                     foreach ($this->get('imap_servers', array()) as $index => $vals) {
                         if ($index == $form['imap_server_id']) {
@@ -2011,7 +2011,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $this->out('imap_prefecth', $prefetch);
                     $this->out('imap_msg_part', "$part");
                     $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
-                    $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', true));
+                    $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', DEFAULT_SIMPLE_MSG_PARTS));
                     $this->out('allow_delete_attachment', $this->user_config->get('allow_delete_attachment_setting', false));
                     if ($msg_struct_current) {
                         $this->out('msg_struct_current', $msg_struct_current);
@@ -2135,7 +2135,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         if ($success) {
             $path = $this->request->get['list_path'];
             $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
+            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {

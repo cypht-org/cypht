@@ -1815,82 +1815,28 @@ var hl_save_link = function() {
 };
 
 var reset_default_value_checkbox = function() {
-    let checkbox = this.parentElement.parentElement.firstChild;
-    if (checkbox.disabled == false) {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        checkbox.setAttribute("current_value", checkbox.checked);
-        checkbox.checked = !checkbox.checked;
-        checkbox.disabled = true;
-    }
-    else {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        checkbox.checked = checkbox.getAttribute("current_value") == "true" ? true : false;
-        checkbox.disabled = false;
-    }
+    var checkbox = $(this).closest('.tooltip_restore').prev('input[type="checkbox"]');
+    var default_value = checkbox.data('default-value');
+    default_value = (default_value === 'true');
+    checkbox.prop('checked', default_value);
+    checkbox.prop('disabled', true);
 };
 
+var reset_default_timezone = function() {
+    var hm_default_timezone = window.hm_default_timezone;
+    $('#timezone').val(hm_default_timezone);
+}
 var reset_default_value_select = function() {
-    let field = this.parentElement.parentElement.firstChild;
-    let tab_static_default_value = {"inline_message_style" : 0, "smtp_compose_type" : 0, "theme_setting" : 0,
-    "timezone" : 0, "list_style" : 0, "idle_time" : 4, "start_page" : 0, "default_sort_order" : 0,
-    "unread_since" : 1, "flagged_since" : 1, "all_since" : 1, "all_email_since" : 1, "feed_since" : 0,
-    "sent_since" : 1};
-
-    if (this.style.transform == "scaleX(1)") {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        field.selectedIndex = field.getAttribute("current_value");
-        field.style.backgroundColor = "#fff";
-        field.style.pointerEvents = "auto";
-        field.style.touchAction = "auto";
-    }
-    else {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        field.setAttribute("current_value", field.selectedIndex);
-        if (field.getAttribute("name") == "language") {
-            for(let compter = 0; field.length > compter; compter ++){
-                if (field.options[compter].getAttribute("value") == "en") {
-                    field.selectedIndex = field.options[compter].index;
-                }
-            }
-        }
-        else {
-            field.selectedIndex = tab_static_default_value[field.getAttribute("name")];
-        }
-        field.style.backgroundColor = "#eee";
-        field.style.pointerEvents = "none";
-        field.style.touchAction = "none";
-    }
-};
+    var dropdown = $(this).closest('.tooltip_restore').prev('select');
+    var default_value = dropdown.data('default-value');
+    dropdown.val(default_value);
+}
 
 var reset_default_value_input = function() {
-    let field = this.parentElement.parentElement.firstChild;
-    const defaultValue = this.getAttribute("default-value");
-
-    if (this.style.transform == "scaleX(1)") {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        field.value = field.getAttribute("current_value");
-        field.style.backgroundColor = "#fff";
-        field.style.pointerEvents = "auto";
-        field.style.touchAction = "auto";
-    }
-    else {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        field.setAttribute("current_value", field.value);
-        field.value = 20;
-        if(defaultValue) {
-            field.value = defaultValue;
-        }
-        field.style.backgroundColor = "#eee";
-        field.style.pointerEvents = "none";
-        field.style.touchAction = "none";
-    }
-};
+    var inputField = $(this).closest('.tooltip_restore').prev('input');
+    var default_value = inputField.data('default-value');
+    inputField.val(default_value);
+}
 
 var decrease_servers = function(section) {
     const element = document.querySelector(`.server_count .${section}_server_count`);
@@ -2055,6 +2001,7 @@ $(function() {
         $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
+        $('.reset_default_timezone').on("click", reset_default_timezone);
     }
 
     if (hm_check_dirty_flag()) {

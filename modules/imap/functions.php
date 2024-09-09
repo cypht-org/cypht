@@ -20,7 +20,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 if (!hm_exists('imap_sources')) {
 function imap_sources($callback, $mod, $folder = 'sent') {
-    $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
+    $inbox = $mod->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
     $sources = array();
     $folder = $folder == 'drafts' ? 'draft': $folder;
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -1560,7 +1560,7 @@ if (!hm_exists('connect_to_imap_server')) {
         if ($enableSieve &&
             $imap_sieve_host &&
             $context->module_is_supported('sievefilters') &&
-            $context->user_config->get('enable_sieve_filter_setting', true)) {
+            $context->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
             try {
 
                 include APP_PATH.'modules/sievefilters/hm-sieve.php';

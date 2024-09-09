@@ -20,7 +20,7 @@ class Hm_Handler_load_theme  extends Hm_Handler_Module
 {
     public function process()
     {
-        $theme = $this->user_config->get('theme_setting', 'default');
+        $theme = $this->user_config->get('theme_setting', DEFAULT_THEME);
         $themes = custom_themes($this->config, hm_themes());
         if ($theme == 'hn') {
             $this->user_config->set('list_style', 'news_style');
@@ -45,7 +45,7 @@ class Hm_Handler_process_theme_setting extends Hm_Handler_Module
         if ($success) {
             $new_settings['theme_setting'] = $form['theme_setting'];
         } else {
-            $settings['theme'] = $this->user_config->get('theme_setting', 'default');
+            $settings['theme'] = $this->user_config->get('theme_setting', DEFAULT_THEME);
         }
         $this->out('new_user_settings', $new_settings, false);
         $this->out('user_settings', $settings, false);
@@ -82,10 +82,10 @@ class Hm_Output_theme_setting extends Hm_Output_Module
     protected function output()
     {
 
-        $current = $this->get('theme', '');
+        $current = $this->get('theme', DEFAULT_THEME);
         $res = '<tr class="general_setting"><td><label for="theme_setting">' .
             $this->trans('Theme') . '</label></td>' .
-            '<td><select class="form-select form-select-sm" id="theme_setting" name="theme_setting">';
+            '<td><select class="form-select form-select-sm" id="theme_setting" name="theme_setting" data-default-value="'.DEFAULT_THEME.'">';
         $reset = '';
         foreach ($this->get('themes', array()) as $name => $label) {
             $res .= '<option ';
