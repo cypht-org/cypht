@@ -58,6 +58,8 @@ class Hm_IMAP_Base {
 
     /**
      * Read IMAP literal found during parse_line().
+     * NOTE: it is important to treat sizes and string functions
+     * in bytes here as literal size is specified in bytes (and not characters). 
      * @param int $size size of the IMAP literal to read
      * @param int $max max size to allow
      * @param int $current current size read
