@@ -64,11 +64,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <h5 class="mt-0">Conditions</h5>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <button class="sieve_add_condition_modal_button btn btn-sm border bg-white">Add Condition</button>
+                            <button class="sieve_add_condition_modal_button btn btn-sm border btn-primary">Add Condition</button>
                         </div>
                     </div>
-                    <div class="d-block mt-3">
-                        <table class="sieve_list_conditions_modal">
+                    <div class="d-block mt-3 table-responsive">
+                        <table class="sieve_list_conditions_modal table">
                         </table>
                     </div>
                 </div>
@@ -79,11 +79,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <h5 class="mt-0">Actions</h5>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <button class="filter_modal_add_action_btn btn btn-sm  border bg-white">Add Action</button>
+                            <button class="filter_modal_add_action_btn btn btn-sm border btn-primary">Add Action</button>
                         </div>
                     </div>
-                    <div class="d-block mt-3">
-                        <table class="filter_actions_modal_table">
+                    <div class="d-block mt-3 table-responsive">
+                        <table class="filter_actions_modal_table table">
                         </table>
                     </div>
                 </div>

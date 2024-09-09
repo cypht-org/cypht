@@ -718,10 +718,12 @@ function Message_List() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('d-flex');
             $('.msg_controls').removeClass('d-none');
+            $('.mailbox_list_title').addClass('hide');
         }
         else {
             $('.msg_controls').removeClass('d-flex');
             $('.msg_controls').addClass('d-none');
+            $('.mailbox_list_title').removeClass('hide');
         }
     };
 

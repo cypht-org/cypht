@@ -632,4 +632,6 @@ return array(
     'Server capabilities' => false,
     'Capabilities' => false,
     'Screen %s first emails' => false,
+    'Please pick a valid date/time' => false,
+    'Snoozing messages...' => false,
 );

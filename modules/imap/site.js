@@ -1135,27 +1135,30 @@ var imap_setup_tags = function() {
 }
 
 var imap_setup_snooze = function() {
+    flatpickr('.snooze_input_date', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        time_24hr: true,
+        minDate: 'today',
+        appendTo: document.body,
+        onOpen: function(selectedDates, dateStr, instance) {
+            instance.calendarContainer.classList.add('centered-calendar');
+        },
+        onClose: function(selectedDates, dateStr, instance) {            
+            if (dateStr && new Date().getTime() < new Date(dateStr).getTime()) {
+                $('.snooze_input').val(dateStr).trigger('change');
+            } else {
+                Hm_Utils.add_sys_message(hm_trans('Please pick a valid date/time'));
+            }
+        }
+    });
     $(document).on('click', '.snooze_date_picker', function(e) {
-        document.querySelector('.snooze_input_date').showPicker();
+        $('.snooze_input_date').trigger('click');
+        $(this).closest('.dropdown-menu').removeClass('show');
     });
     $(document).on('click', '.snooze_helper', function(e) {
         e.preventDefault();
         $('.snooze_input').val($(this).attr('data-value')).trigger('change');
-    });
-    $(document).on('input', '.snooze_input_date', function(e) {
-        var now = new Date();
-        now.setMinutes(now.getMinutes() + 1);
-        $(this).attr('min', now.toJSON().slice(0, 16));
-        if (new Date($(this).val()).getTime() <= now.getTime()) {
-            $('.snooze_date_picker').css('border', '1px solid red');
-        } else {
-            $('.snooze_date_picker').css({'border': 'unset', 'border-top': '1px solid #ddd'});
-        }
-    });
-    $(document).on('change', '.snooze_input_date', function(e) {
-        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.snooze_input').val($(this).val()).trigger('change');
-        }
     });
     $(document).on('change', '.snooze_input', function(e) {
         $('.snooze_dropdown').hide();
@@ -1174,6 +1177,7 @@ var imap_setup_snooze = function() {
                 return;
             };
         }
+        Hm_Utils.add_sys_message(hm_trans('Snoozing messages...'));
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
             {'name': 'imap_snooze_ids', 'value': ids},
@@ -1257,7 +1261,7 @@ $(function() {
 
     if ($('.imap_move').length > 0) {
         check_select_for_imap();
-        $('.toggle_link').on("click", function() {  $('.mailbox_list_title').toggleClass('hide'); setTimeout(search_selected_for_imap, 100); });
+        $('.toggle_link').on("click", function() { setTimeout(search_selected_for_imap, 100); });
         Hm_Ajax.add_callback_hook('ajax_imap_folder_display', check_select_for_imap);
         Hm_Message_List.callbacks.push(check_select_for_imap);
         $('.imap_move').on("click", function() { return false; });

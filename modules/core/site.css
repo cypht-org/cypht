@@ -385,7 +385,6 @@ button {
 .inner_list li {
   padding: 4px;
   padding-left: 10px;
-  color: #555;
   padding-bottom: 0px;
   margin: 2px;
   white-space: nowrap;
@@ -1365,4 +1364,13 @@ div.unseen,
 }
 .mobile .credentials-container .form-floating {
   margin-bottom: 7px;
+}
+.centered-calendar {
+  position: fixed;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  z-index: 1000 !important;  /* Ensure it appears above other content */
+  background: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
