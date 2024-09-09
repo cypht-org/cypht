@@ -325,7 +325,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
-            if ($idx == $this->request->post['imap_server_id']) {
+            if ($idx == $form['imap_server_id']) {
                 $imap_account = $mailbox;
             }
         }
@@ -337,8 +337,8 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
 
         $default_behaviour = 'Discard';
         if ($this->user_config->get('sieve_block_default_behaviour')) {
-            if (array_key_exists($this->request->post['imap_server_id'], $this->user_config->get('sieve_block_default_behaviour'))) {
-                $default_behaviour = $this->user_config->get('sieve_block_default_behaviour')[$this->request->post['imap_server_id']];
+            if (array_key_exists($form['imap_server_id'], $this->user_config->get('sieve_block_default_behaviour'))) {
+                $default_behaviour = $this->user_config->get('sieve_block_default_behaviour')[$form['imap_server_id']];
             }
         }
 
@@ -359,7 +359,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             $unblock_sender = false;
             if ($current_script != '') {
                 $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-                $blocked_list = json_decode(base64_decode($base64_obj));
+                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)));
                 foreach ($blocked_list as $blocked_sender) {
                     if ($blocked_sender != $email_sender) {
                         $blocked_senders[] = $blocked_sender;
@@ -439,7 +439,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope'));
+        list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope', 'imap_msg_uid'));
 
         if (!$success) {
             return;
