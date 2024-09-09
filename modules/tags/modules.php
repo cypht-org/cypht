@@ -103,8 +103,8 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('tag_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('tag_since_setting', DEFAULT_SINCE));
+            $limit = $this->user_config->get('tag_per_source_setting', DEFAULT_TAGS_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('tag_since_setting', DEFAULT_TAGS_SINCE));
             $tag_id = $this->request->get['tag_id'];
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
@@ -128,7 +128,7 @@ class Hm_Handler_process_tag_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('tag_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('tag_per_source', $this, 'max_source_setting_callback', DEFAULT_TAGS_PER_SOURCE);
     }
 }
 
@@ -162,18 +162,18 @@ class Hm_Output_tag_per_source_setting extends Hm_Output_Module {
      * Processed by Hm_Handler_process_tag_source_max_setting
      */
     protected function output() {
-        $sources = DEFAULT_PER_SOURCE;
+        $sources = DEFAULT_TAGS_PER_SOURCE;
         $settings = $this->get('user_settings', array());
         $reset = '';
         if (array_key_exists('tag_per_source', $settings)) {
             $sources = $settings['tag_per_source'];
         }
-        if ($sources != 20) {
+        if ($sources != DEFAULT_TAGS_PER_SOURCE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="tag_setting"><td><label for="tag_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
-            '<td class="d-flex"><input type="text" size="2" class="form-control form-control-sm w-auto" id="tag_per_source" name="tag_per_source" value="'.$this->html_safe($sources).'" />'.$reset.'</td></tr>';
+            '<td class="d-flex"><input type="text" size="2" class="form-control form-control-sm w-auto" id="tag_per_source" name="tag_per_source" value="'.$this->html_safe($sources).'" data-default-value="'.DEFAULT_TAGS_PER_SOURCE.'"/>'.$reset.'</td></tr>';
     }
 }
 
@@ -216,14 +216,14 @@ class Hm_Output_tag_since_setting extends Hm_Output_Module {
      * Processed by Hm_Handler_process_tag_since_setting
      */
     protected function output() {
-        $since = DEFAULT_SINCE;
+        $since = DEFAULT_TAGS_SINCE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('tag_since', $settings) && $settings['tag_since']) {
             $since = $settings['tag_since'];
         }
         return '<tr class="tag_setting"><td><label for="tag_since">'.
             $this->trans('Show junk messages since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'tag_since', $this).'</td></tr>';
+            '<td>'.message_since_dropdown($since, 'tag_since', $this, DEFAULT_TAGS_SINCE).'</td></tr>';
     }
 }
 

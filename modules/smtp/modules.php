@@ -229,7 +229,7 @@ class Hm_Handler_smtp_default_server extends Hm_Handler_Module {
 class Hm_Handler_process_compose_type extends Hm_Handler_Module {
     public function process() {
         function smtp_compose_type_callback($val) { return $val; }
-        process_site_setting('smtp_compose_type', $this, 'smtp_compose_type_callback');
+        process_site_setting('smtp_compose_type', $this, 'smtp_compose_type_callback', DEFAULT_SMTP_COMPOSE_TYPE);
     }
 }
 
@@ -239,7 +239,7 @@ class Hm_Handler_process_compose_type extends Hm_Handler_Module {
 class Hm_Handler_process_auto_bcc extends Hm_Handler_Module {
     public function process() {
         function smtp_auto_bcc_callback($val) { return $val; }
-        process_site_setting('smtp_auto_bcc', $this, 'smtp_auto_bcc_callback', false, true);
+        process_site_setting('smtp_auto_bcc', $this, 'smtp_auto_bcc_callback', DEFAULT_SMTP_AUTO_BCC, true);
     }
 }
 
@@ -392,7 +392,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
         }
 
         $this->out('uploaded_files', get_uploaded_files($draft_id, $this->session));
-        $compose_type = $this->user_config->get('smtp_compose_type_setting', 0);
+        $compose_type = $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE);
         if ($this->get('is_mobile', false)) {
             $compose_type = 0;
         }
@@ -700,7 +700,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $smtp_id = server_from_compose_smtp_id($form['compose_smtp_id']);
         $to = $form['compose_to'];
         $subject = $form['compose_subject'];
-        $body_type = $this->get('smtp_compose_type', 0);
+        $body_type = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
         $draft = array(
             'draft_to' => $form['compose_to'],
             'draft_body' => '',
@@ -781,7 +781,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* check for auto-bcc */
-        $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', false);
+        $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
             $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
@@ -858,7 +858,7 @@ class Hm_Handler_smtp_auto_bcc_check extends Hm_Handler_Module {
      * Set the auto bcc state for output modules to use
      */
     public function process() {
-        $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', 0));
+        $this->out('auto_bcc_enabled', $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC));
     }
 }
 
@@ -939,7 +939,12 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            if(!$settings['enable_attachment_reminder']) {
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            }
+            else {
+                $reset='';
+            }
         }
         else {
             $checked = '';
@@ -948,7 +953,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_attachment_reminder">'.
             $this->trans('Enable Attachment Reminder').'</label></td>'.
             '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" />'.$reset.'</td></tr>';
+            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1048,7 +1053,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $reply = $this->get('reply_details', array());
         $imap_draft = $this->get('imap_draft', array());
         $reply_type = $this->get('reply_type', '');
-        $html = $this->get('smtp_compose_type', 0);
+        $html = $this->get('smtp_compose_type', DEFAULT_SMTP_COMPOSE_TYPE);
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
@@ -1343,13 +1348,13 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
  */
 class Hm_Output_compose_type_setting extends Hm_Output_Module {
     protected function output() {
-        $selected = 2;
+        $selected = DEFAULT_SMTP_COMPOSE_TYPE;
         $settings = $this->get('user_settings', array());
         $reset = '';
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -1375,12 +1380,12 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
  */
 class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
     protected function output() {
-        $auto = false;
+        $auto = DEFAULT_SMTP_AUTO_BCC;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('smtp_auto_bcc', $settings)) {
             $auto = $settings['smtp_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"';
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';

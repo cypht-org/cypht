@@ -17,7 +17,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_process_wordpress_since_setting extends Hm_Handler_Module {
     public function process() {
-        process_site_setting('wordpress_since', $this, 'since_setting_callback');
+        process_site_setting('wordpress_since', $this, 'since_setting_callback', DEFAULT_WORDPRESS_SINCE);
     }
 }
 
@@ -27,7 +27,7 @@ class Hm_Handler_process_wordpress_since_setting extends Hm_Handler_Module {
 class Hm_Handler_process_unread_wp_included extends Hm_Handler_Module {
     public function process() {
         function unread_wp_setting_callback($val) { return $val; }
-        process_site_setting('unread_exclude_wordpress', $this, 'unread_wp_setting_callback', false, true);
+        process_site_setting('unread_exclude_wordpress', $this, 'unread_wp_setting_callback', DEFAULT_UNREAD_EXCLUDE_WORDPRESS, true);
     }
 }
 
@@ -82,7 +82,7 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
         }
         if ($path == 'combined_inbox' || $path == 'unread') {
             $excluded = false;
-            if ($path == 'unread' && $this->user_config->get('unread_exclude_wordpress_setting', false)) {
+            if ($path == 'unread' && $this->user_config->get('unread_exclude_wordpress_setting', DEFAULT_UNREAD_EXCLUDE_WORDPRESS)) {
                 $excluded = true;
             }
             if (!$excluded) {
@@ -145,7 +145,7 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('list_path', 'wp_notifications', false);
                 $this->out('list_parent', $parent);
                 $this->out('mailbox_list_title', array('WordPress.com Notifications'));
-                $this->out('message_list_since', $this->user_config->get('wordpress_since_setting', DEFAULT_SINCE));
+                $this->out('message_list_since', $this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE));
                 $this->out('per_source_limit', 100);
                 $this->append('data_sources', array('callback' => 'load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
@@ -170,13 +170,13 @@ class Hm_Handler_wp_notification_data extends Hm_Handler_Module {
         }
         $this->out('wp_notice_data', $res);
         if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'unread') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
+            $this->out('wp_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE)));
         }
         elseif (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'combined_inbox') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE)));
+            $this->out('wp_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE)));
         }
         elseif (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'wp_notifications') {
-            $this->out('wp_list_since', process_since_argument($this->user_config->get('wordpress_since_setting', DEFAULT_SINCE)));
+            $this->out('wp_list_since', process_since_argument($this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE)));
         }
     }
 }
@@ -403,13 +403,13 @@ class Hm_Output_start_wordpress_settings extends Hm_Output_Module {
  */
 class Hm_Output_wordpress_since_setting extends Hm_Output_Module {
     protected function output() {
-        $since = DEFAULT_SINCE;
+        $since = DEFAULT_WORDPRESS_SINCE;
         $settings = $this->get('user_settings');
         if (array_key_exists('wordpress_since', $settings) && $settings['wordpress_since']) {
             $since = $settings['wordpress_since'];
         }
         return '<tr class="wp_notifications_setting"><td><label for="wordpress_since">'.$this->trans('Show WordPress.com notices received since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'wordpress_since', $this).'</td></tr>';
+            '<td>'.message_since_dropdown($since, 'wordpress_since', $this, DEFAULT_WORDPRESS_SINCE).'</td></tr>';
     }
 }
 

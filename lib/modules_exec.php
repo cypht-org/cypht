@@ -246,7 +246,7 @@ class Hm_Module_Exec {
      * return array
      */
     public function get_current_language() {
-        $lang = $this->handler_response['language'] ?? 'en';
+        $lang = $this->handler_response['language'] ?? DEFAULT_SETTING_LANGUAGE;
         $strings = [];
         if (file_exists(APP_PATH."language/{$lang}.php")) {
             $strings = require APP_PATH."language/{$lang}.php";
@@ -260,7 +260,7 @@ class Hm_Module_Exec {
      */
     public function default_language() {
         if (!array_key_exists('language', $this->handler_response)) {
-            $default_lang = $this->site_config->get('default_language', false);
+            $default_lang = $this->site_config->get('default_language', DEFAULT_SETTING_LANGUAGE);
             if ($default_lang) {
                 $this->handler_response['language'] = $default_lang;
             }

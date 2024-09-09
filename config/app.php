@@ -980,259 +980,329 @@ return [
     | If set to true, passwords for email accounts will never be saved between logins
     | Defaults to false
     */
-    // 'default_setting_no_password_save' => env('DEFAULT_SETTING_NO_PASSWORD_SAVE', false),
+    'default_setting_no_password_save' => env('DEFAULT_SETTING_NO_PASSWORD_SAVE', false),
 
     /*
     |
     | Number of messages per page when viewing IMAP folders
     | Defaults to 20
     */
-    // 'default_setting_imap_per_page' => env('DEFAULT_SETTING_IMAP_PER_PAGE', 20),
+    'default_setting_imap_per_page' => env('DEFAULT_SETTING_IMAP_PER_PAGE', 20),
 
     /*
     |
     | Amount of IMAP message structure detail on the message view page
     | Defaults to full structure
     */
-    // 'default_setting_simple_msg_parts' => env('DEFAULT_SETTING_SIMPLE_MSG_PARTS', false),
+    'default_setting_simple_msg_parts' => env('DEFAULT_SETTING_SIMPLE_MSG_PARTS', false),
 
     /*
     |
     | Next and Previous emails on the message view page
     | Defaults to full structure
     */
-    // 'default_setting_pagination_links' => env('DEFAULT_SETTING_PAGINATE_LINKS', true),
+    'default_setting_pagination_links' => env('DEFAULT_SETTING_PAGINATE_LINKS', true),
 
     /*
     |
     | Show icons for each IMAP message part type
     | Defaults to true
     */
-    // 'default_setting_msg_part_icons' => env('DEFAULT_SETTING_MSG_PART_ICONS', true),
+    'default_setting_msg_part_icons' => env('DEFAULT_SETTING_MSG_PART_ICONS', true),
 
     /*
     |
     | Prefer text parts when viewing a message
     | Defaults to false
     */
-    // 'default_setting_text_only' => env('DEFAULT_SETTING_TEXT_ONLY', true),
+    'default_setting_text_only' => env('DEFAULT_SETTING_TEXT_ONLY', true),
 
     /*
     |
     | Per source max for the combined sent view
     | Defaults to 20
     */
-    // 'default_setting_sent_per_source' => env('DEFAULT_SETTING_SENT_PER_SOURCE', 20),
+    'default_setting_sent_per_source' => env('DEFAULT_SETTING_SENT_PER_SOURCE', 20),
 
     /*
     |
     | Per source time limit for the combined sent view
     | Defaults to 1 week
     */
-    // 'default_setting_sent_since' => env('DEFAULT_SETTING_SENT_SINCE', '-1 week'),
+    'default_setting_sent_since' => env('DEFAULT_SETTING_SENT_SINCE', '-1 week'),
+    
+    /*
+    |
+    | Per source time limit for junk page
+    | Defaults to 1 week
+    */
+    'default_setting_junk_since' => env('DEFAULT_SETTING_JUNK_SINCE', '-1 week'),
+
+        /*
+    |
+    | Per source number limit for junk page
+    | Defaults 20
+    */
+    'default_setting_junk_per_source' => env('DEFAULT_SETTING_JUNK_PER_SOURCE', 20),
+
+    /*
+    |
+    | Per source time limit for tags page
+    | Defaults to 1 week
+    */
+    'default_setting_tags_since' => env('DEFAULT_SETTING_TAGS_SINCE', '-1 week'),
+
+    /*
+    |
+    | Per source number limit for tags page
+    | Defaults 20
+    */
+    'default_setting_tags_per_source' => env('DEFAULT_SETTING_TAGS_PER_SOURCE', 20),
+
+    /*
+    |
+    | Per source time limit for trash page
+    | Defaults to 1 week
+    */
+    'default_setting_trash_since' => env('DEFAULT_SETTING_TRASH_SINCE', '-1 week'),
+
+    /*
+    |
+    | Per source number limit for trash page
+    | Defaults 20
+    */
+    'default_setting_trash_per_source' => env('DEFAULT_SETTING_TRASH_PER_SOURCE', 20),
+
+    /*
+    |
+    | Per source time limit for draft page
+    | Defaults to 1 week
+    */
+    'default_setting_draft_since' => env('DEFAULT_SETTING_DRAFT_SINCE', '-1 week'),
+
+    /*
+    |
+    | Per source number limit for draft page
+    | Defaults 20
+    */
+    'default_setting_draft_per_source' => env('DEFAULT_SETTING_DRAFT_PER_SOURCE', 20),
 
     /*
     |
     | Display source icons in message lists
     | Defaults to true
     */
-    // 'default_setting_show_list_icons' => env('DEFAULT_SETTING_SHOW_LIST_ICONS', true),
+    'default_setting_show_list_icons' => env('DEFAULT_SETTING_SHOW_LIST_ICONS', true),
 
     /*
     |
     | Redirect to this page on login
     | Defaults to none
     */
-    // 'default_setting_start_page' => env('DEFAULT_SETTING_START_PAGE', 'none'),
+    'default_setting_start_page' => env('DEFAULT_SETTING_START_PAGE', 'none'),
 
     /*
     |
     | Don't prompt when deleting something
     | Defaults to false
     */
-    // 'default_setting_disable_delete_prompt' => env('DEFAULT_SETTING_DISABLE_DELETE_PROMPT', false),
+    'default_setting_disable_delete_prompt' => env('DEFAULT_SETTING_DISABLE_DELETE_PROMPT', false),
 
     /*
     |
     | Hide icons in the folder list
     | Defaults to false
     */
-    // 'default_setting_no_folder_icons' => env('DEFAULT_SETTING_NO_FOLDER_ICONS', false),
+    'default_setting_no_folder_icons' => env('DEFAULT_SETTING_NO_FOLDER_ICONS', false),
 
     /*
     |
     | Source max for the all email combined view
     | Defaults to 20
     */
-    // 'default_setting_all_email_per_source' => env('DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE', 20),
+    'default_setting_all_email_per_source' => env('DEFAULT_SETTING_ALL_EMAIL_PER_SOURCE', 20),
 
     /*
     |
     | Per source time limit for the all email combined view
     | Defaults to 1 week
     */
-    // 'default_setting_all_email_since' => env('DEFAULT_SETTING_ALL_EMAIL_SINCE', '-1 week'),
+    'default_setting_all_email_since' => env('DEFAULT_SETTING_ALL_EMAIL_SINCE', '-1 week'),
 
     /*
     |
     | Per source time limit for the everything combined view
     | Defaults to 1 week
     */
-    // 'default_setting_all_since' => env('DEFAULT_SETTING_ALL_SINCE', '-1 week'),
+    'default_setting_all_since' => env('DEFAULT_SETTING_ALL_SINCE', '-1 week'),
 
     /*
     |
     | Per source max for the everything combined view
     | Defaults to 20
     */
-    // 'default_setting_all_per_source' => env('DEFAULT_SETTING_ALL_PER_SOURCE', 20),
+    'default_setting_all_per_source' => env('DEFAULT_SETTING_ALL_PER_SOURCE', 20),
 
     /*
     |
     | Per source max for the unread combined view
     | Defaults to 20
     */
-    // 'default_setting_unread_per_source' => env('DEFAULT_SETTING_UNREAD_PER_SOURCE', 20),
+    'default_setting_unread_per_source' => env('DEFAULT_SETTING_UNREAD_PER_SOURCE', 20),
 
     /*
     |
     | Per source max for the flagged combined view
     | Defaults to 20
     */
-    // 'default_setting_flagged_per_source' => env('DEFAULT_SETTING_FLAGGED_PER_SOURCE', 20),
+    'default_setting_flagged_per_source' => env('DEFAULT_SETTING_FLAGGED_PER_SOURCE', 20),
 
     /*
     |
     | Per source time limit for the flagged combined view
     | Defaults to 1 week
     */
-    // 'default_setting_flagged_since' => env('DEFAULT_SETTING_FLAGGED_SINCE', '-1 week'),
+    'default_setting_flagged_since' => env('DEFAULT_SETTING_FLAGGED_SINCE', '-1 week'),
 
     /*
     |
     | Per source time limit for the unread combined view
     | Defaults to 1 week
     */
-    // 'default_setting_unread_since' => env('DEFAULT_SETTING_UNREAD_SINCE', '-1 week'),
+    'default_setting_unread_since' => env('DEFAULT_SETTING_UNREAD_SINCE', '-1 week'),
+
+    /*
+    |
+    | Per source time limit for IMAP SEARCH to find matching messages
+    | Defaults to 1 week
+    */
+    'default_setting_search_since' => env('DEFAULT_SETTING_SEARCH_SINCE', '-1 week'),
 
     /*
     |
     | Timezone for date displays
     | Defaults to UTC
     */
-    // 'default_setting_timezone' => env('DEFAULT_SETTING_TIMEZONE', 'UTC'),
+    'default_setting_timezone' => env('DEFAULT_SETTING_TIMEZONE', 'UTC'),
 
     /*
     |
     | Message list format style
     | Defaults to email client style
     */
-    // 'default_setting_list_style' => env('DEFAULT_SETTING_LIST_STYLE', 'email_style'),
+    'default_setting_list_style' => env('DEFAULT_SETTING_LIST_STYLE', 'email_style'),
 
     /*
     |
     | Interface language
     | Defaults to en (English)
     */
-    // 'default_setting_language' => env('DEFAULT_SETTING_LANGUAGE', 'en'),
+    'default_setting_language' => env('DEFAULT_SETTING_LANGUAGE', 'en'),
 
     /*
     |
     | Hide new news feed items from the unread combined view
     | Defaults to false
     */
-    // 'default_setting_unread_exclude_feeds' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS', false),
+    'default_setting_unread_exclude_feeds' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_FEEDS', false),
 
     /*
     |
     | Per source max for news feeds
     | Defaults to 20
     */
-    // 'default_setting_feed_limit' => env('DEFAULT_SETTING_FEED_LIMIT', 20),
+    'default_setting_feed_limit' => env('DEFAULT_SETTING_FEED_LIMIT', 20),
 
     /*
     |
     | Per source time limit for news feeds
     | Defaults to 1 week
     */
-    // 'default_setting_feed_since' => env('DEFAULT_SETTING_FEED_SINCE', '-1 week'),
+    'default_setting_feed_since' => env('DEFAULT_SETTING_FEED_SINCE', '-1 week'),
 
     /*
     |
     | Toggle between plain text or HTML formatted mail on the compose page
     | Defaults to 0 (plain text)
     */
-    // 'default_setting_smtp_compose_type' => env('DEFAULT_SETTING_SMTP_COMPOSE_TYPE', 0),
+    'default_setting_smtp_compose_type' => env('DEFAULT_SETTING_SMTP_COMPOSE_TYPE', 0),
 
     /*
     |
     | BCC a copy of outbound mail to the sender
     | Defaults to false
     */
-    // 'default_setting_smtp_auto_bcc' => env('DEFAULT_SETTING_SMTP_AUTO_BCC', false),
+    'default_setting_smtp_auto_bcc' => env('DEFAULT_SETTING_SMTP_AUTO_BCC', false),
 
     /*
     |
     | UI theme
     | Defaults to the default white one ("White Bread")
     */
-    // 'default_setting_theme' => env('DEFAULT_SETTING_THEME', 'default'),
+    'default_setting_theme' => env('DEFAULT_SETTING_THEME', 'default'),
 
     /*
     |
     | Hide WordPress notifications from the unread combined view
     | Defaults to false
     */
-    // 'default_setting_unread_exclude_wordpress' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS', false),
+    'default_setting_unread_exclude_wordpress' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_WORDPRESS', false),
 
     /*
     |
     | Time limit for WordPress notifications
     | Defaults to 1 week
     */
-    // 'default_setting_wordpress_since' => env('DEFAULT_SETTING_WORDPRESS_SINCE', '-1 week'),
+    'default_setting_wordpress_since' => env('DEFAULT_SETTING_WORDPRESS_SINCE', '-1 week'),
 
     /*
     |
     | Hide Github notifications from the unread combined view
     | Defaults to false
     */
-    // 'default_setting_unread_exclude_github' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB', false),
+    'default_setting_unread_exclude_github' => env('DEFAULT_SETTING_UNREAD_EXCLUDE_GITHUB', false),
 
     /*
     |
     | Max per source for Github notifications
     | Defaults to 20
     */
-    // 'default_setting_github_limit' => env('DEFAULT_SETTING_GITHUB_LIMIT', 20),
+    'default_setting_github_limit' => env('DEFAULT_SETTING_GITHUB_LIMIT', 20),
 
     /*
     |
     | Max per source for Github notifications
     | Defaults to 20
     */
-    // 'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 weeks'),
+    'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 weeks'),
 
     /*
     |
     | Display message details inline from the message list
     | Defaults to false
     */
-    // 'default_setting_inline_message' => env('DEFAULT_SETTING_INLINE_MESSAGE', false),
+    'default_setting_inline_message' => env('DEFAULT_SETTING_INLINE_MESSAGE', false),
+
+    /*
+    |
+    | Display message style inline from the message list
+    | Defaults to right
+    */
+    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE', 'right'),
 
     /*
     |
     | Enable keyboard shortcuts
     | Defaults to false
     */
-    // 'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', 1),
+    'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', 1),
 
     /*
     |
     | Enable sieve filter
     | Defaults to false
     */
-    // 'default_setting_enable_sieve_filter' => env('DEFAULT_SETTING_ENABLE_SIEVE_FILTER', false),
+    'default_setting_enable_sieve_filter' => env('DEFAULT_SETTING_ENABLE_SIEVE_FILTER', false),
 
     /*
     | Fancy Login page

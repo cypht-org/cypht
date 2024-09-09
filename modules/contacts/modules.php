@@ -192,7 +192,7 @@ class Hm_Output_contact_auto_collect_setting extends Hm_Output_Module {
 
         return '<tr class="general_setting"><td><label for="contact_auto_collect">' .
             $this->trans('Automatically add outgoing email addresses') . '</label></td>' .
-            '<td><input class="form-check-input" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" value="1" />' . $reset . '</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" data-default-value="true" value="1" />' . $reset . '</td></tr>';
     }
 }
 
