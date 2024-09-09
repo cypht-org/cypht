@@ -15,7 +15,7 @@ class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
      * set a flag to use folder list icons or not
      */
     public function process() {
-        $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', false));
+        $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', DEFAULT_NO_FOLDER_ICONS));
     }
 }
 
@@ -85,7 +85,7 @@ class Hm_Handler_check_missing_passwords extends Hm_Handler_Module {
      * pass a list of servers with missing passwords to the output modules
      */
     public function process() {
-        if (!$this->user_config->get('no_password_save_setting')) {
+        if (!$this->user_config->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE)) {
             return;
         }
         $missing = array();
@@ -136,8 +136,8 @@ class Hm_Handler_http_headers extends Hm_Handler_Module {
      */
     public function process() {
         $headers = array();
-        if ($this->get('language')) {
-            $headers['Content-Language'] = mb_substr($this->get('language'), 0, 2);
+        if ($this->get('language',DEFAULT_SETTING_LANGUAGE)) {
+            $headers['Content-Language'] = mb_substr($this->get('language',DEFAULT_SETTING_LANGUAGE), 0, 2);
         }
         if ($this->request->tls) {
             $headers['Strict-Transport-Security'] = 'max-age=31536000';
@@ -195,9 +195,9 @@ class Hm_Handler_process_list_style_setting extends Hm_Handler_Module {
             if (in_array($val, array('email_style', 'news_style'))) {
                 return $val;
             }
-            return 'email_style';
+            return DEFAULT_LIST_STYLE;
         }
-        process_site_setting('list_style', $this, 'list_style_callback');
+        process_site_setting('list_style', $this, 'list_style_callback', DEFAULT_LIST_STYLE);
     }
 }
 
@@ -216,7 +216,7 @@ class Hm_Handler_process_start_page_setting extends Hm_Handler_Module {
             }
             return false;
         }
-        process_site_setting('start_page', $this, 'start_page_callback');
+        process_site_setting('start_page', $this, 'start_page_callback',DEFAULT_START_PAGE);
     }
 }
 
@@ -264,7 +264,7 @@ class Hm_Handler_process_hide_folder_icons extends Hm_Handler_Module {
         function hide_folder_icons_callback($val) {
             return $val;
         }
-        process_site_setting('no_folder_icons', $this, 'hide_folder_icons_callback', false, true);
+        process_site_setting('no_folder_icons', $this, 'hide_folder_icons_callback', DEFAULT_NO_FOLDER_ICONS, true);
     }
 }
 
@@ -280,7 +280,7 @@ class Hm_Handler_process_show_list_icons extends Hm_Handler_Module {
         function show_list_icons_callback($val) {
             return $val;
         }
-        process_site_setting('show_list_icons', $this, 'show_list_icons_callback', false, true);
+        process_site_setting('show_list_icons', $this, 'show_list_icons_callback', DEFAULT_SHOW_LIST_ICONS, true);
     }
 }
 
@@ -293,7 +293,7 @@ class Hm_Handler_process_unread_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('unread_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('unread_per_source', $this, 'max_source_setting_callback', DEFAULT_UNREAD_PER_SOURCE);
     }
 }
 
@@ -306,7 +306,7 @@ class Hm_Handler_process_all_email_source_max_setting extends Hm_Handler_Module 
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('all_email_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('all_email_per_source', $this, 'max_source_setting_callback', DEFAULT_ALL_EMAIL_PER_SOURCE);
     }
 }
 
@@ -338,7 +338,7 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
         function delete_disabled_callback($val) {
             return $val;
         }
-        process_site_setting('disable_delete_prompt', $this, 'delete_disabled_callback', false, true);
+        process_site_setting('disable_delete_prompt', $this, 'delete_disabled_callback', DEFAULT_DISABLE_DELETE_PROMPT, true);
     }
 }
 
@@ -367,7 +367,7 @@ class Hm_Handler_process_all_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('all_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('all_per_source', $this, 'max_source_setting_callback', DEFAULT_ALL_PER_SOURCE);
     }
 }
 
@@ -393,7 +393,7 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('flagged_since', $this, 'since_setting_callback');
+        process_site_setting('flagged_since', $this, 'since_setting_callback', DEFAULT_FLAGGED_SINCE);
     }
 }
 
@@ -406,7 +406,7 @@ class Hm_Handler_process_all_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('all_since', $this, 'since_setting_callback');
+        process_site_setting('all_since', $this, 'since_setting_callback', DEFAULT_ALL_SINCE);
     }
 }
 
@@ -419,7 +419,7 @@ class Hm_Handler_process_all_email_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('all_email_since', $this, 'since_setting_callback');
+        process_site_setting('all_email_since', $this, 'since_setting_callback', DEFAULT_ALL_EMAIL_SINCE);
     }
 }
 
@@ -432,7 +432,7 @@ class Hm_Handler_process_unread_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('unread_since', $this, 'since_setting_callback');
+        process_site_setting('unread_since', $this, 'since_setting_callback', $this->user_config->get('default_setting_unread_since'));
     }
 }
 
@@ -449,9 +449,9 @@ class Hm_Handler_process_language_setting extends Hm_Handler_Module {
             if (array_key_exists($val, interface_langs())) {
                 return $val;
             }
-            return 'en';
+            return DEFAULT_SETTING_LANGUAGE;
         }
-        process_site_setting('language', $this, 'language_setting_callback');
+        process_site_setting('language', $this, 'language_setting_callback',DEFAULT_SETTING_LANGUAGE);
     }
 }
 
@@ -565,7 +565,20 @@ class Hm_Handler_language extends Hm_Handler_Module {
      * output the user configured language or English if not set
      */
     public function process() {
-        $this->out('language', $this->user_config->get('language_setting', 'en'));
+        $this->out('language', $this->user_config->get('language_setting', DEFAULT_SETTING_LANGUAGE));
+    }
+}
+
+/**
+ * Setup the current language
+ * @subpackage core/handler
+ */
+class Hm_Handler_default_timezone extends Hm_Handler_Module {
+    /**
+     * output the default timezone
+     */
+    public function process() {
+        $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
     }
 }
 
@@ -685,7 +698,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
                     $this->session->set('saved_pages', $pages);
                 }
             }
-            $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting'));
+            $this->out('disable_delete_prompt', $this->user_config->get('disable_delete_prompt_setting', DEFAULT_DISABLE_DELETE_PROMPT));
         }
         if ($this->session->loaded) {
             $start_page = $this->user_config->get('start_page_setting');
@@ -695,7 +708,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         }
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
-        $this->out('no_password_save', $this->user_config->get('no_password_save_setting', false));
+        $this->out('no_password_save', $this->user_config->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE));
         if (!mb_strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
             if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {
@@ -801,7 +814,7 @@ class Hm_Handler_message_list_type extends Hm_Handler_Module {
         if (array_key_exists('uid', $this->request->get) && preg_match("/^[0-9a-z]+$/i", $this->request->get['uid'])) {
             $uid = $this->request->get['uid'];
         }
-        $list_style = $this->user_config->get('list_style_setting', false);
+        $list_style = $this->user_config->get('list_style_setting', DEFAULT_LIST_STYLE);
         if ($this->get('is_mobile', false)) {
             $list_style = 'news_style';
         }
@@ -851,7 +864,7 @@ class Hm_Handler_reload_folder_cookie extends Hm_Handler_Module {
 class Hm_Handler_reset_search extends Hm_Handler_Module {
     public function process() {
         $this->session->set('search_terms', '');
-        $this->session->set('search_since', DEFAULT_SINCE);
+        $this->session->set('search_since', DEFAULT_SEARCH_SINCE);
         $this->session->set('search_fld', DEFAULT_SEARCH_FLD);
     }
 }
@@ -875,7 +888,7 @@ class Hm_Handler_process_search_terms extends Hm_Handler_Module {
         if (array_key_exists('search_fld', $this->request->get)) {
             $this->session->set('search_fld', validate_search_fld($this->request->get['search_fld']));
         }
-        $this->out('search_since', $this->session->get('search_since', DEFAULT_SINCE));
+        $this->out('search_since', $this->session->get('search_since', DEFAULT_SEARCH_SINCE));
         $this->out('search_terms', $this->session->get('search_terms', ''));
         $this->out('search_fld', $this->session->get('search_fld', DEFAULT_SEARCH_FLD));
         if ($this->session->get('search_terms')) {
@@ -893,7 +906,7 @@ class Hm_Handler_process_junk_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('junk_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('junk_per_source', $this, 'max_source_setting_callback', DEFAULT_JUNK_PER_SOURCE);
     }
 }
 
@@ -906,7 +919,7 @@ class Hm_Handler_process_junk_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('junk_since', $this, 'since_setting_callback');
+        process_site_setting('junk_since', $this, 'since_setting_callback', DEFAULT_JUNK_SINCE);
     }
 }
 
@@ -919,7 +932,7 @@ class Hm_Handler_process_trash_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('trash_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('trash_per_source', $this, 'max_source_setting_callback', DEFAULT_TRASH_PER_SOURCE);
     }
 }
 
@@ -945,7 +958,7 @@ class Hm_Handler_process_drafts_source_max_setting extends Hm_Handler_Module {
      * Allowed values are greater than zero and less than MAX_PER_SOURCE
      */
     public function process() {
-        process_site_setting('drafts_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('drafts_per_source', $this, 'max_source_setting_callback', DEFAULT_DRAFT_PER_SOURCE);
     }
 }
 
@@ -958,7 +971,7 @@ class Hm_Handler_process_drafts_since_setting extends Hm_Handler_Module {
      * valid values are defined in the process_since_argument function
      */
     public function process() {
-        process_site_setting('drafts_since', $this, 'since_setting_callback');
+        process_site_setting('drafts_since', $this, 'since_setting_callback', DEFAULT_DRAFT_SINCE);
     }
 }
 

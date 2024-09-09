@@ -23,49 +23,49 @@ function get_message_list_settings($path, $handler) {
     if ($path == 'unread') {
         $list_path = 'unread';
         $mailbox_list_title = array('Unread');
-        $message_list_since = $handler->user_config->get('unread_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE);
+        $per_source_limit = $handler->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
     }
     elseif ($path == 'email') {
-        $message_list_since = $handler->user_config->get('all_email_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('all_email_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('all_email_since_setting', DEFAULT_ALL_EMAIL_SINCE);
+        $per_source_limit = $handler->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
         $list_path = 'email';
         $mailbox_list_title = array('All Email');
     }
     elseif ($path == 'flagged') {
         $list_path = 'flagged';
-        $message_list_since = $handler->user_config->get('flagged_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('flagged_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE);
+        $per_source_limit = $handler->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
         $mailbox_list_title = array('Flagged');
     }
     elseif ($path == 'combined_inbox') {
         $list_path = 'combined_inbox';
-        $message_list_since = $handler->user_config->get('all_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('all_since_setting', DEFAULT_ALL_SINCE);
+        $per_source_limit = $handler->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
         $mailbox_list_title = array('Everything');
     }
     elseif ($path == 'junk') {
         $list_path = 'junk';
-        $message_list_since = $handler->user_config->get('junk_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('junk_since_setting', DEFAULT_JUNK_SINCE);
+        $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_JUNK_PER_SOURCE);
         $mailbox_list_title = array('Junk');
     }
     elseif ($path == 'trash') {
         $list_path = 'trash';
-        $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_TRASH_SINCE);
+        $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_TRASH_PER_SOURCE);
         $mailbox_list_title = array('Trash');
     }
     elseif ($path == 'drafts') {
         $list_path = 'drafts';
-        $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('drafts_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_DRAFT_SINCE);
+        $per_source_limit = $handler->user_config->get('drafts_per_source_setting', DEFAULT_DRAFT_PER_SOURCE);
         $mailbox_list_title = array('Drafts');
     }
     elseif ($path == 'tag' && $handler->module_is_supported('tags')) {
         $list_path = 'tag';
-        $message_list_since = $handler->user_config->get('tag_since_setting', DEFAULT_SINCE);
-        $per_source_limit = $handler->user_config->get('tag_per_source_setting', DEFAULT_PER_SOURCE);
+        $message_list_since = $handler->user_config->get('tag_since_setting', DEFAULT_TAGS_SINCE);
+        $per_source_limit = $handler->user_config->get('tag_per_source_setting', DEFAULT_TAGS_PER_SOURCE);
         $mailbox_list_title = array('Tag');
     }
     return array($list_path, $mailbox_list_title, $message_list_since, $per_source_limit);
@@ -407,7 +407,7 @@ function message_controls($output_mod) {
  * @return string
  */
 if (!hm_exists('message_since_dropdown')) {
-function message_since_dropdown($since, $name, $output_mod) {
+function message_since_dropdown($since, $name, $output_mod, $original_default_value = '-1 week') {
     $times = array(
         'today' => 'Today',
         '-1 week' => 'Last 7 days',
@@ -418,13 +418,13 @@ function message_since_dropdown($since, $name, $output_mod) {
         '-1 year' => 'Last year',
         '-5 years' => 'Last 5 years'
     );
-    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm w-auto">';
+    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm w-auto" data-default-value="'.$original_default_value.'">';
     $reset = '';
     foreach ($times as $val => $label) {
         $res .= '<option';
         if ($val == $since) {
             $res .= ' selected="selected"';
-            if (($name == 'feed_since' && $val != 'today') || ($name != 'feed_since' && $val != '-1 week')) {
+            if ($val != $original_default_value) {
                 $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
             }
 

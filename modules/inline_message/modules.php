@@ -13,8 +13,8 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Handler_get_inline_message_setting extends Hm_Handler_Module {
     public function process() {
-        $this->out('inline_message_setting', $this->user_config->get('inline_message_setting', 0));
-        $this->out('inline_message_style', $this->user_config->get('inline_message_style_setting', 'right'));
+        $this->out('inline_message_setting', $this->user_config->get('inline_message_setting', DEFAULT_INLINE_MESSAGE));
+        $this->out('inline_message_style', $this->user_config->get('inline_message_style_setting', DEFAULT_INLINE_MESSAGE_STYLE));
     }
 }
 
@@ -27,9 +27,9 @@ class Hm_Handler_process_inline_message_style extends Hm_Handler_Module {
             if (in_array($val, array('right', 'inline'), true)) {
                 return $val;
             }
-            return 'right';
+            return DEFAULT_INLINE_MESSAGE_STYLE;
         }
-        process_site_setting('inline_message_style', $this, 'inline_message_style_callback', false, true);
+        process_site_setting('inline_message_style', $this, 'inline_message_style_callback', DEFAULT_INLINE_MESSAGE_STYLE, true);
     }
 }
 
@@ -39,7 +39,7 @@ class Hm_Handler_process_inline_message_style extends Hm_Handler_Module {
 class Hm_Handler_process_inline_message_setting extends Hm_Handler_Module {
     public function process() {
         function inline_message_callback($val) { return $val; }
-        process_site_setting('inline_message', $this, 'inline_message_callback', false, true);
+        process_site_setting('inline_message', $this, 'inline_message_callback', DEFAULT_INLINE_MESSAGE, true);
     }
 }
 
@@ -50,8 +50,8 @@ class Hm_Handler_process_inline_message_setting extends Hm_Handler_Module {
 class Hm_Output_inline_message_flag extends Hm_Output_Module {
     protected function output() {
         return '<script type="text/javascript">var inline_msg_style = function() { return "'.
-            $this->get('inline_message_style', 'right').'";}; var inline_msg = function() { return '.
-            ($this->get('inline_message_setting', 0) && !$this->get('is_mobile', false) ? 'true' : 'false').
+            $this->get('inline_message_style', DEFAULT_INLINE_MESSAGE_STYLE).'";}; var inline_msg = function() { return '.
+            ($this->get('inline_message_setting', DEFAULT_INLINE_MESSAGE) && !$this->get('is_mobile', false) ? 'true' : 'false').
             ';};</script>';
     }
 }
@@ -61,15 +61,17 @@ class Hm_Output_inline_message_flag extends Hm_Output_Module {
  */
 class Hm_Output_inline_message_setting extends Hm_Output_Module {
     protected function output() {
-        $inline = false;
+        $inline = DEFAULT_INLINE_MESSAGE;
         $settings = $this->get('user_settings', array());
         if (array_key_exists('inline_message', $settings)) {
             $inline = $settings['inline_message'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="inline_message">'.$this->trans('Show messages inline').'</label></td><td><input value="1" type="checkbox" class="form-check-input" name="inline_message" id="inline_message"';
+        $res = '<tr class="general_setting"><td><label class="form-check-label" for="inline_message">'.$this->trans('Show messages inline').'</label></td><td><input value="1" type="checkbox" class="form-check-input" name="inline_message" id="inline_message" data-default-value="'.(DEFAULT_INLINE_MESSAGE ? 'true' : 'false') . '"';
         $reset = '';
         if ($inline) {
             $res .= ' checked="checked"';
+        }
+        if($inline !== DEFAULT_INLINE_MESSAGE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
@@ -88,7 +90,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         if (array_key_exists('inline_message_style', $settings)) {
             $selected = $settings['inline_message_style'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Inline Message Style').'</td><td><select class="form-select form-select-sm w-auto" name="inline_message_style">';
+        $res = '<tr class="general_setting"><td>'.$this->trans('Inline Message Style').'</td><td><select class="form-select form-select-sm w-auto" name="inline_message_style" data-default-value="'.DEFAULT_INLINE_MESSAGE_STYLE.'">';
         $res .= '<option ';
         if ($selected == 'right') {
             $res .= 'selected="selected" ';
@@ -96,6 +98,8 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         $res .= 'value="right">'.$this->trans('Right').'</option><option ';
         if ($selected == 'inline') {
             $res .= 'selected="selected" ';
+        }
+        if($selected !== DEFAULT_INLINE_MESSAGE_STYLE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="inline">'.$this->trans('Inline').'</option></select>'.$reset.'</td></tr>';

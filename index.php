@@ -31,9 +31,6 @@ if (DEBUG_MODE) {
 /* don't let anything output content until we are ready */
 ob_start();
 
-/* set default TZ */
-date_default_timezone_set( 'UTC' );
-
 require VENDOR_PATH.'autoload.php';
 /* get includes */
 require APP_PATH.'lib/framework.php';
@@ -42,6 +39,10 @@ $environment->load();
 
 /* get configuration */
 $config = new Hm_Site_Config_File();
+/* set default TZ */
+date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
+/* set the default since and per_source values */
+$environment->define_default_constants($config);
 
 /* setup ini settings */
 if (!$config->get('disable_ini_settings')) {

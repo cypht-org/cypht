@@ -21,7 +21,7 @@ class Hm_Github_Uid_Cache {
  */
 class Hm_Handler_process_github_limit_setting extends Hm_Handler_Module {
     public function process() {
-        process_site_setting('github_limit', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('github_limit', $this, 'max_source_setting_callback', DEFAULT_GITHUB_PER_SOURCE);
     }
 }
 
@@ -30,7 +30,7 @@ class Hm_Handler_process_github_limit_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_process_github_since_setting extends Hm_Handler_Module {
     public function process() {
-        process_site_setting('github_since', $this, 'since_setting_callback');
+        process_site_setting('github_since', $this, 'since_setting_callback',DEFAULT_GITHUB_SINCE);
     }
 }
 
@@ -40,7 +40,7 @@ class Hm_Handler_process_github_since_setting extends Hm_Handler_Module {
 class Hm_Handler_process_unread_github_included extends Hm_Handler_Module {
     public function process() {
         function unread_github_setting_callback($val) { return $val; }
-        process_site_setting('unread_exclude_github', $this, 'unread_github_setting_callback', false, true);
+        process_site_setting('unread_exclude_github', $this, 'unread_github_setting_callback', DEFAULT_UNREAD_EXCLUDE_GITHUB, true);
     }
 }
 
@@ -132,7 +132,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
             Hm_Github_Uid_Cache::load($this->cache->get('github_read_uids', array(), true));
             $details = $this->user_config->get('github_connect_details', array());
             $repos = $this->user_config->get('github_repos', array());
-            $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
+            $limit = $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE);
             $repo = mb_substr($form['list_path'], 7);
             if (in_array($repo, $repos, true)) {
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $repo);
@@ -321,7 +321,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             $details = $this->user_config->get('github_connect_details');
             $repos = $this->user_config->get('github_repos');
             if (in_array($form['github_repo'], $repos, true) && $details) {
-                $limit = $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE);
+                $limit = $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE);
                 $url = sprintf('https://api.github.com/repos/%s/events?page=1&per_page='.$limit, $form['github_repo']);
                 $api = new Hm_API_Curl();
                 $this->out('github_data', $api->command($url, array('Authorization: token ' . $details['access_token'])));
@@ -330,13 +330,13 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
             }
             if (array_key_exists('list_path', $this->request->get)) {
                 if ($this->request->get['list_path'] == 'unread') {
-                    $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE)));
+                    $this->out('github_list_since', process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE)));
                 }
                 if ($this->request->get['list_path'] == 'combined_inbox') {
-                    $this->out('github_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE)));
+                    $this->out('github_list_since', process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE)));
                 }
                 if ($this->request->get['list_path'] == 'github_all') {
-                    $this->out('github_list_since', process_since_argument($this->user_config->get('github_since_setting', DEFAULT_SINCE)));
+                    $this->out('github_list_since', process_since_argument($this->user_config->get('github_since_setting', DEFAULT_GITHUB_SINCE)));
                 }
             }
             if (array_key_exists('github_unread', $this->request->post) && $this->request->post['github_unread']) {
@@ -352,7 +352,7 @@ class Hm_Handler_github_list_data extends Hm_Handler_Module {
 class Hm_Handler_github_list_type extends Hm_Handler_Module {
     public function process() {
         $repos = $this->user_config->get('github_repos', array());
-        $excluded = $this->user_config->get('unread_exclude_github_setting', false);
+        $excluded = $this->user_config->get('unread_exclude_github_setting', DEFAULT_UNREAD_EXCLUDE_GITHUB);
         $github_list = false;
         $parent = '';
         if (array_key_exists('list_parent', $this->request->get)) {
@@ -366,8 +366,8 @@ class Hm_Handler_github_list_type extends Hm_Handler_Module {
                     $this->out('list_path', 'github_all', false);
                     $this->out('list_parent', $parent, false);
                     $this->out('mailbox_list_title', array('Github', 'All'));
-                    $this->out('message_list_since', $this->user_config->get('github_since_setting', DEFAULT_SINCE));
-                    $this->out('per_source_limit', $this->user_config->get('github_limit_setting', DEFAULT_PER_SOURCE));
+                    $this->out('message_list_since', $this->user_config->get('github_since_setting', DEFAULT_GITHUB_SINCE));
+                    $this->out('per_source_limit', $this->user_config->get('github_limit_setting', DEFAULT_GITHUB_PER_SOURCE));
                     foreach ($repos as $repo) {
                         $this->append('data_sources', array('callback' => 'load_github_data', 'type' => 'github', 'name' => $repo, 'id' => $repo));
                     }
@@ -694,13 +694,13 @@ class Hm_Output_start_github_settings extends Hm_Output_Module {
  */
 class Hm_Output_github_since_setting extends Hm_Output_Module {
     protected function output() {
-        $since = DEFAULT_SINCE;
+        $since = DEFAULT_GITHUB_SINCE;
         $settings = $this->get('user_settings');
         if (array_key_exists('github_since', $settings) && $settings['github_since']) {
             $since = $settings['github_since'];
         }
         return '<tr class="github_all_setting"><td><label for="github_since">'.$this->trans('Show Github notices received since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'github_since', $this).'</td></tr>';
+            '<td>'.message_since_dropdown($since, 'github_since', $this, DEFAULT_GITHUB_SINCE).'</td></tr>';
     }
 }
 
@@ -709,13 +709,13 @@ class Hm_Output_github_since_setting extends Hm_Output_Module {
  */
 class Hm_Output_github_limit_setting extends Hm_Output_Module {
     protected function output() {
-        $limit = DEFAULT_PER_SOURCE;
+        $limit = DEFAULT_GITHUB_PER_SOURCE;
         $settings = $this->get('user_settings');
         if (array_key_exists('github_limit', $settings)) {
             $limit = $settings['github_limit'];
         }
         return '<tr class="github_all_setting"><td><label for="github_limit">'.$this->trans('Max Github notices per repository').'</label></td>'.
-            '<td><input type="text" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" /></td></tr>';
+            '<td class="d-flex"><input type="text" id="github_limit" name="github_limit" size="2" value="'.$this->html_safe($limit).'" data-default-value="'.DEFAULT_GITHUB_PER_SOURCE.'"/></td></tr>';
     }
 }
 

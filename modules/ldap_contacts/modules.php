@@ -337,7 +337,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
         $connections = $this->get('ldap_contact_connections', array());
         $auths = $this->get('ldap_contacts_auth', array());
         if (count($connections) > 0) {
-            $res = '<tr><td data-target=".ldap_settings" colspan="2" class="settings_subtitle">'.
+            $res = '<tr><td data-target=".ldap_settings" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
                 '<i class="bi bi-people-fill"></i>'.
                 $this->trans('LDAP Addressbooks').'</td></tr>';
             foreach ($connections as $name => $con) {
@@ -351,7 +351,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
                 }
                 $res .= '<tr class="ldap_settings"><td>'.$this->html_safe($name).'</td><td>';
                 $res .= '<input autocomplete="username" type="text" value="'.$user.'" name="ldap_usernames['.$this->html_safe($name).']" ';
-                $res .= 'placeholder="'.$this->trans('Username').'" class="form-control" /> <input type="password"  class="form-control"';
+                $res .= 'placeholder="'.$this->trans('Username').'" class="form-control mb-2" /> <input type="password"  class="form-control"';
                 if ($pass) {
                     $res .= 'disabled="disabled" placeholder="'.$this->trans('Password saved').'" ';
                     $res .= 'name="ldap_passwords['.$this->html_safe($name).']" /> <input type="button" ';

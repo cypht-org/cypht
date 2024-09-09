@@ -20,12 +20,12 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
             if ($path == 'feeds') {
                 $this->out('list_path', 'feeds', false);
                 $this->out('mailbox_list_title', array('All Feeds'));
-                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
+                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_FEED_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_FEED_LIMIT));
             }
             elseif (preg_match("/^feeds_.+$/", $path)) {
-                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_SINCE));
-                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE));
+                $this->out('message_list_since', $this->user_config->get('feed_since_setting', DEFAULT_FEED_SINCE));
+                $this->out('per_source_limit', $this->user_config->get('feed_limit_setting', DEFAULT_FEED_LIMIT));
                 $this->out('list_path', $path, false);
                 $this->out('custom_list_controls', ' ');
                 $parts = explode('_', $path, 2);
@@ -43,7 +43,7 @@ class Hm_Handler_feed_list_type extends Hm_Handler_Module {
  */
 class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
     public function process() {
-        process_site_setting('feed_limit', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('feed_limit', $this, 'max_source_setting_callback', DEFAULT_FEED_LIMIT);
     }
 }
 
@@ -52,7 +52,7 @@ class Hm_Handler_process_feed_limit_setting extends Hm_Handler_Module {
  */
 class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
     public function process() {
-        process_site_setting('feed_since', $this, 'since_setting_callback');
+        process_site_setting('feed_since', $this, 'since_setting_callback', DEFAULT_FEED_SINCE);
     }
 }
 
@@ -62,7 +62,7 @@ class Hm_Handler_process_feed_since_setting extends Hm_Handler_Module {
 class Hm_Handler_process_unread_feeds_setting extends Hm_Handler_Module {
     public function process() {
         function unread_feed_setting_callback($val) { return $val; }
-        process_site_setting('unread_exclude_feeds', $this, 'unread_feed_setting_callback', false, true);
+        process_site_setting('unread_exclude_feeds', $this, 'unread_feed_setting_callback', DEFAULT_UNREAD_EXCLUDE_FEEDS, true);
     }
 }
 
@@ -177,7 +177,7 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
             $cache = false;
             if (array_key_exists('feed_search', $this->request->post)) {
                 $terms = $this->session->get('search_terms', false);
-                $since = $this->session->get('search_since', DEFAULT_SINCE);
+                $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
                 $fld = $this->session->get('search_fld', 'TEXT');
                 $search = true;
             }
@@ -192,8 +192,8 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 $this->out('login_time', $login_time);
             }
             if ($this->get('list_path') == 'unread') {
-                $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_SINCE));
+                $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
                 $unread_only = true;
                 $cutoff_timestamp = strtotime($date);
                 if ($login_time && $login_time > $cutoff_timestamp) {
@@ -201,13 +201,13 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
                 }
             }
             elseif ($this->get('list_path') == 'combined_inbox') {
-                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
                 $cutoff_timestamp = strtotime($date);
             }
             else {
-                $limit = $this->user_config->get('feed_limit_setting', DEFAULT_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_SINCE));
+                $limit = $this->user_config->get('feed_limit_setting', DEFAULT_FEED_LIMIT);
+                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_FEED_SINCE));
                 $cutoff_timestamp = strtotime($date);
             }
             if (!$search || ($search && $terms)) {
@@ -430,7 +430,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
     public function process() {
         $excluded = false;
         if ($this->get('list_path') == 'unread') {
-            $excluded = $this->user_config->get('unread_exclude_feeds_setting', false);
+            $excluded = $this->user_config->get('unread_exclude_feeds_setting', DEFAULT_UNREAD_EXCLUDE_FEEDS);
         }
         if ($excluded) {
             return;
@@ -469,7 +469,7 @@ class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
         }
         switch ($path) {
             case 'unread':
-                if (!$this->user_config->get('unread_exclude_feeds_setting', false)) {
+                if (!$this->user_config->get('unread_exclude_feeds_setting', DEFAULT_UNREAD_EXCLUDE_FEEDS)) {
                     $callback = 'feeds_combined_content_unread';
                 }
                 break;
@@ -882,13 +882,13 @@ class Hm_Output_start_feed_settings extends Hm_Output_Module {
  */
 class Hm_Output_feed_since_setting extends Hm_Output_Module {
     protected function output() {
-        $since = false;
+        $since = DEFAULT_FEED_SINCE;
         $settings = $this->get('user_settings');
         if (array_key_exists('feed_since', $settings)) {
             $since = $settings['feed_since'];
         }
         return '<tr class="feeds_setting"><td><label for="feed_since">'.$this->trans('Show feed items received since').'</label></td>'.
-            '<td>'.message_since_dropdown($since, 'feed_since', $this).'</td></tr>';
+            '<td>'.message_since_dropdown($since, 'feed_since', $this, DEFAULT_FEED_SINCE).'</td></tr>';
     }
 }
 
@@ -897,17 +897,17 @@ class Hm_Output_feed_since_setting extends Hm_Output_Module {
  */
 class Hm_Output_feed_limit_setting extends Hm_Output_Module {
     protected function output() {
-        $limit = DEFAULT_PER_SOURCE;
+        $limit = DEFAULT_FEED_LIMIT;
         $settings = $this->get('user_settings');
         $reset = '';
         if (array_key_exists('feed_limit', $settings)) {
             $limit = $settings['feed_limit'];
         }
-        if ($limit != 20) {
+        if ($limit != DEFAULT_FEED_LIMIT) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
-            '<td><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" />'.$reset.'</td></tr>';
+            '<td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" data-default-value="'.DEFAULT_FEED_LIMIT.'" />'.$reset.'</td></tr>';
     }
 }
 

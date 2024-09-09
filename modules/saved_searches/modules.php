@@ -296,7 +296,7 @@ if (!hm_exists('get_search_from_post')) {
 function get_search_from_post($request) {
     return array(
         array_key_exists('search_terms', $request->post) ? $request->post['search_terms'] : '',
-        array_key_exists('search_since', $request->post) ? $request->post['search_since'] : DEFAULT_SINCE,
+        array_key_exists('search_since', $request->post) ? $request->post['search_since'] : DEFAULT_SEARCH_SINCE,
         array_key_exists('search_fld', $request->post) ? $request->post['search_fld'] : DEFAULT_SEARCH_FLD,
         array_key_exists('search_name', $request->post) ? $request->post['search_name'] : '',
     );
@@ -309,7 +309,7 @@ if (!hm_exists('get_search_from_url')) {
 function get_search_from_url($request) {
     return array(
         array_key_exists('search_terms', $request->get) ? $request->get['search_terms'] : '',
-        array_key_exists('search_since', $request->get) ? $request->get['search_since'] : DEFAULT_SINCE,
+        array_key_exists('search_since', $request->get) ? $request->get['search_since'] : DEFAULT_SEARCH_SINCE,
         array_key_exists('search_fld', $request->get) ? $request->get['search_fld'] : DEFAULT_SEARCH_FLD,
         array_key_exists('search_name', $request->get) ? $request->get['search_name'] : '',
     );
