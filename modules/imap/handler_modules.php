@@ -750,7 +750,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             if (array_key_exists('imap_prefetch', $this->request->post)) {
                 $prefetched = $this->session->get('imap_prefetched_ids', array());
                 $prefetched[] = $form['imap_server_id'];
-                $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_NUMERIC));
+                $this->session->set('imap_prefetched_ids', array_unique($prefetched, SORT_STRING));
             }
             $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
