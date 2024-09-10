@@ -678,11 +678,6 @@ $(function () {
                 '    </td>' +
                 extra_options +
                 '    <td class="col-sm-5">' +
-                '    <div class="d-flex justify-content-center spinner d-none">' +
-                '       <div class="spinner-border text-dark role="status">' +
-                '           <span class="visually-hidden">Loading...</span>' +
-                '       </div>' +
-                '    </div>' +
                 '    <input type="hidden" name="sieve_selected_action_value[]" value="">' +
                 '    </input>' +
                 '    <td class="col-sm-1 text-end align-middle">' +
@@ -779,7 +774,7 @@ $(function () {
                 }
                 if (selected_action.type === 'mailbox') {
                     let mailboxes = null;
-                    tr_elem.children().find('.spinner').removeClass('d-none');
+                    tr_elem.children().eq(2).html(hm_spinner());
                     Hm_Ajax.request(
                         [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_get_mailboxes'},
                             {'name': 'imap_account', 'value': current_account} ],

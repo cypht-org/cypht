@@ -1858,6 +1858,14 @@ var err_msg = function(msg) {
     return "ERR"+hm_trans(msg);
 };
 
+var hm_spinner = function(type = 'border', size = '') {
+    return `<div class="d-flex justify-content-center spinner">
+        <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>`
+};
+
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
