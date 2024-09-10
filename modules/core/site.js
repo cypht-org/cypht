@@ -2127,7 +2127,6 @@ if(tableBody && !hm_mobile()) {
         sort: false,
         group: 'messages',
         ghostClass: 'drag_target',
-        draggable: ':not(.inline_msg)',
 
         onMove: (sortableEvent) => {
             movingElement = sortableEvent.dragged;
