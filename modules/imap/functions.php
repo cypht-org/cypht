@@ -1449,15 +1449,15 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = snooze_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</button>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_snooze_date($format, true);
         $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';
-    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
-    $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<li><span class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</span>';
+    $txt .= '<input id="snooze_input_date" type="text" class="snooze_input_date d-none">';
     $txt .= '<input class="snooze_input" style="display:none;"></li>';
     if ($unsnooze) {
         $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';

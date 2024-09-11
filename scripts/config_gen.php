@@ -247,6 +247,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
         $mods = get_modules($settings);
         $js_lib = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/js/bootstrap.bundle.min.js");
         $js_lib .= file_get_contents("third_party/cash.min.js");
+        $js_lib .= file_get_contents("third_party/flatpickr.min.js");
         if (in_array('desktop_notifications', $mods, true)) {
             $js_lib .= file_get_contents("third_party/push.min.js");
         }

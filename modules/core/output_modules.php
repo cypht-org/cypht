@@ -498,6 +498,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
     protected function output() {
         $res = '';
         $mods = $this->get('router_module_list');
+        $res .= '<link href="' . WEB_ROOT . 'third_party/flatpickr.min.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         if (! $this->get('theme')) {
             $res .= '<link href="' . WEB_ROOT . 'modules/themes/assets/default/css/default.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
         }
@@ -543,6 +544,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $res = '';
             $js_lib = '<script type="text/javascript" src="'.WEB_ROOT.'vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/cash.min.js"></script>';
+            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/flatpickr.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/resumable.min.js"></script>';
             $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/ays-beforeunload-shim.js"></script>';
             $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/jquery.are-you-sure.js"></script>';

@@ -650,4 +650,6 @@ return array(
     'No tags available yet.' => '尚無可用標籤。',
     'Server capabilities' => '伺服器功能',
     'Capabilities' => '功能',
+    'Please pick a valid date/time' => false,
+    'Snoozing messages...' => false,
 );
