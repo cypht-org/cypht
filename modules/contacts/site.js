@@ -239,7 +239,7 @@ var contact_import_pagination = function() {
     });
 };
 
-var check_cc_exist_in_contacts_list = function(e) {
+var check_cc_exist_in_contacts_list = function() {
     if (typeof list_emails !== "undefined") {
         var compose_cc = $(".compose_cc").val().trim();
         var list_cc = null;

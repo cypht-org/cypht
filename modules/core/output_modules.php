@@ -636,6 +636,9 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '    return key;'.
             '};';
         $res .= 'window.hm_default_timezone = "'.$this->get('default_timezone','UTC').'";';
+        $res .= 'var hm_module_is_supported = function(module) {'.
+            '    return '.json_encode($this->get('enabled_modules', array())).'.indexOf(module) !== -1;'.
+            '};';
         $res .= '</script>';
         return $res;
     }

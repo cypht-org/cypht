@@ -428,7 +428,6 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_output($name, 'header_start', false, $source);
     add_output($name, 'header_css', false, $source);
     add_output($name, 'header_content', false, $source);
-    add_handler($name, 'default_timezone',  false, $source);
     add_output($name, 'js_data', false, $source);
     add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_end', false, $source);

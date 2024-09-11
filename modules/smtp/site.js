@@ -487,12 +487,11 @@ $(function () {
                 modalContentHeadline = "Your subject and body are empty!";
             }
 
-            if (typeof check_cc_exist_in_contacts_list === 'function') {
-                var checkInList = check_cc_exist_in_contacts_list(e);
-
+            if (hm_module_is_supported('contacts')) {
+                var checkInList = check_cc_exist_in_contacts_list();
                 // if contact_cc not exist in contact list for user
                 if (checkInList) {
-                    modalContentHeadline = "Adress mail not exist in your contact liste";
+                    modalContentHeadline = "Adress mail not exist in your contact list";
                     showBtnSendAnywayDontWarnFuture = false;
                 }
 
