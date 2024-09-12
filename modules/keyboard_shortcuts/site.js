@@ -155,7 +155,7 @@ var Keyboard_Actions = {
 $(function() {
 
     if (typeof shortcuts != 'undefined') {
-        $(document).not('input').on('keydown', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
+        $(document).on('keydown', ':not(input)', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }
     if (hm_page_name() == 'shortcuts') {
         $('.reset_shortcut').on("click", function() {
