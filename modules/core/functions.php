@@ -609,3 +609,17 @@ function get_special_folders($mod, $id) {
     }
     return array();
 }
+
+/**
+ * @subpackage core/functions
+ */
+if (!hm_exists('check_file_upload')) {
+function check_file_upload($request, $key) {
+    if (!is_array($request->files) || !array_key_exists($key, $request->files)) {
+        return false;
+    }
+    if (!is_array($request->files[$key]) || !array_key_exists('tmp_name', $request->files[$key])) {
+        return false;
+    }
+    return true;
+}}

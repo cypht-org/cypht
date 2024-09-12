@@ -640,4 +640,6 @@ return array(
     'Server capabilities' => false,
     'Capabilities' => false,
     'Screen %s first emails' => false,
+    'Yaml File' => false,
+    'Please ensure your YAML or CSV  file follows the correct format' => false,
 );
