@@ -1257,7 +1257,7 @@ $(function() {
 
     if ($('.imap_move').length > 0) {
         check_select_for_imap();
-        $('.toggle_link').on("click", function() {  $('.mailbox_list_title').toggleClass('hide'); setTimeout(search_selected_for_imap, 100); });
+        $('.toggle_link').on("click", function() { setTimeout(search_selected_for_imap, 100); });
         Hm_Ajax.add_callback_hook('ajax_imap_folder_display', check_select_for_imap);
         Hm_Message_List.callbacks.push(check_select_for_imap);
         $('.imap_move').on("click", function() { return false; });
