@@ -761,7 +761,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $raw flag to disable decoding header values
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false) {
+        public function get_message_list($uids, $raw=false, $include_preview = false) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', $uids);
@@ -776,7 +776,11 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)])\r\n";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)]";
+            // if ($include_preview) {
+                $command .= " BODY[TEXT]";
+            // }
+            $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -789,6 +793,7 @@ if (!class_exists('Hm_IMAP')) {
             $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'REFERENCES', 'X-SNOOZED', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
             $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority');
             $headers = array();
+
             foreach ($res as $n => $vals) {
                 if (isset($vals[0]) && $vals[0] == '*') {
                     $uid = 0;
@@ -810,23 +815,66 @@ if (!class_exists('Hm_IMAP')) {
                     $x_auto_bcc = '';
                     $x_snoozed = '';
                     $count = count($vals);
+                    $preview_msg = '';
                     for ($i=0;$i<$count;$i++) {
-                        if ($vals[$i] == 'BODY[HEADER.FIELDS') {
-                            $i++;
-                            while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
+
+                        if ($vals[$i] == 'BODY[HEADER.FIELDS' || $vals[$i] == 'BODY[TEXT') {
+                            if ($vals[$i] == 'BODY[HEADER.FIELDS') {
+                                
                                 $i++;
-                            }
-                            $last_header = false;
-                            $lines = explode("\r\n", $vals[$i]);
-                            foreach ($lines as $line) {
-                                $header = mb_strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
-                                if (!$header || (!isset($flds[$header]) && $last_header)) {
-                                    ${$flds[$last_header]} .= str_replace("\t", " ", $line);
+                                while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
+                                    $i++;
                                 }
-                                elseif (isset($flds[$header])) {
-                                    ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
-                                    $last_header = $header;
+                                $last_header = false;
+                                $lines = explode("\r\n", $vals[$i]);
+                                foreach ($lines as $line) {
+                                    $header = mb_strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
+                                    if (!$header || (!isset($flds[$header]) && $last_header)) {
+                                        ${$flds[$last_header]} .= str_replace("\t", " ", $line);
+                                    }
+                                    elseif (isset($flds[$header])) {
+                                        ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
+                                        $last_header = $header;
+                                    }
                                 }
+                            } else {
+
+                                $i++;
+                                $res = '';
+                                while(isset($vals[$i])) {
+
+                                    if ($vals[$i] != ']') {
+                                        $res = trim(preg_replace("/\s*\)$/", '', $vals[$i]));
+                                        break;
+                                    }
+                                    $i++;
+                                }
+                                
+                                $message_part = 0;
+                                $struct = true;
+                                $full_struct = $this->get_message_structure($uid);
+                                $part_struct = $this->search_bodystructure( $full_struct, array('imap_part_number' => $message_part));
+                                if (isset($part_struct[$message_part])) {
+                                    $struct = $part_struct[$message_part];
+                                }
+
+                                if (is_array($struct)) {
+                                    if (isset($struct['encoding']) && $struct['encoding']) {
+                                        if (mb_strtolower($struct['encoding']) == 'quoted-printable') {
+                                            $res = quoted_printable_decode($res);
+                                        }
+                                        elseif (mb_strtolower($struct['encoding']) == 'base64') {
+                                            $res = base64_decode($res);
+                                        }
+                                    }
+                                    if (isset($struct['attributes']['charset']) && $struct['attributes']['charset']) {
+                                        if ($struct['attributes']['charset'] != 'us-ascii') {
+                                            $res = mb_convert_encoding($res, 'UTF-8', $struct['attributes']['charset']);
+                                        }
+                                    }
+                                }
+                                $preview_msg = $res;
+
                             }
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
@@ -846,6 +894,7 @@ if (!class_exists('Hm_IMAP')) {
                             }
                         }
                     }
+
                     if ($uid) {
                         $cset = '';
                         if (mb_stristr($content_type, 'charset=')) {
@@ -860,12 +909,17 @@ if (!class_exists('Hm_IMAP')) {
                                          'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
                                          'x_snoozed'  => $x_snoozed);
 
+                        if (! empty($preview_msg)) {
+                            $headers[$uid]['preview_msg'] = $preview_msg;
+                        }
+
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);
                         }
                         else {
                             $headers[$uid] = array_map(array($this, 'decode_fld'), $headers[$uid]);
                         }
+
 
                     }
                 }
@@ -2184,6 +2238,13 @@ if (!class_exists('Hm_IMAP')) {
                 $headers = $this->get_message_list($uids);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
+                        // $part = true;
+                        // $max = 3000;
+                        // $msg_struct = $this->get_message_structure($uid);
+                        // $struct = $this->search_bodystructure($msg_struct, array('imap_part_number' => $part));
+                        // $msg_struct_current = array_shift($struct);
+                        // $msg_text = $this->get_message_content($uid, $part, $max, $msg_struct_current);
+                        // $headers[$uid]['preview_msg'] = $msg_text;
                         $result[$uid] = $headers[$uid];
                     }
                 }

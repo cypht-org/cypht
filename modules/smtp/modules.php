@@ -2027,7 +2027,7 @@ function get_outbound_msg_detail($post, $draft, $body_type) {
     }
     if (array_key_exists('compose_in_reply_to', $post)) {
         $in_reply_to = $post['compose_in_reply_to'];
-        $draft['draft_in_reply_to'] = $post['compose_in_reply_to'];
+        $draft['draft_in_reply_to'] = $pzost['compose_in_reply_to'];
     }
     if ($body_type == 2) {
         $converter = new GithubFlavoredMarkdownConverter([
