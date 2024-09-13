@@ -239,6 +239,31 @@ var contact_import_pagination = function() {
     });
 };
 
+var check_cc_exist_in_contacts_list = function() {
+    if (typeof list_emails !== "undefined") {
+        var compose_cc = $(".compose_cc").val().trim();
+        var list_cc = null;
+        var list_cc_not_exist_in_my_contact = [];
+        if (compose_cc.length > 0) {
+            list_cc = compose_cc.split(",");
+            var list_html = "<ol>";
+            list_cc.forEach(cc => {
+                cc = cc.trim().split(" ");
+                if (! list_emails.includes(cc.slice(-1)[0])) {
+                    list_cc_not_exist_in_my_contact.push(cc.slice(-1)[0])
+                    list_html += `<li>${cc.slice(-1)[0]}</li>`;
+                }
+            });
+            list_html += "</ol>";
+
+            if (list_cc_not_exist_in_my_contact) {
+                return list_html;
+            }
+        }
+    }
+    return "";
+};
+
 if (hm_page_name() == 'contacts') {
     $('.delete_contact').on("click", function() {
         delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));

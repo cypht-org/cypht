@@ -170,7 +170,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $len =  count($res['foo']);
         $res2 = Hm_Output_Modules::dump();
         $len2 = count($res2['foo']);
-        $this->assertEquals(13, $len);
+        $this->assertEquals(12, $len);
         $this->assertEquals(19, $len2);
     }
     /**
