@@ -822,6 +822,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $offset = 0;
         $msgs = array();
         $list_page = 1;
+        $include_preview = $this->user_config->get('active_preview_message_setting', false);
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
@@ -847,9 +848,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails);
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_preview);
                 } else {
-                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_preview);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
@@ -2276,3 +2277,11 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
+class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Module {
+    public function process() {
+        function process_active_preview_message_callback($val) { return $val; }
+        process_site_setting('active_preview_message', $this, 'process_active_preview_message_callback', true, true);
+    }
+}
+
+

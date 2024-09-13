@@ -1490,3 +1490,18 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
         return $res;
     }
 }
+class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "";
+        if (array_key_exists('active_preview_message', $settings) && $settings['active_preview_message']) {
+            if ($settings['active_preview_message']) {
+                $checked = "checked";
+            }
+        }
+        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
