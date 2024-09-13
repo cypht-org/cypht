@@ -419,29 +419,6 @@ var force_send_message = function() {
     }
 }
 
-var check_cc_exist_in_contacts_list = function(e) {
-        var compose_cc = $(".compose_cc").val().trim();
-        var list_cc = null;
-        var list_cc_not_exist_in_my_contact = [];
-        if (compose_cc.length > 0) {
-            list_cc = compose_cc.split(",");
-            var list_html = "<ol>";
-            list_cc.forEach(cc => {
-                cc = cc.trim().split(" ");
-                if (! list_emails.includes(cc.slice(-1)[0])) {
-                    list_cc_not_exist_in_my_contact.push(cc.slice(-1)[0])
-                    list_html += `<li>${cc.slice(-1)[0]}</li>`;
-                }
-            });
-            list_html += "</ol>";
-
-            if (list_cc_not_exist_in_my_contact) {
-                return list_html;
-            }
-        }
-    return "";
-};
-
 $(function () {
     if (!hm_is_logged()) {
         return;
@@ -510,16 +487,15 @@ $(function () {
                 modalContentHeadline = "Your subject and body are empty!";
             }
 
-            // if contact_cc not exist in contact list for user
-            var checkInList = "";
-            if (list_emails) {
-                checkInList = check_cc_exist_in_contacts_list(e);
+            if (hm_module_is_supported('contacts')) {
+                var checkInList = check_cc_exist_in_contacts_list();
+                // if contact_cc not exist in contact list for user
                 if (checkInList) {
-                    modalContentHeadline = "Adress mail not exist in your contact liste";
+                    modalContentHeadline = "Adress mail not exist in your contact list";
                     showBtnSendAnywayDontWarnFuture = false;
                 }
+
             }
-            
 
             // If the user has disabled the warning, we should send the message
             if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
