@@ -13,6 +13,8 @@ $environment->load();
 
 /* get config object */
 $config = new Hm_Site_Config_File();
+/* set the default since and per_source values */
+$environment->define_default_constants($config);
 
 $session_type = $config->get('session_type');
 $auth_type = $config->get('auth_type');
