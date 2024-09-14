@@ -137,7 +137,6 @@ var save_compose_state = function(no_files, notice) {
         return;
     }
 
-    $('.smtp_send_placeholder').prop('disabled', true);
     $('.smtp_send_placeholder').addClass('disabled_input');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
