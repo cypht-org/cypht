@@ -601,6 +601,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
+        $enabled_modules = $this->get('enabled_modules',array());
         $res = '<script type="text/javascript">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
@@ -636,8 +637,9 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '    return key;'.
             '};';
         $res .= 'window.hm_default_timezone = "'.$this->get('default_timezone','UTC').'";';
-        $res .= 'var hm_module_is_supported = function(module) {'.
-            '    return '.json_encode($this->get('enabled_modules', array())).'.indexOf(module) !== -1;'.
+        $res .= 'var hm_enabled_modules = '.json_encode($this->get('enabled_modules', array())).';'.
+            'var hm_module_is_supported = function(module) {'.
+            '    return hm_enabled_modules.indexOf(module) !== -1;'.
             '};';
         $res .= '</script>';
         return $res;
