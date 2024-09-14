@@ -32,6 +32,8 @@ $environment->load();
 
 /* get config object */
 $config = new Hm_Site_Config_File();
+/* set the default since and per_source values */
+$environment->define_default_constants($config);
 
 /* check config for db auth */
 if ($config->get('auth_type') != 'DB') {
