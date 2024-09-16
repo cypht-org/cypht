@@ -279,16 +279,23 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             return;
         }
 
+        $msg_attrs = array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+        'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+        'draft_in_reply_to' => $inreplyto);
+
+        if ($this->get('save_draft_to_imap') === false) {
+            $mime = prepare_draft_mime($msg_attrs, $uploaded_files);
+            $this->out('draft_mime', $mime);
+            return;
+        }
+
         if ($this->module_is_supported('imap')) {
             $uploaded_files = explode(',', $uploaded_files);
             $userpath = md5($this->session->get('username', false));
             foreach($uploaded_files as $key => $file) {
                 $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
             }
-            $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
-                    'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
-                    'draft_in_reply_to' => $inreplyto), $draft_id, $this->session,
-                    $this, $this->cache, $uploaded_files);
+            $new_draft_id = save_imap_draft($msg_attrs, $draft_id, $this->session, $this, $this->cache, $uploaded_files);
             if ($new_draft_id >= 0) {
                 if ($draft_notice) {
                     Hm_Msgs::add('Draft saved');
@@ -1814,6 +1821,26 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 }
 
+function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '') {
+    $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+    $mime = new Hm_MIME_Msg(
+        $atts['draft_to'],
+        $atts['draft_subject'],
+        $atts['draft_body'],
+        $from,
+        false,
+        $atts['draft_cc'],
+        $atts['draft_bcc'],
+        '',
+        $name,
+        $atts['draft_in_reply_to']
+    );
+
+    $mime->add_attachments($uploaded_files);
+
+    return $mime;
+}
+
 /**
  * @subpackage smtp/functions
  */
@@ -1855,20 +1882,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
     $draft_folder = $imap->select_mailbox($specials['draft']);
 
-    $mime = new Hm_MIME_Msg(
-        $atts['draft_to'],
-        $atts['draft_subject'],
-        $atts['draft_body'],
-        $from,
-        false,
-        $atts['draft_cc'],
-        $atts['draft_bcc'],
-        '',
-        $name,
-        $atts['draft_in_reply_to']
-    );
-
-    $mime->add_attachments($uploaded_files);
+    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name);
     $res = $mime->process_attachments();
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
