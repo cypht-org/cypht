@@ -408,8 +408,8 @@ class Hm_SMTP {
                     break;
             }
         }
-    
-        if (!$result) {
+
+        if (!isset($result)) {
             $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
