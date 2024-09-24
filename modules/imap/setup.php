@@ -437,5 +437,6 @@ return array(
         'tag_id' => FILTER_DEFAULT,
         'first_time_screen_emails' => FILTER_VALIDATE_INT,
         'move_messages_in_screen_email' => FILTER_VALIDATE_BOOLEAN,
+        'keep_unread' => FILTER_VALIDATE_BOOLEAN,
     )
 );
