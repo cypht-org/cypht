@@ -524,7 +524,9 @@ $(function () {
             }
 
             function handleSendAnyway() {
-                smtp_delete_draft($('.compose_draft_id').val());
+                if($('.compose_draft_id').val() === 0){
+                    Hm_Notices.show([info_msg('Please wait, sending message...')]);
+                }
                 if (handleMissingAttachment()) {
                     document.getElementsByClassName("smtp_send")[0].click();
                 } else {
@@ -568,11 +570,6 @@ $(function () {
                     }
                 }
                 return true;
-            }
-            if($('.compose_draft_id').val() === 0){
-                if(confirm('Do you want to save this message as a draft?')){
-                    save_compose_state(false, true);
-                }
             }
         });
         $('.compose_form').on('submit', function() {
