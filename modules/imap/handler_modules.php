@@ -1939,6 +1939,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             $this->out('auto_advance_email_enabled', $this->user_config->get('auto_advance_email_setting', true));
             $part = false;
             $prefetch = false;
+            $keep_unread = $this->request->post['keep_unread'];
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
             }
@@ -1970,17 +1971,17 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         }
                         $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
-                        $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current);
+                        $msg_text = $imap->get_message_content($form['imap_msg_uid'], $part, $max, $msg_struct_current, $keep_unread);
                     }
                     else {
                         if (!$this->user_config->get('text_only_setting', false)) {
-                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'html', $msg_struct);
+                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', 'html', $msg_struct, $keep_unread);
                             if (!$part) {
-                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct, $keep_unread);
                             }
                         }
                         else {
-                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct);
+                            list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', false, $msg_struct, $keep_unread);
                         }
                         $struct = $imap->search_bodystructure( $msg_struct, array('imap_part_number' => $part));
                         $msg_struct_current = array_shift($struct);
@@ -1992,7 +1993,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                                 else {
                                     $subtype = 'plain';
                                 }
-                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', $subtype, $msg_struct);
+                                list($part, $msg_text) = $imap->get_first_message_part($form['imap_msg_uid'], 'text', $subtype, $msg_struct, $keep_unread);
                                 $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
                                 $msg_struct_current = array_shift($struct);
                             }
