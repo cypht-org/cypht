@@ -136,7 +136,7 @@ var save_compose_state = function(no_files, notice) {
     if (!body && !subject && !to && !cc && !bcc) {
         return;
     }
-
+    $('.compose_draft_id').val(0)
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
@@ -151,8 +151,6 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_to', 'value': to},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
-            $('.smtp_send_placeholder').prop('disabled', false);
-            $('.smtp_send_placeholder').removeClass('disabled_input');
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
@@ -526,6 +524,7 @@ $(function () {
             }
 
             function handleSendAnyway() {
+                smtp_delete_draft($('.compose_draft_id').val());
                 if (handleMissingAttachment()) {
                     document.getElementsByClassName("smtp_send")[0].click();
                 } else {
@@ -569,6 +568,11 @@ $(function () {
                     }
                 }
                 return true;
+            }
+            if($('.compose_draft_id').val() === 0){
+                if(confirm('Do you want to save this message as a draft?')){
+                    save_compose_state(false, true);
+                }
             }
         });
         $('.compose_form').on('submit', function() {
