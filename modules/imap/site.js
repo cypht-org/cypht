@@ -525,14 +525,29 @@ function preFetchMessageContent(msgPart, uid) {
         {'name': 'imap_msg_part', 'value': msgPart},
         {'name': 'imap_server_id', 'value': detail.server_id},
         {'name': 'folder', 'value': detail.folder},
-        {'name': 'keep_unread', 'value': true}
+        {'name': 'imap_prefetch', 'value': true}
     ], (res) => {
         Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
-    })
+    }, null, true)
 }
 
 function getMessageStorageKey(uid) {
     return uid + '_' + hm_list_path();
+}
+
+function markPrefetchedMessagesAsRead(uid) {
+    const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
+    
+    Hm_Ajax.request([
+        {'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
+        {'name': 'action_type', 'value': 'read'},
+        {'name': 'message_ids', 'value': [msgId]}
+    ], () => {
+        const folderId = `${detail.type}_${detail.server_id}_${detail.folder}`;
+        Hm_Folders.unread_counts[folderId] -= 1;
+        Hm_Folders.update_unread_counts(folderId);
+    }, null, true);
 }
 
 var expand_imap_mailbox = function(res) {
@@ -877,9 +892,19 @@ var imap_prefetch_msgs = function() {
 };
 
 var imap_setup_message_view_page = function(uid, details, list_path, callback) {
+    if (!uid) {
+        uid = hm_msg_uid();
+    }
+    const callbackFn = (...args) => {
+        markPrefetchedMessagesAsRead(uid); // TODO: Ensure this is executed only for unread messages
+        if (callback) {
+            callback(...args);
+        }
+    };
+    
     const msg_content = get_local_message_content(uid, list_path);
     if (!msg_content || !msg_content.indexOf('<div class="msg_text_inner"></div>') > -1) {
-        get_message_content(false, uid, list_path, details, callback);
+        get_message_content(false, uid, list_path, details, callbackFn);
     }
     else {
         const msgResponse = JSON.parse(msg_content);
