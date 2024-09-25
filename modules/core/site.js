@@ -280,6 +280,14 @@ var Hm_Ajax_Request = function() { return {
                 for (var name in res.folder_status) {
                     Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
                     Hm_Folders.update_unread_counts();
+                    const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
+                    messages.load().then(() => {
+                        if (messages.count != res.folder_status[name].messages) {
+                            messages.load(true).then(() => {
+                                display_imap_mailbox(messages.raws, messages.links);
+                            })
+                        }
+                    });
                 }
             }
             if (this.callback) {
