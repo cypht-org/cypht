@@ -440,7 +440,7 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 var select_imap_folder = function(path, reload) {
     const messages = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number());
     messages.load(reload).then(() => {        
-        display_imap_mailbox(messages.raws, messages.links);
+        display_imap_mailbox(messages.rows, messages.links);
     });
     return false;
 };
@@ -486,16 +486,16 @@ var setup_imap_folder_page = function() {
     Hm_Ajax.add_callback_hook('ajax_message_action', function() { select_imap_folder(hm_list_path(), true); });
 };
 
-var display_imap_mailbox = function(raws, links) {
+var display_imap_mailbox = function(rows, links) {
     const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
-    Hm_Message_List.update([detail.server_id], raws, 'imap');
+    Hm_Message_List.update([detail.server_id], rows, 'imap');
     Hm_Message_List.check_empty_list();
     $('.page_links').html(links);
     $('input[type=checkbox]').on("click", function(e) {
         Hm_Message_List.toggle_msg_controls();
     });    
 
-    const messages = Object.values(raws);    
+    const messages = Object.values(rows);    
     messages.forEach(function(item) {
         const tr = $(item['0']);
         const uid = tr.data('uid');
@@ -531,7 +531,11 @@ async function markPrefetchedMessagesAsRead(uid) {
 
     const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
     await messages.load(false, true);
-    if (messages.markRawAsRead(uid)) {
+    if (!messages.flagAsReadOnOpen) {
+        return;
+    }
+    
+    if (messages.markRowAsRead(uid)) {
         const folderId = `${detail.type}_${detail.server_id}_${detail.folder}`;
         Hm_Folders.unread_counts[folderId] -= 1;
         Hm_Folders.update_unread_counts(folderId);
@@ -844,52 +848,11 @@ var get_local_message_content = function(msg_uid, path) {
     return Hm_Utils.get_from_local_storage(key);
 };
 
-var imap_prefetch_message_content = function(uid, server_id, folder) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
-        {'name': 'imap_msg_uid', 'value': uid},
-        {'name': 'imap_msg_part', 'value': ''},
-        {'name': 'imap_server_id', 'value': server_id},
-        {'name': 'imap_prefetch', 'value': true},
-        {'name': 'folder', 'value': folder}],
-        function(res) {
-            var key = uid+'_imap_'+server_id+'_'+folder;
-            if (!Hm_Utils.get_from_local_storage(key)) {
-                var div;
-                div = $('<div></div>');
-                div.append(res.msg_headers);
-                div.append(res.msg_text);
-                div.append(res.msg_parts);
-                Hm_Utils.save_to_local_storage(key, div.html());
-            }
-        },
-        [],
-        true
-    );
-    return false;
-};
-
-var imap_prefetch_msgs = function() {
-    var detail;
-    var key;
-
-    $(Hm_Utils.get_from_local_storage('formatted_unread_data')).each(function() {
-        if ($(this).attr('class').match(/^imap/)) {
-            detail = Hm_Utils.parse_folder_path($(this).attr('class'), 'imap');
-            key = detail.uid+'_'+detail.type+'_'+detail.server_id+'_'+detail.folder;
-            if (!Hm_Utils.get_from_local_storage(key)) {
-                imap_prefetch_message_content(detail.uid, detail.server_id, detail.folder);
-                return false;
-            }
-        }
-    });
-};
-
 var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     if (!uid) {
         uid = hm_msg_uid();
     }
-    const callbackFn = (...args) => {
+    const callbackFn = (...args) => {        
         markPrefetchedMessagesAsRead(uid);
         if (callback) {
             callback(...args);
@@ -1341,8 +1304,6 @@ $(function() {
             Hm_Timer.add_job(globals.Hm_Background_Unread.load_sources, interval, true);
         }
     }
-    var prefetch_interval = Hm_Utils.get_from_global('imap_prefetch_msg_interval', 43);
-    Hm_Timer.add_job(imap_prefetch_msgs, prefetch_interval, true);
     setTimeout(prefetch_imap_folders, 2);
 });
 

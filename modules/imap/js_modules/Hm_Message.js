@@ -1,39 +1,27 @@
-class Hm_Message {
-    constructor(uid, html) {
-        this.uid = uid;
-        this.html = html;
-    }
-
-    getStorageKey() {
-        return this.uid + '_' + hm_list_path();
-    }
-
-    // TODO: Add message storage implementation
-}
-
 /**
  * An abstraction object of the Message_List focused on state management without UI interaction.
  */
 class Hm_MessagesStore {
 
     /**
-     * @typedef {Object} RawObject
-     * @property {String} 0 - The HTML string of the raw
+     * @typedef {Object} RowObject
+     * @property {String} 0 - The HTML string of the row
      * @property {String} 1 - The IMAP key
      */
 
     /** 
-     * @typedef {Array} RawEntry
+     * @typedef {Array} RowEntry
      * @property {String} 0 - The IMAP key
-     * @property {RawObject} 1 - An object containing the raw message and the IMAP key
+     * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page, raws = {}) {
+    constructor(path, page, rows = {}) {
         this.path = path;
         this.list = path + '_' + page;
-        this.raws = raws;
+        this.rows = rows;
         this.links = "";
         this.count = 0;
+        this.flagAsReadOnOpen = true;
     }
 
     /**
@@ -43,17 +31,19 @@ class Hm_MessagesStore {
     async load(reload = false, hideLoadingState = false) {
         const storedMessages = this.#retrieveFromLocalStorage();
         if (storedMessages && !reload) {
-            this.raws = storedMessages.raws;
+            this.rows = storedMessages.rows;
             this.links = storedMessages.links;
             this.count = storedMessages.count;
+            this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
             return this;
         }
 
-        const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status } = await this.#fetch(hideLoadingState);
+        const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
 
         this.count = Object.values(folder_status)[0].messages;
         this.links = pageLinks;
-        this.raws = updatedMessages;
+        this.rows = updatedMessages;
+        this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
 
         this.#saveToLocalStorage();
 
@@ -65,20 +55,20 @@ class Hm_MessagesStore {
      * @param {String} uid the id of the message to be marked as read
      * @returns {Boolean} true if the message was marked as read, false otherwise
      */
-    markRawAsRead(uid) {
-        const raws = Object.entries(this.raws);
-        const raw = this.#getRawByUid(uid)?.value;
+    markRowAsRead(uid) {
+        const rows = Object.entries(this.rows);
+        const row = this.#getRowByUid(uid)?.value;
         
-        if (raw) {
-            const htmlRaw = $(raw[1]['0']);
-            const wasUnseen = htmlRaw.find('.unseen').length > 0 || htmlRaw.hasClass('unseen');
+        if (row) {
+            const htmlRow = $(row[1]['0']);
+            const wasUnseen = htmlRow.find('.unseen').length > 0 || htmlRow.hasClass('unseen');
 
-            htmlRaw.removeClass('unseen');
-            htmlRaw.find('.unseen').removeClass('unseen');
-            const objectRaws = Object.fromEntries(raws);
-            objectRaws[raw[0]]['0'] = htmlRaw[0].outerHTML;
+            htmlRow.removeClass('unseen');
+            htmlRow.find('.unseen').removeClass('unseen');
+            const objectRows = Object.fromEntries(rows);
+            objectRows[row[0]]['0'] = htmlRow[0].outerHTML;
             
-            this.raws = objectRaws;
+            this.rows = objectRows;
             this.#saveToLocalStorage();
 
             return wasUnseen;
@@ -89,16 +79,16 @@ class Hm_MessagesStore {
     /**
      * 
      * @param {*} uid 
-     * @returns {RawObject|false} the next raw entry if found, false otherwise
+     * @returns {RowObject|false} the next row entry if found, false otherwise
      */
-    getNextRawForMessage(uid) {
-        const raws = Object.entries(this.raws);
-        const raw = this.#getRawByUid(uid)?.index;
+    getNextRowForMessage(uid) {
+        const rows = Object.entries(this.rows);
+        const row = this.#getRowByUid(uid)?.index;
         
-        if (raw !== false) {
-            const nextRaw = raws[raw + 1];
-            if (nextRaw) {
-                return nextRaw[1];
+        if (row !== false) {
+            const nextRow = rows[row + 1];
+            if (nextRow) {
+                return nextRow[1];
             }
         }
         return false;
@@ -107,15 +97,15 @@ class Hm_MessagesStore {
     /**
      * 
      * @param {*} uid 
-     * @returns {RawObject|false} the previous raw entry if found, false otherwise
+     * @returns {RowObject|false} the previous row entry if found, false otherwise
      */
-    getPreviousRawForMessage(uid) {
-        const raws = Object.entries(this.raws);
-        const raw = this.#getRawByUid(uid)?.index;
-        if (raw) {
-            const previousRaw = raws[raw - 1];
-            if (previousRaw) {
-                return previousRaw[1];
+    getPreviousRowForMessage(uid) {
+        const rows = Object.entries(this.rows);
+        const row = this.#getRowByUid(uid)?.index;
+        if (row) {
+            const previousRow = rows[row - 1];
+            if (previousRow) {
+                return previousRow[1];
             }
         }
         return false;
@@ -142,39 +132,40 @@ class Hm_MessagesStore {
     }
 
     #saveToLocalStorage() {
-        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ raws: this.raws, links: this.links, count: this.count }));
+        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ rows: this.rows, links: this.links, count: this.count }));
+        Hm_Utils.save_to_local_storage('flagAsReadOnOpen', this.flagAsReadOnOpen);
     }
 
     #retrieveFromLocalStorage() {
         const stored = Hm_Utils.get_from_local_storage(this.list);
+        const flagAsReadOnOpen = Hm_Utils.get_from_local_storage('flagAsReadOnOpen');
         if (stored) {
-            return JSON.parse(stored);
+            return {...JSON.parse(stored), flagAsReadOnOpen: flagAsReadOnOpen !== 'false'};
         }
         return false;
     }
 
     /**
-     * @typedef {Object} RawOutput
-     * @property {Number} index - The index of the raw
-     * @property {RawEntry} value - The raw entry
+     * @typedef {Object} RowOutput
+     * @property {Number} index - The index of the row
+     * @property {RowEntry} value - The row entry
      * 
      * @param {String} uid 
-     * @returns {RawOutput|false} raw - The raw object if found, false otherwise
+     * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
-    #getRawByUid(uid) {
-        const raws = Object.entries(this.raws);
-        const raw = raws.find(([key, value]) => $(value['0']).attr('data-uid') == uid);
+    #getRowByUid(uid) {
+        const rows = Object.entries(this.rows);
+        const row = rows.find(([key, value]) => $(value['0']).attr('data-uid') == uid);
         
-        if (raw) {
-            const index = raws.indexOf(raw);
-            return { index, value: raw };
+        if (row) {
+            const index = rows.indexOf(row);
+            return { index, value: row };
         }
         return false;
     }
 }
 
 [
-    Hm_Message,
     Hm_MessagesStore
 ].forEach((item) => {
     window[item.name] = item;
