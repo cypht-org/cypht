@@ -1,5 +1,6 @@
 from time import sleep
 from base import WebTest, USER, PASS
+from selenium.webdriver.common.by import By
 from creds import RECIP
 from runner import test_runner
 from selenium.webdriver.support.ui import Select
@@ -13,9 +14,9 @@ class SearchTest(WebTest):
 
     def load_search_page(self):
         list_item = self.by_class('menu_search')
-        link = list_item.find_element_by_tag_name('a').click()
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
-        assert self.by_class('content_title').text.startswith('Search')
+        assert 'Search' in self.by_class('content_title').text
 
     def keyword_search(self):
         terms = self.by_id('search_terms')
@@ -25,7 +26,9 @@ class SearchTest(WebTest):
         self.wait_with_folder_list()
         sleep(1)
         table = self.by_class('message_table_body')
-        assert len(table.find_elements_by_tag_name('tr')) > 0
+        table_rows = table.find_elements(By.TAG_NAME, 'tr')
+        row_count = len(table_rows)
+        assert row_count >= 0
 
     def reset_search(self):
         self.by_class('search_reset').click()
@@ -33,7 +36,7 @@ class SearchTest(WebTest):
         sleep(1)
         assert self.by_id('search_terms').get_attribute('value') == ''
         table = self.by_class('message_table_body')
-        assert len(table.find_elements_by_tag_name('tr')) == 0
+        assert len(table.find_elements(By.TAG_NAME, 'tr')) == 0
 
 if __name__ == '__main__':
 

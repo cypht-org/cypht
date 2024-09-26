@@ -1,6 +1,6 @@
 html,
 body {
-  background: var(--bs-secondary-bg) !important;
+  background-color: var(--bs-secondary-bg) !important;
   font-family: var(--bs-font-sans-serif);
   color: var(--bs-body-color) !important;
 }
@@ -73,7 +73,6 @@ html,
 body {
   max-width: 100%;
   min-height: 100%;
-  background-color: #fff;
 }
 body {
   font-size: 1em;
@@ -323,7 +322,8 @@ td {
   margin-right: 20px;
 }
 .disabled_link {
-  color: #bbb;
+  pointer-events: none;
+  opacity: 0.5;
 }
 input,
 option,
@@ -372,7 +372,7 @@ button {
   margin-bottom: 10px;
 }
 .folders a,
-.unread_link {
+.unread_link,.all_tags {
   color: rgba(var(--bs-body-color-rgb), 0.7);
   text-decoration: none;
   line-height: 1.25em;
@@ -401,7 +401,6 @@ button {
 .inner_list li {
   padding: 4px;
   padding-left: 10px;
-  color: #555;
   padding-bottom: 0px;
   margin: 2px;
   white-space: nowrap;
@@ -627,11 +626,11 @@ button {
 .folder_toggle {
   font-size: 0px;
   float: left;
-  margin: 10px 15px;
+  margin: 15px 15px 10px 15px;
   display: none;
 }
-.folder_toggle img {
-  opacity: 0.5;
+.folder_toggle i {
+  color: var(--bs-body-color);
 }
 .prevnext {
   font-size: 1.3rem;
@@ -666,11 +665,11 @@ button {
   font-size: 0px;
   float: left;
   clear: none;
-  margin-top: 10px;
+  margin-top: 5px;
   margin-left: 23px;
 }
-.hide_folders img {
-  opacity: 0.4;
+.hide_folders i {
+  color: var(--bs-body-color);
 }
 .section_caret {
   opacity: 0.15;
@@ -741,7 +740,7 @@ button {
   padding-left: 5px;
 }
 .folder_list .search_terms {
-  width: 80%;
+  width: 100%;
 }
 .search_content {
   display: table;
@@ -1005,9 +1004,8 @@ div.unseen,
   display: block;
   top: 0px;
   left: -3px;
-  font-size: 20px;
   font-weight: bold;
-  margin-top: 17px !important;
+  margin-top: 15px !important;
   position: fixed;
   z-index: 101;
 }

@@ -129,9 +129,6 @@ class Hm_Contact_Store {
 
     public function import($data) {
         foreach ($data as $contact) {
-            if (! isset($contact['id'])) {
-                $contact['id'] = self::count();
-            }
             $contact['external'] = true;
             $contact = new Hm_Contact($contact);
             self::add($contact, false);

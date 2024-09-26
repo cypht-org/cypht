@@ -133,7 +133,19 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
             $profile['id'] = $form['profile_id'];
             Hm_Profiles::edit($form['profile_id'], $profile);
         } else {
+            $profiles = $this->get('profiles');
+
+            foreach ($profiles as $existing_profile) {
+                if (
+                    ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
+                    ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
+                ) {
+                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    return;
+                }
+            }
             Hm_Profiles::add($profile);
+            Hm_Msgs::add('Profile Created');
         }
 
         if ($default) {
@@ -158,7 +170,7 @@ class Hm_Handler_profile_data extends Hm_Handler_Module {
 class Hm_Output_profile_edit_form extends Hm_Output_Module {
     protected function output() {
         $new_id = $this->get('new_profile_id', -1);
-        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span>'.$this->trans('Profiles').'</span>';
+        $res = '<div class="profile_content p-0"><div class="content_title px-3 d-flex justify-content-between"><span class="profile_content_title">'.$this->trans('Profiles').'</span>';
         $smtp_servers = $this->get('smtp_servers', array());
         $imap_servers = $this->get('imap_servers', array());
         if ($this->get('edit_profile')) {
@@ -307,7 +319,7 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     }
     $res .= '</div>';
 
-    $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-5">';
+    $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
     $res .= '<form method="post" action="?page=profiles">';
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';

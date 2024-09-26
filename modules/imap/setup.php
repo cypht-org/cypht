@@ -15,6 +15,7 @@ add_module_to_all_pages('output', 'prefetch_imap_folder_ids', true, 'imap', 'con
 
 /* add stuff to the info page */
 add_output('info', 'display_imap_status', true, 'imap', 'server_status_start', 'after');
+add_output('info', 'display_imap_capability', true, 'imap', 'server_capabilities_start', 'after');
 add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
@@ -42,6 +43,8 @@ add_handler('settings', 'process_imap_per_page_setting', true, 'imap', 'date', '
 add_handler('settings', 'process_max_google_contacts_number', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_review_sent_email_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_auto_advance_email_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_first_time_screen_emails_per_page_setting', true, 'imap', 'date', 'after');
+add_handler('settings', 'process_setting_move_messages_in_screen_email', true, 'imap', 'process_first_time_screen_emails_per_page_setting', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -57,6 +60,8 @@ add_output('settings', 'enable_simple_download_options', true, 'imap', 'imap_per
 add_output('settings', 'max_google_contacts_number', true, 'imap', 'imap_per_page_setting', 'after');
 add_output('settings', 'review_sent_email', true, 'imap', 'imap_pagination_links', 'after');
 add_output('settings', 'imap_auto_advance_email', true, 'imap', 'imap_pagination_links', 'after');
+add_output('settings', 'first_time_screen_emails_per_page_setting', true, 'imap', 'imap_auto_advance_email', 'after');
+add_output('settings', 'setting_move_messages_in_screen_email', true, 'imap', 'first_time_screen_emails_per_page_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -298,6 +303,13 @@ add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_tag', 'core');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'save_imap_cache',  true);
+add_handler('ajax_imap_tag', 'imap_add_tag_message',  true, 'core');
+
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
 add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);
@@ -330,6 +342,7 @@ return array(
         'ajax_imap_move_copy_action',
         'ajax_imap_folder_status',
         'ajax_imap_snooze',
+        'ajax_imap_tag',
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
@@ -337,12 +350,13 @@ return array(
 
     'allowed_output' => array(
         'imap_connect_status' => array(FILTER_DEFAULT, false),
+        'imap_capabilities_list' => array(FILTER_DEFAULT, false),
         'connect_status' => array(FILTER_DEFAULT, false),
         'auto_sent_folder' => array(FILTER_DEFAULT, false),
         'imap_connect_time' => array(FILTER_DEFAULT, false),
         'imap_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_status_display' => array(FILTER_UNSAFE_RAW, false),
-        'imap_status_server_id' => array(FILTER_VALIDATE_INT, false),
+        'imap_status_server_id' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_path' => array(FILTER_DEFAULT, false),
         'imap_expanded_folder_formatted' => array(FILTER_UNSAFE_RAW, false),
         'imap_server_ids' => array(FILTER_DEFAULT, false),
@@ -418,6 +432,10 @@ return array(
         'review_sent_email' => FILTER_VALIDATE_BOOLEAN,
         'imap_snooze_ids' => FILTER_DEFAULT,
         'imap_snooze_until' => FILTER_DEFAULT,
-        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN
+        'auto_advance_email' => FILTER_VALIDATE_BOOLEAN,
+        'imap_server_ids' => FILTER_DEFAULT,
+        'tag_id' => FILTER_DEFAULT,
+        'first_time_screen_emails' => FILTER_VALIDATE_INT,
+        'move_messages_in_screen_email' => FILTER_VALIDATE_BOOLEAN,
     )
 );

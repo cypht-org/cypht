@@ -144,6 +144,8 @@ class Hm_Handler_load_contacts extends Hm_Handler_Module {
         }
         $this->out('contact_page', $page);
         $this->out('contact_store', $contacts, false);
+        $this->out('enable_warn_contacts_cc_not_exist_in_list_contact', $this->user_config->get('enable_warn_contacts_cc_not_exist_in_list_contact_setting', false));
+
     }
 }
 
@@ -190,7 +192,7 @@ class Hm_Output_contact_auto_collect_setting extends Hm_Output_Module {
 
         return '<tr class="general_setting"><td><label for="contact_auto_collect">' .
             $this->trans('Automatically add outgoing email addresses') . '</label></td>' .
-            '<td><input class="form-check-input" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" value="1" />' . $reset . '</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" data-default-value="true" value="1" />' . $reset . '</td></tr>';
     }
 }
 
@@ -398,6 +400,56 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage contacts/handler
+ */
+class Hm_Handler_save_contact extends Hm_Handler_Module
+{
+    public function process()
+    {
+        list($success, $form ) = $this->process_form(array('email_address'));
+        if ($success) {
+            $contacts = $this->get('contact_store');
+            $contact_list = $contacts->getAll();
+            $existingEmails = array_map(function($contact){
+                return $contact->value('email_address');
+            },$contact_list);
+
+            $list_mails = array_unique(explode(",", $form['email_address']));
+
+            foreach ($list_mails as $addr) {
+                $addresses = process_address_fld($addr);
+                $newEmails = array_column($addresses, 'email');
+                if (!empty($newEmails)) {
+                    $newContacts = array_filter($newEmails, function ($email) use ($existingEmails) {
+                        return !in_array($email, $existingEmails);
+                    });
+                    $existingContacts = array_filter($existingEmails, function ($email) use ($newEmails) {
+                        return in_array($email, $newEmails);
+                    });
+                    if (!empty($newContacts)) {
+                        $newContacts = array_map(function ($email) {
+                            return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => 'Trusted Senders'];
+                        }, $newContacts);
+                        $contacts->add_contact($newContacts[0]);
+                    }
+                    if (!empty($existingContacts)) {
+                        $existingContacts = array_map(function ($email) {
+                            return ['source' => 'local', 'email_address' => $email, 'group' => 'Trusted Senders'];
+                        }, $existingContacts);
+                        foreach ($existingContacts as $key => $contact) {
+                            $contacts->update_contact($key, $contact);
+                        }
+                    }
+                }
+            }
+            $this->session->record_unsaved('Contacts added to  Trusted Contacts list');
+            Hm_Msgs::add('Contacts added to  Trusted Contacts list');
+        }
+
+    }
+}
+
+/**
  * @subpackage contacts/output
  */
 class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
@@ -428,6 +480,56 @@ class Hm_Output_filter_autocomplete_list extends Hm_Output_Module {
         $this->out('contact_suggestions', $suggestions);
     }
 }
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_load_contact_mails extends Hm_Output_Module {
+    protected function output() {
+        if (!$this->get("enable_warn_contacts_cc_not_exist_in_list_contact")) {
+            return "";
+        }
+        $contact_store = $this->get('contact_store');
+        $emails = [];
+        foreach ($contact_store->dump() as $contact) {
+            $email = $contact->value('email_address');
+            if ($email) {
+                $emails[] = $email;
+            }
+        }
+        $emails = json_encode($emails);        
+        return "<script>var list_emails = $emails; </script>";
+    }
+}
+
+/**
+ * @subpackage contacts/output
+ */
+class Hm_Output_enable_warn_contacts_cc_not_exist_in_list_contact extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings');
+        if (array_key_exists('enable_warn_contacts_cc_not_exist_in_list_contact', $settings) && $settings['enable_warn_contacts_cc_not_exist_in_list_contact']) {
+            $checked = ' checked="checked"';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        else {
+            $checked = '';
+            $reset='';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_warn_contacts_cc_not_exist_in_list_contact">'.
+            $this->trans('Enable warn if contacts Cc not exist in list contact').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="enable_warn_contacts_cc_not_exist_in_list_contact" name="enable_warn_contacts_cc_not_exist_in_list_contact" />'.$reset.'</td></tr>';
+    }
+}
+
+class Hm_Handler_process_enable_warn_contacts_cc_not_exist_in_list_contact extends Hm_Handler_Module {
+    public function process() {
+        function enable_warn_contacts_cc_not_exist_in_list_contact_callback($val) { return $val; }
+        process_site_setting('enable_warn_contacts_cc_not_exist_in_list_contact', $this, 'enable_warn_contacts_cc_not_exist_in_list_contact_callback', false, true);
+    }
+}
+
 
 /**
  * @subpackage contacts/functions

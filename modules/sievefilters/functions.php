@@ -64,11 +64,11 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <h5 class="mt-0">Conditions</h5>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <button class="sieve_add_condition_modal_button btn btn-sm border bg-white">Add Condition</button>
+                            <button class="sieve_add_condition_modal_button btn btn-sm border btn-primary">Add Condition</button>
                         </div>
                     </div>
-                    <div class="d-block mt-3">
-                        <table class="sieve_list_conditions_modal">
+                    <div class="d-block mt-3 table-responsive">
+                        <table class="sieve_list_conditions_modal table">
                         </table>
                     </div>
                 </div>
@@ -79,12 +79,21 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                             <h5 class="mt-0">Actions</h5>
                         </div>
                         <div class="flex-grow-1 text-end">
-                            <button class="filter_modal_add_action_btn btn btn-sm  border bg-white">Add Action</button>
+                            <button class="filter_modal_add_action_btn btn btn-sm border btn-primary">Add Action</button>
                         </div>
                     </div>
-                    <div class="d-block mt-3">
-                        <table class="filter_actions_modal_table">
+                    <div class="d-block mt-3 table-responsive">
+                        <table class="filter_actions_modal_table table">
                         </table>
+                    </div>
+                </div>
+                <hr/>
+                <div class="p-3">
+                    <div class="d-flex">
+                        <div class="col-sm-10">
+                            <input type="checkbox" id="stop_filtering"/>
+                            <label for="stop_filtering" class="form-label">Stop filtering</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,7 +102,7 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 }
 
 if (!hm_exists('get_mailbox_filters')) {
-    function get_mailbox_filters($mailbox, $site_config, $user_config, $html=false)
+    function get_mailbox_filters($mailbox, $site_config, $user_config)
     {
         $factory = get_sieve_client_factory($site_config);
         try {
@@ -106,11 +115,7 @@ if (!hm_exists('get_mailbox_filters')) {
             }
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
-            return !$html ? []: '';
-        }
-
-        if ($html == false) {
-            return $scripts;
+            return ['count' => 0, 'list' => ''];
         }
 
         $scripts_sorted = [];
@@ -149,7 +154,7 @@ if (!hm_exists('get_mailbox_filters')) {
             </tr>
             ';
         }
-        return $script_list;
+        return ['count' => count($scripts), 'list' => $script_list];
     }
 }
 

@@ -12,12 +12,14 @@ add_handler('compose', 'smtp_from_replace', true, 'smtp', 'load_user_data', 'aft
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
-add_output('compose', 'compose_form_start', true, 'smtp', 'content_section_start', 'after');
+add_output('compose', 'compose_title', true, 'smtp', 'content_section_start', 'after');
+add_output('compose', 'compose_form_start', true, 'smtp', 'compose_title', 'after');
 add_output('compose', 'compose_form_draft_list', true, 'smtp', 'compose_form_start', 'before');
 add_output('compose', 'compose_form_content', true, 'smtp', 'compose_form_start', 'after');
 add_output('compose', 'compose_form_end', true, 'smtp', 'compose_form_content', 'after');
 add_output('compose', 'compose_form_attach', true, 'smtp', 'compose_form_end', 'after');
-add_handler('compose', 'load_smtp_is_imap_forward', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'load_smtp_is_imap_forward_as_attachment', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'load_smtp_is_imap_forward', true, 'smtp', 'load_smtp_is_imap_forward_as_attachment', 'after');
 
 add_handler('functional_api', 'default_smtp_server', true, 'smtp');
 
@@ -40,6 +42,7 @@ add_handler('settings', 'attachment_dir', true, 'smtp', 'save_user_settings', 'a
 add_output('settings', 'attachment_setting', true, 'smtp', 'compose_type_setting', 'after');
 
 add_output('settings', 'enable_attachment_reminder_setting', true, 'smtp', 'attachment_setting', 'after');
+add_output('settings', 'delete_attachment_setting', true, 'smtp', 'enable_attachment_reminder_setting', 'after');
 add_handler('settings', 'process_enable_attachment_reminder_setting', true, 'smtp', 'save_user_settings', 'before');
 
 /* ajax server setup callback data */
@@ -115,6 +118,7 @@ return array(
         'reply' => FILTER_VALIDATE_INT,
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
+        'forward_as_attachment' => FILTER_VALIDATE_INT,
         'draft_id' => FILTER_VALIDATE_INT,
         'hm_ajax_hook' => FILTER_DEFAULT,
         'compose_to' => FILTER_DEFAULT,

@@ -56,6 +56,7 @@ add_handler('settings', 'process_drafts_since_setting', true, 'core', 'date', 'a
 add_handler('settings', 'process_drafts_source_max_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_hide_folder_icons', true, 'core', 'date', 'after');
 add_handler('settings', 'process_delete_prompt_setting', true, 'core', 'date', 'after');
+add_handler('settings', 'process_delete_attachment_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_no_password_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_start_page_setting', true, 'core', 'date', 'after');
 add_handler('settings', 'process_default_sort_order_setting', true, 'core', 'date', 'after');
@@ -263,6 +264,7 @@ return array(
         'filter' => FILTER_DEFAULT,
         'sort' => FILTER_DEFAULT,
         'keyword' => FILTER_DEFAULT,
+        'screen_emails' => FILTER_DEFAULT,
     ),
 
     'allowed_post' => array(
@@ -293,6 +295,7 @@ return array(
         'list_style' => FILTER_DEFAULT,
         'timezone' => FILTER_DEFAULT,
         'disable_delete_prompt' => FILTER_VALIDATE_INT,
+        'allow_delete_attachment' => FILTER_VALIDATE_INT,
         'section_state' => FILTER_DEFAULT,
         'section_class' => FILTER_DEFAULT,
         'message_ids' => FILTER_DEFAULT,

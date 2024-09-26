@@ -9,7 +9,7 @@
 /* .sp_description { padding-bottom: 20px; } */
 #draft_val, #sent_val, #trash_val, #junk_val { padding-left: 20px; }
 .manage_folder_icon { vertical-align: -3px; opacity: .3 }
-.manage_folder_link { color: #999 !important; }
+.manage_folder_link { opacity: 0.6; }
 
 .folder_subscription_btn { position: absolute; right: 20px; top: 20px; }
 .folders_subscription { padding-left: 10px; width: 100%; display: inline-block; }

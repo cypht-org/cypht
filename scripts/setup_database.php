@@ -13,6 +13,8 @@ $environment->load();
 
 /* get config object */
 $config = new Hm_Site_Config_File();
+/* set the default since and per_source values */
+$environment->define_default_constants($config);
 
 $session_type = $config->get('session_type');
 $auth_type = $config->get('auth_type');
@@ -25,6 +27,39 @@ $bad_driver = "Unsupported db driver: {$db_driver}";
 
 // NOTE: these sql commands could be db agnostic if we change the blobs to text
 
+// Check if the required extensions for the configured DB driver are loaded
+if ($db_driver == 'mysql') {
+    $required_extensions = ['mysqli', 'mysqlnd', 'pdo_mysql'];
+    $missing_extensions = [];
+
+    foreach ($required_extensions as $extension) {
+        if (!extension_loaded($extension)) {
+            $missing_extensions[] = $extension;
+        }
+    }
+
+    if (!empty($missing_extensions)) {
+        error_log('The following required MySQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
+        exit(1);
+    }
+} elseif ($db_driver == 'pgsql') {
+    $required_extensions = ['pgsql', 'pdo_pgsql'];
+    $missing_extensions = [];
+
+    foreach ($required_extensions as $extension) {
+        if (!extension_loaded($extension)) {
+            $missing_extensions[] = $extension;
+        }
+    }
+
+    if (!empty($missing_extensions)) {
+        error_log('The following required PostgreSQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
+        exit(1);
+    }
+} else {
+    error_log("Unsupported DB driver: {$db_driver}");
+    exit(1);
+}
 
 $connection_tries=0;
 $max_tries=10;
@@ -41,7 +76,7 @@ while (!$connected) {
         printf("Attempting to connect to database ... ({$connection_tries}/{$max_tries})\n");
         sleep(1);
     }
-        
+
     if ($connection_tries >= $max_tries) {
         error_log('Unable to connect to database');
         exit(1);
@@ -83,7 +118,7 @@ if (strcasecmp($auth_type, 'DB')==0) {
 
 }
 if (strcasecmp($user_config_type, 'DB')==0) {
-    
+
     printf("Creating database table hm_user_settings ...\n");
 
     if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
@@ -93,7 +128,7 @@ if (strcasecmp($user_config_type, 'DB')==0) {
     } else {
         die($bad_driver);
     }
-    
+
     $conn->exec($stmt);
 }
 

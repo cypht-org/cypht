@@ -307,7 +307,7 @@ function append_bootstrap_icons_files() {
     if (!is_dir("site/fonts")) {
         mkdir('site/fonts', 0755);
     }
-    $source_folder = 'vendor/twbs/bootstrap-icons/font/fonts/';
+    $source_folder = VENDOR_PATH.'twbs/bootstrap-icons/font/fonts/';
     $files = glob("$source_folder*.*");
     foreach($files as $file){
         $dest_forlder = str_replace($source_folder, "site/fonts/", $file);
@@ -326,9 +326,9 @@ function process_bootswatch_files() {
             if (is_dir($src . '/' . $folder) && $folder != 'fonts') {
                 $target = $src . '/' . $folder . '/css/' . $folder . '.css';
                 if ($folder == 'default') {
-                    $content = file_get_contents('vendor/twbs/bootstrap/dist/css/bootstrap.min.css');
+                    $content = file_get_contents(VENDOR_PATH . 'twbs/bootstrap/dist/css/bootstrap.min.css');
                 } else {
-                    $content = file_get_contents('vendor/thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
+                    $content = file_get_contents(VENDOR_PATH . 'thomaspark/bootswatch/dist/' . $folder . '/bootstrap.min.css');
                 }
                 // Append customization done to the default theme
                 $custom = file_get_contents($target);

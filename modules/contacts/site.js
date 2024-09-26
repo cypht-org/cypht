@@ -43,9 +43,8 @@ var add_contact_from_popup = function(event) {
 
 
     if (contact) {
-        var emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g;
-        var email = contact.match(emailRegex)[0];
-        var name = contact.replace(emailRegex, "");
+        var email = contact.match(EMAIL_REGEX)[0];
+        var name = contact.replace(EMAIL_REGEX, "");
 
         var saveContactContent = `<div><table>
                                             <tr><td><strong>${hm_trans('Name')} :</strong></td><td>${name}</td></tr>
@@ -238,6 +237,31 @@ var contact_import_pagination = function() {
             showPage(selected_page, total_pages);
         }
     });
+};
+
+var check_cc_exist_in_contacts_list = function() {
+    if (typeof list_emails !== "undefined") {
+        var compose_cc = $(".compose_cc").val().trim();
+        var list_cc = null;
+        var list_cc_not_exist_in_my_contact = [];
+        if (compose_cc.length > 0) {
+            list_cc = compose_cc.split(",");
+            var list_html = "<ol>";
+            list_cc.forEach(cc => {
+                cc = cc.trim().split(" ");
+                if (! list_emails.includes(cc.slice(-1)[0])) {
+                    list_cc_not_exist_in_my_contact.push(cc.slice(-1)[0])
+                    list_html += `<li>${cc.slice(-1)[0]}</li>`;
+                }
+            });
+            list_html += "</ol>";
+
+            if (list_cc_not_exist_in_my_contact) {
+                return list_html;
+            }
+        }
+    }
+    return "";
 };
 
 if (hm_page_name() == 'contacts') {

@@ -454,6 +454,7 @@ return array(
     'Current password is incorrect' => false,
     'Details' => false,
     'Don\'t save account passwords between logins' => 'Nu salvați parolele între conectări',
+    'Do you want to log out?' => 'Doriți să vă deconectați?',
     'Drafts' => 'Ciorne',
     'Enter your passwords below to gain access to these services during this session.' => false,
     'Failed to authenticate to the SMTP server' => 'Eroare de autentificare la serverul SMTP',
@@ -627,4 +628,10 @@ return array(
     'Junk' => false,
     'Trash' => false,
     'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
+    'Screen %s first emails' => false,
+    'Yaml File' => false,
+    'Please ensure your YAML or CSV  file follows the correct format' => false,
 );

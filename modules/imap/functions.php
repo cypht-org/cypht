@@ -20,7 +20,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 if (!hm_exists('imap_sources')) {
 function imap_sources($callback, $mod, $folder = 'sent') {
-    $inbox = $mod->user_config->get('smtp_auto_bcc_setting', false);
+    $inbox = $mod->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
     $sources = array();
     $folder = $folder == 'drafts' ? 'draft': $folder;
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
@@ -471,11 +471,8 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
         $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
-        if ($lc_type == "textplain" || $lc_type == "multipartmixed") {
-            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'"></a></td>';
-        }
     }
-    if (isset($vals['file_attributes']['attachment'])) {
+    if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
         $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
     }
     $res .= '</tr>';
@@ -605,28 +602,28 @@ function format_msg_part_section($struct, $output_mod, $part, $dl_link, $at_link
     if(!$simple_view){
         foreach ($struct as $id => $vals) {
             if (is_array($vals) && isset($vals['type'])) {
-                $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $use_icons, $simple_view, $mobile);
+                $row = format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_link, $at_link, $use_icons, $simple_view, $mobile);
                 if (!$row) {
                     $level--;
                 }
                 $res .= $row;
                 if (isset($vals['subs'])) {
-                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, ($level + 1));
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, ($level + 1));
                 }
             }
             else {
                 if (is_array($vals) && count($vals) == 1 && isset($vals['subs'])) {
-                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $level);
+                    $res .= format_msg_part_section($vals['subs'], $output_mod, $part, $dl_link, $at_link, $level);
                 }
             }
         }
     }else{
-        $res = format_attachment($struct,  $output_mod, $part, $dl_link);
+        $res = format_attachment($struct, $output_mod, $part, $dl_link, $at_link);
     }
     return $res;
 }}
 
-function format_attachment ($struct,  $output_mod, $part, $dl_args) {
+function format_attachment($struct,  $output_mod, $part, $dl_args, $at_args) {
     $res = '';
 
     foreach ($struct as $id => $vals) {
@@ -636,14 +633,15 @@ function format_attachment ($struct,  $output_mod, $part, $dl_args) {
 
             $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
             $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
-            /* $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(strtolower($vals['encoding'])) : '').
-            '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(strtolower($vals['attributes']['charset'])) : ''); */
 
-            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td></tr>';
+            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+            if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
+                $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td></tr>';
+            }
         }
 
         if(is_array($vals) && isset($vals['subs'])) {
-            $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args);
+            $sub_res = format_attachment($vals['subs'], $output_mod, $part, $dl_args, $at_args);
             $res =$sub_res;
         }
     }
@@ -859,7 +857,7 @@ function imap_refresh_oauth2_token($server, $config) {
  * @return int count of messages moved
  */
 if (!hm_exists('imap_move_same_server')) {
-function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
+function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_emails=false) {
     $moved = array();
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
@@ -867,11 +865,25 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path) {
     $imap = Hm_IMAP_List::connect($server_id, $cache);
     foreach ($ids[$server_id] as $folder => $msgs) {
         if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
-            if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+            if ($screen_emails) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                    $email = current(array_column(process_address_fld($imap->get_message_headers($msg)['From']), "email"));
+                    $uids = $imap->search('ALL', false, array(array('FROM', $email)));
+                    foreach ($uids as $uid) {
+                        if ($imap->message_action(mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
+                            $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $uid, $folder);
+                        }
+                    }
+                }
+            } else {
+                if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+                    foreach ($msgs as $msg) {
+                        $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                    }
                 }
             }
+            
         }
     }
     return $moved;
@@ -1321,6 +1333,44 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     }
     return $res;
 }}
+if (!hm_exists('add_tag_to_message')) {
+function add_tag_to_message($imap, $msg_id, $folder, $tag) {
+    if (!$imap->select_mailbox($folder)) {
+        return false;
+    }
+    $msg = $imap->get_message_content($msg_id, 0);
+    preg_match("/^X-Cypht-Tags:(.+)\r?\n/i", $msg, $matches);
+
+    if (count($matches)) {
+        $msg = str_replace($matches[0], '', $msg);
+        $tags = explode(',', $matches[1]);
+        if(in_array($tag, $tags)) {
+            unset($tags[array_search(trim($tag), $tags)]);
+        }else{
+            $tags[] = trim($tag);
+        }
+    }else {
+        $tags = array($tag);
+    }
+
+    $msg = "X-Cypht-Tags:".implode(',',$tags)."\n".$msg;
+    $msg = str_replace("\r\n", "\n", $msg);
+    $msg = str_replace("\n", "\r\n", $msg);
+    $msg = rtrim($msg)."\r\n";
+
+    $res = false;
+    if ($imap->append_start($folder, strlen($msg))) {
+        $imap->append_feed($msg."\r\n");
+        if ($imap->append_end()) {
+            if ($imap->message_action('DELETE', array($msg_id))) {
+                $imap->message_action('EXPUNGE', array($msg_id));
+                $res = true;
+            }
+        }
+    }
+
+    return $res;
+}}
 
 /**
  * @subpackage imap/functions
@@ -1417,6 +1467,42 @@ function snooze_dropdown($output, $unsnooze = false) {
     return $txt;
 }}
 
+if (!hm_exists('tags_dropdown')) {
+function tags_dropdown($context, $headers) {
+    $folders = $context->get('tags', array());
+    $txt = '<div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+
+    $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
+    foreach ($folders as $folder) {
+        $tag = $folder['name'];
+        $is_checked = in_array($folder['id'], array_map('trim', $tags));
+        $txt .= '<li class="d-flex dropdown-item gap-2">';
+        $txt .= '<input class="form-check-input me-1 label-checkbox" type="checkbox" value="" aria-label="..." data-id="'.$folder['id'].'" '.($is_checked ? 'checked' : '').'>';
+        $txt .= '<span>'.$context->trans($tag).'</span>';
+        $txt .= '</li>';
+    }
+    $txt .= '</ul></div>';
+
+    return $txt;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('forward_dropdown')) {
+    function forward_dropdown($output,$reply_args) {
+        $txt = '<div class="dropdown d-inline-block">
+                    <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
+        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '</ul></div>';
+        return $txt;
+    }
+}
+
 /**
  * @subpackage imap/functions
  */
@@ -1432,7 +1518,7 @@ function parse_sieve_config_host($host) {
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $show_errors = true) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
@@ -1469,23 +1555,28 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         }
 
-        $server = Hm_IMAP_List::get($imap_server_id, false);
+        $server = Hm_IMAP_List::get($imap_server_id, true);
 
         if ($enableSieve &&
             $imap_sieve_host &&
             $context->module_is_supported('sievefilters') &&
-            $context->user_config->get('enable_sieve_filter_setting', true)) {
+            $context->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
             try {
 
-                include APP_PATH.'modules/sievefilters/hm-sieve.php';
+                include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
                 $client = $sieveClientFactory->init(null, $server);
 
-                if (!$client) {
+                if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                 }
             } catch (Exception $e) {
-                Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                if ($show_errors) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                }
+                if (! $server_id) {
+                    Hm_IMAP_List::del($imap_server_id);
+                }
                 return;
             }
         }
@@ -1494,9 +1585,11 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if (imap_authed($imap)) {
             return $imap_server_id;
-        }else {
+        } else {
             Hm_IMAP_List::del($imap_server_id);
-            Hm_Msgs::add('ERRAuthentication failed');
+            if ($show_errors) {
+                Hm_Msgs::add('ERRAuthentication failed');
+            }
             return null;
         }
     }

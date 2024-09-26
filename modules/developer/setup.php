@@ -16,7 +16,9 @@ if (DEBUG_MODE) {
     add_output('info', 'server_information', true, 'developer', 'info_heading', 'after');
     add_output('info', 'server_status_start', true, 'developer', 'server_information', 'after');
     add_output('info', 'server_status_end', true, 'developer', 'server_status_start', 'after');
-    add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after');
+    add_output('info', 'server_capabilities_start', true, 'developer', 'server_status_end', 'after');
+    add_output('info', 'server_capabilities_end', true, 'developer', 'server_capabilities_start', 'after');
+    add_output('info', 'config_map', true, 'developer', 'server_capabilities_end', 'after');
 
     /* folder list */
     add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');

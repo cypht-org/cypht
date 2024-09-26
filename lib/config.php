@@ -103,7 +103,7 @@ abstract class Hm_Config {
      * @return void
      */
     public function set_tz() {
-        date_default_timezone_set($this->get('timezone_setting', 'UTC'));
+        date_default_timezone_set($this->get('timezone_setting', $this->get('default_setting_timezone', 'UTC')));
     }
 
     /**
@@ -142,7 +142,7 @@ abstract class Hm_Config {
     public function filter_servers() {
         $removed = [];
         $excluded = ['imap_servers', 'smtp_servers'];
-        $no_password = $this->get('no_password_save_setting', false);
+        $no_password = $this->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE);
         foreach ($this->config as $key => $vals) {
             if (in_array($key, $excluded, true)) {
                 foreach ($vals as $index => $server) {

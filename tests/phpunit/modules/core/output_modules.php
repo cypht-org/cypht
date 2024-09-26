@@ -18,7 +18,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->run();
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex align-items-center"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class=""><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></form></div></li>', $res->output_data['formatted_folder_list']);
+        $this->assertEquals('<li class="menu_search"><form method="get"><div class="d-flex bd-highlight"><div class="ps-1 pe-2"><a class="unread_link" href="?page=search"><i class="bi bi-search"></i></a></div><div class="flex-fill bd-highlight"><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" name="search_terms" placeholder="Search" /></div></div></form></li>', $res->output_data['formatted_folder_list']);
     }
     /**
      * @preserveGlobalState disabled
@@ -69,7 +69,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_search_form_content() {
         $test = new Output_Test('search_form_content', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update btn btn-primary btn-sm" value="Update" /> <input type="button" class="search_reset btn btn-light border btn-sm" value="Reset" />'), $res->output_response);
+        $this->assertEquals(array('<input type="hidden" name="page" value="search" /> <label class="screen_reader" for="search_terms">Search Terms</label><input required placeholder="Search Terms" id="search_terms" type="search" class="search_terms form-control form-control-sm" name="search_terms" value="" /> <label class="screen_reader" for="search_fld">Search Field</label><select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select> <label class="screen_reader" for="search_since">Search Since</label><select name="search_since" id="search_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm"><option value="4">Arrival Date &darr;</option><option value="-4">Arrival Date &uarr;</option><option value="2">From &darr;</option><option value="-2">From &uarr;</option><option value="3">Subject &darr;</option><option value="-3">Subject &uarr;</option></select> | <input type="submit" class="search_update btn btn-primary btn-sm" value="Update" /> <input type="button" class="search_reset btn btn-light border btn-sm" value="Reset" />'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -302,7 +302,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_server_content_start() {
         $test = new Output_Test('server_content_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="content_title">Servers<div class="list_controls"></div></div><div class="server_content">'), $res->output_response);
+        $this->assertEquals(array('<div class="content_title">Servers</div><div class="server_content">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -474,7 +474,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_start_page_setting() {
         $test = new Output_Test('start_page_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option selected="selected" value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('start_page' => 'page=message_list&list_path=unread'));
         $res = $test->run();
         $this->assertEquals(array('<tr class="general_setting"><td><label for="start_page">First page after login</label></td><td><select class="form-select form-select-sm w-auto" id="start_page" name="start_page"><option value="none">None</option><option value="page=home">Home</option><option value="page=message_list&list_path=combined_inbox">Everything</option><option selected="selected" value="page=message_list&list_path=unread">Unread</option><option value="page=message_list&list_path=flagged">Flagged</option><option value="page=compose">Compose</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
@@ -486,10 +486,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_list_style_setting() {
         $test = new Output_Test('list_style_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style"><option value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('list_style' => 'email_style'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="list_style">Message list style</label></td><td><select class="form-select form-select-sm w-auto" id="list_style" name="list_style" data-default-value="email_style"><option selected="selected" value="email_style">Email</option><option value="news_style">News</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -499,10 +499,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('mailto_handler_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('mailto_handler' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="mailto_handler">Allow handling of mailto links</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="mailto_handler" name="mailto_handler" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -512,10 +512,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_folder_icon_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_folder_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_folder_icons">Hide folder list icons</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_folder_icons" name="no_folder_icons" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -525,10 +525,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('no_password_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_password_save" name="no_password_save" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="no_password_save" name="no_password_save" data-default-value="false" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('no_password_save' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">Don\'t save account passwords between logins</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="no_password_save" name="no_password_save" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -538,10 +538,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('delete_prompt_setting', 'core');
         $test->handler_response = array('user_settings' => array());
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('disable_delete_prompt' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">Disable prompts when deleting</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="false" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -614,10 +614,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_unread_source_max_setting() {
         $test = new Output_Test('unread_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('unread_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="unread_per_source" name="unread_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -626,10 +626,83 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_unread_since_setting() {
         $test = new Output_Test('unread_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
-        $test->handler_response = array('user_settings' => array('unread_since' => '-1 week'));
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('unread_since' => '-2 weeks'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="unread_setting"><td><label for="unread_since">Show messages received since</label></td><td><select name="unread_since" id="unread_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_junk_since_setting() {
+        $test = new Output_Test('junk_since_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="junk_setting"><td><label for="junk_since">Show junk messages since</label></td><td><select name="junk_since" id="junk_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('junk_since' => '-2 weeks'));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="junk_setting"><td><label for="junk_since">Show junk messages since</label></td><td><select name="junk_since" id="junk_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_drafts_since_setting() {
+        $test = new Output_Test('drafts_since_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="drafts_setting"><td><label for="drafts_since">Show draft messages since</label></td><td><select name="drafts_since" id="drafts_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('drafts_since' => '-2 weeks'));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="drafts_setting"><td><label for="drafts_since">Show draft messages since</label></td><td><select name="drafts_since" id="drafts_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_trash_since_setting() {
+        $test = new Output_Test('trash_since_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="trash_setting"><td><label for="trash_since">Show trash messages since</label></td><td><select name="trash_since" id="trash_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('trash_since' => '-2 weeks'));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="trash_setting"><td><label for="trash_since">Show trash messages since</label></td><td><select name="trash_since" id="trash_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
+    }
+
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_junk_source_max_setting() {
+        $test = new Output_Test('junk_source_max_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="junk_setting"><td><label for="junk_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="junk_per_source" name="junk_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('junk_per_source' => 10));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="junk_setting"><td><label for="junk_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="junk_per_source" name="junk_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_drafts_source_max_setting() {
+        $test = new Output_Test('drafts_source_max_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="drafts_setting"><td><label for="drafts_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="drafts_per_source" name="drafts_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('drafts_per_source' => 10));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="drafts_setting"><td><label for="drafts_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="drafts_per_source" name="drafts_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_trash_source_max_setting() {
+        $test = new Output_Test('trash_source_max_setting', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="trash_setting"><td><label for="trash_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="trash_per_source" name="trash_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('trash_per_source' => 10));
+        $res = $test->run();
+        $this->assertEquals(array('<tr class="trash_setting"><td><label for="trash_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="trash_per_source" name="trash_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -638,10 +711,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_flagged_source_max_setting() {
         $test = new Output_Test('flagged_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('flagged_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="flagged_per_source" name="flagged_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -650,10 +723,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_flagged_since_setting() {
         $test = new Output_Test('flagged_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
-        $test->handler_response = array('user_settings' => array('flagged_since' => '-1 week'));
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('flagged_since' => '-2 weeks'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="flagged_setting"><td><label for="flagged_since">Show messages received since</label></td><td><select name="flagged_since" id="flagged_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -666,7 +739,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array('user_settings' => array('all_email_per_source' => 10), 'router_module_list' => array()), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_email_per_source' => 10), 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_email_per_source" name="all_email_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -675,10 +748,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_all_source_max_setting() {
         $test = new Output_Test('all_source_max_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="20" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="20" data-default-value="20" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('all_per_source' => 10));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="10" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_per_source">Max messages per source</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" size="2" id="all_per_source" name="all_per_source" value="10" data-default-value="20" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -689,9 +762,9 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->handler_response = array('user_settings' => array('all_email_since' => '-1 week'), 'router_module_list' => array());
         $res = $test->run();
         $this->assertEquals(array('user_settings' => array('all_email_since' => '-1 week'), 'router_module_list' => array()), $res->output_response);
-        $test->handler_response = array('user_settings' => array('all_email_since' => '-1 week'), 'router_module_list' => array('imap'));
+        $test->handler_response = array('user_settings' => array('all_email_since' => '-2 weeks'), 'router_module_list' => array('imap'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_since">Show messages received since</label></td><td><select name="all_email_since" id="all_email_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="email_setting"><td><label for="all_email_since">Show messages received since</label></td><td><select name="all_email_since" id="all_email_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -700,10 +773,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_all_since_setting() {
         $test = new Output_Test('all_since_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
-        $test->handler_response = array('user_settings' => array('all_since' => '-1 week'));
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $test->handler_response = array('user_settings' => array('all_since' => '-2 weeks'));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="all_setting"><td><label for="all_since">Show messages received since</label></td><td><select name="all_since" id="all_since" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option value="-1 week">Last 7 days</option><option selected="selected" value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -713,7 +786,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('language_setting', 'core');
         $test->handler_response = array('language'=> 'en');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option></select></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label for="language">Language</label></td><td><select id="language" class="form-select form-select-sm w-auto" name="language"><option value="az">Azerbaijani</option><option value="pt-BR">Brazilian Portuguese</option><option value="zh-Hans">Chinese Simplified</option><option value="nl">Dutch</option><option selected="selected" value="en">English</option><option value="et">Estonian</option><option value="fa">Farsi</option><option value="fr">French</option><option value="de">German</option><option value="hu">Hungarian</option><option value="id">Indonesian</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="es">Spanish</option><option value="zh-TW">Traditional Chinese</option></select></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -734,10 +807,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_msg_list_icons_setting() {
         $test = new Output_Test('msg_list_icons_setting', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  id="show_list_icons" name="show_list_icons" value="1" /></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /></td></tr>'), $res->output_response);
         $test->handler_response = array('user_settings' => array('show_list_icons' => true));
         $res = $test->run();
-        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
+        $this->assertEquals(array('<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">Show icons in message lists</label></td><td><input class="form-check-input" type="checkbox"  checked="checked" id="show_list_icons" name="show_list_icons" data-default-value="false" value="1" /><span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span></td></tr>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -758,7 +831,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_start() {
         $test = new Output_Test('folder_list_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a class="folder_toggle" href="#"><i class="bi bi-list"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
+        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<i class="bi bi-list fs-5"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -844,10 +917,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul style="display: none;" class="settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill fs-5 me-2"></i>Home</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -910,10 +983,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-down-fill"" alt="Collapse></i></a>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><a href="#" class="hide_folders">Hide folders<i class="bi bi-caret-left-fill fs-5"></i></a>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

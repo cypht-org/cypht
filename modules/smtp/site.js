@@ -470,6 +470,7 @@ $(function () {
 
             let modalContentHeadline = '';
             let dontWanValueInStorage = '';
+            let showBtnSendAnywayDontWarnFuture = true;
 
             // If the subject is empty, we should warn the user
             if (!subject) {
@@ -487,6 +488,16 @@ $(function () {
             if (!body && !subject) {
                 dontWanValueInStorage = 'dont_warn_empty_subject_body';
                 modalContentHeadline = "Your subject and body are empty!";
+            }
+
+            if (hm_module_is_supported('contacts')) {
+                var checkInList = check_cc_exist_in_contacts_list();
+                // if contact_cc not exist in contact list for user
+                if (checkInList) {
+                    modalContentHeadline = "Adress mail not exist in your contact list";
+                    showBtnSendAnywayDontWarnFuture = false;
+                }
+
             }
 
             // If the user has disabled the warning, we should send the message
@@ -511,9 +522,11 @@ $(function () {
             function showModal() {
                 if (! modal.modalContent.html()) {
                     modal.addFooterBtn(hm_trans('Send anyway'), 'btn-warning', handleSendAnyway);
-                    modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
+                    if (showBtnSendAnywayDontWarnFuture) {
+                        modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
+                    }
                 }
-                modal.setContent(modalContentHeadline + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
+                modal.setContent(modalContentHeadline + checkInList + `<p>${hm_trans('Are you sure you want to send this message?')}</p>`);
                 modal.open();
             }
 
@@ -614,5 +627,37 @@ $(function () {
             $(".bubble_dropdown-content").remove();
             $(this).parent().remove();
         });
+
+        var selectedOption = $('#compose_smtp_id option[selected]');
+        var selectedEmail = selectedOption.data('email');
+        var selectedVal = selectedOption.val();
+
+        var recipientsInput = $('#compose_cc');
+        var excludedEmail = null;
+
+        const excludeEmail = function () {
+            var newRecipients = recipientsInput.val().split(',').filter(function(email) {
+                if (email.includes(selectedEmail)) {
+                    excludedEmail = email;
+                    return false;
+                }
+                return true;
+            }).join(', ');
+            recipientsInput.val(newRecipients);
+        };
+
+        if (recipientsInput.val().includes(selectedEmail)) {
+            excludeEmail();
+            $(document).on('change', '#compose_smtp_id', function() {
+                if ($(this).val() !== selectedVal) {
+                    if (!recipientsInput.val().includes(selectedEmail)) {
+                        recipientsInput.val(recipientsInput.val() + ', ' + excludedEmail);
+                    }
+                } else {
+                    excludeEmail();
+                }
+            });
+        }
+
     }
 });

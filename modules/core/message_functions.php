@@ -449,7 +449,8 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $doc->loadHTML(html_entity_decode($html, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        $doc->loadHTML(htmlentities($html, ENT_QUOTES, 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }
@@ -502,19 +503,20 @@ function addr_split($str, $seps = array(',', ';')) {
     $capture = false;
     $capture_chars = array('"' => '"', '(' => ')', '<' => '>');
     for ($i=0;$i<$max;$i++) {
-        if ($capture && $capture_chars[$capture] == $str[$i]) {
+        $char = mb_substr($str, $i, 1);
+        if ($capture && $capture_chars[$capture] == $char) {
             $capture = false;
         }
-        elseif (!$capture && in_array($str[$i], array_keys($capture_chars))) {
-            $capture = $str[$i];
+        elseif (!$capture && in_array($char, array_keys($capture_chars))) {
+            $capture = $char;
         }
 
-        if (!$capture && in_array($str[$i], $seps)) {
+        if (!$capture && in_array($char, $seps)) {
             $words[] = trim($word);
             $word = '';
         }
         else {
-            $word .= $str[$i];
+            $word .= $char;
         }
     }
     $words[] = trim($word);

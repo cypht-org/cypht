@@ -48,10 +48,7 @@ class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-        if (!is_array($this->request->files) || !array_key_exists('public_key', $this->request->files)) {
-            return;
-        }
-        if (!is_array($this->request->files['public_key']) || !array_key_exists('tmp_name', $this->request->files['public_key'])) {
+        if (! check_file_upload($this->request, 'public_key')) {
             return;
         }
         $fingerprint = validate_public_key($this->request->files['public_key']['tmp_name']);
@@ -72,7 +69,7 @@ class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
  */
 class Hm_Handler_pgp_compose_data extends Hm_Handler_Module {
     public function process() {
-        $this->out('html_mail', $this->user_config->get('smtp_compose_type_setting', 0));
+        $this->out('html_mail', $this->user_config->get('smtp_compose_type_setting', DEFAULT_SMTP_COMPOSE_TYPE));
         $this->out('pgp_public_keys', $this->user_config->get('pgp_public_keys', array()));
     }
 }
@@ -108,20 +105,23 @@ class Hm_Output_pgp_compose_controls extends Hm_Output_Module {
         }
         $pub_keys = $this->get('pgp_public_keys', array());
         $res = '<script type="text/javascript" src="'.WEB_ROOT.'modules/pgp/assets/openpgp.min.js"></script>';
+        $res .= '<div class="container">';
+        $res .= '<div class="row justify-content-md-center">';
+        $res .= '<div class="col col-lg-8">';
         $res .= '<div class="pgp_section">';
 
         $res .= '<span class="pgp_sign"><label for="pgp_sign" class="form-label">'.$this->trans('PGP Sign as').'</label>';
         $res .= '<select id="pgp_sign" size="1" class="form-control"></select></span>';
 
         if (count($pub_keys) > 0) {
-            $res .= '<label for="pgp_encrypt" class="form-label">'.$this->trans('PGP Encrypt for').
+            $res .= '<label for="pgp_encrypt" class="form-label" style="margin-top:1rem">'.$this->trans('PGP Encrypt for').
                 '</label><select id="pgp_encrypt" size="1" class="form-control"><option disabled selected value=""></option>';
             foreach ($pub_keys as $vals) {
                 $res .= '<option value="'.$vals['key'].'">'.$vals['email'].'</option>';
             }
             $res .= '</select>';
         }
-        $res .= '<input type="button" class="pgp_apply" value="'.$this->trans('Apply').'" class="btn btn-primary" /></div>'.prompt_for_passhrase($this);
+        $res .= '</div></div></div></div>';
         return $res;
     }
 }

@@ -167,6 +167,7 @@ if (!class_exists('Hm_IMAP')) {
         /* current selected mailbox status */
         public $folder_state = false;
         private $scramAuthenticator;
+        private $namespace_count = 0;
         /**
          * constructor
          */
@@ -1059,6 +1060,7 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
+            $original_uids_order = $uids;
             if (!empty($uids)) {
                 if (is_array($uids)) {
                     $uids = implode(',', $uids);
@@ -1098,7 +1100,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($only_auto_bcc) {
                $fld .= ' HEADER X-Auto-Bcc cypht';
             }
-            if (!mb_strstr($this->server, 'yahoo') && $exclude_auto_bcc) {
+            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
                $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
             $esearch_enabled = false;
@@ -1138,6 +1140,17 @@ if (!class_exists('Hm_IMAP')) {
                 }
                 if ($esearch_enabled) {
                     $res = $esearch_res;
+                }
+                // keep original sort order of UIDS as fetch command might not return in requested order
+                // this is needed for pagination to work
+                if (! empty($original_uids_order)) {
+                    $unordered = $res;
+                    $res = [];
+                    foreach ($original_uids_order as $uid) {
+                        if (in_array($uid, $unordered)) {
+                            $res[] = $uid;
+                        }
+                    }
                 }
                 return $this->cache_return_val($res, $cache_command);
             }
@@ -1387,7 +1400,7 @@ if (!class_exists('Hm_IMAP')) {
                 foreach ($vals as $i => $v) {
                     if ($body) {
                         if ($v == ']' && isset($vals[$i + 1])) {
-                            if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)]\r\n") {
+                            if ($command2 == "BODY.PEEK[HEADER.FIELDS (DATE)])\r\n") {
                                 $sort_key = strtotime(trim(mb_substr($vals[$i + 1], 5)));
                             }
                             else {
@@ -2128,7 +2141,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array()) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2145,8 +2158,19 @@ if (!class_exists('Hm_IMAP')) {
             else {
                 $uids = $this->sort_by_fetch($sort, $rev, $filter);
             }
+            $terms = array();
             if ($keyword) {
-                $uids = $this->search($filter, $uids, array(array('TEXT', $keyword)));
+                $terms[] = array('TEXT', $keyword);
+            }
+            if ($trusted_senders && is_array($trusted_senders)) {
+                foreach ($trusted_senders as $sender) {
+                    $terms[] = array('FROM', 'NOT '. $sender);
+                }
+                
+            }
+            // Perform a single search call with the combined terms
+            if (!empty($terms)) {
+                $uids = $this->search($filter, $uids, $terms);
             }
             $total = count($uids);
 
@@ -2200,6 +2224,54 @@ if (!class_exists('Hm_IMAP')) {
                 }
             }
             return $result;
+        }
+
+        /**
+         * Test if the server supports searching by custom headers.
+         * 
+         * This function sends a test search command to check if the server supports 
+         * searching by custom headers (e.g., X-Auto-Bcc). If the server does not support 
+         * this feature, it will return false.
+         *
+         * Reference: Stalwart's current limitation on searching by custom headers 
+         * discussed in the following GitHub thread:
+         * https://github.com/stalwartlabs/mail-server/discussions/477
+         * 
+         * Note: This function should be removed once Stalwart starts supporting custom headers.
+         *
+         * @return boolean true if the server supports searching by custom headers.
+         */
+        protected function server_supports_custom_headers() {
+            $test_command = 'UID SEARCH HEADER "X-NonExistent-Header" "test"'."\r\n";
+            $this->send_command($test_command);
+            $response = $this->get_response(false, true);
+            $status = $this->check_response($response, true);
+
+            // Keywords that indicate the header search is not supported
+            $keywords = ['is', 'not', 'supported.'];
+
+            if (!$status) {
+                return false;
+            }
+
+            // Flatten the response array to a single array of strings
+            $flattened_response = array_reduce($response, 'array_merge', []);
+
+            // Check if all keywords are present in the flattened response
+            $sequence_match = true;
+            foreach ($keywords as $keyword) {
+                if (!in_array($keyword, $flattened_response)) {
+                    $sequence_match = false;
+                    break;
+                }
+            }
+
+            // If all keywords are found, the header search is not supported
+            if ($sequence_match) {
+                return false;
+            }
+
+            return true;
         }
     }
 }

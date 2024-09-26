@@ -17,13 +17,13 @@ setup_cypht() {
     cp .github/tests/.env .
     if [ "$DB" = "postgres" ]; then
         # .env
-        sed -i 's/db_driver=mysql/db_driver=pgsql/' .env
+        sed -i 's/DB_DRIVER=mysql/DB_DRIVER=pgsql/' .env
         # mocks.php
         sed -i 's/mysql/pgsql/' tests/phpunit/mocks.php
     fi
     if [ "$DB" = "sqlite" ]; then
         # .env
-        sed -i 's/db_driver=mysql/db_driver=sqlite/' .env
+        sed -i 's/DB_DRIVER=mysql/DB_DRIVER=sqlite/' .env
         # mocks.php
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
@@ -125,7 +125,7 @@ setup_site() {
 	sudo cp .github/tests/selenium/nginx/php_fastcgi.conf /etc/nginx/nginxconfig/php_fastcgi.conf
 	sudo sed -e "s?%VERSION%?${PHP_V}?g" --in-place /etc/nginx/sites-available/default
 	sudo ln -sf "$(pwd)" /var/www/cypht
-	sudo systemctl start nginx.service
+	sudo systemctl start nginx
 	if [ "$(curl -s -o /dev/null -w '%{http_code}' 'http://cypht-test.org')" -eq 200 ]; then
 		STATUS_DONE
 	else
@@ -161,7 +161,7 @@ case "$ARG" in
     phpunit)
         setup_unit_tests
     ;;
-    ui)
+    selenium)
         setup_ui_tests
     ;;
     *)

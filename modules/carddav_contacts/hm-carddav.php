@@ -29,6 +29,7 @@ class Hm_Carddav {
         'carddav_phone' => 'tel',
         'carddav_fn' => 'fn'
     );
+    private $api;
 
     public function __construct($src, $url, $user, $pass) {
         $this->user = $user;

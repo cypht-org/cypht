@@ -455,6 +455,7 @@ return array(
     'Current password is incorrect' => 'A jelenlegi jelszó hibás',
     'Details' => 'Részletek',
     'Don\'t save account passwords between logins' => 'Ne mentse el a jelszavakat bejelentkezések között',
+    'Do you want to log out?' => 'Ki akar jelentkezni?',
     'Drafts' => 'Piszkozatok',
     'Enter your passwords below to gain access to these services during this session.' => 'Adja meg jelszavát, hogy hozzáférjen ezekhez a szolgáltatásokhoz a munkamenet során.',
     'Failed to authenticate to the SMTP server' => 'Sikertelen azonosítás az SMTP kiszolgálón',
@@ -628,4 +629,10 @@ return array(
     'Junk' => false,
     'Trash' => false,
     'Pasted text has leading or trailing spaces' => false,
+    'No tags available yet.' => false,
+    'Server capabilities' => false,
+    'Capabilities' => false,
+    'Screen %s first emails' => false,
+    'Yaml File' => false,
+    'Please ensure your YAML or CSV  file follows the correct format' => false,
 );

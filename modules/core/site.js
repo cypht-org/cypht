@@ -1,5 +1,12 @@
 'use strict';
 
+/**
+ * NOTE: Tiki-Cypht integration dynamically removes everything from the begining of this file
+ * up to swipe_event function definition as it uses jquery (over cash.js) and has bootstrap
+ * framework already included. If you add code here that you wish to be included in Tiki-Cypht
+ * integration, add it below swipe_event function definition.
+ */
+
 /* extend cash.js with some useful bits */
 $.inArray = function(item, list) {
     for (var i in list) {
@@ -77,6 +84,15 @@ var swipe_event = function(el, callback, direction) {
         }
     }, false);
 };
+
+// Constants. To be used anywhere in the app via the window object.
+const globalVars = {
+    EMAIL_REGEX: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/g,
+}
+Object.keys(globalVars).forEach(key => {
+    window[key] = globalVars[key];
+});
+
 
 /* ajax multiplexer */
 var Hm_Ajax = {
@@ -501,7 +517,8 @@ function Message_List() {
         'junk': 'formatted_junk_data',
         'trash': 'formatted_trash_data',
         'sent': 'formatted_sent_data',
-        'drafts': 'formatted_drafts_data'
+        'drafts': 'formatted_drafts_data',
+        'tag': 'formatted_tag_data'
     };
 
     this.run_callbacks = function (completed) {
@@ -684,7 +701,8 @@ function Message_List() {
                 }
             });
         }
-        if (element) {
+        // apply JS pagination only on aggregate folders; imap ones already have the messages sorted
+        if (hm_list_path().substring(0, 5) != 'imap_' && element) {
             $(row, msg_rows).insertBefore(element);
         }
         else {
@@ -702,10 +720,12 @@ function Message_List() {
         if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
             $('.msg_controls').addClass('d-flex');
             $('.msg_controls').removeClass('d-none');
+            $('.mailbox_list_title').addClass('hide');
         }
         else {
             $('.msg_controls').removeClass('d-flex');
             $('.msg_controls').addClass('d-none');
+            $('.mailbox_list_title').removeClass('hide');
         }
     };
 
@@ -1156,6 +1176,7 @@ function Message_List() {
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
+    this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };
 };
 
 /* folder list */
@@ -1293,7 +1314,7 @@ var Hm_Folders = {
     },
 
     folder_list_events: function() {
-        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this).data('target')); });
+        $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
         $('.src_name').on("click", function() {
             var class_name = $(this).data('source');
             var icon_element = $(this).find('.bi');
@@ -1438,7 +1459,7 @@ var Hm_Utils = {
     },
 
     confirm_logout: function() {
-        if ($('#unsaved_changes').val() == 0) {
+        if (! $('#unsaved_changes').length || $('#unsaved_changes').val() == 0) {
             document.getElementById('logout_without_saving').click();
         }
         else {
@@ -1548,7 +1569,7 @@ var Hm_Utils = {
         var results = {}
         var i;
         var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting'];
+        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
         for (i=0;i<sections.length;i++) {
             dsp = Hm_Utils.get_from_local_storage(sections[i]);
             if (hash) {
@@ -1575,6 +1596,19 @@ var Hm_Utils = {
             res = sessionStorage.getItem(key);
         }
         return res;
+    },
+
+    search_from_local_storage: function(pattern) {
+        const results = [];
+        const key_pattern = new RegExp(pattern);
+        for (let i = 0; i < sessionStorage.length; i++) {
+            const key = sessionStorage.key(i);
+            if (key_pattern.test(key)) {
+                const value = get_from_local_storage(key);
+                results.push({ key: key, value: value });
+            }
+        }
+        return results;
     },
 
     save_to_local_storage: function(key, val) {
@@ -1787,82 +1821,28 @@ var hl_save_link = function() {
 };
 
 var reset_default_value_checkbox = function() {
-    let checkbox = this.parentElement.parentElement.firstChild;
-    if (checkbox.disabled == false) {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        checkbox.setAttribute("current_value", checkbox.checked);
-        checkbox.checked = !checkbox.checked;
-        checkbox.disabled = true;
-    }
-    else {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        checkbox.checked = checkbox.getAttribute("current_value") == "true" ? true : false;
-        checkbox.disabled = false;
-    }
+    var checkbox = $(this).closest('.tooltip_restore').prev('input[type="checkbox"]');
+    var default_value = checkbox.data('default-value');
+    default_value = (default_value === 'true');
+    checkbox.prop('checked', default_value);
+    checkbox.prop('disabled', true);
 };
 
+var reset_default_timezone = function() {
+    var hm_default_timezone = window.hm_default_timezone;
+    $('#timezone').val(hm_default_timezone);
+}
 var reset_default_value_select = function() {
-    let field = this.parentElement.parentElement.firstChild;
-    let tab_static_default_value = {"inline_message_style" : 0, "smtp_compose_type" : 0, "theme_setting" : 0,
-    "timezone" : 0, "list_style" : 0, "idle_time" : 4, "start_page" : 0, "default_sort_order" : 0,
-    "unread_since" : 1, "flagged_since" : 1, "all_since" : 1, "all_email_since" : 1, "feed_since" : 0,
-    "sent_since" : 1};
-
-    if (this.style.transform == "scaleX(1)") {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        field.selectedIndex = field.getAttribute("current_value");
-        field.style.backgroundColor = "#fff";
-        field.style.pointerEvents = "auto";
-        field.style.touchAction = "auto";
-    }
-    else {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        field.setAttribute("current_value", field.selectedIndex);
-        if (field.getAttribute("name") == "language") {
-            for(let compter = 0; field.length > compter; compter ++){
-                if (field.options[compter].getAttribute("value") == "en") {
-                    field.selectedIndex = field.options[compter].index;
-                }
-            }
-        }
-        else {
-            field.selectedIndex = tab_static_default_value[field.getAttribute("name")];
-        }
-        field.style.backgroundColor = "#eee";
-        field.style.pointerEvents = "none";
-        field.style.touchAction = "none";
-    }
-};
+    var dropdown = $(this).closest('.tooltip_restore').prev('select');
+    var default_value = dropdown.data('default-value');
+    dropdown.val(default_value);
+}
 
 var reset_default_value_input = function() {
-    let field = this.parentElement.parentElement.firstChild;
-    const defaultValue = this.getAttribute("default-value");
-
-    if (this.style.transform == "scaleX(1)") {
-        this.style.transform = "scaleX(-1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore default value"))
-        field.value = field.getAttribute("current_value");
-        field.style.backgroundColor = "#fff";
-        field.style.pointerEvents = "auto";
-        field.style.touchAction = "auto";
-    }
-    else {
-        this.style.transform = "scaleX(1)";
-        this.parentElement.setAttribute("restore_aria_label",hm_trans("Restore current value"));
-        field.setAttribute("current_value", field.value);
-        field.value = 20;
-        if(defaultValue) {
-            field.value = defaultValue;
-        }
-        field.style.backgroundColor = "#eee";
-        field.style.pointerEvents = "none";
-        field.style.touchAction = "none";
-    }
-};
+    var inputField = $(this).closest('.tooltip_restore').prev('input');
+    var default_value = inputField.data('default-value');
+    inputField.val(default_value);
+}
 
 var decrease_servers = function(section) {
     const element = document.querySelector(`.server_count .${section}_server_count`);
@@ -1880,6 +1860,14 @@ var decrease_servers = function(section) {
 
 var err_msg = function(msg) {
     return "ERR"+hm_trans(msg);
+};
+
+var hm_spinner = function(type = 'border', size = '') {
+    return `<div class="d-flex justify-content-center spinner">
+        <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>`
 };
 
 var fillImapData = function(details) {
@@ -1983,6 +1971,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
+    
+    /* show any pending notices */
+    Hm_Utils.show_sys_messages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -2024,6 +2015,7 @@ $(function() {
         $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
         $('.reset_default_value_select').on("click", reset_default_value_select);
         $('.reset_default_value_input').on("click", reset_default_value_input);
+        $('.reset_default_timezone').on("click", reset_default_timezone);
     }
 
     if (hm_check_dirty_flag()) {
@@ -2629,7 +2621,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.trim().replace(/\s/g, '_') + 'external_resources_allowed';
+    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
