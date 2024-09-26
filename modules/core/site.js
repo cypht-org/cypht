@@ -284,7 +284,7 @@ var Hm_Ajax_Request = function() { return {
                     messages.load().then(() => {
                         if (messages.count != res.folder_status[name].messages) {
                             messages.load(true).then(() => {
-                                display_imap_mailbox(messages.raws, messages.links);
+                                display_imap_mailbox(messages.rows, messages.links);
                             })
                         }
                     });
@@ -973,8 +973,8 @@ function Message_List() {
         const target = $('.msg_headers tr').last();
         const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
         messages.load(false, true);
-        const next = messages.getNextRawForMessage(hm_msg_uid());
-        const prev = messages.getPreviousRawForMessage(hm_msg_uid());
+        const next = messages.getNextRowForMessage(hm_msg_uid());
+        const prev = messages.getPreviousRowForMessage(hm_msg_uid());
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject');
             phref = prevSubject.find('a').prop('href');

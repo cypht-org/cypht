@@ -863,6 +863,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
             $this->out('imap_server_id', $form['imap_server_id']);
+            $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
 }
@@ -1942,7 +1943,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
                 $part = $this->request->post['imap_msg_part'];
             }
-            elseif ((isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch'])) {
+            elseif (isset($this->request->post['imap_prefetch']) && $this->request->post['imap_prefetch']) {
                 $prefetch = true;
             }
 
