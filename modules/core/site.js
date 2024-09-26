@@ -967,30 +967,29 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(cache, class_name) {
-        var phref;
-        var nhref;
-        var target;
-        var subject;
-        var plink = false;
-        var nlink = false;
-        var list = Hm_Utils.get_from_local_storage(cache);
-        var current = $('<div></div>').append(list).find('.'+Hm_Utils.clean_selector(class_name));
-        var prev = current.prev();
-        var next = current.next();
-        target = $('.msg_headers tr').last();
-        if (prev.length) {
-            phref = prev.find('.subject').find('a').prop('href');
-            subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+    this.prev_next_links = function() {
+        let phref;
+        let nhref;
+        const target = $('.msg_headers tr').last();
+        const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
+        messages.load(false, true);
+        const next = messages.getNextRawForMessage(hm_msg_uid());
+        const prev = messages.getPreviousRawForMessage(hm_msg_uid());
+        if (prev) {
+            const prevSubject = $(prev['0']).find('.subject');
+            phref = prevSubject.find('a').prop('href');
+            const subject = new Option(prevSubject.text()).innerHTML;
+            const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
-        if (next.length) {
-            nhref = next.find('.subject').find('a').prop('href');
-            subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+        if (next) {
+            const nextSubject = $(next['0']).find('.subject');
+            nhref = nextSubject.find('a').prop('href');
+            const subject = new Option(nextSubject.text()).innerHTML;
+            const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
+
         return [phref, nhref];
     };
 
