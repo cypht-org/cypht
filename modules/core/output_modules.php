@@ -563,7 +563,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
                     $res .= '<script type="module">';
                     foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js) {
-                        $res .= "\n".'import "./'.WEB_ROOT.str_replace(APP_PATH, '', $js).'";';
+                        $res .= 'import "./'.WEB_ROOT.str_replace(APP_PATH, '', $js).'";';
                     }
                     $res .= '</script>';
                 }
