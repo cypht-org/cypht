@@ -523,16 +523,34 @@ $(function () {
                 modal.open();
             }
 
-            function handleSendAnyway() {
-                if($('.compose_draft_id').val() === 0){
-                    Hm_Notices.show([info_msg('Please wait, sending message...')]);
+            function waitForValueChange(selector, targetValue) {
+                return new Promise((resolve) => {
+                    const checkValue = () => {
+                        if ($(selector).val() !== targetValue) {
+                            resolve();  
+                        } else {
+                            setTimeout(checkValue, 100); 
+                        }
+                    };
+                    checkValue();  
+                });
+            }
+
+            async function handleSendAnyway() {
+
+                if ($('.compose_draft_id').val() == '0') {
+                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                await waitForValueChange('.compose_draft_id', '0');
                 }
+
+                
+            
                 if (handleMissingAttachment()) {
                     document.getElementsByClassName("smtp_send")[0].click();
                 } else {
                     e.preventDefault();
                 }
-            };
+            }
 
             function handleSendAnywayAndDontWarnMe() {
                 Hm_Utils.save_to_local_storage(dontWanValueInStorage, true);
