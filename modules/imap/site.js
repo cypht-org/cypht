@@ -464,6 +464,7 @@ var setup_imap_folder_page = function() {
     if (cache_details[1]) {
         $('.page_links').html(cache_details[1]);
     }
+    select_imap_folder(hm_list_path());
     $('.remove_source').on("click", remove_imap_combined_source);
     $('.add_source').on("click", add_imap_combined_source);
     $('.refresh_link').on("click", function() {
@@ -524,19 +525,23 @@ function getMessageStorageKey(uid) {
     return uid + '_' + hm_list_path();
 }
 
-function markPrefetchedMessagesAsRead(uid) {
+async function markPrefetchedMessagesAsRead(uid) {
     const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
     const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
-    
-    Hm_Ajax.request([
-        {'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
-        {'name': 'action_type', 'value': 'read'},
-        {'name': 'message_ids', 'value': [msgId]}
-    ], () => {
+
+    const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
+    await messages.load(false, true);
+    if (messages.markRawAsRead(uid)) {
         const folderId = `${detail.type}_${detail.server_id}_${detail.folder}`;
         Hm_Folders.unread_counts[folderId] -= 1;
         Hm_Folders.update_unread_counts(folderId);
-    }, null, true);
+
+        Hm_Ajax.request([
+            {'name': 'hm_ajax_hook', 'value': 'ajax_message_action'},
+            {'name': 'action_type', 'value': 'read'},
+            {'name': 'message_ids', 'value': [msgId]}
+        ], null, null, true);
+    }
 }
 
 var expand_imap_mailbox = function(res) {
@@ -885,7 +890,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
         uid = hm_msg_uid();
     }
     const callbackFn = (...args) => {
-        markPrefetchedMessagesAsRead(uid); // TODO: Ensure this is executed only for unread messages
+        markPrefetchedMessagesAsRead(uid);
         if (callback) {
             callback(...args);
         }
