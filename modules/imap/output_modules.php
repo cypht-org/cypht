@@ -87,7 +87,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                     $path = sprintf('?page=message_list&list_path=%s&screen_emails=1', $this->html_safe($this->get('list_path')));
                     $custom .= '<a title="'.sprintf($this->trans('Screen %s first emails'), $this->get('first_time_screen_emails')).
                     '" href="'. $path .'"><i class="bi bi-hand-thumbs-up-fill"></i></a>';
-                }                
+                }
             }
             $this->out('custom_list_controls', $custom);
         }
@@ -776,8 +776,14 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
         $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
         $with_input = $this->get('with_input', false);
+        $folder = $this->get('folder', '');
         if (!empty($folder_data)) {
             $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input);
+            $quota = $this->get('quota');
+            $quota_max = $this->get('quota_max');
+            if (!$folder && $quota) {
+                $res .= '<p class="quota_info"><div class="progress bg-secondary border"><div class="progress-bar bg-light" style="width:'.$quota.'%"></div></div>'.$quota.'% used on '.$quota_max.' MB</p>';
+            }
             $this->out('imap_expanded_folder_formatted', $res);
         }
     }
