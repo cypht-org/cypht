@@ -1546,6 +1546,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if ($enableSieve && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
+            $imap_list['sieve_tls'] = $sieve_tls;
         }
         if ($server_id) {
             if (Hm_IMAP_List::edit($server_id, $imap_list)) {
@@ -1570,7 +1571,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
                 include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
-                $client = $sieveClientFactory->init(null, $server, $sieve_tls);
+                $client = $sieveClientFactory->init(null, $server);
 
                 if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");

@@ -194,7 +194,8 @@ Nux_Quick_Services::add('gandi', array(
     ),
     'sieve' => array(
         'port' => 4190,
-        'host' => 'mail.gandi.net'
+        'host' => 'mail.gandi.net',
+        'tls' => true
     )
 ));
 

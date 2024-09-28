@@ -2525,11 +2525,17 @@ function getServiceDetails(providerKey){
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', true)
                             .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', serverConfig.sieve.tls)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
                     } else {
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', false)
-                            .trigger('change');;
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', false)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val('');
                     }
                 }
