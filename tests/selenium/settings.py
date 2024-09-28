@@ -81,10 +81,6 @@ class SettingsTests(SettingsHelpers):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait()
-        # Change the window size to make sure all elements are visible
-        current_size = self.driver.get_window_size()
-        new_height = 5000
-        self.driver.set_window_size(current_size['width'], new_height)
 
     def load_settings_page(self):
         self.by_css('[data-source=".settings"]').click()
