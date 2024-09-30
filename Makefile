@@ -11,9 +11,8 @@ docker-push:  ## build, tag, and push image to dockerhub. presumes you are logge
 	@[ "$(tag)" = "" ] && (echo "Tag required. Example tag=1.2.3" ; exit 1)
 	@image=$(DOCKERHUB_REPO):$(tag)
 	@echo "Building image $${image}"
-	@docker buildx build . --platform linux/amd64 \
+	@docker buildx build . --platform linux/386,linux/amd64,linux/arm64 \
 		-t $${image} -f docker/Dockerfile --push
-	# TODO: build for arm architectures
 
 .PHONY: dockerhub-push-readme
 .ONESHELL:
