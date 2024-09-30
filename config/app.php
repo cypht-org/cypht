@@ -1295,7 +1295,7 @@ return [
     | Enable keyboard shortcuts
     | Defaults to false
     */
-    'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', 1),
+    'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', false),
 
     /*
     |
