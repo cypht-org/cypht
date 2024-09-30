@@ -1004,6 +1004,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
         }
+        $this->out('do_not_flag_as_read_on_open', $this->get('do_not_flag_as_read_on_open', false));
     }
 }
 
