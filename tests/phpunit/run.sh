@@ -23,13 +23,23 @@ if [ "$DB" = "sqlite" ]; then
     cat ${SCRIPT_DIR}/data/schema.sql | sqlite3 ${FILE}
     cat ${SCRIPT_DIR}/data/seed.sql | sqlite3 ${FILE}
 
-# elif [ "$DB" = "mysql" ]; then    # TODO
+elif [ "$DB" = "mysql" ]; then
+    # Load schema.sql
+    mysql --defaults-extra-file=.github/tests/my.cnf cypht_test < ${SCRIPT_DIR}/data/schema.sql
+    
+    # Load seed.sql
+    mysql --defaults-extra-file=.github/tests/my.cnf cypht_test < ${SCRIPT_DIR}/data/seed_mysql.sql
 
-# elif [ "$DB" = "pgsql" ]; then    # TODO
+elif [ "$DB" = "postgres" ]; then
+    export DB_DRIVER=pgsql
+    # Load schema.sql
+    PGPASSWORD=cypht_test psql -h 127.0.0.1 -U cypht_test -d cypht_test -f ${SCRIPT_DIR}/data/schema.sql
+    # Load seed.sql
+    PGPASSWORD=cypht_test psql -h 127.0.0.1 -U cypht_test -d cypht_test -f ${SCRIPT_DIR}/data/seed_postgres.sql
 
 else
     echo "Database not supported in test: ${DB}"
     exit 1
 fi
 
-phpunit --configuration ${SCRIPT_DIR}/phpunit.xml $@
+phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@

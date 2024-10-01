@@ -26,6 +26,7 @@ class Hm_Test_DB extends TestCase {
             $this->assertEquals('pgsql:host=127.0.0.1;dbname=cypht_test', Hm_DB::build_dsn());
         }
         $this->config->data['db_driver'] = 'sqlite';
+        $this->config->data['db_socket'] = '/tmp/test.db';
         $type = gettype(Hm_DB::connect($this->config));
         $this->assertTrue($type == 'boolean' || $type == 'object');
         $this->assertEquals('sqlite:/tmp/test.db', Hm_DB::build_dsn());

@@ -81,7 +81,7 @@ jobs:
             php scripts/config_gen.php
 
       - name: "Script: test.sh"
-        run: bash .github/tests/test.sh
+        run: bash tests/phpunit/run.sh
 
 
   Test-selenium:

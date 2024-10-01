@@ -325,6 +325,7 @@ class Hm_Functions {
     }
 }
 function setup_db($config) {
+    require_once __DIR__.'/bootstrap.php';
     $config->set('db_connection_type', env('DB_CONNECTION_TYPE', 'host'));
     $config->set('db_socket', env('DB_SOCKET', '/tmp/test.db'));
     $config->set('db_driver', env('DB_DRIVER', 'mysql'));
