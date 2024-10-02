@@ -203,9 +203,11 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
     public function process() {
+        $imap_account = null;
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
             if ($idx == $this->request->post['imap_server_id']) {
                 $imap_account = $mailbox;
+                break;
             }
         }
 
@@ -1345,9 +1347,7 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
     }
 }
 
-/**
- * @subpackage sievefilterstoggle/handler
- */
+
 class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_account', 'script_state', 'sieve_script_name'));
@@ -1379,11 +1379,67 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
-            
+
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         }
         $this->out('success', $success);
+    }
+}
+class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+        if (!$success) {
+            return;
+        }
+
+        foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
+            if ($idx == $form['imap_server_id']) {
+                $imap_account = $mailbox;
+                break;
+            }
+        }
+
+        $email_sender = $this->request->post['sender'];
+        if (mb_strstr($email_sender, '*')) {
+            $email_sender = str_replace('*', '', $email_sender);
+        }
+
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
+
+            if(array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+            }
+
+            $blocked_senders = [];
+            $current_script = $client->getScript('blocked_senders');
+            if ($current_script != '') {
+                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)));
+                foreach ($blocked_list as $blocked_sender) {
+                    $blocked_senders[] = $blocked_sender;
+                }
+            }
+            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
+                        
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
+        }
+    }
+}
+
+
+class Hm_Output_list_block_sieve_output extends Hm_Output_Module {
+    public function output() {
+        $list_block_sieve = $this->get('ajax_list_block_sieve', "");
+        $this->out('ajax_list_block_sieve', $list_block_sieve);
     }
 }
