@@ -15,7 +15,7 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page, rows = {}) {
+    constructor(path, page = 1, rows = {}) {
         this.path = path;
         this.list = path + '_' + page;
         this.rows = rows;
@@ -40,7 +40,7 @@ class Hm_MessagesStore {
 
         const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
 
-        this.count = Object.values(folder_status)[0].messages;
+        this.count = folder_status && Object.values(folder_status)[0].messages;
         this.links = pageLinks;
         this.rows = updatedMessages;
         this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;

@@ -1143,7 +1143,7 @@ function Message_List() {
         while (target[0].tagName != 'TR') { target = target.parent(); }
         var el = $('input[type=checkbox]', target);
         if (!shift && !ctrl) {
-            window.location = $('.subject a', target).prop('href');
+            navigate($('.subject a', target).prop('href'));
             return false;
         }
         else {
