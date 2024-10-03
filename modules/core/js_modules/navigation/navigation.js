@@ -46,17 +46,11 @@ function renderPage(href) {
     const searchParams = new URL(href, window.location.origin).searchParams;
     const page = searchParams.get('page');
     
-    switch (page) {
-        case 'message':
-            imap_setup_message_view_page(searchParams.get('uid'));
-            break;
-
-        case 'message_list':
-            select_imap_folder(searchParams.get('list_path'));
-            Hm_Message_List.set_row_events();
-            break;
-
-        default:
-            break;
+    if (page) {
+        const route = ROUTES.find(route => route.page === page);
+        const routeParams = Object.fromEntries(searchParams.entries());
+        if (route) {
+            route.handler(routeParams);
+        }
     }
 }
