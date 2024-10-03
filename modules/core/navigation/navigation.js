@@ -6,7 +6,11 @@ window.addEventListener('popstate', function(event) {
     
 });
 
-history.replaceState({ main: $('main').html() }, "");
+window.addEventListener('load', function() {
+    renderPage(window.location.href);
+    history.replaceState({ main: $('main').html() }, "");
+});
+
 
 $(document).on('click', 'a', function(event) {
     if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank') {
