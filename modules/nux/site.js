@@ -122,18 +122,7 @@ var add_extra_fields = function(select, id, label, placeholder) {
 };
 
 $(function() {
-    if (hm_page_name() === 'servers') {
-        expand_server_settings();
-        $('.nux_next_button').on("click", nux_service_select);
-        $('#service_select').on("change", function() {
-            if ($(this).val() == 'all-inkl') {
-                add_extra_fields(this, 'all_inkl_login', 'Login', hm_trans('Your All-inkl Login'));
-            } else {
-                $('.nux_extra_fields_container').remove();
-            }
-        });
-    }
-    else if (hm_page_name() === 'message_list') {
+    if (hm_page_name() === 'message_list') {
         var list_path = hm_list_path();
         if (list_path === 'unread' || list_path === 'combined_inbox' || list_path === 'flagged') {
             var data_sources = hm_data_sources();

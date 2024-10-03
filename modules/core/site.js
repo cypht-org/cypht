@@ -1955,14 +1955,6 @@ $(function() {
             }
         });
     })
-    /* setup settings and server pages */
-    if (hm_page_name() == 'settings') {
-        Hm_Utils.expand_core_settings();
-        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    }
-    else if (hm_page_name() == 'servers') {
-        $('.server_section').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    }
     $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
     /* check for folder reload */

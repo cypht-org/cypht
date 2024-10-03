@@ -556,14 +556,14 @@ class Hm_Output_page_js extends Hm_Output_Module {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
                 if (in_array($mod, $mods, true)) {
-                    if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
-                        $core = $rel_name;
-                        continue;
-                    }
-
                     $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
                     foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
                         $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
+                    }
+
+                    if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
+                        $core = $rel_name;
+                        continue;
                     }
 
                     if (is_readable(sprintf("%ssite.js", $name))) {
@@ -579,7 +579,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
                 */
                 foreach (['utils', 'routes', 'navigation'] as $js) {
-                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%sjs_modules/navigation/%s.js", $core, $js).'"></script>';
+                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
                 }
             }
             return $js_lib.$res;

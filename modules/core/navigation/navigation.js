@@ -13,7 +13,6 @@ $(document).on('click', 'a', function(event) {
         event.preventDefault();
         navigate($(this).attr('href'));
     }
-    // TODO: FIX THIS. It prevents event handlers from being called for links with href="#"
 });
 
 async function navigate(url) {
@@ -32,9 +31,9 @@ async function navigate(url) {
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         $('main').replaceWith(main);
 
-        history.pushState({ main }, "", url);
-
         renderPage(url);
+
+        history.pushState({ main }, "", url);
     } catch (error) {
         throw new Error(error);
     }
