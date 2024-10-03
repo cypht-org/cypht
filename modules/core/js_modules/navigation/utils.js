@@ -19,3 +19,11 @@ function showRoutingToast() {
 function hideRoutingToast() {
     bootstrap.Toast.getOrCreateInstance(document.getElementById('routing-toast')).hide()
 }
+
+function getListPathParam() {
+    return new URLSearchParams(window.location.search).get('list_path')
+}
+
+function getMessageUidParam() {
+    return new URLSearchParams(window.location.search).get('uid')
+}

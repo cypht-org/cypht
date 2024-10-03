@@ -508,7 +508,7 @@ var display_imap_mailbox = function(rows, links) {
 };
 
 function preFetchMessageContent(msgPart, uid) {
-    const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
     Hm_Ajax.request([
         {'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
         {'name': 'imap_msg_uid', 'value': uid},
@@ -522,14 +522,15 @@ function preFetchMessageContent(msgPart, uid) {
 }
 
 function getMessageStorageKey(uid) {
-    return uid + '_' + hm_list_path();
+    return uid + '_' + getListPathParam();
 }
 
 async function markPrefetchedMessagesAsRead(uid) {
-    const detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+    const listPath = getListPathParam();
+    const detail = Hm_Utils.parse_folder_path(listPath, 'imap');
     const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
 
-    const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
+    const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number());
     await messages.load(false, true);
     if (!messages.flagAsReadOnOpen) {
         return;
@@ -850,10 +851,11 @@ var get_local_message_content = function(msg_uid, path) {
 
 var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     if (!uid) {
-        uid = hm_msg_uid();
+        uid = getMessageUidParam();
     }
     const callbackFn = (...args) => {        
         markPrefetchedMessagesAsRead(uid);
+        observeMessageTextMutationAndHandleExternalResources();
         if (callback) {
             callback(...args);
         }

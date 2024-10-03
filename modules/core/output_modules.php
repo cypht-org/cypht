@@ -555,21 +555,32 @@ class Hm_Output_page_js extends Hm_Output_Module {
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
-                if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
-                    foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js) {
-                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
-                    }
-
+                if (in_array($mod, $mods, true)) {
                     if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
                         $core = $rel_name;
                         continue;
                     }
-                    
-                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
+
+                    $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+                    foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
+                    }
+
+                    if (is_readable(sprintf("%ssite.js", $name))) {
+                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
+                    }
                 }
             }
             if ($core) {
                 $res = '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.$res;
+                /* Load navigation js modules
+                    * utils.js, routes.js, navigation.js
+                    * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
+                    * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
+                */
+                foreach (['utils', 'routes', 'navigation'] as $js) {
+                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%sjs_modules/navigation/%s.js", $core, $js).'"></script>';
+                }
             }
             return $js_lib.$res;
         }

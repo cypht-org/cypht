@@ -971,10 +971,10 @@ function Message_List() {
         let phref;
         let nhref;
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(hm_list_path(), Hm_Utils.get_url_page_number());
+        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
         messages.load(false, true);
-        const next = messages.getNextRowForMessage(hm_msg_uid());
-        const prev = messages.getPreviousRowForMessage(hm_msg_uid());
+        const next = messages.getNextRowForMessage(getMessageUidParam());
+        const prev = messages.getPreviousRowForMessage(getMessageUidParam());
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject');
             phref = prevSubject.find('a').prop('href');
@@ -2686,7 +2686,7 @@ const handleExternalResources = (inline) => {
 };
 
 const observeMessageTextMutationAndHandleExternalResources = (inline) => {
-    const message = document.querySelector('.msg_text');
+    const message = document.querySelector('.msg_text');    
     if (message) {
         new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {
