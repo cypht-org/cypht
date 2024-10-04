@@ -755,6 +755,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            $this->out('can_share_folders', stripos($imap->get_capability(), 'ACL') !== false);
             if (imap_authed($imap)) {
                 $quota_root = $imap->get_quota_root($folder ? $folder : 'INBOX');
                 if ($quota_root && isset($quota_root[0]['name'])) {
