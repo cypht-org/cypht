@@ -46,6 +46,7 @@ add_handler('settings', 'process_auto_advance_email_setting', true, 'imap', 'dat
 add_handler('settings', 'process_first_time_screen_emails_per_page_setting', true, 'imap', 'date', 'after');
 add_handler('settings', 'process_setting_move_messages_in_screen_email', true, 'imap', 'process_first_time_screen_emails_per_page_setting', 'after');
 add_handler('settings', 'process_setting_active_preview_message', true, 'imap', 'process_setting_move_messages_in_screen_email', 'after');
+add_handler('settings', 'process_setting_ceo_detection_fraud', true, 'imap', 'process_setting_move_messages_in_screen_email', 'after');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -64,6 +65,7 @@ add_output('settings', 'imap_auto_advance_email', true, 'imap', 'imap_pagination
 add_output('settings', 'first_time_screen_emails_per_page_setting', true, 'imap', 'imap_auto_advance_email', 'after');
 add_output('settings', 'setting_move_messages_in_screen_email', true, 'imap', 'first_time_screen_emails_per_page_setting', 'after');
 add_output('settings', 'setting_active_preview_message', true, 'imap', 'setting_move_messages_in_screen_email', 'after');
+add_output('settings', 'setting_ceo_detection_fraud', true, 'imap', 'default_sort_order_setting', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -442,5 +444,9 @@ return array(
         'permissions' => FILTER_DEFAULT,
         'action' => FILTER_DEFAULT,
         'active_preview_message' => FILTER_VALIDATE_BOOLEAN,
+        'ceo_use_detect_ceo_fraud' => FILTER_VALIDATE_BOOLEAN,
+        'ceo_use_trusted_contact' => FILTER_VALIDATE_BOOLEAN,
+        'ceo_suspicious_terms' => FILTER_DEFAULT,
+        'ceo_rate_limit' => FILTER_VALIDATE_INT,
     )
 );

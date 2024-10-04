@@ -814,7 +814,12 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $offset = 0;
         $msgs = array();
         $list_page = 1;
+        $include_content_body = false;
         $include_preview = $this->user_config->get('active_preview_message_setting', false);
+        $ceo_use_detect_ceo_fraud = $this->user_config->get('ceo_use_detect_ceo_fraud_setting', false);
+        if ($include_preview || $ceo_use_detect_ceo_fraud) {
+            $include_content_body = true;
+        }
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
@@ -840,16 +845,44 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_preview);
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body);
                 } else {
-                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_preview);
+                    list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
-                    $msgs[] = $msg;
+                    $uid = $msg['uid'];
+
+                    if ($ceo_use_detect_ceo_fraud && hex2bin($form['folder']) == 'INBOX') {
+                        if ($this->isCeoFraud($msg['to'], $msg['subject'], $msg['preview_msg'])) {
+                            
+                            $folder = "Suspicious emails";
+                            if (!count($imap->get_mailbox_status($folder))) {
+                                $imap->create_mailbox($folder);
+                            }
+                            $dest_folder = bin2hex($folder);
+                            $server_ids = array(
+                                $form['imap_server_id'] => [
+                                    $form['folder'] => $uid
+                                ]
+                            );
+                            imap_move_same_server($server_ids, "move", $this->cache, [null, null, $dest_folder]);
+                            $msg = [];
+                            $total--;
+                        }
+                    }
+                    
+                    if ($msg) {
+                        if (! $include_preview && isset($msg['preview_msg'])) {
+                            $msg['preview_msg'] = "";
+                        }
+                        $msgs[] = $msg;
+                    }
+                    
                 }
+                
                 if ($imap->selected_mailbox) {
                     $imap->selected_mailbox['detail']['exists'] = $total;
                     $this->out('imap_folder_detail', array_merge($imap->selected_mailbox, array('offset' => $offset, 'limit' => $limit)));
@@ -862,6 +895,61 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
+    public function isCeoFraud($email, $subject, $msg) {          
+        // 1. Check Suspicious Terms or Requests
+        $suspiciousTerms = explode(",", $this->user_config->get("ceo_suspicious_terms_setting"));
+        if ($this->detectSuspiciousTerms($msg, $suspiciousTerms) || $this->detectSuspiciousTerms($subject, $suspiciousTerms)) {
+           
+            // 2. check ceo_rate_limit
+            $amounts = $this->extractAmountFromEmail($msg);
+            $amountLimit = $this->user_config->get("ceo_amount_limit_setting");
+            $isUpperAmount = array_reduce($amounts, function ($carry, $value) use ($amountLimit) {
+                return $carry || $value > $amountLimit;
+            }, false);
+            
+            if ($isUpperAmount) {
+                if ($this->user_config->get("ceo_use_trusted_contact_setting")) {
+                    $contacts = $this->get('contact_store');
+                    $contact_list = $contacts->getAll();
+                    $existingEmails = array_map(function($c){
+                        return $c->value('email_address');
+                    },$contact_list);
+                    if (!$this->isEmailInTrustedDomainList(array_values($existingEmails), $email)) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private function detectSuspiciousTerms($msg, $suspiciousTerms) {
+        foreach ($suspiciousTerms as $phrase) {
+            if (stripos($msg, trim($phrase)) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private function isEmailInTrustedDomainList($trustedDomain, $email) {
+        if (in_array($email, $trustedDomain)) {
+            return true;
+        }
+        return false;
+    }
+    private function extractAmountFromEmail($emailBody) {
+        $pattern = '/\b\d+(?:,\d+)?\.?\d*\s*(?:USD|dollars?|US\$?|EUR|euros?|€|JPY|yen|¥|GBP|pounds?|£|CAD|CAD\$|AUD|AUD\$)/i';
+    
+        preg_match_all($pattern, $emailBody, $matches);
+    
+        if ($matches) {
+            return array_map(function($value) { 
+                return floatval(preg_replace('/[^0-9]/', '', $value)); 
+            }, $matches[0]);
+        }
+    }
+    
 }
 
 /**
@@ -2129,6 +2217,7 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
+
 class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Module {
     public function process() {
         function process_active_preview_message_callback($val) { return $val; }
@@ -2136,4 +2225,20 @@ class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Modul
     }
 }
 
-
+/**
+ * Process setting_ceo_detection_fraud in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
+    public function process() {
+        function process_ceo_use_detect_ceo_fraud_callback($val) { return $val; }
+        function process_ceo_use_trusted_contact_callback($val) { return $val; }
+        function process_ceo_suspicious_terms_callback($val) { return $val; }
+        function process_ceo_amount_limit_callback($val) { return $val; }
+        
+        process_site_setting('ceo_use_detect_ceo_fraud', $this, 'process_ceo_use_detect_ceo_fraud_callback');
+        process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
+        process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');
+        process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
+    }
+}
