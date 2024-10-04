@@ -102,6 +102,12 @@ function prepare_imap_message_list($msgs, $mod, $type) {
     $mod->out('formatted_message_list', $res);
 }}
 
+if (!hm_exists('open_share_folder_modal')) {
+function open_share_folder_modal($folder, $id) {
+    
+}
+}
+
 /**
  * Build HTML for a list of IMAP folders
  * @subpackage imap/functions
@@ -111,7 +117,7 @@ function prepare_imap_message_list($msgs, $mod, $type) {
  * @return string
  */
 if (!hm_exists('format_imap_folder_section')) {
-function format_imap_folder_section($folders, $id, $output_mod, $with_input = false) {
+function format_imap_folder_section($folders, $id, $output_mod, $with_input = false, $can_share_folders = false) {
     $results = '<ul class="inner_list">';
     $manage = $output_mod->get('imap_folder_manage_link');
 
@@ -131,7 +137,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                     $attrs .= ' class="folder-disabled"';
                 }
             } else {
-                $attrs = 'data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
+                $attrs = 'id="main-link" data-id="imap_'.$id.'_'.$output_mod->html_safe($folder_name).
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
             }
@@ -150,7 +156,11 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
         if ($with_input) {
             $results .= '<input type="checkbox" value="1" class="folder_subscription" id="'.$output_mod->html_safe($folder_name).'" name="'.$folder_name.'" '.($folder['subscribed']? 'checked="checked"': '').($folder['special']? ' disabled="disabled"': '').' />';
         }
-        $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span></li>';
+        $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span>';
+        if($can_share_folders) {
+            $results .= '<div class="dropdown"><a href="#" class="action-link" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon bi bi-three-dots-vertical"></i></a><ul class="dropdown-menu dropdown-menu"><li><a href="#" class="dropdown-item"><i class="icon bi bi-share"></i> Share</a></ul></div>';
+        }
+        $results .= '</li>';
     }
     if ($manage) {
         $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a></li>';
