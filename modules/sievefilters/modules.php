@@ -63,7 +63,7 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
     public function process() {
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
-        if ($sieve_filters_enabled) {
+        if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
             $factory = get_sieve_client_factory($this->config);
             try {
                 $client = $factory->init($this->user_config, $server);
