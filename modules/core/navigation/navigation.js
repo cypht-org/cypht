@@ -1,6 +1,6 @@
 window.addEventListener('popstate', function(event) {
     if (event.state) {
-        $('main').html(event.state.main);
+        $('main').replaceWith(event.state.main);
     }
     renderPage(window.location.href);
     
@@ -8,7 +8,7 @@ window.addEventListener('popstate', function(event) {
 
 window.addEventListener('load', function() {
     renderPage(window.location.href);
-    history.replaceState({ main: $('main').html() }, "");
+    history.replaceState({ main: $('main').prop('outerHTML') }, "");
 });
 
 
@@ -38,11 +38,13 @@ async function navigate(url) {
         renderPage(url);
 
         history.pushState({ main }, "", url);
+
+        Hm_Folders.hl_selected_menu();
     } catch (error) {
         throw new Error(error);
+    } finally {
+        hideRoutingToast();
     }
-
-    hideRoutingToast();
 }
 
 function renderPage(href) {

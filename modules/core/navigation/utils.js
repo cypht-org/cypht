@@ -27,3 +27,7 @@ function getListPathParam() {
 function getMessageUidParam() {
     return new URLSearchParams(window.location.search).get('uid')
 }
+
+function getPageNameParam() {
+    return new URLSearchParams(window.location.search).get('page')
+}
