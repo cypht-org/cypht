@@ -628,10 +628,10 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
         uid = $('.msg_uid').val();
     }
     if (!detail) {
-        detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+        detail = Hm_Utils.parse_folder_path(list_path, 'imap');
     }
     if (detail && uid) {
-        if (hm_page_name() == 'message') {
+        if (getPageNameParam() == 'message') {
             window.scrollTo(0,0);
         }
         const onSuccess = function(res) {
@@ -746,10 +746,10 @@ var block_unblock_sender = function(msg_uid, detail, scope, action, sender = '',
 var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     var class_name = false;
     if (!detail) {
-        detail = Hm_Utils.parse_folder_path(hm_list_path(), 'imap');
+        detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
     }
     if (!msg_uid) {
-        msg_uid = hm_msg_uid();
+        msg_uid = getMessageUidParam();
     }
     if (detail && !skip_links) {
         class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
@@ -840,13 +840,13 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
 
 var get_local_message_content = function(msg_uid, path) {
     if (!path) {
-        path = hm_list_path();
+        path = getListPathParam();
     }
     if (!msg_uid) {
-        msg_uid = hm_msg_uid();
+        msg_uid = getMessageUidParam();
     }
-    var key = msg_uid+'_'+path;
-    return Hm_Utils.get_from_local_storage(key);
+
+    return Hm_Utils.get_from_local_storage(getMessageStorageKey(msg_uid));
 };
 
 var imap_setup_message_view_page = function(uid, details, list_path, callback) {
@@ -862,7 +862,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     };
     
     const msg_content = get_local_message_content(uid, list_path);
-    if (!msg_content || !msg_content.indexOf('<div class="msg_text_inner"></div>') > -1) {
+    if (!msg_content) {
         get_message_content(false, uid, list_path, details, callbackFn);
     }
     else {
