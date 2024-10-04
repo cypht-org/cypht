@@ -1,5 +1,5 @@
 function applyImapMessageListPageHandlers(routeParams) {
-    select_imap_folder(routeParams.list_path); // Imap is OK, but other types don't work with this handler yet
+    setup_imap_folder_page(routeParams.list_path); // Imap is OK, but other types don't work with this handler yet
     // TODO: - Support folders from other sources (Combined, Feeds, and JMAP as well maybe.)
 }
 
