@@ -1354,10 +1354,11 @@ var Hm_Folders = {
     },
 
     hl_selected_menu: function() {
-        var page = hm_page_name();
-        var path = hm_list_path();
+        const page = getPageNameParam();
+        const path = getListPathParam();
+        
         $('.folder_list').find('*').removeClass('selected_menu');
-        if (path.length) {
+        if (path) {
             if (page == 'message_list' || page == 'message') {
                 $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
