@@ -80,6 +80,9 @@ class Hm_SMTP {
     public $state;
     private $request_auths = array();
     private $scramAuthenticator;
+    private $supports_tls;
+    private $supports_auth;
+    private $max_message_size;
 
     function __construct($conf) {
     $this->scramAuthenticator = new ScramAuthenticator();
