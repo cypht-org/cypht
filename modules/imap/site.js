@@ -400,12 +400,6 @@ var cache_imap_page = function() {
     Hm_Utils.save_to_local_storage(key+'_page_links', $('.page_links').html());
 }
 
-var clear_imap_page_cache = function() {
-    var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_path();
-    Hm_Utils.save_to_local_storage(key, '');
-    Hm_Utils.save_to_local_storage(key+'_page_links', '');
-}
-
 var clear_imap_page_combined_inbox = function() {
     var key = 'imap_1_combined_inbox';
     Hm_Utils.save_to_local_storage(key, '');
@@ -468,16 +462,29 @@ var setup_imap_folder_page = function(listPath) {
             select_imap_folder(listPath, true);
         }
     });
-    $('.imap_filter').on("change", function() { $('#imap_filter_form').submit(); });
+    $('.imap_filter').on("change", function() { $('#imap_filter_form').trigger('submit'); });
     $('.imap_sort').on("change", function() {
-        clear_imap_page_cache();
-        $('#imap_filter_form').submit();
+        $('#imap_filter_form').trigger('submit');
     });
     $('.imap_keyword').on('search', function() {
-        $('#imap_filter_form').submit();
+        $('#imap_filter_form').trigger('submit');
     });
     Hm_Ajax.add_callback_hook('ajax_message_action', function() { select_imap_folder(listPath, true); });
 };
+
+$('#imap_filter_form').on('submit', async function(event) {
+    event.preventDefault();
+    const url = new URL(location.href);
+    url.search = $(this).serialize();
+    history.replaceState(null, '', url);
+    try {
+        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+        await messages.load(true);
+        display_imap_mailbox(messages.rows, messages.links);
+    } catch (error) {
+        // Show error message. TODO: No message utility yet, implement it later.
+    }
+});
 
 var display_imap_mailbox = function(rows, links) {
     const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
