@@ -58,6 +58,18 @@ $.fn.fadeOutAndRemove = function(timeout = 600) {
     return this;
 };
 
+$.fn.modal = function(action) {
+    const modalElement = this[0];
+    if (modalElement) {
+        const modal = new bootstrap.Modal(modalElement);
+        if (action === 'show') {
+            modal.show();
+        } else if (action === 'hide') {
+            modal.hide();
+        }
+    }
+};
+
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
