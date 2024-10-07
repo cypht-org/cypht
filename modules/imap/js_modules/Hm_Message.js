@@ -112,14 +112,9 @@ class Hm_MessagesStore {
     }
 
     #fetch(hideLoadingState = false) {
-        const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
         return new Promise((resolve, reject) => {
             Hm_Ajax.request(
-              [
-                { name: "hm_ajax_hook", value: "ajax_imap_folder_display" },
-                { name: "imap_server_id", value: detail.server_id },
-                { name: "folder", value: detail.folder },
-              ],
+              this.#getRequestConfig(),
               (response) => {
                 resolve(response);
               },
@@ -129,6 +124,36 @@ class Hm_MessagesStore {
               reject
             );
         });
+    }
+
+    #getRequestConfig() {
+        let hook;
+        let serverId;
+        let folder;
+        const config = [];
+        if (this.path.startsWith('imap')) {
+            hook = "ajax_imap_folder_display";
+            const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
+            serverId = detail.server_id;
+            folder = detail.folder;
+        } else {
+            switch (this.path) {
+                case 'unread':
+                    hook = "ajax_imap_unread";
+                    break;
+            }
+        }
+        
+        if (hook) {
+            config.push({ name: "hm_ajax_hook", value: hook });
+        }
+        if (serverId) {
+            config.push({ name: "imap_server_id", value: serverId });
+        }
+        if (folder) {
+            config.push({ name: "folder", value: folder });
+        }
+        return config;
     }
 
     #saveToLocalStorage() {
