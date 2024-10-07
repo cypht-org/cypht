@@ -951,7 +951,6 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $message_part the IMAP message part number
          * @param int $max maximum read length to allow.
          * @param mixed $struct a message part structure array for decoding and
-         *                      charset conversion. bool true for auto discovery
          * @return string message content
          */
         public function get_message_content($uid, $message_part, $max=false, $struct=true) {
@@ -960,13 +959,13 @@ if (!class_exists('Hm_IMAP')) {
                 return '';
             }
             if ($message_part == 0) {
-                $command = "UID FETCH $uid BODY[]\r\n";
+                $command = "UID FETCH $uid BODY" . "[]\r\n";
             }
             else {
                 if (!$this->is_clean($message_part, 'msg_part')) {
                     return '';
                 }
-                $command = "UID FETCH $uid BODY[$message_part]\r\n";
+                $command = "UID FETCH $uid BODY" . "[$message_part]\r\n";
             }
             $cache_command = $command.(string)$max;
             if ($struct) {
@@ -2099,6 +2098,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param int $uid IMAP UID value for the message
          * @param string $type Primary MIME type like "text"
          * @param string $subtype Secondary MIME type like "plain"
+         * @param array $struct message structure array
          * @return string formatted message content, bool false if no matching part is found
          */
         public function get_first_message_part($uid, $type, $subtype=false, $struct=false) {

@@ -208,7 +208,7 @@ if (!hm_exists('save_main_script')) {
                         $script
                     );
                 }
-                $main_script .= $script . "\n";                
+                $main_script .= $script . "\n";
             }
             $main_script = format_main_script($main_script);
             $ret = $client->putScript(
@@ -366,9 +366,9 @@ if (!hm_exists('block_filter')) {
 }
 
 if (!hm_exists('block_filter_dropdown')) {
-    function block_filter_dropdown($mod, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block') {
-        $ret = '<div class="dropdown-menu p-3" id="dropdownMenuBlockSender">'
-            .'<form id="block_sender_form">';
+    function block_filter_dropdown ($mod, $mailbox_id = null, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block', $increment = "") {
+        $ret = '<div class="dropdown-menu p-3" id="dropdownMenuBlockSender' .$increment. '">'
+            .'<form id="block_sender_form' .$increment. '" >';
         if ($with_scope) {
             $ret .= '<div class="mb-2">'
                 .   '<label for="blockSenderScope" class="form-label">'.$mod->trans('Who Is Blocked').'</label>'
@@ -379,7 +379,7 @@ if (!hm_exists('block_filter_dropdown')) {
         }
         $ret .= '<div class="mb-2">'
             .   '<label for="block_action" class="form-label">'.$mod->trans('Action').'</label>'
-            .   '<select class="form-select form-select-sm" name="block_action" id="block_action">'
+            .   '<select class="form-select form-select-sm block_action" name="block_action" id="block_action' .$increment. '">'
             .       '<option value="default">'.$mod->trans('Default action').'</option>'
             .       '<option value="discard">'.$mod->trans('Discard').'</option>'
             .       '<option value="blocked">'.$mod->trans('Move To Blocked Folder').'</option>'
@@ -388,7 +388,7 @@ if (!hm_exists('block_filter_dropdown')) {
             .   '</select>'
             .'</div>'
             .'<div class="d-grid gap-1">'
-            .   '<button class="btn btn-danger btn-sm mt-2" type="submit" id="'.$submit_id.'">'
+            .   '<button class="btn btn-danger btn-sm mt-2 '.$submit_id.'" type="submit" id="'.$submit_id.$increment. '" mailbox_id="'.$mailbox_id.'">'
             .       $mod->trans($submit_title)
             .   '</button>'
             .'</div>'
@@ -419,8 +419,10 @@ if (!hm_exists('get_blocked_senders_array')) {
                     return [];
                 }
                 foreach ($blocked_list as $blocked_sender) {
-                    if (explode('@', $blocked_sender)[0] == '') {
-                        $blocked_sender = '*' . $blocked_sender;
+                    if ($blocked_sender) {
+                        if (explode('@', $blocked_sender)[0] == '') {
+                            $blocked_sender = '*' . $blocked_sender;
+                        }
                     }
                     $blocked_senders[] = $blocked_sender;
                 }
@@ -444,6 +446,7 @@ if (!hm_exists('get_blocked_senders')){
             }
             $current_script = $client->getScript('blocked_senders');
             $blocked_list_actions = [];
+            $blocked_senders = [];
             if ($current_script != '') {
                 $script_split = preg_split('#\r?\n#', $current_script, 0);
                 if (!isset($script_split[1])) {
@@ -474,7 +477,7 @@ if (!hm_exists('get_blocked_senders')){
                 'default' => $module->trans('Default'),
             ];
             $ret = '';
-            foreach ($blocked_senders as $sender) {
+            foreach ($blocked_senders as $k => $sender) {
                 $reject_message = $blocked_list_actions[$sender]['reject_message'];
                 $ret .= '<tr><td>'.$sender.'</td><td>';
                 if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
@@ -487,7 +490,9 @@ if (!hm_exists('get_blocked_senders')){
                     $action = 'default';
                     $ret .= 'Default';
                 }
-                $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown"> <i class="bi bi-pencil-fill ms-3"></i></a>';
+                $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown" aria-labelledby="dropdownMenuBlockSender'.$k.'" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-pencil-fill ms-3"></i></a>';
+                $ret .= block_filter_dropdown($module, $mailbox_id, false, 'edit_blocked_behavior', 'Edit', $k);
+
                 $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'"></i>';
                 if (!mb_strstr($sender, '*')) {
                     $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'"></i>';

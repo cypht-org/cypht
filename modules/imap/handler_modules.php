@@ -865,6 +865,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
             $this->out('imap_server_id', $form['imap_server_id']);
+            $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
 }
