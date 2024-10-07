@@ -488,23 +488,29 @@ $('#imap_filter_form').on('submit', async function(event) {
 
 var display_imap_mailbox = function(rows, links) {
     const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-    Hm_Message_List.update([detail.server_id], rows, 'imap');
-    Hm_Message_List.check_empty_list();
-    $('.page_links').html(links);
-    $('input[type=checkbox]').on("click", function(e) {
-        Hm_Message_List.toggle_msg_controls();
-    });    
+    const serverIds = [];
+    if (detail) {
+        serverIds.push(detail.server_id);
+    }
+    if (rows) {
+        Hm_Message_List.update(serverIds, rows, 'imap');
+        Hm_Message_List.check_empty_list();
+        $('.page_links').html(links);
+        $('input[type=checkbox]').on("click", function(e) {
+            Hm_Message_List.toggle_msg_controls();
+        });    
 
-    const messages = Object.values(rows);    
-    messages.forEach(function(item) {
-        const tr = $(item['0']);
-        const uid = tr.data('uid');
+        const messages = Object.values(rows);    
+        messages.forEach(function(item) {
+            const tr = $(item['0']);
+            const uid = tr.data('uid');
 
-        if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
-            return;
-        }
-        preFetchMessageContent(false, uid);
-    });
+            if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
+                return;
+            }
+            preFetchMessageContent(false, uid);
+        });
+    }
 };
 
 function preFetchMessageContent(msgPart, uid) {
