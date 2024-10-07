@@ -40,7 +40,7 @@ class Hm_MessagesStore {
 
         const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
 
-        this.count = folder_status && Object.values(folder_status)[0].messages;
+        this.count = folder_status && Object.values(folder_status)[0]?.messages;
         this.links = pageLinks;
         this.rows = updatedMessages;
         this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
@@ -140,6 +140,12 @@ class Hm_MessagesStore {
             switch (this.path) {
                 case 'unread':
                     hook = "ajax_imap_unread";
+                    break;
+                case 'flagged':
+                    hook = "ajax_imap_flagged";
+                    break;
+                default:
+                    hook = "ajax_imap_folder_data";
                     break;
             }
         }
