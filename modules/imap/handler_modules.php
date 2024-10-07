@@ -1397,20 +1397,27 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
+
         if ($success) {
-            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = array();
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
-            $this->out('folder_status', $status);
-            $this->out('imap_unread_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+            $folders = array($folder);
+        } else {
+            $data_sources = imap_data_sources('');
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
+
+        $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
+        $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
+        $msg_list = array();
+        list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        $this->out('folder_status', $status);
+        $this->out('imap_unread_data', $msg_list);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
