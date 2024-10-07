@@ -454,9 +454,10 @@ var setup_imap_folder_page = function(listPath) {
     select_imap_folder(listPath);
     $('.remove_source').on("click", remove_imap_combined_source);
     $('.add_source').on("click", add_imap_combined_source);
-    $('.refresh_link').on("click", function() {
+    $('.refresh_link').on("click", function(e) {
+        e.preventDefault();
         if ($('.imap_keyword').val()) {
-            $('#imap_filter_form').submit();
+            $('#imap_filter_form').trigger('submit');
         }
         else {
             select_imap_folder(listPath, true);

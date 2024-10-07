@@ -2143,20 +2143,26 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $path = $this->request->get['list_path'];
-            $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
+        } else {
+            $data_sources = imap_sources('', $this, $this->request->get['list_path']);
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
+        }
+        $path = $this->request->get['list_path'];
+        $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
+        $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
+        if (! isset($folders) || empty($folders)) {
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
             if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
-            }
-            else {
+            } else {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
             }
+
             $folders = array();
             foreach ($msg_list as $msg) {
                 if (hex2bin($msg['folder']) != hex2bin($folder)) {
@@ -2167,18 +2173,20 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
                 $auto_folder = $folders[0];
                 $this->out('auto_'.$path.'_folder', $msg_list[0]['server_name'].' '.$auto_folder);
             }
-            if (array_key_exists('keyword', $this->request->get)) {
-                $keyword = $this->request->get['keyword'];
-                $search_pattern = "/$keyword/i";
-                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
-                    return preg_grep($search_pattern, $filter_msg_list);
-                });
-                $msg_list = $search_result;
-            }
-            $this->out('folder_status', $status);
-            $this->out('imap_'.$path.'_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+        } else {
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)), false);
         }
+        if (array_key_exists('keyword', $this->request->get)) {
+            $keyword = $this->request->get['keyword'];
+            $search_pattern = "/$keyword/i";
+            $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
+                return preg_grep($search_pattern, $filter_msg_list);
+            });
+            $msg_list = $search_result;
+        }
+        $this->out('folder_status', $status);
+        $this->out('imap_'.$path.'_data', $msg_list);
+        $this->out('imap_server_ids', $form['imap_server_ids']);
     }
 }
 
