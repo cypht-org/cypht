@@ -832,7 +832,6 @@ function Message_List() {
         }
         for (index in self.sources) {
             source = self.sources[index];
-            source.callback(source.id, source.folder);
         }
         return false;
     };
@@ -1976,7 +1975,7 @@ $(function() {
         Hm_Folders.update_folder_list();
     }
     if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
-        Hm_Message_List.select_combined_view();
+        // Hm_Message_List.select_combined_view();
         $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
         $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
         if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
