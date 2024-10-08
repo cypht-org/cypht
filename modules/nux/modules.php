@@ -364,7 +364,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             continue;
                         }
                     }
-                } 
+                }
                 if (! empty($server['smtp']['server'])) {
                     if (!$this->module_is_supported('smtp')) {
                         $errors[] = 'SMTP module is not enabled';
@@ -541,7 +541,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Help').'</h4></div>'.
-            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
+            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do. And Cypht also supports the newest protocol: JMAP (RFC8621).').' '.
         '</div></div></div>';
     }
 }
@@ -562,6 +562,8 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
         $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
         $res .= '</div><ul class="mt-4">';
+
+        $jmap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'jmap'; }));
 
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
@@ -593,10 +595,10 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
             }
             else {
                 if ($server_data[$proto] > 1) {
-                    $res .= sprintf($this->trans('You have %d %s sources'), $server_data[$proto], mb_strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s / JMAP ' . $jmap_servers_count . ' sources'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 else {
-                    $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
+                    $res .= sprintf($this->trans('You have %d %s / JMAP ' . $jmap_servers_count . ' source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
                 $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
             }
