@@ -1331,7 +1331,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
         $this->out('folder_status', $status);
         $this->out('imap_combined_inbox_data', $msg_list);
-        $this->out('imap_server_ids', $form['imap_server_ids']);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
@@ -1362,7 +1362,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
         list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
         $this->out('folder_status', $status);
         $this->out('imap_flagged_data', $msg_list);
-        $this->out('imap_server_ids', $form['imap_server_ids']);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
@@ -2197,7 +2197,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         }
         $this->out('folder_status', $status);
         $this->out('imap_'.$path.'_data', $msg_list);
-        $this->out('imap_server_ids', $form['imap_server_ids']);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
