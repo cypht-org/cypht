@@ -25,16 +25,28 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
-     * @returns {Promise<Array<String>>}
+     * Check if the store has data for the current instance
+     * @returns {Boolean}
      */
-    async load(reload = false, hideLoadingState = false) {
+    hasLocalData() {
+        return this.#retrieveFromLocalStorage() !== false;
+    }
+
+    /**
+     * 
+     * @returns {Promise<this>}
+     */
+    async load(reload = false, hideLoadingState = false, doNotFetch = false) {
         const storedMessages = this.#retrieveFromLocalStorage();
         if (storedMessages && !reload) {
             this.rows = storedMessages.rows;
             this.links = storedMessages.links;
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
+            return this;
+        }
+
+        if (doNotFetch) {
             return this;
         }
 
