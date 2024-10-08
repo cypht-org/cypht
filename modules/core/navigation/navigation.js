@@ -35,6 +35,8 @@ async function navigate(url) {
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         $('main').replaceWith(main);
 
+        window.location.next = url;
+
         renderPage(url);
 
         history.pushState({ main }, "", url);
