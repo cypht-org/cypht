@@ -194,7 +194,8 @@ var Hm_Ajax_Request = function() { return {
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        xhr.open('POST', window.location.href)
+        const url = window.location.next ?? window.location.href;
+        xhr.open('POST', url)
         xhr.addEventListener('load', function() {
             config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
