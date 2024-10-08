@@ -230,7 +230,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 }
                             }
 
-                            $contact = ($this->get('contact_store'))->get(null, false, $contact_email);
+                            $contact_store = $this->get('contact_store');
+                            $contact = !$contact_store ? null : $contact_store->get(null, false, $contact_email);
                             $contact_exists = !empty($contact);
 
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
