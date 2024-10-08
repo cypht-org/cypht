@@ -144,6 +144,10 @@ class Hm_MessagesStore {
                 case 'flagged':
                     hook = "ajax_imap_flagged";
                     break;
+                case 'combined_inbox':
+                case 'email':
+                    hook = "ajax_imap_combined_inbox";
+                    break;
                 default:
                     hook = "ajax_imap_folder_data";
                     break;
