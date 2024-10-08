@@ -1,8 +1,14 @@
+const unMountSubscribers = [];
+
 window.addEventListener('popstate', function(event) {
     if (event.state) {
         $('main').replaceWith(event.state.main);
     }
-    renderPage(window.location.href);
+    const unMountCallback = renderPage(window.location.href);
+
+    if (unMountCallback) {
+        unMountSubscribers.push({ url: window.location.search, callback: unMountCallback });
+    }
     
 });
 
@@ -36,14 +42,20 @@ async function navigate(url) {
         $('main').replaceWith(main);
 
         window.location.next = url;
+        const previousUrl = window.location.search;
 
-        renderPage(url);
+        const unMountCallback = renderPage(url);
 
         history.pushState({ main }, "", url);
-
+        
+        if (unMountCallback) {
+            unMountSubscribers.push({ url, callback: unMountCallback });
+        }
         Hm_Folders.hl_selected_menu();
+
+        unMountSubscribers.find(subscriber => subscriber.url === previousUrl)?.callback();
     } catch (error) {
-        throw new Error(error);
+        throw error;
     } finally {
         hideRoutingToast();
     }
@@ -57,7 +69,8 @@ function renderPage(href) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());
         if (route) {
-            route.handler(routeParams);
+            const unMountCallback = route.handler(routeParams);
+            return unMountCallback;
         }
     }
 }

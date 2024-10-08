@@ -450,12 +450,6 @@ var setup_imap_message_list_content_page = function() {
 };
 
 var setup_imap_folder_page = async function(listPath) {
-    const notEmpty = (await new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number()).hasRows());
-    select_imap_folder(listPath).then(() => {
-        if (notEmpty) {
-            select_imap_folder(listPath, true, true)
-        }
-    });
     $('.remove_source').on("click", remove_imap_combined_source);
     $('.add_source').on("click", add_imap_combined_source);
     $('.refresh_link').on("click", function(e) {
