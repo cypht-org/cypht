@@ -160,7 +160,6 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
         $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a></li>';
     }
 
-    $results .= '</ul>';
     return $results;
 }}
 
