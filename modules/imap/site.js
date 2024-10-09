@@ -1408,7 +1408,7 @@ var add_email_in_contact_trusted = function(list_email) {
         }
       );
     }
-  };
+};
 
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 
