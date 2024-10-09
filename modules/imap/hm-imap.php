@@ -11,6 +11,7 @@ require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
 require_once('hm-jmap.php');
+require_once('hm-ews.php');
 
 /**
  * IMAP connection manager
@@ -27,12 +28,7 @@ class Hm_IMAP_List {
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
-            self::$server_list[$id]['object'] = new Hm_JMAP();
-        }
-        else {
-            self::$server_list[$id]['object'] = new Hm_IMAP();
-        }
+        self::$server_list[$id]['object'] = new Hm_Mailbox();
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
@@ -57,6 +53,15 @@ class Hm_IMAP_List {
         }
         $res = $hm_cache->get('imap'.$id);
         return $res;
+    }
+
+    public static function get_connected_mailbox($id, $hm_cache = null) {
+        if ($hm_cache) {
+            $cache = self::get_cache($hm_cache, $id);
+        } else {
+            $cache = false;
+        }
+        return self::connect($id, $cache);
     }
 }
 

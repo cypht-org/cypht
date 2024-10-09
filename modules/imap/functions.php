@@ -1282,14 +1282,11 @@ function get_request_params($request) {
 }}
 
 if (!hm_exists('snooze_message')) {
-function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
-    if (!$imap->select_mailbox($folder)) {
-        return false;
-    }
+function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
     if (!$snooze_tag) {
-        $imap->message_action('UNREAD', array($msg_id));
+        $mailbox->message_action($folder, 'UNREAD', array($msg_id));
     }
-    $msg = $imap->get_message_content($msg_id, 0);
+    $msg = $mailbox->get_message_content($folder, $msg_id);
     preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
@@ -1306,39 +1303,30 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     $res = false;
     $snooze_folder = 'Snoozed';
     if ($snooze_tag) {
-        if (!count($imap->get_mailbox_status($snooze_folder))) {
-            $imap->create_mailbox($snooze_folder);
+        if (!count($mailbox->get_folder_status($snooze_folder))) {
+            $mailbox->create_folder($snooze_folder);
         }
-        if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, mb_strlen($msg))) {
-            $imap->append_feed($msg."\r\n");
-            if ($imap->append_end()) {
-                if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
-                    $imap->message_action('EXPUNGE', array($msg_id));
-                    $res = true;
-                }
+        if ($mailbox->store_message($snooze_folder, $msg)) {
+            if ($mailbox->message_action($folder, 'DELETE', array($msg_id))) {
+                $mailbox->message_action($folder, 'EXPUNGE', array($msg_id));
+                $res = true;
             }
         }
     } else {
         $snooze_headers = parse_snooze_header($matches[0]);
         $original_folder = $snooze_headers['from'];
-        if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, mb_strlen($msg))) {
-            $imap->append_feed($msg."\r\n");
-            if ($imap->append_end()) {
-                if ($imap->select_mailbox($snooze_folder) && $imap->message_action('DELETE', array($msg_id))) {
-                    $imap->message_action('EXPUNGE', array($msg_id));
-                    $res = true;
-                }
+        if ($mailbox->store_message($original_folder, $msg)) {
+            if ($mailbox->message_action($snooze_folder, 'DELETE', array($msg_id))) {
+                $mailbox->message_action($snooze_folder, 'EXPUNGE', array($msg_id));
+                $res = true;
             }
         }
     }
     return $res;
 }}
 if (!hm_exists('add_tag_to_message')) {
-function add_tag_to_message($imap, $msg_id, $folder, $tag) {
-    if (!$imap->select_mailbox($folder)) {
-        return false;
-    }
-    $msg = $imap->get_message_content($msg_id, 0);
+function add_tag_to_message($mailbox, $msg_id, $folder, $tag) {
+    $msg = $mailbox->get_message_content($folder, $msg_id);
     preg_match("/^X-Cypht-Tags:(.+)\r?\n/i", $msg, $matches);
 
     if (count($matches)) {
@@ -1359,13 +1347,10 @@ function add_tag_to_message($imap, $msg_id, $folder, $tag) {
     $msg = rtrim($msg)."\r\n";
 
     $res = false;
-    if ($imap->append_start($folder, strlen($msg))) {
-        $imap->append_feed($msg."\r\n");
-        if ($imap->append_end()) {
-            if ($imap->message_action('DELETE', array($msg_id))) {
-                $imap->message_action('EXPUNGE', array($msg_id));
-                $res = true;
-            }
+    if ($mailbox->store_message($folder, $msg)) {
+        if ($mailbox->message_action($folder, 'DELETE', array($msg_id))) {
+            $mailbox->message_action($folder, 'EXPUNGE', array($msg_id));
+            $res = true;
         }
     }
 
