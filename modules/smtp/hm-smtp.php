@@ -60,6 +60,9 @@ class Hm_SMTP {
     private $config;
     private $server;
     private $starttls;
+    private $supports_tls;
+    private $supports_auth;
+    private $max_message_size;
     private $port;
     private $tls;
     private $auth;
@@ -411,7 +414,6 @@ class Hm_SMTP {
                     break;
             }
         }
-
         if (!isset($result)) {
             $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();
