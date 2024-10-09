@@ -303,9 +303,6 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             elseif (count($moved) == 0) {
                 Hm_Msgs::add('ERRUnable to move/copy selected messages');
             }
-            if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
-                $this->save_hm_msgs();
-            }
             $this->out('move_count', $moved);
         }
     }
@@ -933,7 +930,6 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 Hm_Msgs::add('Message deleted');
                 $this->out('imap_delete_error', false);
             }
-            $this->save_hm_msgs();
         }
     }
 }
@@ -1006,7 +1002,6 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
             }
         }
-        $this->save_hm_msgs();
     }
 }
 
@@ -1086,7 +1081,6 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             $msg = 'ERRFailed to snooze selected messages';
         }
         Hm_Msgs::add($msg);
-        $this->save_hm_msgs();
     }
 }
 
