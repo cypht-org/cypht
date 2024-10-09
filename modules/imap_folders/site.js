@@ -263,25 +263,7 @@ var folder_page_create = function() {
 
 };
 
-$(function() {
-    if (hm_page_name() == 'folders' || hm_page_name() == 'folders_subscription') {
-        $('#imap_server_folder').on("change", function() {
-            $(this).parent().parent().submit();
-        });
-    }
-    if (hm_page_name() == 'folders') {
-        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    }
-    if (hm_page_name() == 'folders_subscription') {
-        $('.subscribe_parent_folder').on("click", function() { return folder_page_folder_list('subscribe_parent_folder_select', 'subscribe_title', 'imap_parent_folder_link', '', 'subscribe_parent', true); });
-        $('.subscribe_parent_folder').trigger('click');
-        $($('.subscribe_parent_folder_select .imap_parent_folder_link')[0]).trigger('click');
-        const selected_imap_server = $('#imap_server_folder').val();
-        const email_folder_server = $(`.email_folders .imap_${selected_imap_server}_ .inner_list`);
-        if (email_folder_server && $(email_folder_server[0]).children().length) {
-            $($('.subscribe_parent_folder_select .imap_parent_folder_link')[0]).trigger('click');
-        }
-    }
+function bindFoldersEventHandlers() {
     $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
     $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
     $('.select_delete_folder').on("click", function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
@@ -305,4 +287,4 @@ $(function() {
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
     $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
     $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
-});
+}
