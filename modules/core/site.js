@@ -844,7 +844,7 @@ function Message_List() {
             self.setup_combined_view(self.page_caches[hm_list_path()]);
         }
         else {
-            if (hm_page_name() == 'search') {
+            if (getPageNameParam() == 'search') {
                 self.setup_combined_view('formatted_search_data');
             }
             else {
@@ -879,7 +879,7 @@ function Message_List() {
             self.set_row_events();
             $('.combined_sort').show();
         }
-        if (hm_page_name() == 'search' && hm_run_search() == "0") {
+        if (getPageNameParam() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
         }
         else {
@@ -999,7 +999,7 @@ function Message_List() {
         var count = Hm_Utils.rows().length;
         if (!count) {
             if (!$('.empty_list').length) {
-                if (hm_page_name() == 'search') {
+                if (getPageNameParam() == 'search') {
                     $('.search_content').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
                 else {
@@ -1054,7 +1054,7 @@ function Message_List() {
         if (new_total != current || missing) {
             $('.total_unread_count').html('&#160;'+new_total+'&#160;');
         }
-        if (new_total > current && hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
+        if (new_total > current && getPageNameParam() != 'message_list' && getListPathParam() != 'unread') {
             $('.menu_unread > a').css('font-weight', 'bold');
         }
         if (amount == -1 || new_total < current) {
@@ -1216,7 +1216,7 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
-                if (hm_list_path() == name && hm_page_name() == 'message_list') {
+                if (getListPathParam() == name && getPageNameParam() == 'message_list') {
                     var title = document.title.replace(/^\[\d+\]/, '');
                     document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
                     /* HERE */
@@ -1948,6 +1948,15 @@ var hasLeadingOrTrailingSpaces = function(str) {
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
+function sortHandlerForMessageListAndSearchPage() {
+    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
+    $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
+    if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
+        $('.menu_unread > a').css('font-weight', 'normal');
+        Hm_Folders.save_folder_list();
+    }
+}
+
 /* executes on onload, has access to other module code */
 $(function() {
     /* Remove disabled attribute to send checkbox */
@@ -1977,29 +1986,12 @@ $(function() {
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
         Hm_Folders.update_folder_list();
     }
-    if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
-        // Hm_Message_List.select_combined_view();
-        $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
-        $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
-        if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
-            $('.menu_unread > a').css('font-weight', 'normal');
-            Hm_Folders.save_folder_list();
-        }
-    }
+
     hl_save_link();
-    if (hm_page_name() == 'search') {
-        $('.search_reset').on("click", Hm_Utils.reset_search_form);
-    }
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
 
-    if (hm_page_name() == 'home') {
-        $('.pw_update').on("click", function() { update_password($(this).data('id')); });
-    }
-    if (hm_page_name() == 'servers') {
-        $('.edit_server_connection').on('click', imap_smtp_edit_action);
-    } 
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -2009,12 +2001,6 @@ $(function() {
         $('.list_controls.on_mobile').hide();
     }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
-    if (hm_page_name() == 'settings') {
-        $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
-        $('.reset_default_value_select').on("click", reset_default_value_select);
-        $('.reset_default_value_input').on("click", reset_default_value_input);
-        $('.reset_default_timezone').on("click", reset_default_timezone);
-    }
 
     if (hm_check_dirty_flag()) {
         $('form:not(.search_terms)').areYouSure();
@@ -2054,7 +2040,7 @@ function fixLtrInRtl() {
     };
 
     function getElements() {
-        var pageName = hm_page_name();
+        var pageName = getPageNameParam();
         if (pageName == "message") {
             return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
         }
@@ -2160,7 +2146,7 @@ if(tableBody && !hm_mobile()) {
             return;
         }
 
-        const page = hm_page_name();
+        const page = getPageNameParam();
         const selectedRows = [];
 
         if(movingNumber > 1) {
