@@ -28,6 +28,9 @@ setup_cypht() {
         sed -i 's/mysql/sqlite/' tests/phpunit/mocks.php
         sed -i "s/'host'/'socket'/" tests/phpunit/mocks.php
     fi
+
+    sed -i "s|ATTACHMENT_DIR=.*|ATTACHMENT_DIR=$(pwd)/hm3/attachments|" .env
+    php scripts/config_gen.php
 }
 
 # Create and populate database for phpunit tests
@@ -132,6 +135,9 @@ setup_site() {
 		STATUS_ERROR
 		exit 1
 	fi
+    STATUS_TITLE "Setup required Directories"
+    mkdir -p "$(pwd)/hm3/attachments"
+	STATUS_DONE
 }
 
 ##### UI END #####

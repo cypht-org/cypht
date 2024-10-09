@@ -338,7 +338,7 @@ class Hm_Output_ldap_auth_settings extends Hm_Output_Module {
         $auths = $this->get('ldap_contacts_auth', array());
         if (count($connections) > 0) {
             $res = '<tr><td data-target=".ldap_settings" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
-                '<i class="bi bi-people-fill"></i>'.
+                '<i class="bi bi-people-fill fs-5 me-2"></i>'.
                 $this->trans('LDAP Addressbooks').'</td></tr>';
             foreach ($connections as $name => $con) {
                 $user = '';
