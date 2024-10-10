@@ -1660,14 +1660,14 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '<div class="modal-dialog modal-lg">';
         $share_folder_modal .= '<div class="modal-content">';
         $share_folder_modal .= '<div class="modal-header">';
-        $share_folder_modal .= '<h5 class="modal-title" id="shareFolderModalLabel">Edit Permissions</h5>';
+        $share_folder_modal .= '<h5 class="modal-title" id="shareFolderModalLabel">'.$this->trans('Edit Permissions').'</h5>';
         $share_folder_modal .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
         $share_folder_modal .= '</div>';
 
         $share_folder_modal .= '<div class="modal-body">';
         $share_folder_modal .= '<div class="row">';
 
-        $share_folder_modal .= '<div class="col-lg-6 col-md-12">';
+        $share_folder_modal .= '<div class="col-lg-8 col-md-12">';
 
         $share_folder_modal .= '<div id="loadingSpinner" class="text-center">';
         $share_folder_modal .= '<div class="spinner-border text-primary" role="status">';
@@ -1678,8 +1678,9 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '<table class="table table-striped" id="permissionTable" style="display:none;">';
         $share_folder_modal .= '<thead>';
         $share_folder_modal .= '<tr>';
-        $share_folder_modal .= '<th>Email</th>';
-        $share_folder_modal .= '<th>Permissions</th>';
+        $share_folder_modal .= '<th>'.$this->trans('User').'</th>';
+        $share_folder_modal .= '<th>'.$this->trans('Permissions').'</th>';
+        $share_folder_modal .= '<th>'.$this->trans('Actions').'</th>';
         $share_folder_modal .= '</tr>';
         $share_folder_modal .= '</thead>';
         $share_folder_modal .= '<tbody></tbody>';
@@ -1687,7 +1688,7 @@ class Hm_Output_modals extends Hm_Output_Module {
         
         $share_folder_modal .= '</div>';
         
-        $share_folder_modal .= '<div class="col-lg-6 col-md-12">';
+        $share_folder_modal .= '<div class="col-lg-4 col-md-12">';
         $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
         $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';
         $share_folder_modal .= '<input type="hidden" name="folder_uid" id="folder_uid" value="">';
@@ -1695,48 +1696,48 @@ class Hm_Output_modals extends Hm_Output_Module {
 
         $share_folder_modal .= '<div class="mb-3 row">';
         $share_folder_modal .= '<div class="col-12">';
-        $share_folder_modal .= '<label class="form-label">Identifier</label>';
+        $share_folder_modal .= '<label class="form-label">'.$this->trans('Identifier').'</label>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="radio" name="identifier" value="user" id="identifierUser" checked>';
-        $share_folder_modal .= '<label for="identifierUser">User:</label>';
+        $share_folder_modal .= '<label for="identifierUser">'.$this->trans('User').':</label>';
         $share_folder_modal .= '<input type="text" class="form-control d-inline-block" id="email" name="email" required placeholder="Enter email">';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="radio" name="identifier" value="all" id="identifierAll">';
-        $share_folder_modal .= '<label for="identifierAll">All users (anyone)</label>';
+        $share_folder_modal .= '<label for="identifierAll">'.$this->trans('All users (anyone)').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="radio" name="identifier" value="guests" id="identifierGuests">';
-        $share_folder_modal .= '<label for="identifierGuests">Guests (anonymous)</label>';
+        $share_folder_modal .= '<label for="identifierGuests">'.$this->trans('Guests (anonymous)').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
 
         $share_folder_modal .= '<div class="mb-3 row">';
         $share_folder_modal .= '<div class="col-12">';
-        $share_folder_modal .= '<label class="form-label">Access Rights</label>';
+        $share_folder_modal .= '<label class="form-label">'.$this->trans('Access Rights').'</label>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="checkbox" name="access_read" id="accessRead" checked>';
-        $share_folder_modal .= '<label for="accessRead">Read</label>';
+        $share_folder_modal .= '<label for="accessRead">'.$this->trans('Read').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="checkbox" name="access_write" id="accessWrite">';
-        $share_folder_modal .= '<label for="accessWrite">Write</label>';
+        $share_folder_modal .= '<label for="accessWrite">'.$this->trans('Write').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="checkbox" name="access_delete" id="accessDelete">';
-        $share_folder_modal .= '<label for="accessDelete">Delete</label>';
+        $share_folder_modal .= '<label for="accessDelete">'.$this->trans('Delete').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="checkbox" name="access_other" id="accessOther">';
-        $share_folder_modal .= '<label for="accessOther">Other</label>';
+        $share_folder_modal .= '<label for="accessOther">'.$this->trans('Other').'</label>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
 
         $share_folder_modal .= '<div class="modal-footer">';
-        $share_folder_modal .= '<button type="submit" class="btn btn-primary">Save</button>';
-        $share_folder_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>';
+        $share_folder_modal .= '<button type="submit" class="btn btn-primary">'.$this->trans('Save').'</button>';
+        $share_folder_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</form>';
         $share_folder_modal .= '</div>';

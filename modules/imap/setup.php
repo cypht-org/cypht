@@ -450,5 +450,6 @@ return array(
         'imap_folder' => FILTER_DEFAULT,
         'identifier' => FILTER_DEFAULT,
         'permissions' => FILTER_DEFAULT,
+        'action' => FILTER_DEFAULT,
     )
 );
