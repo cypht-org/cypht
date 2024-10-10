@@ -117,10 +117,10 @@ var display_feeds_combined_inbox = function(res) {
 
 var feed_item_view = function(uid, list_path, callback) {
     if (!uid) {
-        uid = hm_msg_uid();
+        uid = getMessageUidParam();
     }
     if (!list_path) {
-        list_path = hm_list_path();
+        list_path = getListPathParam();
     }
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
@@ -139,13 +139,13 @@ var display_feed_item_content = function(res) {
     if (!res.feed_msg_headers) {
         return;
     }
-    var msg_uid = hm_msg_uid();
+    var msg_uid = getMessageUidParam();
     $('.msg_text').html('');
     $('.msg_text').append(res.feed_msg_headers);
     $('.msg_text').append(res.feed_msg_text);
     set_message_content();
     document.title = $('.header_subject th').text();
-    var path = hm_list_path();
+    var path = getListPathParam();
     if (hm_list_parent() == 'feeds') {
         Hm_Message_List.prev_next_links('formatted_feed_data', path+'_'+msg_uid);
     }
@@ -170,7 +170,7 @@ var display_feed_item_content = function(res) {
 };
 
 var load_feed_list = function(id) {
-    var cached = Hm_Utils.get_from_local_storage(hm_list_path());
+    var cached = Hm_Utils.get_from_local_storage(getListPathParam());
     if (cached) {
         $('.message_table tbody').html(cached);
     }

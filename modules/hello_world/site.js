@@ -3,8 +3,7 @@
 /**
  * This JS sets up an AJAX request and assigns it to a link on the hello_world page.
  * You have access to cash.js functions when this code is loaded, so use the standard
- * way to delay actions until page onload if you need to. Built in data sources like
- * hm_page_name() are defined before this is run so they are also available. When the
+ * way to delay actions until page onload if you need to. When the
  * site build process is run this code will be combined with JS from other module sets,
  * and optionally minified based on the config/app.php file settings.
  */
@@ -25,12 +24,3 @@ var hello_world_ajax_update = function() {
 var update_hello_world_display = function(res) {
     alert(res.hello_world_ajax_result);
 };
-
-/**
- * If we are on the "hello_world" page, activate the click handler
- */
-if (hm_page_name() == 'hello_world') {
-    $('.hw_ajax_link').on("click", function() {
-        hello_world_ajax_update();
-    });
-}

@@ -7,6 +7,8 @@ function applyImapMessageListPageHandlers(routeParams) {
     imap_setup_tags();
 
     if (window.githubMessageListPageHandler) githubMessageListPageHandler(routeParams);
+    if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
+    if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);
 
     return async function() {
         const refreshIntervalId = await refreshInterval;
@@ -21,4 +23,6 @@ function applyImapMessageContentPageHandlers(routeParams) {
 
     if (window.feedMessageContentPageHandler) feedMessageContentPageHandler(routeParams);
     if (window.githubMessageContentPageHandler) githubMessageContentPageHandler(routeParams);
+    if (window.pgpMessageContentPageHandler) pgpMessageContentPageHandler();
+    if (window.wpMessageContentPageHandler) wpMessageContentPageHandler(routeParams);
 }

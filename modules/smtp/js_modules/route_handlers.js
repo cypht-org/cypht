@@ -245,4 +245,7 @@ function applyComposePageHandlers() {
     $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
     $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
     $('.compose_to').focus();
+
+    if (window.pgpComposePageHandler) pgpComposePageHandler();
+    if (window.profilesComposePageHandler) profilesComposePageHandler();
 }

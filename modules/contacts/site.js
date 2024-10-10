@@ -58,8 +58,8 @@ var add_contact_from_popup = function(event) {
             {'name': 'contact_source', 'value': source}],
             function (res) {
                 $("#contact_popup_body").html(saveContactContent);
-                sessionStorage.removeItem(`${window.location.pathname}imap_4_${hm_list_path()}`);
-                sessionStorage.removeItem(`${window.location.pathname}${hm_msg_uid()}_${hm_list_path()}`);
+                sessionStorage.removeItem(`${window.location.pathname}imap_4_${getListPathParam()}`);
+                sessionStorage.removeItem(`${window.location.pathname}${getMessageUidParam()}_${getListPathParam()}`);
             }
         );
     }

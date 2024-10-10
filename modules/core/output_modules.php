@@ -552,6 +552,10 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
             $core = false;
             $mods = $this->get('router_module_list');
+            // Load navigation utilities used by subsequent modules' handlers
+            if (in_array('core', $mods)) {
+                $res .= '<script type="text/javascript" src="modules/core/navigation/utils.js"></script>';
+            }
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
@@ -574,11 +578,11 @@ class Hm_Output_page_js extends Hm_Output_Module {
             if ($core) {
                 $res = '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.$res;
                 /* Load navigation js modules
-                    * utils.js, routes.js, navigation.js
+                    * routes.js, navigation.js
                     * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
                     * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
                 */
-                foreach (['utils', 'routes', 'navigation'] as $js) {
+                foreach (['routes', 'navigation'] as $js) {
                     $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
                 }
             }
