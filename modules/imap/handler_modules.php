@@ -854,7 +854,18 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
+                    $uid = $msg['uid'];
+                    $part = true;
+                    $max = 87;
+                    $msg_struct = $imap->get_message_structure($uid);
+                    $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
+                    $msg_struct_current = array_shift($struct);
+                    $msg_text = $imap->get_message_content($uid, $part, $max, $msg_struct_current);
+                    // remove line 858 to 863 when https://github.com/cypht-org/cypht/pull/1241 is merged
+                    
+                    $this->validationMessage($msg['to'], $msg['subject'], $msg_text, $imap, $this->cache, $form['imap_server_id']);
                     $msgs[] = $msg;
+                    
                 }
                 if ($imap->selected_mailbox) {
                     $imap->selected_mailbox['detail']['exists'] = $total;
@@ -866,6 +877,71 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('list_page', $list_page);
             $this->out('imap_server_id', $form['imap_server_id']);
             $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
+        }
+    }
+    public function validationMessage($email, $subject, $msg, $imap, $cache, $imap_server_id) {          
+        // 1. Check Suspicious Phrases or Requests
+        $suspiciousPhrases = explode(",", $this->user_config->get("ceo_suspicious_phrases_setting"));
+        if (detectSuspiciousPhrases($msg, $suspiciousPhrases) || detectSuspiciousPhrases($subject, $suspiciousPhrases)) {
+            // 2. check ceo_rate_limit
+            $amount = extractAmountFromEmail($msg);
+            $amountLimit = $this->user_config->get("ceo_rate_limit_setting");
+            if ($amount > $amountLimit) {
+                // 3. Check Sender's Email Address
+                $folder = "Suspicious emails";
+                if (!count($imap->get_mailbox_status($folder))) {
+                    $imap->create_mailbox($folder);
+                }
+                $server_id = $imap_server_id ."_". bin2hex($folder);
+
+                if ($this->user_config->get("ceo_use_trusted_contact_setting")) {
+                    $contacts = $this->get('contact_store');
+                    $contact_list = $contacts->getAll();
+                    $existingEmails = array_map(function($c){
+                        return $c->value('email_address');
+                    },$contact_list);
+                    if (!isValidateAddrEmail(array_values($existingEmails), $email)) {
+                        // 4. action to execute implement here
+                        imap_move_same_server($server_id, "move", $cache, $folder);
+                    }
+                } else {
+                    // 4. action to execute implement here
+                    imap_move_same_server($server_id, "move", $cache, $folder);
+                }
+            }
+        }
+    
+        function detectSuspiciousPhrases($msg, $suspiciousPhrases) {
+            foreach ($suspiciousPhrases as $phrase) {
+                if (stripos($msg, $phrase) !== false) {
+                    return true;
+                }
+            }
+        
+            return false;
+        }
+        function detectUnusualAmount($normalLimit, $amount) {       
+            if ($amount > $normalLimit) {
+                return true;
+            }
+            return false;
+        }
+        function isValidateAddrEmail($trustedDomain, $email) {
+            foreach ($trustedDomain as $e) {
+                if ($email === $e) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        function extractAmountFromEmail($emailBody) {
+            $pattern = '/\b\d+(?:,\d+)?\.?\d*\s*(?:USD|dollars?|US\$?|EUR|euros?|€|JPY|yen|¥|GBP|pounds?|£|CAD|CAD\$|AUD|AUD\$)/i';
+        
+            preg_match_all($pattern, $emailBody, $matches);
+        
+            if (count($matches[0]) > 0) {
+                return $matches[0][0];
+            }
         }
     }
 }
@@ -2192,5 +2268,21 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
     public function process() {
         function process_move_messages_in_screen_email_enabled_callback($val) { return $val; }
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
+    }
+}
+
+/**
+ * Process setting_ceo_detection_fraud in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
+    public function process() {
+        function process_ceo_use_trusted_contact_callback($val) { return $val; }
+        function process_ceo_suspicious_phrases_callback($val) { return $val; }
+        function process_ceo_rate_limit_callback($val) { return $val; }
+        
+        process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
+        process_site_setting('ceo_suspicious_phrases', $this, 'process_ceo_suspicious_phrases_callback');
+        process_site_setting('ceo_rate_limit', $this, 'process_ceo_rate_limit_callback');
     }
 }
