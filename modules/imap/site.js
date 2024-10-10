@@ -434,7 +434,7 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 async function select_imap_folder(path, reload, processInTheBackground = false) {    
     const messages = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number());
     return await messages.load(reload, processInTheBackground).then(() => {        
-        display_imap_mailbox(messages.rows, messages.links);
+        display_imap_mailbox(messages.rows, messages.links, path);
     });
 };
 
@@ -487,8 +487,8 @@ $('#imap_filter_form').on('submit', async function(event) {
     }
 });
 
-var display_imap_mailbox = function(rows, links) {
-    const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
+    const detail = Hm_Utils.parse_folder_path(path, 'imap');
     const serverIds = [];
     if (detail) {
         serverIds.push(detail.server_id);
@@ -504,18 +504,19 @@ var display_imap_mailbox = function(rows, links) {
         const messages = Object.values(rows);    
         messages.forEach(function(item) {
             const tr = $(item['0']);
+            const path = item['1'];
             const uid = tr.data('uid');
 
             if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
                 return;
             }
-            preFetchMessageContent(false, uid);
+            preFetchMessageContent(false, uid, path);
         });
     }
 };
 
-function preFetchMessageContent(msgPart, uid) {
-    const detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+function preFetchMessageContent(msgPart, uid, path) {
+    const detail = Hm_Utils.parse_folder_path(path, 'imap');
     Hm_Ajax.request([
         {'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
         {'name': 'imap_msg_uid', 'value': uid},
