@@ -1,5 +1,5 @@
 function applyImapMessageListPageHandlers(routeParams) {
-    const refreshInterval = setup_imap_folder_page(routeParams.list_path);
+    const setupPageResult = setup_imap_folder_page(routeParams.list_path);
 
     sortHandlerForMessageListAndSearchPage();
 
@@ -11,7 +11,8 @@ function applyImapMessageListPageHandlers(routeParams) {
     if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);
 
     return async function() {
-        const refreshIntervalId = await refreshInterval;
+        const [refreshIntervalId, abortController] = await setupPageResult;
+        abortController.abort();
         clearInterval(refreshIntervalId);
     }
 }
