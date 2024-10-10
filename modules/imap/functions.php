@@ -158,7 +158,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
         }
         $results .= '<span class="unread_count unread_imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"></span>';
         if($can_share_folders) {
-            $results .= '<div class="dropdown"><a href="#" class="action-link" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon bi bi-three-dots-vertical"></i></a><ul class="dropdown-menu dropdown-menu"><li data-id="'.$id.'" data-folder="'.$output_mod->html_safe($folder_name).'"><a href="#" class="dropdown-item share"><i class="icon bi bi-share"></i> Share</a></ul></div>';
+            $results .= '<div class="dropdown"><a href="#" class="action-link" data-bs-toggle="dropdown" aria-expanded="false"><i class="icon bi bi-three-dots-vertical"></i></a><ul class="dropdown-menu dropdown-menu"><li data-id="'.$id.'" data-folder-uid="'.$output_mod->html_safe($folder_name).'" data-folder="'.$output_mod->html_safe($folder['basename']).'"><a href="#" class="dropdown-item share"><i class="icon bi bi-share"></i> Share</a></ul></div>';
         }
         $results .= '</li>';
     }

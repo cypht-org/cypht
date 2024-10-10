@@ -1645,8 +1645,21 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
      * Closes the main tag opened in Hm_Output_content_section_start
      */
     protected function output() {
+        return '</div></main>';
+    }
+}
+
+/**
+ * modals
+ * @subpackage core/output
+ */
+class Hm_Output_modals extends Hm_Output_Module {
+    /**
+     * Outputs modals
+     */
+    protected function output() {
         $share_folder_modal = '<div class="modal fade" id="shareFolderModal" tabindex="-1" aria-labelledby="shareFolderModalLabel" aria-hidden="true">';
-        $share_folder_modal .= '<div class="modal-dialog">';
+        $share_folder_modal .= '<div class="modal-dialog modal-lg">';
         $share_folder_modal .= '<div class="modal-content">';
         $share_folder_modal .= '<div class="modal-header">';
         $share_folder_modal .= '<h5 class="modal-title" id="shareFolderModalLabel">Edit Permissions</h5>';
@@ -1654,16 +1667,37 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
         $share_folder_modal .= '</div>';
 
         $share_folder_modal .= '<div class="modal-body">';
-        $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
+        $share_folder_modal .= '<div class="row">';
 
+        $share_folder_modal .= '<div class="col-lg-6 col-md-12">';
+
+        $share_folder_modal .= '<div id="loadingSpinner" class="text-center">';
+        $share_folder_modal .= '<div class="spinner-border text-primary" role="status">';
+        $share_folder_modal .= '<span class="visually-hidden">Loading...</span>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '<table class="table table-striped" id="permissionTable" style="display:none;">';
+        $share_folder_modal .= '<thead>';
+        $share_folder_modal .= '<tr>';
+        $share_folder_modal .= '<th>Email</th>';
+        $share_folder_modal .= '<th>Permissions</th>';
+        $share_folder_modal .= '</tr>';
+        $share_folder_modal .= '</thead>';
+        $share_folder_modal .= '<tbody></tbody>';
+        $share_folder_modal .= '</table>';
+        
+        $share_folder_modal .= '</div>';
+        
+        $share_folder_modal .= '<div class="col-lg-6 col-md-12">';
+        $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
         $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';
         $share_folder_modal .= '<input type="hidden" name="folder_uid" id="folder_uid" value="">';
+        $share_folder_modal .= '<input type="hidden" name="folder" id="folder" value="">';
 
         $share_folder_modal .= '<div class="mb-3 row">';
-        $share_folder_modal .= '<div class="col-lg-4 col-md-4 col-sm-12">';
+        $share_folder_modal .= '<div class="col-12">';
         $share_folder_modal .= '<label class="form-label">Identifier</label>';
-        $share_folder_modal .= '</div>';
-        $share_folder_modal .= '<div class="col-lg-8 col-md-8 col-sm-12">';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="radio" name="identifier" value="user" id="identifierUser" checked>';
         $share_folder_modal .= '<label for="identifierUser">User:</label>';
@@ -1681,10 +1715,8 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
         $share_folder_modal .= '</div>';
 
         $share_folder_modal .= '<div class="mb-3 row">';
-        $share_folder_modal .= '<div class="col-lg-4 col-md-4 col-sm-12">';
+        $share_folder_modal .= '<div class="col-12">';
         $share_folder_modal .= '<label class="form-label">Access Rights</label>';
-        $share_folder_modal .= '</div>';
-        $share_folder_modal .= '<div class="col-lg-8 col-md-8 col-sm-12">';
         $share_folder_modal .= '<div>';
         $share_folder_modal .= '<input type="checkbox" name="access_read" id="accessRead" checked>';
         $share_folder_modal .= '<label for="accessRead">Read</label>';
@@ -1708,13 +1740,17 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
         $share_folder_modal .= '<button type="submit" class="btn btn-primary">Save</button>';
         $share_folder_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>';
         $share_folder_modal .= '</div>';
-
         $share_folder_modal .= '</form>';
         $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
         $share_folder_modal .= '</div>';
-        return '</div></main>'.$share_folder_modal;
+
+        return $share_folder_modal;
     }
 }
 
