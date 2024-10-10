@@ -370,6 +370,78 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
+        * Sets the Access Control List (ACL) for a specified mailbox.
+        *
+        * This function sends the `SETACL` command to the IMAP server to modify
+        * the access rights of a user or identifier for a given mailbox. The access rights
+        * can either be granted or revoked based on the rights modification string.
+        *
+        * The third argument can either:
+        * - Add rights (using a `+` prefix),
+        * - Remove rights (using a `-` prefix),
+        * - Completely replace existing rights (no prefix).
+        *
+        * @param string $mailbox_name The name of the mailbox for which the ACL is to be set.
+        * @param string $identifier The user or identifier whose permissions are being modified.
+        * @param string $rights_modification The modification to the user's rights (e.g., "+rw" to add read and write access,
+        *                                    "-w" to remove write access, or "rw" to set read and write access explicitly).
+        *
+        * @return bool True if the ACL was successfully set, false if an error occurred.
+        */
+        public function set_acl($mailbox_name, $identifier, $rights_modification) {
+            $command = "SETACL \"$mailbox_name\" \"$identifier\" \"$rights_modification\"\r\n";
+            
+            $this->send_command($command);
+            $response = $this->get_response();
+
+            foreach ($response as $line) {
+                if (mb_strpos($line, 'OK') !== false) {
+                    return true;
+                }
+                elseif (mb_strpos($line, 'NO') !== false || mb_strpos($line, 'BAD') !== false) {
+                    $this->debug[] = 'SETACL failed: ' . $line;
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        /**
+        * Retrieves the Access Control List (ACL) for a specified mailbox.
+        *
+        * This function sends a `GETACL` command to the IMAP server to fetch the list
+        * of users and their respective access rights for the given mailbox. It then
+        * parses the server's response and maps the raw rights to human-readable
+        * permissions using the `map_permissions` function.
+        *
+        * @param string $mailbox_name The name of the mailbox for which to retrieve the ACL.
+        *
+        * @return array An associative array where the keys are email addresses (or user identifiers),
+        *               and the values are human-readable permissions (e.g., 'Read, Write').
+        */
+        public function get_acl($mailbox_name) {
+            $acl_list = [];        
+            $command = "GETACL \"$mailbox_name\"\r\n";
+            $this->send_command($command);
+            $response = $this->get_response();
+        
+            foreach ($response as $line) {
+                if (preg_match('/^\* ACL ([^\s]+) (.+)$/', $line, $matches)) {
+                    $mailbox = $matches[1];
+                    $acl_string = $matches[2];
+        
+                    $acl_parts = explode(' ', $acl_string);
+                    for ($i = 1; $i < count($acl_parts); $i += 2) {
+                        $user = $acl_parts[$i - 1];
+                        $rights = $acl_parts[$i];      
+                        $acl_list[$user] = $this->map_permissions($rights);
+                    }
+                }
+            }
+            return $acl_list;
+        }
+
+        /**
          * special version of LIST to return just special use mailboxes
          * @param string $type type of special folder to return (sent, all, trash, flagged, junk)
          * @return array list of special use folders
@@ -890,6 +962,43 @@ if (!class_exists('Hm_IMAP')) {
             }
             $struct = $this->parse_bodystructure_response($result);
             return $struct;
+        }
+
+        /**
+        * This function maps raw IMAP rights to human-readable permissions.
+        *
+        * It takes the raw IMAP rights string, such as 'lrws' and converts it into a more
+        * understandable format like 'Lookup, Read, Write, Write Seen'.
+        *
+        * @param string $rights The string of IMAP rights (e.g., 'lrws'), where each character 
+        *                       represents a specific permission.
+        *
+        * @return string A comma-separated string of human-readable permissions.
+        */
+        private function map_permissions($rights_string) {
+            $permissions = [];
+            $permission_map = [
+                'l' => 'Lookup',
+                'r' => 'Read',
+                's' => 'See',
+                'w' => 'Write',
+                'i' => 'Insert',
+                'p' => 'Post',
+                'k' => 'Administer',
+                'x' => 'Delete Mailbox',
+                't' => 'Take',
+                'e' => 'Examine',
+                'c' => 'Create',
+                'd' => 'Delete'
+            ];
+        
+            foreach (str_split($rights_string) as $char) {
+                if (isset($permission_map[$char])) {
+                    $permissions[] = $permission_map[$char];
+                }
+            }
+        
+            return implode(', ', $permissions);
         }
 
         /**

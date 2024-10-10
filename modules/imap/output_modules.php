@@ -792,6 +792,15 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
 }
 
 /**
+ * @subpackage imap/output
+ */
+class Hm_Output_get_list_imap_folders_permissions extends Hm_Output_Module {
+    public function output() {
+        $this->out('ajax_imap_folders_permissions', $this->get('imap_folders_permissions', array()));
+    }
+}
+
+/**
  * Add move/copy dialog to the message list controls
  * @subpackage imap/output
  */
