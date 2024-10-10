@@ -1,4 +1,10 @@
-const unMountSubscribers = [];
+const unMountSubscribers = {};
+
+let previousLocationSearch = window.location.search;
+
+function trackLocationSearchChanges() {
+    previousLocationSearch = window.location.search;
+}
 
 window.addEventListener('popstate', function(event) {
     if (event.state) {
@@ -7,14 +13,23 @@ window.addEventListener('popstate', function(event) {
     const unMountCallback = renderPage(window.location.href);
 
     if (unMountCallback) {
-        unMountSubscribers.push({ url: window.location.search, callback: unMountCallback });
+        unMountSubscribers[window.location.search] = unMountCallback;
     }
-    
+
+    Hm_Folders.hl_selected_menu();
+
+    unMountSubscribers[previousLocationSearch]?.();
+
+    trackLocationSearchChanges();
 });
 
 window.addEventListener('load', function() {
-    renderPage(window.location.href);
+    const unMountCallback = renderPage(window.location.href);
     history.replaceState({ main: $('main').prop('outerHTML') }, "");
+
+    if (unMountCallback) {
+        unMountSubscribers[window.location.search] = unMountCallback;
+    }
 });
 
 
@@ -42,18 +57,19 @@ async function navigate(url) {
         $('main').replaceWith(main);
 
         window.location.next = url;
-        const previousUrl = window.location.search;
 
         const unMountCallback = renderPage(url);
 
         history.pushState({ main }, "", url);
         
         if (unMountCallback) {
-            unMountSubscribers.push({ url, callback: unMountCallback });
+            unMountSubscribers[url] = unMountCallback;
         }
         Hm_Folders.hl_selected_menu();
 
-        unMountSubscribers.find(subscriber => subscriber.url === previousUrl)?.callback();
+        unMountSubscribers[previousLocationSearch]?.();
+        
+        trackLocationSearchChanges();
     } catch (error) {
         throw error;
     } finally {
