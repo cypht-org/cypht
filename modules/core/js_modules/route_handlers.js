@@ -15,6 +15,9 @@ function applyServersPageHandlers() {
     // Optional modules
     if (window.feedServersPageHandler) feedServersPageHandler();
     if (window.githubServersPageHandler) githubServersPageHandler();
+    if (window.nasaServersPageHandler) nasaServersPageHandler();
+    if (window.smtpServersPageHandler) smtpServersPageHandler();
+    if (window.wpServersPageHandler) wpServersPageHandler();
 }
 
 function applySettingsPageHandlers() {
@@ -26,12 +29,16 @@ function applySettingsPageHandlers() {
     $('.reset_default_timezone').on("click", reset_default_timezone);
 
     if (window.expand_feed_settings) expand_feed_settings();
+    if (window.smtpSettingsPageHandler) smtpSettingsPageHandler();
 }
 
-function applySearchPageHandlers() {
+function applySearchPageHandlers(routeParams) {
     Hm_Message_List.select_combined_view();
     sortHandlerForMessageListAndSearchPage();
     $('.search_reset').on("click", Hm_Utils.reset_search_form);
+
+    if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
+    if (window.savedSearchesSearchPageHandler) savedSearchesSearchPageHandler();
 }
 
 function applyHomePageHandlers() {

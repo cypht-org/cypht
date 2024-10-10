@@ -3,6 +3,10 @@ NOTE: Handlers are registered as strings instead of functions because some modul
 */
 const modulesRoutes = [
     {
+        page: 'hello_world',
+        handler: 'applyHelloWorldPageHandlers'
+    },
+    {
         page: 'message_list',
         handler: 'applyImapMessageListPageHandlers'
     },
@@ -57,6 +61,22 @@ const modulesRoutes = [
     {
         page: 'folders_subscription',
         handler: 'applyFoldersSubscriptionPageHandlers'
+    },
+    {
+        page: 'pgp',
+        handler: 'applyPgpPageHandlers'
+    },
+    {
+        page: 'profiles',
+        handler: 'applyProfilesPageHandler'
+    },
+    {
+        page: 'block_list',
+        handler: 'applyBlockListPageHandlers'
+    },
+    {
+        page: 'sieve_filters',
+        handler: 'applySieveFiltersPageHandler'
     }
 ]
 

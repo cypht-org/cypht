@@ -93,7 +93,7 @@ var update_save_search_label_results = function(res) {
     }
 }
 
-if (hm_page_name() == 'search') {
+function savedSearchesSearchPageHandler() {
     $('.save_search').on("click", save_search);
     $('.update_search').on("click", update_search);
     $('.delete_search').on("click", delete_search);

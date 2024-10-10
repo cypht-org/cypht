@@ -711,7 +711,7 @@ function Message_List() {
             });
         }
         // apply JS pagination only on aggregate folders; imap ones already have the messages sorted
-        if (hm_list_path().substring(0, 5) != 'imap_' && element) {
+        if (getListPathParam().substring(0, 5) != 'imap_' && element) {
             $(row, msg_rows).insertBefore(element);
         }
         else {
@@ -740,10 +740,10 @@ function Message_List() {
 
     this.update_after_action = function(action_type, selected) {
         var remove = false;
-        if (action_type == 'read' && hm_list_path() == 'unread') {
+        if (action_type == 'read' && getListPathParam() == 'unread') {
             remove = true;
         }
-        if (action_type == 'unflag' && hm_list_path() == 'flagged') {
+        if (action_type == 'unflag' && getListPathParam() == 'flagged') {
             remove = true;
         }
         else if (action_type == 'delete' || action_type == 'archive') {
@@ -765,9 +765,9 @@ function Message_List() {
     };
 
     this.save_updated_list = function() {
-        if (this.page_caches.hasOwnProperty(hm_list_path())) {
-            this.set_message_list_state(this.page_caches[hm_list_path()]);
-            Hm_Utils.save_to_local_storage('sort_'+hm_list_path(), this.sort_fld);
+        if (this.page_caches.hasOwnProperty(getListPathParam())) {
+            this.set_message_list_state(this.page_caches[getListPathParam()]);
+            Hm_Utils.save_to_local_storage('sort_'+getListPathParam(), this.sort_fld);
         }
     };
 
@@ -840,8 +840,8 @@ function Message_List() {
     };
 
     this.select_combined_view = function() {
-        if (self.page_caches.hasOwnProperty(hm_list_path())) {
-            self.setup_combined_view(self.page_caches[hm_list_path()]);
+        if (self.page_caches.hasOwnProperty(getListPathParam())) {
+            self.setup_combined_view(self.page_caches[getListPathParam()]);
         }
         else {
             if (getPageNameParam() == 'search') {
@@ -851,7 +851,7 @@ function Message_List() {
                 self.setup_combined_view(false);
             }
         }
-        var sort_type = Hm_Utils.get_from_local_storage('sort_'+hm_list_path());
+        var sort_type = Hm_Utils.get_from_local_storage('sort_'+getListPathParam());
         if (sort_type != null) {
             this.sort_fld = sort_type;
             $('.combined_sort').val(sort_type);
@@ -904,23 +904,23 @@ function Message_List() {
         var count = 0;
         var rows = Hm_Utils.rows();
         var tbody = Hm_Utils.tbody();
-        if (hm_list_path() == 'unread') {
+        if (getListPathParam() == 'unread') {
             count = rows.length;
             document.title = count+' '+hm_trans('Unread');
         }
-        else if (hm_list_path() == 'flagged') {
+        else if (getListPathParam() == 'flagged') {
             count = rows.length;
             document.title = count+' '+hm_trans('Flagged');
         }
-        else if (hm_list_path() == 'combined_inbox') {
+        else if (getListPathParam() == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Everything');
         }
-        else if (hm_list_path() == 'email') {
+        else if (getListPathParam() == 'email') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Email');
         }
-        else if (hm_list_path() == 'feeds') {
+        else if (getListPathParam() == 'feeds') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Feeds');
         }
@@ -2172,7 +2172,7 @@ if(tableBody && !hm_mobile()) {
             (res) =>{
                 for (const index in res.move_count) {
                     $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
-                    select_imap_folder(hm_list_path());
+                    select_imap_folder(getListPathParam());
                 }
             }
         );
