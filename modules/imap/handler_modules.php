@@ -1663,49 +1663,25 @@ class Hm_Handler_set_acl_to_imap_folders extends Hm_Handler_Module {
      * Output IMAP server permissions array for shared folders
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions'));
+        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions','action'));
         
-        if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions'])) {
+        if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions']) && !empty($form['action'])) {
 
             Hm_IMAP_List::init($this->user_config, $this->session);
             $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
-            $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
-            exit(var_dump($response));
-        }
-    }
-
-    // Define the permission mapping
-    private function map_permissions($rights_string) {
-        $permissions = [];
-        
-        // Map each permission character to its description
-        $permission_map = [
-            'l' => 'Lookup',
-            'r' => 'Read',
-            'w' => 'Write',
-            's' => 'See',
-            't' => 'Take',
-            'i' => 'Insert',
-            'p' => 'Post',
-            'e' => 'Examine',
-            'k' => 'Administer',
-            'a' => 'All rights',
-            'd' => 'Delete',
-            'c' => 'Create',
-            'x' => 'Delete mailbox',
-        ];
-
-        // Check which permissions are present in the rights string
-        foreach (str_split($rights_string) as $char) {
-            if (array_key_exists($char, $permission_map)) {
-                $permissions[] = $permission_map[$char];
+            if($form['action'] === 'add') {
+                $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
+            } else {
+                $response = $imap->delete_acl($form['imap_folder'], $form['identifier']);
+            }
+            if($response) {
+                $permissions = $imap->get_acl($form['imap_folder']);
+                $this->out('imap_folders_permissions', $permissions);
             }
         }
-
-        return $permissions; // Return the list of permissions
     }
 }
 

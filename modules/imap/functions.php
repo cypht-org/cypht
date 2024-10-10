@@ -102,12 +102,6 @@ function prepare_imap_message_list($msgs, $mod, $type) {
     $mod->out('formatted_message_list', $res);
 }}
 
-if (!hm_exists('open_share_folder_modal')) {
-function open_share_folder_modal($folder, $id) {
-    
-}
-}
-
 /**
  * Build HTML for a list of IMAP folders
  * @subpackage imap/functions

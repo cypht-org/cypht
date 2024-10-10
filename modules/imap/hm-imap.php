@@ -381,6 +381,9 @@ if (!class_exists('Hm_IMAP')) {
         * - Remove rights (using a `-` prefix),
         * - Completely replace existing rights (no prefix).
         *
+        * For more information on ACLs, see RFC 4314: 
+        * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
+        *
         * @param string $mailbox_name The name of the mailbox for which the ACL is to be set.
         * @param string $identifier The user or identifier whose permissions are being modified.
         * @param string $rights_modification The modification to the user's rights (e.g., "+rw" to add read and write access,
@@ -396,10 +399,46 @@ if (!class_exists('Hm_IMAP')) {
 
             foreach ($response as $line) {
                 if (mb_strpos($line, 'OK') !== false) {
+                    Hm_Msgs::add('Permissions added successfully');
                     return true;
                 }
                 elseif (mb_strpos($line, 'NO') !== false || mb_strpos($line, 'BAD') !== false) {
                     $this->debug[] = 'SETACL failed: ' . $line;
+                    Hm_Msgs::add('ERRSETACL failed:' . $line);
+                    return false;
+                }
+            }
+            return false;
+        }
+
+        /**
+        * Deletes an access control list (ACL) entry for a specified identifier on a given mailbox.
+        *
+        * This function sends a DELETEACL command to remove any <identifier, rights> pair
+        * for the specified identifier from the access control list for the specified mailbox.
+        *
+        * For more information on ACLs, see RFC 4314: 
+        * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
+        *
+        * @param string $mailbox The name of the mailbox from which to delete the ACL entry.
+        * @param string $identifier The authentication identifier whose rights are to be removed.
+        *
+        * @throws Exception If the delete operation fails or if invalid arguments are provided.
+        *
+        * @return bool Returns true on successful deletion of the ACL entry; otherwise, false.
+        */
+        public function delete_acl($mailbox_name, $identifier) {
+            $command = "DELETEACL \"$mailbox_name\" \"$identifier\"\r\n";
+            $this->send_command($command);
+            $response = $this->get_response();
+
+            foreach ($response as $line) {
+                if (strpos($line, 'OK') !== false) {
+                    Hm_Msgs::add('Permissions removed successfully');
+                    return true;
+                } else {
+                    $this->debug[] = 'DELETEACL failed: ' . $line;
+                    Hm_Msgs::add('ERRDELETEACL failed: ailure: can\'t delete acl');
                     return false;
                 }
             }
@@ -413,6 +452,9 @@ if (!class_exists('Hm_IMAP')) {
         * of users and their respective access rights for the given mailbox. It then
         * parses the server's response and maps the raw rights to human-readable
         * permissions using the `map_permissions` function.
+        *
+        * For more information on ACLs, see RFC 4314: 
+        * [Access Control Lists (ACLs) in Internet Message Access Protocol (IMAP)](https://tools.ietf.org/html/rfc4314).
         *
         * @param string $mailbox_name The name of the mailbox for which to retrieve the ACL.
         *

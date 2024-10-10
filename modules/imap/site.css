@@ -556,7 +556,7 @@ li[class^="imap_"] .inner_list li[class^="imap_"] {
 }
 #loadingSpinner {
     position: absolute;
-    left: 25%;
+    left: 33.5%;
     top: 50%;
     transform: translate(-50%, -50%);
 }
