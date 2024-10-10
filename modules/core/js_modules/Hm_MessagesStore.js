@@ -15,13 +15,14 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, rows = {}) {
+    constructor(path, page = 1, rows = {}, abortController = new AbortController()) {
         this.path = path;
         this.list = path + '_' + page;
         this.rows = rows;
         this.links = "";
         this.count = 0;
         this.flagAsReadOnOpen = true;
+        this.abortController = abortController;
     }
 
     /**
@@ -133,7 +134,8 @@ class Hm_MessagesStore {
               [],
               hideLoadingState,
               undefined,
-              reject
+              reject,
+              this.abortController?.signal
             );
         });
     }
