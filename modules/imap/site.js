@@ -1424,3 +1424,87 @@ $('.screen-email-like').on("click", function() {
     });
     add_email_in_contact_trusted(list_email); return false;
 });
+
+$(document).on('click', '[data-bs-dismiss="modal"]', function() {
+    $('#shareFolderModal').modal('hide');
+});
+
+$(document).on('click', 'a.dropdown-item.share', function(e) {
+    e.preventDefault();
+    const listItem = e.target.closest('li');
+    if(listItem) {
+        listItem.getAttribute('data-id');
+        const uid = listItem.getAttribute('data-id');
+        const folder_uid = listItem.getAttribute('data-folder-uid');
+        const folder = listItem.getAttribute('data-folder');
+        $('#server_id').val(uid);
+        $('#folder_uid').val(folder_uid);
+        $('#folder').val(folder);
+        const currentLabel = $('#shareFolderModalLabel').text();
+        $('#shareFolderModalLabel').text(`${currentLabel} - ${folder} Folder`);
+
+        $('#shareFolderModalLabel').val(`Share ${folder} Folder`);
+        $('#shareFolderModal table tbody').empty();
+        $('#loadingSpinner').show();
+        Hm_Ajax.request(
+            [
+              { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
+              { name: 'imap_server_id', value: uid },
+              { name: 'imap_folder_uid', value: folder_uid },
+              { name: 'imap_folder', value: folder },
+            ],
+            function (res) {
+                $('#loadingSpinner').hide();
+                if (res.ajax_imap_folders_permissions) {
+                    //then populate the modal with the data
+                    const permissions = res.ajax_imap_folders_permissions;
+                    for (const [email, permissionList] of Object.entries(permissions)) {
+                        const row = `
+                            <tr>
+                                <td>${email}</td>
+                                <td>${permissionList}</td>
+                            </tr>
+                        `;
+                        $('#shareFolderModal table tbody').append(row);
+                    }
+                    $('#permissionTable').show();
+                }
+            }
+        );
+        $('#shareFolderModal').modal('show');
+    }
+});
+
+$(document).on('submit', '#shareForm', function(e) {
+    e.preventDefault();
+    const server_id = $('#server_id').val();
+    const folder = $('#folder').val();
+
+
+    let identifier = '';
+    if ($('#identifierUser').is(':checked')) {
+        identifier = $('#email').val();
+    } else if ($('#identifierAll').is(':checked')) {
+        identifier = 'all';
+    } else if ($('#identifierGuests').is(':checked')) {
+        identifier = 'guests';
+    }
+
+    let permissions = '';
+    if ($('#accessRead').is(':checked')) permissions += 'r';
+    if ($('#accessWrite').is(':checked')) permissions += 'w';
+    if ($('#accessDelete').is(':checked')) permissions += 'd';
+    if ($('#accessOther').is(':checked')) permissions += 'a'; 
+    Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
+          { name: 'imap_server_id', value: server_id },
+          { name: 'identifier', value: identifier },
+          { name: 'imap_folder', value: folder },
+          { name: 'permissions', value: `+${permissions}` },
+        ],
+        function (res) {
+            window.location.reload();
+        }
+    );
+});
