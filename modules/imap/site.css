@@ -554,3 +554,9 @@ li[class^="imap_"] .inner_list li[class^="imap_"] {
 .inner_list li[class^="imap_"]:hover .action-link {
     opacity: 1;
 }
+#loadingSpinner {
+    position: absolute;
+    left: 25%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
