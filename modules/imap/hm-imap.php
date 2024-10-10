@@ -12,6 +12,7 @@ require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
 require_once('hm-jmap.php');
 require_once('hm-ews.php');
+require_once('hm-mailbox.php');
 
 /**
  * IMAP connection manager

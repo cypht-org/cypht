@@ -20,30 +20,30 @@ class Hm_Mailbox {
     public function connect(array $config) {
         if (array_key_exists('type', $config) && $config['type'] == 'jmap') {
             $this->connection = new Hm_JMAP();
-            $this->type = TYPE_JMAP;
+            $this->type = self::TYPE_JMAP;
         }
-        elseif (array_key_exists('type', $server) && $server['type'] == 'ews') {
+        elseif (array_key_exists('type', $config) && $config['type'] == 'ews') {
             $this->connection = new Hm_EWS();
-            $this->type = TYPE_EWS;
+            $this->type = self::TYPE_EWS;
         }
         else {
             $this->connection = new Hm_IMAP();
-            $this->type = TYPE_IMAP;
+            $this->type = self::TYPE_IMAP;
         }
         return $this->connection->connect($config);
     }
 
     public function is_imap() {
-        return $this->type !== TYPE_EWS;
+        return $this->type !== self::TYPE_EWS;
     }
 
     public function server_type() {
         switch ($this->type) {
-            case TYPE_IMAP:
+            case self::TYPE_IMAP:
                 return 'IMAP';
-            case TYPE_JMAP:
+            case self::TYPE_JMAP:
                 return 'JMAP';
-            case TYPE_EWS:
+            case self::TYPE_EWS:
                 return 'EWS';
         }
     }
@@ -78,6 +78,61 @@ class Hm_Mailbox {
         }
     }
 
+    public function rename_folder($folder, $new_name) {
+        if (! $this->authed()) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->rename_mailbox($folder, $new_name);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    public function delete_folder($folder) {
+        if (! $this->authed()) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->delete_mailbox($folder);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    public function folder_subscription($folder, $action) {
+        if (! $this->authed()) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->mailbox_subscription($folder, $action);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    public function get_folders($only_subscribed = false) {
+        if (! $this->authed()) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_mailbox_list($only_subscribed);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    public function get_subfolders($folder, $only_subscribed = false, $with_input = false) {
+        if (! $this->authed()) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input);
+        } else {
+            // TODO: EWS
+        }
+    }
+
     public function get_folder_state() {
         if ($this->is_imap()) {
             return $this->connection->folder_state;
@@ -95,7 +150,7 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_special_use_mailboxes($folder) {
+    public function get_special_use_mailboxes($folder = false) {
         if (! $this->authed()) {
             return;
         }
@@ -118,29 +173,37 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_message_headers($msg_id) {
-        return $this->connection->get_message_headers($msg_id);
-    }
-
-    public function get_message_content($folder, $msg_id) {
-        if (! $this->authed()) {
+    public function get_message_headers($folder, $msg_id) {
+        if (! $this->select_folder($folder)) {
             return;
         }
         if ($this->is_imap()) {
-            if (! $this->connection->select_mailbox($folder)) {
-                return;
-            }
-            return $this->connection->get_message_content($msg_id, 0);
+            return $this->connection->get_message_headers($msg_id);
+        } else {
+            // TODO: EWS
+        }
+        
+    }
+
+    public function get_message_content($folder, $msg_id, $part = 0) {
+        if (! $this->authed()) {
+            return;
+        }
+        if (! $this->select_folder($folder)) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_message_content($msg_id, $part);
         } else {
             // TODO: EWS
         }
     }
 
     public function get_structured_message($folder, $msg_id, $part, $text_only) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
         if ($this->is_imap()) {
-            if (! $this->connection->select_mailbox($folder)) {
-                return;
-            }
             $msg_struct = $this->connection->get_message_structure($msg_id);
             if ($part !== false) {
                 if ($part == 0) {
@@ -188,12 +251,12 @@ class Hm_Mailbox {
         }
     }
 
-    public function store_message($folder, $msg) {
+    public function store_message($folder, $msg, $seen = true, $draft = false) {
         if (! $this->authed()) {
             return false;
         }
         if ($this->is_imap()) {
-            if ($this->connection->append_start($folder, mb_strlen($msg), true)) {
+            if ($this->connection->append_start($folder, mb_strlen($msg), $seen, $draft)) {
                 $this->connection->append_feed($msg."\r\n");
                 if (! $this->connection->append_end()) {
                     return true;
@@ -206,10 +269,10 @@ class Hm_Mailbox {
     }
 
     public function delete_message($folder, $msg_id, $trash_folder) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
         if ($this->is_imap()) {
-            if (! $this->connection->select_mailbox($folder)) {
-                return false;
-            }
             if ($trash_folder && $trash_folder != $folder) {
                 if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)) {
                     return true;
@@ -228,17 +291,17 @@ class Hm_Mailbox {
     }
 
     public function message_action($folder, $action, $uids, $mailbox=false, $keyword=false) {
-        if ($this->is_imap()) {
-            $this->connection->select_mailbox($folder);
+        if (! $this->select_folder($folder)) {
+            return;
         }
         return $this->connection->message_action($action, $uids, $mailbox, $keyword);
     }
 
-    public function stream_message_part($msg_id, $part_id, $start_cb) {
+    public function stream_message_part($folder, $msg_id, $part_id, $start_cb) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
         if ($this->is_imap()) {
-            if (! $this->connection->select_mailbox($folder)) {
-                return;
-            }
             $msg_struct = $this->connection->get_message_structure($msg_id);
             $struct = $this->connection->search_bodystructure($msg_struct, array('imap_part_number' => $part_id));
             if (! empty($struct)) {
@@ -280,10 +343,10 @@ class Hm_Mailbox {
     }
 
     public function remove_attachment($folder, $msg_id, $part_id) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
         if ($this->is_imap()) {
-            if (! $this->connection->select_mailbox($folder)) {
-                return false;
-            }
             $msg = $this->connection->get_message_content($msg_id, 0, false, false);
             if ($msg) {
                 $attachment_id = get_attachment_id_for_mail_parser($this->connection, $msg_id, $part_id);
@@ -325,6 +388,24 @@ class Hm_Mailbox {
         }
     }
 
+    public function use_cache() {
+        if ($this->is_imap()) {
+            return $this->connection->use_cache;
+        } else {
+            // TODO: check EWS caching
+            return false;
+        }
+    }
+
+    public function dump_cache($type = 'string') {
+        if ($this->is_imap()) {
+            return $this->connection->dump_cache($type);
+        } else {
+            // TODO: check EWS caching
+            return;
+        }
+    }
+
     public function get_state() {
         return $this->connection->get_state();
     }
@@ -333,7 +414,53 @@ class Hm_Mailbox {
         return $this->connection->get_capability();
     }
 
+    public function get_namespaces() {
+        return $this->connection->get_namespaces();
+    }
+
     public function set_read_only($read_only) {
-        $this->connection->read_only = $read_only;
+        if ($this->is_imap()) {
+            $this->connection->read_only = $read_only;
+        }
+    }
+
+    public function set_search_charset($charset) {
+        if ($this->is_imap()) {
+            $this->connection->search_charset = $charset;
+        }
+    }
+
+    public function search($folder, $target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->search($target, $uids, $terms, $esearch, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    public function get_message_list($folder, $msg_ids) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_message_list($msg_ids);
+        } else {
+            // TODO: EWS
+        }
+    }
+
+    protected function select_folder($folder) {
+        if ($this->is_imap()) {
+            if (isset($this->connection->selected_mailbox['name']) && $this->connection->selected_mailbox['name'] == $folder) {
+                return true;
+            }
+            if (! $this->connection->select_mailbox($folder)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -60,8 +60,8 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
                 Hm_IMAP_List::edit($server['id'], $current);
-                $imap = Hm_IMAP_List::connect($server['id'], false);
-                if ($imap->get_state() == 'authenticated') {
+                $mailbox = Hm_IMAP_List::connect($server['id'], false);
+                if ($mailbox && $mailbox->authed()) {
                     Hm_Msgs::add('Password Updated');
                     $this->out('connect_status', true);
                 }

@@ -179,8 +179,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
                     return;
                 }
-                $imap = Hm_IMAP_List::connect($new_id, false);
-                if ($imap && $imap->get_state() == 'authenticated') {
+                $mailbox = Hm_IMAP_List::connect($new_id, false);
+                if ($mailbox && $mailbox->authed()) {
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
                             'name' => $details['name'],

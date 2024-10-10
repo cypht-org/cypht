@@ -727,13 +727,12 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     $sent_results = array();
     $status = array();
     foreach($ids as $index => $id) {
-        $cache = Hm_IMAP_List::get_cache($hm_cache, $id);
-        $imap = Hm_IMAP_List::connect($id, $cache);
-        if (imap_authed($imap)) {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $hm_cache);
+        if ($mailbox && $mailbox->authed()) {
             $server_details = Hm_IMAP_List::dump($id);
             $folder = $folders[$index];
             if ($sent) {
-                $sent_folder = $imap->get_special_use_mailboxes('sent');
+                $sent_folder = $mailbox->get_special_use_mailboxes('sent');
                 if (array_key_exists('sent', $sent_folder)) {
                     list($sent_status, $sent_results) = merge_imap_search_results($ids, $search_type, $session, $hm_cache, array($sent_folder['sent']), $limit, $terms, false);
                     $status = array_merge($status, $sent_status);
@@ -742,44 +741,42 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     continue;
                 }
             }
-            if ($imap->select_mailbox($folder)) {
-                $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
-                if (!empty($terms)) {
-                    foreach ($terms as $term) {
-                        if (preg_match('/(?:[^\x00-\x7F])/', $term[1]) === 1) {
-                            $imap->search_charset = 'UTF-8';
-                            break;
-                        }
+            if (!empty($terms)) {
+                foreach ($terms as $term) {
+                    if (preg_match('/(?:[^\x00-\x7F])/', $term[1]) === 1) {
+                        $mailbox->set_search_charset('UTF-8');
+                        break;
                     }
-                    if ($sent) {
-                        $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
-                    }
-                    else {
-                        $msgs = $imap->search($search_type, false, $terms);
-                    }
+                }
+                if ($sent) {
+                    $msgs = $mailbox->search($folder, $search_type, false, $terms, array(), true, false, true);
                 }
                 else {
-                    $msgs = $imap->search($search_type);
-                }
-                if ($msgs) {
-                    if ($limit) {
-                        rsort($msgs);
-                        $msgs = array_slice($msgs, 0, $limit);
-                    }
-                    foreach ($imap->get_message_list($msgs) as $msg) {
-                        if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
-                            $msg['flags'] .= ' \Attachment';
-                        }
-                        if (mb_stristr($msg['flags'], 'deleted')) {
-                            continue;
-                        }
-                        $msg['server_id'] = $id;
-                        $msg['folder'] = bin2hex($folder);
-                        $msg['server_name'] = $server_details['name'];
-                        $msg_list[] = $msg;
-                    }
+                    $msgs = $mailbox->search($folder, $search_type, false, $terms);
                 }
             }
+            else {
+                $msgs = $mailbox->search($folder, $search_type);
+            }
+            if ($msgs) {
+                if ($limit) {
+                    rsort($msgs);
+                    $msgs = array_slice($msgs, 0, $limit);
+                }
+                foreach ($mailbox->get_message_list($folder, $msgs) as $msg) {
+                    if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
+                        $msg['flags'] .= ' \Attachment';
+                    }
+                    if (mb_stristr($msg['flags'], 'deleted')) {
+                        continue;
+                    }
+                    $msg['server_id'] = $id;
+                    $msg['folder'] = bin2hex($folder);
+                    $msg['server_name'] = $server_details['name'];
+                    $msg_list[] = $msg;
+                }
+            }
+            $status['imap_'.$id.'_'.bin2hex($folder)] = $mailbox->get_folder_state();
         }
         else {
             $connection_failed = true;
@@ -861,23 +858,22 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
     $moved = array();
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
-    $cache = Hm_IMAP_List::get_cache($hm_cache, $server_id);
-    $imap = Hm_IMAP_List::connect($server_id, $cache);
-    foreach ($ids[$server_id] as $folder => $msgs) {
-        if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
+    $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $hm_cache);
+    if ($mailbox && $mailbox->authed()) {
+        foreach ($ids[$server_id] as $folder => $msgs) {
             if ($screen_emails) {
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
-                    $email = current(array_column(process_address_fld($imap->get_message_headers($msg)['From']), "email"));
-                    $uids = $imap->search('ALL', false, array(array('FROM', $email)));
+                    $email = current(array_column(process_address_fld($mailbox->get_message_headers(hex2bin($folder), $msg)['From']), "email"));
+                    $uids = $mailbox->search(hex2bin($folder), 'ALL', false, array(array('FROM', $email)));
                     foreach ($uids as $uid) {
-                        if ($imap->message_action(mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
+                        if ($mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
                             $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $uid, $folder);
                         }
                     }
                 }
             } else {
-                if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
+                if ($mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
                     foreach ($msgs as $msg) {
                         $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                     }
@@ -901,16 +897,14 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
 if (!hm_exists('imap_move_different_server')) {
 function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
     $moved = array();
-    $cache = Hm_IMAP_List::get_cache($hm_cache, $dest_path[1]);
-    $dest_imap = Hm_IMAP_List::connect($dest_path[1], $cache);
-    if ($dest_imap) {
+    $dest_mailbox = Hm_IMAP_List::get_connected_mailbox($dest_path[1], $hm_cache);
+    if ($dest_mailbox && $dest_mailbox->authed()) {
         foreach ($ids as $server_id => $folders) {
-            $cache = Hm_IMAP_List::get_cache($hm_cache, $server_id);
-            $imap = Hm_IMAP_List::connect($server_id, $cache);
-            foreach ($folders as $folder => $msg_ids) {
-                if (imap_authed($imap) && $imap->select_mailbox(hex2bin($folder))) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $hm_cache);
+            if ($mailbox && $mailbox->authed()) {
+                foreach ($folders as $folder => $msg_ids) {
                     foreach ($msg_ids as $msg_id) {
-                        $detail = $imap->get_message_list(array($msg_id));
+                        $detail = $mailbox->get_message_list(hex2bin($folder), array($msg_id));
                         if (array_key_exists($msg_id, $detail)) {
                             if (mb_stristr($detail[$msg_id]['flags'], 'seen')) {
                                 $seen = true;
@@ -919,23 +913,20 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                                 $seen = false;
                             }
                         }
-                        $msg = $imap->get_message_content($msg_id, 0);
+                        $msg = $mailbox->get_message_content(hex2bin($folder), $msg_id);
                         $msg = str_replace("\r\n", "\n", $msg);
                         $msg = str_replace("\n", "\r\n", $msg);
                         $msg = rtrim($msg)."\r\n";
                         if (!$seen) {
-                            $imap->message_action('UNREAD', array($msg_id));
+                            $mailbox->message_action(hex2bin($folder), 'UNREAD', array($msg_id));
                         }
-                        if ($dest_imap->append_start(hex2bin($dest_path[2]), mb_strlen($msg), $seen)) {
-                            $dest_imap->append_feed($msg."\r\n");
-                            if ($dest_imap->append_end()) {
-                                if ($action == 'move') {
-                                    if ($imap->message_action('DELETE', array($msg_id))) {
-                                        $imap->message_action('EXPUNGE', array($msg_id));
-                                    }
+                        if ($dest_mailbox->store_message(hex2bin($dest_path[2]), $msg, $seen)) {
+                            if ($action == 'move') {
+                                if ($mailbox->message_action(hex2bin($folder), 'DELETE', array($msg_id))) {
+                                    $mailbox->message_action(hex2bin($folder), 'EXPUNGE', array($msg_id));
                                 }
-                                $moved[] = sprintf('imap_%s_%s_%s', $server_id, $msg_id, $folder);
                             }
+                            $moved[] = sprintf('imap_%s_%s_%s', $server_id, $msg_id, $folder);
                         }
                     }
                 }
@@ -1217,14 +1208,14 @@ function decode_folder_str($folder) {
  * @subpackage imap/functions
  */
 if (!hm_exists('prep_folder_name')) {
-function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
+function prep_folder_name($mailbox, $folder, $decode_folder=false, $parent=false) {
     if ($parent && $decode_folder) {
         $parent = decode_folder_str($parent);
     }
     if ($decode_folder) {
         $folder = decode_folder_str($folder);
     }
-    $ns = get_personal_ns($imap);
+    $ns = get_personal_ns($mailbox);
     if (!$folder) {
         return false;
     }
@@ -1244,8 +1235,8 @@ function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
  * @subpackage imap/functions
  */
 if (!hm_exists('get_personal_ns')) {
-function get_personal_ns($imap) {
-    $namespaces = $imap->get_namespaces();
+function get_personal_ns($mailbox) {
+    $namespaces = $mailbox->get_namespaces();
     foreach ($namespaces as $ns) {
         if ($ns['class'] == 'personal') {
             return $ns;
@@ -1561,9 +1552,9 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         }
 
-        $imap = Hm_IMAP_List::connect($imap_server_id, false);
+        $mailbox = Hm_IMAP_List::connect($imap_server_id, false);
 
-        if (imap_authed($imap)) {
+        if ($mailbox->authed()) {
             return $imap_server_id;
         }else {
             Hm_IMAP_List::del($imap_server_id);

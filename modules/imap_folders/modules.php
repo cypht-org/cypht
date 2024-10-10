@@ -98,15 +98,13 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive', 'junk'), true)) {
             return;
         }
-        $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-        $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-
-        if (!is_object($imap) || $imap->get_state() != 'authenticated') {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if (!is_object($mailbox) || ! $mailbox->authed()) {
             Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
             return;
         }
-        $new_folder = prep_folder_name($imap, $form['folder'], true);
-        if (!$new_folder || !$imap->select_mailbox($new_folder)) {
+        $new_folder = prep_folder_name($mailbox, $form['folder'], true);
+        if (! $new_folder || ! $mailbox->get_folder_status($new_folder)) {
             Hm_Msgs::add('ERRSelected folder not found');
             return;
         }
@@ -132,15 +130,13 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-
-            if (!is_object($imap) || $imap->get_state() != 'authenticated') {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if (!is_object($mailbox) || ! $mailbox->authed()) {
                 Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
                 return;
             }
             $specials = $this->user_config->get('special_imap_folders', array());
-            $exposed = $imap->get_special_use_mailboxes();
+            $exposed = $mailbox->get_special_use_mailboxes();
             if ($form['imap_service_name'] == 'gandi') {
                 $specials[$form['imap_server_id']] = array(
                     'sent' => 'Sent',
@@ -182,11 +178,10 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
             if (array_key_exists('parent', $this->request->post) && trim($this->request->post['parent'])) {
                 $parent_str = decode_folder_str($this->request->post['parent']);
             }
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $new_folder = prep_folder_name($imap, $form['folder'], false, $parent_str);
-                if ($new_folder && $imap->create_mailbox($new_folder)) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                $new_folder = prep_folder_name($mailbox, $form['folder'], false, $parent_str);
+                if ($new_folder && $mailbox->create_folder($new_folder)) {
                     Hm_Msgs::add('Folder created');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
@@ -206,16 +201,15 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
             $parent_str = false;
             if (array_key_exists('parent', $this->request->post)) {
                 $parent_str = $this->request->post['parent'];
             }
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $old_folder = prep_folder_name($imap, $form['folder'], true);
-                $new_folder = prep_folder_name($imap, $form['new_folder'], false, $parent_str);
-                if ($new_folder && $old_folder && $imap->rename_mailbox($old_folder, $new_folder)) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                $old_folder = prep_folder_name($mailbox, $form['folder'], true);
+                $new_folder = prep_folder_name($mailbox, $form['new_folder'], false, $parent_str);
+                if ($new_folder && $old_folder && $mailbox->rename_mailbox($old_folder, $new_folder)) {
                     if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                         $imap_servers = $this->user_config->get('imap_servers');
                         $imap_account = $imap_servers[$form['imap_server_id']];
@@ -271,17 +265,16 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $del_folder = prep_folder_name($imap, $form['folder'], true);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                $del_folder = prep_folder_name($mailbox, $form['folder'], true);
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
                         return;
                     }
                 }
-                if ($del_folder && $imap->delete_mailbox($del_folder)) {
+                if ($del_folder && $mailbox->delete_folder($del_folder)) {
                     Hm_Msgs::add('Folder deleted');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
@@ -344,11 +337,10 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('folder', 'subscription_state'));
         if ($success) {
             $imap_server_id = $this->request->get['imap_server_id'];
-            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (imap_authed($imap)) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+            if ($mailbox && $mailbox->authed()) {
                 $folder = hex2bin($form['folder']);
-                $success = $imap->mailbox_subscription($folder, $form['subscription_state']);
+                $success = $mailbox->folder_subscription($folder, $form['subscription_state']);
                 if ($success) {
                     Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $folder));
                     $this->cache->del('imap_folders_imap_'.$imap_server_id.'_');

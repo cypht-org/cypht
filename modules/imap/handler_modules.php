@@ -353,7 +353,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                 $uid = null;
                 $mailbox_page = $mailbox->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
                 foreach ($mailbox_page[1] as $mail) {
-                    $msg_header = $mailbox->get_message_headers($mail['uid']);
+                    $msg_header = $mailbox->get_message_headers($sent_folder, $mail['uid']);
                     if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
                         $uid = $mail['uid'];
                         break;
@@ -677,12 +677,12 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('with_input', $with_subscription);
                 return;
             }
-            if (imap_authed($imap)) {
+            if ($mailbox && $mailbox->authed()) {
                 $only_subscribed = $this->user_config->get('only_subscribed_folders_setting', false);
                 if ($with_subscription) {
                     $only_subscribed = false;
                 }
-                $msgs = $imap->get_folder_list_by_level(hex2bin($folder), $only_subscribed, $with_subscription);
+                $msgs = $mailbox->get_subfolders(hex2bin($folder), $only_subscribed, $with_subscription);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
@@ -693,7 +693,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('with_input', $with_subscription);
             }
             else {
-                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $imap->server_type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
+                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $mailbox->server_type(), $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
             }
         }
     }
@@ -758,7 +758,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $folder['detail']['exists'] = $total;
                     $this->out('imap_folder_detail', array_merge($folder, array('offset' => $offset, 'limit' => $limit)));
                 }
-                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_status()));
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
             }
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
@@ -809,7 +809,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 if ($mailbox->delete_message(hex2bin($form['folder']), $form['imap_msg_uid'], $trash_folder)) {
                     $del_result = true;
                 }
-                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_status()));
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
             }
             if (!$del_result) {
                 Hm_Msgs::add('ERRAn error occurred trying to delete this message');
@@ -913,7 +913,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
                 if ($mailbox->message_action(hex2bin($form['folder']), $cmd, array($form['imap_msg_uid']))) {
                     $flag_result = true;
                 }
-                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_status()));
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
             }
             if (!$flag_result) {
                 Hm_Msgs::add('ERRAn error occurred trying to flag this message');
@@ -1023,7 +1023,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                 }
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
-                    $msg_headers = $mailbox->get_message_headers($msg['uid']);
+                    $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
                     if (isset($msg_headers['X-Snoozed'])) {
                         try {
                             $snooze_headers = parse_snooze_header($msg_headers['X-Snoozed']);
@@ -1389,7 +1389,7 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
         $cache = array();
         foreach ($servers as $index => $server) {
             if (isset($server['object']) && is_object($server['object'])) {
-                if ($server['object']->use_cache) {
+                if ($server['object']->use_cache()) {
                     $cache[$index] = $server['object']->dump_cache('array');
                 }
             }
@@ -1834,8 +1834,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 if ($part == 0 || (isset($msg_struct_current['type']) && mb_strtolower($msg_struct_current['type'] == 'text'))) {
                     $save_reply_text = true;
                 }
-                $msg_headers = $mailbox->get_message_headers($form['imap_msg_uid']);
-                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_status()));
+                $msg_headers = $mailbox->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
                 $this->out('msg_struct', $msg_struct);
                 $this->out('list_headers', get_list_headers($msg_headers));
                 $this->out('msg_headers', $msg_headers);
