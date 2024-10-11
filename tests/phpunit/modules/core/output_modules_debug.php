@@ -22,16 +22,57 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
+     * @dataProvider router_module_list_provider
      */
-    public function test_page_js_debug() {
+    public function test_page_js_debug($given_router_module_list) {
         $test = new Output_Test('page_js', 'core');
-        $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('foo', 'core'));
+        $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => $given_router_module_list);
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script>'), $res->output_response);
-        $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => array('imap'));
-        $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript" src="vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script><script type="text/javascript" src="third_party/cash.min.js"></script><script type="text/javascript" src="third_party/resumable.min.js"></script><script type="text/javascript" src="third_party/ays-beforeunload-shim.js"></script><script type="text/javascript" src="third_party/jquery.are-you-sure.js"></script><script type="text/javascript" src="third_party/sortable.min.js"></script><script type="text/javascript" src="third_party/forge.min.js"></script><script type="text/javascript" src="modules/core/site.js"></script><script type="text/javascript" src="modules/imap/site.js"></script><script type="text/javascript" src="modules/imap/js_modules/Hm_Message.js"></script>'), $res->output_response);
+        $dependant_scripts = array('vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js');
+        $third_party_scripts = array('cash.min.js', 'resumable.min.js', 'ays-beforeunload-shim.js', 'jquery.are-you-sure.js', 'sortable.min.js', 'forge.min.js');
+        $expected_scripts = array_merge($dependant_scripts, array_map(function($script) { return 'third_party/'.$script; }, $third_party_scripts));
+        
+        // The navigation utils and core's site.js should be included before any other module
+        $expected_scripts[] = 'modules/core/navigation/utils.js';
+        $expected_scripts[] = 'modules/core/site.js';
+
+        foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $module) {
+            $name = str_replace(array(APP_PATH, 'modules', DIRECTORY_SEPARATOR), '', $module);
+            if (in_array($name, $given_router_module_list)) {
+                // js_modules
+                $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+                foreach (glob($module.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                    $expected_scripts[] = WEB_ROOT.str_replace(APP_PATH, '', $js);
+                }
+                if ($name === 'core') {
+                    continue;
+                }
+                if (is_readable($module.'site.js')) {
+                    $expected_scripts[] = 'modules/' . $name . '/site.js';
+                }
+            }
+        }
+
+        // core navigation modules included at the end when handlers have been processed
+        $expected_scripts[] = 'modules/core/navigation/routes.js';
+        $expected_scripts[] = 'modules/core/navigation/navigation.js';
+
+        $expected_output = '';
+        foreach ($expected_scripts as $script) {
+            $expected_output .= '<script type="text/javascript" src="'.$script.'"></script>';
+        }
+
+        $this->assertEquals(array($expected_output), $res->output_response);
     }
+
+    static function router_module_list_provider() {
+        return [
+            'one module' => [['core']],
+            'two modules' => [['core', 'imap']],
+            'several modules' => [['core', 'imap', 'inline_message', 'local_contacts']]
+        ];
+    }
+
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
