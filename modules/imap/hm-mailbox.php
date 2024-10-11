@@ -52,7 +52,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_state() == 'authenticated' || $this->connection->get_state() == 'selected';
         } else {
-            // TODO: EWS
+            return $this->connection->authed();
         }
     }
 

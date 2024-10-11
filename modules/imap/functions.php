@@ -1498,6 +1498,7 @@ if (!hm_exists('connect_to_imap_server')) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
+            'type' => $type,
             'hide' => $hidden,
             'port' => $port,
             'user' => $user,
@@ -1508,8 +1509,6 @@ if (!hm_exists('connect_to_imap_server')) {
         }
 
         if ($type === 'jmap') {
-            $imap_list['type'] = 'jmap';
-            $imap_list['hide'] = $hidden;
             $imap_list['port'] = false;
             $imap_list['tls'] = false;
         }
@@ -1526,7 +1525,7 @@ if (!hm_exists('connect_to_imap_server')) {
             }
         } else {
             $imap_server_id = Hm_IMAP_List::add($imap_list);
-            if (! can_save_last_added_server('Hm_IMAP_List', $user)) {
+            if ($type != 'ews' && ! can_save_last_added_server('Hm_IMAP_List', $user)) {
                 return;
             }
         }
@@ -1556,7 +1555,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if ($mailbox->authed()) {
             return $imap_server_id;
-        }else {
+        } else {
             Hm_IMAP_List::del($imap_server_id);
             Hm_Msgs::add('ERRAuthentication failed');
             return null;

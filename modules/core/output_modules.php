@@ -2109,7 +2109,7 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         $hasJmapActivated = in_array('jmap', $this->get('router_module_list'), true);
 
         if($hasImapActivated){
-            $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] != 'jmap'; }));
+            $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] == 'imap'; }));
             $accordionTitle .= 'IMAP';
             $configuredText .=  '<span class="imap_server_count"> ' . $imap_servers_count .'</span> IMAP';
             $hasEssentialModuleActivated = true;

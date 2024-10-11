@@ -22,12 +22,14 @@ add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'message_list_type', 'after');
 add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
+add_handler('servers', 'save_ews_server',  true, 'imap', 'save_imap_servers', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'server_config_stepper_accordion_end_part', 'before');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 add_output('servers', 'stepper_setup_server_jmap', true, 'imap', 'server_config_stepper_end_part', 'before');
 add_output('servers', 'stepper_setup_server_imap', true, 'imap', 'server_config_stepper_end_part', 'before');
 add_output('servers', 'stepper_setup_server_jmap_imap_common', true, 'imap', 'server_config_stepper_end_part', 'before');
+add_output('servers', 'server_config_ews', true, 'imap', 'server_config_stepper_accordion_end_part', 'after');
 
 /* settings page data */
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
@@ -437,5 +439,15 @@ return array(
         'tag_id' => FILTER_DEFAULT,
         'first_time_screen_emails' => FILTER_VALIDATE_INT,
         'move_messages_in_screen_email' => FILTER_VALIDATE_BOOLEAN,
+        'ews_server_id' => FILTER_DEFAULT,
+        'ews_profile_name'  => FILTER_DEFAULT,
+        'ews_email' => FILTER_DEFAULT,
+        'ews_password' => FILTER_UNSAFE_RAW,
+        'ews_server' => FILTER_DEFAULT,
+        'ews_hide_from_c_page' => FILTER_VALIDATE_INT,
+        'ews_create_profile' => FILTER_VALIDATE_INT,
+        'ews_profile_is_default' => FILTER_VALIDATE_INT,
+        'ews_profile_signature' => FILTER_DEFAULT,
+        'ews_profile_reply_to' => FILTER_DEFAULT,
     )
 );

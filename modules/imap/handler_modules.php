@@ -1403,6 +1403,54 @@ class Hm_Handler_save_imap_cache extends Hm_Handler_Module {
 }
 
 /**
+ * Save EWS server details
+ * @subpackage imap/handler
+ */
+class Hm_Handler_save_ews_server extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array(
+            'ews_profile_name',
+            'ews_email',
+            'ews_password',
+            'ews_server',
+            'ews_server_id',
+            'ews_hide_from_c_page',
+            'ews_create_profile',
+            'ews_profile_signature',
+            'ews_profile_reply_to',
+            'ews_profile_is_default',
+        ));
+        // var_dump($success);
+        // var_dump($form);
+        // exit;
+        if ($success) {
+            $server_id = connect_to_imap_server(
+                $form['ews_server'],
+                $form['ews_profile_name'],
+                null,
+                $form['ews_email'],
+                $form['ews_password'],
+                null,
+                null,
+                null,
+                'ews',
+                $this,
+                $form['ews_hide_from_c_page'],
+                $form['ews_server_id'],
+            );
+            if(empty($server_id)) {
+                Hm_Msgs::add("ERRCould not save server");
+                return;
+            };
+            // TODO: EWS check if we shouldn't add the same server to smtp server list for the profile
+            if ($form['ews_create_profile']) {
+                add_profile($form['ews_profile_name'], $form['ews_profile_signature'], $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $form['ews_email'], $form['ews_server'], $server_id, $server_id, $this);
+            }
+        }
+    }
+}
+
+/**
  * Save IMAP servers
  * @subpackage imap/handler
  */
