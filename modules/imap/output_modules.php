@@ -778,8 +778,9 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
         $folder_data = $this->get('imap_expanded_folder_data', array());
         $with_input = $this->get('with_input', false);
         $folder = $this->get('folder', '');
+        $can_share_folders = $this->get('can_share_folders', false);
         if (!empty($folder_data)) {
-            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input);
+            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input, $can_share_folders);
             $quota = $this->get('quota');
             $quota_max = $this->get('quota_max');
             if (!$folder && $quota) {
@@ -787,6 +788,15 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
             }
             $this->out('imap_expanded_folder_formatted', $res);
         }
+    }
+}
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_get_list_imap_folders_permissions extends Hm_Output_Module {
+    public function output() {
+        $this->out('ajax_imap_folders_permissions', $this->get('imap_folders_permissions', array()));
     }
 }
 

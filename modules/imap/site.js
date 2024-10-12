@@ -1424,3 +1424,131 @@ $('.screen-email-like').on("click", function() {
     });
     add_email_in_contact_trusted(list_email); return false;
 });
+
+$(document).on('click', '[data-bs-dismiss="modal"]', function() {
+    $('#shareFolderModal').modal('hide');
+});
+
+$(document).on('click', 'a.dropdown-item.share', function(e) {
+    e.preventDefault();
+    const listItem = e.target.closest('li');
+    if(listItem) {
+        listItem.getAttribute('data-id');
+        const uid = listItem.getAttribute('data-id');
+        const folder_uid = listItem.getAttribute('data-folder-uid');
+        const folder = listItem.getAttribute('data-folder');
+        $('#server_id').val(uid);
+        $('#folder_uid').val(folder_uid);
+        $('#folder').val(folder);
+        const currentLabel = $('#shareFolderModalLabel').text();
+        $('#shareFolderModalLabel').text(`${currentLabel} - ${folder} Folder`);
+
+        $('#shareFolderModalLabel').val(`Share ${folder} Folder`);
+        $('#shareFolderModal table tbody').empty();
+        $('#loadingSpinner').show();
+        Hm_Ajax.request(
+            [
+              { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
+              { name: 'imap_server_id', value: uid },
+              { name: 'imap_folder_uid', value: folder_uid },
+              { name: 'imap_folder', value: folder },
+            ],
+            function (res) {
+                $('#loadingSpinner').hide();
+                if (res.ajax_imap_folders_permissions) {
+                    const permissions = res.ajax_imap_folders_permissions;
+                    //then populate the modal with the data
+                    populate_permissions_table(permissions);
+                    $('#permissionTable').show();
+                }
+            }
+        );
+        $('#shareFolderModal').modal('show');
+    }
+});
+
+var populate_permissions_table = function(permissions) {
+    $('#shareFolderModal table tbody').empty();
+    for (const [email, permissionList] of Object.entries(permissions)) {
+        const translatedPermissions = permissionList.split(',').map(permission => {
+            return hm_trans(permission.trim()); // Translate each permission
+        });
+        const permissionsString = translatedPermissions.join(', ');
+        const row = `
+            <tr>
+                <td>${email}</td>
+                <td>${permissionsString}</td>
+                <td>
+                    <button class="btn btn-sm btn-primary edit-permission" data-email="${email}" data-permissions="${permissionList}">Edit</button>
+                </td>
+            </tr>
+        `;
+        $('#shareFolderModal table tbody').append(row);
+    }
+}
+
+$(document).on('click', '.edit-permission', function(e) {
+    e.preventDefault();
+
+    const email = $(this).data('email');
+    const permissions = $(this).data('permissions');
+
+    $('#email').val(email);
+    $('#identifierUser').prop('checked', true);
+
+
+    // Uncheck all permissions initially
+    $('#accessRead').prop('checked', false);
+    $('#accessWrite').prop('checked', false);
+    $('#accessDelete').prop('checked', false);
+    $('#accessOther').prop('checked', false);
+
+    // Map the permissions string to checkboxes
+    if (permissions.includes('Read')) $('#accessRead').prop('checked', true);
+    if (permissions.includes('Write')) $('#accessWrite').prop('checked', true);
+    if (permissions.includes('Delete')) $('#accessDelete').prop('checked', true);
+    if (permissions.includes('Administer') || permissions.includes('Other')) $('#accessOther').prop('checked', true);
+
+    // Show the form for editing
+    $('#shareFolderModal').modal('show');
+});
+
+$(document).on('submit', '#shareForm', function(e) {
+    e.preventDefault();
+    const server_id = $('#server_id').val();
+    const folder = $('#folder').val();
+
+    let identifier = '';
+    if ($('#identifierUser').is(':checked')) {
+        identifier = $('#email').val();
+    } else if ($('#identifierAll').is(':checked')) {
+        identifier = 'all';
+    } else if ($('#identifierGuests').is(':checked')) {
+        identifier = 'guests';
+    }
+
+    let permissions = '';
+    if ($('#accessRead').is(':checked')) permissions += 'r';
+    if ($('#accessWrite').is(':checked')) permissions += 'w';
+    if ($('#accessDelete').is(':checked')) permissions += 'd';
+    if ($('#accessOther').is(':checked')) permissions += 'a';
+    // If no permissions are selected, call DELETEACL elser call SETACL
+    const action = permissions === '' ? 'remove' : 'add';
+    Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
+          { name: 'imap_server_id', value: server_id },
+          { name: 'identifier', value: identifier },
+          { name: 'imap_folder', value: folder },
+          { name: 'action', value: action },
+          { name: 'permissions', value: permissions },
+        ],
+        function (res) {
+            if(res.ajax_imap_folders_permissions) {
+                console.log("ajax_imap_folders_permissions",res.ajax_imap_folders_permissions);
+                const permissions = res.ajax_imap_folders_permissions;
+                populate_permissions_table(permissions);
+            }
+        }
+    );
+});

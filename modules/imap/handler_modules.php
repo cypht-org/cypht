@@ -755,6 +755,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
+            $this->out('can_share_folders', stripos($imap->get_capability(), 'ACL') !== false);
             if (imap_authed($imap)) {
                 $quota_root = $imap->get_quota_root($folder ? $folder : 'INBOX');
                 if ($quota_root && isset($quota_root[0]['name'])) {
@@ -1626,6 +1627,59 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
                     }
                     $this->append('data_sources', $vals);
                 }
+            }
+        }
+    }
+}
+/**
+ * Load IMAP servers permissions for shared folders
+ * @subpackage imap/handler
+ */
+class Hm_Handler_load_imap_folders_permissions extends Hm_Handler_Module {
+    /**
+     * Output IMAP server permissions array for shared folders
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder_uid','imap_folder'));
+        
+        if ($success && !empty($form['imap_server_id']) && !empty($form['imap_folder'])  && !empty($form['imap_folder_uid'])) {
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
+            $permissions = $imap->get_acl($form['imap_folder']);
+            $this->out('imap_folders_permissions', $permissions);
+        }
+    }
+}
+
+/**
+ * Load IMAP servers permissions for shared folders
+ * @subpackage imap/handler
+ */
+class Hm_Handler_set_acl_to_imap_folders extends Hm_Handler_Module {
+    /**
+     * Output IMAP server permissions array for shared folders
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions','action'));
+        
+        if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions']) && !empty($form['action'])) {
+
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
+            if($form['action'] === 'add') {
+                $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
+            } else {
+                $response = $imap->delete_acl($form['imap_folder'], $form['identifier']);
+            }
+            if($response) {
+                $permissions = $imap->get_acl($form['imap_folder']);
+                $this->out('imap_folders_permissions', $permissions);
             }
         }
     }
