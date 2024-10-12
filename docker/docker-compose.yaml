@@ -14,7 +14,7 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
   cypht:
-    image: cypht/cypht:2.3.0
+    image: cypht/cypht:2.4.0
     ports:
       - "80:80"
     # env_file:
