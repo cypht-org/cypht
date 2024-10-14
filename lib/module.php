@@ -191,14 +191,22 @@ trait Hm_Handler_Validate {
      * @return bool
      */
     public function validate_method($session, $request) {
-        if (!in_array(mb_strtolower($request->method), ['get', 'post'], true)) {
-            if ($session->loaded) {
-                $session->destroy($request);
-                Hm_Debug::add(sprintf('LOGGED OUT: invalid method %s', $request->method));
+        if (!empty($request->method) && is_string($request->method)) {
+            if (!in_array(mb_strtolower($request->method), ['get', 'post'], true)) {
+                if ($session->loaded) {
+                    $session->destroy($request);
+                    Hm_Debug::add(sprintf('LOGGED OUT: invalid method %s', $request->method));
+                }
+                return false;
             }
-            return false;
+            return true;
         }
-        return true;
+        // Handle the case where method is null or invalid
+        if ($session->loaded) {
+            $session->destroy($request);
+            Hm_Debug::add('LOGGED OUT: missing or invalid request method');
+        }
+        return false;
     }
 
     /**
