@@ -1208,14 +1208,14 @@ function decode_folder_str($folder) {
  * @subpackage imap/functions
  */
 if (!hm_exists('prep_folder_name')) {
-function prep_folder_name($mailbox, $folder, $decode_folder=false, $parent=false) {
+function prep_folder_name($imap, $folder, $decode_folder=false, $parent=false) {
     if ($parent && $decode_folder) {
         $parent = decode_folder_str($parent);
     }
     if ($decode_folder) {
         $folder = decode_folder_str($folder);
     }
-    $ns = get_personal_ns($mailbox);
+    $ns = get_personal_ns($imap);
     if (!$folder) {
         return false;
     }
@@ -1235,8 +1235,8 @@ function prep_folder_name($mailbox, $folder, $decode_folder=false, $parent=false
  * @subpackage imap/functions
  */
 if (!hm_exists('get_personal_ns')) {
-function get_personal_ns($mailbox) {
-    $namespaces = $mailbox->get_namespaces();
+function get_personal_ns($imap) {
+    $namespaces = $imap->get_namespaces();
     foreach ($namespaces as $ns) {
         if ($ns['class'] == 'personal') {
             return $ns;

@@ -33,6 +33,10 @@ class Hm_Mailbox {
         return $this->connection->connect($config);
     }
 
+    public function get_connection() {
+        return $this->connection;
+    }
+
     public function is_imap() {
         return $this->type !== self::TYPE_EWS;
     }
@@ -63,29 +67,33 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_status($folder);
         } else {
-            // TODO: EWS
+            return $this->connection->get_folder_status($folder);
         }
     }
 
-    public function create_folder($folder) {
+    public function create_folder($folder, $parent = null) {
         if (! $this->authed()) {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->create_mailbox($folder);
+            $new_folder = prep_folder_name($this->connection, $folder, false, $parent);
+            return $this->connection->create_mailbox($new_folder);
         } else {
-            // TODO: EWS
+            return $this->connection->create_folder($folder, $parent);
         }
     }
 
-    public function rename_folder($folder, $new_name) {
+    public function rename_folder($folder, $new_name, $parent = null) {
         if (! $this->authed()) {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->rename_mailbox($folder, $new_name);
+            $old_folder = prep_folder_name($this->connection, $folder, true);
+            $new_folder = prep_folder_name($this->connection, $new_name, false, $parent);
+            return $this->connection->rename_mailbox($old_folder, $new_folder);
         } else {
-            // TODO: EWS
+            $folder = decode_folder_str($folder);
+            return $this->connection->rename_folder($folder, $new_name, $parent);
         }
     }
 
@@ -94,9 +102,19 @@ class Hm_Mailbox {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->delete_mailbox($folder);
+            $del_folder = prep_folder_name($this->connection, $folder, true);
+            return $this->connection->delete_mailbox($del_folder);
         } else {
-            // TODO: EWS
+            $del_folder = decode_folder_str($folder);
+            return $this->connection->delete_folder($del_folder);
+        }
+    }
+
+    public function prep_folder_name($folder) {
+        if ($this->is_imap()) {
+            return prep_folder_name($this->connection, $folder, true);
+        } else {
+            return $folder;
         }
     }
 
@@ -118,7 +136,8 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_list($only_subscribed);
         } else {
-            // TODO: EWS
+            // TODO: EWS only_subscribed
+            return $this->connection->get_folders();
         }
     }
 
@@ -129,7 +148,8 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input);
         } else {
-            // TODO: EWS
+            // TODO: EWS only_subscribed and with_input
+            return $this->connection->get_folders($folder);
         }
     }
 
@@ -169,7 +189,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
         } else {
-            // TODO: EWS
+            return $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
         }
     }
 
@@ -412,10 +432,6 @@ class Hm_Mailbox {
 
     public function get_capability() {
         return $this->connection->get_capability();
-    }
-
-    public function get_namespaces() {
-        return $this->connection->get_namespaces();
     }
 
     public function set_read_only($read_only) {

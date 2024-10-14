@@ -103,7 +103,7 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
             Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
             return;
         }
-        $new_folder = prep_folder_name($mailbox, $form['folder'], true);
+        $new_folder = $mailbox->prep_folder_name($form['folder']);
         if (! $new_folder || ! $mailbox->get_folder_status($new_folder)) {
             Hm_Msgs::add('ERRSelected folder not found');
             return;
@@ -174,14 +174,12 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('folder', 'imap_server_id'));
         if ($success) {
             $parent = false;
-            $parent_str = false;
             if (array_key_exists('parent', $this->request->post) && trim($this->request->post['parent'])) {
-                $parent_str = decode_folder_str($this->request->post['parent']);
+                $parent = decode_folder_str($this->request->post['parent']);
             }
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $new_folder = prep_folder_name($mailbox, $form['folder'], false, $parent_str);
-                if ($new_folder && $mailbox->create_folder($new_folder)) {
+                if ($form['folder'] && $mailbox->create_folder($form['folder'], $parent)) {
                     Hm_Msgs::add('Folder created');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
@@ -201,15 +199,13 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
         if ($success) {
-            $parent_str = false;
+            $parent = false;
             if (array_key_exists('parent', $this->request->post)) {
-                $parent_str = $this->request->post['parent'];
+                $parent = $this->request->post['parent'];
             }
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $old_folder = prep_folder_name($mailbox, $form['folder'], true);
-                $new_folder = prep_folder_name($mailbox, $form['new_folder'], false, $parent_str);
-                if ($new_folder && $old_folder && $mailbox->rename_mailbox($old_folder, $new_folder)) {
+                if ($form['folder'] && $form['new_folder'] && $mailbox->rename_folder($form['folder'], $form['new_folder'], $parent)) {
                     if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                         $imap_servers = $this->user_config->get('imap_servers');
                         $imap_account = $imap_servers[$form['imap_server_id']];
@@ -267,14 +263,14 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
         if ($success) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $del_folder = prep_folder_name($mailbox, $form['folder'], true);
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
                         return;
                     }
                 }
-                if ($del_folder && $mailbox->delete_folder($del_folder)) {
+                if ($form['folder'] && $mailbox->delete_folder($form['folder'])) {
                     Hm_Msgs::add('Folder deleted');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
