@@ -16,7 +16,7 @@ var load_github_data = function(id) {
 };
 
 var load_github_data_background = function(id) {
-        Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_unread', 'value': 1}, {'name': 'github_repo', 'value': id}], display_github_data_background);
+        Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_unread', 'value': 1}, {'name': 'github_repo', 'value': id}], display_github_data_background,[],true);
 };
 
 var display_github_data_background = function(res) {

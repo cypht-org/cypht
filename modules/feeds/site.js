@@ -7,7 +7,8 @@ var feed_test_action = function(event) {
     Hm_Ajax.request(
         form.serializeArray(),
         function() {},
-        {'feed_connect': 1}
+        {'feed_connect': 1},
+        true
     );
 };
 
@@ -40,7 +41,7 @@ var feeds_search_page_content = function(id) {
             {'name': 'feed_server_ids', 'value': id}],
             display_feeds_search_result,
             [],
-            false,
+            true,
             Hm_Message_List.set_search_state
         );
     }

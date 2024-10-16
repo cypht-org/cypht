@@ -25,7 +25,7 @@ var delete_search = function(event) {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_delete_search'},
             {'name': 'search_name', 'value': name}],
-            search_delete_results
+            search_delete_results,[],true
         );
     }
     return false;
@@ -55,7 +55,7 @@ var update_save_search_label = function(event) {
             {'name': 'search_terms_label', 'value': $('.search_terms_label').val()},
             {'name': 'old_search_terms_label', 'value': $('.old_search_terms_label').val()},
             {'name': 'search_name', 'value': $('.search_terms').val()}],
-            update_save_search_label_results
+            update_save_search_label_results, [], true
         );
     }
     return false;
