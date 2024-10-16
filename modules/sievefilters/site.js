@@ -131,13 +131,6 @@ var hm_sieve_possible_actions = function() {
             extra_field: false
         },
         {
-            name: 'forward',
-            description: 'Forward',
-            placeholder: 'mail@example.org',
-            type: 'string',
-            extra_field: false
-        },
-        {
             name: 'reject',
             description: 'Reject',
             placeholder: 'Reject message',
@@ -539,12 +532,6 @@ $(function () {
             $('#stop_filtering').prop('checked', false);
             current_account = $(this).attr('account');
             edit_filter_modal.open();
-
-            // Reset the form fields when opening the modal
-            $(".modal_sieve_filter_name").val('');
-            $(".modal_sieve_script_priority").val('');
-            $(".sieve_list_conditions_modal").empty();
-            $(".filter_actions_modal_table").empty();
         });
         $('.add_script').on('click', function () {
             edit_script_modal.setTitle('Add Script');
@@ -863,6 +850,23 @@ $(function () {
             );
         });
 
+        /**
+         * Toggle Filter
+         */
+        $('.toggle_filter').on('change', function () {
+            const checkbox = $(this);
+            Hm_Ajax.request(
+                [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_toggle_script_state'},
+                    {'name': 'imap_account', 'value': checkbox.attr('imap_account')},
+                    {'name': 'script_state', 'value': checkbox.prop('checked')},
+                    {'name': 'sieve_script_name', 'value': checkbox.attr('script_name')}],
+                function(res) {
+                    if (res.status !== 'OK') {
+                        checkbox.prop('checked', !checkbox.prop('checked'));
+                    }
+                }
+            );
+        });
 
         /**
          * Delete script event
