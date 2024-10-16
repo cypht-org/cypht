@@ -82,7 +82,7 @@ class Hm_Environment {
         define('DEFAULT_GITHUB_SINCE', $config->get('default_setting_github_since', '-1 week'));
         define('DEFAULT_INLINE_MESSAGE', $config->get('default_setting_inline_message', false));
         define('DEFAULT_INLINE_MESSAGE_STYLE', $config->get('default_setting_inline_message_style', 'right'));
-        define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', 1));
+        define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
         define('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
     }
 
