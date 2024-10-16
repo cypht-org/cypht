@@ -2289,7 +2289,7 @@ function submitSmtpImapServer() {
     Hm_Ajax.request(requestData, function(res) {
         resetStepperButtons();
         if (res.just_saved_credentials) {
-            if (!res.imap_server_id) {
+            if (res.imap_server_id) {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                     {'name': 'imap_server_id', value: res.imap_server_id},
