@@ -29,3 +29,4 @@ lib/hm3/users/
 /data/
 /docker/data/
 /docker/site/
+venv
