@@ -333,6 +333,7 @@ return array(
         'srv_setup_stepper_profile_signature' => FILTER_DEFAULT,
         'srv_setup_stepper_profile_reply_to' => FILTER_DEFAULT,
         'srv_setup_stepper_imap_sieve_host' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_sieve_mode_tls' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_only_jmap' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_address' => FILTER_DEFAULT,

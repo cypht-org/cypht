@@ -160,11 +160,41 @@ class Hm_Auth_IMAP extends Hm_Auth {
     public function __construct($config) {
         $this->site_config = $config;
         require_once APP_PATH.'modules/imap/hm-imap.php';
+        include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
     }
 
     /* IMAP authentication server settings */
     private $imap_settings = [];
 
+    private function check_sieve_connection()
+    {
+        $sieve_config_host = $this->imap_settings['sieve_config_host'];
+        if ($sieve_config_host) {
+            try {
+
+                include_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
+                $sieveClientFactory = new Hm_Sieve_Client_Factory();
+                $client = $sieveClientFactory->init(null, [
+                    'sieve_config_host' => $sieve_config_host,
+                    'user' => $this->imap_settings['username'],
+                    'pass' => $this->imap_settings['password'],
+                    'sieve_tls' => $this->imap_settings['sieve_tls_mode']
+                ]);
+                if (!$client) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                    return false;
+                }
+                return true;
+            } catch (Exception $e) {
+                Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                if (! $server_id) {
+                    Hm_IMAP_List::del($imap_server_id);
+                }
+                return false;
+            }
+        }
+        return false;
+    }
     /**
      * @param object $imap imap connection object
      * @return boolean
@@ -172,6 +202,12 @@ class Hm_Auth_IMAP extends Hm_Auth {
     private function check_connection($imap) {
         $imap->connect($this->imap_settings);
         if ($imap->get_state() == 'authenticated') {
+            //make sure we have a sieve connection
+            if (! empty($this->imap_settings['sieve_config_host'])) {
+                if(! $this->check_sieve_connection()) {
+                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                }
+            }
             return true;
         }
         elseif ($imap->get_state() != 'connected') {
@@ -194,7 +230,7 @@ class Hm_Auth_IMAP extends Hm_Auth {
      */
     public function check_credentials($user, $pass) {
         $imap = new Hm_IMAP();
-        list($server, $port, $tls, $sieve_config) = get_auth_config($this->site_config, 'imap');
+        list($server, $port, $tls, $sieve_config, $sieve_tls_mode) = get_auth_config($this->site_config, 'imap');
         if (!$user || !$pass || !$server || !$port) {
             Hm_Debug::add($imap->show_debug(true));
             Hm_Debug::add('Invalid IMAP auth configuration settings');
@@ -203,7 +239,8 @@ class Hm_Auth_IMAP extends Hm_Auth {
         $this->imap_settings = ['server' => $server, 'port' => $port,
             'tls' => $tls, 'username' => $user, 'password' => $pass,
             'no_caps' => false, 'blacklisted_extensions' => ['enable'],
-            'sieve_config_host' => $sieve_config
+            'sieve_config_host' => $sieve_config,
+            'sieve_tls_mode' => $sieve_tls_mode
         ];
         return $this->check_connection($imap);
     }
@@ -319,6 +356,7 @@ function get_auth_config($config, $prefix) {
     $ret = [$server, $port, $tls];
     if ($prefix == 'imap') {
         $ret[] = $config->get($prefix.'_auth_sieve_conf_host', false);
+        $ret[] = $config->get($prefix.'_auth_sieve_tls_mode', false);
     }
     return $ret;
 }

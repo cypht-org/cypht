@@ -135,10 +135,18 @@ return [
     /*
     |
     | The hostname/IP address and port sieve is listening on. Example: example.org:4190
-    | Note: Add tls:// prefix to enable explicit STARTTLS
+    | Keep this blank to disable sieve filter support on login
     |
     */
-    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', 'tls://mail.gandi.net:4190'),
+    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', ''),
+
+    /*
+    |
+    | this will add the tls:// prefix to the sieve host if set to true
+    | to make this work make sure you set DEFAULT_SETTING_ENABLE_SIEVE_FILTER to true
+    |
+    */
+    'imap_auth_sieve_tls_mode' => env('IMAP_AUTH_SIEVE_TLS_MODE', true),
 
     /*
     | -------------------
