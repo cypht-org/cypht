@@ -154,11 +154,38 @@ class Hm_EWS {
 
     public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
         $folder = new Type\FolderIdType($folder);
-        $result = $this->api->getMailItems($folder, [
-            // TODO: sort, pagination, search
-        ]);
+        $request = array(
+            'Traversal' => 'Shallow',
+            'ItemShape' => array(
+                'BaseShape' => 'IdOnly'
+            ),
+            'ParentFolderIds' => $folder->toArray(true)
+        );
+        // TODO: sort, pagination, search
+        $request = Type::buildFromArray($request);
+        $result = $this->ews->FindItem($request);
+        $itemIds = array_map(function($msg) {
+            return $msg->get('itemId')->get('id');
+        }, $result->get('items')->get('message'));
+        return [$result->get('totalItemsInView'), $this->get_message_list($itemIds)];
+    }
+
+    public function get_message_list($itemIds) {
+        $request = array(
+            'ItemShape' => array(
+                'BaseShape' => 'AllProperties'
+            ),
+            'ItemIds' => [
+                'ItemId' => array_map(function($id) {
+                    return ['Id' => $id];
+                }, $itemIds),
+            ],
+        );
+        $request = Type::buildFromArray($request);
+        $result = $this->ews->GetItem($request);
         $messages = [];
-        foreach ($result->get('items')->get('message') as $message) {
+        foreach ($result as $message) {
+            // TODO: EWS - check \Answered, \Flagged, \Deleted flags
             $flags = [];
             if ($message->get('isRead')) {
                 $flags[] = '\\Seen';
@@ -166,17 +193,17 @@ class Hm_EWS {
             if ($message->get('isDraft')) {
                 $flags[] = '\\Draft';
             }
-            // TODO: EWS - check \Answered, \Flagged, \Deleted flags
-            $messages[] = [
-                'uid' => $message->get('itemId')->get('id'),
+            $uid = bin2hex($message->get('itemId')->get('id'));
+            $msg = [
+                'uid' => $uid,
                 'flags' => implode(' ', $flags),
                 'internal_date' => $message->get('dateTimeCreated'),
                 'size' => $message->get('size'),
                 'date' => $message->get('dateTimeReceived'),
-                'from' => $message->get('from')->get('mailbox')->get('emailAddress'),
-                'to' => $message->get('receivedBy')->get('mailbox')->get('emailAddress'),
+                'from' => $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>',
+                'to' => $message->get('toRecipients')->Mailbox->get('name') . ' <' . $message->get('toRecipients')->Mailbox->get('emailAddress') . '>',
                 'subject' => $message->get('subject'),
-                'content-type' => $message->get('mimeContent'),
+                'content-type' => null,
                 'timestamp' => time(),
                 'charset' => null,
                 'x-priority' => null,
@@ -189,7 +216,22 @@ class Hm_EWS {
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
             ];
+            foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
+                foreach (['x-gm-msgid' => 'google_msg_id', 'x-gm-thrid' => 'google_thread_id', 'x-gm-labels' => 'google_labels', 'x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'content-type' => 'content-type', 'x-priority' => 'x-priority'] as $hname => $key) {
+                    if (strtolower($header->get('headerName')) == $hname) {
+                        $msg[$key] = (string) $header;
+                    }
+                }
+            }
+            $cset = '';
+            if (mb_stristr($msg['content-type'], 'charset=')) {
+                if (preg_match("/charset\=([^\s;]+)/", $msg['content-type'], $matches)) {
+                    $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
+                }
+            }
+            $msg['charset'] = $cset;
+            $messages[$uid] = $msg;
         }
-        return [$result->get('totalItemsInView'), $messages];
+        return $messages;
     }
 }

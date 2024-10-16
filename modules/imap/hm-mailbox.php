@@ -16,6 +16,7 @@ class Hm_Mailbox {
 
     protected $type;
     protected $connection;
+    protected $selected_folder;
 
     public function connect(array $config) {
         if (array_key_exists('type', $config) && $config['type'] == 'jmap') {
@@ -166,7 +167,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->selected_mailbox;
         } else {
-            // TODO: EWS
+            return $this->selected_folder;
         }
     }
 
@@ -186,6 +187,9 @@ class Hm_Mailbox {
      * @return array - [total results found, results for a single page]
      */
     public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[]) {
+        if (! $this->select_folder($folder)) {
+            return;
+        }
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
         } else {
@@ -469,6 +473,7 @@ class Hm_Mailbox {
     }
 
     protected function select_folder($folder) {
+        $this->selected_folder = ['name' => $folder, 'detail' => []];
         if ($this->is_imap()) {
             if (isset($this->connection->selected_mailbox['name']) && $this->connection->selected_mailbox['name'] == $folder) {
                 return true;
