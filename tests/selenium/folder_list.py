@@ -36,6 +36,7 @@ class FolderListTests(WebTest):
         list_item = self.by_class('menu_home')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
 
     def collapse_section(self):
@@ -65,6 +66,7 @@ class FolderListTests(WebTest):
         self.driver.execute_script("arguments[0].scrollIntoView(true);", a_tag)
         self.driver.execute_script("arguments[0].click();", a_tag)
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
         self.by_css('[data-source=".main"]').click()
 

@@ -23,6 +23,7 @@ class TagTest(WebTest):
         list_item = self.by_class('tags_add_new')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Tags'
         assert self.by_class('tree-view').text == 'No tags available yet.'
 
@@ -39,6 +40,7 @@ class TagTest(WebTest):
         self.wait()
         self.by_id('edit_tag').click()
         self.wait()
+        self.wait_for_navigation_to_complete()
         name = self.by_name('tag_name')
         name.send_keys('Test 1')
         self.by_name('submit_tag').click()

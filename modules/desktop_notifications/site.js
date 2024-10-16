@@ -4,7 +4,7 @@
 $(function() {
     $('body').on('new_message', function() {
         var unread_page = false;
-        if (hm_page_name() == 'message_list' && hm_list_path() == 'unread') {
+        if (getPageNameParam() == 'message_list' && getListPathParam() == 'unread') {
             unread_page = true;
         }
         if (!document.hidden && unread_page) {

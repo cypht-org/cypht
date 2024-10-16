@@ -17,6 +17,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert 'Search' in self.by_class('content_title').text
 
     def sent(self):
@@ -24,6 +25,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('mailbox_list_title').text == 'Sent'
 
     def unread(self):
@@ -31,6 +33,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('mailbox_list_title').text == 'Unread'
 
     def combined_inbox(self):
@@ -40,6 +43,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('mailbox_list_title').text == 'Everything'
 
     def flagged(self):
@@ -47,6 +51,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('mailbox_list_title').text == 'Flagged'
 
     def contacts(self):
@@ -56,6 +61,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Contacts'
 
     def compose(self):
@@ -65,6 +71,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Compose'
 
     def calendar(self):
@@ -74,6 +81,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('calendar_content_title').text == 'Calendar'
 
     def history(self):
@@ -83,6 +91,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Message history'
 
     def home(self):
@@ -91,6 +100,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
 
     def servers_page(self):
@@ -98,6 +108,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Servers'
 
     def site(self):
@@ -105,6 +116,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Site Settings'
 
     def folders(self):
@@ -114,6 +126,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Folders'
 
     def save(self):
@@ -121,6 +134,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Save Settings'
 
     def password(self):
@@ -132,6 +146,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text.strip() == 'Change Password'
 
     def profiles(self):
