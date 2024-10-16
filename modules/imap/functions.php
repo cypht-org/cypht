@@ -159,6 +159,12 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
     if ($manage) {
         $results .= '<li class="manage_folders_li"><i class="bi bi-gear-wide me-1"></i><a class="manage_folder_link" href="'.$manage.'">'.$output_mod->trans('Manage Folders').'</a></li>';
     }
+    $f = $output_mod->get('folder', '');
+    $quota = $output_mod->get('quota');
+    $quota_max = $output_mod->get('quota_max');
+    if (!$f && $quota) {
+        $results .= '<li class="quota_info"><div class="progress bg-secondary border"><div class="progress-bar bg-light" style="width:'.$quota.'%"></div></div>'.$quota.'% used on '.$quota_max.' MB</li>';
+    }
 
     $results .= '</ul>';
     return $results;
