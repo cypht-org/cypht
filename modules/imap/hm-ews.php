@@ -88,6 +88,7 @@ class Hm_EWS {
         try {
             $result = $this->api->getFolder((new Type\FolderIdType($folder))->toArray(true));
             return [
+                'name' => $result->get('displayName'),
                 'messages' => $result->get('totalCount'),
                 'uidvalidity' => false,
                 'uidnext' => false,

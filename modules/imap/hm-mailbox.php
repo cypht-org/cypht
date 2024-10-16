@@ -72,6 +72,15 @@ class Hm_Mailbox {
         }
     }
 
+    public function get_folder_name($folder) {
+        if ($this->is_imap()) {
+            return $folder;
+        } else {
+            $result = $this->connection->get_folder_status($folder);
+            return $result['name'];
+        }
+    }
+
     public function create_folder($folder, $parent = null) {
         if (! $this->authed()) {
             return;
@@ -191,10 +200,15 @@ class Hm_Mailbox {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+            $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
         } else {
-            return $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+            $messages = $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+            $folder = $this->selected_folder['name'];
         }
+        foreach ($messages[1] as &$msg) {
+            $msg['folder'] = bin2hex($folder);
+        }
+        return $messages;
     }
 
     public function get_message_headers($folder, $msg_id) {
@@ -473,7 +487,6 @@ class Hm_Mailbox {
     }
 
     protected function select_folder($folder) {
-        $this->selected_folder = ['name' => $folder, 'detail' => []];
         if ($this->is_imap()) {
             if (isset($this->connection->selected_mailbox['name']) && $this->connection->selected_mailbox['name'] == $folder) {
                 return true;
@@ -481,6 +494,9 @@ class Hm_Mailbox {
             if (! $this->connection->select_mailbox($folder)) {
                 return false;
             }
+        } else {
+            $result = $this->get_folder_status($folder);
+            $this->selected_folder = ['id' => $folder, 'name' => $result['name'], 'detail' => []];
         }
         return true;
     }

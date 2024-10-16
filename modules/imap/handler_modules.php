@@ -573,7 +573,13 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     else {
                         $folder = hex2bin($parts[2]);
                     }
-                    $title = array('IMAP', $details['name'], $folder);
+                    $mailbox = Hm_IMAP_List::get_connected_mailbox($details['id'], $this->cache);
+                    if ($mailbox && $mailbox->authed()) {
+                        $label = $mailbox->get_folder_name($folder);
+                    } else {
+                        $label = $folder;
+                    }
+                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
@@ -751,7 +757,6 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
-                    $msg['folder'] = $form['folder'];
                     $msgs[] = $msg;
                 }
                 if ($folder = $mailbox->get_selected_folder()) {
