@@ -17,6 +17,8 @@ use garethp\ews\API\ExchangeWebServices;
 use garethp\ews\API\Type;
 use garethp\ews\MailAPI;
 
+use ZBateson\MailMimeParser\MailMimeParser;
+
 /**
  * public interface to EWS mailboxes
  * @subpackage imap/lib
@@ -202,7 +204,7 @@ class Hm_EWS {
                 'size' => $message->get('size'),
                 'date' => $message->get('dateTimeReceived'),
                 'from' => $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>',
-                'to' => $message->get('toRecipients')->Mailbox->get('name') . ' <' . $message->get('toRecipients')->Mailbox->get('emailAddress') . '>',
+                'to' => $this->extract_mailbox($message->get('toRecipients')),
                 'subject' => $message->get('subject'),
                 'content-type' => null,
                 'timestamp' => time(),
@@ -234,5 +236,198 @@ class Hm_EWS {
             $messages[$uid] = $msg;
         }
         return $messages;
+    }
+
+    public function get_message_headers($itemId) {
+        $request = array(
+            'ItemShape' => array(
+                'BaseShape' => 'AllProperties',
+            ),
+            'ItemIds' => [
+                'ItemId' => ['Id' => hex2bin($itemId)],
+            ],
+        );
+        $request = Type::buildFromArray($request);
+        $message = $this->ews->GetItem($request);
+        $headers = [];
+        $headers['Arrival Date'] = $message->get('dateTimeCreated');
+        $headers['From'] = $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>';
+        $headers['To'] = $this->extract_mailbox($message->get('toRecipients'));
+        if ($message->get('ccRecipients')) {
+            $headers['Cc'] = $this->extract_mailbox($message->get('ccRecipients'));
+        }
+        if ($message->get('bccRecipients')) {
+            $headers['Bcc'] = $this->extract_mailbox($message->get('bccRecipients'));
+        }
+        foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
+            $name = $header->get('headerName');
+            if (isset($headers[$name])) {
+                if (! is_array($headers[$name])) {
+                    $headers[$name] = [$headers[$name]];
+                }
+                $headers[$name][] = (string) $header;
+            } else {
+                $headers[$name] = (string) $header;
+            }
+        }
+        return $headers;
+    }
+
+    public function get_message_content($itemId, $part) {
+        if ($part) {
+            list($msg_struct, $msg_struct_current, $msg_text, $part) = $this->get_structured_message($itemId, $part, false);
+            return $msg_text;
+        } else {
+            $message = $this->get_mime_message_by_id($itemId);
+            $content = $message->getHtmlContent();
+            if (empty($content)) {
+                $content = $message->getTextContent();
+            }
+            return $content;
+        }
+    }
+
+    public function get_structured_message($itemId, $part, $text_only) {
+        $message = $this->get_mime_message_by_id($itemId);
+        $msg_struct = [];
+        $this->parse_mime_part($message, $msg_struct, 0);
+        if ($part !== false) {
+            $struct = $this->search_mime_part_in_struct($msg_struct, ['part_id' => $part], true);
+        } else {
+            $struct = null;
+            if (! $text_only) {
+                $struct = $this->search_mime_part_in_struct($msg_struct, ['type' => 'text', 'subtype' => 'html']);
+            }
+            if (! $struct) {
+                $struct = $this->search_mime_part_in_struct($msg_struct, ['type' => 'text']);
+            }
+        }
+        if ($struct) {
+            $part = array_key_first($struct);
+            $msg_struct_current = $struct[$part];
+            $msg_text = $msg_struct_current['mime_object']->getContent();
+        } else {
+            $part = false;
+            $msg_struct_current = null;
+            $msg_text = '';
+        }
+        if (isset($msg_struct_current['subtype']) && mb_strtolower($msg_struct_current['subtype'] == 'html')) {
+            // add inline images
+            if (preg_match_all("/src=('|\"|)cid:([^\s'\"]+)/", $msg_text, $matches)) {
+                $cids = array_pop($matches);
+                foreach ($cids as $id) {
+                    $struct = $this->search_mime_part_in_struct($msg_struct, ['id' => $id, 'type' => 'image']);
+                    if ($struct) {
+                        $struct = array_shift($struct);
+                        $msg_text = str_replace('cid:'.$id, 'data:image/'.$struct['subtype'].';base64,'.base64_encode($struct['mime_object']->getContent()), $msg_text);
+                    }
+                }
+            }
+        }
+        return [$msg_struct, $msg_struct_current, $msg_text, $part];
+    }
+
+    protected function parse_mime_part($part, &$struct, $part_num) {
+        $struct[$part_num] = [];
+        list($struct[$part_num]['type'], $struct[$part_num]['subtype']) = explode('/', $part->getContentType());
+        if ($part->isMultiPart()) {
+            $boundary = $part->getHeaderParameter('Content-Type', 'boundary');
+            if ($boundary) {
+                $struct[$part_num]['attributes'] = ['boundary' => $boundary];
+            }
+            $struct[$part_num]['disposition'] = $part->getContentDisposition();
+            $struct[$part_num]['language'] = '';
+            $struct[$part_num]['location'] = '';
+        } else {
+            $content = $part->getContent();
+            $charset = $part->getCharset();
+            if ($charset) {
+                $struct[$part_num]['attributes'] = ['charset' => $charset];
+            }
+            $struct[$part_num]['id'] = $part->getContentId();
+            $struct[$part_num]['description'] = $part->getHeaderValue('Content-Description');
+            $struct[$part_num]['encoding'] = $part->getContentTransferEncoding();
+            $struct[$part_num]['size'] = strlen($content);
+            $struct[$part_num]['lines'] = substr_count($content, "\n");
+            $struct[$part_num]['md5'] = '';
+            $struct[$part_num]['disposition'] = $part->getContentDisposition();
+            $struct[$part_num]['file_attributes'] = '';
+            $struct[$part_num]['language'] = '';
+            $struct[$part_num]['location'] = '';
+        }
+        $struct[$part_num]['mime_object'] = $part;
+        if ($part->getChildCount() > 0) {
+            $struct[$part_num]['subs'] = [];
+            foreach ($part->getChildParts() as $i => $child) {
+                $this->parse_mime_part($child, $struct[$part_num]['subs'], $part_num . '.' . ($i+1));
+            }
+        }
+    }
+
+    protected function search_mime_part_in_struct($struct, $conditions, $all = false) {
+        $found = [];
+        foreach ($struct as $part_id => $sub) {
+            $matches = 0;
+            if (isset($conditions['part_id']) && $part_id == $conditions['part_id']) {
+                $matches++;
+            }
+            foreach ($conditions as $name => $value) {
+                if (isset($sub[$name]) && mb_stristr($sub[$name], $value)) {
+                    $matches++;
+                }
+            }
+            if ($matches === count($conditions)) {
+                $part = $sub;
+                if (isset($part['subs'])) {
+                    $part['subs'] = count($part['subs']);
+                }
+                $found[$part_id] = $part;
+                if (! $all) {
+                    break;
+                }
+            }
+            if (isset($sub['subs'])) {
+                $found = array_merge($found, $this->search_mime_part_in_struct($sub['subs'], $conditions, $all));
+            }
+            if (! $all && $found) {
+                break;
+            }
+        }
+        return $found;
+    }
+
+    protected function get_mime_message_by_id($itemId) {
+        $request = array(
+            'ItemShape' => array(
+                'BaseShape' => 'IdOnly',
+                'IncludeMimeContent' => true,
+            ),
+            'ItemIds' => [
+                'ItemId' => ['Id' => hex2bin($itemId)],
+            ],
+        );
+        $request = Type::buildFromArray($request);
+        $message = $this->ews->GetItem($request);
+        $mime = $message->get('mimeContent');
+        $content = base64_decode($mime);
+        if (strtoupper($mime->get('characterSet')) != 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $mime->get('characterSet'));
+        }
+        $parser = new MailMimeParser();
+        return $parser->parse($content, false);
+    }
+
+    protected function extract_mailbox($data) {
+        if (is_array($data)) {
+            $result = [];
+            foreach ($data as $mailbox) {
+                $result[] = $this->extract_mailbox($mailbox);
+            }
+            return $result;
+        } elseif (is_object($data)) {
+            return $data->Mailbox->get('name') . ' <' . $data->Mailbox->get('emailAddress') . '>';
+        } else {
+            return (string) $data;
+        }
     }
 }

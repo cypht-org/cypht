@@ -218,7 +218,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_message_headers($msg_id);
         } else {
-            // TODO: EWS
+            return $this->connection->get_message_headers($msg_id);
         }
         
     }
@@ -233,7 +233,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_message_content($msg_id, $part);
         } else {
-            // TODO: EWS
+            return $this->connection->get_message_content($msg_id, $part);
         }
     }
 
@@ -285,7 +285,7 @@ class Hm_Mailbox {
             }
             return [$msg_struct, $msg_struct_current, $msg_text, $part];
         } else {
-            // TODO: EWS
+            return $this->connection->get_structured_message($msg_id, $part, $text_only);
         }
     }
 
@@ -482,7 +482,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_message_list($msg_ids);
         } else {
-            // TODO: EWS
+            return $this->connection->get_message_list($msg_ids);
         }
     }
 
