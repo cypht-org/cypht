@@ -69,6 +69,7 @@ jobs:
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
+          update: true
           fail-fast: true
 
       - name: "Script: setup.sh"
@@ -128,6 +129,7 @@ jobs:
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
+          update: true
           fail-fast: true
 
       - name: "Composer Install Dependencies"
