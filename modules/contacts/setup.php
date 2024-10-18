@@ -20,7 +20,6 @@ add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_me
 
 add_handler('compose', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_data', 'before');
-add_handler('compose', 'load_contacts', true, 'contacts', 'process_compose_form_submit', 'after');
 add_handler('compose', 'store_contact_message', true, 'contacts', 'load_contacts', 'after');
 
 add_handler('ajax_imap_folder_display', 'load_contacts', true, 'contacts', 'load_user_data', 'after');

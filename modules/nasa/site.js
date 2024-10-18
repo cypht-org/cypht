@@ -41,7 +41,7 @@ var nasa_disconnect_result = function(res) {
     Hm_Folders.reload_folders(true);
 };
 
-if (hm_page_name() == 'servers') {
+function nasaServersPageHandler() {
     $('.nasa_api_connect').on("click", nasa_connect);
     $('.nasa_api_disconnect').on("click", nasa_disconnect);
 }

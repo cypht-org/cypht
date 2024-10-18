@@ -535,3 +535,28 @@
 .fade-in {
   animation-name: fadeIn;
 }
+li[class^="imap_"] .inner_list li[class^="imap_"] {
+    /* display: flex;
+    align-items: center; */
+    position: relative;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    margin: 2px 0;
+    transition: background-color .3s;
+}
+.inner_list li[class^="imap_"] #main-link {
+    flex-grow: 1;
+}
+.inner_list li[class^="imap_"] .action-link {
+    opacity: 0;
+}
+.inner_list li[class^="imap_"]:hover .action-link {
+    opacity: 1;
+}
+#loadingSpinner {
+    position: absolute;
+    left: 33.5%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}

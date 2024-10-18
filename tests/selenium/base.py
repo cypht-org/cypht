@@ -25,6 +25,10 @@ class WebTest:
     def __init__(self, cap=None):
         self.read_ini()
         self.driver = get_driver(cap)
+        # Change the window size to make sure all elements are visible
+        current_size = self.driver.get_window_size()
+        new_height = 5000
+        self.driver.set_window_size(current_size['width'], new_height)
         self.browser = False
         if 'browserName' in self.driver.capabilities:
             self.browser = self.driver.capabilities['browserName'].lower()
@@ -34,14 +38,12 @@ class WebTest:
         self.modules = []
         self.servers = 1
         self.auth_type = ''
-        config_files = glob.glob('../../config/*.php')
-        for file_path in config_files:
-            result = subprocess.run(['php', 'get_config.php'], stdout=subprocess.PIPE)
-            config_dict = json.loads(result.stdout.decode())
-            if 'modules' in config_dict and isinstance(config_dict['modules'], list):
-                self.modules += config_dict['modules']
-            if 'auth_type' in config_dict:
-                self.auth_type = config_dict['auth_type']
+        result = subprocess.run(['php', 'get_config.php'], stdout=subprocess.PIPE)
+        config_dict = json.loads(result.stdout.decode())
+        if 'modules' in config_dict and isinstance(config_dict['modules'], list):
+            self.modules += config_dict['modules']
+        if 'auth_type' in config_dict:
+            self.auth_type = config_dict['auth_type']
 
     def load(self):
         print(" - loading site")
@@ -140,6 +142,16 @@ class WebTest:
         wait = WebDriverWait(self.driver, timeout)
         element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
 )
+        
+    def wait_for_navigation_to_complete(self, timeout=30):
+        print(" - waiting for the navigation to complete...")
+        # This might not be always accurate in the future. This works because for now only navigation requests are made using the fetch API.
+        # It might be necessary to find a more robust way to determine navigation requests.
+        get_current_navigations_request_entries_length = lambda: self.driver.execute_script('return window.performance.getEntriesByType("resource").filter((r) => r.initiatorType === "fetch").length')
+        navigation_length = get_current_navigations_request_entries_length()
+        WebDriverWait(self.driver, timeout).until(
+            lambda driver: get_current_navigations_request_entries_length() > navigation_length
+        )
 
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':

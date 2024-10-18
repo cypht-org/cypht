@@ -35,6 +35,7 @@ class SettingsHelpers(WebTest):
         list_item = self.by_class('menu_settings')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
 
@@ -82,80 +83,70 @@ class SettingsTests(SettingsHelpers):
         self.login(USER, PASS)
         self.wait()
 
-    def list_style_test(self):
+    def load_settings_page(self):
+        self.by_css('[data-source=".settings"]').click()
+        list_item = self.by_class('menu_settings')
+        list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
+        assert self.by_class('content_title').text == 'Site Settings'
+
+    def list_style_test(self):
         self.dropdown_test('general_setting', 'list_style', 'email_style', 'news_style')
 
     def auto_bcc_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'smtp_auto_bcc', False, 'smtp')
 
     def keyboard_shortcuts_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'enable_keyboard_shortcuts', False, 'keyboard_shortcuts')
 
     def inline_message_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'inline_message', False, 'inline_message')
 
     def no_folder_icons_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'no_folder_icons', False)
 
     def mailto_handler_test(self):
         self.checkbox_test('general_setting', 'mailto_handler', False)
 
     def msg_list_icons_test(self):
-        self.wait_with_folder_list()
-        self.checkbox_test('general_setting', 'show_list_icons', False)
+        self.checkbox_test('general_setting', 'show_list_icons', True)
 
     def msg_part_icons_test(self):
-        self.wait_with_folder_list()
-        self.checkbox_test('general_setting', 'msg_part_icons', False)
+        self.checkbox_test('general_setting', 'msg_part_icons', True)
 
     def simple_msg_parts_test(self):
-        self.wait_with_folder_list()
-        self.checkbox_test('general_setting', 'simple_msg_parts', True)
+        self.checkbox_test('general_setting', 'simple_msg_parts', False)
 
     def text_only_test(self):
-        self.wait_with_folder_list()
-        self.checkbox_test('general_setting', 'text_only', False)
+        self.checkbox_test('general_setting', 'text_only', True)
 
     def disable_delete_prompt_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'disable_delete_prompt', False)
 
     def no_password_save_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('general_setting', 'no_password_save', False)
         self.close_section('general_setting')
 
     def imap_per_page_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('general_setting', 'imap_per_page', 20, 100, 'imap')
 
     def mail_format_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('general_setting', 'smtp_compose_type', '0', '1', 'smtp')
 
     def theme_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('general_setting', 'theme_setting', 'default', 'cosmo')
 
     def tz_test(self):
-        self.wait_with_folder_list()
-        self.dropdown_test('general_setting', 'timezone', 'Africa/Abidjan', 'Africa/Algiers')
+        self.dropdown_test('general_setting', 'timezone', 'UTC', 'Africa/Abidjan')
 
     def start_page_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('general_setting', 'start_page', 'none', 'page=home')
 
     def unread_since_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('unread_setting', 'unread_since', '-1 week', '-6 weeks')
 
     def unread_max_per_source_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('unread_setting', 'unread_per_source', 20, 100)
 
     def unread_exclude_github_test(self):
@@ -165,52 +156,41 @@ class SettingsTests(SettingsHelpers):
         self.checkbox_test('unread_setting', 'unread_exclude_wordpress', False, 'wordpress')
 
     def unread_exclude_feed_test(self):
-        self.wait_with_folder_list()
         self.checkbox_test('unread_setting', 'unread_exclude_feeds', False, 'feeds')
         self.close_section('unread_setting')
 
     def flagged_since_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('flagged_setting', 'flagged_since', '-1 week', '-6 weeks')
 
     def flagged_max_per_source_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('flagged_setting', 'flagged_per_source', 20, 100)
         self.close_section('flagged_setting')
 
     def all_since_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('all_setting', 'all_since', '-1 week', '-6 weeks')
 
     def all_max_per_source_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('all_setting', 'all_per_source', 20, 100)
         self.close_section('all_setting')
 
     def all_email_since_test(self):
-        self.wait_with_folder_list()
         self.dropdown_test('email_setting', 'all_email_since', '-1 week', '-6 weeks')
 
     def all_email_max_per_source_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('email_setting', 'all_email_per_source', 20, 100)
         self.close_section('email_setting')
 
     def feeds_since_test(self):
-        self.wait()
-        self.dropdown_test('feeds_setting', 'feed_since', 'today', '-6 weeks')
+        self.dropdown_test('feeds_setting', 'feed_since', '-1 week', '-6 weeks')
 
     def feeds_max_per_source_test(self):
-        self.wait()
         self.number_fld_test('feeds_setting', 'feed_limit', 20, 100)
         self.close_section('feeds_setting')
 
     def sent_since_test(self):
-        self.wait()
         self.dropdown_test('sent_setting', 'sent_since', '-1 week', '-6 weeks')
 
     def sent_max_per_source_test(self):
-        self.wait_with_folder_list()
         self.number_fld_test('sent_setting', 'sent_per_source', 20, 100)
         self.close_section('sent_setting')
 
@@ -229,6 +209,7 @@ if __name__ == '__main__':
     test_runner(SettingsTests, [
 
         # general options
+        'load_settings_page',
         'list_style_test',
         'start_page_test',
         'tz_test',
@@ -236,8 +217,8 @@ if __name__ == '__main__':
         'imap_per_page_test',
         'mail_format_test',
         'auto_bcc_test',
-        # 'keyboard_shortcuts_test',
-        # 'inline_message_test',
+        'keyboard_shortcuts_test',
+        'inline_message_test',
         'no_folder_icons_test',
         'msg_list_icons_test',
         'msg_part_icons_test',

@@ -230,7 +230,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                 }
                             }
 
-                            $contact = ($this->get('contact_store'))->get(null, false, $contact_email);
+                            $contact_store = $this->get('contact_store');
+                            $contact = !$contact_store ? null : $contact_store->get(null, false, $contact_email);
                             $contact_exists = !empty($contact);
 
                             $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
@@ -482,14 +483,14 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $res .= '<form class="imap_connect" method="POST">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
             $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
-            $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
+            $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6 overflow-auto" >';
             $res .= sprintf('
                 <div class="text-muted"><strong>%s</strong></div>
                 <div class="server_subtitle">%s/%d %s</div>',
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
 
-            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4  ">';
+            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4 mb-2 ">';
 
             // IMAP Username
             $res .= '<div class="form-floating">';
@@ -510,28 +511,28 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
-            $res .= '</div></div></div><div class="col-lg-3 d-flex justify-content-start align-items-center">';
+            $res .= '</div></div></div><div class="col-xl-3 col-lg-4 col-md-6 d-flex justify-content-start align-items-center">';
 
             // Buttons
             $disabled = isset($vals['default']) ? ' disabled': '';
             if (!isset($vals['user']) || !$vals['user']) {
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2 mt-3" />';
             } else {
                 $keysToRemove = array('object', 'connected', 'default', 'nopass');
                 $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
 
                 $type = $vals['type'] ?? 'imap';
-                $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
-                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2"'.$disabled.' />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2"'.$disabled.' />';
+                $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2 mt-3"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2 mt-3" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3"'.$disabled.' />';
+                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2 mt-3"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
             $hidden = array_key_exists('hide', $vals) && $vals['hide'];
-            $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
-            $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+            $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3" />';
+            $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3" />';
 
             $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
             $res .= '</div></div></div></form>';
@@ -773,19 +774,22 @@ class Hm_Output_filter_expanded_folder_data extends Hm_Output_Module {
      * Build the HTML for a list of subfolders. The page cache is used to pass this to the folder list.
      */
     protected function output() {
-        $res = '';
         $folder_data = $this->get('imap_expanded_folder_data', array());
         $with_input = $this->get('with_input', false);
-        $folder = $this->get('folder', '');
+        $can_share_folders = $this->get('can_share_folders', false);
         if (!empty($folder_data)) {
-            $res .= format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input);
-            $quota = $this->get('quota');
-            $quota_max = $this->get('quota_max');
-            if (!$folder && $quota) {
-                $res .= '<p class="quota_info"><div class="progress bg-secondary border"><div class="progress-bar bg-light" style="width:'.$quota.'%"></div></div>'.$quota.'% used on '.$quota_max.' MB</p>';
-            }
+            $res = format_imap_folder_section($folder_data, $this->get('imap_expanded_folder_id'), $this, $with_input, $can_share_folders);
             $this->out('imap_expanded_folder_formatted', $res);
         }
+    }
+}
+
+/**
+ * @subpackage imap/output
+ */
+class Hm_Output_get_list_imap_folders_permissions extends Hm_Output_Module {
+    public function output() {
+        $this->out('ajax_imap_folders_permissions', $this->get('imap_folders_permissions', array()));
     }
 }
 
@@ -1004,6 +1008,7 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
         }
+        $this->out('do_not_flag_as_read_on_open', $this->get('do_not_flag_as_read_on_open', false));
     }
 }
 

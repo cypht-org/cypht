@@ -69,6 +69,7 @@ jobs:
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
+          update: true
           fail-fast: true
 
       - name: "Script: setup.sh"
@@ -78,10 +79,9 @@ jobs:
         run: |
             composer install
             composer require --dev php-coveralls/php-coveralls
-            php scripts/config_gen.php
 
       - name: "Script: test.sh"
-        run: bash .github/tests/test.sh
+        run: bash tests/phpunit/run.sh
 
 
   Test-selenium:
@@ -128,12 +128,12 @@ jobs:
           tools: phpunit, composer
           ini-values: cgi.fix_pathinfo=1
         env:
+          update: true
           fail-fast: true
 
       - name: "Composer Install Dependencies"
         run: |
             composer install
-            php scripts/config_gen.php
 
       - name: "Script: setup.sh"
         run: bash .github/tests/setup.sh

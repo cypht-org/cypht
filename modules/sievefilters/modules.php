@@ -63,7 +63,7 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
     public function process() {
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
-        if ($sieve_filters_enabled) {
+        if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
             $factory = get_sieve_client_factory($this->config);
             try {
                 $client = $factory->init($this->user_config, $server);
@@ -439,8 +439,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope', 'imap_msg_uid'));
-
+        list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope'));
         if (!$success) {
             return;
         }
@@ -452,6 +451,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         }
 
         if (isset($this->request->post['imap_msg_uid'])) {
+            $form['imap_msg_uid'] = $this->request->post['imap_msg_uid'];
             $imap = Hm_IMAP_List::connect($this->request->post['imap_server_id']);
 
             if (!imap_authed($imap)) {
@@ -1214,7 +1214,6 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $res .= '</tbody></table>';
             $res .= '</div></div></div>';
         }
-        $res .= block_filter_dropdown($this, false, 'edit_blocked_behavior', 'Edit');
         $res .= '</div></div>';
         return $res;
     }

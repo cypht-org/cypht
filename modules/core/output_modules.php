@@ -554,17 +554,36 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $mods = $this->get('router_module_list');
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
-                if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
-                    $core = $rel_name;
-                    continue;
-                }
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
-                if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
-                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
+                if (in_array($mod, $mods, true)) {
+                    $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+                    foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
+                    }
+
+                    if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
+                        $core = $rel_name;
+                        continue;
+                    }
+
+                    if (is_readable(sprintf("%ssite.js", $name))) {
+                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
+                    }
                 }
             }
             if ($core) {
-                $res = '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.$res;
+                $res = // Load navigation utilities used by subsequent modules' handlers
+                '<script type="text/javascript" src="' . WEB_ROOT . 'modules/core/navigation/utils.js"></script>'.
+                '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.
+                $res;
+                /* Load navigation js modules
+                    * routes.js, navigation.js
+                    * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
+                    * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
+                */
+                foreach (['routes', 'navigation'] as $js) {
+                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
+                }
             }
             return $js_lib.$res;
         }
@@ -1641,6 +1660,112 @@ class Hm_Output_content_section_end extends Hm_Output_Module {
      */
     protected function output() {
         return '</div></main>';
+    }
+}
+
+/**
+ * modals
+ * @subpackage core/output
+ */
+class Hm_Output_modals extends Hm_Output_Module {
+    /**
+     * Outputs modals
+     */
+    protected function output() {
+        $share_folder_modal = '<div class="modal fade" id="shareFolderModal" tabindex="-1" aria-labelledby="shareFolderModalLabel" aria-hidden="true">';
+        $share_folder_modal .= '<div class="modal-dialog modal-lg">';
+        $share_folder_modal .= '<div class="modal-content">';
+        $share_folder_modal .= '<div class="modal-header">';
+        $share_folder_modal .= '<h5 class="modal-title" id="shareFolderModalLabel">'.$this->trans('Edit Permissions').'</h5>';
+        $share_folder_modal .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '<div class="modal-body">';
+        $share_folder_modal .= '<div class="row">';
+
+        $share_folder_modal .= '<div class="col-lg-8 col-md-12">';
+
+        $share_folder_modal .= '<div id="loadingSpinner" class="text-center">';
+        $share_folder_modal .= '<div class="spinner-border text-primary" role="status">';
+        $share_folder_modal .= '<span class="visually-hidden">Loading...</span>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '<table class="table table-striped" id="permissionTable" style="display:none;">';
+        $share_folder_modal .= '<thead>';
+        $share_folder_modal .= '<tr>';
+        $share_folder_modal .= '<th>'.$this->trans('User').'</th>';
+        $share_folder_modal .= '<th>'.$this->trans('Permissions').'</th>';
+        $share_folder_modal .= '<th>'.$this->trans('Actions').'</th>';
+        $share_folder_modal .= '</tr>';
+        $share_folder_modal .= '</thead>';
+        $share_folder_modal .= '<tbody></tbody>';
+        $share_folder_modal .= '</table>';
+        
+        $share_folder_modal .= '</div>';
+        
+        $share_folder_modal .= '<div class="col-lg-4 col-md-12">';
+        $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
+        $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';
+        $share_folder_modal .= '<input type="hidden" name="folder_uid" id="folder_uid" value="">';
+        $share_folder_modal .= '<input type="hidden" name="folder" id="folder" value="">';
+
+        $share_folder_modal .= '<div class="mb-3 row">';
+        $share_folder_modal .= '<div class="col-12">';
+        $share_folder_modal .= '<label class="form-label">'.$this->trans('Identifier').'</label>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="radio" name="identifier" value="user" id="identifierUser" checked>';
+        $share_folder_modal .= '<label for="identifierUser">'.$this->trans('User').':</label>';
+        $share_folder_modal .= '<input type="text" class="form-control d-inline-block" id="email" name="email" required placeholder="Enter email">';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="radio" name="identifier" value="all" id="identifierAll">';
+        $share_folder_modal .= '<label for="identifierAll">'.$this->trans('All users (anyone)').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="radio" name="identifier" value="guests" id="identifierGuests">';
+        $share_folder_modal .= '<label for="identifierGuests">'.$this->trans('Guests (anonymous)').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '<div class="mb-3 row">';
+        $share_folder_modal .= '<div class="col-12">';
+        $share_folder_modal .= '<label class="form-label">'.$this->trans('Access Rights').'</label>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="checkbox" name="access_read" id="accessRead" checked>';
+        $share_folder_modal .= '<label for="accessRead">'.$this->trans('Read').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="checkbox" name="access_write" id="accessWrite">';
+        $share_folder_modal .= '<label for="accessWrite">'.$this->trans('Write').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="checkbox" name="access_delete" id="accessDelete">';
+        $share_folder_modal .= '<label for="accessDelete">'.$this->trans('Delete').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '<div>';
+        $share_folder_modal .= '<input type="checkbox" name="access_other" id="accessOther">';
+        $share_folder_modal .= '<label for="accessOther">'.$this->trans('Other').'</label>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '<div class="modal-footer">';
+        $share_folder_modal .= '<button type="submit" class="btn btn-primary">'.$this->trans('Save').'</button>';
+        $share_folder_modal .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</form>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+        $share_folder_modal .= '</div>';
+
+        return $share_folder_modal;
     }
 }
 

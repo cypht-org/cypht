@@ -158,24 +158,22 @@ var capture_subject_click = function() {
     });
 };
 
-$(function() {
-    if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
-        if (inline_msg()) {
-            setTimeout(capture_subject_click, 100);
-            $('tr').removeClass('hl');
-            Hm_Ajax.add_callback_hook('*', capture_subject_click);
-            Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
-            Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
-            Hm_Ajax.add_callback_hook('ajax_imap_archive_message', msg_inline_close);
-            if (hm_list_path().substr(0, 4) !== 'imap') {
-                Hm_Ajax.add_callback_hook('ajax_imap_unread', msg_inline_close);
-            }
-            if (hm_list_path().substr(0, 4) === 'imap') {
-                Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
-            }
+function inlineMessageMessageListAndSearchPageHandler(routeParams) {
+    if (window.inline_msg && inline_msg()) {
+        setTimeout(capture_subject_click, 100);
+        $('tr').removeClass('hl');
+        Hm_Ajax.add_callback_hook('*', capture_subject_click);
+        Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
+        Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
+        Hm_Ajax.add_callback_hook('ajax_imap_archive_message', msg_inline_close);
+        if (routeParams.list_path?.substr(0, 4) !== 'imap') {
+            Hm_Ajax.add_callback_hook('ajax_imap_unread', msg_inline_close);
+        }
+        if (routeParams.list_path?.substr(0, 4) === 'imap') {
+            Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
         }
     }
-});
+}
 
 const messagesListMutation = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {

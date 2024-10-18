@@ -94,17 +94,23 @@ class Hm_DB {
         if (!$type) {
             $type = self::execute_type($sql);
         }
-        $sql = $dbh->prepare($sql);
-        if (!$sql || !$sql->execute($args)) {
+        try {
+            $sql = $dbh->prepare($sql);
+            if (!$sql || !$sql->execute($args)) {
+                return false;
+            }
+            if ($type == 'modify' || $type == 'insert') {
+                return $sql->rowCount();
+            }
+            if ($all) {
+                return $sql->fetchAll(PDO::FETCH_ASSOC);
+            }
+            return $sql->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $oops) {
+            Hm_Msgs::add('ERRDatabase error. Please try again.');
+            Hm_Debug::add($oops->getMessage());
             return false;
         }
-        if ($type == 'modify' || $type == 'insert') {
-            return $sql->rowCount();
-        }
-        if ($all) {
-            return $sql->fetchAll(PDO::FETCH_ASSOC);
-        }
-        return $sql->fetch(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -139,6 +145,7 @@ class Hm_DB {
         try {
             self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
             self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            self::$dbh[$key]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
             return self::$dbh[$key];
         } catch (Exception $oops) {

@@ -8,21 +8,14 @@ class TagTest(WebTest):
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)
-        self.wait_with_folder_list()
+        self.wait()
 
     def load_tag_page(self):
-        self.load()
-        # ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView(false);", element);
-
-
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         self.by_css('[data-source=".tags_folders"]').click()
         list_item = self.by_class('tags_add_new')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Tags'
         assert self.by_class('tree-view').text == 'No tags available yet.'
 
@@ -39,6 +32,7 @@ class TagTest(WebTest):
         self.wait()
         self.by_id('edit_tag').click()
         self.wait()
+        self.wait_for_navigation_to_complete()
         name = self.by_name('tag_name')
         name.send_keys('Test 1')
         self.by_name('submit_tag').click()
