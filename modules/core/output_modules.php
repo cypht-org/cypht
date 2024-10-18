@@ -573,7 +573,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
             }
             if ($core) {
                 $res = // Load navigation utilities used by subsequent modules' handlers
-                '<script type="text/javascript" src="modules/core/navigation/utils.js"></script>'.
+                '<script type="text/javascript" src="' . WEB_ROOT . 'modules/core/navigation/utils.js"></script>'.
                 '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.
                 $res;
                 /* Load navigation js modules

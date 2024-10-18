@@ -184,8 +184,8 @@ function get_module_assignments($settings) {
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
             if ($mod === 'core') {
-                foreach (['routes', 'utils', 'navigation'] as $js_module) {
-                    $js .= file_get_contents("modules/core/navigation/$js_module.js");
+                foreach (glob('modules/core/navigation/*.js') as $js_module) {
+                    $js .= file_get_contents($js_module);
                 }
             }
             foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js_module) {
