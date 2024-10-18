@@ -12,7 +12,7 @@ if (!hm_exists('add_profile')) {
             'replyto' => $reply_to,
             'default' => $is_default,
             'address' => $email,
-            'server' =>  $server_mail,
+            'server' =>  $imap_server_id,
             'user' => $email,
             'type' => 'imap'
         );
