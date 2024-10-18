@@ -1008,13 +1008,13 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             'srv_setup_stepper_profile_signature',
             'srv_setup_stepper_profile_reply_to',
             'srv_setup_stepper_imap_sieve_host',
+            'srv_setup_stepper_imap_sieve_mode_tls',
             'srv_setup_stepper_only_jmap',
             'srv_setup_stepper_imap_hide_from_c_page',
             'srv_setup_stepper_jmap_address',
             'srv_setup_stepper_imap_server_id',
             'srv_setup_stepper_smtp_server_id',
         ));
-
         if ($success) {
             // Destructure form array into variables
             [
@@ -1036,6 +1036,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_profile_signature' => $profileSignature,
                 'srv_setup_stepper_profile_reply_to' => $profileReplyTo,
                 'srv_setup_stepper_imap_sieve_host' => $imapSieveHost,
+                'srv_setup_stepper_imap_sieve_mode_tls' => $imapSieveTls,
                 'srv_setup_stepper_only_jmap' => $onlyJmap,
                 'srv_setup_stepper_imap_hide_from_c_page' => $hideFromCombinedView,
                 'srv_setup_stepper_jmap_address' => $jmapAddress,
@@ -1064,7 +1065,8 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     'jmap',
                     $this,
                     $hideFromCombinedView,
-                    $imapServerId
+                    $imapServerId,
+                    $imapSieveTls
                 );
 
                 if(!isset($this->jmap_server_id)) {
@@ -1113,6 +1115,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         $this,
                         $hideFromCombinedView,
                         $imapServerId,
+                        $imapSieveTls
                     );
 
                     if(!isset($this->imap_server_id)) {

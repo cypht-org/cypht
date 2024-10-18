@@ -14,8 +14,9 @@ Mailbox 1:
     port: 465
     tls: true
   sieve:
-    host: tls://imap.example.org
+    host: imap.example.org
     port: 4190
+    tls: true
   profile:
     reply_to: email@example.org
     signature:
@@ -36,8 +37,9 @@ Mailbox 2:
     port: 465
     tls: true
   sieve:
-    host: tls://jmap.example2.org
+    host: jmap.example2.org
     port: 4190
+    tls: false
   profile:
     reply_to: test@example2.org
     signature: my-signature

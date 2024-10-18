@@ -1516,16 +1516,15 @@ if (!hm_exists('forward_dropdown')) {
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
-    $host = $url['host'] ?? $url['path'];
+    if(!isset($url['host'])) {
+        $host = $url['path'];
+    }
     $port = $url['port'] ?? '4190';
-    $scheme = $url['scheme'] ?? 'tcp://';
-    $tls = $scheme === 'tls';
-    // $host = '$scheme://'.$host;
-    return [$host, $port, $tls];
+    return [$host, $port];
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $show_errors = true) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
@@ -1547,8 +1546,8 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if ($enableSieve && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
+            $imap_list['sieve_tls'] = $sieve_tls;
         }
-
         if ($server_id) {
             if (Hm_IMAP_List::edit($server_id, $imap_list)) {
                 $imap_server_id = $server_id;

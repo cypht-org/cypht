@@ -2260,6 +2260,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
         { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
         { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
+        { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
         { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
@@ -2313,6 +2314,7 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_imap_sieve_mode_tls").prop('checked', false);
     $("#srv_setup_stepper_only_jmap").prop('checked', false);
     $('#step_config-imap_bloc').show();
     $('#step_config-smtp_bloc').show();
@@ -2462,6 +2464,7 @@ function display_config_step(stepNumber) {
         if($('#srv_setup_stepper_enable_sieve').is(':checked')) {
             requiredFields.push(
                 {key: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val()},
+                {key: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').val()},
             )
         }
 
@@ -2522,11 +2525,17 @@ function getServiceDetails(providerKey){
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', true)
                             .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', serverConfig.sieve.tls)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
                     } else {
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', false)
-                            .trigger('change');;
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', false)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val('');
                     }
                 }
