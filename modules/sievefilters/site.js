@@ -1511,6 +1511,23 @@ function sieveFiltersPageHandler() {
         );
     });
 
+    /**
+     * Toggle Filter
+     */
+    $('.toggle_filter').on('change', function () {
+        const checkbox = $(this);
+        Hm_Ajax.request(
+            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_toggle_script_state'},
+                {'name': 'imap_account', 'value': checkbox.attr('imap_account')},
+                {'name': 'script_state', 'value': checkbox.prop('checked')},
+                {'name': 'sieve_script_name', 'value': checkbox.attr('script_name')}],
+            function(res) {
+                if (res.success) {
+                    checkbox.prop('checked', !checkbox.prop('checked'));
+                }
+            }
+        );
+    });
 
     /**
      * Delete script event
