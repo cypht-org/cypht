@@ -1065,7 +1065,8 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     'jmap',
                     $this,
                     $hideFromCombinedView,
-                    $imapServerId
+                    $imapServerId,
+                    $imapSieveTls
                 );
 
                 if(!isset($this->jmap_server_id)) {

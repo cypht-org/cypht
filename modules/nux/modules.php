@@ -333,6 +333,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $this,
                             $server['jmap']['hide_from_combined_view'],
                             false,
+                            $server['sieve']['tls'],
                             false
                         );
                         if (! $jmap_server_id) {
@@ -357,6 +358,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $this,
                             $server['imap']['hide_from_combined_view'],
                             false,
+                            $server['sieve']['tls'],
                             false
                         );
                         if (! $imap_server_id) {
