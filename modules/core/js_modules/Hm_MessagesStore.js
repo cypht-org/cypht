@@ -15,20 +15,29 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page, rows = {}) {
+    constructor(path, page = 1, rows = {}, abortController = new AbortController()) {
         this.path = path;
         this.list = path + '_' + page;
         this.rows = rows;
         this.links = "";
         this.count = 0;
         this.flagAsReadOnOpen = true;
+        this.abortController = abortController;
+    }
+
+    /**
+     * Check if the store has data for the current instance
+     * @returns {Boolean}
+     */
+    hasLocalData() {
+        return this.#retrieveFromLocalStorage() !== false;
     }
 
     /**
      * 
-     * @returns {Promise<Array<String>>}
+     * @returns {Promise<this>}
      */
-    async load(reload = false, hideLoadingState = false) {
+    async load(reload = false, hideLoadingState = false, doNotFetch = false) {
         const storedMessages = this.#retrieveFromLocalStorage();
         if (storedMessages && !reload) {
             this.rows = storedMessages.rows;
@@ -38,9 +47,13 @@ class Hm_MessagesStore {
             return this;
         }
 
+        if (doNotFetch) {
+            return this;
+        }
+
         const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
 
-        this.count = Object.values(folder_status)[0].messages;
+        this.count = folder_status && Object.values(folder_status)[0]?.messages;
         this.links = pageLinks;
         this.rows = updatedMessages;
         this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
@@ -112,23 +125,59 @@ class Hm_MessagesStore {
     }
 
     #fetch(hideLoadingState = false) {
-        const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
         return new Promise((resolve, reject) => {
             Hm_Ajax.request(
-              [
-                { name: "hm_ajax_hook", value: "ajax_imap_folder_display" },
-                { name: "imap_server_id", value: detail.server_id },
-                { name: "folder", value: detail.folder },
-              ],
+              this.#getRequestConfig(),
               (response) => {
                 resolve(response);
               },
               [],
               hideLoadingState,
               undefined,
-              reject
+              reject,
+              this.abortController?.signal
             );
         });
+    }
+
+    #getRequestConfig() {
+        let hook;
+        let serverId;
+        let folder;
+        const config = [];
+        if (this.path.startsWith('imap')) {
+            hook = "ajax_imap_folder_display";
+            const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
+            serverId = detail.server_id;
+            folder = detail.folder;
+        } else {
+            switch (this.path) {
+                case 'unread':
+                    hook = "ajax_imap_unread";
+                    break;
+                case 'flagged':
+                    hook = "ajax_imap_flagged";
+                    break;
+                case 'combined_inbox':
+                case 'email':
+                    hook = "ajax_imap_combined_inbox";
+                    break;
+                default:
+                    hook = "ajax_imap_folder_data";
+                    break;
+            }
+        }
+        
+        if (hook) {
+            config.push({ name: "hm_ajax_hook", value: hook });
+        }
+        if (serverId) {
+            config.push({ name: "imap_server_id", value: serverId });
+        }
+        if (folder) {
+            config.push({ name: "folder", value: folder });
+        }
+        return config;
     }
 
     #saveToLocalStorage() {

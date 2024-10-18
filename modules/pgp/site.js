@@ -306,28 +306,13 @@ var Hm_Pgp = {
     }
 }
 
-$(function() {
-    if (hm_page_name() == 'compose') {
-        if (($('#pgp_encrypt option').length + $('#pgp_sign option').length) == 0) {
-            $('.pgp_section').hide();
-        }
-        $('.smtp_send_placeholder').on("click", function() { Hm_Pgp.process_settings(); return false; });
+function pgpComposePageHandler() {
+    if (($('#pgp_encrypt option').length + $('#pgp_sign option').length) == 0) {
+        $('.pgp_section').hide();
     }
-    else if (hm_page_name() == 'message') {
-        Hm_Ajax.add_callback_hook('ajax_imap_message_content', Hm_Pgp.check_pgp_msg);
-    }
-    else if (hm_page_name() == 'pgp') {
-        $('.priv_title').on("click", function() { $('.priv_keys').toggle(); });
-        $('.public_title').on("click", function() { $('.public_keys').toggle(); });
-        $('.delete_pgp_key').on("click", function() { return hm_delete_prompt(); });
-        $('#priv_key').on("change", function(evt) { Hm_Pgp.read_private_key(evt); });
-        Hm_Pgp.list_private_keys();
-        if (window.location.hash == '#public_keys') {
-            $('.public_keys').toggle();
-        }
-        if (window.location.hash == '#private_keys') {
-            $('.private_keys').toggle();
-        }
+    $('.smtp_send_placeholder').on("click", function() { Hm_Pgp.process_settings(); return false; });
+}
 
-    }
-});
+function pgpMessageContentPageHandler() {
+    Hm_Ajax.add_callback_hook('ajax_imap_message_content', Hm_Pgp.check_pgp_msg);
+}
