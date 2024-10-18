@@ -203,9 +203,11 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
     public function process() {
+        $imap_account = null;
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
             if ($idx == $this->request->post['imap_server_id']) {
                 $imap_account = $mailbox;
+                break;
             }
         }
 
@@ -1342,5 +1344,64 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
                 }
             }
         }
+    }
+}
+
+/**
+ * Check the status of an SIEVE server
+ * @subpackage sieve/handler
+ */
+class Hm_Handler_load_list_sieve_block extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+
+        if (!$success) {
+            return;
+        }
+
+        foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
+            if ($idx == $this->request->post['imap_server_id']) {
+                $imap_account = $mailbox;
+            }
+        }
+
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+            $scripts = $client->listScripts();
+
+            if(array_search('blocked_senders', $scripts, true) === false) {
+                $client->putScript(
+                    'blocked_senders',
+                    ''
+                );
+            }
+
+            $blocked_senders = [];
+            $current_script = $client->getScript('blocked_senders');
+
+            if ($current_script != '') {
+                $script_split = preg_split('#\r?\n#', $current_script, 0);
+                $base64_obj = str_replace("# ", "", $script_split[1]);
+                $blocked_list = json_decode(base64_decode($base64_obj));
+                foreach ($blocked_list as $blocked_sender) {
+                    $blocked_senders[] = $blocked_sender;
+                }
+            }
+            $blocked_senders = array_unique($blocked_senders);
+            $this->out('list_blocked_senders', $blocked_senders);     
+            
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
+        }
+    }
+}
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_get_list_sieve_block extends Hm_Output_Module {
+    public function output() {
+        $this->out('ajax_liste_block_sieve', $this->get('list_blocked_senders', array()));
     }
 }
