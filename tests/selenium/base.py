@@ -140,6 +140,16 @@ class WebTest:
         wait = WebDriverWait(self.driver, timeout)
         element = wait.until(wait_for_non_empty_text((By.CLASS_NAME, "sys_messages"))
 )
+        
+    def wait_for_navigation_to_complete(self, timeout=30):
+        print(" - waiting for the navigation to complete...")
+        # This might not be always accurate in the future. This works because for now only navigation requests are made using the fetch API.
+        # It might be necessary to find a more robust way to determine navigation requests.
+        get_current_navigations_request_entries_length = lambda: self.driver.execute_script('return window.performance.getEntriesByType("resource").filter((r) => r.initiatorType === "fetch").length')
+        navigation_length = get_current_navigations_request_entries_length()
+        WebDriverWait(self.driver, timeout).until(
+            lambda driver: get_current_navigations_request_entries_length() > navigation_length
+        )
 
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':

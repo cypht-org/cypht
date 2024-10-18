@@ -554,20 +554,36 @@ class Hm_Output_page_js extends Hm_Output_Module {
             $mods = $this->get('router_module_list');
             foreach (glob(APP_PATH.'modules'.DIRECTORY_SEPARATOR.'**', GLOB_ONLYDIR | GLOB_MARK) as $name) {
                 $rel_name = str_replace(APP_PATH, '', $name);
-                if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
-                    $core = $rel_name;
-                    continue;
-                }
                 $mod = str_replace(array('modules', DIRECTORY_SEPARATOR), '', $rel_name);
-                if (in_array($mod, $mods, true) && is_readable(sprintf("%ssite.js", $name))) {
-                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
-                    foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js) {
+                if (in_array($mod, $mods, true)) {
+                    $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+                    foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
                         $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
+                    }
+
+                    if ($rel_name == 'modules'.DIRECTORY_SEPARATOR.'core'.DIRECTORY_SEPARATOR) {
+                        $core = $rel_name;
+                        continue;
+                    }
+
+                    if (is_readable(sprintf("%ssite.js", $name))) {
+                        $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $rel_name).'"></script>';
                     }
                 }
             }
             if ($core) {
-                $res = '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.$res;
+                $res = // Load navigation utilities used by subsequent modules' handlers
+                '<script type="text/javascript" src="' . WEB_ROOT . 'modules/core/navigation/utils.js"></script>'.
+                '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%ssite.js", $core).'"></script>'.
+                $res;
+                /* Load navigation js modules
+                    * routes.js, navigation.js
+                    * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
+                    * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
+                */
+                foreach (['routes', 'navigation'] as $js) {
+                    $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
+                }
             }
             return $js_lib.$res;
         }

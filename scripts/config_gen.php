@@ -183,12 +183,18 @@ function get_module_assignments($settings) {
         $mods = get_modules($settings);
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
+            if ($mod === 'core') {
+                foreach (glob('modules/core/navigation/*.js') as $js_module) {
+                    $js .= file_get_contents($js_module);
+                }
+            }
             foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js_module) {
                 $js .= file_get_contents($js_module);
             }
             if (is_readable(sprintf("modules/%s/site.js", $mod))) {
                 $js .= str_replace("'use strict';", '', file_get_contents(sprintf("modules/%s/site.js", $mod)));
              }
+             
             if (is_readable(sprintf("modules/%s/site.css", $mod))) {
                $css .= file_get_contents(sprintf("modules/%s/site.css", $mod));
             }
