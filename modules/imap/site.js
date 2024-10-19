@@ -114,7 +114,7 @@ var imap_test_action = function(event) {
     );
 }
 
-var imap_setup_server_page = function() {
+var imapServersPageHandler = function() {
     $('.imap_delete').on('click', imap_delete_action);
     $('.save_imap_connection').on('click', imap_save_action);
     $('.hide_imap_connection').on('click', imap_hide);
