@@ -6,6 +6,8 @@ function applyImapMessageListPageHandlers(routeParams) {
     imap_setup_snooze();
     imap_setup_tags();
 
+    Hm_Message_List.set_row_events();
+
     $('.core_msg_control').on("click", function(e) {
         e.preventDefault();
         Hm_Message_List.message_action($(this).data('action')); 

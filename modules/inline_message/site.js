@@ -125,7 +125,6 @@ var capture_subject_click = function() {
         var inline_msg_loaded_callback = function() {
             $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
             $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback, false, $(this).data('allowImages')); });
             update_imap_links(uid, details);
         };
 

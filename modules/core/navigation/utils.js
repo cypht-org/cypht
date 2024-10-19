@@ -13,11 +13,11 @@ const toastHTML = `
 document.body.insertAdjacentHTML('beforeend', toastHTML)
 
 function showRoutingToast() {
-    bootstrap.Toast.getOrCreateInstance(document.getElementById('routing-toast')).show()
+    window.routingToast = showLoaderToast('Redirecting...');
 }
 
 function hideRoutingToast() {
-    bootstrap.Toast.getOrCreateInstance(document.getElementById('routing-toast')).hide()
+    window.routingToast.hide();
 }
 
 function getListPathParam() {
