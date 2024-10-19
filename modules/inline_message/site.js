@@ -94,7 +94,6 @@ var get_inline_msg_details = function(link) {
 };
 
 var msg_inline_close = function() {
-    $('.refresh_link').trigger('click');
     if (inline_msg_style() == 'right') {
         $('.msg_text').remove();
         $('.message_table').css('width', '100%');

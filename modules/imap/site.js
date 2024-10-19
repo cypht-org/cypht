@@ -467,6 +467,9 @@ var setup_imap_folder_page = async function(listPath) {
         await select_imap_folder(listPath, true, true)
     }
 
+    // Update browser title
+    Hm_Message_List.update_title(listPath);
+
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
     const backgroundAbortController = new AbortController();
     const interval = setInterval(async () => {

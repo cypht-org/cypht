@@ -54,7 +54,9 @@ async function navigate(url) {
 
         const html = await response.text();
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
+        const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
         $('main').replaceWith(main);
+        document.title = title.replace(/<[^>]*>/g, '');
 
         window.location.next = url;
 
