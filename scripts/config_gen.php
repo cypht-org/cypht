@@ -188,7 +188,8 @@ function get_module_assignments($settings) {
                     $js .= file_get_contents($js_module);
                 }
             }
-            foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . '*.js') as $js_module) {
+            $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+            foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . '*.js', GLOB_BRACE) as $js_module) {
                 $js .= file_get_contents($js_module);
             }
             if (is_readable(sprintf("modules/%s/site.js", $mod))) {
