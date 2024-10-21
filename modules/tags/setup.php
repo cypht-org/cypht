@@ -19,7 +19,6 @@ add_handler('ajax_imap_message_content', 'tag_data', true, 'tags', 'load_user_da
 add_handler('message_list', 'tag_data', true, 'tags', 'load_user_data', 'after');
 
 setup_base_ajax_page('ajax_imap_tag_data', 'core');
-add_handler('ajax_imap_tag_data', 'load_user_data', true,'core');
 add_handler('ajax_imap_tag_data', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
 add_handler('ajax_imap_tag_data', 'imap_tag_content', true, 'tags', 'load_imap_servers_from_config', 'after');
 add_output('ajax_imap_tag_data', 'filter_tag_data', true);
