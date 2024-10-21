@@ -156,6 +156,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_for_navigation_to_complete()
         assert self.by_class('profile_content_title').text == 'Profiles'
 
 if __name__ == '__main__':
