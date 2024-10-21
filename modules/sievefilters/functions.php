@@ -139,11 +139,22 @@ if (!hm_exists('get_mailbox_filters')) {
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
+            $display_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
+            $checked = ' checked';
+            if (preg_match('/^s(en|dis)abled/', $display_name)) {
+                $display_name = str_replace(['senabled ', 'sdisabled '], '', $display_name);
+                if (strpos($display_name, 'sdisabled') === 0) {
+                    $checked = '';
+                }
+            }
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
                 <td>' . str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2))) . '</td>
                 <td>
+                    <span class="form-switch">
+                        <input script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="toggle_filter form-check-input" type="checkbox" role="switch" id="Check" name="script_state"'.$checked.'>
+                    </span>
                     <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
