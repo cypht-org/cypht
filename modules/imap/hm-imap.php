@@ -905,6 +905,7 @@ if (!class_exists('Hm_IMAP')) {
             $headers = array();
             foreach ($res as $n => $vals) {
                 if (isset($vals[0]) && $vals[0] == '*') {
+                    var_dump($vals); die; // get_mailbox_page
                     $uid = 0;
                     $size = 0;
                     $subject = '';
@@ -926,6 +927,7 @@ if (!class_exists('Hm_IMAP')) {
                     $count = count($vals);
                     for ($i=0;$i<$count;$i++) {
                         if ($vals[$i] == 'BODY[HEADER.FIELDS') {
+                            
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -2335,6 +2337,13 @@ if (!class_exists('Hm_IMAP')) {
                 $headers = $this->get_message_list($uids);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
+                        $part = true;
+                        $max = 3000;
+                        $msg_struct = $this->get_message_structure($uid);
+                        $struct = $this->search_bodystructure($msg_struct, array('imap_part_number' => $part));
+                        $msg_struct_current = array_shift($struct);
+                        $msg_text = $this->get_message_content($uid, $part, $max, $msg_struct_current);
+                        $headers[$uid]['preview_msg'] = $msg_text;
                         $result[$uid] = $headers[$uid];
                     }
                 }
