@@ -881,7 +881,10 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
                         .append(msgResponse.msg_text)
                         .append(msgResponse.msg_parts);
         document.title = $('.header_subject th').text();
-
+        if ($('.header_subject th').find('.bi.bi-star-half.account_icon').length === 0) {
+            $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+            $('.close_inline_msg').on("click", function() { window.history.back(); });
+        }
 
         $('.reply_link, .reply_all_link, .forward_link').each(function() {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
