@@ -6,6 +6,17 @@ function applyImapMessageListPageHandlers(routeParams) {
     imap_setup_snooze();
     imap_setup_tags();
 
+    Hm_Message_List.set_row_events();
+
+    $('.core_msg_control').on("click", function(e) {
+        e.preventDefault();
+        Hm_Message_List.message_action($(this).data('action')); 
+    });
+    $('.toggle_link').on("click", function(e) {
+        e.preventDefault();
+        Hm_Message_List.toggle_rows();
+    });
+
     if (window.githubMessageListPageHandler) githubMessageListPageHandler(routeParams);
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
     if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);

@@ -53,7 +53,7 @@ class FolderListTests(WebTest):
         self.driver.execute_script("arguments[0].click();", hide_button)
         assert self.by_class('folder_toggle').text.startswith('Show folders')
         list_item = self.by_class('menu_home')
-        link = list_item.find_element(By.TAG_NAME, 'a');
+        link = list_item.find_element(By.TAG_NAME, 'a')
         assert link.is_displayed() == False
 
     def show_folders(self):

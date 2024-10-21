@@ -917,27 +917,27 @@ function Message_List() {
     };
 
     /* TODO: remove module specific refs */
-    this.update_title = function() {
+    this.update_title = function(list_path = getListPathParam()) {
         var count = 0;
         var rows = Hm_Utils.rows();
         var tbody = Hm_Utils.tbody();
-        if (getListPathParam() == 'unread') {
+        if (list_path == 'unread') {
             count = rows.length;
             document.title = count+' '+hm_trans('Unread');
         }
-        else if (getListPathParam() == 'flagged') {
+        else if (list_path == 'flagged') {
             count = rows.length;
             document.title = count+' '+hm_trans('Flagged');
         }
-        else if (getListPathParam() == 'combined_inbox') {
+        else if (list_path == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Everything');
         }
-        else if (getListPathParam() == 'email') {
+        else if (list_path == 'email') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Email');
         }
-        else if (getListPathParam() == 'feeds') {
+        else if (list_path == 'feeds') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Feeds');
         }

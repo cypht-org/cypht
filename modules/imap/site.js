@@ -467,6 +467,9 @@ var setup_imap_folder_page = async function(listPath) {
         await select_imap_folder(listPath, true, true)
     }
 
+    // Update browser title
+    Hm_Message_List.update_title(listPath);
+
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
     const backgroundAbortController = new AbortController();
     const interval = setInterval(async () => {
@@ -684,7 +687,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
                 onSuccess(res);
-                if (!noupdate) {
+                if (!noupdate && !msg_part) {
                     Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
                 }
             },
@@ -846,6 +849,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         return block_unblock_sender(msg_uid, detail, $(this).data('target'), 'unblock', sender);
     });
     fixLtrInRtl();
+
+    handleAttachementDownload();
+    handleViewMessagePart();
 };
 
 var get_local_message_content = function(msg_uid, path) {
