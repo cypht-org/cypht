@@ -296,6 +296,14 @@ class Hm_Handler_special_folders extends Hm_Handler_Module {
                 $this->out('archive_folder', $specials[$this->request->get['imap_server_id']]['archive']);
                 $this->out('draft_folder', $specials[$this->request->get['imap_server_id']]['draft']);
                 $this->out('junk_folder', $specials[$this->request->get['imap_server_id']]['junk']);
+                $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->get['imap_server_id'], $this->cache);
+                if ($mailbox && $mailbox->authed()) {
+                    $folder_names = [];
+                    foreach ($specials[$this->request->get['imap_server_id']] as $name => $folder) {
+                        $folder_names[$name] = $mailbox->get_folder_name($folder);
+                    }
+                    $this->out('special_folder_names', $folder_names);
+                }
             }
         }
         else {
@@ -477,13 +485,15 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
         }
 
         $sent_folder = $this->get('sent_folder', $this->trans('Not set'));
-        if (!$sent_folder) {
-            $sent_folder = $this->trans('Not set');
+        if (! $sent_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['sent'] ?? $sent_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".sent_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Sent Folder').':<span id="sent_val">'.$sent_folder.'</span></a>
+                    <a href="#" class="pe-auto">'.$this->trans('Sent Folder').':<span id="sent_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog sent_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -521,13 +531,15 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
         }
 
         $archive_folder = $this->get('archive_folder', $this->trans('Not set'));
-        if (!$archive_folder) {
-            $archive_folder = $this->trans('Not set');
+        if (! $archive_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['archive'] ?? $archive_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".archive_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Archive Folder').':<span id="archive_val">'.$archive_folder.'</span></a>
+                    <a href="#" class="pe-auto">'.$this->trans('Archive Folder').':<span id="archive_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog archive_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -565,13 +577,15 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
         }
 
         $draft_folder = $this->get('draft_folder', $this->trans('Not set'));
-        if (!$draft_folder) {
-            $draft_folder = $this->trans('Not set');
+        if (! $draft_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['draft'] ?? $draft_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".draft_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Draft Folder').':<span id="draft_val">'.$draft_folder.'</span></a>
+                    <a href="#" class="pe-auto">'.$this->trans('Draft Folder').':<span id="draft_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog draft_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -609,13 +623,15 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
         }
 
         $trash_folder = $this->get('trash_folder', $this->trans('Not set'));
-        if (!$trash_folder) {
-            $trash_folder = $this->trans('Not set');
+        if (! $trash_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['trash'] ?? $trash_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".trash_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Trash Folder').':<span id="trash_val">'.$trash_folder.'</span></a>
+                    <a href="#" class="pe-auto">'.$this->trans('Trash Folder').':<span id="trash_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
         $res .= '<div class="folder_dialog trash_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
@@ -650,13 +666,15 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
         }
 
         $junk_folder = $this->get('junk_folder', $this->trans('Not set'));
-        if (!$junk_folder) {
-            $junk_folder = $this->trans('Not set');
+        if (! $junk_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['junk'] ?? $junk_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Junk Folder').':<span id="junk_val">'.$junk_folder.'</span></a>
+                    <a href="#" class="pe-auto">'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
                 </div>';
 
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';

@@ -124,7 +124,11 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return prep_folder_name($this->connection, $folder, true);
         } else {
-            return $folder;
+            if (substr_count($folder, '_') >= 2) {
+                return decode_folder_str($folder);
+            } else {
+                return $folder;
+            }
         }
     }
 
@@ -187,7 +191,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_special_use_mailboxes($folder);
         } else {
-            // TODO: EWS
+            return $this->connection->get_special_use_folders($folder);
         }
     }
     

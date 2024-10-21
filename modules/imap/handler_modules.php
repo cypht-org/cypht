@@ -1451,6 +1451,20 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
             if ($form['ews_create_profile']) {
                 add_profile($form['ews_profile_name'], $form['ews_profile_signature'], $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $form['ews_email'], $form['ews_server'], $server_id, $server_id, $this);
             }
+            // auto-assign special folders
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+            if (is_object($mailbox) && $mailbox->authed()) {
+                $specials = $this->user_config->get('special_imap_folders', array());
+                $exposed = $mailbox->get_special_use_mailboxes();
+                $specials[$server_id] = [
+                    'sent' => $exposed['sent'] ?? '',
+                    'draft' => $exposed['drafts'] ?? '',
+                    'trash' => $exposed['trash'] ?? '',
+                    'archive' => $exposed['archive'] ?? '',
+                    'junk' => $exposed['junk'] ?? ''
+                ];
+                $this->user_config->set('special_imap_folders', $specials);
+            }
         }
     }
 }

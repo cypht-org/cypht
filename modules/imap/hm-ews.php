@@ -86,9 +86,31 @@ class Hm_EWS {
         return $result;
     }
 
+    public function get_special_use_folders($folder = false) {
+        $special = array_filter([
+            'trash' => Enumeration\DistinguishedFolderIdNameType::DELETED,
+            'sent' => Enumeration\DistinguishedFolderIdNameType::SENT,
+            'flagged' => false,
+            'all' => false,
+            'junk' => Enumeration\DistinguishedFolderIdNameType::JUNK,
+            'archive' => false, // TODO: check if Enumeration\DistinguishedFolderIdNameType::ARCHIVEMSGFOLDERROOT should be used - it is outside of MESSAGE_ROOT, however.
+            'drafts' => Enumeration\DistinguishedFolderIdNameType::DRAFTS,
+        ]);
+        if (isset($special[$folder])) {
+            return [$folder => $special[$folder]];
+        } else {
+            return $special;
+        }
+    }
+
     public function get_folder_status($folder) {
         try {
-            $result = $this->api->getFolder((new Type\FolderIdType($folder))->toArray(true));
+            if ($this->is_distinguished_folder($folder)) {
+                $folder = new Type\DistinguishedFolderIdType($folder);
+            } else {
+                $folder = new Type\FolderIdType($folder);
+            }
+            $result = $this->api->getFolder($folder->toArray(true));
             return [
                 'name' => $result->get('displayName'),
                 'messages' => $result->get('totalCount'),
@@ -454,5 +476,11 @@ class Hm_EWS {
         } else {
             return (string) $data;
         }
+    }
+
+    protected function is_distinguished_folder($folder) {
+        $oClass = new ReflectionClass(new Enumeration\DistinguishedFolderIdNameType());
+        $constants = $oClass->getConstants();
+        return in_array($folder, $constants);
     }
 }
