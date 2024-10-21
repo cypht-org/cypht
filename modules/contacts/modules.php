@@ -310,20 +310,15 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res = '<div class="contact-group contact-group-effect-scale contact-group-theme-1">';
         $tabIndex = 1;
         $contactGroups = [];
-
         if ($contacts) {
-            foreach ($contacts->page($current_page, $per_page) as $id => $contact) {
-                $group = $contact->value('group');
-                if (!$group || empty($group)) {
-                    $group = 'Personal Addresses'; // Set the group to "Personal Addresses" when it's null or empty
+            foreach ($contacts->paginate_grouped('group', $current_page, $per_page) as $key => $contact) {
+                if (!array_key_exists($key, $contactGroups)) {
+                    $contactGroups[$key] = [];
                 }
-                if (!array_key_exists($group, $contactGroups)) {
-                    $contactGroups[$group] = [];
-                }
-                $contactGroups[$group][] = $contact;
+                $contactGroups[$key][] = $contact;
             }
         }
-
+        
         foreach ($contactGroups as $group => $groupContacts) {
             $res .= '<input type="radio" name="contact-group" ' . ($tabIndex === 1 ? 'checked ' : '') . 'id="tab' . $tabIndex . '" class="' . ($tabIndex === 1 ? 'tab-content-first' : 'tab-content-' . $tabIndex) . '">';
             $res .= '<label for="tab' . $tabIndex . '">' . $this->html_safe($group) . '</label>';
@@ -334,54 +329,55 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res .= '<ul>';
 
         foreach ($contactGroups as $group => $groupContacts) {
+
             $res .= '<li class="tab-content '.($tabIndex === 1 ? 'tab-content-first' : 'tab-content-'.$tabIndex).' typography">';
             $res .= '<table class="contact_list">';
             $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
-            $total = count($groupContacts);
-
             foreach ($groupContacts as $contact) {
-                $name = $contact->value('display_name');
-                if (!trim($name)) {
-                    $name = $contact->value('fn');
-                }
-                $res .= '<tr class="contact_row_'.$this->html_safe($id).'">';
-                $res .= '<td><a data-id="contact_'.$this->html_safe($id).'_detail" '.
-                    '" class="show_contact" title="'.$this->trans('Details').'">'.
-                    '<i class="bi bi-person-fill"></i> '.
-                    '</d><td>'.$this->html_safe($contact->value('type')).'<td><span class="contact_src">'.
-                    ($contact->value('source') == 'local' ? '' : $this->html_safe($contact->value('source'))).'</span>'.
-                    '</td><td>' . $this->html_safe($name) . '</td>' .
-                    '<td><div class="contact_fld">'.$this->html_safe($contact->value('email_address')).'</div></td>'.
-                    '<td class="contact_fld"><a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
-                    $this->html_safe($contact->value('phone_number')).'</a></td>'.
-                    '<td class="text-end" style="width : 100px">';
-                if (in_array($contact->value('type').':'.$contact->value('source'), $editable, true)) {
-                    $res .= '<a data-id="'.$this->html_safe($contact->value('id')).'" data-type="'.$this->html_safe($contact->value('type')).'" data-source="'.$this->html_safe($contact->value('source')).
-                        '" class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
-                        '<a href="?page=contacts&amp;contact_id='.$this->html_safe($contact->value('id')).'&amp;contact_source='.
-                        $this->html_safe($contact->value('source')).'&amp;contact_type='.
-                        $this->html_safe($contact->value('type')).'&amp;contact_page='.$current_page.
-                        '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
-                }
-                $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($contact->value('id')).
-                    '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-                    '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+                foreach ($contact as $c) {
+                    $name = $c->value('display_name');
+                    if (!trim($name)) {
+                        $name = $c->value('fn');
+                    }
 
-                $res .= '</td></tr>';
-                $res .= '<tr><td id="contact_'.$this->html_safe($id).'_detail" class="contact_detail_row" colspan="6">';
-                $res .= build_contact_detail($this, $contact, $id).'</td>';
-                $res .= '</td></tr>';
+                    $res .= '<tr class="contact_row_'.$this->html_safe($c->value('id')).'">';
+                    $res .= '<td><a data-id="contact_'.$this->html_safe($c->value('id')).'_detail" '.
+                        '" class="show_contact" title="'.$this->trans('Details').'">'.
+                        '<i class="bi bi-person-fill"></i> '.
+                        '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
+                        ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
+                        '</td><td>' . $this->html_safe($name) . '</td>' .
+                        '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
+                        '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
+                        $this->html_safe($c->value('phone_number')).'</a></td>'.
+                        '<td class="text-end" style="width : 100px">';
+                    if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+                        $res .= '<a data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).
+                            '" class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
+                            '<a href="?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
+                            $this->html_safe($c->value('source')).'&amp;contact_type='.
+                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page.
+                            '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
+                    }
+                    $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
+                        '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
+                        '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+
+                    $res .= '</td></tr>';
+                    $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
+                    $res .= build_contact_detail($this, $c, $c->value('id')).'</td>';
+                    $res .= '</td></tr>';
+                }
             }
             $res .= '<tr><td class="contact_pages" colspan="7">';
             $contactsPerPage = $per_page;
-            $totalContacts = count($contacts->dump());
+            $totalContacts = count($contact);
             $totalPages = ceil($totalContacts / $contactsPerPage);
             $currentPage = $current_page;
-
             if ($currentPage > 1) {
                 $res .= '<a href="?page=contacts&contact_page='.($currentPage - 1).'">Previous</a>';
             }
-            if ($currentPage < $totalPages) {
+            if ($currentPage <= $totalPages) {
                 $res .= ' <a href="?page=contacts&contact_page='.($currentPage + 1).'">Next</a>';
             }
             $res .= '</td></tr>';
