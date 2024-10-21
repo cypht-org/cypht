@@ -287,6 +287,31 @@ class Hm_EWS {
         }
     }
 
+    public function stream_message_part($itemId, $part, $start_cb) {
+        if ($part !== '0' && $part) {
+            // imap handler modules strip this prefix
+            $part = '0.' . $part;
+        }
+        list($msg_struct, $part_struct, $msg_text, $part) = $this->get_structured_message($itemId, $part, false);
+        $charset = '';
+        if (! empty($part_struct['attributes']['charset'])) {
+            $charset = '; charset=' . $part_struct['attributes']['charset'];
+        }
+        $part_name = get_imap_part_name($part_struct, $itemId, $part);
+        $start_cb($part_struct['type'] . '/' . $part_struct['subtype'] . $charset, $part_name);
+        if (! $charset) {
+            $charset = 'UTF-8';
+        } else {
+            $charset = $part_struct['attributes']['charset'];
+        }
+        $stream = $part_struct['mime_object']->getContentStream($charset);
+        if ($stream) {
+            while (! $stream->eof()) {
+                echo $stream->read(1024);
+            }
+        }
+    }
+
     public function get_structured_message($itemId, $part, $text_only) {
         $message = $this->get_mime_message_by_id($itemId);
         $msg_struct = [];

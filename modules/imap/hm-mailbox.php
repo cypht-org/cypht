@@ -376,7 +376,7 @@ class Hm_Mailbox {
                 }
             }
         } else {
-            // TODO: EWS
+            return $this->connection->stream_message_part($msg_id, $part_id, $start_cb);
         }
     }
 
