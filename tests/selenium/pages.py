@@ -126,7 +126,7 @@ class PageTests(WebTest):
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        self.wait(By.CLASS_NAME, 'content_title')
+        self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Folders'
 
     def save(self):

@@ -84,6 +84,7 @@ class SettingsTests(SettingsHelpers):
         self.wait()
 
     def load_settings_page(self):
+        self.wait_on_class('main_menu')
         self.by_css('[data-source=".settings"]').click()
         list_item = self.by_class('menu_settings')
         list_item.find_element(By.TAG_NAME, 'a').click()
