@@ -1272,16 +1272,10 @@ div.unseen,
   color: var(--bs-primary) !important;
 }
 
-.drop_target {
-  background-color: #eee !important;
-}
 .dragged_element {
   background-color: #fff !important;
   border: solid 1px #ddd;
   padding: 10px;
-}
-.drag_target {
-  background-color: #888 !important;
 }
 .cursor-pointer {
   cursor: pointer !important;
