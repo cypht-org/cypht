@@ -2679,6 +2679,7 @@ const handleExternalResources = (inline) => {
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
+        sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();

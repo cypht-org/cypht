@@ -73,7 +73,7 @@ async function navigate(url) {
         
         trackLocationSearchChanges();
     } catch (error) {
-        throw error;
+        Hm_Notices.show([`ERR${error.message}`]);
     } finally {
         hideRoutingToast();
     }

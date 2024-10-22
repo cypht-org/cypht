@@ -123,7 +123,7 @@ function githubServersPageHandler() {
 }
 
 function githubMessageContentPageHandler(routeParams) {
-    if (routeParams.substr(0, 6) == 'github') {
+    if (routeParams.list_path.substr(0, 6) == 'github') {
         github_item_view();
     }
 }
