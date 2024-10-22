@@ -346,7 +346,7 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
                 $folder = hex2bin($form['folder']);
                 $success = $mailbox->folder_subscription($folder, $form['subscription_state']);
                 if ($success) {
-                    Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $folder));
+                    Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $mailbox->get_folder_name($folder)));
                     $this->cache->del('imap_folders_imap_'.$imap_server_id.'_');
                 } else {
                     Hm_Msgs::add(sprintf('ERRAn error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder));

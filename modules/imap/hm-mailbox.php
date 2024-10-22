@@ -18,6 +18,16 @@ class Hm_Mailbox {
     protected $connection;
     protected $selected_folder;
 
+    protected $server_id;
+    protected $user_config;
+    protected $session;
+
+    public function __construct($server_id, $user_config, $session) {
+        $this->server_id = $server_id;
+        $this->user_config = $user_config;
+        $this->session = $session;
+    }
+
     public function connect(array $config) {
         if (array_key_exists('type', $config) && $config['type'] == 'jmap') {
             $this->connection = new Hm_JMAP();
@@ -139,7 +149,25 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->mailbox_subscription($folder, $action);
         } else {
-            // TODO: EWS
+            // emulate folder subscription via settings
+            $config = $this->user_config->get('unsubscribed_folders');
+            if (! isset($config[$this->server_id])) {
+                $config[$this->server_id] = [];
+            }
+            if ($action) {
+                $index = array_search($folder, $config[$this->server_id]);
+                if ($index !== false) {
+                    unset($config[$this->server_id][$index]);
+                }
+            } else {
+                if (! in_array($folder, $config[$this->server_id])) {
+                    $config[$this->server_id][] = $folder;
+                }
+            }
+            $this->user_config->set('unsubscribed_folders', $config);
+            $this->session->set('user_data', $this->user_config->dump());
+            $this->session->record_unsaved('Folder subscription updated');
+            return true;
         }
     }
 
@@ -151,7 +179,7 @@ class Hm_Mailbox {
             return $this->connection->get_mailbox_list($only_subscribed);
         } else {
             // TODO: EWS only_subscribed
-            return $this->connection->get_folders();
+            return $this->connection->get_folders(null, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? []);
         }
     }
 
@@ -163,7 +191,7 @@ class Hm_Mailbox {
             return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input);
         } else {
             // TODO: EWS only_subscribed and with_input
-            return $this->connection->get_folders($folder);
+            return $this->connection->get_folders($folder, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? []);
         }
     }
 

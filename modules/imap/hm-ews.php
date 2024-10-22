@@ -44,7 +44,7 @@ class Hm_EWS {
         return $this->authed;
     }
 
-    public function get_folders($folder = null) {
+    public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = []) {
         $result = [];
         if (empty($folder)) {
             $folder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
@@ -61,9 +61,13 @@ class Hm_EWS {
         $resp = $this->ews->FindFolder($request);
         $folders = $resp->get('folders')->get('folder');
         if ($folders) {
+            $special = $this->get_special_use_folders();
             foreach($folders as $folder) {
                 $id = $folder->get('folderId')->get('id');
                 $name = $folder->get('displayName');
+                if ($only_subscribed && in_array($id, $unsubscribed_folders)) {
+                    continue;
+                }
                 $result[$id] = array(
                     'id' => $id,
                     'parent' => null, // TODO
@@ -78,8 +82,9 @@ class Hm_EWS {
                     'noselect' => false,
                     'can_have_kids' => true,
                     'has_kids' => $folder->get('childFolderCount') > 0,
-                    'special' => true,
-                    'clickable' => true
+                    'special' => in_array($id, $special),
+                    'clickable' => true,
+                    'subscribed' => ! in_array($id, $unsubscribed_folders),
                 );
             }
         }
@@ -87,7 +92,7 @@ class Hm_EWS {
     }
 
     public function get_special_use_folders($folder = false) {
-        $special = array_filter([
+        $special = [
             'trash' => Enumeration\DistinguishedFolderIdNameType::DELETED,
             'sent' => Enumeration\DistinguishedFolderIdNameType::SENT,
             'flagged' => false,
@@ -95,7 +100,16 @@ class Hm_EWS {
             'junk' => Enumeration\DistinguishedFolderIdNameType::JUNK,
             'archive' => false, // TODO: check if Enumeration\DistinguishedFolderIdNameType::ARCHIVEMSGFOLDERROOT should be used - it is outside of MESSAGE_ROOT, however.
             'drafts' => Enumeration\DistinguishedFolderIdNameType::DRAFTS,
-        ]);
+        ];
+        foreach ($special as $type => $folderId) {
+            if ($folderId) {
+                $distinguishedFolder = $this->api->getFolderByDistinguishedId($folderId);
+                if ($distinguishedFolder) {
+                    $special[$type] = $distinguishedFolder->get('folderId')->get('id');
+                }
+            }
+        }
+        $special = array_filter($special);
         if (isset($special[$folder])) {
             return [$folder => $special[$folder]];
         } else {

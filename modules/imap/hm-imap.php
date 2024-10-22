@@ -23,13 +23,17 @@ class Hm_IMAP_List {
     use Hm_Server_List;
 
     public static $use_cache = true;
+    protected static $user_config;
+    protected static $session;
 
     public static function init($user_config, $session) {
         self::initRepo('imap_servers', $user_config, $session, self::$server_list);
+        self::$user_config = $user_config;
+        self::$session = $session;
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_Mailbox();
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session);
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
