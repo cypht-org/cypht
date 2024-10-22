@@ -17,6 +17,7 @@ class Hm_Mailbox {
     protected $type;
     protected $connection;
     protected $selected_folder;
+    protected $folder_state;
 
     protected $server_id;
     protected $user_config;
@@ -198,8 +199,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->folder_state;
         } else {
-            // TODO: check EWS
-            return true;
+            return $this->folder_state;
         }
     }
 
@@ -526,8 +526,8 @@ class Hm_Mailbox {
                 return false;
             }
         } else {
-            $result = $this->get_folder_status($folder);
-            $this->selected_folder = ['id' => $folder, 'name' => $result['name'], 'detail' => []];
+            $this->folder_state = $this->get_folder_status($folder);
+            $this->selected_folder = ['id' => $folder, 'name' => $this->folder_state['name'], 'detail' => []];
         }
         return true;
     }
