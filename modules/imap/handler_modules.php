@@ -750,14 +750,32 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $this->out('can_share_folders', stripos($imap->get_capability(), 'ACL') !== false);
             if (imap_authed($imap)) {
                 $quota_root = $imap->get_quota_root($folder ? $folder : 'INBOX');
-                if ($quota_root && isset($quota_root[0]['name'])) {
-                    $quota = $imap->get_quota($quota_root[0]['name']);
-                    if ($quota) {
-                        $current = floatval($quota[0]['current']);
-                        $max = floatval($quota[0]['max']);
-                        if ($max > 0) {
-                            $this->out('quota', ceil(($current / $max) * 100));
-                            $this->out('quota_max', $max / 1024);
+                if($imap instanceof Hm_JMAP) {
+                    if (!empty($quota_root["methodResponses"][0][1]["list"])) {
+                        $quota = $quota_root["methodResponses"][0][1]["list"][0];
+
+                        if ($quota) {
+                            $used = floatval($quota['used']);
+                            $max = floatval($quota['hardLimit']);
+                            if ($max > 0) {
+                                $quotaPercentage = ceil(($used / $max) * 100);
+                                $quotaMaxInMB = $max / (1024 * 1024);
+                
+                                $this->out('quota', $quotaPercentage);
+                                $this->out('quota_max', $quotaMaxInMB);
+                            }
+                        }
+                    }
+                }else {
+                    if ($quota_root && isset($quota_root[0]['name'])) {
+                        $quota = $imap->get_quota($quota_root[0]['name']);
+                        if ($quota) {
+                            $current = floatval($quota[0]['current']);
+                            $max = floatval($quota[0]['max']);
+                            if ($max > 0) {
+                                $this->out('quota', ceil(($current / $max) * 100));
+                                $this->out('quota_max', $max / 1024);
+                            }
                         }
                     }
                 }
