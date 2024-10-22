@@ -190,8 +190,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input);
         } else {
-            // TODO: EWS only_subscribed and with_input
-            return $this->connection->get_folders($folder, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? []);
+            return $this->connection->get_folders($folder, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? [], $with_input);
         }
     }
 

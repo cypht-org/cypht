@@ -44,7 +44,7 @@ class Hm_EWS {
         return $this->authed;
     }
 
-    public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = []) {
+    public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = [], $with_input = false) {
         $result = [];
         if (empty($folder)) {
             $folder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
@@ -52,7 +52,7 @@ class Hm_EWS {
             $folder = new Type\FolderIdType($folder);
         }
         $request = array(
-            'Traversal' => 'Deep',
+            'Traversal' => 'Shallow',
             'FolderShape' => array(
                 'BaseShape' => 'AllProperties',
             ),
@@ -62,6 +62,9 @@ class Hm_EWS {
         $folders = $resp->get('folders')->get('folder');
         if ($folders) {
             $special = $this->get_special_use_folders();
+            if ($folders instanceof Type\FolderType) {
+                $folders = [$folders];
+            }
             foreach($folders as $folder) {
                 $id = $folder->get('folderId')->get('id');
                 $name = $folder->get('displayName');
@@ -70,20 +73,21 @@ class Hm_EWS {
                 }
                 $result[$id] = array(
                     'id' => $id,
-                    'parent' => null, // TODO
-                    'delim' => false, // TODO - check, might be IMAP-specific
+                    'parent' => $folder->get('parentFolderId')->get('id'),
+                    'delim' => false,
                     'name' => $name,
-                    'name_parts' => [], // TODO - check, might be IMAP-specific
+                    'name_parts' => [],
                     'basename' => $name,
                     'realname' => $name,
-                    'namespace' => '', // TODO - check, might be IMAP-specific
+                    'namespace' => '',
                     // TODO - flags
                     'marked' => false, 
                     'noselect' => false,
                     'can_have_kids' => true,
                     'has_kids' => $folder->get('childFolderCount') > 0,
+                    'children' => $folder->get('childFolderCount'),
                     'special' => in_array($id, $special),
-                    'clickable' => true,
+                    'clickable' => ! $with_input && ! in_array($id, $unsubscribed_folders),
                     'subscribed' => ! in_array($id, $unsubscribed_folders),
                 );
             }
@@ -140,10 +144,12 @@ class Hm_EWS {
 
     public function create_folder($folder, $parent = null) {
         if (empty($parent)) {
-            $parent = Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT;
+            $parent = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+        } else {
+            $parent = new Type\FolderIdType($parent);
         }
         try {
-            return $this->api->createFolders([$folder], new Type\DistinguishedFolderIdType($parent));
+            return $this->api->createFolders([$folder], $parent);
         } catch(Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
@@ -203,13 +209,17 @@ class Hm_EWS {
         // TODO: sort, pagination, search
         $request = Type::buildFromArray($request);
         $result = $this->ews->FindItem($request);
+        $messages = $result->get('items')->get('message') ?? [];
         $itemIds = array_map(function($msg) {
             return $msg->get('itemId')->get('id');
-        }, $result->get('items')->get('message'));
+        }, $messages);
         return [$result->get('totalItemsInView'), $this->get_message_list($itemIds)];
     }
 
     public function get_message_list($itemIds) {
+        if (empty($itemIds)) {
+            return [];
+        }
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties'
