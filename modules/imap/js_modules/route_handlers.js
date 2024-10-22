@@ -5,6 +5,7 @@ function applyImapMessageListPageHandlers(routeParams) {
 
     imap_setup_snooze();
     imap_setup_tags();
+    handleMessagesDragAndDrop();
 
     Hm_Message_List.set_row_events();
 
