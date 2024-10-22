@@ -1364,3 +1364,10 @@ div.unseen,
 .mobile .credentials-container .form-floating {
   margin-bottom: 7px;
 }
+
+.popover {
+  --bs-popover-max-width: 200px;
+  --bs-popover-border-color: var(--bs-primary);
+  --bs-popover-header-bg: var(--bs-primary);
+  --bs-popover-header-color: var(--bs-white);
+}
