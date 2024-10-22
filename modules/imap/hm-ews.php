@@ -28,6 +28,11 @@ class Hm_EWS {
     protected $api;
     protected $authed = false;
 
+    // Extended property tags and their values defined in MS-OXOFLAG, MS-OXPROPS, MS-OXOMSG, MS-OXCMSG specs
+    const PID_TAG_FLAG_STATUS = 0x1090;
+    const PID_TAG_ICON_INDEX = 0x1080;
+    const PID_TAG_ICON_REPLIED = 0x00000105;
+
     public function connect(array $config) {
         try {
             $this->ews = ExchangeWebServices::fromUsernameAndPassword($config['server'], $config['username'], $config['password'], ['version' => ExchangeWebServices::VERSION_2016]);
@@ -204,12 +209,127 @@ class Hm_EWS {
             'ItemShape' => array(
                 'BaseShape' => 'IdOnly'
             ),
+            'IndexedPageItemView' => [
+                'MaxEntriesReturned' => $limit,
+                'Offset' => $offset,
+                'BasePoint' => 'Beginning',
+            ],
             'ParentFolderIds' => $folder->toArray(true)
         );
-        // TODO: sort, pagination, search
+        if (! empty($sort)) {
+            switch ($sort) {
+                case 'ARRIVAL':
+                    $fieldURI = 'item:DateTimeCreated';
+                    break;
+                case 'DATE':
+                    $fieldURI = 'item:DateTimeReceived';
+                    break;
+                case 'CC':
+                    // TODO: figure out a way to sort by something not availalbe in FindItem operation
+                    $fieldURI = null;
+                    break;
+                case 'TO':
+                    // TODO: figure out a way to sort by something not availalbe in FindItem operation
+                    $fieldURI = null;
+                    break;
+                case 'SUBJECT':
+                    $fieldURI = 'item:Subject';
+                    break;
+                case 'FROM':
+                    $fieldURI = 'message:From';
+                    break;
+                case 'SIZE':
+                    $fieldURI = 'item:Size';
+                    break;
+                default:
+                    $fieldURI = null;
+            }
+            if ($fieldURI) {
+                $request['SortOrder'] = [
+                    'FieldOrder' => [
+                        'Order' => $reverse ? 'Descending' : 'Ascending',
+                        'FieldURI' => [
+                            'FieldURI' => $fieldURI,
+                        ],
+                    ]
+                ];
+            }
+        }
+        $qs = [];
+        if (! empty($keyword)) {
+            $qs[] = $keyword;
+        }
+        switch ($flag_filter) {
+            case 'UNSEEN':
+                $qs[] = 'isRead:false';
+                break;
+            case 'UNSEEN':
+                $qs[] = 'isRead:true';
+                break;
+            // TODO:
+            case 'FLAGGED':
+                $qs[] = 'isFlagged:true';
+                break;
+            case 'UNFLAGGED':
+                $qs[] = 'isFlagged:false';
+                break;
+            case 'ANSWERED':
+                $request['Restriction'] = [
+                    'IsEqualTo' => [
+                        'ExtendedFieldURI' => [
+                            'PropertyTag' => self::PID_TAG_ICON_INDEX,
+                            'PropertyType' => 'Integer',
+                        ],
+                        'FieldURIOrConstant' => [
+                            'Constant' => ['Value' => self::PID_TAG_ICON_REPLIED],
+                        ],
+                    ],
+                ];
+                break;
+            case 'UNANSWERED':
+                $request['Restriction'] = [
+                    'IsNotEqualTo' => [
+                        'ExtendedFieldURI' => [
+                            'PropertyTag' => self::PID_TAG_ICON_INDEX,
+                            'PropertyType' => 'Integer',
+                        ],
+                        'FieldURIOrConstant' => [
+                            'Constant' => ['Value' => self::PID_TAG_ICON_REPLIED],
+                        ],
+                    ],
+                ];
+                break;
+                break;
+            case 'ALL':
+            default:
+                // noop
+        }
+        if ($qs && empty($request['Restriction'])) {
+            $request['QueryString'] = implode(' ', $qs);
+        } elseif ($keyword && ! empty($request['Restriction'])) {
+            $restriction = ['And' => $request['Restriction']];
+            $restriction['And']['Or'] = [
+                [
+                    'Contains' => [
+                        'FieldURI' => ['FieldURI' => 'item:Subject'],
+                        'Constant' => ['Value' => $keyword],
+                    ],
+                ],
+                [
+                    'Contains' => [
+                        'FieldURI' => ['FieldURI' => 'item:Body'],
+                        'Constant' => ['Value' => $keyword],
+                    ],
+                ],
+            ];
+            $request['Restriction'] = $restriction;
+        }
         $request = Type::buildFromArray($request);
         $result = $this->ews->FindItem($request);
         $messages = $result->get('items')->get('message') ?? [];
+        if ($messages instanceof Type\MessageType) {
+            $messages = [$messages];
+        }
         $itemIds = array_map(function($msg) {
             return $msg->get('itemId')->get('id');
         }, $messages);
@@ -222,7 +342,19 @@ class Hm_EWS {
         }
         $request = array(
             'ItemShape' => array(
-                'BaseShape' => 'AllProperties'
+                'BaseShape' => 'AllProperties',
+                'AdditionalProperties' => [
+                    'ExtendedFieldURI' => [
+                        [
+                        'PropertyTag' => self::PID_TAG_FLAG_STATUS, //check flagged msg
+                        'PropertyType' => 'Integer',
+                        ],
+                        [
+                            'PropertyTag' => self::PID_TAG_ICON_INDEX, // check if replied/answered
+                            'PropertyType' => 'Integer',
+                        ],
+                    ],
+                ],
             ),
             'ItemIds' => [
                 'ItemId' => array_map(function($id) {
@@ -232,15 +364,31 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $result = $this->ews->GetItem($request);
+        if ($result instanceof Type\MessageType) {
+            $result = [$result];
+        }
         $messages = [];
         foreach ($result as $message) {
-            // TODO: EWS - check \Answered, \Flagged, \Deleted flags
+            // note about flags: EWS - doesn't support the \Deleted flag
             $flags = [];
             if ($message->get('isRead')) {
                 $flags[] = '\\Seen';
             }
             if ($message->get('isDraft')) {
                 $flags[] = '\\Draft';
+            }
+            if ($extended_properties = $message->get('extendedProperty')) {
+                if ($extended_properties instanceof Type\ExtendedPropertyType) {
+                    $extended_properties = [$extended_properties];
+                }
+                foreach ($extended_properties as $prop) {
+                    if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_FLAG_STATUS && $prop->get('value') > 0) {
+                        $flags[] = '\\Flagged';
+                    }
+                    if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_ICON_INDEX && $prop->get('value') == self::PID_TAG_ICON_REPLIED) {
+                        $flags[] = '\\Answered';
+                    }
+                }
             }
             $uid = bin2hex($message->get('itemId')->get('id'));
             $msg = [
