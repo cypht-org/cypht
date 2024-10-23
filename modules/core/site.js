@@ -986,14 +986,14 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function() {
+    this.prev_next_links = function(msgUid) {
         let phref;
         let nhref;
         const target = $('.msg_headers tr').last();
         const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
         messages.load(false, true);
-        const next = messages.getNextRowForMessage(getMessageUidParam());
-        const prev = messages.getPreviousRowForMessage(getMessageUidParam());
+        const next = messages.getNextRowForMessage(msgUid);
+        const prev = messages.getPreviousRowForMessage(msgUid);
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject');
             phref = prevSubject.find('a').prop('href');
