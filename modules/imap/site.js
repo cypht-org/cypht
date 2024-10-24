@@ -1362,21 +1362,80 @@ var add_email_in_contact_trusted = function(list_email) {
         }
       );
     }
-  };
+};
+
+var list_blocked_senders = [];
+get_liste_block_sieve(Hm_Utils.parse_folder_path(hm_list_path()));
+
+function get_liste_block_sieve(detail) {
+    var page = hm_page_name();
+    if (page == 'message_list') {
+        Hm_Ajax.request(
+            [
+                { name: 'hm_ajax_hook', value: 'ajax_liste_block_sieve' },
+                { name: 'imap_server_id', 'value': detail.server_id},
+            ],
+            function (res) {
+                if (res.ajax_liste_block_sieve) {
+                    list_blocked_senders = res.ajax_liste_block_sieve;
+                }
+            }
+        );
+    }
+};
 
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 
 $('.screen-email-like').on("click", function() {
     var list_email = [];
+    var list_msg_uid = [];
+    var email_existing_in_blocked_senders = [];
     $('input[type=checkbox]').each(function() {
         if (this.checked && this.id.search('imap') != -1) {
             let email = $('.'+ this.id +' .from').attr("data-title")
             if (email = email.trim()) {
                 list_email.push(email);
+                if (list_blocked_senders) {
+                    Object.keys(list_blocked_senders).forEach(key => {
+                        if (list_blocked_senders[key] === email) {
+                            email_existing_in_blocked_senders.push(email);
+                            list_msg_uid.push($(this).parent().parent().attr("data-uid"));
+                            delete list_blocked_senders[key];
+                        }
+                    });
+                }
             }
         }
     });
-    add_email_in_contact_trusted(list_email); return false;
+
+    if (email_existing_in_blocked_senders) {
+        var list_html = "<ol>";
+        email_existing_in_blocked_senders.forEach(sender => {
+            sender = sender.trim();
+            list_html += `<li>${sender}</li>`;
+        });
+        list_html += "</ol>";
+        const modal = new Hm_Modal({
+            modalId: 'emptySubjectBodyModal',
+            title: 'Warning',
+            btnSize: 'sm'
+        });
+
+        var modalContentHeadline = "Adress mail exist in your Block list";
+        modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
+        modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
+        modal.open();
+        function handleAddEmail() {
+            list_msg_uid.forEach(function(msg_uid) {
+                block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(hm_list_path()), 'sender', 'unblocked');
+            });
+            modal.hide();
+            add_email_in_contact_trusted(list_email);
+        };
+    } else {
+        add_email_in_contact_trusted(list_email);
+    }
+    return false;
 });
 
 $(document).on('click', '[data-bs-dismiss="modal"]', function() {
