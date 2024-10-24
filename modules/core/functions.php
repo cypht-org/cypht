@@ -290,7 +290,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
             $result = $callback($form[$type]);
         }
         else {
-            $result = $default;
+            $result = $form[$type];
         }
         $new_settings[$type.'_setting'] = $result;
     }

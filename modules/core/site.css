@@ -1359,6 +1359,13 @@ div.unseen,
   margin-bottom: 7px;
 }
 
+.setting_description {
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--bs-secondary) !important;
+}
+
 .popover {
   --bs-popover-max-width: 200px;
   --bs-popover-border-color: var(--bs-primary);
