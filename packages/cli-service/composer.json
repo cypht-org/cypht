@@ -1,0 +1,31 @@
+{
+    "name": "cypht/cli-service",
+    "description": "A package that integrates with Cypht webmail to provide real-time email notifications using WebSockets and an event-driven scheduler system. It leverages Symfony's console commands and Ratchet for handling WebSocket connections.",
+    "type": "library",
+    "require": {
+        "symfony/console": "^5.3 || ^6.0",
+        "php-di/php-di": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Cypht\\Service\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Steven Ngesera",
+            "email": "muhngesteven@gmail.com"
+        }
+    ],
+    "version": "1.0.0",
+    "minimum-stability": "dev"
+}
