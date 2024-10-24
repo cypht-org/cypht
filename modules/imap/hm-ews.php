@@ -14,6 +14,7 @@
 use garethp\ews\API\Enumeration;
 use garethp\ews\API\Exception;
 use garethp\ews\API\ExchangeWebServices;
+use garethp\ews\API\ItemUpdateBuilder;
 use garethp\ews\API\Type;
 use garethp\ews\MailAPI;
 
@@ -30,6 +31,7 @@ class Hm_EWS {
 
     // Extended property tags and their values defined in MS-OXOFLAG, MS-OXPROPS, MS-OXOMSG, MS-OXCMSG specs
     const PID_TAG_FLAG_STATUS = 0x1090;
+    const PID_TAG_FLAG_FLAGGED = 0x00000002;
     const PID_TAG_ICON_INDEX = 0x1080;
     const PID_TAG_ICON_REPLIED = 0x00000105;
 
@@ -346,8 +348,8 @@ class Hm_EWS {
                 'AdditionalProperties' => [
                     'ExtendedFieldURI' => [
                         [
-                        'PropertyTag' => self::PID_TAG_FLAG_STATUS, //check flagged msg
-                        'PropertyType' => 'Integer',
+                            'PropertyTag' => self::PID_TAG_FLAG_STATUS, //check flagged msg
+                            'PropertyType' => 'Integer',
                         ],
                         [
                             'PropertyTag' => self::PID_TAG_ICON_INDEX, // check if replied/answered
@@ -430,6 +432,76 @@ class Hm_EWS {
             $messages[$uid] = $msg;
         }
         return $messages;
+    }
+
+    public function message_action($action, $itemIds, $folder=false, $keyword=false) {
+        if (empty($itemIds)) {
+            return true;
+        }
+        if (! is_array($itemIds)) {
+            $itemIds = [$itemIds];
+        }
+        switch ($action) {
+            case 'READ':
+                $change = ItemUpdateBuilder::buildUpdateItemChanges('Message', 'message', ['IsRead' => true]);
+                break;
+            case 'UNREAD':
+                $change = ItemUpdateBuilder::buildUpdateItemChanges('Message', 'message', ['IsRead' => false]);
+                break;
+            case 'FLAG':
+                $change = [
+                    'SetItemField' => [
+                        'ExtendedFieldURI' => [
+                            'PropertyTag' => self::PID_TAG_FLAG_STATUS,
+                            'PropertyType' => 'Integer',
+                        ],
+                        'Message' => [
+                            'ExtendedProperty' => [
+                                'ExtendedFieldURI' => [
+                                    'PropertyTag' => self::PID_TAG_FLAG_STATUS,
+                                    'PropertyType' => 'Integer',
+                                ],
+                                'Value' => self::PID_TAG_FLAG_FLAGGED,
+                            ],
+                        ],
+                    ],
+                ];
+                break;
+            case 'UNFLAG':
+                $change = [
+                    'DeleteItemField' => [
+                        'ExtendedFieldURI' => [
+                            'PropertyTag' => self::PID_TAG_FLAG_STATUS,
+                            'PropertyType' => 'Integer',
+                        ],
+                    ],
+                ];
+                break;
+            case 'ARCHIVE':
+            case 'ANSWERED':
+            case 'DELETE':
+            case 'UNDELETE':
+            case 'CUSTOM':
+                // TODO: unsupported out of the box, we can emulate via custom extended properties
+                break;
+            default:
+                $change = null;
+        }
+
+        $changes = ['ItemChange' => []];
+        foreach ($itemIds as $itemId) {
+            $changes['ItemChange'][] = [
+                'ItemId' => (new Type\ItemIdType(hex2bin($itemId)))->toArray(),
+                'Updates' => $change,
+            ];
+        }
+        $items = $this->api->updateItems($changes);
+
+        if ($items) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function get_message_headers($itemId) {
