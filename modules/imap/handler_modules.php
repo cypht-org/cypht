@@ -852,9 +852,19 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     list($total, $results) = $imap->get_mailbox_page(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
                 }
                 foreach ($results as $msg) {
+                    // echo "<pre>"; var_dump($msg); die;
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
                     $msg['folder'] = $form['folder'];
+                    // $uid = $msg['uid'];
+                    // $part = true;
+                    // $max = 87;
+                    // $msg_struct = $imap->get_message_structure($uid);
+                    // $struct = $imap->search_bodystructure($msg_struct, array('imap_part_number' => $part));
+                    // $msg_struct_current = array_shift($struct);
+                    // $msg_text = $imap->get_message_content($uid, $part, $max, $msg_struct_current);
+                    // // $msg['preview_msg'] = "xxxxxxx";
+                    // $msg['preview_msg'] = $msg_text;
                     $msgs[] = $msg;
                 }
                 if ($imap->selected_mailbox) {
@@ -2275,3 +2285,4 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
+
