@@ -1,0 +1,22 @@
+#!/usr/bin/env php
+<?php
+define('SKIP_HM_DISPATCH', true);
+
+
+// Load the application dependencies and bootstrap the application
+require_once __DIR__ . '/index.php';
+
+
+use Symfony\Component\Console\Application;
+use Cypht\Service\Providers\CommandServiceProvider;
+
+$container = require __DIR__ . '/packages/cli-service/bootstrap.php';
+
+$application = new Application('Cypht Console', '1.0');
+
+// Register commands automatically using the service provider
+$commandServiceProvider = new CommandServiceProvider();
+$commandServiceProvider->register($application, $container);
+
+// Run the console application
+$application->run();
