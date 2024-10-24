@@ -4,8 +4,10 @@
 #### Cypht
 [https://cypht.org](https://cypht.org)
 
-All your E-mail, from all your accounts, in one place. Cypht is like a news 
-reader, but for E-mail. Cypht does not replace your existing accounts - it 
+All your email, from all your accounts, in one place. Supports IMAP/SMTP, 
+[JMAP](https://github.com/cypht-org/cypht/issues/180) and 
+[soon EWS](https://github.com/cypht-org/cypht/issues/247). Cypht is like a 
+news reader, but for E-mail. Cypht does not replace your existing accounts - it 
 combines them into one. And it's also a news reader.
 
 ![screenshot](https://github.com/cypht-org/cypht-website/blob/master/img/Inbox.PNG "Inbox View").
