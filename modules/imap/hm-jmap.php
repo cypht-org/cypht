@@ -69,7 +69,8 @@ class Hm_JMAP {
     );
     private $default_caps = array(
         'urn:ietf:params:jmap:core',
-        'urn:ietf:params:jmap:mail'
+        'urn:ietf:params:jmap:mail',
+        'urn:ietf:params:jmap:quota'
     );
 
     public $selected_mailbox;
@@ -376,6 +377,28 @@ class Hm_JMAP {
         return $this->parse_folder_list_by_level($level);
     }
 
+    public function get_quota_root($mailbox) { 
+        if (!is_array($this->session)) {
+            throw new Exception("Not authenticated. Please authenticate first.");
+        }
+        $methods = [
+            [
+                "Quota/get",
+                [
+                    "accountId"=> (string)$this->account_id,
+                    "name"     => $this->session['username'],
+                    "scope"    => "folder",
+                    "folder"   => $mailbox
+                ],
+                "0"
+            ]
+        ];
+        $response = $this->send_command($this->session['apiUrl'], $methods, 'POST');
+        return $response;
+    }
+    public function get_capability() {
+        //TODO: Implement
+    }
     /**
      * Return cached data
      * @return array
@@ -452,7 +475,7 @@ class Hm_JMAP {
         $methods = array(array(
             'Mailbox/get',
             array(
-                'accountId' => $this->account_id,
+                'accountId' => (string)$this->account_id,
                 'ids' => NULL
             ),
             'fl'
