@@ -846,51 +846,61 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         }
 
         $archive_folder = false;
+        $form_folder = hex2bin($form['folder']);
         $errors = 0;
+        $status = null;
 
         $specials = get_special_folders($this, $form['imap_server_id']);
         if (array_key_exists('archive', $specials) && $specials['archive']) {
             $archive_folder = $specials['archive'];
         }
-        if (!$archive_folder) {
-            Hm_Msgs::add('No archive folder configured for this IMAP server');
-            $errors++;
-        }
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
-        if (! $errors && $mailbox && $mailbox->authed()) {
-            $archive_exists = count($mailbox->get_folder_status($archive_folder));
-            if (!$archive_exists) {
-                Hm_Msgs::add('Configured archive folder for this IMAP server does not exist');
+        if ($mailbox && ! $mailbox->is_imap() && empty($archive_folder)) {
+            // EWS supports archiving to user archive folders
+            $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']));
+        } else {
+            if (!$archive_folder) {
+                Hm_Msgs::add('No archive folder configured for this IMAP server');
                 $errors++;
             }
 
-            $form_folder = hex2bin($form['folder']);
+            if (! $errors && $mailbox && $mailbox->authed()) {
+                $archive_exists = count($mailbox->get_folder_status($archive_folder));
+                if (!$archive_exists) {
+                    Hm_Msgs::add('Configured archive folder for this IMAP server does not exist');
+                    $errors++;
+                }
 
-            /* path according to original option setting */
-            if ($this->user_config->get('original_folder_setting', false)) {
-                $archive_folder .= '/' . $form_folder;
-                if (!count($mailbox->get_folder_status($archive_folder))) {
-                    if (! $mailbox->create_folder($archive_folder)) {
-                        $debug = $mailbox->get_debug();
-                        if (! empty($debug['debug'])) {
-                            Hm_Msgs::add('ERR' . array_pop($debug['debug']));
-                        } else {
-                            Hm_Msgs::add('ERRCould not create configured archive folder for the original folder of the message');
+                /* path according to original option setting */
+                if ($this->user_config->get('original_folder_setting', false)) {
+                    $archive_folder .= '/' . $form_folder;
+                    if (!count($mailbox->get_folder_status($archive_folder))) {
+                        if (! $mailbox->create_folder($archive_folder)) {
+                            $debug = $mailbox->get_debug();
+                            if (! empty($debug['debug'])) {
+                                Hm_Msgs::add('ERR' . array_pop($debug['debug']));
+                            } else {
+                                Hm_Msgs::add('ERRCould not create configured archive folder for the original folder of the message');
+                            }
+                            $errors++;
                         }
-                        $errors++;
                     }
                 }
-            }
 
-            /* try to move the message */
-            if (! $errors && $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $archive_folder)) {
-                Hm_Msgs::add("Message archived");
-            }
-            else {
-                Hm_Msgs::add('ERRAn error occurred archiving the message');
+                /* try to move the message */
+                if (! $errors) {
+                    $status = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $archive_folder);
+                }
             }
         }
+
+        if ($status) {
+            Hm_Msgs::add("Message archived");
+        } else {
+            Hm_Msgs::add('ERRAn error occurred archiving the message');
+        }
+
         $this->save_hm_msgs();
     }
 }
@@ -1073,7 +1083,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                             if (array_key_exists('trash', $specials)) {
                                 if ($specials['trash']) {
                                     $trash_folder = $specials['trash'];
-                                } else {
+                                } elseif ($mailbox->is_imap()) {
                                     Hm_Msgs::add(sprintf('ERRNo trash folder configured for %s', $server_details['name']));
                                 }
                             }
@@ -1082,7 +1092,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                             if(array_key_exists('archive', $specials)) {
                                 if($specials['archive']) {
                                     $archive_folder = $specials['archive'];
-                                } else {
+                                } elseif ($mailbox->is_imap()) {
                                     Hm_Msgs::add(sprintf('ERRNo archive folder configured for %s', $server_details['name']));
                                 }
                             }

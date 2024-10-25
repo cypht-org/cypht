@@ -341,20 +341,18 @@ class Hm_Mailbox {
         if (! $this->select_folder($folder)) {
             return;
         }
-        if ($this->is_imap()) {
-            if ($trash_folder && $trash_folder != $folder) {
-                if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)) {
-                    return true;
-                }
+        if ($trash_folder && $trash_folder != $folder) {
+            if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)) {
+                return true;
             }
-            else {
-                if ($this->connection->message_action('DELETE', array($msg_id))) {
+        }
+        else {
+            if ($this->connection->message_action('DELETE', array($msg_id))) {
+                if ($this->is_imap()) {
                     $this->connection->message_action('EXPUNGE', array($msg_id));
-                    return true;
                 }
+                return true;
             }
-        } else {
-            // TODO: EWS
         }
         return false;
     }

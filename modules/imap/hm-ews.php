@@ -399,7 +399,7 @@ class Hm_EWS {
                 'internal_date' => $message->get('dateTimeCreated'),
                 'size' => $message->get('size'),
                 'date' => $message->get('dateTimeReceived'),
-                'from' => $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>',
+                'from' => $this->extract_mailbox($message->get('from')),
                 'to' => $this->extract_mailbox($message->get('toRecipients')),
                 'subject' => $message->get('subject'),
                 'content-type' => null,
@@ -442,6 +442,14 @@ class Hm_EWS {
             $itemIds = [$itemIds];
         }
         switch ($action) {
+            case 'ARCHIVE':
+                return $this->archive_items($itemIds);
+            case 'DELETE':
+                return $this->delete_items($itemIds);
+            case 'COPY':
+                return $this->copy_items($itemIds, $folder);
+            case 'MOVE':
+                return $this->move_items($itemIds, $folder);
             case 'READ':
                 $change = ItemUpdateBuilder::buildUpdateItemChanges('Message', 'message', ['IsRead' => true]);
                 break;
@@ -477,31 +485,31 @@ class Hm_EWS {
                     ],
                 ];
                 break;
-            case 'ARCHIVE':
             case 'ANSWERED':
-            case 'DELETE':
             case 'UNDELETE':
             case 'CUSTOM':
                 // TODO: unsupported out of the box, we can emulate via custom extended properties
+                $change = null;
                 break;
+            case 'EXPUNGE':
+                // IMAP-only, not supported or needed by EWS
+                return true;
             default:
                 $change = null;
         }
 
-        $changes = ['ItemChange' => []];
-        foreach ($itemIds as $itemId) {
-            $changes['ItemChange'][] = [
-                'ItemId' => (new Type\ItemIdType(hex2bin($itemId)))->toArray(),
-                'Updates' => $change,
-            ];
+        if ($change) {
+            $changes = ['ItemChange' => []];
+            foreach ($itemIds as $itemId) {
+                $changes['ItemChange'][] = [
+                    'ItemId' => (new Type\ItemIdType(hex2bin($itemId)))->toArray(),
+                    'Updates' => $change,
+                ];
+            }
+            return $this->api->updateItems($changes);
         }
-        $items = $this->api->updateItems($changes);
 
-        if ($items) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     public function get_message_headers($itemId) {
@@ -715,8 +723,10 @@ class Hm_EWS {
                 $result[] = $this->extract_mailbox($mailbox);
             }
             return $result;
-        } elseif (is_object($data)) {
+        } elseif (is_object($data) && $data->Mailbox) {
             return $data->Mailbox->get('name') . ' <' . $data->Mailbox->get('emailAddress') . '>';
+        } elseif (is_object($data) && $data->get('mailbox')) {
+            return $data->get('mailbox')->get('name') . ' <' . $data->get('mailbox')->get('emailAddress') . '>';
         } else {
             return (string) $data;
         }
@@ -726,5 +736,77 @@ class Hm_EWS {
         $oClass = new ReflectionClass(new Enumeration\DistinguishedFolderIdNameType());
         $constants = $oClass->getConstants();
         return in_array($folder, $constants);
+    }
+
+    protected function archive_items($itemIds) {
+        // TODO: update underlying lib to support ArchiveItem and newer services.wsdl file (better get the wsdl from the actual server)
+        $request = [
+            'ArchiveSourceFolderId' => (new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_INBOX))->toArray(true),
+            'ItemIds' => [
+                'ItemId' => array_map(function($itemId) {
+                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                }, $itemIds),
+            ]
+        ];
+        $request = Type::buildFromArray($request);
+        try {
+            $result = $this->ews->ArchiveItem($request);
+        } catch (Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
+            $result = false;
+        }
+        return $result;
+    }
+
+    protected function delete_items($itemIds) {
+        try {
+            // TODO: use HardDelete type for items stored in deleted items or trash folder
+            $result = $this->api->deleteItems(array_map(function($itemId) {
+                return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+            }, $itemIds));
+        } catch (Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
+            $result = false;
+        }
+        return $result;
+    }
+
+    protected function copy_items($itemIds, $folder) {
+        $request = [
+            'ToFolderId' => (new Type\FolderIdType($folder))->toArray(true),
+            'ItemIds' => [
+                'ItemId' => array_map(function($itemId) {
+                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                }, $itemIds),
+            ]
+        ];
+        $request = Type::buildFromArray($request);
+        try {
+            $result = $this->ews->CopyItem($request);
+        } catch (Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
+            $result = false;
+        }
+        return $result;
+    }
+
+    protected function move_items($itemIds, $folder) {
+        $request = [
+            'ToFolderId' => (new Type\FolderIdType($folder))->toArray(true),
+            'ItemIds' => [
+                'ItemId' => array_map(function($itemId) {
+                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                }, $itemIds),
+            ],
+            'ReturnNewItemIds' => false,
+        ];
+        $request = Type::buildFromArray($request);
+        try {
+            $result = $this->ews->MoveItem($request);
+        } catch (Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
+            $result = false;
+        }
+        return $result;
     }
 }
