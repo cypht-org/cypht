@@ -619,8 +619,26 @@ function check_file_upload($request, $key) {
     return true;
 }}
 
-if (!hm_exists('get_nexter_date')) {
-function get_nexter_date($format, $only_label = false) {
+function privacy_setting_callback($val, $key, $mod) {
+    $setting = Hm_Output_privacy_settings::$settings[$key];
+    $key .= '_setting';
+    $user_setting = $mod->user_config->get($key);
+    $update = $mod->request->post['update'];
+
+    if ($update) {
+        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        $mod->user_config->set($key, $val);
+
+        $user_data = $mod->session->get('user_data', array());
+        $user_data[$key] = $val;
+        $mod->session->set('user_data', $user_data);
+        $mod->session->record_unsaved('Privacy settings updated');
+    }
+    return $val;
+}
+
+if (!hm_exists('get_scheduled_date')) {
+function get_scheduled_date($format, $only_label = false) {
     if ($format == 'later_in_day') {
         $date_string = 'today 18:00';
         $label = 'Later in the day';
@@ -675,7 +693,7 @@ function schedule_dropdown($output, $send_now = false) {
     }
     $txt .= '<ul class="dropdown-menu nexter_dropdown schedule_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
-        $labels = get_nexter_date($format, true);
+        $labels = get_scheduled_date($format, true);
         $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';

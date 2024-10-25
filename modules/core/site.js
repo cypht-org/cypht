@@ -1789,18 +1789,6 @@ var hasLeadingOrTrailingSpaces = function(str) {
     return str !== str.trim();
 };
 
-var sprintf = function(format, ...args) {
-    let i = 0;
-    return format.replace(/%([sd])/g, (match, type) => {
-        let arg = args[i++];
-        switch (type) {
-            case 's': return String(arg);
-            case 'd': return Number(arg);
-            default: return match;
-        }
-    });
-}
-
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
@@ -1847,13 +1835,7 @@ $(function() {
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
-
-    if (hm_page_name() == 'home') {
-        $('.pw_update').on("click", function() { update_password($(this).data('id')); });
-    }
-    if (hm_page_name() == 'servers') {
-        $('.edit_server_connection').on('click', imap_smtp_edit_action);
-    }
+    
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -2411,7 +2393,7 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
     }
 };
 
-var setup_nexter_date = function(callback) {
+function setupNexterDate(callback) {
     $(document).on('click', '.nexter_date_picker', function(e) {
         document.querySelector('.nexter_input_date').showPicker();
     });

@@ -1154,7 +1154,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
         $snooze_tag = null;
         if ($form['imap_snooze_until'] != 'unsnooze') {
             $at = date('D, d M Y H:i:s O');
-            $until = get_nexter_date($form['imap_snooze_until']);
+            $until = get_scheduled_date($form['imap_snooze_until']);
             $snooze_tag = "X-Snoozed: at $at; until $until";
         }
         $ids = explode(',', $form['imap_snooze_ids']);

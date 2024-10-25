@@ -1470,7 +1470,7 @@ function snooze_dropdown($output, $unsnooze = false) {
                 <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
                 <ul class="dropdown-menu nexter_dropdown snooze_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
-        $labels = get_nexter_date($format, true);
+        $labels = get_scheduled_date($format, true);
         $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';
