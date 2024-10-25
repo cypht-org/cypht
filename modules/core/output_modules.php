@@ -2415,10 +2415,11 @@ class Hm_Output_server_config_stepper_accordion_end_part extends Hm_Output_Modul
 
 class Hm_Output_privacy_settings extends Hm_Output_Module {
     static $settings = [
-        'images_white_list' => [
+        'images_whitelist' => [
             'type' => 'text',
             'label' => 'External images whitelist',
             'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
+            'separator' => ','
         ]
     ];
 

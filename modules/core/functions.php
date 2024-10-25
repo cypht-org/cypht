@@ -287,10 +287,10 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
 
     if ($success) {
         if (function_exists($callback)) {
-            $result = $callback($form[$type]);
+            $result = $callback($form[$type], $type, $handler);
         }
         else {
-            $result = $form[$type];
+            $result = $default;
         }
         $new_settings[$type.'_setting'] = $result;
     }
@@ -623,3 +623,17 @@ function check_file_upload($request, $key) {
     }
     return true;
 }}
+
+function privacy_setting_callback($val, $key, $mod) {
+    $setting = Hm_Output_privacy_settings::$settings[$key];
+    $user_setting = $mod->user_config->get("$key\_setting", '');
+    $update = $mod->request->post['update'];
+
+    if ($update) {
+        // TODO: FIX - the updated setting doesn't get saved.
+        $val = $user_setting . ($setting['separator'] ?? '') . $val;
+    }
+    Hm_Msgs::add('updating privacy to value: ' . $val);
+    Hm_Msgs::add('User settings: ' . json_encode($mod->get('user_settings')));
+    return $val;
+}

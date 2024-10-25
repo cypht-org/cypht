@@ -2483,7 +2483,8 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
+    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
@@ -2532,13 +2533,15 @@ const handleExternalResources = (inline) => {
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            Hm_Utils.save_to_local_storage(sender, 1);
-            $('.msg_text_inner').remove();
-            if (inline) {
-                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-            } else {
-                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-            }
+            // Hm_Utils.save_to_local_storage(sender, 1);
+            addSenderToImagesWhitelist(senderEmail).then(() => {
+                $('.msg_text_inner').remove();
+                if (inline) {
+                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+                } else {
+                    get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+                }
+            })
         });
     }
 

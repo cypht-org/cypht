@@ -2023,6 +2023,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             }
 
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
+            $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
 
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);

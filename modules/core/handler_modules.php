@@ -1152,7 +1152,7 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
     public function process() {
         $settings = Hm_Output_privacy_settings::$settings;
         foreach ($settings as $key => $setting) {
-            process_site_setting($key, $this);
+            process_site_setting($key, $this, 'privacy_setting_callback');
         }
     }
 }

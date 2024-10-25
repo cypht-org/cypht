@@ -185,6 +185,10 @@ add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
 add_handler('ajax_quick_servers_setup', 'date', true, 'core');
 add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
 
+/* privacy settings control */
+setup_base_ajax_page('ajax_privacy_settings', 'core');
+add_handler('ajax_privacy_settings', 'privacy_settings',  true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -204,6 +208,7 @@ return array(
         'notfound',
         'search',
         'ajax_quick_servers_setup',
+        'ajax_privacy_settings'
     ),
     'allowed_output' => array(
         'date' => array(FILTER_DEFAULT, false),
@@ -221,7 +226,7 @@ return array(
         'page_links' => array(FILTER_UNSAFE_RAW, false),
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_DEFAULT, false),
-        'imap_service_name' => array(FILTER_DEFAULT, false),
+        'imap_service_name' => array(FILTER_DEFAULT, false)
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_DEFAULT,
@@ -340,6 +345,7 @@ return array(
         'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_address' => FILTER_DEFAULT,
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
-        'images_white_list' => FILTER_DEFAULT,
+        'images_whitelist' => FILTER_DEFAULT,
+        'update' => FILTER_VALIDATE_BOOLEAN,
     )
 );
