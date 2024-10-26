@@ -1,12 +1,12 @@
 <?php
 
-namespace Cypht\Service\Commands;
+namespace Services\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CheckMailCommand extends BaseCommand
+class Hm_CheckMailCommand extends Hm_BaseCommand
 {
     /**
      * The name of the command.

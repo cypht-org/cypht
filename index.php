@@ -49,9 +49,7 @@ if (!$config->get('disable_ini_settings')) {
     require APP_PATH.'lib/ini_set.php';
 }
 /* process the request */
-if (!defined('SKIP_HM_DISPATCH')) {
-    new Hm_Dispatch($config);
-}
+new Hm_Dispatch($config);
 
 /* log some debug stats about the page */
 if (DEBUG_MODE) {

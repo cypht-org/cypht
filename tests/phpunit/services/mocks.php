@@ -1,8 +1,6 @@
 <?php
 
-namespace Tests\Mocks;
-
-use Cypht\Service\Commands\BaseCommand;
+use Services\Commands\Hm_BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * TestCommand is a mock command for testing BaseCommand functionalities.
  */
-class TestCommand extends BaseCommand
+class Hm_TestCommand extends Hm_BaseCommand
 {
     /**
      * The name of the command (e.g., "test:command").

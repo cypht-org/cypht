@@ -1,12 +1,12 @@
 <?php
 
-namespace Cypht\Service\Providers;
+namespace Services\Providers;
 
 use Psr\Container\ContainerInterface;
+use Services\Commands\Hm_BaseCommand;
 use Symfony\Component\Console\Application;
-use Cypht\Service\Commands\BaseCommand;
 
-class CommandServiceProvider
+class Hm_CommandServiceProvider
 {
     /**
      * Register commands in the application.
@@ -16,13 +16,13 @@ class CommandServiceProvider
      */
     public function register(Application $application, ContainerInterface $container): void
     {
-        $commandNamespace = 'Cypht\Service\Commands';
+        $commandNamespace = 'Services\Commands';
         $commandFiles = glob(__DIR__ . '/../Commands/*.php');
 
         foreach ($commandFiles as $file) {
             $className = $commandNamespace . '\\' . basename($file, '.php');
 
-            if (class_exists($className) && is_subclass_of($className, BaseCommand::class)) {
+            if (class_exists($className) && is_subclass_of($className, Hm_BaseCommand::class)) {
                 $command = new $className($container);
                 $application->add($command);
             }

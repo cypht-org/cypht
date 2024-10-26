@@ -1,8 +1,8 @@
 <?php
 
-namespace Cypht\Service\Events;
+namespace Services\Events;
 
-abstract class BaseEvent
+abstract class Hm_BaseEvent
 {
     protected array $payload;
 
