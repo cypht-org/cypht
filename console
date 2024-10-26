@@ -1,21 +1,53 @@
 #!/usr/bin/env php
 <?php
-define('SKIP_HM_DISPATCH', true);
-
-
 // Load the application dependencies and bootstrap the application
-require_once __DIR__ . '/index.php';
+define('APP_PATH', '');
+define('VENDOR_PATH', APP_PATH.'vendor/');
+define('CONFIG_PATH', APP_PATH.'config/');
+define('WEB_ROOT', '');
+define('ASSETS_THEMES_ROOT', '');
+define('DEBUG_MODE', true);
+define('CACHE_ID', '');
+define('SITE_ID', '');
+define('JS_HASH', '');
+define('CSS_HASH', '');
+
+/* show all warnings in debug mode */
+if (DEBUG_MODE) {
+    error_reporting(E_ALL);
+}
+
+/* don't let anything output content until we are ready */
+ob_start();
+
+require VENDOR_PATH.'autoload.php';
+/* get includes */
+require APP_PATH.'lib/framework.php';
+$environment = Hm_Environment::getInstance();
+$environment->load();
+
+/* get configuration */
+$config = new Hm_Site_Config_File();
+/* set default TZ */
+date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
+/* set the default since and per_source values */
+$environment->define_default_constants($config);
+
+/* setup ini settings */
+if (!$config->get('disable_ini_settings')) {
+    require APP_PATH.'lib/ini_set.php';
+}
 
 
 use Symfony\Component\Console\Application;
-use Cypht\Service\Providers\CommandServiceProvider;
+use Services\Providers\Hm_CommandServiceProvider;
 
-$container = require __DIR__ . '/packages/cli-service/bootstrap.php';
+$container = require __DIR__ . '/services/Hm_bootstrap.php';
 
 $application = new Application('Cypht Console', '1.0');
 
 // Register commands automatically using the service provider
-$commandServiceProvider = new CommandServiceProvider();
+$commandServiceProvider = new Hm_CommandServiceProvider();
 $commandServiceProvider->register($application, $container);
 
 // Run the console application

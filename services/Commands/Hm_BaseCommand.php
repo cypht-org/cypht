@@ -1,6 +1,6 @@
 <?php
 
-namespace Cypht\Service\Commands;
+namespace Services\Commands;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * BaseCommand provides common functionality for all console commands.
  */
-abstract class BaseCommand extends Command
+abstract class Hm_BaseCommand extends Command
 {
     /**
      * @var ContainerInterface

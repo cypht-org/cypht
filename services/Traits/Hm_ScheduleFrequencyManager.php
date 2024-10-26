@@ -1,9 +1,9 @@
 <?php
 
-namespace Cypht\Service\Traits;
+namespace Services\Traits;
 
 
-trait ScheduleFrequencyManager
+trait Hm_ScheduleFrequencyManager
 {
     /**
      * The expression representing the event's frequency.

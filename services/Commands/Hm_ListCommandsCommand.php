@@ -1,6 +1,6 @@
 <?php
 
-namespace Cypht\Service\Commands;
+namespace Services\Commands;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * ListCommandsCommand is a console command that lists all registered commands in the application.
  */
-class ListCommandsCommand extends BaseCommand
+class Hm_ListCommandsCommand extends Hm_BaseCommand
 {
     protected static $defaultName = 'list';
 

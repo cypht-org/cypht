@@ -1,16 +1,13 @@
 <?php
 
-namespace Tests\Commands;
-
-use Tests\Mocks\TestCommand;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
-class BaseCommandTest extends TestCase
+class Hm_Test_Command extends TestCase
 {
-    /** @var ContainerInterface|PHPUnit\Framework\MockObject\MockObject */
+    /** @var ContainerInterface*/
     protected $container;
 
     /** @var TestCommand */
@@ -22,9 +19,12 @@ class BaseCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->container = $this->createMock(\DI\Container::class);
+        require_once __DIR__.'/services/mocks.php';
+        $this->container = $this->getMockBuilder(ContainerInterface::class)
+        ->disableOriginalConstructor()
+        ->getMock();
 
-        $this->command = new TestCommand($this->container);
+        $this->command = new Hm_TestCommand($this->container);
 
         $this->input = new ArrayInput([]);
         $this->output = new BufferedOutput();
@@ -32,14 +32,18 @@ class BaseCommandTest extends TestCase
         $this->command->run($this->input, $this->output);
     }
 
-    public function testSuccessOutput()
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_success_output()
     {
         $this->command->success('This is a success message.');
 
         $this->assertStringContainsString('This is a success message.', $this->output->fetch());
     }
 
-    public function testErrorOutput(): void
+    public function test_error_output(): void
     {
         // Simulate an error message
         $this->command->error('This is an error message.');
@@ -51,7 +55,7 @@ class BaseCommandTest extends TestCase
         $this->assertStringContainsString('This is an error message.', $outputContent);
     }
 
-    public function testInfoOutput(): void
+    public function test_info_output(): void
     {
         // Simulate an informational message
         $this->command->info('This is an info message.');
@@ -63,7 +67,7 @@ class BaseCommandTest extends TestCase
         $this->assertStringContainsString('This is an info message.', $outputContent);
     }
 
-    public function testWarningOutput(): void
+    public function test_warning_output(): void
     {
         // Simulate a warning message
         $this->command->warning('This is a warning message.');
@@ -75,7 +79,7 @@ class BaseCommandTest extends TestCase
         $this->assertStringContainsString('This is a warning message.', $outputContent);
     }
 
-    public function testTextOutput(): void
+    public function test_text_output(): void
     {
         // Simulate a plain text message
         $this->command->text('This is a plain text message.');
@@ -87,7 +91,7 @@ class BaseCommandTest extends TestCase
         $this->assertStringContainsString('This is a plain text message.', $outputContent);
     }
 
-    public function testExecute()
+    public function test_execute()
     {
         $exitCode = $this->command->run($this->input, $this->output);
 
@@ -95,7 +99,7 @@ class BaseCommandTest extends TestCase
         $this->assertStringContainsString('Test command executed successfully.', $this->output->fetch());
     }
 
-    // public function testGetService()
+    // public function test_get_service()
     // {
     //     // TODO: Implement testGetService() method
     // }

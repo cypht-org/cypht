@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d664be91483f1546046fb1b242ae4239",
+    "content-hash": "418c062e366f9db13a46adee68ef581e",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -118,46 +118,6 @@
                 "source": "https://github.com/ChristianRiesen/base32/tree/1.6.0"
             },
             "time": "2021-02-26T10:19:33+00:00"
-        },
-        {
-            "name": "cypht/cli-service",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "./packages/cli-service",
-                "reference": "5d38f44f996511d8ec37628fb3c268d8e05e2f45"
-            },
-            "require": {
-                "php-di/php-di": "^7.0",
-                "symfony/console": "^5.3 || ^6.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^10.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Cypht\\Service\\": "src/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "Cypht\\Service\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Steven Ngesera",
-                    "email": "muhngesteven@gmail.com"
-                }
-            ],
-            "description": "A package that integrates with Cypht webmail to provide real-time email notifications using WebSockets and an event-driven scheduler system. It leverages Symfony's console commands and Ratchet for handling WebSocket connections.",
-            "transport-options": {
-                "relative": true
-            }
         },
         {
             "name": "dasprid/enum",
