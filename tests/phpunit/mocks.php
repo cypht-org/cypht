@@ -1,4 +1,5 @@
 <?php
+
 class Hm_Mock_Session {
     public $enc_key = 'asdf';
     public $loaded = true;
