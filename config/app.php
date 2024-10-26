@@ -1317,4 +1317,6 @@ return [
     | Use this setting switch between the legacy login page and the fancy one
     */
     'fancy_login' => env('FANCY_LOGIN', false),
+
+    'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 ];

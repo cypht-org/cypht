@@ -201,7 +201,8 @@ trait Hm_Handler_Module_Exec {
             'router_login_state'  => $session->is_active(),
             'router_url_path'     => $request->path,
             'router_module_list'  => $this->site_config->get_modules(),
-            'router_app_name'     => $this->site_config->get('app_name', 'HM3')
+            'router_app_name'     => $this->site_config->get('app_name', 'HM3'),
+            'router_js_exclude_deps' => explode(',', $this->site_config->get('js_exclude_deps')),
         ));
     }
 }
