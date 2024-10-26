@@ -541,7 +541,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_exclude_dependencies = $this->get('router_js_exclude_dependencies', array());
+            $js_exclude_dependencies = explode(',', $this->get('router_js_exclude_deps', ''));
             $js_lib = get_js_libs($js_exclude_dependencies);
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/forge.min.js"></script>';
