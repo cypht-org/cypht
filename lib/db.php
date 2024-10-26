@@ -60,6 +60,10 @@ class Hm_DB {
         );
     }
 
+    static public function getConfig() {
+        return self::$config;
+    }
+
     /**
      * Build a DSN to connect to the db with
      * @return string
