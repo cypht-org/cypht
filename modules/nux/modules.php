@@ -177,6 +177,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 );
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
+                    $imap_list['sieve_tls'] = $details['sieve']['tls'];
                 }
                 $new_id = Hm_IMAP_List::add($imap_list);
                 if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
