@@ -35,6 +35,7 @@ require APP_PATH.'lib/db.php';
 require APP_PATH.'lib/servers.php';
 require APP_PATH.'lib/api.php';
 require APP_PATH.'lib/webdav_formats.php';
+require APP_PATH.'lib/js_libs.php';
 
 require_once APP_PATH.'modules/core/functions.php';
 

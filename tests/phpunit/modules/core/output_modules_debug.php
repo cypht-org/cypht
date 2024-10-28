@@ -65,6 +65,8 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $this->assertEquals(array($expected_output), $res->output_response);
     }
 
+    // TODO: Add a test case excluding some js dependencies
+
     static function router_module_list_provider() {
         return [
             'one module' => [['core']],

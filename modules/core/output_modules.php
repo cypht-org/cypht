@@ -541,12 +541,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="'.WEB_ROOT.'vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/cash.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/ays-beforeunload-shim.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/jquery.are-you-sure.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/sortable.min.js"></script>';
+            $js_exclude_dependencies = explode(',', $this->get('router_js_exclude_deps', ''));
+            $js_lib = get_js_libs($js_exclude_dependencies);
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/forge.min.js"></script>';
             }
@@ -558,6 +554,12 @@ class Hm_Output_page_js extends Hm_Output_Module {
                 if (in_array($mod, $mods, true)) {
                     $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
                     foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                        if (preg_match('/\[(.+)\]/', $js, $matches)) {
+                            $dep = $matches[1];
+                            if (in_array($dep, $js_exclude_dependencies)) {
+                                continue;
+                            }
+                        }
                         $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
                     }
 
