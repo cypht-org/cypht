@@ -86,7 +86,6 @@ add_handler('message', 'imap_download_message', true, 'imap', 'message_list_type
 add_handler('message', 'imap_show_message', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 add_handler('message', 'imap_remove_attachment', true, 'imap', 'message_list_type', 'after');
-add_handler('message', 'privacy_settings', true, 'core');
 add_output('message', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* message source page */

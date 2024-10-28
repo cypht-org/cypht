@@ -626,14 +626,14 @@ function check_file_upload($request, $key) {
 
 function privacy_setting_callback($val, $key, $mod) {
     $setting = Hm_Output_privacy_settings::$settings[$key];
-    $user_setting = $mod->user_config->get("$key\_setting", '');
+    $user_setting = $mod->user_config->get($key . "_setting");
     $update = $mod->request->post['update'];
 
     if ($update) {
         // TODO: FIX - the updated setting doesn't get saved.
-        $val = $user_setting . ($setting['separator'] ?? '') . $val;
+        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        $mod->user_config->set($key . '_setting', $val);
+        $mod->session->record_unsaved('Privacy settings updated');
     }
-    Hm_Msgs::add('updating privacy to value: ' . $val);
-    Hm_Msgs::add('User settings: ' . json_encode($mod->get('user_settings')));
     return $val;
 }

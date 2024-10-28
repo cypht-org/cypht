@@ -2526,6 +2526,7 @@ const handleExternalResources = (inline) => {
         noticesElement.appendChild(allowAll);
 
         const button = document.createElement('a');
+        button.setAttribute('href', '#');
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
@@ -2539,7 +2540,7 @@ const handleExternalResources = (inline) => {
                 if (inline) {
                     inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
                 } else {
-                    get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
+                    get_message_content(elements[0].dataset.messagePart, getMessageUidParam(), getListPathParam(), false, false, false)
                 }
             })
         });
