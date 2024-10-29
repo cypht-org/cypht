@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Jobs;
+namespace Services\Core\Jobs;
 
 use Services\Contracts\Hm_Job;
 

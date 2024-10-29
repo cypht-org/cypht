@@ -1,9 +1,10 @@
 <?php
 
-namespace Services\Queue;
+namespace Services\Core\Queue;
 
+use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
-use Services\Jobs\Hm_BaseJob;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class Hm_JobDispatcher
@@ -19,9 +20,9 @@ class Hm_JobDispatcher
      * @param Hm_QueueManager $queueManager
      * @param string $defaultDriver
      */
-    public function __construct(Hm_QueueManager $queueManager, string $defaultDriver = 'redis')
+    public function __construct(ContainerInterface $container, string $defaultDriver = 'redis')
     {
-        $this->queueManager = $queueManager;
+        $this->queueManager = $container->get('Hm_QueueManager');//$this->queueManager = $queueManager;
         $this->defaultDriver = $defaultDriver;
     }
 

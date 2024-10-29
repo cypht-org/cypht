@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Queue;
+namespace Services\Core\Queue;
 
 use Services\Contracts\Queue\Hm_ShouldQueue;
 

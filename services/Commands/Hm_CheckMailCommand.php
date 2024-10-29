@@ -3,6 +3,7 @@
 namespace Services\Commands;
 
 use Services\Jobs\Hm_ProcessNewEmail;
+use Services\Core\Commands\Hm_BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,6 +18,11 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
     protected static $defaultName = 'check:mail';
 
 
+    protected function configure()
+    {
+        $this->setDescription('Check for new mail');
+    }
+    
     /**
      * Execute the console command.
      *
