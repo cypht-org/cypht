@@ -2,7 +2,6 @@
 
 namespace Services\Traits;
 
-
 trait Hm_ScheduleFrequencyManager
 {
     /**
@@ -10,7 +9,7 @@ trait Hm_ScheduleFrequencyManager
      *
      * @var string
      */
-    protected $expression;
+    protected $expression = '* * * * *'; // Default to every minute
 
     /**
      * The timezone for scheduling.
@@ -68,6 +67,7 @@ trait Hm_ScheduleFrequencyManager
         $startTime = new \DateTime($startTime, new \DateTimeZone($this->timezone));
         $endTime = new \DateTime($endTime, new \DateTimeZone($this->timezone));
 
+        // Adjust for overnight intervals
         if ($endTime < $startTime) {
             if ($startTime > $now) {
                 $startTime->modify('-1 day');
@@ -88,7 +88,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyMinute()
     {
-        return $this->spliceIntoPosition(1, '*');
+        return $this->cron('* * * * *');
     }
 
     /**
@@ -98,7 +98,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyTwoMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/2');
+        return $this->cron('*/2 * * * *');
     }
 
     /**
@@ -108,7 +108,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyThreeMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/3');
+        return $this->cron('*/3 * * * *');
     }
 
     /**
@@ -118,7 +118,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyFourMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/4');
+        return $this->cron('*/4 * * * *');
     }
 
     /**
@@ -128,7 +128,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyFiveMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/5');
+        return $this->cron('*/5 * * * *');
     }
 
     /**
@@ -138,7 +138,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyTenMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/10');
+        return $this->cron('*/10 * * * *');
     }
 
     /**
@@ -148,7 +148,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyFifteenMinutes()
     {
-        return $this->spliceIntoPosition(1, '*/15');
+        return $this->cron('*/15 * * * *');
     }
 
     /**
@@ -158,7 +158,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function everyThirtyMinutes()
     {
-        return $this->spliceIntoPosition(1, '0,30');
+        return $this->cron('0,30 * * * *');
     }
 
     /**
@@ -168,7 +168,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function hourly()
     {
-        return $this->spliceIntoPosition(1, 0);
+        return $this->cron('0 * * * *');
     }
 
     /**
@@ -180,7 +180,7 @@ trait Hm_ScheduleFrequencyManager
     public function hourlyAt($offset)
     {
         $offset = is_array($offset) ? implode(',', $offset) : $offset;
-        return $this->spliceIntoPosition(1, $offset);
+        return $this->cron("$offset * * * *");
     }
 
     /**
@@ -190,7 +190,7 @@ trait Hm_ScheduleFrequencyManager
      */
     public function daily()
     {
-        return $this->spliceIntoPosition(1, 0)->spliceIntoPosition(2, 0);
+        return $this->cron('0 0 * * *'); // Midnight
     }
 
     /**
@@ -202,8 +202,7 @@ trait Hm_ScheduleFrequencyManager
     public function dailyAt($time)
     {
         $segments = explode(':', $time);
-        return $this->spliceIntoPosition(2, (int)$segments[0])
-                    ->spliceIntoPosition(1, count($segments) === 2 ? (int)$segments[1] : '0');
+        return $this->cron(count($segments) === 2 ? "{$segments[1]} {$segments[0]} * * *" : "0 {$segments[0]} * * *");
     }
 
     /**

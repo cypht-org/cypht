@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Queue\Drivers;
+namespace Services\Core\Queue\Drivers;
 
 use Hm_DB;
 use Services\Jobs\Hm_BaseJob;

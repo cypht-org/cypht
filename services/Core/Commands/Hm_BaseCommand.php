@@ -1,6 +1,6 @@
 <?php
 
-namespace Services\Commands;
+namespace Services\Core\Commands;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;

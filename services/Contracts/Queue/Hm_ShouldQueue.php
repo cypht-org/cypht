@@ -2,7 +2,7 @@
 
 namespace Services\Contracts\Queue;
 
-use Services\Jobs\Hm_BaseJob;
+use Services\Core\Jobs\Hm_BaseJob;
 
 interface Hm_ShouldQueue
 {

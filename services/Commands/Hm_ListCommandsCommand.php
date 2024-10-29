@@ -3,6 +3,7 @@
 namespace Services\Commands;
 
 use Psr\Container\ContainerInterface;
+use Services\Core\Commands\Hm_BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,6 +24,11 @@ class Hm_ListCommandsCommand extends Hm_BaseCommand
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
+    }
+
+    protected function configure()
+    {
+        $this->setDescription('Lists all registered commands in the application.');
     }
 
     /**

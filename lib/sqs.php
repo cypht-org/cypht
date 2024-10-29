@@ -42,7 +42,7 @@ class Hm_AmazonSQS {
     /**
      * Connect to Amazon SQS
      * @param object $site_config site settings
-     * @return SqsClient|false SQS Client on success
+     * @return this|false
      */
     static public function connect($site_config) {
         self::parse_config($site_config);
