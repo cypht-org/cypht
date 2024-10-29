@@ -42,3 +42,20 @@ $scheduler->command('backup:database')->dailyAt('02:00');
 // Dispatch the event
 (new NewEmailProcessedEvent)->dispatch('user@example.com');
 ```
+```
+// Notification Example usage
+
+use Services\Notifications\UserNotification;
+
+// Configure the notification channels
+$config = [
+    'channels' => ['slack', 'telegram'], // User-defined channels
+];
+
+// Create an instance of UserNotification with the specified channels
+$notification = new UserNotification($config);
+
+// Send a message through the specified channels
+$message = "Hello! You have a new alert.";
+$notification->sendNotification($message);
+```

@@ -60,6 +60,7 @@
         "symfony/console": "^6.4",
         "symfony/dependency-injection": "*",
         "symfony/dotenv": "^4.3 || 5.4",
+        "symfony/notifier": "*",
         "symfony/yaml": "~6.4.3",
         "thomaspark/bootswatch": "^5.3",
         "twbs/bootstrap": "^5.3",
