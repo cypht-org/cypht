@@ -23,8 +23,8 @@ function get_js_libs($exclude_deps = []) {
 function get_js_libs_content($exclude_deps = []) {
     $js_lib = '';
 
-    foreach (JS_LIBS as $dep) {
-        if (!in_array($dep, $exclude_deps)) {
+    foreach (JS_LIBS as $key => $dep) {
+        if (!in_array($key, $exclude_deps)) {
             $js_lib .= file_get_contents(APP_PATH.$dep);
         }
     }
