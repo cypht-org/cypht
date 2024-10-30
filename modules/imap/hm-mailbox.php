@@ -234,7 +234,7 @@ class Hm_Mailbox {
             $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
         } else {
             $messages = $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
-            $folder = $this->selected_folder['name'];
+            $folder = $this->selected_folder['id'];
         }
         foreach ($messages[1] as &$msg) {
             $msg['folder'] = bin2hex($folder);
