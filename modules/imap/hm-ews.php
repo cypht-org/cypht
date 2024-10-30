@@ -144,7 +144,11 @@ class Hm_EWS {
                 'recent' => false,
                 'unseen' => $result->get('unreadCount'),
             ];
-        } catch (Exception $e) {
+        } catch (Exception\ExchangeException $e) {
+            // since this is used for missing folders check, we skip error reporting
+            return [];
+        } catch (\Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
             return [];
         }
     }
@@ -157,7 +161,7 @@ class Hm_EWS {
         }
         try {
             return $this->api->createFolders([$folder], $parent);
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
         }
@@ -189,7 +193,7 @@ class Hm_EWS {
             $resp = $this->ews->UpdateFolder($request);
             // TODO: EWS: resolve internal server error issue and return status
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
         }
@@ -198,7 +202,7 @@ class Hm_EWS {
     public function delete_folder($folder) {
         try {
             return $this->api->deleteFolder(new Type\FolderIdType($folder));
-        } catch(Exception $e) {
+        } catch(\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
         }
@@ -739,19 +743,20 @@ class Hm_EWS {
     }
 
     protected function archive_items($itemIds) {
-        // TODO: update underlying lib to support ArchiveItem and newer services.wsdl file (better get the wsdl from the actual server)
+        $itemIds = array_map(function($itemId) {
+            return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+        }, $itemIds);
+        $parent = $this->get_parent_folder_of_items($itemIds);
         $request = [
-            'ArchiveSourceFolderId' => (new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_INBOX))->toArray(true),
+            'ArchiveSourceFolderId' => (new Type\FolderIdType($parent))->toArray(true),
             'ItemIds' => [
-                'ItemId' => array_map(function($itemId) {
-                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
-                }, $itemIds),
+                'ItemId' => $itemIds,
             ]
         ];
         $request = Type::buildFromArray($request);
         try {
             $result = $this->ews->ArchiveItem($request);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             $result = false;
         }
@@ -764,7 +769,7 @@ class Hm_EWS {
             $result = $this->api->deleteItems(array_map(function($itemId) {
                 return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
             }, $itemIds));
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             $result = false;
         }
@@ -783,7 +788,7 @@ class Hm_EWS {
         $request = Type::buildFromArray($request);
         try {
             $result = $this->ews->CopyItem($request);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             $result = false;
         }
@@ -803,10 +808,39 @@ class Hm_EWS {
         $request = Type::buildFromArray($request);
         try {
             $result = $this->ews->MoveItem($request);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             $result = false;
         }
         return $result;
+    }
+
+    protected function get_parent_folder_of_items($itemIdTypes) {
+        $folder = null;
+        $request = [
+            'ItemShape' => [
+                'BaseShape' => 'IdOnly',
+                'AdditionalProperties' => [
+                    'FieldURI' => ['FieldURI' => 'item:ParentFolderId'],
+                ],
+            ],
+            'ItemIds' => [
+                'ItemId' => $itemIdTypes,
+            ],
+        ];
+        $request = Type::buildFromArray($request);
+        $result = $this->ews->GetItem($request);
+        if ($result instanceof Type\MessageType) {
+            $result = [$result];
+        }
+        foreach ($result as $message) {
+            if (! $folder) {
+                $folder = $message->get('ParentFolderId')->get('id');
+            }
+            if ($folder != $message->get('ParentFolderId')->get('id')) {
+                throw new Exception('Parent folder of items stored in different folders cannot be determinted.');
+            }
+        }
+        return $folder;
     }
 }
