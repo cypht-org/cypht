@@ -1,5 +1,5 @@
 async function addSenderToImagesWhitelist(email) {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         Hm_Ajax.request([
             { name: "hm_ajax_hook", value: "ajax_privacy_settings" },
             { name: "images_whitelist", value: email },

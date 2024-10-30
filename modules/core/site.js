@@ -2452,7 +2452,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(messagePart, false, false, false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
     });
 }
 
@@ -2521,7 +2521,7 @@ const handleExternalResources = (inline) => {
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
             allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+            handleAllowResource(allowAll, getParam('part'), inline);
         }
         noticesElement.appendChild(allowAll);
 
@@ -2530,18 +2530,19 @@ const handleExternalResources = (inline) => {
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
-        sessionAvailableOnlyActionInfo(button)
+        const popover = sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            // Hm_Utils.save_to_local_storage(sender, 1);
             addSenderToImagesWhitelist(senderEmail).then(() => {
                 $('.msg_text_inner').remove();
                 if (inline) {
                     inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
                 } else {
-                    get_message_content(elements[0].dataset.messagePart, getMessageUidParam(), getListPathParam(), false, false, false)
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
                 }
+            }).finally(() => {
+                popover.dispose();
             })
         });
     }

@@ -17,3 +17,7 @@ function getMessageUidParam() {
 function getPageNameParam() {
     return new URLSearchParams(window.location.search).get('page')
 }
+
+function getParam(param) {
+    return new URLSearchParams(window.location.search).get(param)
+}
