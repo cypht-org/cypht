@@ -442,7 +442,8 @@ class Hm_Mailbox {
                 return $this->connection->get_quota($folder);
             }
         } else {
-            // TODO: EWS
+            // not supported by EWS
+            return [];
         }
     }
 
@@ -450,7 +451,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->show_debug(true, true, true);
         } else {
-            // TODO: EWS
+            return [];
         }
     }
 
@@ -458,7 +459,6 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->use_cache;
         } else {
-            // TODO: check EWS caching
             return false;
         }
     }
@@ -467,8 +467,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->dump_cache($type);
         } else {
-            // TODO: check EWS caching
-            return;
+            return null;
         }
     }
 
