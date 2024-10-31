@@ -117,9 +117,13 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
 
                 if ($allowed) {
-                    $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
-                        return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
-                    }, $msgText);
+                    $images_whitelist = $this->get('images_whitelist');
+                    $sender_email = $this->get('sender_email');
+                    if (! in_array($sender_email, $images_whitelist)) {
+                        $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
+                            return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
+                        }, $msgText);
+                    }
                 }
 
                 $txt .= format_msg_html($msgText, $allowed);
@@ -226,9 +230,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }else{
                                 $EmailRegexp = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                                 if(preg_match($EmailRegexp, $value, $matches)){
-                                    $contact_email = $matches[0][0];
+                                    $contact_email = $matches[0];
                                 }
                             }
+
+                            $this->out('sender_email', $contact_email);
 
                             $contact_store = $this->get('contact_store');
                             $contact = !$contact_store ? null : $contact_store->get(null, false, $contact_email);

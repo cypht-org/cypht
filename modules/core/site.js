@@ -2382,7 +2382,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(messagePart, false, false, false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
     });
 }
 
@@ -2413,7 +2413,8 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
+    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
@@ -2450,25 +2451,29 @@ const handleExternalResources = (inline) => {
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
             allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+            handleAllowResource(allowAll, getParam('part'), inline);
         }
         noticesElement.appendChild(allowAll);
 
         const button = document.createElement('a');
+        button.setAttribute('href', '#');
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
-        sessionAvailableOnlyActionInfo(button)
+        const popover = sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            Hm_Utils.save_to_local_storage(sender, 1);
-            $('.msg_text_inner').remove();
-            if (inline) {
-                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-            } else {
-                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-            }
+            addSenderToImagesWhitelist(senderEmail).then(() => {
+                $('.msg_text_inner').remove();
+                if (inline) {
+                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+                } else {
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
+                }
+            }).finally(() => {
+                popover.dispose();
+            })
         });
     }
 

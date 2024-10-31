@@ -1146,3 +1146,13 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
         }
     }
 }
+
+class Hm_Handler_privacy_settings extends Hm_Handler_Module {
+    
+    public function process() {
+        $settings = Hm_Output_privacy_settings::$settings;
+        foreach ($settings as $key => $setting) {
+            process_site_setting($key, $this, 'privacy_setting_callback');
+        }
+    }
+}
