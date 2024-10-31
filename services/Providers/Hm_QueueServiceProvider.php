@@ -20,6 +20,17 @@ class Hm_QueueServiceProvider
         $queueConnection = getenv('QUEUE_CONNECTION') ?: 'database';
         $containerBuilder = Hm_Container::getContainer();
         
+        $containerBuilder->register('queue.manager', Hm_QueueManager::class)
+        ->setShared(true);
+
+        $containerBuilder->register('job.dispatcher', Hm_JobDispatcher::class)
+        ->addArgument(new Reference('queue.manager'))
+        ->setShared(true);
+
+        $containerBuilder->register('queue.worker', Hm_QueueWorker::class)
+            ->addArgument(new Reference('queue.driver.' . $queueConnection))
+            ->setShared(true);
+
         switch ($queueConnection) {
             case 'redis':
                 $containerBuilder->register('queue.driver.redis', Hm_RedisQueue::class)
@@ -29,24 +40,18 @@ class Hm_QueueServiceProvider
                     ->addMethodCall('addDriver', ['redis', new Reference('queue.driver.redis')]);
                 break;
             case 'sqs':
-                $containerBuilder->register('queue.driver.database', Hm_AmazonSQSQueue::class)
+                $containerBuilder->register('queue.driver.sqs', Hm_AmazonSQSQueue::class)
                     ->addArgument($containerBuilder->get('amazon.sqs'));
                 $containerBuilder->getDefinition('queue.manager')
                     ->addMethodCall('addDriver', ['sqs', new Reference('queue.driver.redis')]);
                 break;
             default:
                 $containerBuilder->register('queue.driver.database', Hm_DatabaseQueue::class)
-                    ->addArgument($containerBuilder->get('db'));
+                    ->addArgument(new Reference('db'))
+                    ->addArgument(new Reference('db.connection'));
                 $containerBuilder->getDefinition('queue.manager')
                     ->addMethodCall('addDriver', ['database', new Reference('queue.driver.database')]);
                 break;
         }
-        $containerBuilder->register('job.dispatcher', Hm_JobDispatcher::class)
-            ->addArgument(new Reference('queue.manager'))
-            ->setShared(true);
-
-        $containerBuilder->register('queue.worker', Hm_QueueWorker::class)
-            ->addArgument(new Reference('queue.driver.' . $queueConnection))
-            ->setShared(true);
     }
 }

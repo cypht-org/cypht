@@ -2,9 +2,7 @@
 
 namespace Services\Core\Events;
 
-use Services\Events;
-
-class Hm_EventManager
+class Hm_EventDispatcher
 {
     protected static array $listeners = [];
 

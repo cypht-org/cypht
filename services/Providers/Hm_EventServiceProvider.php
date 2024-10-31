@@ -2,7 +2,7 @@
 
 namespace Services\Providers;
 
-use Services\Core\Events\Hm_EventManager;
+use Services\Core\Events\Hm_EventDispatcher;
 use Services\Listeners\Hm_NewMaiListener;
 use Services\Events\Hm_NewEmailProcessedEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +19,7 @@ class Hm_EventServiceProvider
     {
         foreach ($this->listen as $event => $listeners) {
             foreach ($listeners as $listener) {
-                Hm_EventManager::listen($event, $listener);
+                Hm_EventDispatcher::listen($event, $listener);
             }
         }
     }

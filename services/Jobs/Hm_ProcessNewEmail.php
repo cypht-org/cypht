@@ -3,14 +3,14 @@
 namespace Services\Jobs;
 
 use Services\Core\Jobs\Hm_BaseJob;
-use Services\Traits\Hm_EventDispatchable;
+use Services\Traits\Hm_Dispatchable;
 use Services\Traits\Hm_InteractsWithQueue;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 use Services\Events\Hm_NewEmailProcessedEvent;
 
-class Hm_ProcessNewEmail extends Hm_BaseJob //implements Hm_ShouldQueue
+class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
 {
-    use Hm_EventDispatchable;//Hm_InteractsWithQueue;
+    use Hm_Dispatchable, Hm_InteractsWithQueue;
 
     protected string $driver = 'database';
 
@@ -23,7 +23,8 @@ class Hm_ProcessNewEmail extends Hm_BaseJob //implements Hm_ShouldQueue
     {
         //fetch new email
         //then process it
-        (new Hm_NewEmailProcessedEvent($this->email))->dispatch();
+
+        dump('job processing');
         
     }
 

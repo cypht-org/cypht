@@ -3,7 +3,7 @@
 namespace Services\Traits;
 
 use Services\Contracts\Hm_Job;
-use Services\Queue\Hm_QueueManager;
+use Services\Core\Queue\Hm_QueueManager;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 
 /**
@@ -26,7 +26,7 @@ trait Hm_InteractsWithQueue
      */
     public function push(Hm_Job $job, $data = '', $queue = null)
     {
-        $driver = $job->getDriver();
+        $driver = $this->getDriver();
 
         // Call the appropriate method from the QueueManager to push the job
         (new Hm_QueueManager)->getDriver($driver)->push($this, $data, $queue);
