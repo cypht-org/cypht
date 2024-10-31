@@ -452,17 +452,17 @@ function list_sources($sources, $output_mod) {
         if (array_key_exists('nodisplay', $src) && $src['nodisplay']) {
             continue;
         }
-        if ($src['type'] == 'imap' && !array_key_exists('folder', $src)) {
-            $folder = '_INBOX';
+        if ($src['type'] == 'imap' && !array_key_exists('folder_name', $src)) {
+            $folder = 'INBOX';
         }
-        elseif (!array_key_exists('folder', $src)) {
+        elseif (!array_key_exists('folder_name', $src)) {
             $folder = '';
         }
         else {
-            $folder = '_'.hex2bin($src['folder']);
+            $folder = $src['folder_name'];
         }
         $res .= '<div class="list_src">'.$output_mod->html_safe($src['type']).' '.$output_mod->html_safe($src['name']);
-        $res .= ' '.$output_mod->html_safe(str_replace('_', '', $folder));
+        $res .= ' '.$output_mod->html_safe($folder);
         $res .= '</div>';
     }
     $res .= '</div>';

@@ -208,8 +208,18 @@ class Hm_EWS {
         }
     }
 
-    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
-        $folder = new Type\FolderIdType($folder);
+    /**
+     * Performs an EWS search using FindItem operation and supplies sorting + pagination arguments.
+     * Search can be perfomed using Advanced Query Syntax when keyword is an array containing terms
+     * searching in specific fields (e.g. advanced search) or Restrictions list when requesting
+     * filtering by extended properties as answered or unanswered emails.
+     */
+    public function search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
+        if ($this->is_distinguished_folder(strtolower($folder))) {
+            $folder = new Type\DistinguishedFolderIdType(strtolower($folder));
+        } else {
+            $folder = new Type\FolderIdType($folder);
+        }
         $request = array(
             'Traversal' => 'Shallow',
             'ItemShape' => array(
@@ -262,14 +272,42 @@ class Hm_EWS {
             }
         }
         $qs = [];
-        if (! empty($keyword)) {
+        if (is_array($keyword)) {
+            foreach ($keyword as $term) {
+                switch ($term[0]) {
+                    case 'SINCE':
+                        $qs[] = "Received:>$term[1]";
+                        break;
+                    case 'FROM':
+                        $qs[] = "From:($term[1])";
+                        break;
+                    case 'TO':
+                        $qs[] = "To:($term[1])";
+                        break;
+                    case 'CC':
+                        $qs[] = "Cc:($term[1])";
+                        break;
+                    case 'TEXT':
+                        $qs[] = "(Subject:($term[1]) OR Body:($term[1]))";
+                        break;
+                    case 'BODY':
+                        $qs[] = "Body:($term[1])";
+                        break;
+                    case 'SUBJECT':
+                        $qs[] = "Subject:($term[1])";
+                        break;
+                    default:
+                        // TODO: check for other types of terms
+                }
+            }
+        } elseif (! empty($keyword)) {
             $qs[] = $keyword;
         }
         switch ($flag_filter) {
             case 'UNSEEN':
                 $qs[] = 'isRead:false';
                 break;
-            case 'UNSEEN':
+            case 'SEEN':
                 $qs[] = 'isRead:true';
                 break;
             // TODO:
@@ -339,7 +377,12 @@ class Hm_EWS {
         $itemIds = array_map(function($msg) {
             return $msg->get('itemId')->get('id');
         }, $messages);
-        return [$result->get('totalItemsInView'), $this->get_message_list($itemIds)];
+        return [$result->get('totalItemsInView'), $itemIds];
+    }
+
+    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
+        list ($total, $itemIds) = $this->search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+        return [$total, $this->get_message_list($itemIds)];
     }
 
     public function get_message_list($itemIds) {

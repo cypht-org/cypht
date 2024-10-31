@@ -179,7 +179,6 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_list($only_subscribed);
         } else {
-            // TODO: EWS only_subscribed
             return $this->connection->get_folders(null, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? []);
         }
     }
@@ -500,7 +499,9 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $this->connection->search($target, $uids, $terms, $esearch, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
         } else {
-            // TODO: EWS
+            // deleted flag, auto-bcc feature - not supported by EWS
+            list($total, $itemIds) = $this->connection->search($folder, false, false, $target, 0, 9999, $terms, []);
+            return $itemIds;
         }
     }
 
