@@ -1,7 +1,9 @@
 <?php
-namespace Services\Commands;
+
+namespace Services\Core\Commands;
 
 use Services\Core\Commands\Hm_BaseCommand;
+use Services\Core\Hm_Container;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,13 +14,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Hm_QueueWorkCommand extends Hm_BaseCommand
 {
     protected static $defaultName = 'queue:work';
-
-    protected $queueWorker;
-
-    public function __construct(ContainerInterface $container)
-    {
-        parent::__construct($container);
-    }
 
     protected function configure()
     {
@@ -40,10 +35,10 @@ class Hm_QueueWorkCommand extends Hm_BaseCommand
         $output->writeln("Processing jobs from the [$queue] on connection [$connection]...");
 
         if ($input->getOption('once')) {
-            $this->container->get('queue.worker')->work();
+            Hm_Container::getContainer()->get('queue.worker')->work();
         } else {
             while (true) {
-                $this->container->get('queue.worker')->work();
+                Hm_Container::getContainer()->get('queue.worker')->work();
                 sleep($input->getOption('sleep'));
             }
         }

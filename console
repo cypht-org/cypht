@@ -11,10 +11,10 @@ list($containerBuilder, $config) = require __DIR__ . '/services/Hm_bootstrap.php
 $application = new Application('Cypht Console', '1.0');
 
 $commandServiceProvider = $containerBuilder->get('command.serviceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-$commandServiceProvider->register($application, $containerBuilder);
+$commandServiceProvider->register($application);
 
 $queueServiceProvider = $containerBuilder->get('queue.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-$queueServiceProvider->register($containerBuilder);
+$queueServiceProvider->register();
 
 $queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
 $queueServiceProvider->register($config, new Hm_Session_Setup($config));

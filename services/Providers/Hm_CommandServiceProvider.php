@@ -14,18 +14,18 @@ class Hm_CommandServiceProvider
      * Register commands in the application.
      *
      * @param Application $application The Symfony console application.
-     * @param ContainerInterface $container The dependency injection container.
      * @return void
      */
-    public function register(Application $application, ContainerInterface $container): void
+    public function register(Application $application): void
     {
-        $commandNamespace = 'Services\Commands';
         $commandFiles = $this->getCommandFiles();
 
         foreach ($commandFiles as $file) {
-            $className = $commandNamespace . '\\' . basename($file, '.php');
+            $namespace = $this->getNamespaceFromFilePath($file);
+            $className = $namespace . '\\' . basename($file, '.php');
+
             try {
-                $this->registerCommand($application, $className, $container);
+                $this->registerCommand($application, $className);
             } catch (InvalidArgumentException $e) {
                 Hm_Debug::add(sprintf('Command registration escaped for %s: No need to register the command class.', $className));
             }
@@ -39,7 +39,24 @@ class Hm_CommandServiceProvider
      */
     protected function getCommandFiles(): array
     {
-        return glob(__DIR__ . '/../Commands/*.php');
+        return array_merge(
+            glob(__DIR__ . '/../Core/Commands/*.php'),
+            glob(__DIR__ . '/../Commands/*.php')
+        );
+    }
+
+    /**
+     * Get the namespace from the file path.
+     *
+     * @param string $filePath The file path.
+     * @return string The namespace.
+     */
+    protected function getNamespaceFromFilePath(string $filePath): string
+    {
+        if (strpos($filePath, '/Core/Commands/') !== false) {
+            return 'Services\Core\Commands';
+        }
+        return 'Services\Commands';
     }
 
     /**
@@ -51,16 +68,15 @@ class Hm_CommandServiceProvider
      *
      * @param Application $application The Symfony console application.
      * @param string $className The fully qualified name of the command class.
-     * @param ContainerInterface $container The dependency injection container.
      * @return void
      */
-    protected function registerCommand(Application $application, string $className, ContainerInterface $container): void
+    protected function registerCommand(Application $application, string $className): void
     {
         if (!class_exists($className) || !is_subclass_of($className, Hm_BaseCommand::class)) {
             throw new InvalidArgumentException(sprintf('Class "%s" is not a valid command class.', $className));
         }
 
-        $command = new $className($container);
+        $command = new $className;
         $application->add($command);
     }
 }
