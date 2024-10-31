@@ -13,10 +13,6 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class Hm_BaseCommand extends Command
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
 
     /**
      * @var SymfonyStyle
@@ -26,14 +22,11 @@ abstract class Hm_BaseCommand extends Command
     /**
      * BaseCommand constructor.
      *
-     * @param ContainerInterface $container Dependency Injection Container.
      * @param string|null $name The name of the command.
      */
-    public function __construct(ContainerInterface $container, ?string $name = null)
+    public function __construct(?string $name = null)
     {
         parent::__construct($name);
-
-        $this->container = $container;
     }
 
     /**
@@ -61,16 +54,6 @@ abstract class Hm_BaseCommand extends Command
         $this->info('Executing command: ' . $this->getName());
 
         return Command::SUCCESS;
-    }
-    /**
-     * Get a service from the container.
-     *
-     * @param string $service The service class Hm_BaseCommand interface.
-     * @return mixed The requested service.
-     */
-    protected function getService(string $service)
-    {
-        return $this->container->get($service);
     }
 
     /**

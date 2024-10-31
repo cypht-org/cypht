@@ -3,7 +3,7 @@
 namespace Services\Core\Queue\Drivers;
 
 use Hm_DB;
-use Services\Jobs\Hm_BaseJob;
+use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 
 /**

@@ -17,7 +17,6 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
      */
     protected static $defaultName = 'check:mail';
 
-
     protected function configure()
     {
         $this->setDescription('Check for new mail');

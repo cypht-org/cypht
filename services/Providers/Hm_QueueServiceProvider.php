@@ -1,6 +1,7 @@
 <?php
 namespace Services\Providers;
 
+use Services\Core\Hm_Container;
 use Services\Core\Queue\Hm_QueueWorker;
 use Services\Core\Queue\Hm_QueueManager;
 use Services\Core\Queue\Hm_JobDispatcher;
@@ -14,10 +15,11 @@ class Hm_QueueServiceProvider
 {
     protected Hm_QueueManager $queueManager;
 
-    public function register(ContainerBuilder $containerBuilder): void
+    public function register()
     {
         $queueConnection = getenv('QUEUE_CONNECTION') ?: 'database';
-
+        $containerBuilder = Hm_Container::getContainer();
+        
         switch ($queueConnection) {
             case 'redis':
                 $containerBuilder->register('queue.driver.redis', Hm_RedisQueue::class)

@@ -1,7 +1,7 @@
 <?php
 
 use Services\Core\Hm_Container;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\ErrorHandler\ErrorHandler;
 
 define('APP_PATH', dirname(__DIR__).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
@@ -41,5 +41,7 @@ if (!$config->get('disable_ini_settings')) {
 }
 
 $containerBuilder = Hm_Container::getContainer();
+// Activer le gestionnaire d'erreurs
+ErrorHandler::register();
 
 return [$containerBuilder,$config];
