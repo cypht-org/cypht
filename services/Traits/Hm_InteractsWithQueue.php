@@ -5,6 +5,7 @@ namespace Services\Traits;
 use Services\Contracts\Hm_Job;
 use Services\Core\Queue\Hm_QueueManager;
 use Services\Contracts\Queue\Hm_ShouldQueue;
+use Services\Core\Jobs\Hm_BaseJob;
 
 /**
  * Trait Hm_InteractsWithQueue
@@ -24,7 +25,7 @@ trait Hm_InteractsWithQueue
      * @param string|null $queue Optional name of the queue.
      * @return void
      */
-    public function push(Hm_Job $job, $data = '', $queue = null)
+    public function push(Hm_Job $job, $data = '', $queue = null): void
     {
         $driver = $this->getDriver();
 
@@ -40,7 +41,7 @@ trait Hm_InteractsWithQueue
      * @param string|null $queue Optional name of the queue.
      * @return mixed The job from the queue or null if the queue is empty.
      */
-    public function pop($queue = null)
+    public function pop($queue = null): ?Hm_BaseJob
     {
         $driver = $this->getDriver();
 
@@ -63,7 +64,7 @@ trait Hm_InteractsWithQueue
      * @param int $delay The number of seconds to delay the release.
      * @return void
      */
-    public function release($queue = null, $delay = 0)
+    public function release($queue = null, $delay = 0): void
     {
         $driver = $this->getDriver();
 

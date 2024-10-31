@@ -59,3 +59,23 @@ $notification = new UserNotification($config);
 $message = "Hello! You have a new alert.";
 $notification->sendNotification($message);
 ```
+
+#Database queue tables
+
+We have twi database that we using to manage database queue: `hm_jobs` & `hm_failed_jobs`
+```
+-- Active jobs table
+CREATE TABLE hm_jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payload TEXT,
+    attempts INT DEFAULT 0
+);
+
+-- Failed jobs table
+CREATE TABLE hm_failed_jobs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    payload TEXT,
+    failed_at DATETIME,
+    exception TEXT
+);
+```

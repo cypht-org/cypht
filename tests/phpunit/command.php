@@ -1,14 +1,11 @@
 <?php
 
 use PHPUnit\Framework\TestCase;
-use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class Hm_Test_Command extends TestCase
 {
-    /** @var ContainerInterface*/
-    protected $container;
 
     /** @var TestCommand */
     protected $command;
@@ -20,11 +17,8 @@ class Hm_Test_Command extends TestCase
     protected function setUp(): void
     {
         require_once __DIR__.'/services/mocks.php';
-        $this->container = $this->getMockBuilder(ContainerInterface::class)
-        ->disableOriginalConstructor()
-        ->getMock();
 
-        $this->command = new Hm_TestCommand($this->container);
+        $this->command = new Hm_TestCommand();
 
         $this->input = new ArrayInput([]);
         $this->output = new BufferedOutput();

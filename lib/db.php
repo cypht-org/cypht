@@ -92,6 +92,7 @@ class Hm_DB {
      * @return boolean|integer|array
      */
     static public function execute($dbh, $sql, $args, $type = false, $all = false) {
+        
         if (!$dbh) {
             return false;
         }

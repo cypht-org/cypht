@@ -2,6 +2,7 @@
 
 namespace Services\Traits;
 
+use Services\Core\Events\Hm_BaseEvent;
 use Services\Core\Events\Hm_EventDispatcher;
 use Services\Core\Jobs\Hm_BaseJob;
 use Services\Core\Queue\Hm_JobDispatcher;
@@ -16,10 +17,12 @@ trait Hm_Dispatchable
     public static function dispatch(...$arguments)
     {
         $instance = new static(...$arguments);
-
         if (is_subclass_of($instance, Hm_BaseJob::class)) {
-            # code...
             Hm_JobDispatcher::dispatch($instance);
+        }elseif(is_subclass_of($instance, Hm_BaseEvent::class)){
+            Hm_EventDispatcher::dispatch($instance);
+        }else{
+            throw new \Exception("Class must be an instance of Hm_BaseJob or Hm_BaseEvent");
         }
     }
 

@@ -32,19 +32,7 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->info("Checking for new mail...");
-
-        // Example: Call the mail checking service from the container
-        // $imap = $this->getService('Hm_Imap');
-        // $newMessages = $imap->search('UNSEEN'); 
         Hm_ProcessNewEmail::dispatch(email: 'muhngesteven@gmail.com');
-
-        if (!empty($newMessages)) {
-            $this->success('You have new messages!');
-            // dispatch event
-        } else {
-            $this->info('No new messages.');
-        }
-
         return Command::SUCCESS;
     }
 }

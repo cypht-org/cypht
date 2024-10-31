@@ -4,6 +4,7 @@ namespace Services\Core\Queue;
 
 use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
+use Services\Core\Hm_Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -12,20 +13,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class Hm_JobDispatcher
 {
-    protected Hm_QueueManager $queueManager;
-    protected string $defaultDriver;
-
-    /**
-     * Hm_JobDispatcher constructor.
-     * @param Hm_QueueManager $queueManager
-     * @param string $defaultDriver
-     */
-    public function __construct(ContainerInterface $container, string $defaultDriver = 'redis')
-    {
-        $this->queueManager = $container->get('Hm_QueueManager');//$this->queueManager = $queueManager;
-        $this->defaultDriver = $defaultDriver;
-    }
-
     /**
      * Dispatch the job to the queue
      *
@@ -33,11 +20,10 @@ class Hm_JobDispatcher
      * @param string|null $queue
      * @return void
      */
-    public function dispatch(Hm_BaseJob $job, string $queue = null): void {
-        if ($job instanceof Hm_ShouldQueue) {
-            $driver = $job->driver ?? $this->defaultDriver;
-            $queueDriver = $this->queueManager->getDriver($driver);
-
+    static public function dispatch(Hm_BaseJob $job): void {
+        if (is_subclass_of($job, Hm_ShouldQueue::class)) {
+            $driver = $job->driver;
+            $queueDriver = Hm_Container::getContainer()->get('queue.manager')->getDriver($driver);
             if ($queueDriver) {
                 $queueDriver->push($job);
             } else {
@@ -46,7 +32,5 @@ class Hm_JobDispatcher
         }else {
             $job->handle();
         }
-        // $driver = $this->queueManager->getDriver($queue ?? $this->defaultDriver);
-        // $driver->push($job);
     }
 }

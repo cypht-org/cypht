@@ -13,7 +13,7 @@ class Hm_EventDispatcher
 
     public static function dispatch($event): void
     {
-        $eventClass = get_class($event);        
+        $eventClass = get_class($event);   
         // Check if there are listeners for this event
         if (isset(self::$listeners[$eventClass])) {
             foreach (self::$listeners[$eventClass] as $listenerClass) {

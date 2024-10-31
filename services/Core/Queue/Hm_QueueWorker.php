@@ -27,15 +27,15 @@ class Hm_QueueWorker
      * @return void
      */
     public function work(): void {
-        dd($this->queue);
         while ($job = $this->queue->pop())
         {
             try {
-                $job->handle();
+                // dd($job);
+                $this->queue->process($job);
             } catch (\Exception $e) {
-                $job->failed();
-                // Optionally release the job back to the queue with a delay
-                $this->queue->release($job, 30); 
+                // $job->failed();
+                // // Optionally release the job back to the queue with a delay
+                // $this->queue->release($job, 30); 
             }
         }
     }
