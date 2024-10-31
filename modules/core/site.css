@@ -601,6 +601,15 @@ button {
   font-weight: normal;
   text-align: left;
 }
+.folder_toggle {
+  font-size: 0px;
+  float: left;
+  margin: 15px 15px 10px 15px;
+  display: none;
+}
+.folder_toggle i {
+  color: var(--bs-body-color);
+}
 .prevnext {
   font-size: 1.3rem;
   margin-right: 5px;
@@ -967,6 +976,15 @@ div.unseen,
   width: 16px;
   height: 16px;
   vertical-align: -5px;
+}
+.mobile .folder_toggle {
+  display: block;
+  top: 0px;
+  left: -3px;
+  font-weight: bold;
+  margin-top: 15px !important;
+  position: fixed;
+  z-index: 101;
 }
 .mobile .message_table {
   padding-left: 5px !important;
