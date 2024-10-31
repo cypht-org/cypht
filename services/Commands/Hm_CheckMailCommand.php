@@ -36,7 +36,7 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
         // Example: Call the mail checking service from the container
         // $imap = $this->getService('Hm_Imap');
         // $newMessages = $imap->search('UNSEEN'); 
-        (new Hm_ProcessNewEmail('muhngesteven@gmail.com'))->handle();
+        Hm_ProcessNewEmail::dispatch(email: 'muhngesteven@gmail.com');
 
         if (!empty($newMessages)) {
             $this->success('You have new messages!');

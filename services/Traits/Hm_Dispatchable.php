@@ -2,9 +2,11 @@
 
 namespace Services\Traits;
 
-use Services\Events\Hm_EventManager;
+use Services\Core\Events\Hm_EventDispatcher;
+use Services\Core\Jobs\Hm_BaseJob;
+use Services\Core\Queue\Hm_JobDispatcher;
 
-trait Hm_EventDispatchable
+trait Hm_Dispatchable
 {
     /**
      * Dispatch the event with the given arguments.
@@ -13,9 +15,12 @@ trait Hm_EventDispatchable
      */
     public static function dispatch(...$arguments)
     {
-        $event = new static(...$arguments);
-        // Call the event listener or handle it in some way
-        Hm_EventManager::dispatch($event);
+        $instance = new static(...$arguments);
+
+        if (is_subclass_of($instance, Hm_BaseJob::class)) {
+            # code...
+            Hm_JobDispatcher::dispatch($instance);
+        }
     }
 
     /**

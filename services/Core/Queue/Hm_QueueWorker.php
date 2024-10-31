@@ -27,6 +27,7 @@ class Hm_QueueWorker
      * @return void
      */
     public function work(): void {
+        dd($this->queue);
         while ($job = $this->queue->pop())
         {
             try {
