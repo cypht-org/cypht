@@ -1176,7 +1176,6 @@ var Hm_Folders = {
 
     open_folder_list: function() {
         $('.folder_list').show();
-        $('.folder_toggle').toggle();
         if (hm_mobile()) {
             $('main').hide();
         }
@@ -1198,7 +1197,6 @@ var Hm_Folders = {
 
     hide_folder_list: function(forget) {
         $('.folder_list').hide();
-        $('.folder_toggle').show();
         if (!forget) {
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
             Hm_Utils.save_to_local_storage('hide_folder_list', '1');
@@ -1340,7 +1338,6 @@ var Hm_Folders = {
             $('.folder_list').html(folder_list);
             if (Hm_Utils.get_from_local_storage('hide_folder_list') == '1') {
                 $('.folder_list').hide();
-                $('.folder_toggle').show();
                 $('main').css('display', 'block');
             }
             Hm_Folders.hl_selected_menu();
@@ -1351,10 +1348,6 @@ var Hm_Folders = {
             return true;
         }
         return false;
-    },
-
-    toggle_folders_event: function() {
-        $('.folder_toggle').on("click", function() { return Hm_Folders.open_folder_list(); });
     }
 };
 
@@ -1924,7 +1917,6 @@ $(function() {
 
     /* setup a few page wide event handlers */
     Hm_Utils.cancel_logout_event();
-    Hm_Folders.toggle_folders_event();
 
     /* fire up the job scheduler */
     Hm_Timer.fire();

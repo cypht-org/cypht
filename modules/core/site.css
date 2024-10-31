@@ -47,6 +47,7 @@ a:hover {
   display: table-cell;
   background-color: #fff;
   padding-top: 0px;
+  min-height: 100vh;
 }
 
 .selected_menu,
@@ -462,12 +463,6 @@ button {
 }
 .content_title {
   margin-top: 0px;
-  background: linear-gradient(
-    180deg,
-    var(--bs-body-bg),
-    var(--bs-body-bg),
-    var(--bs-secondary-bg)
-  ) !important;
   border-bottom: solid 1px var(--bs-secondary-bg);
   border-top: solid 1px var(--bs-secondary-bg);
   padding-bottom: 10px;
@@ -605,15 +600,6 @@ button {
   font-size: 90%;
   font-weight: normal;
   text-align: left;
-}
-.folder_toggle {
-  font-size: 0px;
-  float: left;
-  margin: 15px 15px 10px 15px;
-  display: none;
-}
-.folder_toggle i {
-  color: var(--bs-body-color);
 }
 .prevnext {
   font-size: 1.3rem;
@@ -946,7 +932,6 @@ div.unseen,
   padding: 0px !important;
   font-size: 130%;
   margin-right: 0px;
-  display: none;
   width: 100%;
 }
 .mobile .folder_list li a {
@@ -966,7 +951,7 @@ div.unseen,
   z-index: 100;
   top: 0px;
   position: fixed;
-  padding-left: 45px !important;
+  padding-left: 4rem !important;
   margin-bottom: 5px;
   left: 0px;
   right: 0px;
@@ -982,15 +967,6 @@ div.unseen,
   width: 16px;
   height: 16px;
   vertical-align: -5px;
-}
-.mobile .folder_toggle {
-  display: block;
-  top: 0px;
-  left: -3px;
-  font-weight: bold;
-  margin-top: 15px !important;
-  position: fixed;
-  z-index: 101;
 }
 .mobile .message_table {
   padding-left: 5px !important;
@@ -1371,4 +1347,34 @@ div.unseen,
   --bs-popover-border-color: var(--bs-primary);
   --bs-popover-header-bg: var(--bs-primary);
   --bs-popover-header-color: var(--bs-white);
+}
+
+.menu-toggle {
+  position: fixed;
+  top: 0;
+  left: -2rem;
+  z-index: 1000;
+  width: 5rem;
+  text-align: right;
+}
+
+.mobile nav {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  z-index: 1000;
+  transform: translateX(-120%);
+  transition: transform 0.3s;
+}
+
+nav .menu-toggle {
+  right: -2rem;
+  left: unset;
+  text-align: left;
+}
+
+body {
+  overflow-x: hidden;
 }

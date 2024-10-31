@@ -831,7 +831,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_start() {
         $test = new Output_Test('folder_list_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a class="folder_toggle" href="#">Show folders<i class="bi bi-list fs-5"></i></a><nav class="folder_cell"><div class="folder_list">'), $res->output_response);
+        $this->assertEquals(array('<nav class="folder_cell"><div class="folder_list">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

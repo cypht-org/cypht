@@ -56,6 +56,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         // core navigation modules included at the end when handlers have been processed
         $expected_scripts[] = 'modules/core/navigation/routes.js';
         $expected_scripts[] = 'modules/core/navigation/navigation.js';
+        $expected_scripts[] = 'modules/core/navigation/navbar.js';
 
         $expected_output = '';
         foreach ($expected_scripts as $script) {
