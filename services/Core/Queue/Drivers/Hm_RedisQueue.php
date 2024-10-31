@@ -3,7 +3,7 @@
 namespace Services\Core\Queue\Drivers;
 
 use Hm_Redis;
-use Services\Jobs\Hm_BaseJob;
+use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 
 /**
@@ -65,5 +65,9 @@ class Hm_RedisQueue implements Hm_ShouldQueue
             sleep($delay);
         }
         $this->push($job);
+    }
+    public function process(Hm_BaseJob $job): void
+    {
+        //TO DO: Implement process() method
     }
 }

@@ -23,16 +23,4 @@ class Hm_EventServiceProvider
             }
         }
     }
-
-     /**
-     * Set the container instance for events and listeners.
-     *
-     * @param  ContainerInterface  $container
-     * @return void
-     */
-    public function setContainer(ContainerInterface $container): void
-    {
-        // var_dump($container);
-        // Hm_EventManager::setContainer($container);
-    }
 }
