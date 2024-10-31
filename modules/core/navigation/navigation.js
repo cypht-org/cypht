@@ -80,9 +80,11 @@ async function navigate(url) {
 }
 
 function renderPage(href) {
+    window.dispatchEvent(new CustomEvent('page-change'));
+
     const searchParams = new URL(href, window.location.origin).searchParams;
     const page = searchParams.get('page');
-    
+
     if (page) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());

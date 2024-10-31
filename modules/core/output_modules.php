@@ -583,7 +583,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
                     * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
                 */
-                foreach (['routes', 'navigation'] as $js) {
+                foreach (['routes', 'navigation', 'navbar'] as $js) {
                     $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
                 }
             }
