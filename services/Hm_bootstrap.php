@@ -1,10 +1,7 @@
 <?php
 
-// use Services\Core\Scheduling\Scheduler;
-use Services\Core\Queue\Hm_QueueManager;
-use Services\Core\Queue\Hm_JobDispatcher;
+use Services\Core\Hm_Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Services\Providers\{ Hm_CommandServiceProvider, Hm_EventServiceProvider, Hm_SchedulerServiceProvider, Hm_QueueServiceProvider };
 
 define('APP_PATH', dirname(__DIR__).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
@@ -42,50 +39,7 @@ $environment->define_default_constants($config);
 if (!$config->get('disable_ini_settings')) {
     require APP_PATH.'lib/ini_set.php';
 }
-// Initialize the scheduler
-// $scheduler = new Scheduler($config);
 
+$containerBuilder = Hm_Container::getContainer();
 
-$containerBuilder = new ContainerBuilder();
-
-// Register Hm_DB
-$containerBuilder->register('db', Hm_DB::class)
-    ->setShared(true);
-
-// Register Hm_Redis
-$containerBuilder->register('redis', Hm_Redis::class)
-    ->setShared(true);
-
-// Register Hm_AmazonSQS
-$containerBuilder->register('amazon.sqs', Hm_AmazonSQS::class)
-    ->setShared(true);
-
-// Register Hm_QueueManager
-$containerBuilder->register('queue.manager', Hm_QueueManager::class)
-    ->setShared(true);
-
-// Register Hm_JobDispatcher
-$containerBuilder->register('job.dispatcher', Hm_JobDispatcher::class)
-    ->setShared(true);
-
-// Register Hm_Site_Config_File
-$containerBuilder->register('Hm_Site_Config_File', Hm_Site_Config_File::class)
-    ->setShared(true);
-
-// Register Hm_CommandServiceProvider
-$containerBuilder->register('command.serviceProvider', Hm_CommandServiceProvider::class)
-    ->setShared(true);
-
-// Register Hm_QueueServiceProvider
-$containerBuilder->register('queue.ServiceProvider',Hm_QueueServiceProvider::class)
-    // ->addArgument(new \Symfony\Component\DependencyInjection\Reference(Hm_Site_Config_File::class))
-    // ->addArgument(null)
-    ->setShared(true);
-
-$containerBuilder->register('scheduler.ServiceProvider', Hm_SchedulerServiceProvider::class)
-    ->setShared(true);
-$containerBuilder->register('event.ServiceProvider', Hm_EventServiceProvider::class)
-    ->setShared(true);
-
-// return $containerBuilder;
 return [$containerBuilder,$config];

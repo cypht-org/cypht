@@ -65,7 +65,7 @@ abstract class Hm_BaseCommand extends Command
     /**
      * Get a service from the container.
      *
-     * @param string $service The service class or interface.
+     * @param string $service The service class Hm_BaseCommand interface.
      * @return mixed The requested service.
      */
     protected function getService(string $service)

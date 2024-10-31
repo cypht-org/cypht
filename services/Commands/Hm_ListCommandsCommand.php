@@ -34,8 +34,8 @@ class Hm_ListCommandsCommand extends Hm_BaseCommand
     /**
      * Execute the command to list all registered commands.
      *
-     * @param InputInterface $input The input interface for the command.
-     * @param OutputInterface $output The output interface for the command.
+     * @param InputInterface $input The input interface Hm_ListCommandsCommand the command.
+     * @param OutputInterface $output The output interface Hm_ListCommandsCommand the command.
      * @return int Command exit code.
      */
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -45,7 +45,7 @@ class Hm_CommandServiceProvider
     /**
      * Register a command with the application.
      *
-     * This method checks if the given class name is a valid command class.
+     * This method checks if the given class Hm_CommandServiceProvider is a valid command class.
      * If it is valid, the command is instantiated and added to the application.
      * If not, the registration is simply skipped without any exceptions.
      *
