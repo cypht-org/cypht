@@ -284,7 +284,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                 $extension = pathinfo($this->request->files['accounts_sample']['name'], PATHINFO_EXTENSION);
                 if (in_array(strtolower($extension), ['yaml', 'yml'])) {
                     $servers = Yaml::parseFile($this->request->files['accounts_sample']['tmp_name']);
-                } elseif ($this->request->files['accounts_sample']['type'] == 'text/csv'){
+                } elseif (in_array($this->request->files['accounts_sample']['type'], ['text/csv', 'text/plain'])) {
                     $servers = [];
                     $server_data = parse_csv_with_headers($this->request->files['accounts_sample']['tmp_name']);
 
@@ -364,7 +364,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             continue;
                         }
                     }
-                } 
+                }
                 if (! empty($server['smtp']['server'])) {
                     if (!$this->module_is_supported('smtp')) {
                         $errors[] = 'SMTP module is not enabled';
