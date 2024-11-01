@@ -484,57 +484,6 @@ class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
-class Hm_Handler_smtp_save extends Hm_Handler_Module {
-    public function process() {
-        $just_saved_credentials = false;
-        if (isset($this->request->post['smtp_save'])) {
-            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
-            if (!$success) {
-                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
-            }
-            else {
-                if (in_server_list('Hm_SMTP_List', $form['smtp_server_id'], $form['smtp_user'])) {
-                    Hm_Msgs::add('ERRThis server and username are already configured');
-                    return;
-                }
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
-                if (smtp_authed($smtp)) {
-                    $just_saved_credentials = true;
-                    Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved('SMTP server saved');
-                }
-                else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
-                    Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
-                }
-            }
-        }
-        $this->out('just_saved_credentials', $just_saved_credentials);
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
-class Hm_Handler_smtp_forget extends Hm_Handler_Module {
-    public function process() {
-        $just_forgot_credentials = false;
-        if (isset($this->request->post['smtp_forget'])) {
-            list($success, $form) = $this->process_form(array('smtp_server_id'));
-            if ($success) {
-                Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
-                $just_forgot_credentials = true;
-                Hm_Msgs::add('Server credentials forgotten');
-                $this->session->record_unsaved('SMTP server credentials forgotten');
-            }
-        }
-        $this->out('just_forgot_credentials', $just_forgot_credentials);
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
 class Hm_Handler_smtp_delete extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['smtp_delete'])) {
@@ -557,9 +506,9 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     public function process() {
         $smtp = false;
         if (isset($this->request->post['smtp_connect'])) {
-            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
+            list($success, $form) = $this->process_form(array('smtp_server_id'));
             $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
-            if ($smtp_details && ($success | array_key_exists('smtp_server_id', $form))) {
+            if ($success && $smtp_details) {
                 if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
@@ -569,22 +518,13 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                         }
                     }
                 }
+                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
+                if (smtp_authed($smtp)) {
+                    Hm_Msgs::add("Successfully authenticated to the SMTP server");
+                    return;
+                }
             }
-            if ($success) {
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
-            }
-            elseif (isset($form['smtp_server_id'])) {
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
-            }
-            if ($smtp && $smtp->state == 'authed') {
-                Hm_Msgs::add("Successfully authenticated to the SMTP server");
-            }
-            elseif ($smtp && $smtp->state == 'connected') {
-                Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
-            }
-            else {
-                Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
-            }
+            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
         }
     }
 }
@@ -1520,7 +1460,6 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-light border btn-sm me-2" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm me-2" />';
                 }
                 else {
                     $keysToRemove = array('object', 'connected');
@@ -1529,7 +1468,6 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                     $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2" data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="smtp" />';
                     $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-primary btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm me-2" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-warning btn-sm me-2" />';
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }

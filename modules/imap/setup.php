@@ -119,8 +119,6 @@ add_handler('ajax_imap_debug', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_debug', 'imap_hide', true);
 add_handler('ajax_imap_debug', 'imap_connect', true);
 add_handler('ajax_imap_debug', 'imap_delete', true);
-add_handler('ajax_imap_debug', 'imap_forget', true);
-add_handler('ajax_imap_debug', 'imap_save', true);
 add_handler('ajax_imap_debug', 'save_imap_cache',  true);
 add_handler('ajax_imap_debug', 'save_imap_servers',  true);
 add_handler('ajax_imap_debug', 'save_user_data',  true, 'core');
@@ -405,8 +403,6 @@ return array(
         'imap_connect' => FILTER_DEFAULT,
         'imap_remember' => FILTER_VALIDATE_INT,
         'imap_folder_ids' => FILTER_DEFAULT,
-        'imap_forget' => FILTER_DEFAULT,
-        'imap_save' => FILTER_DEFAULT,
         'submit_imap_server' => FILTER_DEFAULT,
         'submit_jmap_server' => FILTER_DEFAULT,
         'new_jmap_address' => FILTER_SANITIZE_URL,
