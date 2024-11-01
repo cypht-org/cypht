@@ -17,7 +17,7 @@ class Hm_NewEmailProcessedEvent extends Hm_BaseEvent implements Hm_ShouldQueue
      * 
      * @return void
      */
-    public function __construct(public string $email)
+    public function __construct(private string $email)
     {
         $this->email = $email;
     }

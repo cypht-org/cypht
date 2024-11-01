@@ -29,7 +29,7 @@ class Hm_QueueWorkCommand extends Hm_BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $connection = $input->getArgument('connection') ?: 'default';
+        $connection = $input->getArgument('connection') ?: env('QUEUE_CONNECTION', 'database');
         $queue = $input->getOption('queue') ?: 'default';
 
         $output->writeln("Processing jobs from the [$queue] on connection [$connection]...");

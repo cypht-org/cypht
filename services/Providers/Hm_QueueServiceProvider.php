@@ -9,7 +9,6 @@ use Services\Core\Queue\Drivers\Hm_RedisQueue;
 use Services\Core\Queue\Drivers\Hm_DatabaseQueue;
 use Services\Core\Queue\Drivers\Hm_AmazonSQSQueue;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class Hm_QueueServiceProvider
 {
@@ -35,15 +34,17 @@ class Hm_QueueServiceProvider
             case 'redis':
                 $containerBuilder->register('queue.driver.redis', Hm_RedisQueue::class)
                     ->addArgument(new Reference('redis'))
+                    ->addArgument(new Reference('redis.connection'))
                     ->addArgument('default');
                 $containerBuilder->getDefinition('queue.manager')
                     ->addMethodCall('addDriver', ['redis', new Reference('queue.driver.redis')]);
                 break;
             case 'sqs':
                 $containerBuilder->register('queue.driver.sqs', Hm_AmazonSQSQueue::class)
-                    ->addArgument($containerBuilder->get('amazon.sqs'));
+                    ->addArgument(new Reference('amazon.sqs'))
+                    ->addArgument(new Reference('amazon.sqs.connection'));
                 $containerBuilder->getDefinition('queue.manager')
-                    ->addMethodCall('addDriver', ['sqs', new Reference('queue.driver.redis')]);
+                    ->addMethodCall('addDriver', ['sqs', new Reference('queue.driver.sqs')]);
                 break;
             default:
                 $containerBuilder->register('queue.driver.database', Hm_DatabaseQueue::class)

@@ -5,7 +5,6 @@ namespace Services\Providers;
 use Services\Core\Events\Hm_EventDispatcher;
 use Services\Listeners\Hm_NewMaiListener;
 use Services\Events\Hm_NewEmailProcessedEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class Hm_EventServiceProvider
 {
