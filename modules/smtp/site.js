@@ -512,7 +512,7 @@ $(function () {
 
             // if contact_cc not exist in contact list for user
             var checkInList = "";
-            if (list_emails) {
+            if (typeof list_emails != 'undefined') {
                 checkInList = check_cc_exist_in_contacts_list(e);
                 if (checkInList) {
                     modalContentHeadline = "Adress mail not exist in your contact liste";

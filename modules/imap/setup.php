@@ -19,6 +19,8 @@ add_output('info', 'display_imap_capability', true, 'imap', 'server_capabilities
 add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
+add_handler('servers', 'profile_data',  true, 'profiles', 'load_user_data', 'after');
+add_handler('servers', 'compose_profile_data',  true, 'profiles', 'profile_data', 'after');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'message_list_type', 'after');
 add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
@@ -116,6 +118,10 @@ add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list
 
 /* ajax server setup callback data */
 setup_base_ajax_page('ajax_imap_debug', 'core');
+add_handler('ajax_imap_debug', 'profile_data',  true, 'profiles', 'load_user_data', 'after');
+add_handler('ajax_imap_debug', 'compose_profile_data',  true, 'profiles', 'profile_data', 'after');
+add_handler('ajax_imap_debug', 'profile_data',  true, 'smtp', 'compose_profile_data', 'after');
+add_handler('ajax_imap_debug', 'load_smtp_servers_from_config', true, 'smtp', 'profile_data', 'after');
 add_handler('ajax_imap_debug', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_debug', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_debug', 'imap_hide', true);

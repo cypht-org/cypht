@@ -179,8 +179,8 @@ trait Hm_Server_List {
         Hm_Repository::get as repo_get;
     }
 
-    public static function init($name, $user_config) {
-        self::initRepo($name, $user_config, self::$server_list);
+    public static function init($name, $user_config, $session) {
+        self::initRepo($name, $user_config, $session, self::$server_list);
     }
 
     /**

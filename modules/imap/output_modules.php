@@ -181,7 +181,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
+            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%s',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
             );
@@ -1481,7 +1481,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                             </div>
                             <div class="form-check form-switch mt-3">
                                 <input type="hidden" name="ews_create_profile" value="0">
-                                <input class="form-check-input" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="ews_create_profile" value="1" checked>
+                                <input class="form-check-input" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="ews_create_profile" name="ews_create_profile" value="1" checked>
                                 <label class="form-check-label" for="ews_create_profile">'.$this->trans('Create Profile').'</label>
                             </div>
                             <div class="ms-3">
@@ -1495,7 +1495,7 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                                 </div>
                                 <div class="form-check">
                                     <input type="hidden" name="ews_profile_is_default" value="0">
-                                    <input class="form-check-input" type="checkbox" role="switch" id="ews_profile_is_default" value="1" checked>
+                                    <input class="form-check-input" type="checkbox" role="switch" id="ews_profile_is_default" name="ews_profile_is_default" value="1" checked>
                                     <label class="form-check-label" for="ews_profile_is_default">'.$this->trans('Set this profile default').'</label>
                                 </div>
                             </div>

@@ -5,7 +5,7 @@
  * @package modules
  * @subpackage imap
  *
- * This class hides the implementation details of IMAP, JMAP and EWS connections and provides
+ * This class hides the implementation details of IMAP, JMAP, SMTP and EWS connections and provides
  * a common interface to work with a mail account/mailbox. It acts as a bridge to more than one
  * underlying connections/protocols.
  */
@@ -13,6 +13,7 @@ class Hm_Mailbox {
     const TYPE_IMAP = 1;
     const TYPE_JMAP = 2;
     const TYPE_EWS = 3;
+    const TYPE_SMTP = 4;
 
     protected $type;
     protected $connection;
@@ -30,19 +31,23 @@ class Hm_Mailbox {
     }
 
     public function connect(array $config) {
-        if (array_key_exists('type', $config) && $config['type'] == 'jmap') {
-            $this->connection = new Hm_JMAP();
+        if (array_key_exists('type', $config) && $config['type'] == 'smtp') {
+            $this->type = self::TYPE_SMTP;
+            $this->connection = new Hm_SMTP($config);
+            return $this->connection->connect();
+        } elseif (array_key_exists('type', $config) && $config['type'] == 'jmap') {
             $this->type = self::TYPE_JMAP;
-        }
-        elseif (array_key_exists('type', $config) && $config['type'] == 'ews') {
-            $this->connection = new Hm_EWS();
+            $this->connection = new Hm_JMAP();
+            return $this->connection->connect($config);
+        } elseif (array_key_exists('type', $config) && $config['type'] == 'ews') {
             $this->type = self::TYPE_EWS;
-        }
-        else {
-            $this->connection = new Hm_IMAP();
+            $this->connection = new Hm_EWS();
+            return $this->connection->connect($config);
+        } else {
             $this->type = self::TYPE_IMAP;
+            $this->connection = new Hm_IMAP();
+            return $this->connection->connect($config);
         }
-        return $this->connection->connect($config);
     }
 
     public function get_connection() {
@@ -50,7 +55,11 @@ class Hm_Mailbox {
     }
 
     public function is_imap() {
-        return $this->type !== self::TYPE_EWS;
+        return $this->type === self::TYPE_IMAP || $this->type === self::TYPE_JMAP;
+    }
+
+    public function is_smtp() {
+        return $this->type === self::TYPE_SMTP;
     }
 
     public function server_type() {
@@ -67,8 +76,20 @@ class Hm_Mailbox {
     public function authed() {
         if ($this->is_imap()) {
             return $this->connection->get_state() == 'authenticated' || $this->connection->get_state() == 'selected';
+        } elseif ($this->is_smtp()) {
+            return $this->connection->state == 'authed';
         } else {
             return $this->connection->authed();
+        }
+    }
+
+    public function state() {
+        if ($this->is_imap()) {
+            return $this->connection->get_state();
+        } elseif ($this->is_smtp()) {
+            return $this->connection->state;
+        } else {
+            return null;
         }
     }
 
@@ -331,7 +352,7 @@ class Hm_Mailbox {
                 }
             }
         } else {
-            // TODO: EWS
+            return $this->connection->store_message($folder, $msg, $seen, $draft);
         }
         return false;
     }
@@ -340,16 +361,14 @@ class Hm_Mailbox {
         if (! $this->select_folder($folder)) {
             return;
         }
-        if ($trash_folder && $trash_folder != $folder) {
+        if ($this->is_imap() && $trash_folder && $trash_folder != $folder) {
             if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)) {
                 return true;
             }
         }
         else {
             if ($this->connection->message_action('DELETE', array($msg_id))) {
-                if ($this->is_imap()) {
-                    $this->connection->message_action('EXPUNGE', array($msg_id));
-                }
+                $this->connection->message_action('EXPUNGE', array($msg_id));
                 return true;
             }
         }
@@ -415,7 +434,8 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             $msg = $this->connection->get_message_content($msg_id, 0, false, false);
             if ($msg) {
-                $attachment_id = get_attachment_id_for_mail_parser($this->connection, $msg_id, $part_id);
+                $struct = $this->connection->get_message_structure($msg_id);
+                $attachment_id = get_attachment_id_for_mail_parser($struct, $part_id);
                 if ($attachment_id !== false) {
                     $msg = remove_attachment($attachment_id, $msg);
                     if ($this->connection->append_start($folder, mb_strlen($msg))) {
@@ -430,7 +450,17 @@ class Hm_Mailbox {
                 }
             }
         } else {
-            // TODO: EWS
+            $message = $this->connection->get_mime_message_by_id($msg_id);
+            $result = $this->connection->get_structured_message($msg_id, false, false);
+            $struct = $result[0];
+            $attachment_id = get_attachment_id_for_mail_parser($struct, $part_id);
+            if ($attachment_id !== false) {
+                $message->removeAttachmentPart($attachment_id);
+                if ($this->connection->store_message($folder, (string) $message)) {
+                    $this->connection->message_action('HARDDELETE', [$msg_id]);
+                    return true;
+                }
+            }
         }
     }
 
@@ -512,6 +542,21 @@ class Hm_Mailbox {
             return $this->connection->get_message_list($msg_ids);
         } else {
             return $this->connection->get_message_list($msg_ids);
+        }
+    }
+
+    public function send_message($from, $recipients, $message, $delivery_receipt = false) {
+        if ($this->is_smtp()) {
+            if ($delivery_receipt) {
+                $from_params = 'RET=HDRS';
+                $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
+            } else {
+                $from_params = '';
+                $recipients_params = '';
+            }
+            return $this->connection->send_message($from, $recipients, $message, $from_params, $recipients_params);
+        } else {
+            return $this->connection->send_message($from, $recipients, $message, $delivery_receipt);
         }
     }
 

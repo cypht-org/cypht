@@ -27,7 +27,7 @@ add_handler('profiles', 'load_smtp_servers_from_config', true, 'smtp', 'load_use
 add_handler('profiles', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 
 /* servers page */
-add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'language', 'after');
+add_handler('servers', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 add_handler('servers', 'process_add_smtp_server', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('servers', 'add_smtp_servers_to_page_data', true, 'smtp', 'process_add_smtp_server', 'after');
 add_handler('servers', 'save_smtp_servers', true, 'smtp', 'add_smtp_servers_to_page_data', 'after');
@@ -119,7 +119,7 @@ return array(
         'reply_all' => FILTER_VALIDATE_INT,
         'forward' => FILTER_VALIDATE_INT,
         'forward_as_attachment' => FILTER_VALIDATE_INT,
-        'draft_id' => FILTER_VALIDATE_INT,
+        'draft_id' => FILTER_DEFAULT,
         'hm_ajax_hook' => FILTER_DEFAULT,
         'compose_to' => FILTER_DEFAULT,
         'mailto_uri' => FILTER_DEFAULT,
@@ -138,7 +138,7 @@ return array(
     'allowed_output' => array(
         'file_details' => array(FILTER_UNSAFE_RAW, false),
         'draft_subject' => array(FILTER_DEFAULT, false),
-        'draft_id' => array(FILTER_VALIDATE_INT, false),
+        'draft_id' => array(FILTER_DEFAULT, false),
         'profile_value' => array(FILTER_DEFAULT, false),
         'msg_sent_and_archived' => array(FILTER_VALIDATE_BOOLEAN, false),
         'sent_msg_id' => array(FILTER_VALIDATE_BOOLEAN, false),
@@ -171,7 +171,7 @@ return array(
         'compose_bcc' => FILTER_UNSAFE_RAW,
         'compose_delivery_receipt' => FILTER_VALIDATE_BOOLEAN,
         'compose_smtp_id' => FILTER_DEFAULT,
-        'draft_id' => FILTER_VALIDATE_INT,
+        'draft_id' => FILTER_DEFAULT,
         'draft_body' => FILTER_UNSAFE_RAW,
         'draft_subject' => FILTER_UNSAFE_RAW,
         'draft_to' => FILTER_UNSAFE_RAW,

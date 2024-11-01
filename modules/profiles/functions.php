@@ -16,7 +16,9 @@ if (!hm_exists('add_profile')) {
             'user' => $email,
             'type' => 'imap'
         );
-
-        Hm_Profiles::add($profile);
+        $id = Hm_Profiles::add($profile);
+        if ($is_default) {
+            Hm_Profiles::setDefault($id);
+        }
     }
 }

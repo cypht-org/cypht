@@ -3,7 +3,7 @@
 /**
  * EWS integration
  * @package modules
- * @subpackage imap
+ * @subpackage core
  *
  * This is a drop-in replacment of IMAP, JMAP and SMTP classes that allows usage of Exchange Web Services (EWS)
  * in all functions provided in imap and smtp modules - accessing mailbox, folders, reading messages,
@@ -34,6 +34,9 @@ class Hm_EWS {
     const PID_TAG_FLAG_FLAGGED = 0x00000002;
     const PID_TAG_ICON_INDEX = 0x1080;
     const PID_TAG_ICON_REPLIED = 0x00000105;
+    const PID_TAG_MESSAGE_FLAGS = 0x0E07;
+    const PID_TAG_MESSAGE_READ = 0x00000001;
+    const PID_TAG_MESSAGE_DRAFT = 0x00000008;
 
     public function connect(array $config) {
         try {
@@ -109,7 +112,7 @@ class Hm_EWS {
             'flagged' => false,
             'all' => false,
             'junk' => Enumeration\DistinguishedFolderIdNameType::JUNK,
-            'archive' => false, // TODO: check if Enumeration\DistinguishedFolderIdNameType::ARCHIVEMSGFOLDERROOT should be used - it is outside of MESSAGE_ROOT, however.
+            'archive' => false,
             'drafts' => Enumeration\DistinguishedFolderIdNameType::DRAFTS,
         ];
         foreach ($special as $type => $folderId) {
@@ -203,6 +206,58 @@ class Hm_EWS {
         try {
             return $this->api->deleteFolder(new Type\FolderIdType($folder));
         } catch(\Exception $e) {
+            Hm_Msgs::add('ERR' . $e->getMessage());
+            return false;
+        }
+    }
+
+    public function send_message($from, $recipients, $message, $delivery_receipt = false) {
+        try {
+            $msg = new Type\MessageType();
+            $msg->setFrom($from);
+            $msg->setToRecipients($recipients);
+            $msg->setMimeContent(base64_encode($message));
+            if ($delivery_receipt) {
+                $msg->setIsDeliveryReceiptRequested($delivery_receipt);
+            }
+            $this->api->sendMail($msg, [
+                'MessageDisposition' => 'SendOnly', // saving to sent items is handled by the imap module depending on the chosen sent folder
+            ]);
+            return;
+        } catch (\Exception $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public function store_message($folder, $message, $seen = true, $draft = false) {
+        try {
+            if ($this->is_distinguished_folder($folder)) {
+                $folder = new Type\DistinguishedFolderIdType($folder);
+            } else {
+                $folder = new Type\FolderIdType($folder);
+            }
+            $msg = new Type\MessageType();
+            $msg->setMimeContent(base64_encode($message));
+            $flags = 0;
+            if ($seen) {
+                $flags |= self::PID_TAG_MESSAGE_READ;
+            }
+            if ($draft) {
+                $flags |= self::PID_TAG_MESSAGE_DRAFT;
+            }
+            $msg->addExtendedProperty(Type\ExtendedPropertyType::buildFromArray([
+                'ExtendedFieldURI' => [
+                    'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
+                    'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+                ],
+                'Value' => $flags,
+            ]));
+            $this->api->sendMail($msg, [
+                'MessageDisposition' => 'SaveOnly',
+                'SavedItemFolderId' => $folder->toArray(true),
+            ]);
+            return true;
+        } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
         }
@@ -310,7 +365,6 @@ class Hm_EWS {
             case 'SEEN':
                 $qs[] = 'isRead:true';
                 break;
-            // TODO:
             case 'FLAGGED':
                 $qs[] = 'isFlagged:true';
                 break;
@@ -322,7 +376,7 @@ class Hm_EWS {
                     'IsEqualTo' => [
                         'ExtendedFieldURI' => [
                             'PropertyTag' => self::PID_TAG_ICON_INDEX,
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                         'FieldURIOrConstant' => [
                             'Constant' => ['Value' => self::PID_TAG_ICON_REPLIED],
@@ -335,7 +389,7 @@ class Hm_EWS {
                     'IsNotEqualTo' => [
                         'ExtendedFieldURI' => [
                             'PropertyTag' => self::PID_TAG_ICON_INDEX,
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                         'FieldURIOrConstant' => [
                             'Constant' => ['Value' => self::PID_TAG_ICON_REPLIED],
@@ -396,11 +450,11 @@ class Hm_EWS {
                     'ExtendedFieldURI' => [
                         [
                             'PropertyTag' => self::PID_TAG_FLAG_STATUS, //check flagged msg
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                         [
                             'PropertyTag' => self::PID_TAG_ICON_INDEX, // check if replied/answered
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                     ],
                 ],
@@ -418,27 +472,7 @@ class Hm_EWS {
         }
         $messages = [];
         foreach ($result as $message) {
-            // note about flags: EWS - doesn't support the \Deleted flag
-            $flags = [];
-            if ($message->get('isRead')) {
-                $flags[] = '\\Seen';
-            }
-            if ($message->get('isDraft')) {
-                $flags[] = '\\Draft';
-            }
-            if ($extended_properties = $message->get('extendedProperty')) {
-                if ($extended_properties instanceof Type\ExtendedPropertyType) {
-                    $extended_properties = [$extended_properties];
-                }
-                foreach ($extended_properties as $prop) {
-                    if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_FLAG_STATUS && $prop->get('value') > 0) {
-                        $flags[] = '\\Flagged';
-                    }
-                    if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_ICON_INDEX && $prop->get('value') == self::PID_TAG_ICON_REPLIED) {
-                        $flags[] = '\\Answered';
-                    }
-                }
-            }
+            $flags = $this->extract_flags($message);
             $uid = bin2hex($message->get('itemId')->get('id'));
             $msg = [
                 'uid' => $uid,
@@ -493,6 +527,8 @@ class Hm_EWS {
                 return $this->archive_items($itemIds);
             case 'DELETE':
                 return $this->delete_items($itemIds);
+            case 'HARDDELETE':
+                return $this->delete_items($itemIds, true);
             case 'COPY':
                 return $this->copy_items($itemIds, $folder);
             case 'MOVE':
@@ -508,13 +544,13 @@ class Hm_EWS {
                     'SetItemField' => [
                         'ExtendedFieldURI' => [
                             'PropertyTag' => self::PID_TAG_FLAG_STATUS,
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                         'Message' => [
                             'ExtendedProperty' => [
                                 'ExtendedFieldURI' => [
                                     'PropertyTag' => self::PID_TAG_FLAG_STATUS,
-                                    'PropertyType' => 'Integer',
+                                    'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                                 ],
                                 'Value' => self::PID_TAG_FLAG_FLAGGED,
                             ],
@@ -527,7 +563,7 @@ class Hm_EWS {
                     'DeleteItemField' => [
                         'ExtendedFieldURI' => [
                             'PropertyTag' => self::PID_TAG_FLAG_STATUS,
-                            'PropertyType' => 'Integer',
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
                         ],
                     ],
                 ];
@@ -539,7 +575,7 @@ class Hm_EWS {
                 $change = null;
                 break;
             case 'EXPUNGE':
-                // IMAP-only, not supported or needed by EWS
+                // not needed for EWS
                 return true;
             default:
                 $change = null;
@@ -563,6 +599,18 @@ class Hm_EWS {
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
+                'AdditionalProperties' => [
+                    'ExtendedFieldURI' => [
+                        [
+                            'PropertyTag' => self::PID_TAG_FLAG_STATUS, //check flagged msg
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+                        ],
+                        [
+                            'PropertyTag' => self::PID_TAG_ICON_INDEX, // check if replied/answered
+                            'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+                        ],
+                    ],
+                ],
             ),
             'ItemIds' => [
                 'ItemId' => ['Id' => hex2bin($itemId)],
@@ -570,9 +618,19 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
+        $sender = $message->get('sender');
+        $from = $message->get('from');
         $headers = [];
         $headers['Arrival Date'] = $message->get('dateTimeCreated');
-        $headers['From'] = $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>';
+        if ($sender && $from) {
+            $headers['From'] = $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>';
+        } elseif ($sender) {
+            $headers['From'] = $this->extract_mailbox($sender);
+        } elseif ($from) {
+            $headers['From'] = $this->extract_mailbox($from);
+        } else {
+            $headers['From'] = null;
+        }
         $headers['To'] = $this->extract_mailbox($message->get('toRecipients'));
         if ($message->get('ccRecipients')) {
             $headers['Cc'] = $this->extract_mailbox($message->get('ccRecipients'));
@@ -580,6 +638,7 @@ class Hm_EWS {
         if ($message->get('bccRecipients')) {
             $headers['Bcc'] = $this->extract_mailbox($message->get('bccRecipients'));
         }
+        $headers['Flags'] = implode(' ', $this->extract_flags($message));
         foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
             $name = $header->get('headerName');
             if (isset($headers[$name])) {
@@ -590,6 +649,11 @@ class Hm_EWS {
             } else {
                 $headers[$name] = (string) $header;
             }
+        }
+        if (! $message->isRead()) {
+            $this->api->updateMailItem($message->getItemId(), [
+                'IsRead' => true,
+            ]);
         }
         return $headers;
     }
@@ -673,6 +737,27 @@ class Hm_EWS {
         return [$msg_struct, $msg_struct_current, $msg_text, $part];
     }
 
+    public function get_mime_message_by_id($itemId) {
+        $request = array(
+            'ItemShape' => array(
+                'BaseShape' => 'IdOnly',
+                'IncludeMimeContent' => true,
+            ),
+            'ItemIds' => [
+                'ItemId' => ['Id' => hex2bin($itemId)],
+            ],
+        );
+        $request = Type::buildFromArray($request);
+        $message = $this->ews->GetItem($request);
+        $mime = $message->get('mimeContent');
+        $content = base64_decode($mime);
+        if (strtoupper($mime->get('characterSet')) != 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $mime->get('characterSet'));
+        }
+        $parser = new MailMimeParser();
+        return $parser->parse($content, false);
+    }
+
     protected function parse_mime_part($part, &$struct, $part_num) {
         $struct[$part_num] = [];
         list($struct[$part_num]['type'], $struct[$part_num]['subtype']) = explode('/', $part->getContentType());
@@ -697,7 +782,14 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
-            $struct[$part_num]['file_attributes'] = '';
+            if ($filename = $part->getFilename()) {
+                $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+                if ($part->getContentDisposition() == 'attachment') {
+                    $struct[$part_num]['file_attributes']['attachment'] = true;
+                }
+            } else {
+                $struct[$part_num]['file_attributes'] = '';
+            }
             $struct[$part_num]['language'] = '';
             $struct[$part_num]['location'] = '';
         }
@@ -742,27 +834,6 @@ class Hm_EWS {
         return $found;
     }
 
-    protected function get_mime_message_by_id($itemId) {
-        $request = array(
-            'ItemShape' => array(
-                'BaseShape' => 'IdOnly',
-                'IncludeMimeContent' => true,
-            ),
-            'ItemIds' => [
-                'ItemId' => ['Id' => hex2bin($itemId)],
-            ],
-        );
-        $request = Type::buildFromArray($request);
-        $message = $this->ews->GetItem($request);
-        $mime = $message->get('mimeContent');
-        $content = base64_decode($mime);
-        if (strtoupper($mime->get('characterSet')) != 'UTF-8') {
-            $content = mb_convert_encoding($content, 'UTF-8', $mime->get('characterSet'));
-        }
-        $parser = new MailMimeParser();
-        return $parser->parse($content, false);
-    }
-
     protected function extract_mailbox($data) {
         if (is_array($data)) {
             $result = [];
@@ -779,6 +850,31 @@ class Hm_EWS {
         }
     }
 
+    protected function extract_flags($message) {
+        // note about flags: EWS - doesn't support the \Deleted flag
+        $flags = [];
+        if ($message->get('isRead')) {
+            $flags[] = '\\Seen';
+        }
+        if ($message->get('isDraft')) {
+            $flags[] = '\\Draft';
+        }
+        if ($extended_properties = $message->get('extendedProperty')) {
+            if ($extended_properties instanceof Type\ExtendedPropertyType) {
+                $extended_properties = [$extended_properties];
+            }
+            foreach ($extended_properties as $prop) {
+                if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_FLAG_STATUS && $prop->get('value') > 0) {
+                    $flags[] = '\\Flagged';
+                }
+                if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_ICON_INDEX && $prop->get('value') == self::PID_TAG_ICON_REPLIED) {
+                    $flags[] = '\\Answered';
+                }
+            }
+        }
+        return $flags;
+    }
+
     protected function is_distinguished_folder($folder) {
         $oClass = new ReflectionClass(new Enumeration\DistinguishedFolderIdNameType());
         $constants = $oClass->getConstants();
@@ -786,32 +882,54 @@ class Hm_EWS {
     }
 
     protected function archive_items($itemIds) {
-        $itemIds = array_map(function($itemId) {
-            return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
-        }, $itemIds);
-        $parent = $this->get_parent_folder_of_items($itemIds);
-        $request = [
-            'ArchiveSourceFolderId' => (new Type\FolderIdType($parent))->toArray(true),
-            'ItemIds' => [
-                'ItemId' => $itemIds,
-            ]
-        ];
-        $request = Type::buildFromArray($request);
-        try {
-            $result = $this->ews->ArchiveItem($request);
-        } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
-            $result = false;
+        $result = true;
+        $folders = $this->get_parent_folders_of_items($itemIds);
+        foreach ($folders as $folder => $itemIds) {
+            if ($this->is_distinguished_folder($folder)) {
+                $folder = new Type\DistinguishedFolderIdType($folder);
+            } else {
+                $folder = new Type\FolderIdType($folder);
+            }
+            $request = [
+                'ArchiveSourceFolderId' => $folder->toArray(true),
+                'ItemIds' => [
+                    'ItemId' => $itemIds = array_map(function($itemId) {
+                        return (new Type\ItemIdType($itemId))->toArray();
+                    }, $itemIds),
+                ]
+            ];
+            $request = Type::buildFromArray($request);
+            try {
+                $result = $result && $this->ews->ArchiveItem($request);
+            } catch (\Exception $e) {
+                Hm_Msgs::add('ERR' . $e->getMessage());
+                $result = false;
+            }
         }
         return $result;
     }
 
-    protected function delete_items($itemIds) {
+    protected function delete_items($itemIds, $hard = false) {
+        $result = true;
         try {
-            // TODO: use HardDelete type for items stored in deleted items or trash folder
-            $result = $this->api->deleteItems(array_map(function($itemId) {
-                return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
-            }, $itemIds));
+            if ($hard) {
+                $result = $this->api->deleteItems(array_map(function($itemId) {
+                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                }, $itemIds), [
+                    'DeleteType' => 'HardDelete',
+                ]);
+            } else {
+                $trash = $this->api->getFolderByDistinguishedId(Type\DistinguishedFolderIdNameType::DELETED);
+                $folders = $this->get_parent_folders_of_items($itemIds);
+                foreach ($folders as $folder => $itemIds) {
+                    if ($trash && $folder == $trash->get('folderId')->get('id')) {
+                        $options = ['DeleteType' => 'HardDelete'];
+                    } else {
+                        $options = [];
+                    }
+                    $result = $result && $this->api->deleteItems($itemIds, $options);
+                }
+            }
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             $result = false;
@@ -820,8 +938,13 @@ class Hm_EWS {
     }
 
     protected function copy_items($itemIds, $folder) {
+        if ($this->is_distinguished_folder($folder)) {
+            $folder = new Type\DistinguishedFolderIdType($folder);
+        } else {
+            $folder = new Type\FolderIdType($folder);
+        }
         $request = [
-            'ToFolderId' => (new Type\FolderIdType($folder))->toArray(true),
+            'ToFolderId' => $folder->toArray(true),
             'ItemIds' => [
                 'ItemId' => array_map(function($itemId) {
                     return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
@@ -839,8 +962,13 @@ class Hm_EWS {
     }
 
     protected function move_items($itemIds, $folder) {
+        if ($this->is_distinguished_folder($folder)) {
+            $folder = new Type\DistinguishedFolderIdType($folder);
+        } else {
+            $folder = new Type\FolderIdType($folder);
+        }
         $request = [
-            'ToFolderId' => (new Type\FolderIdType($folder))->toArray(true),
+            'ToFolderId' => $folder->toArray(true),
             'ItemIds' => [
                 'ItemId' => array_map(function($itemId) {
                     return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
@@ -858,8 +986,11 @@ class Hm_EWS {
         return $result;
     }
 
-    protected function get_parent_folder_of_items($itemIdTypes) {
-        $folder = null;
+    protected function get_parent_folders_of_items($itemIds) {
+        $itemIds = array_map(function($itemId) {
+            return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+        }, $itemIds);
+        $folders = null;
         $request = [
             'ItemShape' => [
                 'BaseShape' => 'IdOnly',
@@ -868,7 +999,7 @@ class Hm_EWS {
                 ],
             ],
             'ItemIds' => [
-                'ItemId' => $itemIdTypes,
+                'ItemId' => $itemIds,
             ],
         ];
         $request = Type::buildFromArray($request);
@@ -877,13 +1008,12 @@ class Hm_EWS {
             $result = [$result];
         }
         foreach ($result as $message) {
-            if (! $folder) {
-                $folder = $message->get('ParentFolderId')->get('id');
+            $folder = $message->get('ParentFolderId')->get('id');
+            if (! isset($folders[$folder])) {
+                $folders[$folder] = [];
             }
-            if ($folder != $message->get('ParentFolderId')->get('id')) {
-                throw new Exception('Parent folder of items stored in different folders cannot be determinted.');
-            }
+            $folders[$folder][] = $message->getItemId();
         }
-        return $folder;
+        return $folders;
     }
 }

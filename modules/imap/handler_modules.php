@@ -401,7 +401,7 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                 if (count($path) == 3 && $path[0] == 'imap') {
                     $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1], $this->cache);
                     if ($mailbox && $mailbox->authed()) {
-                        $this->out('folder_status', array('imap_'.$path[1].'_'.$path[2] => $mailbox->getFolderState()));
+                        $this->out('folder_status', array('imap_'.$path[1].'_'.$path[2] => $mailbox->get_folder_state()));
                         $mailbox->message_action(hex2bin($path[2]), 'ANSWERED', array($form['compose_msg_uid']));
                     }
                 }
@@ -423,7 +423,7 @@ class Hm_Handler_imap_mark_as_read extends Hm_Handler_Module {
         if ($success) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->getFolderState()));
+                $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
                 $mailbox->message_action(hex2bin($form['folder']), 'READ', array($form['imap_msg_uid']));
             }
         }
@@ -1101,7 +1101,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         foreach ($folders as $folder => $uids) {
                             $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
 
-                            if ($form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
+                            if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
                                 if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)) {
                                     $errs++;
                                 }
@@ -1111,7 +1111,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                 }
                             }
-                            elseif ($form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
+                            elseif ($mailbox->is_imap() && $form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
                                 /* path according to original option setting */
                                 if ($this->user_config->get('original_folder_setting', false)) {
                                     $archive_folder .= '/' . hex2bin($folder);
@@ -1435,11 +1435,8 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
             'ews_profile_reply_to',
             'ews_profile_is_default',
         ));
-        // var_dump($success);
-        // var_dump($form);
-        // exit;
         if ($success) {
-            $server_id = connect_to_imap_server(
+            $imap_server_id = connect_to_imap_server(
                 $form['ews_server'],
                 $form['ews_profile_name'],
                 null,
@@ -1453,20 +1450,29 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 $form['ews_hide_from_c_page'],
                 $form['ews_server_id'],
             );
-            if(empty($server_id)) {
+            if(empty($imap_server_id)) {
                 Hm_Msgs::add("ERRCould not save server");
                 return;
-            };
-            // TODO: EWS check if we shouldn't add the same server to smtp server list for the profile
-            if ($form['ews_create_profile']) {
-                add_profile($form['ews_profile_name'], $form['ews_profile_signature'], $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $form['ews_email'], $form['ews_server'], $server_id, $server_id, $this);
+            }
+            $smtp_server_id = connect_to_smtp_server(
+                $form['ews_server'],
+                $form['ews_profile_name'],
+                null,
+                $form['ews_email'],
+                $form['ews_password'],
+                null,
+                'ews',
+                $form['ews_server_id'],
+            );
+            if ($form['ews_create_profile'] && $imap_server_id && $smtp_server_id) {
+                add_profile($form['ews_profile_name'], $form['ews_profile_signature'], $form['ews_profile_reply_to'], $form['ews_profile_is_default'], $form['ews_email'], $form['ews_server'], $smtp_server_id, $imap_server_id, $this);
             }
             // auto-assign special folders
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
             if (is_object($mailbox) && $mailbox->authed()) {
                 $specials = $this->user_config->get('special_imap_folders', array());
                 $exposed = $mailbox->get_special_use_mailboxes();
-                $specials[$server_id] = [
+                $specials[$imap_server_id] = [
                     'sent' => $exposed['sent'] ?? '',
                     'draft' => $exposed['drafts'] ?? '',
                     'trash' => $exposed['trash'] ?? '',
@@ -1475,6 +1481,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 ];
                 $this->user_config->set('special_imap_folders', $specials);
             }
+            $this->session->record_unsaved('EWS server added');
         }
     }
 }
@@ -2002,11 +2009,21 @@ class Hm_Handler_imap_delete extends Hm_Handler_Module {
         if (isset($this->request->post['imap_delete'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
+                $type = imap_server_type($form['imap_server_id']);
+                if (strtolower($type) == 'ews') {
+                    $details = Hm_IMAP_List::dump($form['imap_server_id']);
+                    foreach (Hm_Profiles::getAll() as $profile) {
+                        if ($details['user'] == $profile['user'] && $details['server'] == $profile['server']) {
+                            Hm_Profiles::del($profile['id']);
+                            Hm_SMTP_List::del($profile['smtp_id']);
+                        }
+                    }
+                }
                 $res = Hm_IMAP_List::del($form['imap_server_id']);
                 if ($res) {
                     $this->out('deleted_server_id', $form['imap_server_id']);
                     Hm_Msgs::add('Server deleted');
-                    $this->session->record_unsaved(sprintf('%s server deleted', imap_server_type($form['imap_server_id'])));
+                    $this->session->record_unsaved(sprintf('%s server deleted', $type));
                 }
             }
             else {

@@ -504,20 +504,18 @@ if (!hm_exists('remove_attachment')) {
 /*
  * ZBateson\MailMimeParser uses 0-based index for attachments
  * Which mixes embedded images and attachments
- * @param Hm_IMAP $imap Imap object
- * @param int $msg message id
- * @param string $msg_id message part
+ * @param array $struct Imap structure
+ * @param string $part_id message part
  * @return int
  */
 if (!hm_exists('get_attachment_id_for_mail_parser')) {
-    function get_attachment_id_for_mail_parser($imap, $uid, $msg_id) {
+    function get_attachment_id_for_mail_parser($struct, $part_id) {
         $count = -1;
         $id = false;
-        $struct = $imap->get_message_structure($uid);
         foreach ($struct[0]['subs'] as $key => $sub) {
             if (! empty($sub['file_attributes'])) {
                 $count++;
-                if ($key == $msg_id && isset($sub['file_attributes']['attachment'])) {
+                if ($key == $part_id && isset($sub['file_attributes']['attachment'])) {
                     $id = $count;
                     break;
                 }
@@ -1065,16 +1063,6 @@ function clear_existing_reply_details($session) {
     foreach (array_slice($msgs, $max) as $name) {
         $session->del($name);
     }
-}}
-
-/**
- * @subpackage imap/functions
- * @param object $imap imap library object
- * @return bool
- */
-if (!hm_exists('imap_authed')) {
-function imap_authed($imap) {
-    return is_object($imap) && ($imap->get_state() == 'authenticated' || $imap->get_state() == 'selected');
 }}
 
 /**

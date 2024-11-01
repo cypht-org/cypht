@@ -481,8 +481,8 @@ class Hm_Handler_smtp_save extends Hm_Handler_Module {
                     Hm_Msgs::add('ERRThis server and username are already configured');
                     return;
                 }
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
-                if (smtp_authed($smtp)) {
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
+                if ($mailbox && $mailbox->authed()) {
                     $just_saved_credentials = true;
                     Hm_Msgs::add("Server saved");
                     $this->session->record_unsaved('SMTP server saved');
@@ -555,15 +555,15 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                 }
             }
             if ($success) {
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
             }
             elseif (isset($form['smtp_server_id'])) {
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false);
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false);
             }
-            if ($smtp && $smtp->state == 'authed') {
+            if ($mailbox && $mailbox->authed()) {
                 Hm_Msgs::add("Successfully authenticated to the SMTP server");
             }
-            elseif ($smtp && $smtp->state == 'connected') {
+            elseif ($mailbox && $mailbox->state() == 'connected') {
                 Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
             }
             else {
@@ -704,8 +704,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
-        $from_params = '';
-        $recipients_params = '';
 
         /* parse attachments */
         $uploaded_files = [];
@@ -722,11 +720,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
-
-        if (!empty($this->request->post['compose_delivery_receipt'])) {
-            $from_params      = 'RET=HDRS';
-            $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
-        }
 
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
@@ -747,8 +740,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
 
         /* try to connect */
-        $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (!smtp_authed($smtp)) {
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+        if (! $mailbox || ! $mailbox->authed()) {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             repopulate_compose_form($draft, $this);
             return;
@@ -770,7 +763,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg(), $from_params, $recipients_params);
+        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), ! empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
             repopulate_compose_form($draft, $this);
@@ -781,7 +774,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime->get_mime_msg());
         }
 
         /* check for associated IMAP server to save a copy */
@@ -1424,6 +1417,10 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         foreach ($list as $index => $vals) {
 
             $no_edit = false;
+
+            if (array_key_exists('type', $vals) && $vals['type'] == 'ews') {
+                continue;
+            }
 
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
@@ -2153,14 +2150,6 @@ function profile_from_compose_smtp_id($profiles, $id) {
 /**
  * @subpackage smtp/functions
  */
-if (!hm_exists('smtp_authed')) {
-function smtp_authed($smtp) {
-    return is_object($smtp) && $smtp->state == 'authed';
-}}
-
-/**
- * @subpackage smtp/functions
- */
 if (!hm_exists('parse_mailto')) {
 function parse_mailto($str) {
     $res = array(
@@ -2200,6 +2189,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
+        'type' => 'smtp',
         'server' => $smtp_server,
         'port' => $smtp_port,
         'tls' => $smtp_tls,
