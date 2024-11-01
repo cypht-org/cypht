@@ -287,7 +287,7 @@ function process_site_setting($type, $handler, $callback=false, $default=false, 
 
     if ($success) {
         if (function_exists($callback)) {
-            $result = $callback($form[$type]);
+            $result = $callback($form[$type], $type, $handler);
         }
         else {
             $result = $default;
@@ -428,7 +428,6 @@ function setup_base_page($name, $source=false, $use_layout=true) {
     add_output($name, 'header_start', false, $source);
     add_output($name, 'header_css', false, $source);
     add_output($name, 'header_content', false, $source);
-    add_handler($name, 'default_timezone',  false, $source);
     add_output($name, 'js_data', false, $source);
     add_output($name, 'js_search_data', true, $source);
     add_output($name, 'header_end', false, $source);
@@ -444,6 +443,7 @@ function setup_base_page($name, $source=false, $use_layout=true) {
         add_output($name, 'folder_list_end', true, $source);
         add_output($name, 'content_section_start', true, $source);
         add_output($name, 'content_section_end', true, $source);
+        add_output($name, 'modals', true, $source);
         add_output($name, 'save_reminder', true, $source);
         add_output($name, 'content_end', false, $source, 'page_js', 'after');
     }
@@ -608,4 +608,36 @@ function get_special_folders($mod, $id) {
         return $specials[$id];
     }
     return array();
+}
+
+/**
+ * @subpackage core/functions
+ */
+if (!hm_exists('check_file_upload')) {
+function check_file_upload($request, $key) {
+    if (!is_array($request->files) || !array_key_exists($key, $request->files)) {
+        return false;
+    }
+    if (!is_array($request->files[$key]) || !array_key_exists('tmp_name', $request->files[$key])) {
+        return false;
+    }
+    return true;
+}}
+
+function privacy_setting_callback($val, $key, $mod) {
+    $setting = Hm_Output_privacy_settings::$settings[$key];
+    $key .= '_setting';
+    $user_setting = $mod->user_config->get($key);
+    $update = $mod->request->post['update'];
+
+    if ($update) {
+        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        $mod->user_config->set($key, $val);
+
+        $user_data = $mod->session->get('user_data', array());
+        $user_data[$key] = $val;
+        $mod->session->set('user_data', $user_data);
+        $mod->session->record_unsaved('Privacy settings updated');
+    }
+    return $val;
 }

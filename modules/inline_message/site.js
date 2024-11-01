@@ -94,7 +94,6 @@ var get_inline_msg_details = function(link) {
 };
 
 var msg_inline_close = function() {
-    $('.refresh_link').trigger('click');
     if (inline_msg_style() == 'right') {
         $('.msg_text').remove();
         $('.message_table').css('width', '100%');
@@ -126,7 +125,6 @@ var capture_subject_click = function() {
         var inline_msg_loaded_callback = function() {
             $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
             $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-            $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback, false, $(this).data('allowImages')); });
             update_imap_links(uid, details);
         };
 
@@ -158,24 +156,22 @@ var capture_subject_click = function() {
     });
 };
 
-$(function() {
-    if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
-        if (inline_msg()) {
-            setTimeout(capture_subject_click, 100);
-            $('tr').removeClass('hl');
-            Hm_Ajax.add_callback_hook('*', capture_subject_click);
-            Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
-            Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
-            Hm_Ajax.add_callback_hook('ajax_imap_archive_message', msg_inline_close);
-            if (hm_list_path().substr(0, 4) !== 'imap') {
-                Hm_Ajax.add_callback_hook('ajax_imap_unread', msg_inline_close);
-            }
-            if (hm_list_path().substr(0, 4) === 'imap') {
-                Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
-            }
+function inlineMessageMessageListAndSearchPageHandler(routeParams) {
+    if (window.inline_msg && inline_msg()) {
+        setTimeout(capture_subject_click, 100);
+        $('tr').removeClass('hl');
+        Hm_Ajax.add_callback_hook('*', capture_subject_click);
+        Hm_Ajax.add_callback_hook('ajax_imap_delete_message', msg_inline_close);
+        Hm_Ajax.add_callback_hook('ajax_imap_move_copy_action', msg_inline_close);
+        Hm_Ajax.add_callback_hook('ajax_imap_archive_message', msg_inline_close);
+        if (routeParams.list_path?.substr(0, 4) !== 'imap') {
+            Hm_Ajax.add_callback_hook('ajax_imap_unread', msg_inline_close);
+        }
+        if (routeParams.list_path?.substr(0, 4) === 'imap') {
+            Hm_Ajax.add_callback_hook('ajax_imap_folder_display', capture_subject_click);
         }
     }
-});
+}
 
 const messagesListMutation = new MutationObserver(function (mutations) {
     mutations.forEach(function (mutation) {

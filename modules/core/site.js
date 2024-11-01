@@ -1,63 +1,5 @@
 'use strict';
 
-/**
- * NOTE: Tiki-Cypht integration dynamically removes everything from the begining of this file
- * up to swipe_event function definition as it uses jquery (over cash.js) and has bootstrap
- * framework already included. If you add code here that you wish to be included in Tiki-Cypht
- * integration, add it below swipe_event function definition.
- */
-
-/* extend cash.js with some useful bits */
-$.inArray = function(item, list) {
-    for (var i in list) {
-        if (list[i] === item) {
-            return i;
-        }
-    }
-    return -1;
-};
-$.isEmptyObject = function(obj) {
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            return false;
-        }
-    }
-    return true;
-};
-$.fn.submit = function() { this[0].submit(); }
-$.fn.focus = function() { this[0].focus(); };
-$.fn.serializeArray = function() {
-    var parts;
-    var res = [];
-    var args = this.serialize().split('&');
-    for (var i in args) {
-        parts = args[i].split('=');
-        if (parts[0] && parts[1]) {
-            res.push({'name': parts[0], 'value': parts[1]});
-        }
-    }
-    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
-};
-$.fn.sort = function(sort_function) {
-    var list = [];
-    for (var i=0, len=this.length; i < len; i++) {
-        list.push(this[i]);
-    }
-    return $(list.sort(sort_function));
-};
-$.fn.fadeOut = function(timeout = 600) {
-    return this.css("opacity", 0)
-    .css("transition", `opacity ${timeout}ms`)
-};
-$.fn.fadeOutAndRemove = function(timeout = 600) {
-    this.fadeOut(timeout)
-    var tm = setTimeout(() => {
-        this.remove();
-        clearTimeout(tm)
-    }, timeout);
-    return this;
-};
-
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
@@ -115,7 +57,7 @@ var Hm_Ajax = {
         return;
     },
 
-    request: function(args, callback, extra, no_icon, batch_callback, on_failure) {
+    request: function(args, callback, extra, no_icon, batch_callback, on_failure, signal) {
         var bcb = false;
         if (typeof batch_callback != 'undefined' && $.inArray(batch_callback, this.batch_callbacks) === -1) {
             bcb = batch_callback.toString();
@@ -134,7 +76,7 @@ var Hm_Ajax = {
             $('body').addClass('wait');
         }
         Hm_Ajax.active_reqs++;
-        return ajax.make_request(args, callback, extra, name, on_failure, batch_callback);
+        return ajax.make_request(args, callback, extra, name, on_failure, batch_callback, signal);
     },
 
     show_loading_icon: function() {
@@ -194,7 +136,13 @@ var Hm_Ajax_Request = function() { return {
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        xhr.open('POST', window.location.href)
+        const url = window.location.next ?? window.location.href;
+        xhr.open('POST', url)
+        if (config.signal) {
+            config.signal.addEventListener('abort', function() {
+                xhr.abort();
+            });
+        }
         xhr.addEventListener('load', function() {
             config.callback.done(Hm_Utils.json_decode(xhr.response, true), xhr);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
@@ -222,7 +170,7 @@ var Hm_Ajax_Request = function() { return {
         return res.join('&');
     },
 
-    make_request: function(args, callback, extra, request_name, on_failure, batch_callback) {
+    make_request: function(args, callback, extra, request_name, on_failure, batch_callback, signal) {
         var name;
         var arg;
         this.batch_callback = batch_callback;
@@ -248,7 +196,7 @@ var Hm_Ajax_Request = function() { return {
         }
         var dt = new Date();
         this.start_time = dt.getTime();
-        this.xhr_fetch({url: '', data: args, callback: this});
+        this.xhr_fetch({url: '', data: args, callback: this, signal});
         return false;
     },
 
@@ -277,9 +225,19 @@ var Hm_Ajax_Request = function() { return {
                 Hm_Notices.show(res.router_user_msgs);
             }
             if (res.folder_status) {
-                for (var name in res.folder_status) {
-                    Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
-                    Hm_Folders.update_unread_counts();
+                for (const name in res.folder_status) {
+                    if (name === getPageNameParam()) {
+                        Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
+                        Hm_Folders.update_unread_counts();
+                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
+                        messages.load().then(() => {
+                            if (messages.count != res.folder_status[name].messages) {
+                                messages.load(true).then(() => {
+                                    display_imap_mailbox(messages.rows, messages.links);
+                                })
+                            }
+                        });
+                    }
                 }
             }
             if (this.callback) {
@@ -700,7 +658,7 @@ function Message_List() {
             });
         }
         // apply JS pagination only on aggregate folders; imap ones already have the messages sorted
-        if (hm_list_path().substring(0, 5) != 'imap_' && element) {
+        if (getListPathParam().substring(0, 5) != 'imap_' && element) {
             $(row, msg_rows).insertBefore(element);
         }
         else {
@@ -729,10 +687,10 @@ function Message_List() {
 
     this.update_after_action = function(action_type, selected) {
         var remove = false;
-        if (action_type == 'read' && hm_list_path() == 'unread') {
+        if (action_type == 'read' && getListPathParam() == 'unread') {
             remove = true;
         }
-        if (action_type == 'unflag' && hm_list_path() == 'flagged') {
+        if (action_type == 'unflag' && getListPathParam() == 'flagged') {
             remove = true;
         }
         else if (action_type == 'delete' || action_type == 'archive') {
@@ -754,9 +712,9 @@ function Message_List() {
     };
 
     this.save_updated_list = function() {
-        if (this.page_caches.hasOwnProperty(hm_list_path())) {
-            this.set_message_list_state(this.page_caches[hm_list_path()]);
-            Hm_Utils.save_to_local_storage('sort_'+hm_list_path(), this.sort_fld);
+        if (this.page_caches.hasOwnProperty(getListPathParam())) {
+            this.set_message_list_state(this.page_caches[getListPathParam()]);
+            Hm_Utils.save_to_local_storage('sort_'+getListPathParam(), this.sort_fld);
         }
     };
 
@@ -824,24 +782,23 @@ function Message_List() {
         }
         for (index in self.sources) {
             source = self.sources[index];
-            source.callback(source.id, source.folder);
         }
         return false;
     };
 
     this.select_combined_view = function() {
-        if (self.page_caches.hasOwnProperty(hm_list_path())) {
-            self.setup_combined_view(self.page_caches[hm_list_path()]);
+        if (self.page_caches.hasOwnProperty(getListPathParam())) {
+            self.setup_combined_view(self.page_caches[getListPathParam()]);
         }
         else {
-            if (hm_page_name() == 'search') {
+            if (getPageNameParam() == 'search') {
                 self.setup_combined_view('formatted_search_data');
             }
             else {
                 self.setup_combined_view(false);
             }
         }
-        var sort_type = Hm_Utils.get_from_local_storage('sort_'+hm_list_path());
+        var sort_type = Hm_Utils.get_from_local_storage('sort_'+getListPathParam());
         if (sort_type != null) {
             this.sort_fld = sort_type;
             $('.combined_sort').val(sort_type);
@@ -869,7 +826,7 @@ function Message_List() {
             self.set_row_events();
             $('.combined_sort').show();
         }
-        if (hm_page_name() == 'search' && hm_run_search() == "0") {
+        if (getPageNameParam() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
         }
         else {
@@ -890,27 +847,27 @@ function Message_List() {
     };
 
     /* TODO: remove module specific refs */
-    this.update_title = function() {
+    this.update_title = function(list_path = getListPathParam()) {
         var count = 0;
         var rows = Hm_Utils.rows();
         var tbody = Hm_Utils.tbody();
-        if (hm_list_path() == 'unread') {
+        if (list_path == 'unread') {
             count = rows.length;
             document.title = count+' '+hm_trans('Unread');
         }
-        else if (hm_list_path() == 'flagged') {
+        else if (list_path == 'flagged') {
             count = rows.length;
             document.title = count+' '+hm_trans('Flagged');
         }
-        else if (hm_list_path() == 'combined_inbox') {
+        else if (list_path == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Everything');
         }
-        else if (hm_list_path() == 'email') {
+        else if (list_path == 'email') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Email');
         }
-        else if (hm_list_path() == 'feeds') {
+        else if (list_path == 'feeds') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Feeds');
         }
@@ -959,30 +916,29 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(cache, class_name) {
-        var phref;
-        var nhref;
-        var target;
-        var subject;
-        var plink = false;
-        var nlink = false;
-        var list = Hm_Utils.get_from_local_storage(cache);
-        var current = $('<div></div>').append(list).find('.'+Hm_Utils.clean_selector(class_name));
-        var prev = current.prev();
-        var next = current.next();
-        target = $('.msg_headers tr').last();
-        if (prev.length) {
-            phref = prev.find('.subject').find('a').prop('href');
-            subject = new Option(prev.find('.subject').text()).innerHTML;
-            plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+    this.prev_next_links = function(msgUid) {
+        let phref;
+        let nhref;
+        const target = $('.msg_headers tr').last();
+        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+        messages.load(false, true);
+        const next = messages.getNextRowForMessage(msgUid);
+        const prev = messages.getPreviousRowForMessage(msgUid);
+        if (prev) {
+            const prevSubject = $(prev['0']).find('.subject');
+            phref = prevSubject.find('a').prop('href');
+            const subject = new Option(prevSubject.text()).innerHTML;
+            const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
-        if (next.length) {
-            nhref = next.find('.subject').find('a').prop('href');
-            subject = new Option(next.find('.subject').text()).innerHTML;
-            nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+        if (next) {
+            const nextSubject = $(next['0']).find('.subject');
+            nhref = nextSubject.find('a').prop('href');
+            const subject = new Option(nextSubject.text()).innerHTML;
+            const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
+
         return [phref, nhref];
     };
 
@@ -990,7 +946,7 @@ function Message_List() {
         var count = Hm_Utils.rows().length;
         if (!count) {
             if (!$('.empty_list').length) {
-                if (hm_page_name() == 'search') {
+                if (getPageNameParam() == 'search') {
                     $('.search_content').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
                 else {
@@ -1045,7 +1001,7 @@ function Message_List() {
         if (new_total != current || missing) {
             $('.total_unread_count').html('&#160;'+new_total+'&#160;');
         }
-        if (new_total > current && hm_page_name() != 'message_list' && hm_list_path() != 'unread') {
+        if (new_total > current && getPageNameParam() != 'message_list' && getListPathParam() != 'unread') {
             $('.menu_unread > a').css('font-weight', 'bold');
         }
         if (amount == -1 || new_total < current) {
@@ -1136,7 +1092,7 @@ function Message_List() {
         while (target[0].tagName != 'TR') { target = target.parent(); }
         var el = $('input[type=checkbox]', target);
         if (!shift && !ctrl) {
-            window.location = $('.subject a', target).prop('href');
+            navigate($('.subject a', target).prop('href'));
             return false;
         }
         else {
@@ -1207,7 +1163,7 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
-                if (hm_list_path() == name && hm_page_name() == 'message_list') {
+                if (getListPathParam() == name && getPageNameParam() == 'message_list') {
                     var title = document.title.replace(/^\[\d+\]/, '');
                     document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
                     /* HERE */
@@ -1347,10 +1303,11 @@ var Hm_Folders = {
     },
 
     hl_selected_menu: function() {
-        var page = hm_page_name();
-        var path = hm_list_path();
+        const page = getPageNameParam();
+        const path = getListPathParam();
+        
         $('.folder_list').find('*').removeClass('selected_menu');
-        if (path.length) {
+        if (path) {
             if (page == 'message_list' || page == 'message') {
                 $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
@@ -1858,6 +1815,14 @@ var err_msg = function(msg) {
     return "ERR"+hm_trans(msg);
 };
 
+var hm_spinner = function(type = 'border', size = '') {
+    return `<div class="d-flex justify-content-center spinner">
+        <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>`
+};
+
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
@@ -1866,6 +1831,9 @@ var fillImapData = function(details) {
     if (details.sieve_config_host) {
         $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
         $("#srv_setup_stepper_enable_sieve").trigger("click", false);
+        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', details.tls)
+                            .trigger('change');
     }
 
     if(details.tls) {
@@ -1930,6 +1898,15 @@ var hasLeadingOrTrailingSpaces = function(str) {
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 
+function sortHandlerForMessageListAndSearchPage() {
+    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
+    $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
+    if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
+        $('.menu_unread > a').css('font-weight', 'normal');
+        Hm_Folders.save_folder_list();
+    }
+}
+
 /* executes on onload, has access to other module code */
 $(function() {
     /* Remove disabled attribute to send checkbox */
@@ -1940,14 +1917,6 @@ $(function() {
             }
         });
     })
-    /* setup settings and server pages */
-    if (hm_page_name() == 'settings') {
-        Hm_Utils.expand_core_settings();
-        $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    }
-    else if (hm_page_name() == 'servers') {
-        $('.server_section').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
-    }
     $('.reset_factory_button').on('click', function() { return hm_delete_prompt(); });
 
     /* check for folder reload */
@@ -1967,29 +1936,12 @@ $(function() {
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
         Hm_Folders.update_folder_list();
     }
-    if (hm_page_name() == 'message_list' || hm_page_name() == 'search') {
-        Hm_Message_List.select_combined_view();
-        $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
-        $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
-        if (hm_list_path() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
-            $('.menu_unread > a').css('font-weight', 'normal');
-            Hm_Folders.save_folder_list();
-        }
-    }
+
     hl_save_link();
-    if (hm_page_name() == 'search') {
-        $('.search_reset').on("click", Hm_Utils.reset_search_form);
-    }
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
 
-    if (hm_page_name() == 'home') {
-        $('.pw_update').on("click", function() { update_password($(this).data('id')); });
-    }
-    if (hm_page_name() == 'servers') {
-        $('.edit_server_connection').on('click', imap_smtp_edit_action);
-    } 
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -1999,12 +1951,6 @@ $(function() {
         $('.list_controls.on_mobile').hide();
     }
     $('.offline').on("click", function() { Hm_Utils.test_connection(); });
-    if (hm_page_name() == 'settings') {
-        $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
-        $('.reset_default_value_select').on("click", reset_default_value_select);
-        $('.reset_default_value_input').on("click", reset_default_value_input);
-        $('.reset_default_timezone').on("click", reset_default_timezone);
-    }
 
     if (hm_check_dirty_flag()) {
         $('form:not(.search_terms)').areYouSure();
@@ -2044,7 +1990,7 @@ function fixLtrInRtl() {
     };
 
     function getElements() {
-        var pageName = hm_page_name();
+        var pageName = getPageNameParam();
         if (pageName == "message") {
             return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
         }
@@ -2072,157 +2018,6 @@ function listControlsMenu() {
     $('.list_sources').hide();
 }
 
-
-// Sortablejs
-const tableBody = document.querySelector('.message_table_body');
-if(tableBody && !hm_mobile()) {
-    const allFoldersClassNames = [];
-    let targetFolder;
-    let movingElement;
-    let movingNumber;
-    Sortable.create(tableBody, {
-        sort: false,
-        group: 'messages',
-        ghostClass: 'drag_target',
-        draggable: ':not(.inline_msg)',
-
-        onMove: (sortableEvent) => {
-            movingElement = sortableEvent.dragged;
-            targetFolder = sortableEvent.related?.className.split(' ')[0];
-            return false;
-        },
-
-        onEnd: () => {
-            // Remove the highlight class from the tr
-            document.querySelectorAll('.message_table_body > tr.drag_target').forEach((row) => {
-                row.classList.remove('drag_target');
-            });
-            return false;
-        }
-    });
-
-    const isValidFolderReference = (className='') => {
-        return className.startsWith('imap_') && allFoldersClassNames.includes(className)
-    }
-
-    Sortable.utils.on(tableBody, 'dragstart', (evt) => {
-        let movingElements = [];
-        // Is the target element checked
-        const isChecked = evt.target.querySelector('.checkbox_cell input[type=checkbox]:checked');
-        if (isChecked) {
-            movingElements = document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked');
-            // Add a highlight class to the tr
-            movingElements.forEach((checkbox) => {
-                checkbox.parentElement.parentElement.classList.add('drag_target');
-            });
-        } else {
-            // If not, uncheck all other checked elements so that they don't get moved
-            document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked').forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-        }
-
-        movingNumber = movingElements.length || 1;
-
-        const element = document.createElement('div');
-        element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
-        element.style.position = 'absolute';
-        element.className = 'dragged_element';
-        document.body.appendChild(element);
-
-        function moveElement() {
-            element.style.display = 'none';
-        }
-
-        function removeElement() {
-            element.remove();
-        }
-
-        document.addEventListener('drag', moveElement);
-        document.addEventListener('mouseover', removeElement);
-
-        evt.dataTransfer.setDragImage(element, 0, 0);
-    });
-
-    Sortable.utils.on(tableBody, 'dragend', () => {
-        // If the target is not a folder, do nothing
-        if (!isValidFolderReference(targetFolder ?? '')) {
-            return;
-        }
-
-        const page = hm_page_name();
-        const selectedRows = [];
-
-        if(movingNumber > 1) {
-            document.querySelectorAll('.message_table_body > tr').forEach(row => {
-                if (row.querySelector('.checkbox_cell input[type=checkbox]:checked')) {
-                    selectedRows.push(row);
-                }
-            });
-        }
-
-        if (selectedRows.length == 0) {
-            selectedRows.push(movingElement);
-        }
-
-        const movingIds = selectedRows.map(row => row.className.split(' ')[0]);
-
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
-            {'name': 'imap_move_ids', 'value': movingIds.join(',')},
-            {'name': 'imap_move_to', 'value': targetFolder},
-            {'name': 'imap_move_page', 'value': page},
-            {'name': 'imap_move_action', 'value': 'move'}],
-            (res) =>{
-                for (const index in res.move_count) {
-                    $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
-                    select_imap_folder(hm_list_path());
-                }
-            }
-        );
-
-        // Reset the target folder
-        targetFolder = null;
-    });
-
-    const folderList = document.querySelector('.folder_list');
-
-    const observer = new MutationObserver((mutations) => {
-        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
-        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
-
-        // Keep track of all folders class names
-        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
-
-        emailFoldersGroups.forEach((emailFolders) => {
-            Sortable.create(emailFolders, {
-                sort: false,
-                group: {
-                    put: 'messages'
-                }
-            });
-        });
-
-        emailFoldersElements.forEach((emailFolder) => {
-            emailFolder.addEventListener('dragenter', () => {
-                emailFolder.classList.add('drop_target');
-            });
-            emailFolder.addEventListener('dragleave', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-            emailFolder.addEventListener('drop', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-        });
-    });
-
-    const config = {
-        childList: true
-    };
-
-    observer.observe(folderList, config);
-}
-
 var resetStepperButtons = function() {
     $('.step_config-actions button').removeAttr('disabled');
     $('#stepper-action-finish').text($('#stepper-action-finish').text().slice(0, -3));
@@ -2247,6 +2042,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
         { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
         { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
+        { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
         { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
@@ -2262,7 +2058,7 @@ function submitSmtpImapServer() {
     Hm_Ajax.request(requestData, function(res) {
         resetStepperButtons();
         if (res.just_saved_credentials) {
-            if (!res.imap_server_id) {
+            if (res.imap_server_id) {
                 Hm_Ajax.request(
                     [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_accept_special_folders'},
                     {'name': 'imap_server_id', value: res.imap_server_id},
@@ -2300,6 +2096,7 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_imap_sieve_mode_tls").prop('checked', false);
     $("#srv_setup_stepper_only_jmap").prop('checked', false);
     $('#step_config-imap_bloc').show();
     $('#step_config-smtp_bloc').show();
@@ -2449,6 +2246,7 @@ function display_config_step(stepNumber) {
         if($('#srv_setup_stepper_enable_sieve').is(':checked')) {
             requiredFields.push(
                 {key: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val()},
+                {key: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').val()},
             )
         }
 
@@ -2509,11 +2307,17 @@ function getServiceDetails(providerKey){
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', true)
                             .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', serverConfig.sieve.tls)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
                     } else {
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', false)
-                            .trigger('change');;
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', false)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val('');
                     }
                 }
@@ -2578,7 +2382,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(messagePart, false, false, false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
     });
 }
 
@@ -2609,7 +2413,8 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
+    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
@@ -2646,24 +2451,29 @@ const handleExternalResources = (inline) => {
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
             allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+            handleAllowResource(allowAll, getParam('part'), inline);
         }
         noticesElement.appendChild(allowAll);
 
         const button = document.createElement('a');
+        button.setAttribute('href', '#');
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
+        const popover = sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            Hm_Utils.save_to_local_storage(sender, 1);
-            $('.msg_text_inner').remove();
-            if (inline) {
-                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-            } else {
-                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-            }
+            addSenderToImagesWhitelist(senderEmail).then(() => {
+                $('.msg_text_inner').remove();
+                if (inline) {
+                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+                } else {
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
+                }
+            }).finally(() => {
+                popover.dispose();
+            })
         });
     }
 
@@ -2671,7 +2481,7 @@ const handleExternalResources = (inline) => {
 };
 
 const observeMessageTextMutationAndHandleExternalResources = (inline) => {
-    const message = document.querySelector('.msg_text');
+    const message = document.querySelector('.msg_text');    
     if (message) {
         new MutationObserver(function (mutations) {
             mutations.forEach(function (mutation) {

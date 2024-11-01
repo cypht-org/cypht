@@ -663,6 +663,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
             $with_subscription = isset($this->request->post['subscription_state']) && $this->request->post['subscription_state'];
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
+                $this->out('can_share_folders', stripos($mailbox->get_capability(), 'ACL') !== false);
                 $quota_root = $mailbox->get_quota($folder ? $folder : 'INBOX', true);
                 if ($quota_root && isset($quota_root[0]['name'])) {
                     $quota = $mailbox->get_quota($quota_root[0]['name'], false);
@@ -681,6 +682,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
                 $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
                 return;
             }
             if ($mailbox && $mailbox->authed()) {
@@ -697,6 +699,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('imap_expanded_folder_id', $form['imap_server_id']);
                 $this->out('imap_expanded_folder_path', $path);
                 $this->out('with_input', $with_subscription);
+                $this->out('folder', $folder);
             }
             else {
                 Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $mailbox->server_type(), $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
@@ -768,6 +771,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('imap_mailbox_page', $msgs);
             $this->out('list_page', $list_page);
             $this->out('imap_server_id', $form['imap_server_id']);
+            $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
 }
@@ -1194,24 +1198,30 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
-                $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_ALL_EMAIL_SINCE));
-            }
-            else {
-                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
-            }
             $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
-            $this->out('folder_status', $status);
-            $this->out('imap_combined_inbox_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+            $folders = array($folder);
+        } else {
+            $data_sources = imap_data_sources('');
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
+
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
+            $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_ALL_EMAIL_SINCE));
+        }
+        else {
+            $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
+        }
+        list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        $this->out('folder_status', $status);
+        $this->out('imap_combined_inbox_data', $msg_list);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
@@ -1226,18 +1236,23 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
             $ids = explode(',', $form['imap_server_ids']);
-            $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
-            $this->out('folder_status', $status);
-            $this->out('imap_flagged_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+            $folders = array($folder);
+        } else {
+            $data_sources = imap_data_sources('');
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
+        $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
+        $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
+        list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        $this->out('folder_status', $status);
+        $this->out('imap_flagged_data', $msg_list);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
@@ -1282,20 +1297,27 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
+
         if ($success) {
-            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
-            $msg_list = array();
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)));
-            $this->out('folder_status', $status);
-            $this->out('imap_unread_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+            $folders = array($folder);
+        } else {
+            $data_sources = imap_data_sources('');
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
+
+        $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
+        $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
+        $msg_list = array();
+        list($status, $msg_list) = merge_imap_search_results($ids, 'UNSEEN', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        $this->out('folder_status', $status);
+        $this->out('imap_unread_data', $msg_list);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 
@@ -1584,6 +1606,59 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         }
     }
 }
+/**
+ * Load IMAP servers permissions for shared folders
+ * @subpackage imap/handler
+ */
+class Hm_Handler_load_imap_folders_permissions extends Hm_Handler_Module {
+    /**
+     * Output IMAP server permissions array for shared folders
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder_uid','imap_folder'));
+        
+        if ($success && !empty($form['imap_server_id']) && !empty($form['imap_folder'])  && !empty($form['imap_folder_uid'])) {
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
+            $permissions = $imap->get_acl($form['imap_folder']);
+            $this->out('imap_folders_permissions', $permissions);
+        }
+    }
+}
+
+/**
+ * Load IMAP servers permissions for shared folders
+ * @subpackage imap/handler
+ */
+class Hm_Handler_set_acl_to_imap_folders extends Hm_Handler_Module {
+    /**
+     * Output IMAP server permissions array for shared folders
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions','action'));
+        
+        if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions']) && !empty($form['action'])) {
+
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
+            
+            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
+            if($form['action'] === 'add') {
+                $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
+            } else {
+                $response = $imap->delete_acl($form['imap_folder'], $form['identifier']);
+            }
+            if($response) {
+                $permissions = $imap->get_acl($form['imap_folder']);
+                $this->out('imap_folders_permissions', $permissions);
+            }
+        }
+    }
+}
 
 /**
  * Load IMAP servers for the user config object
@@ -1626,6 +1701,7 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
             );
             if (! empty($auth_server['sieve_config_host'])) {
                 $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];
+                $imap_details['sieve_tls'] = $auth_server['sieve_tls'];
             }
             if (!$default_server_id) {
                 Hm_IMAP_List::add($imap_details);
@@ -1883,7 +1959,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
-        
+
         if ($success) {
             $this->out('msg_text_uid', $form['imap_msg_uid']);
             $this->out('msg_server_id', $form['imap_server_id']);
@@ -1904,6 +1980,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
             }
 
             $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
+            $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
 
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
@@ -2056,20 +2133,26 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $path = $this->request->get['list_path'];
-            $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
             $ids = explode(',', $form['imap_server_ids']);
+        } else {
+            $data_sources = imap_sources('', $this, $this->request->get['list_path']);
+            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
+        }
+        $path = $this->request->get['list_path'];
+        $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
+        $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
+        if (! isset($folders) || empty($folders)) {
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
             if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
-            }
-            else {
+            } else {
                 list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
             }
+
             $folders = array();
             foreach ($msg_list as $msg) {
                 if (hex2bin($msg['folder']) != hex2bin($folder)) {
@@ -2080,18 +2163,20 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
                 $auto_folder = $folders[0];
                 $this->out('auto_'.$path.'_folder', $msg_list[0]['server_name'].' '.$auto_folder);
             }
-            if (array_key_exists('keyword', $this->request->get)) {
-                $keyword = $this->request->get['keyword'];
-                $search_pattern = "/$keyword/i";
-                $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
-                    return preg_grep($search_pattern, $filter_msg_list);
-                });
-                $msg_list = $search_result;
-            }
-            $this->out('folder_status', $status);
-            $this->out('imap_'.$path.'_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+        } else {
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)), false);
         }
+        if (array_key_exists('keyword', $this->request->get)) {
+            $keyword = $this->request->get['keyword'];
+            $search_pattern = "/$keyword/i";
+            $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
+                return preg_grep($search_pattern, $filter_msg_list);
+            });
+            $msg_list = $search_result;
+        }
+        $this->out('folder_status', $status);
+        $this->out('imap_'.$path.'_data', $msg_list);
+        $this->out('imap_server_ids', implode(',', $ids));
     }
 }
 

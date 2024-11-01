@@ -176,6 +176,7 @@ function get_module_assignments($settings) {
     $js = '';
     $css = '';
     $assets = array();
+    $js_exclude_dependencies = explode(',', ($settings['js_exclude_deps'] ?? ''));
     $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
 
@@ -183,9 +184,25 @@ function get_module_assignments($settings) {
         $mods = get_modules($settings);
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
-            if (is_readable(sprintf("modules/%s/site.js", $mod))) {
-               $js .= str_replace("'use strict';", '', file_get_contents(sprintf("modules/%s/site.js", $mod)));
+            if ($mod === 'core') {
+                foreach (glob('modules/core/navigation/*.js') as $js_module) {
+                    $js .= file_get_contents($js_module);
+                }
             }
+            $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
+            foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . '*.js', GLOB_BRACE) as $js_module) {
+                if (preg_match('/\[(.+)\]/', $js_module, $matches)) {
+                    $dep = $matches[1];
+                    if (in_array($dep, $js_exclude_dependencies)) {
+                        continue;
+                    }
+                }
+                $js .= file_get_contents($js_module);
+            }
+            if (is_readable(sprintf("modules/%s/site.js", $mod))) {
+                $js .= str_replace("'use strict';", '', file_get_contents(sprintf("modules/%s/site.js", $mod)));
+             }
+             
             if (is_readable(sprintf("modules/%s/site.css", $mod))) {
                $css .= file_get_contents(sprintf("modules/%s/site.css", $mod));
             }
@@ -245,8 +262,7 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
     }
     if ($js) {
         $mods = get_modules($settings);
-        $js_lib = file_get_contents(VENDOR_PATH . "twbs/bootstrap/dist/js/bootstrap.bundle.min.js");
-        $js_lib .= file_get_contents("third_party/cash.min.js");
+        $js_lib = get_js_libs_content(explode(',', $settings['js_exclude_deps']));
         if (in_array('desktop_notifications', $mods, true)) {
             $js_lib .= file_get_contents("third_party/push.min.js");
         }
@@ -256,10 +272,6 @@ function combine_includes($js, $js_compress, $css, $css_compress, $settings) {
             $settings['encrypt_local_storage'])) {
             $js_lib .= file_get_contents("third_party/forge.min.js");
         }
-        $js_lib .= file_get_contents("third_party/resumable.min.js");
-        $js_lib .= file_get_contents("third_party/ays-beforeunload-shim.js");
-        $js_lib .= file_get_contents("third_party/jquery.are-you-sure.js");
-        $js_lib .= file_get_contents("third_party/sortable.min.js");
         file_put_contents('tmp.js', $js);
         $js_out = $js_lib.compress($js, $js_compress, 'tmp.js');
         $js_hash = build_integrity_hash($js_out);

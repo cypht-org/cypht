@@ -9,7 +9,7 @@ var display_next_nux_step = function(res) {
         $('.nux_step_two').html('');
         document.getElementById('service_select').getElementsByTagName('option')[0].selected = 'selected';
         $('.nux_username').val('');
-        $('.nux_extra_fields').remove();
+        $('.nux_extra_fields_container').remove();
         return false;
     });
 };
@@ -118,28 +118,5 @@ var expand_server_settings = function() {
 };
 
 var add_extra_fields = function(select, id, label, placeholder) {
-    $(select).next().next().after('<input type="text" id="nux_'+id+'" class="nux_extra_fields" placeholder="'+placeholder+'"><label class="screen_reader nux_extra_fields" for="nux_'+id+'">'+label+'</label><br class="nux_extra_fields">');
+    $(select).parent().after('<div class="form-floating mb-3 nux_extra_fields_container"><input type="text" id="nux_'+id+'" class="nux_extra_fields form-control" placeholder="'+placeholder+'"><label for="nux_'+id+'">'+label+'</label></div>');
 };
-
-$(function() {
-    if (hm_page_name() === 'servers') {
-        expand_server_settings();
-        $('.nux_next_button').on("click", nux_service_select);
-        $('#service_select').on("change", function() {
-            if ($(this).val() == 'all-inkl') {
-                add_extra_fields(this, 'all_inkl_login', 'Login', hm_trans('Your All-inkl Login'));
-            } else {
-                $('.nux_extra_fields').remove();
-            }
-        });
-    }
-    else if (hm_page_name() === 'message_list') {
-        var list_path = hm_list_path();
-        if (list_path === 'unread' || list_path === 'combined_inbox' || list_path === 'flagged') {
-            var data_sources = hm_data_sources();
-            if (data_sources.length === 0) {
-                $('.nux_empty_combined_view').show();
-            }
-        }
-    }
-});

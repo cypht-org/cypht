@@ -54,6 +54,11 @@ class Hm_EWS {
         return $this->authed;
     }
 
+    public function get_capability() {
+        // IMAP extra capabilities not supported here
+        return '';
+    }
+
     public function get_folders($folder = null, $only_subscribed = false, $unsubscribed_folders = [], $with_input = false) {
         $result = [];
         if (empty($folder)) {

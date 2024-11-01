@@ -135,10 +135,18 @@ return [
     /*
     |
     | The hostname/IP address and port sieve is listening on. Example: example.org:4190
-    | Note: Add tls:// prefix to enable explicit STARTTLS
+    | Keep this blank to disable sieve filter support on login
     |
     */
-    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', 'tls://mail.gandi.net:4190'),
+    'imap_auth_sieve_conf_host' => env('IMAP_AUTH_SIEVE_CONF_HOST', ''),
+
+    /*
+    |
+    | this will add the tls:// prefix to the sieve host if set to true
+    | to make this work make sure you set DEFAULT_SETTING_ENABLE_SIEVE_FILTER to true
+    |
+    */
+    'imap_auth_sieve_tls_mode' => env('IMAP_AUTH_SIEVE_TLS_MODE', true),
 
     /*
     | -------------------
@@ -625,7 +633,7 @@ return [
     | Handles page layout, login/logout, and the default settings pages. This set
     | is required.
     */
-    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts')),
+    'modules' => explode(',', env('CYPHT_MODULES','core,contacts,local_contacts,feeds,imap,smtp,account,idle_timer,calendar,themes,nux,developer,history,saved_searches,advanced_search,highlights,profiles,inline_message,imap_folders,keyboard_shortcuts,tags')),
     // 'modules' => [
     //     /*
     //     |  ----
@@ -1274,7 +1282,7 @@ return [
     | Max per source for Github notifications
     | Defaults to 20
     */
-    'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 weeks'),
+    'default_setting_github_since' => env('DEFAULT_SETTING_GITHUB_SINCE', '-1 week'),
 
     /*
     |
@@ -1295,7 +1303,7 @@ return [
     | Enable keyboard shortcuts
     | Defaults to false
     */
-    'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', 1),
+    'default_setting_enable_keyboard_shortcuts' => env('DEFAULT_SETTING_ENABLE_KEYBOARD_SHORTCUTS', false),
 
     /*
     |
@@ -1309,4 +1317,6 @@ return [
     | Use this setting switch between the legacy login page and the fancy one
     */
     'fancy_login' => env('FANCY_LOGIN', false),
+
+    'js_exclude_deps' => env('JS_EXCLUDE_DEPS', ''),
 ];

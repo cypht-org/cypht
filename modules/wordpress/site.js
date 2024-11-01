@@ -19,7 +19,7 @@ var display_wordpress_notices = function(res) {
 
 var wp_notice_view = function(uid, callback) {
     if (!uid) {
-        uid = hm_msg_uid();
+        uid = getMessageUidParam();
     }
     $('.msg_text_inner').html('');
     Hm_Ajax.request(
@@ -37,8 +37,8 @@ var display_wp_notice = function(res) {
     $('.msg_text').html('');
     $('.msg_text').append(res.wp_notice_headers);
     $('.msg_text').append(res.wp_notice_text);
-    var path = hm_list_path();
-    var uid = hm_msg_uid();
+    var path = getListPathParam();
+    var uid = getMessageUidParam();
     if (hm_list_parent() == 'unread') {
         Hm_Message_List.prev_next_links('formatted_unread_data', uid);
     }
@@ -49,12 +49,13 @@ var display_wp_notice = function(res) {
 
 };
 
-if (hm_page_name() == 'message_list') {
-    if (hm_list_path() == 'wp_notifications') {
+function wpMessageListPageHandler(routeParams) {
+    if (routeParams.list_path == 'wp_notifications') {
         Hm_Message_List.page_caches.wp_notifications = 'formatted_wp_notice_data';
     }
 }
-else if (hm_page_name() == 'servers') {
+
+function wpServersPageHandler() {
     if ($('#wp_disconnect_form').length) {
         $('#wp_disconnect_form').submit(function(e) {
             if (!hm_delete_prompt()) {
@@ -65,8 +66,9 @@ else if (hm_page_name() == 'servers') {
         });
     }
 }
-else if (hm_page_name() == 'message') {
-    if (hm_list_path() == 'wp_notifications') {
+
+function wpMessageContentPageHandler(routeParams) {
+    if (routeParams.list_path == 'wp_notifications') {
         wp_notice_view();
     }
 }

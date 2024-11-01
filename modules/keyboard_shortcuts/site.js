@@ -87,7 +87,7 @@ var Keyboard_Shortcuts = {
         var control_keys = {'alt': e.altKey, 'shift': e.shiftKey, 'meta': e.metaKey, 'control': e.ctrlKey};
         for (index in shortcuts) {
             combo = shortcuts[index];
-            if (combo['page'] != '*' && combo['page'] != hm_page_name()) {
+            if (combo['page'] != '*' && combo['page'] != getPageNameParam()) {
                 continue;
             }
             if (e.keyCode != combo['char']) {
@@ -155,11 +155,6 @@ var Keyboard_Actions = {
 $(function() {
 
     if (typeof shortcuts != 'undefined') {
-        $(document).not('input').on('keydown', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
-    }
-    if (hm_page_name() == 'shortcuts') {
-        $('.reset_shortcut').on("click", function() {
-            Hm_Utils.redirect('?page=shortcuts');
-        });
+        $(document).on('keydown', ':not(input)', function(e) { return Keyboard_Shortcuts.check(e, shortcuts); });
     }
 });

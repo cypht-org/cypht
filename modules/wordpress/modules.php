@@ -243,8 +243,8 @@ class Hm_Handler_setup_wordpress_connect extends Hm_Handler_Module {
     public function process() {
         $details = wp_connect_details($this->config);
         if (!empty($details)) {
-            $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri']);
-            $this->out('wp_auth_url', $oauth2->request_authorization_url($details['auth_url'], 'global', 'wp_authorization'));
+            $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['redirect_uri'] ?? null);
+            $this->out('wp_auth_url', $oauth2->request_authorization_url($details['auth_url'] ?? null, 'global', 'wp_authorization'));
             $this->out('wp_connect_details', $this->user_config->get('wp_connect_details', array()));
         }
     }

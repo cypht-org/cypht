@@ -229,8 +229,7 @@ class Hm_MIME_Msg {
     function prep_message_body() {
         $body = $this->body;
         if (!$this->html) {
-            $body = mb_convert_encoding(trim($body), "HTML-ENTITIES", "UTF-8");
-            $body = mb_convert_encoding($body, "UTF-8", "HTML-ENTITIES");
+            $body = htmlspecialchars(trim($body), ENT_QUOTES | ENT_HTML5, 'UTF-8');
             if (!empty($this->attachments)) {
                 $this->headers['Content-Type'] = 'multipart/mixed; boundary='.$this->boundary;
                 $body = sprintf("--%s\r\nContent-Type: text/plain; charset=UTF-8; format=flowed\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n%s",

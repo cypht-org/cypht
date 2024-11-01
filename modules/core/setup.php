@@ -65,6 +65,7 @@ add_handler('settings', 'process_show_list_icons', true, 'core', 'date', 'after'
 add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
+add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
@@ -101,6 +102,7 @@ add_output('settings', 'start_all_email_settings', true, 'core', 'all_source_max
 add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email_settings', 'after');
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
+add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
 
 /* message list page */
 setup_base_page('message_list');
@@ -183,6 +185,10 @@ add_handler('ajax_quick_servers_setup', 'language',  true, 'core');
 add_handler('ajax_quick_servers_setup', 'date', true, 'core');
 add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
 
+/* privacy settings control */
+setup_base_ajax_page('ajax_privacy_settings', 'core');
+add_handler('ajax_privacy_settings', 'privacy_settings',  true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -202,6 +208,7 @@ return array(
         'notfound',
         'search',
         'ajax_quick_servers_setup',
+        'ajax_privacy_settings'
     ),
     'allowed_output' => array(
         'date' => array(FILTER_DEFAULT, false),
@@ -219,7 +226,7 @@ return array(
         'page_links' => array(FILTER_UNSAFE_RAW, false),
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_DEFAULT, false),
-        'imap_service_name' => array(FILTER_DEFAULT, false),
+        'imap_service_name' => array(FILTER_DEFAULT, false)
     ),
     'allowed_cookie' => array(
         'CYPHTID' => FILTER_DEFAULT,
@@ -333,9 +340,12 @@ return array(
         'srv_setup_stepper_profile_signature' => FILTER_DEFAULT,
         'srv_setup_stepper_profile_reply_to' => FILTER_DEFAULT,
         'srv_setup_stepper_imap_sieve_host' => FILTER_DEFAULT,
+        'srv_setup_stepper_imap_sieve_mode_tls' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_only_jmap' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'srv_setup_stepper_jmap_address' => FILTER_DEFAULT,
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
+        'images_whitelist' => FILTER_DEFAULT,
+        'update' => FILTER_VALIDATE_BOOLEAN,
     )
 );

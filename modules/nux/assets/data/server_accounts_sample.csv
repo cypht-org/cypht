@@ -1,0 +1,3 @@
+server_name;username;password;jmap_server;jmap_hide_from_combined_view;imap_server;imap_port;imap_tls;imap_hide_from_combined_view;smtp_server;smtp_port;smtp_tls;sieve_host;sieve_port;sieve_tls;profile_reply_to;profile_signature;profile_is_default
+Mailbox 1;email@example.org;secret;;FALSE;imap.example.org;993;TRUE;FALSE;smtp.example.org;465;TRUE;tls://imap.exemple.org;4190;true;email@example.org;;FALSE
+Mailbox 2;test@example2.org;secret2;jmap.example2.org;FALSE;;;;;smtp.example2.org;465;TRUE;tls://jmap.example2.org;4190;false;test@example2.org;my-signature;TRUE

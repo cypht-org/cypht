@@ -570,19 +570,6 @@ class Hm_Handler_language extends Hm_Handler_Module {
 }
 
 /**
- * Setup the current language
- * @subpackage core/handler
- */
-class Hm_Handler_default_timezone extends Hm_Handler_Module {
-    /**
-     * output the default timezone
-     */
-    public function process() {
-        $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
-    }
-}
-
-/**
  * Setup the date
  * @subpackage core/handler
  */
@@ -668,6 +655,8 @@ class Hm_Handler_default_page_data extends Hm_Handler_Module {
         $this->out('data_sources', array(), false);
         $this->out('encrypt_ajax_requests', $this->config->get('encrypt_ajax_requests', false));
         $this->out('encrypt_local_storage', $this->config->get('encrypt_local_storage', false));
+        $this->out('default_timezone', $this->user_config->get('default_setting_timezone', 'UTC'));
+        $this->out('enabled_modules', $this->config->get_modules());
         if (!crypt_state($this->config)) {
             $this->out('single_server_mode', true);
         }
@@ -1019,13 +1008,13 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             'srv_setup_stepper_profile_signature',
             'srv_setup_stepper_profile_reply_to',
             'srv_setup_stepper_imap_sieve_host',
+            'srv_setup_stepper_imap_sieve_mode_tls',
             'srv_setup_stepper_only_jmap',
             'srv_setup_stepper_imap_hide_from_c_page',
             'srv_setup_stepper_jmap_address',
             'srv_setup_stepper_imap_server_id',
             'srv_setup_stepper_smtp_server_id',
         ));
-
         if ($success) {
             // Destructure form array into variables
             [
@@ -1047,6 +1036,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 'srv_setup_stepper_profile_signature' => $profileSignature,
                 'srv_setup_stepper_profile_reply_to' => $profileReplyTo,
                 'srv_setup_stepper_imap_sieve_host' => $imapSieveHost,
+                'srv_setup_stepper_imap_sieve_mode_tls' => $imapSieveTls,
                 'srv_setup_stepper_only_jmap' => $onlyJmap,
                 'srv_setup_stepper_imap_hide_from_c_page' => $hideFromCombinedView,
                 'srv_setup_stepper_jmap_address' => $jmapAddress,
@@ -1075,7 +1065,8 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     'jmap',
                     $this,
                     $hideFromCombinedView,
-                    $imapServerId
+                    $imapServerId,
+                    $imapSieveTls
                 );
 
                 if(!isset($this->jmap_server_id)) {
@@ -1124,6 +1115,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         $this,
                         $hideFromCombinedView,
                         $imapServerId,
+                        $imapSieveTls
                     );
 
                     if(!isset($this->imap_server_id)) {
@@ -1151,6 +1143,16 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 $this->out('just_saved_credentials', true);
                 Hm_Msgs::add("Server saved");
             }
+        }
+    }
+}
+
+class Hm_Handler_privacy_settings extends Hm_Handler_Module {
+    
+    public function process() {
+        $settings = Hm_Output_privacy_settings::$settings;
+        foreach ($settings as $key => $setting) {
+            process_site_setting($key, $this, 'privacy_setting_callback');
         }
     }
 }

@@ -326,6 +326,12 @@ add_handler('ajax_imap_unsnooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_unsnooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_unsnooze', 'imap_unsnooze_message',  true, 'core');
 
+/* share folders */
+setup_base_ajax_page('ajax_share_folders', 'core');
+add_handler('ajax_share_folders', 'load_imap_folders_permissions',  true);
+add_output('ajax_share_folders', 'get_list_imap_folders_permissions',  true);
+add_handler('ajax_share_folders', 'set_acl_to_imap_folders',  true);
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -354,6 +360,7 @@ return array(
         'ajax_imap_unsnooze',
         'ajax_imap_junk',
         'message_source',
+        'ajax_share_folders',
     ),
 
     'allowed_output' => array(
@@ -375,6 +382,8 @@ return array(
         'show_pagination_links' => array(FILTER_VALIDATE_BOOLEAN, false),
         'snoozed_messages' => array(FILTER_VALIDATE_INT, false),
         'auto_advance_email_enabled' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
+        'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_get' => array(
@@ -455,5 +464,10 @@ return array(
         'ews_profile_is_default' => FILTER_VALIDATE_INT,
         'ews_profile_signature' => FILTER_DEFAULT,
         'ews_profile_reply_to' => FILTER_DEFAULT,
+        'imap_folder_uid' => FILTER_DEFAULT,
+        'imap_folder' => FILTER_DEFAULT,
+        'identifier' => FILTER_DEFAULT,
+        'permissions' => FILTER_DEFAULT,
+        'action' => FILTER_DEFAULT,
     )
 );

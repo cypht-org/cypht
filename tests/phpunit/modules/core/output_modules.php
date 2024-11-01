@@ -1019,6 +1019,15 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
+    public function test_modals() {
+        $test = new Output_Test('modals', 'core');
+        $res = $test->run();
+        $this->assertEquals(array('<div class="modal fade" id="shareFolderModal" tabindex="-1" aria-labelledby="shareFolderModalLabel" aria-hidden="true"><div class="modal-dialog modal-lg"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="shareFolderModalLabel">Edit Permissions</h5><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div><div class="modal-body"><div class="row"><div class="col-lg-8 col-md-12"><div id="loadingSpinner" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div><table class="table table-striped" id="permissionTable" style="display:none;"><thead><tr><th>User</th><th>Permissions</th><th>Actions</th></tr></thead><tbody></tbody></table></div><div class="col-lg-4 col-md-12"><form id="shareForm" action="" method="POST"><input type="hidden" name="server_id" id="server_id" value=""><input type="hidden" name="folder_uid" id="folder_uid" value=""><input type="hidden" name="folder" id="folder" value=""><div class="mb-3 row"><div class="col-12"><label class="form-label">Identifier</label><div><input type="radio" name="identifier" value="user" id="identifierUser" checked><label for="identifierUser">User:</label><input type="text" class="form-control d-inline-block" id="email" name="email" required placeholder="Enter email"></div><div><input type="radio" name="identifier" value="all" id="identifierAll"><label for="identifierAll">All users (anyone)</label></div><div><input type="radio" name="identifier" value="guests" id="identifierGuests"><label for="identifierGuests">Guests (anonymous)</label></div></div></div><div class="mb-3 row"><div class="col-12"><label class="form-label">Access Rights</label><div><input type="checkbox" name="access_read" id="accessRead" checked><label for="accessRead">Read</label></div><div><input type="checkbox" name="access_write" id="accessWrite"><label for="accessWrite">Write</label></div><div><input type="checkbox" name="access_delete" id="accessDelete"><label for="accessDelete">Delete</label></div><div><input type="checkbox" name="access_other" id="accessOther"><label for="accessOther">Other</label></div></div></div><div class="modal-footer"><button type="submit" class="btn btn-primary">Save</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button></div></form></div></div></div></div></div></div>'), $res->output_response);
+    }
+    /**
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
     public function test_message_start() {
         $test = new Output_Test('message_start', 'core');
         $res = $test->run();

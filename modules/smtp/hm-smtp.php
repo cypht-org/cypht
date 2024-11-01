@@ -87,6 +87,9 @@ class Hm_SMTP {
     public $state;
     private $request_auths = array();
     private $scramAuthenticator;
+    private $supports_tls;
+    private $supports_auth;
+    private $max_message_size;
 
     function __construct($conf) {
     $this->scramAuthenticator = new ScramAuthenticator();
@@ -415,8 +418,7 @@ class Hm_SMTP {
                     break;
             }
         }
-    
-        if (!$result) {
+        if (!isset($result)) {
             $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
