@@ -6,7 +6,7 @@ use Aws\Exception\AwsException;
 /**
  * Amazon SQS wrapper
  * @package framework
- * @subpackage queue
+ * @subpackage sqs
  */
 class Hm_AmazonSQS {
 
@@ -14,7 +14,7 @@ class Hm_AmazonSQS {
     private static $sqsClient;
 
     /** Required configuration parameters */
-    static private $required_config = ['aws_key', 'aws_secret', 'aws_region', 'sqs_queue_url'];
+    static private $required_config = ['aws_key', 'aws_secret', 'aws_region'];
 
     /** SQS config */
     static private $config;
@@ -29,7 +29,7 @@ class Hm_AmazonSQS {
             'aws_key' => $site_config->get('aws_key', false),
             'aws_secret' => $site_config->get('aws_secret', false),
             'aws_region' => $site_config->get('aws_region', false),
-            'sqs_queue_url' => $site_config->get('sqs_queue_url', false),
+            'sqs_queue' => $site_config->get('sqs_queue', 'default'),
         ];
 
         foreach (self::$required_config as $v) {
@@ -69,22 +69,31 @@ class Hm_AmazonSQS {
         }
     }
 
+    static private function getQueueUrl(SqsClient $client, string $queueName) {
+        try {
+            $result = $client->getQueueUrl([
+                'QueueName' => $queueName,
+            ]);
+            return $result['QueueUrl'];
+        } catch (AwsException $e) {
+            Hm_Debug::add($e->getMessage());
+            return false;
+        }
+    }
+
     /**
      * Send a message to the SQS queue
      * @param string $message
      * @return string|false Message ID or false on failure
      */
-    static public function sendMessage($message, int $delay = 0) {
-        if (!self::$sqsClient) {
-            return false;
-        }
-
+    static public function sendMessage(SqsClient $client, $message, int $delay = 0,  string $queueName = null) {
         try {
-            $result = self::$sqsClient->sendMessage([
-                'QueueUrl'    => self::$config['sqs_queue_url'],
+            $result = $client->sendMessage([
+                'QueueUrl'    => self::getQueueUrl($client, !is_null($queueName) ? $queueName : self::$config['sqs_queue']),
                 'MessageBody' => $message,
                 'DelaySeconds' => $delay,
             ]);
+
             return $result['MessageId'];
         } catch (AwsException $e) {
             Hm_Debug::add($e->getMessage());
@@ -97,14 +106,10 @@ class Hm_AmazonSQS {
      * @param int $maxMessages
      * @return array
      */
-    static public function receiveMessages($maxMessages = 1) {
-        if (!self::$sqsClient) {
-            return [];
-        }
-
+    static public function receiveMessages(SqsClient $client, $maxMessages = 1) {
         try {
-            $result = self::$sqsClient->receiveMessage([
-                'QueueUrl' => self::$config['sqs_queue_url'],
+            $result = $client->receiveMessage([
+                'QueueUrl' => self::getQueueUrl($client, self::$config['sqs_queue']),
                 'MaxNumberOfMessages' => $maxMessages,
                 'WaitTimeSeconds' => 10,
             ]);
@@ -120,14 +125,10 @@ class Hm_AmazonSQS {
      * @param string $receiptHandle
      * @return bool
      */
-    static public function deleteMessage($receiptHandle) {
-        if (!self::$sqsClient) {
-            return false;
-        }
-
+    static public function deleteMessage(SqsClient $client, $receiptHandle) {
         try {
-            self::$sqsClient->deleteMessage([
-                'QueueUrl' => self::$config['sqs_queue_url'],
+            $client->deleteMessage([
+                'QueueUrl' => self::getQueueUrl($client, self::$config['sqs_queue']),
                 'ReceiptHandle' => $receiptHandle,
             ]);
             return true;
