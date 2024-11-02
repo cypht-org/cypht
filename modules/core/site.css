@@ -369,9 +369,10 @@ button {
   margin-right: 20px;
   padding-right: 15px;
   padding-bottom: 40px;
-  min-width: 200px;
+  min-width: 300px;
   padding-top: 0px;
   min-height: 100vh;
+  padding-top: 20px;
 }
 
 .folders,
@@ -381,7 +382,9 @@ button {
   margin-left: 10px;
   padding-right: 0px;
 }
-.folders li,
+.folders li {
+  margin: 10px 0px;
+}
 .inner_list li {
   padding: 4px;
   padding-left: 10px;
@@ -445,12 +448,6 @@ button {
   padding-left: 25px;
   margin-top: 0px;
   margin-right: -15px;
-  background: linear-gradient(
-    180deg,
-    var(--bs-body-bg),
-    var(--bs-body-bg),
-    var(--bs-secondary-bg)
-  ) !important;
   border-bottom: solid 1px var(--bs-secondary-bg);
   border-top: solid 1px var(--bs-secondary-bg);
   padding-top: 10px;
@@ -716,9 +713,6 @@ button {
 }
 .search_terms {
   padding-left: 5px;
-}
-.folder_list .search_terms {
-  width: 100%;
 }
 .search_content {
   display: table;
@@ -1395,4 +1389,15 @@ nav .menu-toggle {
 
 body {
   overflow-x: hidden;
+}
+
+.menu-icon {
+  font-size: 0.8rem;
+  margin-right: 0.5rem;
+}
+
+.app-logo {
+  height: 3rem;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
 }

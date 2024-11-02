@@ -1008,7 +1008,7 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-send-check-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-send-check-fill menu-icon"></i>';
         }
         $res .= $this->trans('Sent').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1546,7 +1546,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-file-earmark-text fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-file-earmark-text menu-icon"></i>';
         }
         $res .= $this->trans('Compose').'</a></li>';
 
