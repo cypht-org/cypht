@@ -863,6 +863,19 @@ class Hm_Handler_smtp_from_replace extends Hm_Handler_Module {
 }
 
 /**
+ * Determine if composer_from is set
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_subject_replace extends Hm_Handler_Module {
+    public function process()
+    {
+        if (array_key_exists('compose_subject', $this->request->get)) {
+            $this->out('compose_subject', $this->request->get['compose_subject']);
+        }
+    }
+}
+
+/**
  * Determine if auto-bcc is active
  * @subpackage smtp/handler
  */
@@ -1085,7 +1098,6 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
 class Hm_Output_compose_form_content extends Hm_Output_Module {
     protected function output() {
         $to = '';
-        $subject = '';
         $body = '';
         $files = $this->get('uploaded_files', array());
         $cc = '';
@@ -1101,6 +1113,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
+        $subject = $this->get('compose_subject');
         $forward_as_attachment=$this->get('as_attr');
 
         if (!$msg_path) {
