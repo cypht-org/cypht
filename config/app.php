@@ -1023,7 +1023,7 @@ return [
     | Prefer text parts when viewing a message
     | Defaults to false
     */
-    'default_setting_text_only' => env('DEFAULT_SETTING_TEXT_ONLY', true),
+    'default_setting_text_only' => env('DEFAULT_SETTING_TEXT_ONLY', false),
 
     /*
     |
@@ -1038,7 +1038,7 @@ return [
     | Defaults to 1 week
     */
     'default_setting_sent_since' => env('DEFAULT_SETTING_SENT_SINCE', '-1 week'),
-    
+
     /*
     |
     | Per source time limit for junk page
