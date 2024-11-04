@@ -796,7 +796,7 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
         if ($this->get('imap_support')) {
             $res = '<li class="menu_folders"><a class="unread_link" href="?page=folders">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-folder-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-folder-fill menu-icon"></i>';
             }
             $res .= $this->trans('Folders').'</a></li>';
             if ($this->format == 'HTML5') {

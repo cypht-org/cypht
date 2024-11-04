@@ -1441,22 +1441,18 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             $parts = explode('_', $src);
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
+            $class = $this->html_safe($src);
             if (!$single) {
-                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
+                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".'.$this->html_safe($src).'">'.$this->trans($name).
                     '<i class="bi bi-chevron-down"></i></div>';
+                $class .= ' collapse';
             }
 
-            if ($single) {
-                $res .= '<div ';
-            }
-            else {
-                $res .= '<div style="display: none;" ';
-            }
-            $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
+            $res .= '<div class="'.$class.'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-globe-americas menu-icon"></i>';
                 }
                 $res .= $this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
@@ -1478,12 +1474,12 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
      * Opens an unordered list
      */
     protected function output() {
-        $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
+        $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '<ul style="display: none;" class="settings folders">';
+            '<ul class="collapse settings folders">';
         $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-house-door-fill menu-icon"></i>';
         }
         $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1546,7 +1542,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-pc-display-horizontal menu-icon"></i>';
         }
         $res .= $this->trans('Servers').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1564,7 +1560,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-gear-wide-connected menu-icon"></i>';
         }
         $res .= $this->trans('Site').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1585,7 +1581,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-download fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-download menu-icon"></i>';
         }
         $res .= $this->trans('Save').'</a></li>';
         $this->concat('formatted_folder_list', $res);

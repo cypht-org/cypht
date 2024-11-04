@@ -365,7 +365,7 @@ class Hm_Output_tags extends hm_output_module {
         }
         $res .= '<li class="tags_add_new"><a href="?page=tags">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-plus-square fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-plus-square menu-icon"></i>';
         }
         $res .= $this->trans('Add label').'</a></li>';
         $this->append('folder_sources', array('tags_folders', $res));
