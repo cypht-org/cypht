@@ -1323,7 +1323,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
     protected function output() {
         $res = '';
         if (DEBUG_MODE) {
-            $res .= ' <span title="'.
+            $res .= '<span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
