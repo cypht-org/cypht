@@ -1862,133 +1862,29 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
      */
     public function process() {
         if (isset($this->request->post['imap_connect'])) {
-            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
-
-            $sieve_enabled = false;
-            if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                if (!isset($this->request->post['imap_sieve_host'])) {
-                    foreach ($this->get('imap_servers', array()) as $index => $vals) {
-                        if ($index == $form['imap_server_id']) {
-                            $selected_imap = $vals;
-                            break;
-                        }
-                    }
-                    if (isset($selected_imap['sieve_config_host'])) {
-                        $sieve_enabled = true;
-                        $sieve_hostname = $selected_imap['sieve_config_host'];
-                    }
-                } else {
-                    $sieve_enabled = true;
-                    $sieve_hostname = $this->request->post['imap_sieve_host'];
-                }
-                if ($sieve_enabled) {
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            if ($success && $imap_details) {         
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     try {
-                        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($sieve_hostname);
+                        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_details['sieve_config_host']);
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
+                        $client->connect($imap_details['user'], $imap_details['pass'], $imap_details['sieve_tls'], "", "PLAIN");
                     } catch (Exception $e) {
                         Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                         return;
                     }
                 }
-            }
 
-            $imap = false;
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            if ($success) {
-                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
-            }
-            elseif (isset($form['imap_server_id'])) {
-                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            }
-            if ($imap) {
-                if ($imap->get_state() == 'authenticated') {
-                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $imap->server_type, $form['imap_user']));
-                }
-                else {
-                    Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server : %s", $imap->server_type, $form['imap_user']));
-                }
-            }
-            else {
-                Hm_Msgs::add('ERRUsername and password are required');
-                $this->out('old_form', $form);
-            }
-        }
-    }
-}
-
-/**
- * Forget IMAP server credentials
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_forget extends Hm_Handler_Module {
-    /**
-     * Used on the servers page to forget login information for an IMAP server
-     */
-    public function process() {
-        $just_forgot_credentials = false;
-        if (isset($this->request->post['imap_forget'])) {
-            list($success, $form) = $this->process_form(array('imap_server_id'));
-            if ($success) {
-                Hm_IMAP_List::forget_credentials($form['imap_server_id']);
-                $just_forgot_credentials = true;
-                Hm_Msgs::add('Server credentials forgotten');
-                $this->session->record_unsaved('IMAP server credentials forgotten');
-            }
-            else {
-                $this->out('old_form', $form);
-            }
-        }
-        $this->out('just_forgot_credentials', $just_forgot_credentials);
-    }
-}
-
-/**
- * Save a user/pass combination for an IMAP server
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_save extends Hm_Handler_Module {
-    /**
-     * Authenticate then save the username and password for an IMAP server
-     */
-    public function process() {
-        $just_saved_credentials = false;
-        if (isset($this->request->post['imap_save'])) {
-            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
-
-            if (isset($this->request->post['imap_sieve_host'])) {
-                try {
-                    list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
-                    $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                    $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
-                } catch (Exception $e) {
-                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
-                    return;
-                }
-            }
-
-            if (!$success) {
-                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
-            }
-            else {
-                if (in_server_list('Hm_IMAP_List', $form['imap_server_id'], $form['imap_user'])) {
-                    Hm_Msgs::add('ERRThis server and username are already configured');
-                    return;
-                }
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], true);
+                $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $imap_details['user'], $imap_details['pass']);
                 if (imap_authed($imap)) {
-                    $just_saved_credentials = true;
-                    Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved(sprintf('%s server saved', $imap->server_type));
-                }
-                else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? " . $form['imap_user']);
-                    Hm_IMAP_List::forget_credentials($form['imap_server_id']);
+                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $imap->server_type, $imap_details['user']));
+                    return;
                 }
             }
+            Hm_Msgs::add("ERRFailed to authenticate to IMAP server");
         }
-        $this->out('just_saved_credentials', $just_saved_credentials);
     }
 }
 
