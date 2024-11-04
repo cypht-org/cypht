@@ -3,8 +3,8 @@
 namespace Services\Providers;
 
 use Hm_Cache;
-use Services\Core\Scheduling\CacheMutex;
-use Services\Core\Scheduling\Scheduler;
+use Services\Core\Scheduling\Hm_CacheMutex;
+use Services\Core\Scheduling\Hm_Scheduler;
 
 class Hm_SchedulerServiceProvider
 {
@@ -20,10 +20,10 @@ class Hm_SchedulerServiceProvider
         $cache = new Hm_Cache($config, $session);
 
         // Create the CacheMutex instance using the cache
-        $mutex = new CacheMutex($cache);
+        $mutex = new Hm_CacheMutex($cache);
 
         // Create the Scheduler instance, passing in the CacheMutex
-        $scheduler = new Scheduler($mutex);
+        $scheduler = new Hm_Scheduler($mutex);
 
         // Register scheduled tasks here (optional setup)
         // Example:

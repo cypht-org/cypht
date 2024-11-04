@@ -3,9 +3,9 @@
 namespace Services\Traits;
 
 use Services\Contracts\Hm_Job;
+use Services\Core\Jobs\Hm_BaseJob;
 use Services\Core\Queue\Hm_QueueManager;
 use Services\Contracts\Queue\Hm_ShouldQueue;
-use Services\Core\Jobs\Hm_BaseJob;
 
 /**
  * Trait Hm_InteractsWithQueue

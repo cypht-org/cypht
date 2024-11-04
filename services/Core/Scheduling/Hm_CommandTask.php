@@ -2,7 +2,7 @@
 
 namespace Services\Core\Scheduling;
 
-class CommandTask extends ScheduledTask
+class Hm_CommandTask extends Hm_ScheduledTask
 {
     private $command;
     private $onOneServer = false;
@@ -10,7 +10,7 @@ class CommandTask extends ScheduledTask
     private $expiresAt = null;
     private $withoutOverlapping = false;
 
-    public function __construct($command, CacheMutex $mutex)
+    public function __construct($command, Hm_CacheMutex $mutex)
     {
         $fullCommand = "php console " . $command;
         parent::__construct(function () use ($fullCommand) {

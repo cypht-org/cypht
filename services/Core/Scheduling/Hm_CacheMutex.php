@@ -5,7 +5,7 @@ namespace Services\Core\Scheduling;
 use Hm_Cache;
 use Services\Contracts\Scheduling\Mutex;
 
-class CacheMutex implements Mutex
+class Hm_CacheMutex implements Mutex
 {
     private $cache;
 
