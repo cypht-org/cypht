@@ -12,7 +12,7 @@ class ProfileTest(SettingsHelpers):
 
     def load_profile_page(self):
         self.load()
-        self.by_css('[data-source=".settings"]').click()
+        self.by_css('[data-bs-target=".settings"]').click()
         list_item = self.by_class('menu_profiles')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

@@ -136,7 +136,7 @@ class WebTest:
         self.wait(By.CLASS_NAME, class_name)
 
     def wait_with_folder_list(self):
-        self.wait(By.CLASS_NAME, "main_menu")
+        self.wait(By.CLASS_NAME, "folder_list")
 
     def wait_on_sys_message(self, timeout=30):
         wait = WebDriverWait(self.driver, timeout)
