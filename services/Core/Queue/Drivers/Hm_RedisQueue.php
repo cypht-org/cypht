@@ -10,7 +10,7 @@ use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 
 /**
- * Redis Queue using Hm_Redis with Hm_Cache_Base trait support
+ * Redis Queue using Hm_Redis with Hm_Cache_Base trait Hm_RedisQueue
  */
 class Hm_RedisQueue implements Hm_ShouldQueue, Hm_Queueable
 {

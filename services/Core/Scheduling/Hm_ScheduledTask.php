@@ -4,7 +4,7 @@ namespace Services\Core\Scheduling;
 
 use Services\Traits\Hm_ScheduleFrequencyManager;
 
-class ScheduledTask
+class Hm_ScheduledTask
 {
     use Hm_ScheduleFrequencyManager;
 

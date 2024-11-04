@@ -2,10 +2,10 @@
 
 namespace Services\Traits;
 
-use Services\Core\Events\Hm_BaseEvent;
-use Services\Core\Events\Hm_EventDispatcher;
 use Services\Core\Jobs\Hm_BaseJob;
+use Services\Core\Events\Hm_BaseEvent;
 use Services\Core\Queue\Hm_JobDispatcher;
+use Services\Core\Events\Hm_EventDispatcher;
 
 trait Hm_Dispatchable
 {

@@ -5,7 +5,7 @@ namespace Services\Core\Scheduling;
 use Hm_Cache;
 use Hm_Session_Setup;
 
-class Scheduler
+class Hm_Scheduler
 {
     protected $tasks = [];
     protected $config;
@@ -18,7 +18,7 @@ class Scheduler
     public function command($command)
     {
         $cache = new Hm_Cache($this->config, new Hm_Session_Setup($this->config));
-        $commandTask = new CommandTask($command, new CacheMutex($cache));
+        $commandTask = new Hm_CommandTask($command, new Hm_CacheMutex($cache));
         $this->tasks[] = $commandTask;
         return $commandTask;
     }
@@ -35,7 +35,7 @@ class Scheduler
      */
     public function register(callable $callback, $name = '', $description = '', $tags = [], $timezone = 'UTC')
     {
-        $task = new ScheduledTask($callback, $name, $description, $tags, $timezone);
+        $task = new Hm_ScheduledTask($callback, $name, $description, $tags, $timezone);
         $this->tasks[] = $task;
 
         return $task;
