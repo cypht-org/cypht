@@ -17,7 +17,7 @@ class FolderListTests(WebTest):
         self.load()
 
     def reload_folder_list(self):
-        main_menu = self.by_class('folder_list')
+        main_menu = self.by_class('main')
         assert main_menu.is_displayed()
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
@@ -26,9 +26,9 @@ class FolderListTests(WebTest):
         ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
         # And once it is stale, we can now wait for it to become available again as the page contents are loaded again.
         main_menu = WebDriverWait(self.driver, 10,ignored_exceptions=ignored_exceptions).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'folder_list'))
+        EC.presence_of_element_located((By.CLASS_NAME, 'main'))
         )
-        main_menu = self.by_class('folder_list')
+        main_menu = self.by_class('main')
         #and finally perform our test on the actual, refreshed element.
         assert main_menu.is_displayed()
 
