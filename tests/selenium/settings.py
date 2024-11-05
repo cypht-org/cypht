@@ -3,8 +3,7 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from runner import test_runner
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import Select
 
 
 class SettingsHelpers(WebTest):
@@ -33,12 +32,9 @@ class SettingsHelpers(WebTest):
     def settings_section(self, section):
         if not self.by_class('settings').is_displayed():
             self.by_css('[data-bs-target=".settings"]').click()
-            WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+            self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_settings')
-        link = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(list_item.find_element(By.TAG_NAME, 'a'))
-        )
-        link.click()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
@@ -91,12 +87,9 @@ class SettingsTests(SettingsHelpers):
     def load_settings_page(self):
         self.wait_on_class('main')
         self.by_css('[data-bs-target=".settings"]').click()
-        WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+        self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_settings')
-        link = WebDriverWait(self.driver, 10).until(
-            EC.element_to_be_clickable(list_item.find_element(By.TAG_NAME, 'a'))
-        )
-        link.click()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Site Settings'

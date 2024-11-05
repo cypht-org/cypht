@@ -153,6 +153,16 @@ class WebTest:
             lambda driver: get_current_navigations_request_entries_length() > navigation_length
         )
 
+    def wait_for_settings_to_expand(self):
+        print(" - waiting for the settings section to expand...")
+        WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+
+    def click_when_clickable(self, el):
+        print(" - waiting for element to be clickable")
+        WebDriverWait(self.driver, 10).until(
+            exp_cond.element_to_be_clickable(el)
+        ).click()
+
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':
             print(" - waiting {0} extra second for Safari".format(timeout))
