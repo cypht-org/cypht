@@ -1269,19 +1269,17 @@ var Hm_Folders = {
 
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
-        $('.src_name').on("click", function() {
-            var class_name = $(this).data('source');
-            var icon_element = $(this).find('.bi');
-            Hm_Utils.toggle_section(class_name);
-            setTimeout(() => {
-                var target_element = document.querySelector(class_name);
-                var is_visible = Hm_Utils.is_element_visible(target_element);
-                if (is_visible) {
-                    icon_element.removeClass('bi-chevron-down').addClass('bi-chevron-up');
-                } else {
-                    icon_element.removeClass('bi-chevron-up').addClass('bi-chevron-down');
-                }
-            }, 0);
+        $('.src_name').on('click', function() {
+
+            let transformValue = '';
+            if ($(this).attr('aria-expanded') == 'true') {
+                transformValue = 'rotate(180deg)';
+                
+            } else {
+                transformValue = 'rotate(0deg)';
+            }
+            
+            $(this).find('i').css('transform', transformValue);
         });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
@@ -1309,7 +1307,7 @@ var Hm_Folders = {
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path) {
             if (page == 'message_list' || page == 'message') {
-                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
+                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").closest('li').addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
             else {

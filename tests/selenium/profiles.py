@@ -2,6 +2,7 @@ from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from runner import test_runner
 from settings import SettingsHelpers
+from selenium.webdriver.support.ui import WebDriverWait
 
 class ProfileTest(SettingsHelpers):
 
@@ -12,7 +13,8 @@ class ProfileTest(SettingsHelpers):
 
     def load_profile_page(self):
         self.load()
-        self.by_css('[data-source=".settings"]').click()
+        self.by_css('[data-bs-target=".settings"]').click()
+        WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
         list_item = self.by_class('menu_profiles')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

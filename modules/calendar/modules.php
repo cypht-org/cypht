@@ -132,7 +132,7 @@ class Hm_Output_calendar_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_calendar"><a class="unread_link" href="?page=calendar">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-calendar-week-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-calendar-week-fill menu-icon"></i>';
         }
         $res .= $this->trans('Calendar').'</a></li>';
         if ($this->format == 'HTML5') {
