@@ -221,7 +221,7 @@ var Hm_Ajax_Request = function() { return {
                 Hm_Ajax.err_condition = false;
                 Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
                 Hm_Notices.show(res.router_user_msgs);
             }
             if (res.folder_status) {
