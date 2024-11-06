@@ -48,8 +48,7 @@ var feeds_search_page_content = function(id) {
 };
 
 var display_feeds_search_result = function(res) {
-    var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feeds_combined_content_unread = function(id) {
@@ -66,8 +65,7 @@ var feeds_combined_content_unread = function(id) {
 };
 
 var display_feeds_combined_unread = function(res) {
-    var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feeds_combined_content = function(id) {
@@ -93,8 +91,7 @@ var set_combined_feeds_state = function() {
 };
 
 var display_feeds_combined = function(res) {
-    var ids = res.feed_server_ids.split(',');
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
     $('.total').text($('.message_table tbody tr').length);
 };
 
@@ -111,8 +108,7 @@ var feeds_combined_inbox_content= function(id) {
 };
 
 var display_feeds_combined_inbox = function(res) {
-    var ids = res.feed_server_ids.split(',');
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var feed_item_view = function(uid, list_path, callback) {
@@ -184,7 +180,7 @@ var load_feed_list = function(id) {
 
 var display_feed_list = function(res) {
     var ids = [res.feed_server_ids];
-    Hm_Message_List.update(ids, res.formatted_message_list, 'feeds');
+    Hm_Message_List.update(res.formatted_message_list);
     var key = 'feeds_'+res.feed_server_ids;
     var data = Hm_Message_List.filter_list();
     data.find('*[style]').attr('style', '');

@@ -381,7 +381,7 @@ var send_requests = function(requests) {
             params,
             function(res) {
                 var detail = Hm_Utils.parse_folder_path(request['source'], 'imap');
-                Hm_Message_List.update([detail.server_id+n], res.formatted_message_list, 'imap');
+                Hm_Message_List.update(res.formatted_message_list);
                 if (Hm_Utils.rows().length > 0) {
                     $('.adv_controls').show();
                     $('.core_msg_control').off('click');

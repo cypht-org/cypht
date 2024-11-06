@@ -259,7 +259,7 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
                 add_auto_folder(res.auto_sent_folder);
             }
 
-            Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+            Hm_Message_List.update(res.formatted_message_list);
 
             $('.page_links').html(res.page_links);
             cache_imap_page();
@@ -447,14 +447,8 @@ $('#imap_filter_form').on('submit', async function(event) {
 });
 
 var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
-    const detail = Hm_Utils.parse_folder_path(path, 'imap');
-    const serverIds = [];
-    if (detail) {
-        serverIds.push(detail.server_id);
-    }
     if (rows) {
-        // TODO: Review the update() method, it seems not to be correctly removing the old data from the page
-        Hm_Message_List.update(serverIds, rows, 'imap');
+        Hm_Message_List.update(rows);
         Hm_Message_List.check_empty_list();
         $('.page_links').html(links);
         $('input[type=checkbox]').on("click", function(e) {
