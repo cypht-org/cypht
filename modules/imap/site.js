@@ -453,6 +453,7 @@ var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
         serverIds.push(detail.server_id);
     }
     if (rows) {
+        // TODO: Review the update() method, it seems not to be correctly removing the old data from the page
         Hm_Message_List.update(serverIds, rows, 'imap');
         Hm_Message_List.check_empty_list();
         $('.page_links').html(links);

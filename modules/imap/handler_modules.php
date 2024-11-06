@@ -456,12 +456,7 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
                 $this->session->record_unsaved('Added folder to combined pages');
             }
             else {
-                if (is_array($sources) && array_key_exists($form['list_path'], $sources)) {
-                    unset($sources[$form['list_path']]);
-                }
-                else {
-                    $sources[$form['list_path']] = 'remove';
-                }
+                $sources[$form['list_path']] = 'remove';
                 Hm_Msgs::add('Folder removed from combined pages');
                 $this->session->record_unsaved('Removed folder from combined pages');
             }
@@ -1311,7 +1306,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
             $folders = array($folder);
         } else {
-            $data_sources = imap_data_sources('');
+            $data_sources = imap_data_sources('', $this->session->get('custom_imap_sources', user:true));
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
