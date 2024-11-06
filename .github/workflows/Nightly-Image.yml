@@ -1,28 +1,84 @@
-name: Nightly-Image-Build
-
-defaults:
-  run:
-    shell: bash
+name: Build Daily Image
 
 on:
+  pull_request_target:
   workflow_call:
+    inputs:
+      php_version:
+        description: "PHP version to use for the build"
+        required: false
+        default: "latest"
+        type: string
+
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches:
+      - master
+  workflow_dispatch:
 
 jobs:
-  Nightly-Image-Build:
-    name: Nightly-Image-${{ matrix.arch }}-PHP${{ matrix.php-versions }}
+  build-and-push:
     runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     strategy:
       matrix:
-        php-versions: ['8.1']
-        arch: ['x64', 'aarch64']
+        include:
+          - php_version: ${{ inputs.php_version }}
 
     steps:
-      - name: "Checkout code"
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: "Build Nightly Image"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Debugging steps for DOCKER_USERNAME
+      - name: Verify DOCKER_USERNAME is set
         run: |
-            echo "Publish each updated content to the nightly mirror, package and fix errors in time."
+          if [ -z "$DOCKER_USERNAME" ]; then
+            echo "DOCKER_USERNAME is empty or not set!"
+            exit 1
+          else
+            echo "DOCKER_USERNAME is set."
+          fi
+
+      - name: Output partial DOCKER_USERNAME
+        run: |
+          echo "Partial DOCKER_USERNAME: ${DOCKER_USERNAME:0:3}***"
+
+      - name: Debug DOCKER_USERNAME length
+        run: |
+          echo "Length of DOCKER_USERNAME: ${#DOCKER_USERNAME}"
+
+      - name: Encode and Debug DOCKER_USERNAME
+        run: |
+          echo "Encoded DOCKER_USERNAME: $(echo -n "$DOCKER_USERNAME" | base64)"
+
+      - name: Log Environment Variables
+        run: env
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          file: ./docker/Dockerfile
+          push: true
+          tags: cypht/cypht-daily:${{ matrix.php_version }}
+          debug: true
+
+      - name: Log out from Docker Hub
+        run: docker logout
