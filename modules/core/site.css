@@ -669,7 +669,8 @@ button {
 .general_setting,
 .junk_setting,
 .trash_setting,
-.drafts_setting {
+.drafts_setting,
+.privacy_setting {
   display: none;
 }
 .update_search_label_field {
@@ -1354,7 +1355,7 @@ div.unseen,
   font-size: 0.9rem;
   display: inline-block;
   margin-top: 0.5rem;
-  color: var(--bs-secondary) !important;
+  opacity: .6;
 }
 
 .popover {
