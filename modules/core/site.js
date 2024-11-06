@@ -489,38 +489,12 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(ids, msgs, type, cache) {
-        var completed = false;
-        this.completed_count++;
-        if (this.completed_count == this.sources.length) {
-            this.completed_count = 0;
-            completed = true;
+    this.update = function(msgs) {
+        Hm_Utils.tbody().html('');
+        for (const index in msgs) {
+            const row = msgs[index][0];
+            Hm_Utils.tbody().append(row);
         }
-        if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            this.run_callbacks(completed);
-            return 0;
-        }
-        if (msgs[0] === "") {
-            this.run_callbacks(completed);
-            return 0;
-        }
-        var msg_rows;
-        if (!cache) {
-            msg_rows = Hm_Utils.tbody();
-        }
-        else {
-            msg_rows = cache;
-        }
-        if (!this.background && !$.isEmptyObject(msgs)) {
-            $('.empty_list').remove();
-        }
-        var msg_ids = this.add_rows(msgs, msg_rows);
-        var count = this.remove_rows(ids, msg_ids, type, msg_rows);
-        this.run_callbacks(completed);
-        if (!cache) {
-            this.set_tab_index();
-        }
-        return count;
     };
 
     this.set_tab_index = function() {
@@ -530,38 +504,6 @@ function Message_List() {
             $(this).attr('tabindex', count);
             count++;
         });
-    };
-
-    this.remove_rows = function(ids, msg_ids, type, msg_rows) {
-        var count = $('tr', msg_rows).length;
-        var parts;
-        var re;
-        var i;
-        var id;
-        for (i=0;i<ids.length;i++) {
-            id = ids[i];
-            if ((id+'').search('_') != -1) {
-                parts = id.split('_', 2);
-                re = new RegExp(parts[1]+'$');
-                parts[1] = re;
-            }
-            else {
-                parts = [id, false];
-            }
-            $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
-                var id = this.className;
-                if (id.indexOf(' ') != -1) {
-                    id = id.split(' ')[0];
-                }
-                if (!parts[1] || parts[1].exec(id)) {
-                    if ($.inArray(id, msg_ids) == -1) {
-                        count--;
-                        $(this).remove();
-                    }
-                }
-            });
-        }
-        return count;
     };
 
     this.sort = function(fld) {
@@ -601,30 +543,6 @@ function Message_List() {
             Hm_Utils.tbody().append(sort_result[i]);
         }
         this.save_updated_list();
-    };
-
-    this.add_rows = function(msgs, msg_rows) {
-        var msg_ids = [];
-        var row;
-        var id;
-        var index;
-        for (index in msgs) {
-            row = msgs[index][0];
-            id = msgs[index][1];
-            if (this.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
-                continue;
-            }
-            id = id.replace(/ /, '-');
-            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) {
-                this.insert_into_message_list(row, msg_rows);
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
-            }
-            else {
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).replaceWith(row)
-            }
-            msg_ids.push(id);
-        }
-        return msg_ids;
     };
 
     this.insert_into_message_list = function(row, msg_rows) {

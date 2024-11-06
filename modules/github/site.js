@@ -28,7 +28,7 @@ var display_github_data_background = function(res) {
 
 var display_github_data = function(res) {
     var path = getListPathParam();
-    Hm_Message_List.update([res.github_server_id], res.formatted_message_list, 'github');
+    Hm_Message_List.update(res.formatted_message_list);
     if (path != 'github_all') {
         var data = Hm_Message_List.filter_list();
         data.find('*[style]').attr('style', '');
