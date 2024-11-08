@@ -16,9 +16,6 @@ $commandServiceProvider->register($application);
 $queueServiceProvider = $containerBuilder->get('queue.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
 $queueServiceProvider->register();
 
-$queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
-$queueServiceProvider->register($config, new Hm_Session_Setup($config));
-
 $eventServiceProvider = $containerBuilder->get('event.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
 // $eventServiceProvider->setContainer($containerBuilder);
 $eventServiceProvider->register();
