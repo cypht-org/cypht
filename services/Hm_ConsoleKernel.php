@@ -3,12 +3,22 @@
 namespace Services;
 
 use Services\Core\Scheduling\Hm_Scheduler;
-use Services\Core\Hm_Container;
 
+/**
+ * Class Hm_ConsoleKernel
+ * @package Services
+ */
 class Hm_ConsoleKernel
 {
+    /**
+     * @var Hm_Scheduler
+     */
     protected $scheduler;
 
+    /**
+     * Hm_ConsoleKernel constructor.
+     * @param Hm_Scheduler $scheduler
+     */
     public function __construct(Hm_Scheduler $scheduler)
     {
         $this->scheduler = $scheduler;

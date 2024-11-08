@@ -14,6 +14,10 @@ class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
     use Hm_Dispatchable, Hm_InteractsWithQueue, Hm_Serializes;
 
     public string $email;
+    /**
+     * The queue driver
+     */
+    public string $driver = 'redis';
 
     public function __construct(string $email)
     {

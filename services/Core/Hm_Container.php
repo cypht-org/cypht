@@ -8,6 +8,10 @@ use Hm_AmazonSQS;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Services\Providers\{Hm_CommandServiceProvider, Hm_EventServiceProvider, Hm_SchedulerServiceProvider, Hm_QueueServiceProvider};
 
+/**
+ * Class Hm_Container
+ * @package Services\Core
+ */
 class Hm_Container
 {
     private static $container = null;
@@ -16,6 +20,12 @@ class Hm_Container
     private function __construct() {}
     private function __clone() {}
 
+    /**
+     * Set the container
+     *
+     * @param ContainerBuilder $containerBuilder
+     * @return ContainerBuilder
+     */
     public static function setContainer(ContainerBuilder $containerBuilder): ContainerBuilder
     {
         if (self::$container === null) {
@@ -25,12 +35,17 @@ class Hm_Container
         return self::$container;
     }
 
+    /**
+     * Bind the container
+     *
+     * @return ContainerBuilder
+     */
     public static function bind(): ContainerBuilder
     {
         $config = self::$container->get('config');
 
         if ($config->get('queue_enabled')) {
-
+            
             if ($config->get('queue_driver') === 'database') {
                 // Register Hm_DB
                 self::$container->set('db.connection', Hm_DB::connect(self::$container->get('config')));
@@ -67,6 +82,11 @@ class Hm_Container
         return self::$container;
     }
 
+    /**
+     * Get the container
+     *
+     * @return ContainerBuilder
+     */
     public static function getContainer(): ContainerBuilder
     {
         return self::$container;

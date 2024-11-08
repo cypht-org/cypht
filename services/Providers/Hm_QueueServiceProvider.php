@@ -10,14 +10,25 @@ use Services\Core\Queue\Drivers\Hm_DatabaseQueue;
 use Services\Core\Queue\Drivers\Hm_AmazonSQSQueue;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ * Class Hm_QueueServiceProvider
+ * @package Services\Providers
+ */
 class Hm_QueueServiceProvider
 {
+    /**
+     * @var Hm_QueueManager
+     */
     protected Hm_QueueManager $queueManager;
 
+    /**
+     * Register the service provider
+     */
     public function register()
     {
-        $queueConnection = getenv('QUEUE_DRIVER') ?: 'database';
         $containerBuilder = Hm_Container::getContainer();
+        $config = $containerBuilder->get('config');
+        $queueConnection = $config->get('queue_driver');
         
         $containerBuilder->register('queue.manager', Hm_QueueManager::class)
         ->setShared(true);
@@ -46,7 +57,7 @@ class Hm_QueueServiceProvider
                 $containerBuilder->getDefinition('queue.manager')
                     ->addMethodCall('addDriver', ['sqs', new Reference('queue.driver.sqs')]);
                 break;
-            default:
+            case 'database':
                 $containerBuilder->register('queue.driver.database', Hm_DatabaseQueue::class)
                     ->addArgument(new Reference('db'))
                     ->addArgument(new Reference('db.connection'));
