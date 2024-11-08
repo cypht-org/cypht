@@ -18,7 +18,7 @@ class Hm_CacheMutex implements Mutex
     /**
      * Create a lock for the task.
      *
-     * @param Task $task The task instance
+     * @param Hm_CommandTask $task The task instance
      * @param int $expiresAt Time in seconds for the lock expiration
      * @return bool Returns true if the lock was created, false otherwise
      */
