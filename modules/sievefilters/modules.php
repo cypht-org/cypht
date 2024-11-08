@@ -937,7 +937,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             }
             if ($action->action == 'move') {
                 $custom_condition->addAction(
-                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => [$action->value]])
+                    new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => $action->value])
                 );
             }
             if ($action->action == 'reject') {
