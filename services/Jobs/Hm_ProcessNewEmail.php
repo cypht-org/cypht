@@ -13,8 +13,6 @@ class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
 {
     use Hm_Dispatchable, Hm_InteractsWithQueue, Hm_Serializes;
 
-    public string $driver = 'sqs';
-
     public string $email;
 
     public function __construct(string $email)

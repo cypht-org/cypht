@@ -5,7 +5,7 @@ namespace Services;
 use Services\Core\Scheduling\Hm_Scheduler;
 use Services\Core\Hm_Container;
 
-class Hm_ConsoleKernal
+class Hm_ConsoleKernel
 {
     protected $scheduler;
 
@@ -22,8 +22,7 @@ class Hm_ConsoleKernal
     {
         // Register tasks with the scheduler
         $this->scheduler->command('check:mail')
-            ->everyMinute();
-            // ->onOneServer()
-            // ->withoutOverlapping(10);
+            ->everyMinute()
+            ->withoutOverlapping();
     }
 }

@@ -30,12 +30,15 @@ class Hm_ScheduledTask
         $this->expression = $expression;
     }
 
+    public function getName()
+    {   
+        return $this->name;
+    }
+
     public function isDue()
-    {
-        
+    {   
         if ($this->isEnabled) {
             $this->calculateNextRunTime();
-            dd($this->isEnabled);
             return $this->nextRunTime <= new \DateTime('now', new \DateTimeZone($this->timezone));
         }
         return false;
@@ -114,6 +117,7 @@ class Hm_ScheduledTask
 
         // Calculate next minute
         $nextMinute = $this->getNextFieldValue($next->format('i'), $minuteField, 0, 59);
+
         if ($nextMinute !== null) {
 
             $next->setTime($next->format('H'), $nextMinute);
@@ -153,7 +157,7 @@ class Hm_ScheduledTask
         $nextDayOfWeek = $this->getNextFieldValue($next->format('w'), $dayOfWeekField, 0, 6);
 
         if ($nextDayOfWeek !== null) {
-            while ($next->format('w') !== $nextDayOfWeek) {
+            while (intval($next->format('w')) !== $nextDayOfWeek) {
                 $next->modify('+1 day');
             }
         } else {
