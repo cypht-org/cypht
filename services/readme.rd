@@ -15,17 +15,10 @@ $worker = new QueueWorker($queueManager->getDriver('redis'));
 $worker->work();
 ```
 
+#Adding scheduler
+you can use register or command on `$scheduler`, we prepared the class `Hm_ConsoleKernel` for that:
 ```
 <?php
-
-require 'path/to/your/autoload.php';
-
-use Services\Scheduling\Scheduler;
-
-// Initialize the scheduler
-$scheduler = new Scheduler($config);
-
-
 // Register a task with custom name, description, tags, and timezone
 $scheduler->register(function () {
     echo "Running database cleanup\n";
@@ -40,16 +33,22 @@ $scheduler->command('backup:database')->dailyAt('02:00');
 
 as we now have `Hm_SchedulerRunCommand.php` we can do:
 ```
-* * * * * php81 /path/to/cypht/project/console schedule:run
+* * * * * cd /path-to-your-project && php console schedule:run >> /dev/null 2>&1
+```
+#Running the Scheduler Locally
+
+Typically, you would not add a scheduler cron entry to your local development machine. Instead, you may use the `schedule:work` Console command. This command will run in the foreground and invoke the scheduler every minute until you terminate the command:
+```
+php console schedule:work
 ```
 
-```
-// Dispatch the event
+#Dispatch the event
+``` 
 (new NewEmailProcessedEvent)->dispatch('user@example.com');
 ```
-```
-// Notification Example usage
 
+#Notification Example usage
+```
 use Services\Notifications\UserNotification;
 
 // Configure the notification channels

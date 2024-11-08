@@ -23,6 +23,7 @@ class Hm_QueueManager
 
     public function getDriver(string $name): Hm_ShouldQueue
     {
+        dump("Getting driver $name");
         return $this->drivers[$name];
     }
 }

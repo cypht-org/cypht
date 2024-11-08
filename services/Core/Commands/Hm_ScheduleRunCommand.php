@@ -8,11 +8,22 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+/**
+ * Class Hm_ScheduleRunCommand
+ * @package Services\Core\Commands
+ */
 class Hm_ScheduleRunCommand extends Hm_BaseCommand
 {
-    // Default name for the command
+    /**
+     * The name of the command.
+     *
+     * @var string
+     */
     protected static $defaultName = 'schedule:run';
 
+    /**
+     * Configure the command.
+     */
     protected function configure()
     {
         $this
@@ -21,11 +32,16 @@ class Hm_ScheduleRunCommand extends Hm_BaseCommand
             ;
     }
 
+    /**
+     * Execute the console command.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int Command exit code.
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Get the scheduler instance from the container
         $scheduler = Hm_Container::getContainer()->get('scheduler');
-        // Run the tasks that are due
         $scheduler->run();
         
         $output->writeln("All due scheduled tasks have been executed.");

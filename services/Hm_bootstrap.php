@@ -1,7 +1,7 @@
 <?php
 
-use Services\Core\Hm_Container;
 use Services\Hm_ConsoleKernel;
+use Services\Core\Hm_Container;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 

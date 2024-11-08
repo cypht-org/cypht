@@ -67,8 +67,8 @@ class Hm_CacheMutex implements Mutex
      */
     private function getMutexKey($task)
     {
-        return 'mutex_' . hash('sha256', get_class($task) . $task->name . json_encode($task->command));
-        // return 'mutex_' . hash('sha256', $task->name);
+        // return 'mutex_' . hash('sha256', get_class($task) . $task->name . json_encode($task->command));
+        return 'mutex_' . hash('sha256', $task->name);
     }
 
     /**

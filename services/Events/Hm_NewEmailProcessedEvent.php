@@ -7,7 +7,7 @@ use Services\Core\Events\Hm_BaseEvent;
 
 class Hm_NewEmailProcessedEvent extends Hm_BaseEvent// implements Hm_ShouldQueue
 {
-    use Hm_Dispatchable;//, Hm_InteractsWithQueue;
+    use Hm_Dispatchable;//Hm_InteractsWithQueue;
 
     /**
      * Create a new event instance.

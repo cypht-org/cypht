@@ -4,9 +4,13 @@ namespace Services\Providers;
 
 use Hm_Cache;
 use Services\Core\Hm_Container;
-use Services\Core\Scheduling\Hm_CacheMutex;
 use Services\Core\Scheduling\Hm_Scheduler;
+use Services\Core\Scheduling\Hm_CacheMutex;
 
+/**
+ * Class Hm_SchedulerServiceProvider
+ * @package Services\Providers
+ */
 class Hm_SchedulerServiceProvider
 {
 

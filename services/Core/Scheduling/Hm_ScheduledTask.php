@@ -8,18 +8,76 @@ class Hm_ScheduledTask
 {
     use Hm_ScheduleFrequencyManager;
 
+    /**
+     * The caallback to run
+     *
+     */
     private $callback;
+    /**
+     * The next run time
+     *
+     * @var string
+     */
     private $nextRunTime;
+    /**
+     * check if the task is enabled
+     *
+     * @var boolean
+     */
     private $isEnabled = true;
+    /**
+     * The task name
+     *
+     * @var string
+     */
     private $name;
+    /**
+     * The task name
+     *
+     * @var string
+     */
     private $description;
+    /**
+     * The task name
+     *
+     * @var array
+     */
     private $tags = [];
+    /**
+     * The last run time
+     *
+     */
     private $lastRunTime;
+    /**
+     * The maximum number of retries
+     *
+     * @var int
+     */
+    private int $maxRetries = 3;
 
-    private $maxRetries = 3;
-    private $retryInterval = 60; // Interval in seconds between retries
-    private $retryCount = 0; // Track the number of retries attempted
+    /**
+     * Interval in seconds between retries
+     *
+     * @var int
+     */
+    private int $retryInterval = 60;
+    /**
+     * Track the number of retries attempted
+     *
+     * @var int
+     */
+    private int $retryCount = 0;
 
+    /**
+     * Create a new scheduled task
+     *
+     * @param callable $callback
+     * @param string $name
+     * @param string $description
+     * @param array $tags
+     * @param string $timezone
+     * @param string $expression
+     */
     public function __construct(callable $callback, $name = '', $description = '', $tags = [], $timezone = 'UTC', $expression = '* * * * *')
     {
         $this->callback = $callback;
@@ -30,11 +88,21 @@ class Hm_ScheduledTask
         $this->expression = $expression;
     }
 
+    /**
+     * Get the task name
+     *
+     * @return string
+     */
     public function getName()
     {   
         return $this->name;
     }
 
+    /**
+     * Check if the task is due to run
+     *
+     * @return bool
+     */
     public function isDue()
     {   
         if ($this->isEnabled) {
@@ -44,6 +112,19 @@ class Hm_ScheduledTask
         return false;
     }
 
+    /**
+     * Get the next run time
+     *
+     * @return \DateTime
+     */
+    public function getTimezone()
+    {
+        return $this->timezone;
+    }
+
+    /**
+     * Run the scheduled task
+     */
     public function run()
     {
         if (!$this->isDue()) {
@@ -72,6 +153,85 @@ class Hm_ScheduledTask
         $this->scheduleNextRun();
     }
 
+    /**
+     * Calculate the next run time based on the cron expression
+     *
+     * @return \DateTime
+     */
+    public function calculateNextRunTime()
+    {
+        // Ensure the cron expression is valid
+        if (empty($this->expression)) {
+            throw new \InvalidArgumentException("Cron expression must be set.");
+        }
+    
+        // Split the cron expression into parts
+        $parts = preg_split('/\s+/', $this->expression);
+        if (count($parts) !== 5) {
+            throw new \InvalidArgumentException("Invalid cron expression: {$this->expression}");
+        }
+    
+        // Extract cron fields
+        list($minuteField, $hourField, $dayOfMonthField, $monthField, $dayOfWeekField) = $parts;
+    
+        // Initialize current time and timezone
+        $now = new \DateTime('now', new \DateTimeZone($this->timezone));
+        $next = clone $now;
+    
+        // Only increment the minute by default, assuming the task is set to run every minute
+        if ($minuteField === '*' && $hourField === '*' && $dayOfMonthField === '*' && $monthField === '*' && $dayOfWeekField === '*') {
+            $next->modify('+1 minute');
+            return $next;
+        }
+    
+        // Calculate the next minute
+        $nextMinute = $this->getNextFieldValue((int)$next->format('i'), $minuteField, 0, 59);
+        if ($nextMinute < (int)$next->format('i')) {
+            // Increment the hour if the calculated minute is in the past for the current hour
+            $next->modify('+1 hour');
+        }
+        $next->setTime((int)$next->format('H'), $nextMinute);
+    
+        // Calculate the next hour
+        $nextHour = $this->getNextFieldValue((int)$next->format('H'), $hourField, 0, 23);
+        if ($nextHour < (int)$next->format('H')) {
+            // Increment the day if the calculated hour is in the past for the current day
+            $next->modify('+1 day');
+        }
+        $next->setTime($nextHour, (int)$next->format('i'));
+    
+        // Calculate the next day of the month
+        $nextDay = $this->getNextFieldValue((int)$next->format('d'), $dayOfMonthField, 1, 31);
+        if ($nextDay < (int)$next->format('d')) {
+            // Increment the month if the calculated day is in the past for the current month
+            $next->modify('+1 month');
+        }
+        $next->setDate((int)$next->format('Y'), (int)$next->format('m'), $nextDay);
+    
+        // Calculate the next month
+        $nextMonth = $this->getNextFieldValue((int)$next->format('n'), $monthField, 1, 12);
+        if ($nextMonth < (int)$next->format('n')) {
+            // Increment the year if the calculated month is in the past for the current year
+            $next->modify('+1 year');
+        }
+        $next->setDate((int)$next->format('Y'), $nextMonth, (int)$next->format('d'));
+    
+        // Calculate the next day of the week if specified
+        if ($dayOfWeekField !== '*') {
+            $nextDayOfWeek = $this->getNextFieldValue((int)$next->format('w'), $dayOfWeekField, 0, 6);
+            while ((int)$next->format('w') !== $nextDayOfWeek) {
+                $next->modify('+1 day'); // Move forward by one day until it matches the specified day of the week
+            }
+        }
+    
+        return $next;
+    }
+
+    /**
+     * Handle retries for the task
+     *
+     * @param \Exception $e
+     */
     private function handleRetry(\Exception $e)
     {
         if ($this->retryCount < $this->maxRetries) {
@@ -90,83 +250,24 @@ class Hm_ScheduledTask
         }
     }
 
+    /**
+     * Schedule the next run time for the task
+     */
     private function scheduleNextRun()
     {
         // You can schedule the next run based on cron expression or your custom logic
         $this->nextRunTime = $this->calculateNextRunTime();
     }
 
-    private function calculateNextRunTime()
-    {
-        // Ensure the cron expression is valid
-        if (empty($this->expression)) {
-            throw new \InvalidArgumentException("Cron expression must be set.");
-        }
-
-        // Split the cron expression into parts
-        $parts = preg_split('/\s+/', $this->expression);
-        if (count($parts) !== 5) {
-            throw new \InvalidArgumentException("Invalid cron expression: {$this->expression}");
-        }
-
-        // Extract the cron fields
-        list($minuteField, $hourField, $dayOfMonthField, $monthField, $dayOfWeekField) = $parts;
-
-        $now = new \DateTime('now', new \DateTimeZone($this->timezone));
-        $next = clone $now;
-
-        // Calculate next minute
-        $nextMinute = $this->getNextFieldValue($next->format('i'), $minuteField, 0, 59);
-
-        if ($nextMinute !== null) {
-
-            $next->setTime($next->format('H'), $nextMinute);
-        } else {
-            $next->modify('+1 hour');
-            $next->setTime(0, $this->getNextFieldValue(0, $minuteField, 0, 59));
-        }
-        
-        // Calculate next hour
-        $nextHour = $this->getNextFieldValue($next->format('H'), $hourField, 0, 23);
-        if ($nextHour !== null) {
-            $next->setTime($nextHour, $next->format('i'));
-        } else {
-            $next->modify('+1 day');
-            $next->setTime(0, $this->getNextFieldValue(0, $minuteField, 0, 59));
-        }
-
-        // Calculate next day of the month
-        $nextDay = $this->getNextFieldValue($next->format('d'), $dayOfMonthField, 1, 31);
-        if ($nextDay !== null) {
-            $next->setDate($next->format('Y'), $next->format('m'), $nextDay);
-        } else {
-            $next->modify('+1 month');
-            $next->setDate($next->format('Y'), $next->format('m'), $this->getNextFieldValue(1, $dayOfMonthField, 1, 31));
-        }
-
-        // Calculate next month
-        $nextMonth = $this->getNextFieldValue($next->format('n'), $monthField, 1, 12);
-        if ($nextMonth !== null) {
-            $next->setDate($next->format('Y'), $nextMonth, $next->format('d'));
-        } else {
-            $next->modify('+1 year');
-            $next->setDate($next->format('Y'), $this->getNextFieldValue(1, $monthField, 1, 12), $next->format('d'));
-        }
-
-        // Calculate next day of the week
-        $nextDayOfWeek = $this->getNextFieldValue($next->format('w'), $dayOfWeekField, 0, 6);
-
-        if ($nextDayOfWeek !== null) {
-            while (intval($next->format('w')) !== $nextDayOfWeek) {
-                $next->modify('+1 day');
-            }
-        } else {
-            $next->modify('+1 week');
-        }
-
-        return $next;
-    }
-
+    /**
+     * Get the next valid field value
+     *
+     * @param int $currentValue
+     * @param string $field
+     * @param int $min
+     * @param int $max
+     * @return int
+     */
     private function getNextFieldValue($currentValue, $field, $min, $max)
     {
         $values = [];

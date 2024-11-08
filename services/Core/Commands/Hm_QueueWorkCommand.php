@@ -11,10 +11,17 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Class Hm_QueueWorkCommand
+ * @package Services\Core\Commands
+ */
 class Hm_QueueWorkCommand extends Hm_BaseCommand
 {
     protected static $defaultName = 'queue:work';
 
+    /**
+     * Configure the command.
+     */
     protected function configure()
     {
         $this
@@ -27,6 +34,13 @@ class Hm_QueueWorkCommand extends Hm_BaseCommand
             ->addOption('tries', null, InputOption::VALUE_OPTIONAL, 'Number of times to attempt a job before logging it failed', 1);
     }
 
+    /**
+     * Execute the console command.
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int Command exit code.
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $connection = $input->getArgument('connection') ?: env('QUEUE_DRIVER', 'database');
