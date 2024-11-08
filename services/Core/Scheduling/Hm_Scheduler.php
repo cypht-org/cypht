@@ -6,6 +6,7 @@ use Hm_Cache;
 use Hm_Debug;
 use Hm_Msgs;
 use Hm_Session_Setup;
+use Services\Core\Hm_Container;
 
 class Hm_Scheduler
 {
@@ -19,7 +20,7 @@ class Hm_Scheduler
 
     public function command($command)
     {
-        $cache = new Hm_Cache($this->config, new Hm_Session_Setup($this->config));
+        $cache = new Hm_Cache($this->config, Hm_Container::getContainer()->get('session'));
         $commandTask = new Hm_CommandTask($command, new Hm_CacheMutex($cache));
         $this->tasks[] = $commandTask;
         return $commandTask;

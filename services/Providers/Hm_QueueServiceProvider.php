@@ -16,7 +16,7 @@ class Hm_QueueServiceProvider
 
     public function register()
     {
-        $queueConnection = getenv('QUEUE_CONNECTION') ?: 'database';
+        $queueConnection = getenv('QUEUE_DRIVER') ?: 'database';
         $containerBuilder = Hm_Container::getContainer();
         
         $containerBuilder->register('queue.manager', Hm_QueueManager::class)

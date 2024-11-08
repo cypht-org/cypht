@@ -30,7 +30,6 @@ class Hm_ScheduleRunCommand extends Hm_BaseCommand
         
         $output->writeln("All due scheduled tasks have been executed.");
         // dd($scheduler);
-        dd('hello');
 
         return Command::SUCCESS;
     }
