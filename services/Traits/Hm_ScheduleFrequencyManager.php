@@ -230,4 +230,19 @@ trait Hm_ScheduleFrequencyManager
         $segments[$position - 1] = $value;
         return $this->cron(implode(' ', $segments));
     }
+
+    /**
+     * Skip task execution based on a condition.
+     * 
+     * @param callable $condition
+     * @return $this
+     */
+    protected function skip(callable $condition)
+    {
+        if ($condition()) {
+            echo "Skipping task due to the condition.\n";
+            return $this;
+        }
+        return $this;
+    }
 }

@@ -38,6 +38,11 @@ $scheduler->command('check:mail')->everyMinute()
 $scheduler->command('backup:database')->dailyAt('02:00');
 ```
 
+as we now have `Hm_SchedulerRunCommand.php` we can do:
+```
+* * * * * php81 /path/to/cypht/project/console schedule:run
+```
+
 ```
 // Dispatch the event
 (new NewEmailProcessedEvent)->dispatch('user@example.com');
