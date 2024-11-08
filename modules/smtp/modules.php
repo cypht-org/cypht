@@ -1581,7 +1581,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                         $res .= 'selected="selected" ';
                     }
                     $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
-                    $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $profile['address'], $vals['name']));
+                    $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], ($profile['name'] != $profile['address']) ? $profile['address']: "", ($vals['name'] != $profile['name'] && $vals['name'] != $profile['address']) ? $vals['name'] : ""));
                     $res .= '</option>';
                 }
             }
@@ -1591,7 +1591,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                     $res .= 'selected="selected" ';
                 }
                 $res .= 'value="'.$output_mod->html_safe($vals['id']).'">';
-                $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
+                $res .= $output_mod->html_safe(($vals['user'] == $vals['name']) ? $vals['user'] : sprintf("%s - %s", $vals['user'], $vals['name']));
                 $res .= '</option>';
             }
         }
