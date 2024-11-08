@@ -4,21 +4,29 @@ namespace Services\Core\Scheduling;
 
 class Hm_CommandTask extends Hm_ScheduledTask
 {
-    private $command;
+    public $command;
     private $onOneServer = false;
     private $mutex;
     private $expiresAt = null;
     private $withoutOverlapping = false;
 
-    public function __construct($command, Hm_CacheMutex $mutex)
+    /**
+     * The name of the command task.
+     *
+     * @var string
+     */
+    public $name;
+
+    public function __construct($command, Hm_CacheMutex $mutex, $name = null)
     {
+        $this->name = $name ?: $command;
         $fullCommand = "php console " . $command;
         parent::__construct(function () use ($fullCommand) {
             echo "Executing Command: $fullCommand\n";
             $output = shell_exec($fullCommand);
             echo $output;
         }, $command);
-
+        
         $this->command = $fullCommand;
         $this->mutex = $mutex;
     }

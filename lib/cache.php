@@ -624,6 +624,7 @@ class Hm_Cache {
      * @return string
      */
     protected function key_hash($key) {
+        dd($this->session->get('fingerprint'));
         return sprintf('hm_cache_%s', hash('sha256', (sprintf('%s%s%s%s', $key, SITE_ID,
             $this->session->get('fingerprint'), $this->session->get('username')))));
     }

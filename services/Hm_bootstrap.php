@@ -1,6 +1,7 @@
 <?php
 
 use Services\Core\Hm_Container;
+use Services\Hm_ConsoleKernal;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -48,6 +49,19 @@ $containerBuilder = Hm_Container::setContainer(new ContainerBuilder());
 // Register Hm_Site_Config_File
 $containerBuilder->set('config', $config);
 
+/* setup a session handler, but don't actually start a session yet */
+$session_config = new Hm_Session_Setup($config);
+$session = $session_config->setup_session();
+// list($session, $request) = session_init();
+$containerBuilder->set('session', $session);
+
 Hm_Container::bind();
+
+// Prepare Kernel instance parameters
+$queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider');
+$queueServiceProvider->register($config, $session);
+
+// Create a new Kernel instance
+$kernel = (new Hm_ConsoleKernal($containerBuilder->get('scheduler')))->schedule();
 
 return [$containerBuilder, $config];

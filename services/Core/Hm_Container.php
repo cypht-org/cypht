@@ -56,6 +56,7 @@ class Hm_Container
 
         self::$container->register('scheduler.ServiceProvider', Hm_SchedulerServiceProvider::class)
         ->setShared(true);
+
         self::$container->register('event.ServiceProvider', Hm_EventServiceProvider::class)
         ->setShared(true);
 

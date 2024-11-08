@@ -3,6 +3,8 @@
 namespace Services\Core\Scheduling;
 
 use Hm_Cache;
+use Hm_Debug;
+use Hm_Msgs;
 use Hm_Session_Setup;
 
 class Hm_Scheduler
@@ -50,7 +52,14 @@ class Hm_Scheduler
     {
         foreach ($this->tasks as $task) {
             if ($task->isDue()) {
-                $task->run();
+                try {
+                    $task->run();
+                    Hm_Debug::add("Task '{$task->getName()}' executed successfully.");
+                    Hm_Msgs::add("Task '{$task->getName()}' executed successfully.");
+                } catch (\Exception $e) {
+                    Hm_Debug::add("ERRORExecuting task '{$task->getName()}': " . $e->getMessage());
+                    Hm_Msgs::add("ERRORExecuting task '{$task->getName()}': " . $e->getMessage());
+                }
             }
         }
     }
