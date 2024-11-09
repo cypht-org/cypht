@@ -101,12 +101,12 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
+        $data_sources = imap_data_sources('');
+        $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+        $tag_id = $this->request->post['folder'];
+        if ($ids && $tag_id) {
             $limit = $this->user_config->get('tag_per_source_setting', DEFAULT_TAGS_PER_SOURCE);
             $date = process_since_argument($this->user_config->get('tag_since_setting', DEFAULT_TAGS_SINCE));
-            $tag_id = $this->request->get['tag_id'];
-            $ids = explode(',', $form['imap_server_ids']);
             $folder = bin2hex('INBOX');
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
@@ -114,7 +114,7 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
             list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date), array('HEADER X-Cypht-Tags', $tag_id)));
             $this->out('folder_status', $status);
             $this->out('imap_tag_data', $msg_list);
-            $this->out('imap_server_ids', $form['imap_server_ids']);
+            $this->out('imap_server_ids', implode(',', $ids));
         }
     }
 }
