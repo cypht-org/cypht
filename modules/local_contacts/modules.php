@@ -240,7 +240,7 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             $button = '<input type="hidden" name="contact_id" value="'.$this->html_safe($current['id']).'" />'.
                 '<input class="btn btn-primary edit_contact_submit" type="submit" name="edit_contact" value="'.$this->trans('Update').'" />';
         }
-        return '<div class="add_contact kokokoko"><form class="" method="POST">'.
+        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
             '<input type="hidden" name="contact_source" value="local" />'.
@@ -276,7 +276,7 @@ class Hm_Output_import_contacts_form extends Hm_Output_Module {
         $title = $this->trans('Import from CSV file');
         $csv_sample_path = WEB_ROOT.'modules/local_contacts/assets/data/contact_sample.csv';
 
-        return '<div class="add_contact"><form class="add_contact_form" method="POST" enctype="multipart/form-data">'.
+        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST" enctype="multipart/form-data">'.
             '<button class="server_title mt-2 btn btn-light" title="'.$notice.'"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
             '<div><a href="'.$csv_sample_path.'">'.$this->trans('download a sample csv file').'</a></div><br />'.
