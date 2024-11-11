@@ -1576,7 +1576,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
                 include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
-                $client = $sieveClientFactory->init(null, $server);
+                $client = $sieveClientFactory->init(null, $server, $context->module_is_supported('nux'));
 
                 if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
