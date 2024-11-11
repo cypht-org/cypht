@@ -45,6 +45,9 @@ class Hm_Contact_Store {
 
     public function add_contact($data, $save = true) {
         $contact = new Hm_Contact($data);
+        if ($contact->value('external')) {
+            $save = false;
+        }
         self::add($contact, $save);
         return true;
     }
