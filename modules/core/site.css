@@ -1405,3 +1405,9 @@ body {
   margin-bottom: 1rem;
   padding-left: 1rem;
 }
+
+a[disabled] {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
+}
