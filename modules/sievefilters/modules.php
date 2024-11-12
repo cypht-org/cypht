@@ -485,7 +485,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             
             $client = $factory->init($this->user_config, $imap_account);
             $scripts = $client->listScripts();
-            var_dump("xxxxxxxxxxxx"); die;
+
             if(array_search('blocked_senders', $scripts, true) === false) {
                 $client->putScript(
                     'blocked_senders',
@@ -1293,7 +1293,6 @@ class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
 class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
-        // exit(var_dump($settings['enable_sieve_filter']));
         if ((array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) || DEFAULT_ENABLE_SIEVE_FILTER) {
             $checked = ' checked="checked"';
             $reset = '';

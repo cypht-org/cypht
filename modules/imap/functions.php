@@ -1523,11 +1523,12 @@ function parse_sieve_config_host($host) {
     $url = parse_url($host);
     if(!isset($url['host'])) {
         $host = $url['path'];
+    } else {
+        $host = $url['host'];
     }
     $port = $url['port'] ?? '4190';
     $scheme = $url['scheme'] ?? 'tcp://';
     $tls = $scheme === 'tls';
-    // echo "<pre>"; var_dump($url, $host); die;
     return [$host, $port, $tls];
 }}
 
