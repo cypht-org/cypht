@@ -5,9 +5,22 @@ class Hm_Sieve_Client_Factory {
     public function init($user_config = null, $imap_account = null)
     {
         if ($imap_account && ! empty($imap_account['sieve_config_host'])) {
-            list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
+            // list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
+            list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+            if (! isset($imap_account['sieve_tls'])) {
+                $imap_account['sieve_tls'] = $sieve_tls;
+            }
+            
+            $regex = '/:\d+$/';
+            preg_match($regex, $sieve_host, $matches);
+            if (count($matches) > 0) {
+                $sieve_host = preg_replace($regex, '', $sieve_host);
+            }
+            // echo "<pre>"; var_dump($imap_account['sieve_config_host'], $sieve_host); die;
+            
             $client = new PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
             $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
+            echo "<pre>"; var_dump( $client); die;
             return $client;
         } else {
             $errorMsg = 'Invalid config host';
@@ -17,4 +30,5 @@ class Hm_Sieve_Client_Factory {
             throw new Exception($errorMsg);
         }
     }
+   
 }

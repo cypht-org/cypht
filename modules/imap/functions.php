@@ -1525,7 +1525,10 @@ function parse_sieve_config_host($host) {
         $host = $url['path'];
     }
     $port = $url['port'] ?? '4190';
-    return [$host, $port];
+    $scheme = $url['scheme'] ?? 'tcp://';
+    $tls = $scheme === 'tls';
+    // echo "<pre>"; var_dump($url, $host); die;
+    return [$host, $port, $tls];
 }}
 
 if (!hm_exists('connect_to_imap_server')) {

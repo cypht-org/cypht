@@ -400,6 +400,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
+                echo "<pre>";
+                var_dump($this->get('sieve_filters_client')); 
                 if ($this->get('sieve_filters_client')) {
                     $user_config = $this->get('user_config');
                     $contact_list = $user_config->get('contacts', []);
@@ -409,6 +411,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
+                    var_dump($sender, $existing_emails); 
                     if(!in_array($sender, $existing_emails)){
                         $txt .= ' | <div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
                         $txt .= block_filter_dropdown($this);
@@ -416,6 +419,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 } else {
                     $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
+                die('xxxxxxxxxx');
             }
             $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 

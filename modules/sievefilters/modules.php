@@ -482,9 +482,10 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
         $factory = get_sieve_client_factory($this->config);
         try {
+            
             $client = $factory->init($this->user_config, $imap_account);
             $scripts = $client->listScripts();
-
+            var_dump("xxxxxxxxxxxx"); die;
             if(array_search('blocked_senders', $scripts, true) === false) {
                 $client->putScript(
                     'blocked_senders',

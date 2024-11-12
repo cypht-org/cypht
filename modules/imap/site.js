@@ -1314,7 +1314,7 @@ var add_email_in_contact_trusted = function(list_email) {
 };
 
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
-
+block_unblock_sender("23", Hm_Utils.parse_folder_path(getListPathParam()), 'sender', 'blocked');
 $('.screen-email-like').on("click", function() {
     var list_email = [];
     $('input[type=checkbox]').each(function() {
