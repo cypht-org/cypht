@@ -144,6 +144,7 @@ class Hm_MessagesStore {
         let hook;
         let serverId;
         let folder;
+        let tag_id;
         const config = [];
         if (this.path.startsWith('imap')) {
             hook = "ajax_imap_folder_display";
@@ -164,7 +165,7 @@ class Hm_MessagesStore {
                     break;
                 case 'tag':
                     hook = "ajax_imap_tag_data";
-                    folder = getParam('tag_id');
+                    tag_id = getParam('tag_id');
                     break;
                 default:
                     hook = "ajax_imap_folder_data";
@@ -180,6 +181,9 @@ class Hm_MessagesStore {
         }
         if (folder) {
             config.push({ name: "folder", value: folder });
+        }
+        if (tag_id) {
+            config.push({ name: "tag_id", value: tag_id });
         }
         return config;
     }
