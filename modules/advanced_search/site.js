@@ -415,18 +415,23 @@ var send_requests = function(requests, allFolders) {
         Hm_Ajax.request(
             params,
             function(res) {
-                var detail = Hm_Utils.parse_folder_path(request['source'], 'imap');
+                // HACK. As we are sending multiple requests (each source a request), let's keep a snapshot of the last message list before updating the view
+                let tableRows = Hm_Utils.rows();
                 Hm_Message_List.update(res.formatted_message_list);
                 if (Hm_Utils.rows().length > 0) {
                     $('.adv_controls').show();
                     $('.core_msg_control').off('click');
                     $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
-                    Hm_Message_List.set_checkbox_callback();
                     if (typeof check_select_for_imap !== 'undefined') {
                         check_select_for_imap();
                     }
                 }
                 Hm_Message_List.check_empty_list();
+
+                // prepend the previous message list
+                if (n !== 0) {
+                    Hm_Utils.tbody().prepend(tableRows);
+                }
             },
             [],
             false,
