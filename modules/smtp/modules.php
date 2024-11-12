@@ -1436,7 +1436,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
 
             $res .= '<form class="smtp_connect"  method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="smtp_server_id" class="smtp_server_id" value="'.$this->html_safe($index).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-lg-2 col-md-6 mb-2 overflow-auto">';
             $res .= sprintf('<div class="text-muted"><strong>%s</strong></div>
                 <div class="server_subtitle">%s/%d %s</div>',
