@@ -211,10 +211,10 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
                         if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+                            list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
                             try {
                                 $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                                $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
+                                $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
                                 $script_names = array_filter(
                                     $linked_mailboxes,
                                     function ($value) use($old_folder) {
@@ -802,7 +802,7 @@ class Hm_Output_folders_page_link extends Hm_Output_Module {
         if ($this->get('imap_support')) {
             $res = '<li class="menu_folders"><a class="unread_link" href="?page=folders">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-folder-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-folder-fill menu-icon"></i>';
             }
             $res .= $this->trans('Folders').'</a></li>';
             if ($this->format == 'HTML5') {
@@ -837,10 +837,10 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
         if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
             return;
         }
-        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($imap_account['sieve_config_host']);
+        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
         try {
-            $client->connect($imap_account['user'], $imap_account['pass'], $sieve_tls, "", "PLAIN");
+            $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {

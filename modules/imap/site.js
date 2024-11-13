@@ -57,58 +57,14 @@ var imap_unhide = function(event) {
     imap_hide_action(form, server_id, 0);
 };
 
-var imap_forget_action = function(event) {
-    event.preventDefault();
-    Hm_Notices.hide(true);
-    var form = $(this).closest('.imap_connect');
-    var btnContainer = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_forgot_credentials) {
-                form.find('.credentials').prop('disabled', false);
-                form.find('.credentials').val('');
-                btnContainer.append('<input type="submit" value="Save" class="save_imap_connection btn btn-outline-secondary btn-sm me-2" />');
-                $('.save_imap_connection').on('click', imap_save_action);
-                $('.forget_imap_connection', form).hide();
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'imap_forget': 1}
-    );
-};
-
-var imap_save_action = function(event) {
-    event.preventDefault();
-    Hm_Notices.hide(true);
-    var form = $(this).closest('.imap_connect');
-    var btnContainer = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_saved_credentials) {
-                form.find('.credentials').attr('disabled', true);
-                form.find('.save_imap_connection').hide();
-                form.find('.imap_password').val('');
-                form.find('.imap_password').attr('placeholder', '[saved]');
-                btnContainer.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />');
-                $('.forget_imap_connection').on('click', imap_forget_action);
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'imap_save': 1}
-    );
-};
-
-var imap_test_action = function(event) {
+var imap_test_action = function(event) {    
     $('.imap_folder_data').empty();
     event.preventDefault();
     Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
-        form.serializeArray(),
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_debug'},
+            {'name': 'imap_server_id', 'value': $('.imap_server_id', form).val()}],
         false,
         {'imap_connect': 1}
     );
@@ -116,10 +72,8 @@ var imap_test_action = function(event) {
 
 var imapServersPageHandler = function() {
     $('.imap_delete').on('click', imap_delete_action);
-    $('.save_imap_connection').on('click', imap_save_action);
     $('.hide_imap_connection').on('click', imap_hide);
     $('.unhide_imap_connection').on('click', imap_unhide);
-    $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
     $('.edit_ews_server_connection').on('click', ews_edit_action);
 
@@ -326,7 +280,7 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
                 add_auto_folder(res.auto_sent_folder);
             }
 
-            Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+            Hm_Message_List.update(res.formatted_message_list);
 
             $('.page_links').html(res.page_links);
             cache_imap_page();
@@ -514,13 +468,8 @@ $('#imap_filter_form').on('submit', async function(event) {
 });
 
 var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
-    const detail = Hm_Utils.parse_folder_path(path, 'imap');
-    const serverIds = [];
-    if (detail) {
-        serverIds.push(detail.server_id);
-    }
     if (rows) {
-        Hm_Message_List.update(serverIds, rows, 'imap');
+        Hm_Message_List.update(rows);
         Hm_Message_List.check_empty_list();
         $('.page_links').html(links);
         $('input[type=checkbox]').on("click", function(e) {
@@ -1383,7 +1332,7 @@ var add_email_in_contact_trusted = function(list_email) {
         }
       );
     }
-  };
+};
 
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 

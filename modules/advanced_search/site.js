@@ -85,6 +85,15 @@ var expand_adv_folder = function(res) {
     }
 };
 
+$(document).on("change", "input#all_folders", function() {
+    const folderLi = $(this).closest('li');
+    if ($(this).is(':checked')) {
+        folderLi.find('a').attr('disabled', 'disabled');
+    } else {
+        folderLi.find('a').removeAttr('disabled');
+    }
+});
+
 var adv_select_imap_folder = function(el) {
     var close = $(globals.close_html);
     close.addClass('close_adv_folders ms-2');
@@ -96,6 +105,19 @@ var adv_select_imap_folder = function(el) {
     $(el).after(close);
     list_container.show();
     folders.show();
+
+    folders.find('li').each(function() {
+        const wrapper = $('<div class="d-flex justify-content-between"></div>');
+        $(this).wrapInner(wrapper);
+        const allFoldersCheckbox = `
+        <span class="form-check">
+            <label class="form-check-label" for="all_folders">All Folders</label>
+            <input class="form-check-input" type="checkbox" id="all_folders">
+        </span>
+        `;
+        wrapper.append(allFoldersCheckbox);
+    })
+
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
     $('.adv_folder_list').html(folders.html());
 
@@ -188,15 +210,27 @@ var adv_expand_sections = function() {
 }
 
 var get_adv_sources = function() {
-    var sources = [];
-    var selected_sources = $('div', $('.adv_source_list'));
+    const sources = [];
+
+    const searchInAllFolders = $('.adv_folder_list li input:checked')
+    searchInAllFolders.each(function() {
+        const li = $(this).closest('li');
+        sources.push({'source': li.attr('class'), 'label': li.find('a').text()});
+    });
+    
+
+    const selected_sources = $('div', $('.adv_source_list'));
     if (!selected_sources) {
         return sources;
     }
     selected_sources.each(function() {
-        sources.push({'source': this.className, 'label': $(this).text()});
+        const source = this.className;
+        const mailboxSource = source.split('_').slice(0, 2).join('_');
+        if (!sources.find(s => s.source.indexOf(mailboxSource) > -1)) {
+            sources.push({'source': source, 'label': $('a', $(this)).text()});
+        }
     });
-    return sources;
+    return [sources, searchInAllFolders.length > 0];
 };
 
 var get_adv_terms = function() {
@@ -294,7 +328,7 @@ var process_advanced_search = function() {
         Hm_Notices.show([err_msg('You must enter at least one search term')]);
         return;
     }
-    var sources = get_adv_sources();
+    const [sources, allFolders] = get_adv_sources();
     if (sources.length == 0) {
         Hm_Notices.show([err_msg('You must select at least one source')]);
         return;
@@ -315,7 +349,7 @@ var process_advanced_search = function() {
     search_summary({ 'terms': terms, 'targets': targets, 'sources': sources,
             'times': times, 'other': other });
 
-    send_requests(build_adv_search_requests(terms, sources, targets, times, other));
+    send_requests(build_adv_search_requests(terms, sources, targets, times, other), allFolders);
 };
 
 var save_search_details = function(terms, sources, targets, times, other) {
@@ -350,7 +384,7 @@ var adv_group_vals = function(data, type) {
     return groups;
 };
 
-var send_requests = function(requests) {
+var send_requests = function(requests, allFolders) {
     var request;
     $('tr', Hm_Utils.tbody()).remove();
     Hm_Utils.save_to_local_storage('formatted_advanced_search_data', '');
@@ -366,6 +400,7 @@ var send_requests = function(requests) {
             {'name': 'adv_end', 'value': request['time']['to']},
             {'name': 'adv_source_limit', 'value': request['other']['limit']},
             {'name': 'adv_charset', 'value': request['other']['charset']},
+            {'name': 'all_folders', 'value': allFolders}
         ];
 
         for (var i=0, len=request['terms'].length; i < len; i++) {
@@ -380,18 +415,23 @@ var send_requests = function(requests) {
         Hm_Ajax.request(
             params,
             function(res) {
-                var detail = Hm_Utils.parse_folder_path(request['source'], 'imap');
-                Hm_Message_List.update([detail.server_id+n], res.formatted_message_list, 'imap');
+                // HACK. As we are sending multiple requests (each source a request), let's keep a snapshot of the last message list before updating the view
+                let tableRows = Hm_Utils.rows();
+                Hm_Message_List.update(res.formatted_message_list);
                 if (Hm_Utils.rows().length > 0) {
                     $('.adv_controls').show();
                     $('.core_msg_control').off('click');
                     $('.core_msg_control').on("click", function() { return Hm_Message_List.message_action($(this).data('action')); });
-                    Hm_Message_List.set_checkbox_callback();
                     if (typeof check_select_for_imap !== 'undefined') {
                         check_select_for_imap();
                     }
                 }
                 Hm_Message_List.check_empty_list();
+
+                // prepend the previous message list
+                if (n !== 0) {
+                    Hm_Utils.tbody().prepend(tableRows);
+                }
             },
             [],
             false,

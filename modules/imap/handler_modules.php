@@ -299,9 +299,6 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             elseif (count($moved) == 0) {
                 Hm_Msgs::add('ERRUnable to move/copy selected messages');
             }
-            if ($form['imap_move_action'] == 'move' && $form['imap_move_page'] == 'message') {
-                $this->save_hm_msgs();
-            }
             $this->out('move_count', $moved);
         }
     }
@@ -448,12 +445,7 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
                 $this->session->record_unsaved('Added folder to combined pages');
             }
             else {
-                if (is_array($sources) && array_key_exists($form['list_path'], $sources)) {
-                    unset($sources[$form['list_path']]);
-                }
-                else {
-                    $sources[$form['list_path']] = 'remove';
-                }
+                $sources[$form['list_path']] = 'remove';
                 Hm_Msgs::add('Folder removed from combined pages');
                 $this->session->record_unsaved('Removed folder from combined pages');
             }
@@ -729,6 +721,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $offset = 0;
         $msgs = array();
         $list_page = 1;
+        $include_preview = $this->user_config->get('active_preview_message_setting', false);
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
@@ -753,9 +746,9 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_preview);
                 } else {
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_preview);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
@@ -828,7 +821,6 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 Hm_Msgs::add('Message deleted');
                 $this->out('imap_delete_error', false);
             }
-            $this->save_hm_msgs();
         }
     }
 }
@@ -981,7 +973,6 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             $msg = 'ERRFailed to snooze selected messages';
         }
         Hm_Msgs::add($msg);
-        $this->save_hm_msgs();
     }
 }
 
@@ -1205,7 +1196,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
             $folders = array($folder);
         } else {
-            $data_sources = imap_data_sources('');
+            $data_sources = imap_data_sources('', $this->session->get('custom_imap_sources', user:true));
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
@@ -1219,6 +1210,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
         }
         list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        
         $this->out('folder_status', $status);
         $this->out('imap_combined_inbox_data', $msg_list);
         $this->out('imap_server_ids', implode(',', $ids));
@@ -1819,133 +1811,37 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
      */
     public function process() {
         if (isset($this->request->post['imap_connect'])) {
-            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
-
-            $sieve_enabled = false;
-            if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                if (!isset($this->request->post['imap_sieve_host'])) {
-                    foreach ($this->get('imap_servers', array()) as $index => $vals) {
-                        if ($index == $form['imap_server_id']) {
-                            $selected_imap = $vals;
-                            break;
-                        }
-                    }
-                    if (isset($selected_imap['sieve_config_host'])) {
-                        $sieve_enabled = true;
-                        $sieve_hostname = $selected_imap['sieve_config_host'];
-                    }
-                } else {
-                    $sieve_enabled = true;
-                    $sieve_hostname = $this->request->post['imap_sieve_host'];
-                }
-                if ($sieve_enabled) {
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
+            if ($success && $imap_details) {         
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     try {
-                        list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($sieve_hostname);
+                        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_details['sieve_config_host']);
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
+                        $client->connect($imap_details['user'], $imap_details['pass'], $imap_details['sieve_tls'], "", "PLAIN");
                     } catch (Exception $e) {
                         Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
                         return;
                     }
                 }
-            }
 
-            $mailbox = false;
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            if ($success) {
-                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
-            }
-            elseif (isset($form['imap_server_id'])) {
-                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            }
-            if ($mailbox) {
-                if ($mailbox->authed()) {
-                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
-                }
-                else {
-                    Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
-                }
-            }
-            else {
-                Hm_Msgs::add('ERRUsername and password are required');
-                $this->out('old_form', $form);
-            }
-        }
-    }
-}
-
-/**
- * Forget IMAP server credentials
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_forget extends Hm_Handler_Module {
-    /**
-     * Used on the servers page to forget login information for an IMAP server
-     */
-    public function process() {
-        $just_forgot_credentials = false;
-        if (isset($this->request->post['imap_forget'])) {
-            list($success, $form) = $this->process_form(array('imap_server_id'));
-            if ($success) {
-                Hm_IMAP_List::forget_credentials($form['imap_server_id']);
-                $just_forgot_credentials = true;
-                Hm_Msgs::add('Server credentials forgotten');
-                $this->session->record_unsaved('IMAP server credentials forgotten');
-            }
-            else {
-                $this->out('old_form', $form);
-            }
-        }
-        $this->out('just_forgot_credentials', $just_forgot_credentials);
-    }
-}
-
-/**
- * Save a user/pass combination for an IMAP server
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_save extends Hm_Handler_Module {
-    /**
-     * Authenticate then save the username and password for an IMAP server
-     */
-    public function process() {
-        $just_saved_credentials = false;
-        if (isset($this->request->post['imap_save'])) {
-            list($success, $form) = $this->process_form(array('imap_user', 'imap_pass', 'imap_server_id'));
-
-            if (isset($this->request->post['imap_sieve_host'])) {
-                try {
-                    list($sieve_host, $sieve_port, $sieve_tls) = parse_sieve_config_host($this->request->post['imap_sieve_host']);
-                    $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                    $client->connect($form['imap_user'], $form['imap_pass'], $sieve_tls, "", "PLAIN");
-                } catch (Exception $e) {
-                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
-                    return;
-                }
-            }
-
-            if (!$success) {
-                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
-            }
-            else {
-                if (in_server_list('Hm_IMAP_List', $form['imap_server_id'], $form['imap_user'])) {
-                    Hm_Msgs::add('ERRThis server and username are already configured');
-                    return;
-                }
+                $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass'], true);
-                if ($mailbox && $mailbox->authed()) {
-                    $just_saved_credentials = true;
-                    Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved(sprintf('%s server saved', $mailbox->server_type()));
+                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
+                if ($mailbox) {
+                    if ($mailbox->authed()) {
+                        Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
+                    }
+                    else {
+                        Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
+                    }
                 }
                 else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct? " . $form['imap_user']);
-                    Hm_IMAP_List::forget_credentials($form['imap_server_id']);
+                    Hm_Msgs::add('ERRUsername and password are required');
+                    $this->out('old_form', $form);
                 }
             }
         }
-        $this->out('just_saved_credentials', $just_saved_credentials);
     }
 }
 
@@ -2199,3 +2095,11 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
+class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Module {
+    public function process() {
+        function process_active_preview_message_callback($val) { return $val; }
+        process_site_setting('active_preview_message', $this, 'process_active_preview_message_callback', true, true);
+    }
+}
+
+

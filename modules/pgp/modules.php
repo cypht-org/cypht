@@ -211,7 +211,7 @@ class Hm_Output_pgp_settings_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_pgp"><a class="unread_link" href="?page=pgp">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-lock-fill account_icon"></i> ';
+            $res .= '<i class="bi bi-lock-fill account_icon menu-icon"></i> ';
         }
         $res .= $this->trans('PGP').'</a></li>';
         if ($this->format == 'HTML5') {

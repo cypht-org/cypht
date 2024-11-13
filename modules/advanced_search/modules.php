@@ -89,9 +89,26 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
                 $params[] = array($target, $term);
             }
         }
-        $this->out('imap_search_results', $this->imap_search($flags, $mailbox, $params, $limit));
+
+        if ($this->request->post['all_folders']) {
+            $msg_list = $this->all_folders_search($mailbox, $flags, $params, $limit);
+        } else {
+            $msg_list = $this->imap_search($flags, $mailbox, $params, $limit);
+        }
+        $this->out('imap_search_results', $msg_list);
         $this->out('folder_status', $mailbox->get_folder_state());
         $this->out('imap_server_ids', array($this->imap_id));
+    }
+
+    private function all_folders_search($mailbox, $flags, $params, $limit) {
+        $folders = $mailbox->get_folders();
+        $msg_list = array();
+        foreach ($folders as $folder) {
+            $this->folder = $folder['name'];
+            $msgs = $this->imap_search($flags, $mailbox, $params, $limit);
+            $msg_list = array_merge($msg_list, $msgs);
+        }
+        return $msg_list;
     }
 
     private function imap_search($flags, $mailbox, $params, $limit) {

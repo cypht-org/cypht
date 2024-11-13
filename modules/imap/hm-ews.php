@@ -443,12 +443,12 @@ class Hm_EWS {
         return [$result->get('totalItemsInView'), $itemIds];
     }
 
-    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
+    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview = false) {
         list ($total, $itemIds) = $this->search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
-        return [$total, $this->get_message_list($itemIds)];
+        return [$total, $this->get_message_list($itemIds, $include_preview)];
     }
 
-    public function get_message_list($itemIds) {
+    public function get_message_list($itemIds, $include_preview = false) {
         if (empty($itemIds)) {
             return [];
         }
@@ -519,6 +519,7 @@ class Hm_EWS {
                 }
             }
             $msg['charset'] = $cset;
+            $msg['preview_msg'] = $include_preview ? $message->get('body') :  "";
             $messages[$uid] = $msg;
         }
         return $messages;

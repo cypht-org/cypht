@@ -246,14 +246,14 @@ class Hm_Mailbox {
      * Get messages in a folder applying filters, sorting and pagination
      * @return array - [total results found, results for a single page]
      */
-    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[]) {
+    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[], $include_preview = false) {
         if (! $this->select_folder($folder)) {
             return;
         }
         if ($this->is_imap()) {
-            $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+            $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview);
         } else {
-            $messages = $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders);
+            $messages = $this->connection->get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview);
             $folder = $this->selected_folder['id'];
         }
         foreach ($messages[1] as &$msg) {

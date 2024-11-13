@@ -33,7 +33,6 @@ a:hover {
 .folder_cell {
   vertical-align: top;
   height: 100%;
-  max-width: 15%;
   display: table-cell;
   padding: 0px;
   margin: 0px;
@@ -50,11 +49,11 @@ a:hover {
   min-height: 100vh;
 }
 
-.selected_menu,
+.selected_menu {
+  background-color: var(--bs-primary-bg-subtle);
+}
 .selected_menu a {
   color: var(--bs-link-color) !important;
-  font-weight: bold !important;
-  line-height: 1.25em;
 }
 
 form {
@@ -369,9 +368,10 @@ button {
   margin-right: 20px;
   padding-right: 15px;
   padding-bottom: 40px;
-  min-width: 200px;
+  min-width: 300px;
   padding-top: 0px;
   min-height: 100vh;
+  padding-top: 20px;
 }
 
 .folders,
@@ -381,13 +381,18 @@ button {
   margin-left: 10px;
   padding-right: 0px;
 }
-.folders li,
+.folders li {
+  padding: 0.5rem;
+  border-radius: var(--bs-border-radius);
+  transition: all linear 0.3s;
+  margin-bottom: 10px;
+}
 .inner_list li {
-  padding: 4px;
-  padding-left: 10px;
-  padding-bottom: 0px;
   margin: 2px;
   white-space: nowrap;
+}
+.inner_list li i {
+  margin-right: 0.25rem;
 }
 .loading_folders {
   text-align: center;
@@ -444,19 +449,18 @@ button {
   cursor: pointer;
   padding-left: 25px;
   margin-top: 0px;
-  margin-right: -15px;
-  background: linear-gradient(
-    180deg,
-    var(--bs-body-bg),
-    var(--bs-body-bg),
-    var(--bs-secondary-bg)
-  ) !important;
   border-bottom: solid 1px var(--bs-secondary-bg);
-  border-top: solid 1px var(--bs-secondary-bg);
   padding-top: 10px;
   font-size: 125%;
   letter-spacing: -1px;
   padding-bottom: 10px;
+  transition: border-bottom-color 0.3s linear;
+}
+.src_name > i {
+  transition: transform 0.3s;
+}
+.src_name[aria-expanded="true"] {
+  border-bottom-color: transparent;
 }
 .main_menu {
   padding-top: 20px;
@@ -665,7 +669,8 @@ button {
 .general_setting,
 .junk_setting,
 .trash_setting,
-.drafts_setting {
+.drafts_setting,
+.privacy_setting {
   display: none;
 }
 .update_search_label_field {
@@ -716,9 +721,6 @@ button {
 }
 .search_terms {
   padding-left: 5px;
-}
-.folder_list .search_terms {
-  width: 100%;
 }
 .search_content {
   display: table;
@@ -933,13 +935,9 @@ div.unseen,
 }
 .mobile .folder_cell {
   display: block;
-  max-width: 96%;
-  width: 96%;
   padding: 0px !important;
 }
 .mobile .folder_list {
-  padding: 0px !important;
-  font-size: 130%;
   margin-right: 0px;
   width: 100%;
 }
@@ -1357,7 +1355,7 @@ div.unseen,
   font-size: 0.9rem;
   display: inline-block;
   margin-top: 0.5rem;
-  color: var(--bs-secondary) !important;
+  opacity: .6;
 }
 
 .popover {
@@ -1395,4 +1393,21 @@ nav .menu-toggle {
 
 body {
   overflow-x: hidden;
+}
+
+.menu-icon {
+  font-size: 1rem;
+  margin-right: 0.5rem;
+}
+
+.app-logo {
+  height: 3rem;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+a[disabled] {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
 }

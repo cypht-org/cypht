@@ -52,8 +52,6 @@ add_handler('ajax_smtp_debug', 'load_smtp_servers_from_config',  true);
 add_handler('ajax_smtp_debug', 'add_smtp_servers_to_page_data',  true);
 add_handler('ajax_smtp_debug', 'smtp_connect', true);
 add_handler('ajax_smtp_debug', 'smtp_delete', true);
-add_handler('ajax_smtp_debug', 'smtp_forget', true);
-add_handler('ajax_smtp_debug', 'smtp_save', true);
 add_handler('ajax_smtp_debug', 'save_smtp_servers', true);
 add_handler('ajax_smtp_debug', 'save_user_data',  true, 'core');
 add_handler('ajax_smtp_debug', 'date', true, 'core');
@@ -155,8 +153,6 @@ return array(
         'new_smtp_address' => FILTER_DEFAULT,
         'new_smtp_port' => FILTER_DEFAULT,
         'smtp_connect' => FILTER_VALIDATE_INT,
-        'smtp_forget' => FILTER_VALIDATE_INT,
-        'smtp_save' => FILTER_VALIDATE_INT,
         'smtp_delete' => FILTER_VALIDATE_INT,
         'smtp_send' => FILTER_VALIDATE_INT,
         'submit_smtp_server' => FILTER_DEFAULT,

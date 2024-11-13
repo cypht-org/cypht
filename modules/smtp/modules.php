@@ -481,57 +481,6 @@ class Hm_Handler_save_smtp_servers extends Hm_Handler_Module {
 /**
  * @subpackage smtp/handler
  */
-class Hm_Handler_smtp_save extends Hm_Handler_Module {
-    public function process() {
-        $just_saved_credentials = false;
-        if (isset($this->request->post['smtp_save'])) {
-            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
-            if (!$success) {
-                Hm_Msgs::add('ERRUsername and Password are required to save a connection');
-            }
-            else {
-                if (in_server_list('Hm_SMTP_List', $form['smtp_server_id'], $form['smtp_user'])) {
-                    Hm_Msgs::add('ERRThis server and username are already configured');
-                    return;
-                }
-                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass'], true);
-                if ($mailbox && $mailbox->authed()) {
-                    $just_saved_credentials = true;
-                    Hm_Msgs::add("Server saved");
-                    $this->session->record_unsaved('SMTP server saved');
-                }
-                else {
-                    Hm_Msgs::add("ERRUnable to save this server, are the username and password correct?");
-                    Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
-                }
-            }
-        }
-        $this->out('just_saved_credentials', $just_saved_credentials);
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
-class Hm_Handler_smtp_forget extends Hm_Handler_Module {
-    public function process() {
-        $just_forgot_credentials = false;
-        if (isset($this->request->post['smtp_forget'])) {
-            list($success, $form) = $this->process_form(array('smtp_server_id'));
-            if ($success) {
-                Hm_SMTP_List::forget_credentials($form['smtp_server_id']);
-                $just_forgot_credentials = true;
-                Hm_Msgs::add('Server credentials forgotten');
-                $this->session->record_unsaved('SMTP server credentials forgotten');
-            }
-        }
-        $this->out('just_forgot_credentials', $just_forgot_credentials);
-    }
-}
-
-/**
- * @subpackage smtp/handler
- */
 class Hm_Handler_smtp_delete extends Hm_Handler_Module {
     public function process() {
         if (isset($this->request->post['smtp_delete'])) {
@@ -554,9 +503,9 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
     public function process() {
         $smtp = false;
         if (isset($this->request->post['smtp_connect'])) {
-            list($success, $form) = $this->process_form(array('smtp_user', 'smtp_pass', 'smtp_server_id'));
+            list($success, $form) = $this->process_form(array('smtp_server_id'));
             $smtp_details = Hm_SMTP_List::dump($form['smtp_server_id'], true);
-            if ($smtp_details && ($success | array_key_exists('smtp_server_id', $form))) {
+            if ($success && $smtp_details) {
                 if (array_key_exists('auth', $smtp_details) && $smtp_details['auth'] == 'xoauth2') {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
@@ -566,21 +515,16 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                         }
                     }
                 }
-            }
-            if ($success) {
-                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $form['smtp_user'], $form['smtp_pass']);
-            }
-            elseif (isset($form['smtp_server_id'])) {
-                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false);
-            }
-            if ($mailbox && $mailbox->authed()) {
-                Hm_Msgs::add("Successfully authenticated to the SMTP server");
-            }
-            elseif ($mailbox && $mailbox->state() == 'connected') {
-                Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
-            }
-            else {
-                Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
+                if ($mailbox && $mailbox->authed()) {
+                    Hm_Msgs::add("Successfully authenticated to the SMTP server");
+                }
+                elseif ($mailbox && $mailbox->state() == 'connected') {
+                    Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
+                }
+                else {
+                    Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+                }
             }
         }
     }
@@ -998,7 +942,7 @@ class Hm_Output_sent_folder_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_sent"><a class="unread_link" href="?page=message_list&amp;list_path=sent">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-send-check-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-send-check-fill menu-icon"></i>';
         }
         $res .= $this->trans('Sent').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1490,7 +1434,7 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
 
             $res .= '<form class="smtp_connect"  method="POST"><div class="row">';
             $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
-            $res .= '<input type="hidden" name="smtp_server_id" value="'.$this->html_safe($index).'" />';
+            $res .= '<input type="hidden" name="smtp_server_id" class="smtp_server_id" value="'.$this->html_safe($index).'" />';
             $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-lg-2 col-md-6 mb-2 overflow-auto">';
             $res .= sprintf('<div class="text-muted"><strong>%s</strong></div>
                 <div class="server_subtitle">%s/%d %s</div>',
@@ -1514,7 +1458,6 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
             if (!$no_edit) {
                 if (!isset($vals['user']) || !$vals['user']) {
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-light border btn-sm me-2" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_smtp_connection btn btn-light border btn-sm me-2" />';
                 }
                 else {
                     $keysToRemove = array('object', 'connected');
@@ -1523,7 +1466,6 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
                     $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2" data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="smtp" />';
                     $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_smtp_connect btn btn-outline-primary btn-sm me-2" />';
                     $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="delete_smtp_connection btn btn-outline-danger btn-sm me-2" />';
-                    $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_smtp_connection btn btn-outline-warning btn-sm me-2" />';
                 }
                 $res .= '<input type="hidden" value="ajax_smtp_debug" name="hm_ajax_hook" />';
             }
@@ -1540,7 +1482,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_compose"><a class="unread_link" href="?page=compose">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-file-earmark-text fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-file-earmark-text menu-icon"></i>';
         }
         $res .= $this->trans('Compose').'</a></li>';
 
@@ -1637,7 +1579,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                         $res .= 'selected="selected" ';
                     }
                     $res .= 'value="'.$output_mod->html_safe($vals['id'].'.'.($index+1)).'">';
-                    $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], $profile['address'], $vals['name']));
+                    $res .= $output_mod->html_safe(sprintf('"%s" %s %s', $profile['name'], ($profile['name'] != $profile['address']) ? $profile['address']: "", ($vals['name'] != $profile['name'] && $vals['name'] != $profile['address']) ? $vals['name'] : ""));
                     $res .= '</option>';
                 }
             }
@@ -1647,7 +1589,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                     $res .= 'selected="selected" ';
                 }
                 $res .= 'value="'.$output_mod->html_safe($vals['id']).'">';
-                $res .= $output_mod->html_safe(sprintf("%s - %s", $vals['user'], $vals['name']));
+                $res .= $output_mod->html_safe(($vals['user'] == $vals['name']) ? $vals['user'] : sprintf("%s - %s", $vals['user'], $vals['name']));
                 $res .= '</option>';
             }
         }

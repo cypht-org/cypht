@@ -527,7 +527,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $disabled = isset($vals['default']) ? ' disabled': '';
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2 mt-3" />';
             } else {
                 $keysToRemove = array('object', 'connected', 'default', 'nopass');
                 $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
@@ -536,7 +535,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2 mt-3"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2 mt-3" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3"'.$disabled.' />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2 mt-3"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
@@ -704,11 +702,9 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-outline-danger btn-sm imap_delete me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="btn btn-outline-success btn-sm save_imap_connection me-2" />';
             } else {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="btn btn-primary btn-sm test_imap_connect me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-danger btn-sm imap_delete me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="btn btn-outline-warning btn-sm forget_imap_connection me-2" />';
             }
 
             // Hide/Unhide Button Logic
@@ -1655,3 +1651,18 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
         return $res;
     }
 }
+class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "";
+        if (array_key_exists('active_preview_message', $settings) && $settings['active_preview_message']) {
+            if ($settings['active_preview_message']) {
+                $checked = "checked";
+            }
+        }
+        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
