@@ -116,15 +116,19 @@ class Hm_EWS {
             'sent' => Enumeration\DistinguishedFolderIdNameType::SENT,
             'flagged' => false,
             'all' => false,
-            'junk' => Enumeration\DistinguishedFolderIdNameType::JUNK,
+            'junk' => Enumeration\DistinguishedFolderIdNameType::JUNKEMAIL,
             'archive' => false,
             'drafts' => Enumeration\DistinguishedFolderIdNameType::DRAFTS,
         ];
         foreach ($special as $type => $folderId) {
             if ($folderId) {
-                $distinguishedFolder = $this->api->getFolderByDistinguishedId($folderId);
-                if ($distinguishedFolder) {
-                    $special[$type] = $distinguishedFolder->get('folderId')->get('id');
+                try {
+                    $distinguishedFolder = $this->api->getFolderByDistinguishedId($folderId);
+                    if ($distinguishedFolder) {
+                        $special[$type] = $distinguishedFolder->get('folderId')->get('id');
+                    }
+                } catch (\Exception $e) {
+                    Hm_Msgs::add('ERR' . $e->getMessage());
                 }
             }
         }
