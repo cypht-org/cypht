@@ -4,8 +4,10 @@ namespace Services\Traits;
 
 use Services\Core\Jobs\Hm_BaseJob;
 use Services\Core\Events\Hm_BaseEvent;
-use Services\Core\Queue\Hm_JobDispatcher;
+use Services\Core\Jobs\Hm_JobDispatcher;
 use Services\Core\Events\Hm_EventDispatcher;
+use Services\Core\Notifications\Hm_Notification;
+use Services\Core\Notifications\Hm_NotificationDispatcher;
 
 trait Hm_Dispatchable
 {
@@ -21,6 +23,8 @@ trait Hm_Dispatchable
             Hm_JobDispatcher::dispatch($instance);
         }elseif(is_subclass_of($instance, Hm_BaseEvent::class)){
             Hm_EventDispatcher::dispatch($instance);
+        }elseif(is_subclass_of($instance, Hm_Notification::class)){
+            Hm_NotificationDispatcher::send($instance);
         }else{
             throw new \Exception("Class must be an instance of Hm_BaseJob or Hm_BaseEvent");
         }

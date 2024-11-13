@@ -4,7 +4,7 @@ namespace Services\Providers;
 use Services\Core\Hm_Container;
 use Services\Core\Queue\Hm_QueueWorker;
 use Services\Core\Queue\Hm_QueueManager;
-use Services\Core\Queue\Hm_JobDispatcher;
+use Services\Core\Jobs\Hm_JobDispatcher;
 use Services\Core\Queue\Drivers\Hm_RedisQueue;
 use Services\Core\Queue\Drivers\Hm_DatabaseQueue;
 use Services\Core\Queue\Drivers\Hm_AmazonSQSQueue;

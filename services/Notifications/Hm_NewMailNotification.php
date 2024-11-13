@@ -2,10 +2,15 @@
 
 namespace Services\Notifications;
 
+use Services\Traits\Hm_Dispatchable;
+use Services\Traits\Hm_InteractsWithQueue;
+use Services\Contracts\Queue\Hm_ShouldQueue;
 use Services\Core\Notifications\Hm_Notification;
 
-class Hm_NewMailNotification extends Hm_Notification
+class Hm_NewMailNotification extends Hm_Notification implements Hm_ShouldQueue
 {
+    use Hm_Dispatchable, Hm_InteractsWithQueue;
+
     public function __construct(array $config = [])
     {
         parent::__construct($config);
@@ -13,14 +18,6 @@ class Hm_NewMailNotification extends Hm_Notification
 
     public function via(): array
     {
-        // Specify which channels this notification should use
-        return ['slack', 'telegram'];
-    }
-
-    public function sendNotification($notifiable, string $message): void
-    {
-        // You can define a title and content as needed
-        $title = "New Notification";
-        $this->send($notifiable, $title, $message);
+        return ['slack', 'telegram','broadcast'];
     }
 }
