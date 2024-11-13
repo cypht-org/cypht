@@ -71,7 +71,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-4"></i></a></div>';
         }
         return '';
     }
@@ -443,6 +443,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
+        $res .= '<div class="cypht-layout">';
         return $res;
     }
 }
@@ -607,10 +608,10 @@ class Hm_Output_page_js extends Hm_Output_Module {
  */
 class Hm_Output_content_end extends Hm_Output_Module {
     /**
-     * Closes the body and html tags
+     * Closes the layout wrapper, body, and html tags
      */
     protected function output() {
-        return '</body></html>';
+        return '</div></body></html>';
     }
 }
 

@@ -48,7 +48,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $this->assertEquals(array(), $res->output_response);
         $test->handler_response = array('changed_settings' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="save_reminder"><a title="You have unsaved changes" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="save_reminder"><a title="You have unsaved changes" href="?page=save"><i class="bi bi-save2-fill fs-4"></i></a></div>'), $res->output_response);
         $test->handler_response = array('single_server_mode' => true);
         $res = $test->run();
         $this->assertEquals(array('single_server_mode' => true), $res->output_response);
@@ -359,10 +359,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_start() {
         $test = new Output_Test('content_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><script type="text/javascript">sessionStorage.clear();</script>'), $res->output_response);
+        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><script type="text/javascript">sessionStorage.clear();</script><div class="cypht-layout">'), $res->output_response);
         $test->handler_response = array('changed_settings' => array(0), 'router_login_state' => true);
         $res = $test->run();
-        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><input type="hidden" id="hm_page_key" value="" /><a class="unsaved_icon" href="?page=save" title="Unsaved Changes"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>'), $res->output_response);
+        $this->assertEquals(array('<body class=""><noscript class="noscript">You need to have Javascript enabled to use , sorry about that!</noscript><input type="hidden" id="hm_page_key" value="" /><a class="unsaved_icon" href="?page=save" title="Unsaved Changes"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a><div class="cypht-layout">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -434,7 +434,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_end() {
         $test = new Output_Test('content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('</body></html>'), $res->output_response);
+        $this->assertEquals(array('</div></body></html>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

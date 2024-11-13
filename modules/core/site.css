@@ -5,6 +5,27 @@ body {
   color: var(--bs-body-color) !important;
 }
 
+.cypht-layout {
+  display: grid;
+  width: 100%;
+  grid-template-areas: "nav main";
+  grid-template-columns: 320px 1fr;
+  grid-template-rows: auto;
+}
+
+.mobile .cypht-layout {
+  display: block;
+}
+
+main {
+  grid-area: main;
+}
+
+.login_form {
+  position: absolute;
+  inset: 0;
+}
+
 .folder_list,
 .content_cell,
 .compose_page,
@@ -31,9 +52,10 @@ a:hover {
   color: var(--bs-link-hover-color);
 }
 .folder_cell {
-  vertical-align: top;
+  position: relative;
+  grid-area: nav;
   height: 100%;
-  display: table-cell;
+  display: block;
   padding: 0px;
   margin: 0px;
 }
@@ -365,13 +387,14 @@ button {
 }
 .folder_list {
   background-color: #fff;
-  margin-right: 20px;
   padding-right: 15px;
   padding-bottom: 40px;
-  min-width: 300px;
-  padding-top: 0px;
+  width: 300px;
   min-height: 100vh;
+  height: 100%;
   padding-top: 20px;
+  position: fixed;
+  overflow-y: auto;
 }
 
 .folders,
@@ -736,9 +759,9 @@ button {
   padding: 5px;
 }
 .save_reminder {
-  clear: both;
-  float: right;
-  margin-right: 25px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .save_reminder img {
   opacity: 0.4;
