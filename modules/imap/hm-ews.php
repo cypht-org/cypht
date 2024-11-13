@@ -519,7 +519,7 @@ class Hm_EWS {
                 }
             }
             $msg['charset'] = $cset;
-            $msg['preview_msg'] = $include_preview ? $message->get('body') :  "";
+            $msg['preview_msg'] = $include_preview ? strip_tags($message->get('body')) :  "";
             $messages[$uid] = $msg;
         }
         return $messages;

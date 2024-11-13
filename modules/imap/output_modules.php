@@ -1596,7 +1596,6 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_ews_server_connection btn btn-outline-success btn-sm me-2"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="ews" />';
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2"'.$disabled.' />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
