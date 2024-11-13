@@ -1320,10 +1320,6 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
         }
         list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
-
-        usort($msg_list, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
         
         $this->out('folder_status', $status);
         $this->out('imap_combined_inbox_data', $msg_list);

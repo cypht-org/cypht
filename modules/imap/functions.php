@@ -804,6 +804,11 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     if (count($sent_results) > 0) {
         $msg_list = array_merge($msg_list, $sent_results);
     }
+
+    usort($msg_list, function($a, $b) {
+        return strtotime($b['internal_date']) - strtotime($a['internal_date']);
+    });
+    
     return array($status, $msg_list);
 }}
 
