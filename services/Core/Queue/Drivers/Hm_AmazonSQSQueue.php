@@ -5,8 +5,9 @@ namespace Services\Core\Queue\Drivers;
 use Hm_AmazonSQS;
 use Aws\Sqs\SqsClient;
 use Services\Contracts\Queue\Hm_Queueable;
-use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
+use Services\Core\Notifications\Hm_Notification;
+use Services\Core\Queue\Hm_Queueable as Hm_QueueableClass;
 
 /**
  * Amazon SQS Queue
@@ -46,20 +47,20 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
     /**
      * Push the job to the queue
      *
-     * @param Hm_BaseJob $job
+     * @param Hm_QueueableClass $item
      * @return void
      */
-    public function push(Hm_BaseJob $job): void
+    public function push(Hm_QueueableClass $item): void
     {
-        $this->amazonSQS->sendMessage($this->sqsConnection, serialize($job));
+        $this->amazonSQS->sendMessage($this->sqsConnection, serialize($item));
     }
 
     /**
      * Pop the job from the queue
      *
-     * @return Hm_BaseJob|null
+     * @return Hm_QueueableClass|null
      */
-    public function pop(): ?Hm_BaseJob
+    public function pop(): ?Hm_QueueableClass
     {
         $messages = $this->amazonSQS->receiveMessages($this->sqsConnection);
         if (!empty($messages)) {
@@ -68,16 +69,22 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
             $body = $message['Body'];
             $this->amazonSQS->deleteMessage($this->sqsConnection, $receiptHandle);
 
-            $job = unserialize($body);
+            $item = unserialize($body);
 
             try {
-                $job->handle();
+                // Check if the item is a notification, if so send it
+                if($item instanceof Hm_Notification) {
+                    $item->send();
+                }else {
+                    // Otherwise handle the job
+                    $item->handle();
+                }
             } catch (\Exception $e) {
-                $this->fail($job, $e); // Log the failure
+                $this->fail($item, $e); // Log the failure
                 throw new \Exception("Failed to process job: " . $e->getMessage());
             }
 
-            return $job; // Return the job if it was processed successfully
+            return $item; // Return the job if it was processed successfully
         }
 
         return null;
@@ -86,33 +93,33 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
     /**
      * Release the job back to the queue
      *
-     * @param Hm_BaseJob $job
+     * @param Hm_QueueableClass $item
      * @param int $delay
      * @return void
      */
-    public function release(Hm_BaseJob $job, int $delay = 0): void
+    public function release(Hm_QueueableClass $item, int $delay = 0): void
     {
-        $messageBody = serialize($job);
+        $messageBody = serialize($item);
         $this->amazonSQS->sendMessage($this->sqsConnection, $messageBody, $delay);
     }
 
      /**
      * Process the job and handle failures.
      *
-     * @param Hm_BaseJob $job
+     * @param Hm_QueueableClass $item
      * @param int $maxAttempts
      * @return void
      */
-    public function process(Hm_BaseJob $job): void
+    public function process(Hm_QueueableClass $item): void
     {
         try {
-            $job->handle();
+            $item->handle();
         } catch (\Exception $e) {
-            $job->incrementAttempts();
-            if ($job->getAttempts() >= $job->tries) {
-                $this->fail($job, $e);
+            $item->incrementAttempts();
+            if ($item->getAttempts() >= $item->tries) {
+                $this->fail($item, $e);
             } else {
-                $this->release($job, 5);
+                $this->release($item, 5);
             }
         }
     }
@@ -120,14 +127,14 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
     /**
      * Move a job to the failed jobs queue after max attempts
      *
-     * @param Hm_BaseJob $job
+     * @param Hm_QueueableClass $iten
      * @param \Exception $exception
      * @return void
      */
-    protected function fail(Hm_BaseJob $job, \Exception $exception): void
+    protected function fail(Hm_QueueableClass $item, \Exception $exception): void
     {
-        $failedJobData = [
-            'job' => serialize($job),
+        $failedItemData = [
+            'item' => serialize($item),
             'failed_at' => (new \DateTime())->format('Y-m-d H:i:s'),
             'exception' => $exception->getMessage()
         ];
@@ -135,7 +142,7 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
         // You may want to handle how you store failed jobs.
         // For simplicity, we will just serialize and log them here,
         // but ideally, you would want to use a persistent store.
-        $this->amazonSQS->sendMessage($this->sqsConnection, serialize($failedJobData), 0, $this->failedQueue);
+        $this->amazonSQS->sendMessage($this->sqsConnection, serialize($failedItemData), 0, $this->failedQueue);
     }
 
     /**
@@ -148,12 +155,12 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
         $messages = $this->amazonSQS->receiveMessages($this->sqsConnection, $this->failedQueue);
         foreach ($messages as $message) {
             $body = $message['Body'];
-            $failedJobData = unserialize($body);
-            $job = unserialize($failedJobData['job']);
+            $failedItemData = unserialize($body);
+            $item = unserialize($failedItemData['item']);
             
             // Optionally reset attempts if your job has that logic
-            $job->resetAttempts(); 
-            $this->push($job); // Push back to current queue
+            $item->resetAttempts(); 
+            $this->push($item); // Push back to current queue
             
             // Optionally delete the failed job message
             $this->amazonSQS->deleteMessage($this->sqsConnection, $message['ReceiptHandle']);

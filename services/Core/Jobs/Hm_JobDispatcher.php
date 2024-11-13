@@ -1,10 +1,10 @@
 <?php
 
-namespace Services\Core\Queue;
+namespace Services\Core\Jobs;
 
+use Services\Core\Hm_Container;
 use Services\Core\Jobs\Hm_BaseJob;
 use Services\Contracts\Queue\Hm_ShouldQueue;
-use Services\Core\Hm_Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,7 +23,6 @@ class Hm_JobDispatcher
     static public function dispatch(Hm_BaseJob $job): void {
         if (is_subclass_of($job, Hm_ShouldQueue::class)) {
             $driver = $job->driver;
-            dd($driver);
             $queueDriver = Hm_Container::getContainer()->get('queue.manager')->getDriver($driver);
             if ($queueDriver) {
                 $queueDriver->push($job);

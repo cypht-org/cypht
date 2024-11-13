@@ -3,43 +3,146 @@
 namespace Services\Core\Notifications;
 
 use Symfony\Component\Notifier\Notifier;
-use Services\Core\Notifications\Channels\Hm_SlackChannel;
-use Services\Core\Notifications\Channels\Hm_TwilioChannel;
-use Services\Core\Notifications\Channels\Hm_TelegramChannel;
+use Services\Traits\Hm_Dispatchable;
+use Services\Core\Queue\Hm_Queueable;
+use Services\Contracts\Notifications\Hm_Dispatcher;
+use Symfony\Component\Notifier\Recipient\Recipient;
 
-class Hm_Notification
+/**
+ * Notification class
+ * package: Services\Core\Notifications
+ */
+class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
 {
-    public function __construct(private array $config = [])
+    use Hm_Dispatchable;
+    /**
+     * The notification driver.
+     * 
+     * @var string
+     */
+    public string $driver;
+      /**
+     * The notification title.
+     * 
+     * @var string
+     */
+    public string $title;
+
+    /**
+     * The notification lines.
+     * 
+     * @var array
+     */
+    public array $lines = []; 
+
+    /**
+     * The recipient of the notification.
+     * 
+     * @var Recipient
+     */
+    protected Recipient $recipient; 
+
+    /**
+     * Set the title of the notification.
+     *
+     * @param string $title
+     * @return self
+     */
+    public function greeting(string $title): self
     {
-        $this->config = $config; // Set configuration in the constructor
+        $this->title = $title;
+        return $this;
     }
 
+     /**
+     * Add a line to the message of the notification.
+     *
+     * @param string $line
+     * @return self
+     */
+    public function line(string $line): self
+    {
+        $this->lines[] = $line;
+        return $this;
+    }
+
+    /**
+     * Get the full message text, combining all lines.
+     *
+     * @return string
+     */
+    public function getMessageText(): string
+    {
+        return implode("\n", $this->lines);
+    }
+    /**
+     * Notifcations can be sent through multiple channels.
+     * 
+     * @return array
+     */
     public function via(): array
     {
-        return $this->config['channels'] ?? ['slack', 'telegram'];
+        return [];
     }
 
-    public function send($notifiable, string $title, string $content): void
+    /**
+     * Get the recipient of the notification.
+     *
+     * @return Recipient
+     */
+    public function getRecipient(): Recipient
     {
-        $channels = $this->via();
-        foreach ($channels as $channel) {
-            $this->sendThroughChannel($channel, $notifiable, $content);
+        return $this->recipient;
+    }
+
+    /**
+     * Get the title of the notification.
+     *
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * Set the recipient for the notification.
+     *
+     * @param mixed $recipient
+     * @return self
+     */
+    static public function to(mixed $recipient): string
+    {
+        self::$recipient = new Recipient(
+            is_array($recipient) ? implode(',', $recipient) : $recipient
+        );
+        return static::class;
+    }
+
+    public function send(): void
+    {
+        if (method_exists($this, 'dispatch')) {
+            self::dispatch();
+        } else {
+            throw new \Exception("Queueing functionality is unavailable.");
         }
     }
 
-    private function sendThroughChannel(string $channel, $notifiable, string $message): void
+    public function sendNow(): void
     {
-        switch ($channel) {
-            case 'slack':
-                (new Hm_SlackChannel(new SlackTransport()))->send($notifiable, $message);
-                break;
-            case 'telegram':
-                (new Hm_TelegramChannel(new TelegramTransport()))->send($notifiable, $message);
-                break;
-            case 'twilio':
-                (new Hm_TwilioChannel(new TwilioTransport()))->send($notifiable, $message);
-                break;
-            // Add more channels as necessary
+        $channels = $this->via();
+        foreach ($channels as $channel) {
+            $channelClass = "\\Services\\Core\\Notifications\\Channels\\Hm_" . ucfirst($channel) . "Channel";
+            if (class_exists($channelClass)) {
+                $channelInstance = new $channelClass();
+                if (method_exists($channelInstance, 'send')) {
+                    $channelInstance->send($this->recipient, $this->title, $this->getMessageText());
+                } else {
+                    throw new \Exception("The channel {$channel} does not have a send method.");
+                }
+            }else {
+                throw new \Exception("Channel {$channel} not found.");
+            }
         }
     }
 }

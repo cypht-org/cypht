@@ -27,10 +27,10 @@ class Hm_QueueWorker
      * @return void
      */
     public function work(): void {
-        while ($job = $this->queue->pop())
+        while ($item = $this->queue->pop())
         {
             try {
-                $this->queue->process($job);
+                $this->queue->process($item);
             } catch (\Exception $e) {
                 // $job->failed();
                 // // Optionally release the job back to the queue with a delay

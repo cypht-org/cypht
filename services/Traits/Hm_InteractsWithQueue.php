@@ -2,8 +2,7 @@
 
 namespace Services\Traits;
 
-use Services\Contracts\Hm_Job;
-use Services\Core\Jobs\Hm_BaseJob;
+use Services\Core\Queue\Hm_Queueable;
 use Services\Core\Queue\Hm_QueueManager;
 use Services\Contracts\Queue\Hm_ShouldQueue;
 
@@ -20,19 +19,19 @@ trait Hm_InteractsWithQueue
     /**
      * Push a job onto the queue.
      *
-     * @param Hm_ShouldQueue $job The job to be pushed onto the queue.
+     * @param Hm_ShouldQueue $item The item to be pushed onto the queue.
      * @param mixed $data Optional data to pass with the job.
      * @param string|null $queue Optional name of the queue.
      * @return void
      */
-    public function push(Hm_Job $job, $data = '', $queue = null): void
+    public function push(Hm_Queueable $item, $data = '', $queue = null): void
     {
         $driver = $this->getDriver();
 
         // Call the appropriate method from the QueueManager to push the job
         (new Hm_QueueManager)->getDriver($driver)->push($this, $data, $queue);
         
-        echo "Job of type " . get_class($job) . " pushed to the queue successfully.\n";
+        echo "Job of type " . get_class($item) . " pushed to the queue successfully.\n";
     }
 
     /**
@@ -41,24 +40,24 @@ trait Hm_InteractsWithQueue
      * @param string|null $queue Optional name of the queue.
      * @return mixed The job from the queue or null if the queue is empty.
      */
-    public function pop($queue = null): ?Hm_BaseJob
+    public function pop($queue = null): ?Hm_Queueable
     {
         $driver = $this->getDriver();
 
         // Call the appropriate method from the QueueManager to pop a job
-        $job = (new Hm_QueueManager)->getDriver($driver)->pop($queue);
+        $item = (new Hm_QueueManager)->getDriver($driver)->pop($queue);
 
-        if ($job) {
-            echo "Job of type " . get_class($job) . " popped from the queue.\n";
+        if ($item) {
+            echo "Job of type " . get_class($item) . " popped from the queue.\n";
         } else {
             echo "No job available in the queue.\n";
         }
 
-        return $job;
+        return $item;
     }
 
     /**
-     * Release a job back onto the queue with an optional delay.
+     * Release a item back onto the queue with an optional delay.
      *
      * @param string|null $queue Optional name of the queue.
      * @param int $delay The number of seconds to delay the release.
