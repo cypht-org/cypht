@@ -853,6 +853,9 @@ function imap_refresh_oauth2_token($server, $config) {
         elseif ($server['server'] == 'imap-mail.outlook.com') {
             $details = $oauth2_data['outlook'];
         }
+        elseif ($server['server'] == 'imap-mail.office365.com') {
+            $details = $oauth2_data['office365'];
+        }
         if (!empty($details)) {
             $oauth2 = new Hm_Oauth2($details['client_id'], $details['client_secret'], $details['client_uri']);
             $result = $oauth2->refresh_token($details['refresh_uri'], $server['refresh_token']);
