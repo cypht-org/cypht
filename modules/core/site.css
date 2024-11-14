@@ -1,3 +1,9 @@
+:root {
+  --nav-collapsed-size: 100px;
+  --nav-expanded-size: 320px;
+  --nav-size: var(--nav-expanded-size);
+}
+
 html,
 body {
   background-color: var(--bs-secondary-bg) !important;
@@ -9,8 +15,9 @@ body {
   display: grid;
   width: 100%;
   grid-template-areas: "nav main";
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: var(--nav-size) 1fr;
   grid-template-rows: auto;
+  transition: all 0.1s linear;
 }
 
 .mobile .cypht-layout {
@@ -389,7 +396,7 @@ button {
   background-color: #fff;
   padding-right: 15px;
   padding-bottom: 40px;
-  width: 300px;
+  width: calc(var(--nav-size) - 20px);
   min-height: 100vh;
   height: 100%;
   padding-top: 20px;
@@ -409,6 +416,7 @@ button {
   border-radius: var(--bs-border-radius);
   transition: all linear 0.3s;
   margin-bottom: 10px;
+  position: relative;
 }
 .inner_list li {
   margin: 2px;
@@ -1388,15 +1396,6 @@ div.unseen,
   --bs-popover-header-color: var(--bs-white);
 }
 
-.menu-toggle {
-  position: fixed;
-  top: 0;
-  left: -2rem;
-  z-index: 1000;
-  width: 5rem;
-  text-align: right;
-}
-
 .mobile nav {
   position: absolute;
   inset: 0;
@@ -1408,7 +1407,24 @@ div.unseen,
   transition: transform 0.3s;
 }
 
-nav .menu-toggle {
+.menu-toggle {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  z-index: 999;
+  color: var(--bs-primary);
+}
+
+.mobile .menu-toggle {
+  position: fixed;
+  top: 0;
+  left: -2rem;
+  z-index: 1000;
+  width: 5rem;
+  text-align: right;
+}
+
+.mobile nav .menu-toggle {
   right: -2rem;
   left: unset;
   text-align: left;
@@ -1427,6 +1443,36 @@ body {
   height: 3rem;
   margin-bottom: 1rem;
   padding-left: 1rem;
+}
+
+/* Collapsed nabar state */
+
+nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, nav.collapsed .folder_list .src_name, nav.collapsed .folder_list .collapse {
+  display: none !important;
+}
+
+nav.collapsed .menu-toggle {
+  right: 22%;
+  top: 0;
+  margin: auto;
+}
+
+nav.collapsed .folders {
+  margin-top: 50px;
+}
+
+nav.collapsed li {
+  text-align: center;
+  justify-content: center;
+}
+
+nav.collapsed .menu-icon {
+  margin-right: unset;
+}
+
+nav.collapsed .total_unread_count {
+  position: absolute;
+  top: 0;
 }
 
 a[disabled] {

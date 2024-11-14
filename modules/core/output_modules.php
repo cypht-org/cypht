@@ -1291,8 +1291,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-list fs-5"></i></a>'.
-            '<nav class="folder_cell"><div class="folder_list">';
+        $res = '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -1358,33 +1357,33 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-box2-fill menu-icon"></i>';
             }
-            $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
+            $res .= '<span class="nav-label">'.$this->trans('Everything').'</span</a><span class="combined_inbox_count"></span></li>';
         }
         $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Unread').'</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
         $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Junk').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
         $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Trash').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Trash').'</span></a></li>';
         $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
-        $res .= $this->trans('Drafts').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1403,7 +1402,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Logout').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1616,7 +1615,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-left-fill fs-5"></i></a>';
+        $res .= '<div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
         if ($this->format == 'HTML5') {
             return $res;
         }
