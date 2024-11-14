@@ -205,7 +205,7 @@ class Hm_Output_contacts_page_link extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-people-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Contacts').'</a></li>';
+        $res .= '<span class="nav-label">'. $this->trans('Contacts').'</span></a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

@@ -1,26 +1,31 @@
-if(window.hm_mobile && hm_mobile()) {
+$(() => {
+    if(window.hm_mobile && hm_mobile()) {
 
-    window.addEventListener('page-change', () => {
-        hideMobileNavbar();
-    });
+        window.addEventListener('page-change', () => {
+            hideMobileNavbar();
+        });
 
-    const menuToggle = `
-    <div class="menu-toggle rounded-pill p-2 bg-primary-subtle fw-bold cursor-pointer">
-        <i class="bi bi-list fs-5 fw-bold"></i>
-    </div>
-    `
-
-    $('.mobile nav').before(menuToggle);
-    $('.mobile nav').prepend(menuToggle);
-
-    $('.menu-toggle').on('click', function() {
-        showMobileNavbar();
-    });
-
-    $('nav .menu-toggle').on('click', function() {
-        hideMobileNavbar();
-    });
-}
+        const menuToggle = `
+        <div class="menu-toggle rounded-pill p-2 fw-bold cursor-pointer">
+            <i class="bi bi-list fs-5 fw-bold"></i>
+        </div>
+        `
+    
+        $('.mobile nav').before(menuToggle);
+    
+        $(document).on('click', '.menu-toggle', showMobileNavbar);
+        $(document).on('click', 'nav .menu-toggle', hideMobileNavbar)
+    } else {
+        $(document).on('click', '.menu-toggle', function() {
+            $('nav').toggleClass('collapsed');
+            if ($('nav').hasClass('collapsed')) {
+                document.documentElement.style.setProperty('--nav-size', 'var(--nav-collapsed-size)');
+            } else {
+                document.documentElement.style.setProperty('--nav-size', 'var(--nav-expanded-size)');
+            }
+        })
+    }
+})
 
 function hideMobileNavbar() {
     $('nav').css('transform', 'translateX(-120%)');

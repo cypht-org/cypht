@@ -52,17 +52,16 @@ class FolderListTests(WebTest):
 
     def hide_folders(self):
         self.driver.execute_script("window.scrollBy(0, 1000);")
-        self.wait(By.CLASS_NAME, 'hide_folders')
+        self.wait(By.CLASS_NAME, 'menu-toggle')
         # Use JavaScript to click the element
-        hide_button = self.by_class('hide_folders')
+        hide_button = self.by_class('menu-toggle')
         self.driver.execute_script("arguments[0].click();", hide_button)
-        assert self.by_class('folder_toggle').text.startswith('Show folders')
         list_item = self.by_class('menu_home')
         link = list_item.find_element(By.TAG_NAME, 'a')
         assert link.is_displayed() == False
 
     def show_folders(self):
-        folder_toggle = self.by_class('folder_toggle')
+        folder_toggle = self.by_class('menu-toggle')
         self.driver.execute_script("arguments[0].click();", folder_toggle)
         self.wait(By.CLASS_NAME, 'main')
         self.by_css('[data-bs-target=".settings"]').click()
