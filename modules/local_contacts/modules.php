@@ -279,7 +279,7 @@ class Hm_Output_import_contacts_form extends Hm_Output_Module {
         return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST" enctype="multipart/form-data">'.
             '<button class="server_title mt-2 btn btn-light" title="'.$notice.'"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
-            '<div><a href="'.$csv_sample_path.'">'.$this->trans('download a sample csv file').'</a></div><br />'.
+            '<div><a href="'.$csv_sample_path.'" data-external="true">'.$this->trans('download a sample csv file').'</a></div><br />'.
             '<input type="hidden" name="contact_source" value="csv" />'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_csv">'.$this->trans('Csv File').'</label>'.

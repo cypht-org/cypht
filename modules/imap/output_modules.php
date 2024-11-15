@@ -267,7 +267,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                                 <tr>
                                                     <td><strong>Tel :</strong></td>
                                                     <td>
-                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'" data-external="true">'.
                                                         $this->html_safe($contact->value('phone_number')).'</a>
                                                     </td>
                                                 </tr>

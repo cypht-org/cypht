@@ -471,10 +471,10 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             '<div class="server_form"><br />' .
             '<div class="row">' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $yaml_file_sample_path . '" download>' . $this->trans('Download a sample yaml file') . '</a></div>' .
+            '<div><a href="' . $yaml_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample yaml file') . '</a></div>' .
             '</div>' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $csv_file_sample_path . '" download>' . $this->trans('Download a sample csv file') . '</a></div><br />' .
+            '<div><a href="' . $csv_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample csv file') . '</a></div><br />' .
             '</div>' .
             '</div>' .
             '<input type="hidden" name="hm_page_key" value="' . $this->html_safe(Hm_Request_Key::generate()) . '" />' .
