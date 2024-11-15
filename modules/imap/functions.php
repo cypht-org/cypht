@@ -142,10 +142,10 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
                 '" href="?page=message_list&amp;list_path='.
                 urlencode('imap_'.$id.'_'.$output_mod->html_safe($folder_name)).'"';
             }
-            if (mb_strlen($output_mod->html_safe($folder['basename']))>15) {
+            if (mb_strlen($folder['basename'])>15) {
                 $results .= '<a ' . $attrs .
                     ' title="'.$output_mod->html_safe($folder['basename']).
-                    '">'.mb_substr($output_mod->html_safe($folder['basename']),0,15).'...</a>';
+                    '">'.$output_mod->html_safe(mb_substr($folder['basename'],0,15)).'...</a>';
             }
             else {
                 $results .= '<a ' . $attrs. '>'.$output_mod->html_safe($folder['basename']).'</a>';
