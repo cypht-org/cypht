@@ -167,10 +167,10 @@ function human_readable_interval($date_str) {
     $t['month']  = $t['day']*30;
     $t['year']   = $t['week']*52;
 
-    if ($interval < 0) {
+    if ($interval < -300) {
         return 'From the future!';
     }
-    elseif ($interval == 0) {
+    elseif ($interval <= 0) {
         return 'Just now';
     }
     foreach (array_reverse($t) as $name => $val) {
