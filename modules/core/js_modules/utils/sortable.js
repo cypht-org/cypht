@@ -14,14 +14,28 @@ function handleMessagesDragAndDrop() {
             onMove: (sortableEvent) => {
                 movingElement = sortableEvent.dragged;
                 targetFolder = sortableEvent.related?.className.split(' ')[0];
+                if (sortableEvent.originalEvent.type === 'touchmove') {
+                    const touch = sortableEvent.originalEvent.touches[0];
+                    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                    const closestFolder = element?.closest('li');
+                    targetFolder = closestFolder?.className.split(' ')[0];
+                    if (closestFolder) {
+                        document.querySelectorAll('.email_folders .inner_list > li').forEach(folder => {
+                            folder.classList.remove('bg-secondary-subtle');
+                        });
+                        closestFolder.classList.add('bg-secondary-subtle');
+                    }
+                }
                 return false;
             },
     
-            onEnd: () => {
-                // Remove the highlight class from the tr
+            onEnd: (evt) => {
                 document.querySelectorAll('.message_table_body > tr.table-secondary').forEach((row) => {
                     row.classList.remove('table-secondary');
                 });
+                if (evt.type === 'touchend') {
+                    evt.preventDefault();
+                }
                 return false;
             }
         });
@@ -32,7 +46,7 @@ function handleMessagesDragAndDrop() {
 
         alterDragImage(tableBody);
     
-        Sortable.utils.on(tableBody, 'dragend', () => {
+        const handleDragEnd = () => {
             // If the target is not a folder, do nothing
             if (!isValidFolderReference(targetFolder ?? '')) {
                 return;
@@ -71,34 +85,49 @@ function handleMessagesDragAndDrop() {
     
             // Reset the target folder
             targetFolder = null;
+        };
+
+        Sortable.utils.on(tableBody, 'dragend', handleDragEnd);
+        tableBody.addEventListener('touchend', handleDragEnd);
+
+        const mutationObserver = new MutationObserver(() => {
+            if (document.querySelectorAll('.email_folders')) {
+
+                const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
+                const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
+
+                // Keep track of all folders class names
+                allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
+
+
+                emailFoldersGroups.forEach((emailFolders) => {
+                    Sortable.create(emailFolders, {
+                        sort: false,
+                        group: {
+                            put: 'messages'
+                        }
+                    });
+                });
+
+                emailFoldersElements.forEach((emailFolder) => {
+                    emailFolder.addEventListener('dragover', () => {
+                        emailFolder.classList.add('bg-secondary-subtle');
+                    });
+                    emailFolder.addEventListener('dragleave', () => {
+                        emailFolder.classList.remove('bg-secondary-subtle');
+                    });
+                    emailFolder.addEventListener('drop', () => {
+                        emailFolder.classList.remove('bg-secondary-subtle');
+                    });
+                });
+
+                mutationObserver.disconnect();
+            }
         });
 
-
-        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
-        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
-
-        // Keep track of all folders class names
-        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
-
-        emailFoldersGroups.forEach((emailFolders) => {
-            Sortable.create(emailFolders, {
-                sort: false,
-                group: {
-                    put: 'messages'
-                }
-            });
-        });
-
-        emailFoldersElements.forEach((emailFolder) => {
-            emailFolder.addEventListener('dragover', () => {
-                emailFolder.classList.add('bg-secondary-subtle');
-            });
-            emailFolder.addEventListener('dragleave', () => {
-                emailFolder.classList.remove('bg-secondary-subtle');
-            });
-            emailFolder.addEventListener('drop', () => {
-                emailFolder.classList.remove('bg-secondary-subtle');
-            });
+        mutationObserver.observe(document.querySelector('.folder_cell'), {
+            childList: true,
+            subtree: true
         });
     }
 }
