@@ -93,12 +93,10 @@ class Hm_Output_dev_content extends Hm_Output_Module {
     protected function output() {
         return '<div class="dev_content p-0"><div class="content_title px-3">'.$this->trans('Developer Documentation').'</div>'.
             '<div class="p-3">'.
-            '<p class="mb-2">There is not a lot of documentation yet, but there are a few resources available online. First is the module overview page at our website intended for developers interested in creating module sets.</p>'.
-            '<a class="ms-5" href="http://cypht.org/modules.html" data-external="true">http://cypht.org/modules.html</a>'.
-            '<p class="mt-4 mb-2">Code Documentation for Cypht is auto-generated using <a href="http://www.apigen.org/" data-external="true">Apigen</a> and while not yet complete, has a lot of useful information</p>'.
-            '<a class="ms-5" href="http://cypht.org/docs/code_docs/index.html" data-external="true">http://cypht.org/docs/code_docs/index.html</a>'.
-            '<p class="mt-4 mb-2">Finally there is a "hello world" module with lots of comments included in the project download and browsable at github</p>'.
-            '<a class="ms-5" href="https://github.com/cypht-org/cypht/tree/master/modules/hello_world" data-external="true">https://github.com/cypht-org/cypht/tree/master/modules/hello_world</a>'.
+            '<p class="mb-2">There is documentation available for developers, along with several resources online. One valuable resource is the <b>Module Overview Page</b> on the Cypht website, which is designed for developers interested in creating module sets:</p>'.
+            '<a class="ms-5" href="http://cypht.org/modules.html" data-external="true">Cypht Module Overview Page</a>'.
+            '<p class="mt-4 mb-2">As of 2024, the Cypht developers\' community has significantly evolved, offering comprehensive resources for new developers to understand the structure and functionality of Cypht. A nearly complete documentation is now accessible, making it easier for developers to get started and dive deeper into the platform\'s architecture:</p>'.
+            '<a class="ms-5" href="https://www.cypht.org/developers-documentation.html" data-external="true">Cypht Developers Documentation</a>'. '<p class="mt-4 mb-2">These resources provide a solid foundation for learning and contributing to the Cypht ecosystem, empowering developers to explore and extend its capabilities effectively.</p>'.
             '</div></div>';
     }
 }
