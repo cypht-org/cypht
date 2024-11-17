@@ -19,20 +19,15 @@ RUN set -e \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
     && ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
-COPY <<EOF /tmp/xdebug.ini
-[xdebug]
-zend_extension=xdebug.so
+RUN echo "[xdebug]" > /tmp/xdebug.ini && \
+    echo "zend_extension=xdebug.so" >> /tmp/xdebug.ini && \
+    echo "xdebug.mode=debug" >> /tmp/xdebug.ini && \
+    echo "xdebug.client_host=host.docker.internal" >> /tmp/xdebug.ini
 
-xdebug.mode=debug
-xdebug.client_host=host.docker.internal
-EOF
+RUN echo "post_max_size = 60M" > /usr/local/etc/php/conf.d/cypht.ini && \
+    echo "upload_max_filesize = 50M" >> /usr/local/etc/php/conf.d/cypht.ini && \
+    echo "open_basedir = /var/lib/hm3/:/usr/local/share/cypht/:/tmp" >> /usr/local/etc/php/conf.d/cypht.ini
 
-COPY <<EOF /usr/local/etc/php/conf.d/cypht.ini
-post_max_size = 60M
-upload_max_filesize = 50M
-# the following is needed for sqlite access
-open_basedir = /var/lib/hm3/:/usr/local/share/cypht/:/tmp
-EOF
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
