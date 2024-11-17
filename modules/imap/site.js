@@ -402,6 +402,8 @@ var setup_imap_folder_page = async function(listPath) {
     const hadLocalData = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number()).hasLocalData();
     await select_imap_folder(listPath);
 
+    handleMessagesDragAndDrop();
+
     if (hadLocalData) {
         await select_imap_folder(listPath, true, true)
     }
