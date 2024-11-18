@@ -709,4 +709,8 @@ class Nux_Quick_Services {
         }
         return array();
     }
+
+    static public function get() {
+        return self::$services;
+    }
 }

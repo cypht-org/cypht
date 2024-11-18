@@ -106,7 +106,7 @@ if (!hm_exists('get_mailbox_filters')) {
     {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = [];
             foreach ($client->listScripts() as $script) {
                 if (mb_strstr($script, 'cypht')) {
@@ -414,7 +414,7 @@ if (!hm_exists('get_blocked_senders_array')) {
     {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = $client->listScripts();
 
             if (array_search('blocked_senders', $scripts, true) === false) {
@@ -450,7 +450,7 @@ if (!hm_exists('get_blocked_senders')){
     function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config, $module) {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = $client->listScripts();
             if (array_search('blocked_senders', $scripts, true) === false) {
                 return '';
@@ -521,6 +521,22 @@ if (!hm_exists('get_blocked_senders')){
 if (!hm_exists('initialize_sieve_client_factory')) {
     function initialize_sieve_client_factory($site_config, $user_config, $imapServer) {
         $factory = get_sieve_client_factory($site_config);
-        return $factory->init($user_config, $imapServer);
+        return $factory->init($user_config, $imapServer, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
+    }
+}
+
+if (!hm_exists('get_sieve_host_from_services')) {
+    require_once APP_PATH.'modules/nux/modules.php';
+    function get_sieve_host_from_services($imap_host) {
+        $services = Nux_Quick_Services::get();
+        foreach ($services as $service) {
+            if (isset($service['server']) && $service['server'] === $imap_host && isset($service['sieve'])) {
+                return [
+                    'host' => $service['sieve']['host'],
+                    'port' => $service['sieve']['port'] ?? 4190,
+                ];
+            }
+        }
+        return null;
     }
 }
