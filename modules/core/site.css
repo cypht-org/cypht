@@ -413,13 +413,10 @@ button {
   padding-right: 0px;
 }
 .folders li {
-  padding: 0.5rem;
+  padding: 0.3rem;
   border-radius: var(--bs-border-radius);
   transition: all linear 0.3s;
   position: relative;
-}
-.folders li a {
-  display: block;
 }
 .inner_list li {
   margin: 2px;
