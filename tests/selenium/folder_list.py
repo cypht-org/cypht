@@ -70,7 +70,8 @@ class FolderListTests(WebTest):
         self.driver.execute_script("arguments[0].scrollIntoView(true);", a_tag)
         self.driver.execute_script("arguments[0].click();", a_tag)
         self.wait_with_folder_list()
-        self.wait_for_navigation_to_complete()
+        if self.by_class('content_title').text != 'Home':
+            self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
 
 
