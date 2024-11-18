@@ -950,7 +950,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_site_link() {
         $test = new Output_Test('settings_site_link', 'core');
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_settings"><a class="site_link" href="?page=settings"><i class="bi bi-gear-wide-connected menu-icon"></i>Site</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_settings"><a class="unread_link" href="?page=settings"><i class="bi bi-gear-wide-connected menu-icon"></i>Site</a></li>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
