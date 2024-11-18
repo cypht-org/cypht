@@ -875,7 +875,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $raw flag to disable decoding header values
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false) {
+        public function get_message_list($uids, $raw=false, $include_preview = false) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', $uids);
@@ -890,7 +890,11 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)])\r\n";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)]";
+            if ($include_preview) {
+                $command .= " BODY[0.1]";
+            }
+            $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -901,8 +905,9 @@ if (!class_exists('Hm_IMAP')) {
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
             $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'REFERENCES', 'X-SNOOZED', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
             $headers = array();
+
             foreach ($res as $n => $vals) {
                 if (isset($vals[0]) && $vals[0] == '*') {
                     $uid = 0;
@@ -926,6 +931,7 @@ if (!class_exists('Hm_IMAP')) {
                     $count = count($vals);
                     for ($i=0;$i<$count;$i++) {
                         if ($vals[$i] == 'BODY[HEADER.FIELDS') {
+                                
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -942,6 +948,17 @@ if (!class_exists('Hm_IMAP')) {
                                     $last_header = $header;
                                 }
                             }
+                        }
+                        elseif ($vals[$i] == 'BODY[0.1') {
+                            $content = '';
+                            $i++;
+                            $i++;
+                            while(isset($vals[$i]) && $vals[$i] != ')') {
+                                $content .= $vals[$i];
+                                $i++;
+                            }
+                            $i++;
+                            $flds['body'] = $content;
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
                             if (isset($vals[($i + 1)])) {
@@ -960,6 +977,7 @@ if (!class_exists('Hm_IMAP')) {
                             }
                         }
                     }
+
                     if ($uid) {
                         $cset = '';
                         if (mb_stristr($content_type, 'charset=')) {
@@ -973,6 +991,7 @@ if (!class_exists('Hm_IMAP')) {
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
                                          'x_snoozed'  => $x_snoozed);
+                        $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);
@@ -980,6 +999,7 @@ if (!class_exists('Hm_IMAP')) {
                         else {
                             $headers[$uid] = array_map(array($this, 'decode_fld'), $headers[$uid]);
                         }
+
 
                     }
                 }
@@ -2292,7 +2312,7 @@ if (!class_exists('Hm_IMAP')) {
          * @return array list of headers
          */
 
-        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array()) {
+        public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=array(), $include_preview = false) {
             $result = array();
 
             /* select the mailbox if need be */
@@ -2332,7 +2352,7 @@ if (!class_exists('Hm_IMAP')) {
 
             /* get the headers and build a result array by UID */
             if (!empty($uids)) {
-                $headers = $this->get_message_list($uids);
+                $headers = $this->get_message_list($uids, false, $include_preview);
                 foreach($uids as $uid) {
                     if (isset($headers[$uid])) {
                         $result[$uid] = $headers[$uid];

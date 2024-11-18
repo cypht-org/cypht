@@ -11,6 +11,7 @@
   --bs-primary: teal;
   --bs-link-color: teal;
   --bs-link-hover-color: #006363;
+  --bs-primary-rgb: 0, 128, 128;
 }
 
 .btn-primary {

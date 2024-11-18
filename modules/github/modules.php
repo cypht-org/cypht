@@ -649,7 +649,7 @@ class Hm_Output_github_connect_section extends Hm_Output_Module {
 
         if (empty($details)) {
             $res .= 'Connect to Github<br /><br />';
-            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
+            $res .= '<a class="btn btn-secondary" href="'.$this->get('github_auth_url', '').'" data-external="true">'.$this->trans('Enable').'</a></div></div><div class="end_float"</div>';
         }
         else {
             $res .='<h6>'. $this->trans('Already connected').'</h6>';
@@ -860,7 +860,7 @@ function github_parse_payload($data, $output_mod) {
             $res .= $output_mod->html_safe(wordwrap($vals['message'], 100));
         }
         if (array_key_exists('html_url', $vals)) {
-            $res .= sprintf('<div class="github_link"><a href="%s">%s</a></div>',
+            $res .= sprintf('<div class="github_link"><a href="%s" data-external="true">%s</a></div>',
                 $output_mod->html_safe($vals['html_url']), $output_mod->html_safe($vals['html_url']));
         }
         if (array_key_exists('url', $vals) && array_key_exists('sha', $vals)) {

@@ -23,56 +23,12 @@ var smtp_test_action = function(event) {
     var form = $(this).closest('.smtp_connect');
     Hm_Notices.hide(true);
     Hm_Ajax.request(
-        form.serializeArray(),
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_debug'},
+            {'name': 'smtp_server_id', 'value': $('.smtp_server_id', form).val()}],
         false,
         {'smtp_connect': 1}
     );
-};
-
-var smtp_save_action = function(event) {
-    event.preventDefault();
-    var form = $(this).closest('.smtp_connect');
-    var btnContainer = $(this).parent();
-    Hm_Notices.hide(true);
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_saved_credentials) {
-                form.find('.credentials').attr('disabled', true);
-                form.find('.save_smtp_connection').hide();
-                form.find('.smtp_password').val('');
-                form.find('.smtp_password').attr('placeholder', '[saved]');
-                btnContainer.append('<input type="submit" value="Forget" class="forget_smtp_connection btn btn-outline-secondary btn-sm me-2" />');
-                $('.forget_smtp_connection').on('click', smtp_forget_action);
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'smtp_save': 1}
-    );
-};
-
-var smtp_forget_action = function(event) {
-    event.preventDefault();
-    var form = $(this).closest('.smtp_connect');
-    var btnContainer = $(this).parent();
-    Hm_Notices.hide(true);
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_forgot_credentials) {
-                form.find('.credentials').prop('disabled', false);
-                form.find('.credentials').val('');
-                btnContainer.append('<input type="submit" value="Save" class="save_smtp_connection btn btn-outline-secondary btn-sm me-2" />');
-                $('.save_smtp_connection').on('click', smtp_save_action);
-                $('.forget_smtp_connection', form).remove();
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'smtp_forget': 1}
-    );
-};
+};             
 
 var smtp_delete_action = function(event) {
     if (!hm_delete_prompt()) {
@@ -175,8 +131,6 @@ var toggle_recip_flds = function() {
 
 function smtpServersPageHandler() {
     $('.test_smtp_connect').on('click', smtp_test_action);
-    $('.save_smtp_connection').on('click', smtp_save_action);
-    $('.forget_smtp_connection').on('click', smtp_forget_action);
     $('.delete_smtp_connection').on('click', smtp_delete_action);
     var dsp = Hm_Utils.get_from_local_storage('.smtp_section');
     if (dsp === 'block' || dsp === 'none') {

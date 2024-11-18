@@ -125,7 +125,7 @@ class Hm_Output_developer_doc_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_dev"><a class="unread_link" href="?page=dev">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-bug-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-bug-fill menu-icon"></i>';
         }
         $res .= $this->trans('Dev').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -147,7 +147,7 @@ class Hm_Output_info_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_info"><a class="unread_link" href="?page=info">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-info-circle fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-info-circle menu-icon"></i>';
         }
         $res .= $this->trans('Info').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -213,13 +213,13 @@ class Hm_Output_config_map extends Hm_Output_Module {
         $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
         foreach ($mods as $name => $vals) {
             $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
-            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html"><i alt="Refresh" class="bi bi-code-slash"></i></a></td></tr>';
+            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html" data-external="true"><i alt="Refresh" class="bi bi-code-slash"></i></a></td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
             $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
                 $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
-                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html"><i alt="Refresh" class="bi bi-code-slash"></i></a></td></tr>';
+                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html" data-external="true"><i alt="Refresh" class="bi bi-code-slash"></i></a></td></tr>';
             }
         }
     }
@@ -232,13 +232,13 @@ class Hm_Output_config_map extends Hm_Output_Module {
         $res .= '<tr><th class="c'.$page.'" >Handler Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
         foreach ($mods as $name => $vals) {
             $res .= '<tr><td class="hmod c'.$page.'">'.$name.'</td><td class="hmod_val c'.$page.'">'.$vals[0].'</td>';
-            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html"><i class="bi bi-code-slash"></i></a></td></tr>';
+            $res .= '<td class="hmod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Handler_'.$name.'.html" data-external="true"><i class="bi bi-code-slash"></i></a></td></tr>';
         }
         if (array_key_exists($page, $outputs)) {
             $res .= '<tr><th class="c'.$page.'" >Output Modules</th><th class="c'.$page.'" >'.$this->trans('Source').'</th><th class="c'.$page.'" >Docs/Code</th></tr>';
             foreach($outputs[$page] as $name => $vals) {
                 $res .= '<tr><td class="omod c'.$page.'">'.$name.'</td><td class="omod_val c'.$page.'">'.$vals[0].'</td>';
-                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html"><i class="bi bi-code-slash"></i></a></td></tr>';
+                $res .= '<td class="omod c'.$page.'"><a href="https://cypht.org/docs/code_docs/classes/Hm_Output_'.$name.'.html" data-external="true"><i class="bi bi-code-slash"></i></a></td></tr>';
             }
         }
     }

@@ -411,7 +411,6 @@ class Hm_SMTP {
                     break;
             }
         }
-
         if (!isset($result)) {
             $result = 'An error occurred authenticating to the SMTP server';
             $res = $this->get_response();

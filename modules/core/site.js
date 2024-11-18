@@ -1,75 +1,5 @@
 'use strict';
 
-/**
- * NOTE: Tiki-Cypht integration dynamically removes everything from the begining of this file
- * up to swipe_event function definition as it uses jquery (over cash.js) and has bootstrap
- * framework already included. If you add code here that you wish to be included in Tiki-Cypht
- * integration, add it below swipe_event function definition.
- */
-
-/* extend cash.js with some useful bits */
-$.inArray = function(item, list) {
-    for (var i in list) {
-        if (list[i] === item) {
-            return i;
-        }
-    }
-    return -1;
-};
-$.isEmptyObject = function(obj) {
-    for (var key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            return false;
-        }
-    }
-    return true;
-};
-$.fn.submit = function() { this[0].submit(); }
-$.fn.focus = function() { this[0].focus(); };
-$.fn.serializeArray = function() {
-    var parts;
-    var res = [];
-    var args = this.serialize().split('&');
-    for (var i in args) {
-        parts = args[i].split('=');
-        if (parts[0] && parts[1]) {
-            res.push({'name': parts[0], 'value': parts[1]});
-        }
-    }
-    return res.map(function(x) {return {name: x.name, value: decodeURIComponent(x.value.replace(/\+/g, " "))}});
-};
-$.fn.sort = function(sort_function) {
-    var list = [];
-    for (var i=0, len=this.length; i < len; i++) {
-        list.push(this[i]);
-    }
-    return $(list.sort(sort_function));
-};
-$.fn.fadeOut = function(timeout = 600) {
-    return this.css("opacity", 0)
-    .css("transition", `opacity ${timeout}ms`)
-};
-$.fn.fadeOutAndRemove = function(timeout = 600) {
-    this.fadeOut(timeout)
-    var tm = setTimeout(() => {
-        this.remove();
-        clearTimeout(tm)
-    }, timeout);
-    return this;
-};
-
-$.fn.modal = function(action) {
-    const modalElement = this[0];
-    if (modalElement) {
-        const modal = new bootstrap.Modal(modalElement);
-        if (action === 'show') {
-            modal.show();
-        } else if (action === 'hide') {
-            modal.hide();
-        }
-    }
-};
-
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
@@ -291,12 +221,12 @@ var Hm_Ajax_Request = function() { return {
                 Hm_Ajax.err_condition = false;
                 Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
                 Hm_Notices.show(res.router_user_msgs);
             }
             if (res.folder_status) {
                 for (const name in res.folder_status) {
-                    if (name === getPageNameParam()) {
+                    if (name === getListPathParam()) {
                         Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
                         Hm_Folders.update_unread_counts();
                         const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
@@ -373,9 +303,14 @@ function Hm_Modal(options) {
     };
 
     this.opts = { ...defaults, ...options };
+    this.modal = $(`#${this.opts.modalId}`);
 
     this.init = function () {
-        if (this.modal) {
+        if (this.modal.length) {
+            this.modalContent = this.modal.find('.modal-body');
+            this.modalTitle = this.modal.find('.modal-title');
+            this.modalFooter = this.modal.find('.modal-footer');
+            this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
             return;
         }
 
@@ -408,6 +343,7 @@ function Hm_Modal(options) {
     };
 
     this.open = () => {
+        this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
         this.bsModal.show();
     };
 
@@ -559,38 +495,12 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(ids, msgs, type, cache) {
-        var completed = false;
-        this.completed_count++;
-        if (this.completed_count == this.sources.length) {
-            this.completed_count = 0;
-            completed = true;
+    this.update = function(msgs) {
+        Hm_Utils.tbody().html('');
+        for (const index in msgs) {
+            const row = msgs[index][0];
+            Hm_Utils.tbody().append(row);
         }
-        if ($('input[type=checkbox]', $('.message_table')).filter(function() {return this.checked; }).length > 0) {
-            this.run_callbacks(completed);
-            return 0;
-        }
-        if (msgs[0] === "") {
-            this.run_callbacks(completed);
-            return 0;
-        }
-        var msg_rows;
-        if (!cache) {
-            msg_rows = Hm_Utils.tbody();
-        }
-        else {
-            msg_rows = cache;
-        }
-        if (!this.background && !$.isEmptyObject(msgs)) {
-            $('.empty_list').remove();
-        }
-        var msg_ids = this.add_rows(msgs, msg_rows);
-        var count = this.remove_rows(ids, msg_ids, type, msg_rows);
-        this.run_callbacks(completed);
-        if (!cache) {
-            this.set_tab_index();
-        }
-        return count;
     };
 
     this.set_tab_index = function() {
@@ -600,38 +510,6 @@ function Message_List() {
             $(this).attr('tabindex', count);
             count++;
         });
-    };
-
-    this.remove_rows = function(ids, msg_ids, type, msg_rows) {
-        var count = $('tr', msg_rows).length;
-        var parts;
-        var re;
-        var i;
-        var id;
-        for (i=0;i<ids.length;i++) {
-            id = ids[i];
-            if ((id+'').search('_') != -1) {
-                parts = id.split('_', 2);
-                re = new RegExp(parts[1]+'$');
-                parts[1] = re;
-            }
-            else {
-                parts = [id, false];
-            }
-            $('tr[class^='+type+'_'+parts[0]+'_]', msg_rows).filter(function() {
-                var id = this.className;
-                if (id.indexOf(' ') != -1) {
-                    id = id.split(' ')[0];
-                }
-                if (!parts[1] || parts[1].exec(id)) {
-                    if ($.inArray(id, msg_ids) == -1) {
-                        count--;
-                        $(this).remove();
-                    }
-                }
-            });
-        }
-        return count;
     };
 
     this.sort = function(fld) {
@@ -671,30 +549,6 @@ function Message_List() {
             Hm_Utils.tbody().append(sort_result[i]);
         }
         this.save_updated_list();
-    };
-
-    this.add_rows = function(msgs, msg_rows) {
-        var msg_ids = [];
-        var row;
-        var id;
-        var index;
-        for (index in msgs) {
-            row = msgs[index][0];
-            id = msgs[index][1];
-            if (this.deleted.indexOf(Hm_Utils.clean_selector(id)) != -1) {
-                continue;
-            }
-            id = id.replace(/ /, '-');
-            if (!$('.'+Hm_Utils.clean_selector(id), msg_rows).length) {
-                this.insert_into_message_list(row, msg_rows);
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).show();
-            }
-            else {
-                $('.'+Hm_Utils.clean_selector(id), msg_rows).replaceWith(row)
-            }
-            msg_ids.push(id);
-        }
-        return msg_ids;
     };
 
     this.insert_into_message_list = function(row, msg_rows) {
@@ -917,27 +771,27 @@ function Message_List() {
     };
 
     /* TODO: remove module specific refs */
-    this.update_title = function() {
+    this.update_title = function(list_path = getListPathParam()) {
         var count = 0;
         var rows = Hm_Utils.rows();
         var tbody = Hm_Utils.tbody();
-        if (getListPathParam() == 'unread') {
+        if (list_path == 'unread') {
             count = rows.length;
             document.title = count+' '+hm_trans('Unread');
         }
-        else if (getListPathParam() == 'flagged') {
+        else if (list_path == 'flagged') {
             count = rows.length;
             document.title = count+' '+hm_trans('Flagged');
         }
-        else if (getListPathParam() == 'combined_inbox') {
+        else if (list_path == 'combined_inbox') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Everything');
         }
-        else if (getListPathParam() == 'email') {
+        else if (list_path == 'email') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Email');
         }
-        else if (getListPathParam() == 'feeds') {
+        else if (list_path == 'feeds') {
             count = $('tr .unseen', tbody).length;
             document.title = count+' '+hm_trans('Unread in Feeds');
         }
@@ -986,14 +840,14 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function() {
+    this.prev_next_links = function(msgUid) {
         let phref;
         let nhref;
         const target = $('.msg_headers tr').last();
         const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
         messages.load(false, true);
-        const next = messages.getNextRowForMessage(getMessageUidParam());
-        const prev = messages.getPreviousRowForMessage(getMessageUidParam());
+        const next = messages.getNextRowForMessage(msgUid);
+        const prev = messages.getPreviousRowForMessage(msgUid);
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject');
             phref = prevSubject.find('a').prop('href');
@@ -1233,12 +1087,15 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
-                if (getListPathParam() == name && getPageNameParam() == 'message_list') {
-                    var title = document.title.replace(/^\[\d+\]/, '');
-                    document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
-                    /* HERE */
+                const count = Hm_Folders.unread_counts[name] || '';
+                if (count) {
+                    if (getListPathParam() == name && getPageNameParam() == 'message_list') {
+                        var title = document.title.replace(/^\[\d+\]/, '');
+                        document.title = '['+count+'] '+title;
+                        /* HERE */
+                    }
+                    $('.unread_'+name).html('&#160;'+count+'&#160;');
                 }
-                $('.unread_'+name).html('&#160;'+Hm_Folders.unread_counts[name]+'&#160;');
             }
         }
         Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));
@@ -1339,19 +1196,17 @@ var Hm_Folders = {
 
     folder_list_events: function() {
         $('.imap_folder_link').on("click", function() { return expand_imap_folders($(this)); });
-        $('.src_name').on("click", function() {
-            var class_name = $(this).data('source');
-            var icon_element = $(this).find('.bi');
-            Hm_Utils.toggle_section(class_name);
-            setTimeout(() => {
-                var target_element = document.querySelector(class_name);
-                var is_visible = Hm_Utils.is_element_visible(target_element);
-                if (is_visible) {
-                    icon_element.removeClass('bi-chevron-down').addClass('bi-chevron-up');
-                } else {
-                    icon_element.removeClass('bi-chevron-up').addClass('bi-chevron-down');
-                }
-            }, 0);
+        $('.src_name').on('click', function() {
+
+            let transformValue = '';
+            if ($(this).attr('aria-expanded') == 'true') {
+                transformValue = 'rotate(180deg)';
+                
+            } else {
+                transformValue = 'rotate(0deg)';
+            }
+            
+            $(this).find('i').css('transform', transformValue);
         });
         $('.update_message_list').on("click", function(e) {
             var text = e.target.innerHTML;
@@ -1379,7 +1234,7 @@ var Hm_Folders = {
         $('.folder_list').find('*').removeClass('selected_menu');
         if (path) {
             if (page == 'message_list' || page == 'message') {
-                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").addClass('selected_menu');
+                $("[data-id='"+Hm_Utils.clean_selector(path)+"']").closest('li').addClass('selected_menu');
                 $('.menu_'+Hm_Utils.clean_selector(path)).addClass('selected_menu');
             }
             else {
@@ -1901,6 +1756,9 @@ var fillImapData = function(details) {
     if (details.sieve_config_host) {
         $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
         $("#srv_setup_stepper_enable_sieve").trigger("click", false);
+        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', details.tls)
+                            .trigger('change');
     }
 
     if(details.tls) {
@@ -2085,157 +1943,6 @@ function listControlsMenu() {
     $('.list_sources').hide();
 }
 
-
-// Sortablejs
-const tableBody = document.querySelector('.message_table_body');
-if(tableBody && !hm_mobile()) {
-    const allFoldersClassNames = [];
-    let targetFolder;
-    let movingElement;
-    let movingNumber;
-    Sortable.create(tableBody, {
-        sort: false,
-        group: 'messages',
-        ghostClass: 'drag_target',
-        draggable: ':not(.inline_msg)',
-
-        onMove: (sortableEvent) => {
-            movingElement = sortableEvent.dragged;
-            targetFolder = sortableEvent.related?.className.split(' ')[0];
-            return false;
-        },
-
-        onEnd: () => {
-            // Remove the highlight class from the tr
-            document.querySelectorAll('.message_table_body > tr.drag_target').forEach((row) => {
-                row.classList.remove('drag_target');
-            });
-            return false;
-        }
-    });
-
-    const isValidFolderReference = (className='') => {
-        return className.startsWith('imap_') && allFoldersClassNames.includes(className)
-    }
-
-    Sortable.utils.on(tableBody, 'dragstart', (evt) => {
-        let movingElements = [];
-        // Is the target element checked
-        const isChecked = evt.target.querySelector('.checkbox_cell input[type=checkbox]:checked');
-        if (isChecked) {
-            movingElements = document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked');
-            // Add a highlight class to the tr
-            movingElements.forEach((checkbox) => {
-                checkbox.parentElement.parentElement.classList.add('drag_target');
-            });
-        } else {
-            // If not, uncheck all other checked elements so that they don't get moved
-            document.querySelectorAll('.message_table_body > tr > .checkbox_cell input[type=checkbox]:checked').forEach((checkbox) => {
-                checkbox.checked = false;
-            });
-        }
-
-        movingNumber = movingElements.length || 1;
-
-        const element = document.createElement('div');
-        element.textContent = `Move ${movingNumber} conversation${movingNumber > 1 ? 's' : ''}`;
-        element.style.position = 'absolute';
-        element.className = 'dragged_element';
-        document.body.appendChild(element);
-
-        function moveElement() {
-            element.style.display = 'none';
-        }
-
-        function removeElement() {
-            element.remove();
-        }
-
-        document.addEventListener('drag', moveElement);
-        document.addEventListener('mouseover', removeElement);
-
-        evt.dataTransfer.setDragImage(element, 0, 0);
-    });
-
-    Sortable.utils.on(tableBody, 'dragend', () => {
-        // If the target is not a folder, do nothing
-        if (!isValidFolderReference(targetFolder ?? '')) {
-            return;
-        }
-
-        const page = getPageNameParam();
-        const selectedRows = [];
-
-        if(movingNumber > 1) {
-            document.querySelectorAll('.message_table_body > tr').forEach(row => {
-                if (row.querySelector('.checkbox_cell input[type=checkbox]:checked')) {
-                    selectedRows.push(row);
-                }
-            });
-        }
-
-        if (selectedRows.length == 0) {
-            selectedRows.push(movingElement);
-        }
-
-        const movingIds = selectedRows.map(row => row.className.split(' ')[0]);
-
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_move_copy_action'},
-            {'name': 'imap_move_ids', 'value': movingIds.join(',')},
-            {'name': 'imap_move_to', 'value': targetFolder},
-            {'name': 'imap_move_page', 'value': page},
-            {'name': 'imap_move_action', 'value': 'move'}],
-            (res) =>{
-                for (const index in res.move_count) {
-                    $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
-                    select_imap_folder(getListPathParam());
-                }
-            }
-        );
-
-        // Reset the target folder
-        targetFolder = null;
-    });
-
-    const folderList = document.querySelector('.folder_list');
-
-    const observer = new MutationObserver((mutations) => {
-        const emailFoldersGroups = document.querySelectorAll('.email_folders .inner_list');
-        const emailFoldersElements = document.querySelectorAll('.email_folders .inner_list > li');
-
-        // Keep track of all folders class names
-        allFoldersClassNames.push(...[...emailFoldersElements].map(folder => folder.className.split(' ')[0]));
-
-        emailFoldersGroups.forEach((emailFolders) => {
-            Sortable.create(emailFolders, {
-                sort: false,
-                group: {
-                    put: 'messages'
-                }
-            });
-        });
-
-        emailFoldersElements.forEach((emailFolder) => {
-            emailFolder.addEventListener('dragenter', () => {
-                emailFolder.classList.add('drop_target');
-            });
-            emailFolder.addEventListener('dragleave', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-            emailFolder.addEventListener('drop', () => {
-                emailFolder.classList.remove('drop_target');
-            });
-        });
-    });
-
-    const config = {
-        childList: true
-    };
-
-    observer.observe(folderList, config);
-}
-
 var resetStepperButtons = function() {
     $('.step_config-actions button').removeAttr('disabled');
     $('#stepper-action-finish').text($('#stepper-action-finish').text().slice(0, -3));
@@ -2260,6 +1967,7 @@ function submitSmtpImapServer() {
         { name: 'srv_setup_stepper_imap_port', value: $('#srv_setup_stepper_imap_port').val() },
         { name: 'srv_setup_stepper_imap_tls', value: $('input[name="srv_setup_stepper_imap_tls"]:checked').val() },
         { name: 'srv_setup_stepper_enable_sieve', value: $('#srv_setup_stepper_enable_sieve').prop('checked') },
+        { name: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').prop('checked') },
         { name: 'srv_setup_stepper_create_profile', value: $('#srv_setup_stepper_create_profile').prop('checked') },
         { name: 'srv_setup_stepper_profile_is_default', value: $('#srv_setup_stepper_profile_is_default').prop('checked') },
         { name: 'srv_setup_stepper_profile_signature', value: $('#srv_setup_stepper_profile_signature').val() },
@@ -2313,6 +2021,7 @@ function resetQuickSetupForm() {
     $("#srv_setup_stepper_is_sender").prop('checked', true);
     $("#srv_setup_stepper_is_receiver").prop('checked', true);
     $("#srv_setup_stepper_enable_sieve").prop('checked', false);
+    $("#srv_setup_stepper_imap_sieve_mode_tls").prop('checked', false);
     $("#srv_setup_stepper_only_jmap").prop('checked', false);
     $('#step_config-imap_bloc').show();
     $('#step_config-smtp_bloc').show();
@@ -2462,6 +2171,7 @@ function display_config_step(stepNumber) {
         if($('#srv_setup_stepper_enable_sieve').is(':checked')) {
             requiredFields.push(
                 {key: 'srv_setup_stepper_imap_sieve_host', value: $('#srv_setup_stepper_imap_sieve_host').val()},
+                {key: 'srv_setup_stepper_imap_sieve_mode_tls', value: $('#srv_setup_stepper_imap_sieve_mode_tls').val()},
             )
         }
 
@@ -2522,11 +2232,17 @@ function getServiceDetails(providerKey){
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', true)
                             .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', serverConfig.sieve.tls)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val(serverConfig.sieve.host + ':' + serverConfig.sieve.port);
                     } else {
                         $('#srv_setup_stepper_enable_sieve')
                             .prop('checked', false)
-                            .trigger('change');;
+                            .trigger('change');
+                        $('#srv_setup_stepper_imap_sieve_mode_tls')
+                            .prop('checked', false)
+                            .trigger('change');
                         $('#srv_setup_stepper_imap_sieve_host').val('');
                     }
                 }
@@ -2591,7 +2307,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(messagePart, false, false, false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
     });
 }
 
@@ -2622,7 +2338,8 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const sender = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0] + '_external_resources_allowed';
+    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
     elements.forEach(function (element) {
@@ -2659,24 +2376,29 @@ const handleExternalResources = (inline) => {
             allowAllLink.dataset.src = blockedResources.join(',');
             allowAllLink.textContent = 'Allow all';
             allowAll.appendChild(allowAllLink);
-            handleAllowResource(allowAll, elements[0].dataset.messagePart, inline);
+            handleAllowResource(allowAll, getParam('part'), inline);
         }
         noticesElement.appendChild(allowAll);
 
         const button = document.createElement('a');
+        button.setAttribute('href', '#');
         button.classList.add('always_allow_image', 'btn', 'btn-light', 'btn-sm');
         button.textContent = 'Always allow from this sender';
         noticesElement.appendChild(button);
+        const popover = sessionAvailableOnlyActionInfo(button)
 
         button.addEventListener('click', function (e) {
             e.preventDefault();
-            Hm_Utils.save_to_local_storage(sender, 1);
-            $('.msg_text_inner').remove();
-            if (inline) {
-                inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
-            } else {
-                get_message_content(elements[0].dataset.messagePart, false, false, false, false, false)
-            }
+            addSenderToImagesWhitelist(senderEmail).then(() => {
+                $('.msg_text_inner').remove();
+                if (inline) {
+                    inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
+                } else {
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
+                }
+            }).finally(() => {
+                popover.dispose();
+            })
         });
     }
 

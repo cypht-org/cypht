@@ -117,9 +117,13 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                 $externalResRegexp = '/src="(https?:\/\/[^"]*)"|src=\'(https?:\/\/[^\']*)\'/i';
 
                 if ($allowed) {
-                    $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
-                        return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
-                    }, $msgText);
+                    $images_whitelist = $this->get('images_whitelist');
+                    $sender_email = $this->get('sender_email');
+                    if (! in_array($sender_email, $images_whitelist)) {
+                        $msgText = preg_replace_callback($externalResRegexp, function ($matches) {
+                            return 'data-src="' . $matches[1] . '" ' . 'src="" ' . 'data-message-part="' . $this->html_safe($this->get('imap_msg_part')) . '"';
+                        }, $msgText);
+                    }
                 }
 
                 $txt .= format_msg_html($msgText, $allowed);
@@ -226,9 +230,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }else{
                                 $EmailRegexp = "/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i";
                                 if(preg_match($EmailRegexp, $value, $matches)){
-                                    $contact_email = $matches[0][0];
+                                    $contact_email = $matches[0];
                                 }
                             }
+
+                            $this->out('sender_email', $contact_email);
 
                             $contact_store = $this->get('contact_store');
                             $contact = !$contact_store ? null : $contact_store->get(null, false, $contact_email);
@@ -261,7 +267,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                                 <tr>
                                                     <td><strong>Tel :</strong></td>
                                                     <td>
-                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'" data-external="true">'.
                                                         $this->html_safe($contact->value('phone_number')).'</a>
                                                     </td>
                                                 </tr>
@@ -343,11 +349,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (array_key_exists('from', $lc_headers)) {
                 $imap_server_id = explode('_', $this->get('msg_list_path'))[1];
                 $server = Hm_IMAP_List::get($imap_server_id, false);
-                $addr_list = process_address_fld($lc_headers['from']);
-                $addr_list = array_filter($addr_list, function ($addr) use($server) {
-                    return $addr['email'] != $server['user'];
-                });
-                $size += count($addr_list);
+                if ($server) {
+                    $addr_list = process_address_fld($lc_headers['from']);
+                    $addr_list = array_filter($addr_list, function ($addr) use($server) {
+                        return $addr['email'] != $server['user'];
+                    });
+                    $size += count($addr_list);
+                }
             }
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
@@ -517,7 +525,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
             $disabled = isset($vals['default']) ? ' disabled': '';
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2 mt-3" />';
             } else {
                 $keysToRemove = array('object', 'connected', 'default', 'nopass');
                 $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
@@ -526,7 +533,6 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_server_connection btn btn-outline-success btn-sm me-2 mt-3"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="'.$type.'" />';
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2 mt-3" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3"'.$disabled.' />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2 mt-3"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons
@@ -694,11 +700,9 @@ class Hm_Output_display_configured_jmap_servers extends Hm_Output_Module {
             // Buttons
             if (!isset($vals['user']) || !$vals['user']) {
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-outline-danger btn-sm imap_delete me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="btn btn-outline-success btn-sm save_imap_connection me-2" />';
             } else {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="btn btn-primary btn-sm test_imap_connect me-2" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="btn btn-danger btn-sm imap_delete me-2" />';
-                $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="btn btn-outline-warning btn-sm forget_imap_connection me-2" />';
             }
 
             // Hide/Unhide Button Logic
@@ -1412,10 +1416,20 @@ class Hm_Output_stepper_setup_server_imap extends Hm_Output_Module {
                                            <input class="form-check-input" type="checkbox" id="srv_setup_stepper_enable_sieve"  onchange="handleSieveStatusChange(this)">
                                            <label class="form-check-label" for="srv_setup_stepper_enable_sieve">'.$this->trans('Enable Sieve').'</label>
                                         </div>
-                                        <div class="form-floating hide" id="srv_setup_stepper_imap_sieve_host_bloc">
-                                            <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
-                                            <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
-                                            <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
+                                        <div id="srv_setup_stepper_imap_sieve_host_bloc" class="hide">
+                                            <div class="form-floating">
+                                                <input required type="text" id="srv_setup_stepper_imap_sieve_host" name="srv_setup_stepper_imap_sieve_host" class="txt_fld form-control" value="" placeholder="'.$this->trans('Sieve Host').'">
+                                                <label class="" for="srv_setup_stepper_imap_sieve_host">'.$this->trans('Sieve Host').'</label>
+                                                <span id="srv_setup_stepper_imap_sieve_host-error" class="invalid-feedback"></span>
+                                            </div>
+                                            <div class="form-floating">
+                                                <div class="form-check" id="srv_setup_stepper_imap_sieve_mode_tls_bloc">
+                                                    <input class="form-check-input" type="checkbox" role="switch" value="1" id="srv_setup_stepper_imap_sieve_mode_tls" name="srv_setup_stepper_imap_sieve_mode_tls">
+                                                    <label class="form-check-label" for="srv_setup_stepper_imap_sieve_mode_tls">
+                                                        '.$this->trans('Sieve TLS Mode').'
+                                                    </label>
+                                                </div>
+                                            </div>
                                         </div>';
                      }
                 $res .= '</div>';
@@ -1474,3 +1488,18 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
         return $res;
     }
 }
+class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "";
+        if (array_key_exists('active_preview_message', $settings) && $settings['active_preview_message']) {
+            if ($settings['active_preview_message']) {
+                $checked = "checked";
+            }
+        }
+        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+

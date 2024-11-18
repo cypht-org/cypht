@@ -1,4 +1,3 @@
 ## Tags
 
-This module set is not yet functional. It is intended to provide users a way to
-organize content by tags/labels.
+This module allows users to organize content effectively by utilizing tags/labels. It is designed to enhance content management by enabling users to assign relevant tags, facilitating easy categorization, filtering, and retrieval of content. The tagging feature is fully implemented, allowing for seamless interaction where users can add, edit, or remove tags as needed.

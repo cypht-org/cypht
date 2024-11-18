@@ -11,7 +11,7 @@ class TagTest(WebTest):
         self.wait()
 
     def load_tag_page(self):
-        self.by_css('[data-source=".tags_folders"]').click()
+        self.by_css('[data-bs-target=".tags_folders"]').click()
         list_item = self.by_class('tags_add_new')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

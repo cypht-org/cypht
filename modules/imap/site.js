@@ -57,69 +57,23 @@ var imap_unhide = function(event) {
     imap_hide_action(form, server_id, 0);
 };
 
-var imap_forget_action = function(event) {
-    event.preventDefault();
-    Hm_Notices.hide(true);
-    var form = $(this).closest('.imap_connect');
-    var btnContainer = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_forgot_credentials) {
-                form.find('.credentials').prop('disabled', false);
-                form.find('.credentials').val('');
-                btnContainer.append('<input type="submit" value="Save" class="save_imap_connection btn btn-outline-secondary btn-sm me-2" />');
-                $('.save_imap_connection').on('click', imap_save_action);
-                $('.forget_imap_connection', form).hide();
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'imap_forget': 1}
-    );
-};
-
-var imap_save_action = function(event) {
-    event.preventDefault();
-    Hm_Notices.hide(true);
-    var form = $(this).closest('.imap_connect');
-    var btnContainer = $(this).parent();
-    Hm_Ajax.request(
-        form.serializeArray(),
-        function(res) {
-            if (res.just_saved_credentials) {
-                form.find('.credentials').attr('disabled', true);
-                form.find('.save_imap_connection').hide();
-                form.find('.imap_password').val('');
-                form.find('.imap_password').attr('placeholder', '[saved]');
-                btnContainer.append('<input type="submit" value="Forget" class="forget_imap_connection btn btn-outline-warning btn-sm me-2" />');
-                $('.forget_imap_connection').on('click', imap_forget_action);
-                Hm_Utils.set_unsaved_changes(1);
-                Hm_Folders.reload_folders(true);
-            }
-        },
-        {'imap_save': 1}
-    );
-};
-
-var imap_test_action = function(event) {
+var imap_test_action = function(event) {    
     $('.imap_folder_data').empty();
     event.preventDefault();
     Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
-        form.serializeArray(),
+        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_debug'},
+            {'name': 'imap_server_id', 'value': $('.imap_server_id', form).val()}],
         false,
         {'imap_connect': 1}
     );
 }
 
-var imap_setup_server_page = function() {
+var imapServersPageHandler = function() {
     $('.imap_delete').on('click', imap_delete_action);
-    $('.save_imap_connection').on('click', imap_save_action);
     $('.hide_imap_connection').on('click', imap_hide);
     $('.unhide_imap_connection').on('click', imap_unhide);
-    $('.forget_imap_connection').on('click', imap_forget_action);
     $('.test_imap_connect').on('click', imap_test_action);
 
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');
@@ -305,7 +259,7 @@ var imap_message_list_content = function(id, folder, hook, batch_callback) {
                 add_auto_folder(res.auto_sent_folder);
             }
 
-            Hm_Message_List.update(ids, res.formatted_message_list, 'imap');
+            Hm_Message_List.update(res.formatted_message_list);
 
             $('.page_links').html(res.page_links);
             cache_imap_page();
@@ -372,26 +326,6 @@ var add_imap_combined_source = function(event) {
     return update_imap_combined_source(getListPathParam(), 1, event);
 };
 
-var imap_combined_unread_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_unread', Hm_Message_List.set_unread_state);
-};
-
-var imap_combined_flagged_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_flagged', Hm_Message_List.set_flagged_state);
-};
-
-var imap_combined_inbox_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
-};
-
-var imap_folder_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_folder_data', cache_folder_data);
-};
-
-var imap_tag_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_tag_data', cache_folder_data);
-};
-
 var cache_imap_page = function() {
     var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+getListPathParam();
     var data = Hm_Message_List.filter_list();
@@ -436,6 +370,11 @@ async function select_imap_folder(path, reload, processInTheBackground = false, 
     await messages.load(reload, processInTheBackground).then(() => {        
         display_imap_mailbox(messages.rows, messages.links, path);
     });
+
+    if (path === 'unread') {
+        Hm_Message_List.set_unread_state();
+    }
+
     return messages;
 };
 
@@ -463,9 +402,14 @@ var setup_imap_folder_page = async function(listPath) {
     const hadLocalData = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number()).hasLocalData();
     await select_imap_folder(listPath);
 
+    handleMessagesDragAndDrop();
+
     if (hadLocalData) {
         await select_imap_folder(listPath, true, true)
     }
+
+    // Update browser title
+    Hm_Message_List.update_title(listPath);
 
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
     const backgroundAbortController = new AbortController();
@@ -490,34 +434,20 @@ $('#imap_filter_form').on('submit', async function(event) {
 });
 
 var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
-    const detail = Hm_Utils.parse_folder_path(path, 'imap');
-    const serverIds = [];
-    if (detail) {
-        serverIds.push(detail.server_id);
-    }
     if (rows) {
-        Hm_Message_List.update(serverIds, rows, 'imap');
+        Hm_Message_List.update(rows);
         Hm_Message_List.check_empty_list();
         $('.page_links').html(links);
         $('input[type=checkbox]').on("click", function(e) {
             Hm_Message_List.toggle_msg_controls();
-        });    
-
-        const messages = Object.values(rows);    
-        messages.forEach(function(item) {
-            const tr = $(item['0']);
-            const path = item['1'];
-            const uid = tr.data('uid');
-
-            if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
-                return;
-            }
-            preFetchMessageContent(false, uid, path);
         });
     }
 };
 
 function preFetchMessageContent(msgPart, uid, path) {
+    if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
+        return;
+    }
     const detail = Hm_Utils.parse_folder_path(path, 'imap');
     Hm_Ajax.request([
         {'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
@@ -651,7 +581,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
                 $('.msg_text').append(res.msg_text);
                 $('.msg_text').append(res.msg_parts);
                 document.title = $('.header_subject th').text();
-                imap_message_view_finished();
+                imap_message_view_finished(uid, detail);
             }
             else {
                 $('.reply_link, .reply_all_link, .forward_link').each(function() {
@@ -684,7 +614,7 @@ var get_message_content = function(msg_part, uid, list_path, detail, callback, n
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
                 onSuccess(res);
-                if (!noupdate) {
+                if (!noupdate && !msg_part) {
                     Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
                 }
             },
@@ -762,41 +692,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         msg_uid = getMessageUidParam();
     }
     if (detail && !skip_links) {
-        class_name = 'imap_'+detail.server_id+'_'+msg_uid+'_'+detail.folder;
-        if (hm_list_parent() === 'combined_inbox') {
-            Hm_Message_List.prev_next_links('formatted_combined_inbox', class_name);
-        }
-        else if (hm_list_parent() === 'unread') {
-            Hm_Message_List.prev_next_links('formatted_unread_data', class_name);
-        }
-        else if (hm_list_parent() === 'flagged') {
-            Hm_Message_List.prev_next_links('formatted_flagged_data', class_name);
-        }
-        else if (hm_list_parent() === 'advanced_search') {
-            Hm_Message_List.prev_next_links('formatted_advanced_search_data', class_name);
-        }
-        else if (hm_list_parent() === 'search') {
-            Hm_Message_List.prev_next_links('formatted_search_data', class_name);
-        }
-        else if (hm_list_parent() === 'sent') {
-            Hm_Message_List.prev_next_links('formatted_sent_data', class_name);
-        }
-        else if (hm_list_parent() === 'junk') {
-            Hm_Message_List.prev_next_links('formatted_junk_data', class_name);
-        }
-        else if (hm_list_parent() === 'trash') {
-            Hm_Message_List.prev_next_links('formatted_trash_data', class_name);
-        }
-        else if (hm_list_parent() === 'drafts') {
-            Hm_Message_List.prev_next_links('formatted_drafts_data', class_name);
-        }
-        else if (hm_list_parent() === 'tag') {
-            Hm_Message_List.prev_next_links('formatted_tag_data', class_name);
-        }
-        else {
-            var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+getListPathParam();
-            Hm_Message_List.prev_next_links(key, class_name);
-        }
+        Hm_Message_List.prev_next_links(msg_uid);
     }
     if (Hm_Message_List.track_read_messages(class_name)) {
         if (hm_list_parent() == 'unread') {
@@ -846,6 +742,9 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
         return block_unblock_sender(msg_uid, detail, $(this).data('target'), 'unblock', sender);
     });
     fixLtrInRtl();
+
+    handleAttachementDownload();
+    handleViewMessagePart();
 };
 
 var get_local_message_content = function(msg_uid, path) {
@@ -888,7 +787,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
             $(this).addClass('disabled_link');
         });
-        imap_message_view_finished();
+        imap_message_view_finished(uid, details);
         get_message_content(false, uid, list_path, details, callback, true);
     }
 };
@@ -1399,7 +1298,7 @@ var add_email_in_contact_trusted = function(list_email) {
         }
       );
     }
-  };
+};
 
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 

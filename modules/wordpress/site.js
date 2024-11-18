@@ -9,11 +9,11 @@ var load_wp_notices = function() {
 };
 
 var display_combined_wp_notices = function(res) {
-    Hm_Message_List.update([0], res.formatted_message_list, 'wp_notices');
+    Hm_Message_List.update(res.formatted_message_list);
 };
 
 var display_wordpress_notices = function(res) {
-    Hm_Message_List.update([0], res.formatted_message_list, 'wp_notices');
+    Hm_Message_List.update(res.formatted_message_list);
     Hm_Message_List.set_message_list_state('formatted_wp_notice_data')
 };
 

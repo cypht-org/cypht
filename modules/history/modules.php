@@ -181,9 +181,9 @@ class Hm_Output_history_page_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_history"><a class="unread_link" href="?page=history">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-clock-history fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-clock-history menu-icon"></i>';
         }
-        $res .= $this->trans('History').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('History').'</span></a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }

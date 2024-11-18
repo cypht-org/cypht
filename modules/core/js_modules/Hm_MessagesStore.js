@@ -162,6 +162,10 @@ class Hm_MessagesStore {
                 case 'email':
                     hook = "ajax_imap_combined_inbox";
                     break;
+                case 'tag':
+                    hook = "ajax_imap_tag_data";
+                    folder = getParam('tag_id');
+                    break;
                 default:
                     hook = "ajax_imap_folder_data";
                     break;

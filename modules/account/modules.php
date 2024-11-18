@@ -208,7 +208,7 @@ class Hm_Output_change_password_link extends Hm_Output_Module {
         if ($this->get('internal_users')) {
             $res = '<li class="menu_change_password"><a class="unread_link" href="?page=change_password">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-key-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-key-fill menu-icon"></i>';
             }
             $res .= $this->trans('Password').'</a></li>';
             $this->concat('formatted_folder_list', $res);

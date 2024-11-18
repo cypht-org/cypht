@@ -223,6 +223,11 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $msg['subject'] = '[No Subject]';
         }
         $subject = $msg['subject'];
+        $preview_msg = "";
+        if (isset($msg['preview_msg'])) {
+            $preview_msg = $msg['preview_msg'];
+        }
+       
         if ($parent_list == 'sent') {
             $icon = 'sent';
             $from = $msg['to'];
@@ -298,7 +303,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
                     array('icon_callback', $flags),
-                    array('subject_callback', $subject, $url, $flags, $icon),
+                    array('subject_callback', $subject, $url, $flags, $icon, $preview_msg),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('date_callback', $date, $timestamp),
@@ -314,7 +319,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('checkbox_callback', $id),
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
-                    array('subject_callback', $subject, $url, $flags),
+                    array('subject_callback', $subject, $url, $flags, null, $preview_msg),
                     array('date_callback', $date, $timestamp, $is_snoozed),
                     array('icon_callback', $flags)
                 ),
@@ -468,7 +473,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
     if ($mobile) {
         $res .= '<div class="part_size">'.$output_mod->html_safe($size);
         $res .= '</div><div class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</div>';
-        $res .= '<div class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></div></td>';
+        $res .= '<div class="download_link"><a href="#" data-src="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></div></td>';
     }
     else {
         $res .= '</td><td class="part_size">'.$output_mod->html_safe($size);
@@ -477,10 +482,10 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
                 '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : '');
         }
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
-        $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+        $res .= '<td class="download_link"><a href="#" data-src="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
     }
     if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
-        $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
+        $res .= '<td><a href="#" data-src="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td>';
     }
     $res .= '</tr>';
     return $res;
@@ -641,7 +646,7 @@ function format_attachment($struct,  $output_mod, $part, $dl_args, $at_args) {
             $res .= '<tr><td class="part_desc" colspan="4">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
             $res .= '</td><td class="part_size">'.$output_mod->html_safe($size).'</td>';
 
-            $res .= '<td class="download_link"><a href="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
+            $res .= '<td class="download_link"><a href="#" data-src="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
             if ($output_mod->get('allow_delete_attachment') && isset($vals['file_attributes']['attachment'])) {
                 $res .= '<td><a href="?'.$at_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" class="remove_attachment">'.$output_mod->trans('Remove').'</a></td></tr>';
             }
@@ -799,6 +804,11 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
     if (count($sent_results) > 0) {
         $msg_list = array_merge($msg_list, $sent_results);
     }
+
+    usort($msg_list, function($a, $b) {
+        return strtotime($b['internal_date']) - strtotime($a['internal_date']);
+    });
+    
     return array($status, $msg_list);
 }}
 
@@ -1516,16 +1526,16 @@ if (!hm_exists('forward_dropdown')) {
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
+    if ($url === false) {
+        return $host;
+    }
     $host = $url['host'] ?? $url['path'];
     $port = $url['port'] ?? '4190';
-    $scheme = $url['scheme'] ?? 'tcp://';
-    $tls = $scheme === 'tls';
-    // $host = '$scheme://'.$host;
-    return [$host, $port, $tls];
+    return [$host, $port];
 }}
 
 if (!hm_exists('connect_to_imap_server')) {
-    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $show_errors = true) {
+    function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(
             'name' => $name,
             'server' => $address,
@@ -1547,8 +1557,8 @@ if (!hm_exists('connect_to_imap_server')) {
 
         if ($enableSieve && $imap_sieve_host) {
             $imap_list['sieve_config_host'] = $imap_sieve_host;
+            $imap_list['sieve_tls'] = $sieve_tls;
         }
-
         if ($server_id) {
             if (Hm_IMAP_List::edit($server_id, $imap_list)) {
                 $imap_server_id = $server_id;
@@ -1572,7 +1582,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
                 include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
-                $client = $sieveClientFactory->init(null, $server);
+                $client = $sieveClientFactory->init(null, $server, $context->module_is_supported('nux'));
 
                 if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");

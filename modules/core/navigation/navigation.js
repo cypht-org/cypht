@@ -34,9 +34,12 @@ window.addEventListener('load', function() {
 
 
 $(document).on('click', 'a', function(event) {
-    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank') {
+    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
         event.preventDefault();
-        navigate($(this).attr('href'));
+        const currentPage = new URL(window.location.href).searchParams.toString();
+        if (currentPage !== $(this).attr('href').split('?')[1]) {
+            navigate($(this).attr('href'));
+        }
     }
 });
 
@@ -54,7 +57,9 @@ async function navigate(url) {
 
         const html = await response.text();
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
+        const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
         $('main').replaceWith(main);
+        document.title = title.replace(/<[^>]*>/g, '');
 
         window.location.next = url;
 
@@ -71,16 +76,18 @@ async function navigate(url) {
         
         trackLocationSearchChanges();
     } catch (error) {
-        throw error;
+        Hm_Notices.show([`ERR${error.message}`]);
     } finally {
         hideRoutingToast();
     }
 }
 
 function renderPage(href) {
+    window.dispatchEvent(new CustomEvent('page-change'));
+
     const searchParams = new URL(href, window.location.origin).searchParams;
     const page = searchParams.get('page');
-    
+
     if (page) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());

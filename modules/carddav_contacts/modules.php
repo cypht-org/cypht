@@ -332,7 +332,7 @@ class Hm_Output_carddav_contacts_form extends Hm_Output_Module {
             }
             $target .= '</select><br />';
         }
-        return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
+        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.$target.''.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.

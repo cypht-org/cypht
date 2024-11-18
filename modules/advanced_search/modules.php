@@ -78,9 +78,6 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         if (!imap_authed($imap)) {
             return;
         }
-        if (!$imap->select_mailbox($this->folder)) {
-            return;
-        }
         if ($charset) {
             $imap->search_charset = $charset;
         }
@@ -93,9 +90,29 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
                 $params[] = array($target, $term);
             }
         }
-        $this->out('imap_search_results', $this->imap_search($flags, $imap, $params, $limit));
+
+        if ($this->request->post['all_folders']) {
+            $msg_list = $this->all_folders_search($imap, $flags, $params, $limit);
+        } else if (!$imap->select_mailbox($this->folder)) {
+            return;
+        } else {
+            $msg_list = $this->imap_search($flags, $imap, $params, $limit);
+        }
+        $this->out('imap_search_results', $msg_list);
         $this->out('folder_status', $imap->folder_state);
         $this->out('imap_server_ids', array($this->imap_id));
+    }
+
+    private function all_folders_search($imap, $flags, $params, $limit) {
+        $folders = $imap->get_mailbox_list();
+        $msg_list = array();
+        foreach ($folders as $folder) {
+            $this->folder = $folder['name'];
+            $imap->select_mailbox($this->folder);
+            $msgs = $this->imap_search($flags, $imap, $params, $limit);
+            $msg_list = array_merge($msg_list, $msgs);
+        }
+        return $msg_list;
     }
 
     private function imap_search($flags, $imap, $params, $limit) {

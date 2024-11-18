@@ -793,7 +793,7 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
             if(count($this->get('feeds', array()))  > 1) {
                 $res .= '<li class="menu_feeds"><a class="unread_link" href="?page=message_list&amp;list_path=feeds">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-rss-fill fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-rss-fill menu-icon"></i>';
                 }
                 $res .= $this->trans('All');
                 $res .= '</a> <span class="unread_feed_count"></span></li>';
@@ -802,14 +802,14 @@ class Hm_Output_filter_feed_folders extends Hm_Output_Module {
                 $res .= '<li class="feeds_'.$this->html_safe($id).'">'.
                     '<a data-id="feeds_'.$this->html_safe($id).'" href="?page=message_list&list_path=feeds_'.$this->html_safe($id).'">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-rss fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-rss menu-icon"></i>';
                 }
                 $res .= $this->html_safe($folder).'</a></li>';
             }
         }
         $res .= '<li class="feeds_add_new"><a href="?page=servers#feeds_section">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-plus-square fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-plus-square menu-icon"></i>';
         }
         $res .= $this->trans('Add a feed').'</a></li>';
         if ($res) {
@@ -873,7 +873,7 @@ class Hm_Output_filter_feed_status_data extends Hm_Output_Module {
 class Hm_Output_start_feed_settings extends Hm_Output_Module {
     protected function output() {
         return '<tr><td colspan="2" data-target=".feeds_setting" class="settings_subtitle cursor-pointer border-bottom p-2">'.
-            '<i class="bi bi-rss-fill fs-5 me-2"></i>'.$this->trans('Feed Settings').'</td></tr>';
+            '<i class="bi bi-rss-fill menu-icon"></i>'.$this->trans('Feed Settings').'</td></tr>';
     }
 }
 

@@ -56,6 +56,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         // core navigation modules included at the end when handlers have been processed
         $expected_scripts[] = 'modules/core/navigation/routes.js';
         $expected_scripts[] = 'modules/core/navigation/navigation.js';
+        $expected_scripts[] = 'modules/core/navigation/navbar.js';
 
         $expected_output = '';
         foreach ($expected_scripts as $script) {
@@ -64,6 +65,8 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
 
         $this->assertEquals(array($expected_output), $res->output_response);
     }
+
+    // TODO: Add a test case excluding some js dependencies
 
     static function router_module_list_provider() {
         return [
@@ -80,9 +83,9 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
     public function test_main_menu_start_debug() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">Main <span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><i class="bi bi-chevron-down"></i></div><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<span title="Running in debug mode. See https://cypht.org/install.html Section 6 for more detail." class="debug_title">Debug</span><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
     }
 }

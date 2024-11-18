@@ -17,6 +17,7 @@ function applyServersPageHandlers() {
     if (window.githubServersPageHandler) githubServersPageHandler();
     if (window.nasaServersPageHandler) nasaServersPageHandler();
     if (window.smtpServersPageHandler) smtpServersPageHandler();
+    if (window.imapServersPageHandler) imapServersPageHandler();
     if (window.wpServersPageHandler) wpServersPageHandler();
 }
 

@@ -212,7 +212,7 @@ class Hm_Output_shortcuts_page_link extends Hm_Output_Module {
         if ($this->get('shortcuts_enabled')) {
             $res = '<li class="menu_shortcuts"><a class="unread_link" href="?page=shortcuts">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-code-slash fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-code-slash menu-icon"></i>';
             }
             $res .= $this->trans('Shortcuts').'</a></li>';
             if ($this->format == 'HTML5') {

@@ -83,7 +83,10 @@ function imap_auth_port_setting($current) {
 }
 
 function imap_auth_sieve_conf_host_setting($current) {
-    return '<tr><td>Sieve configuration</td><td><input type="number" value="'.$current.'" name="imap_auth_sieve_conf_host" /></td></tr>';
+    return '<tr><td>Sieve configuration</td><td><input type="text" value="'.$current.'" name="imap_auth_sieve_conf_host" /></td></tr>';
+}
+function imap_auth_sieve_tls_mode_setting($current) {
+    return '<tr><td>Sieve configuration mode</td><td><input type="text" value="'.$current.'" name="imap_auth_sieve_tls_mode" /></td></tr>';
 }
 
 function imap_auth_server_setting($current) {
@@ -231,7 +234,8 @@ function setting_defaults() {
             'imap_auth_server' => 'localhost',
             'imap_auth_port' => '143',
             'imap_auth_tls' => '',
-            'imap_auth_sieve_conf_host' => ''
+            'imap_auth_sieve_conf_host' => '',
+            'imap_auth_sieve_tls_mode' => false
         ),
         'SMTP' => array(
             'default_smtp_name' => '',

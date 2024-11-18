@@ -100,6 +100,14 @@ add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_ou
 add_handler('settings', 'process_enable_sieve_filter_setting', true, 'sievefilters', 'save_user_settings', 'before');
 add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'start_general_settings', 'after');
 
+/**
+ * toggle fliter
+ */
+setup_base_ajax_page('ajax_sieve_toggle_script_state', 'core');
+add_handler('ajax_sieve_toggle_script_state', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_sieve_toggle_script_state', 'settings_load_imap', true);
+add_handler('ajax_sieve_toggle_script_state', 'sieve_toggle_script_state', true);
+
 return array(
     'allowed_pages' => array(
         'block_list',
@@ -115,6 +123,7 @@ return array(
         'ajax_sieve_get_mailboxes',
         'ajax_sieve_block_domain',
         'ajax_sieve_block_change_behaviour',
+        'ajax_sieve_toggle_script_state',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -130,6 +139,7 @@ return array(
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
+        'script_state' => FILTER_DEFAULT,
         'imap_account' => FILTER_DEFAULT,
         'sieve_script_name' => FILTER_DEFAULT,
         'sieve_script_priority' => FILTER_VALIDATE_INT,

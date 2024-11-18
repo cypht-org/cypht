@@ -106,7 +106,7 @@ if (!hm_exists('get_mailbox_filters')) {
     {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = [];
             foreach ($client->listScripts() as $script) {
                 if (mb_strstr($script, 'cypht')) {
@@ -139,11 +139,22 @@ if (!hm_exists('get_mailbox_filters')) {
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
+            $display_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
+            $checked = ' checked';
+            if (preg_match('/^s(en|dis)abled/', $display_name)) {
+                $display_name = str_replace(['senabled ', 'sdisabled '], '', $display_name);
+                if (strpos($display_name, 'sdisabled') === 0) {
+                    $checked = '';
+                }
+            }
             $script_list .= '
             <tr>
                 <td>'. $exp_name[sizeof($exp_name) - 2] .'</td>
                 <td>' . str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2))) . '</td>
                 <td>
+                    <span class="form-switch">
+                        <input script_name_parsed="'.$parsed_name.'" priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'" class="toggle_filter form-check-input" type="checkbox" role="switch" id="Check" name="script_state"'.$checked.'>
+                    </span>
                     <a href="#" script_name_parsed="'.$parsed_name.'"  priority="'.$exp_name[sizeof($exp_name) - 2].'" imap_account="'.$mailbox['name'].'" script_name="'.$script_name.'"  class="edit_'.$base_class.'">
                         <i class="bi bi-pencil-fill"></i>
                     </a>
@@ -403,7 +414,7 @@ if (!hm_exists('get_blocked_senders_array')) {
     {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = $client->listScripts();
 
             if (array_search('blocked_senders', $scripts, true) === false) {
@@ -439,7 +450,7 @@ if (!hm_exists('get_blocked_senders')){
     function get_blocked_senders($mailbox, $mailbox_id, $icon_svg, $icon_block_domain_svg, $site_config, $user_config, $module) {
         $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox);
+            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
             $scripts = $client->listScripts();
             if (array_search('blocked_senders', $scripts, true) === false) {
                 return '';
@@ -510,6 +521,22 @@ if (!hm_exists('get_blocked_senders')){
 if (!hm_exists('initialize_sieve_client_factory')) {
     function initialize_sieve_client_factory($site_config, $user_config, $imapServer) {
         $factory = get_sieve_client_factory($site_config);
-        return $factory->init($user_config, $imapServer);
+        return $factory->init($user_config, $imapServer, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
+    }
+}
+
+if (!hm_exists('get_sieve_host_from_services')) {
+    require_once APP_PATH.'modules/nux/modules.php';
+    function get_sieve_host_from_services($imap_host) {
+        $services = Nux_Quick_Services::get();
+        foreach ($services as $service) {
+            if (isset($service['server']) && $service['server'] === $imap_host && isset($service['sieve'])) {
+                return [
+                    'host' => $service['sieve']['host'],
+                    'port' => $service['sieve']['port'] ?? 4190,
+                ];
+            }
+        }
+        return null;
     }
 }

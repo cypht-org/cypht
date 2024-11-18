@@ -177,6 +177,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 );
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
+                    $imap_list['sieve_tls'] = $details['sieve']['tls'];
                 }
                 $new_id = Hm_IMAP_List::add($imap_list);
                 if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
@@ -202,7 +203,6 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
                     Hm_Msgs::add('E-mail account successfully added');
-                    $this->save_hm_msgs();
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
@@ -333,6 +333,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $this,
                             $server['jmap']['hide_from_combined_view'],
                             false,
+                            $server['sieve']['tls'],
                             false
                         );
                         if (! $jmap_server_id) {
@@ -357,6 +358,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $this,
                             $server['imap']['hide_from_combined_view'],
                             false,
+                            $server['sieve']['tls'],
                             false
                         );
                         if (! $imap_server_id) {
@@ -469,10 +471,10 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             '<div class="server_form"><br />' .
             '<div class="row">' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $yaml_file_sample_path . '" download>' . $this->trans('Download a sample yaml file') . '</a></div>' .
+            '<div><a href="' . $yaml_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample yaml file') . '</a></div>' .
             '</div>' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $csv_file_sample_path . '" download>' . $this->trans('Download a sample csv file') . '</a></div><br />' .
+            '<div><a href="' . $csv_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample csv file') . '</a></div><br />' .
             '</div>' .
             '</div>' .
             '<input type="hidden" name="hm_page_key" value="' . $this->html_safe(Hm_Request_Key::generate()) . '" />' .
@@ -706,5 +708,9 @@ class Nux_Quick_Services {
             return self::$services[$id];
         }
         return array();
+    }
+
+    static public function get() {
+        return self::$services;
     }
 }

@@ -15,15 +15,16 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      * Add a search form to the top of the folder list
      */
     protected function output() {
-        $res = '<li class="menu_search"><form method="get">';
-        $res .= '<div class="d-flex bd-highlight">';
+        $res = '<li class="menu_search mb-2"><form method="get">';
+        $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<div class="ps-1 pe-2"><a class="unread_link" href="?page=search">';
-            $res .= '<i class="bi bi-search"></i></a></div>';
+            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' . 
+            '<i class="bi bi-search"></i>' .
+            '</a>';
         }
-        $res .= '<div class="flex-fill bd-highlight"><input type="hidden" name="page" value="search" />'.
-            '<input type="search" class="search_terms form-control form-control-sm" '.
-            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></div></form></li>';
+        $res .= '<input type="hidden" name="page" value="search" />'.
+            '<input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" '.
+            'name="search_terms" placeholder="'.$this->trans('Search').'" /></div></form></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -70,7 +71,7 @@ class Hm_Output_save_reminder extends Hm_Output_Module {
         $changed = $this->get('changed_settings', array());
         if (!empty($changed)) {
             return '<div class="save_reminder"><a title="'.$this->trans('You have unsaved changes').
-                '" href="?page=save"><i class="bi bi-save2-fill fs-2"></i></a></div>';
+                '" href="?page=save"><i class="bi bi-save2-fill fs-4"></i></a></div>';
         }
         return '';
     }
@@ -442,6 +443,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
             $res .= '<a class="unsaved_icon" href="?page=save" title="'.$this->trans('Unsaved Changes').
                 '"><i class="bi bi-save2-fill fs-5 unsaved_reminder"></i></a>';
         }
+        $res .= '<div class="cypht-layout">';
         return $res;
     }
 }
@@ -541,12 +543,8 @@ class Hm_Output_page_js extends Hm_Output_Module {
     protected function output() {
         if (DEBUG_MODE) {
             $res = '';
-            $js_lib = '<script type="text/javascript" src="'.WEB_ROOT.'vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/cash.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/resumable.min.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/ays-beforeunload-shim.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/jquery.are-you-sure.js"></script>';
-            $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/sortable.min.js"></script>';
+            $js_exclude_dependencies = explode(',', $this->get('router_js_exclude_deps', ''));
+            $js_lib = get_js_libs($js_exclude_dependencies);
             if ($this->get('encrypt_ajax_requests', '') || $this->get('encrypt_local_storage', '')) {
                 $js_lib .= '<script type="text/javascript" src="'.WEB_ROOT.'third_party/forge.min.js"></script>';
             }
@@ -558,6 +556,12 @@ class Hm_Output_page_js extends Hm_Output_Module {
                 if (in_array($mod, $mods, true)) {
                     $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
                     foreach (glob($name.'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . "*.js", GLOB_BRACE) as $js) {
+                        if (preg_match('/\[(.+)\]/', $js, $matches)) {
+                            $dep = $matches[1];
+                            if (in_array($dep, $js_exclude_dependencies)) {
+                                continue;
+                            }
+                        }
                         $res .= '<script type="text/javascript" src="'.WEB_ROOT.str_replace(APP_PATH, '', $js).'"></script>';
                     }
 
@@ -581,7 +585,7 @@ class Hm_Output_page_js extends Hm_Output_Module {
                     * They have to be loaded after each module's js files, because routes.js depend on the handlers defined in the modules.
                     * Therefore, navigation.js is also loaded after routes.js, because the routes should be loaded beforehand to be able to navigate.
                 */
-                foreach (['routes', 'navigation'] as $js) {
+                foreach (['routes', 'navigation', 'navbar'] as $js) {
                     $res .= '<script type="text/javascript" src="'.WEB_ROOT.sprintf("%snavigation/%s.js", $core, $js).'"></script>';
                 }
             }
@@ -604,10 +608,10 @@ class Hm_Output_page_js extends Hm_Output_Module {
  */
 class Hm_Output_content_end extends Hm_Output_Module {
     /**
-     * Closes the body and html tags
+     * Closes the layout wrapper, body, and html tags
      */
     protected function output() {
-        return '</body></html>';
+        return '</div></body></html>';
     }
 }
 
@@ -1287,8 +1291,7 @@ class Hm_Output_folder_list_start extends Hm_Output_Module {
      * Opens the folder list nav tag
      */
     protected function output() {
-        $res = '<a class="folder_toggle" href="#">'.$this->trans('Show folders').'<i class="bi bi-list fs-5"></i></a>'.
-            '<nav class="folder_cell"><div class="folder_list">';
+        $res = '<nav class="folder_cell"><div class="folder_list">';
         return $res;
     }
 }
@@ -1318,14 +1321,14 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
      * Opens a div and unordered list tag
      */
     protected function output() {
-        $res = '<div class="src_name main_menu d-flex justify-content-between pe-2" data-source=".main">'.$this->trans('Main');
+        $res = '';
         if (DEBUG_MODE) {
-            $res .= ' <span title="'.
+            $res .= '<span title="'.
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<i class="bi bi-chevron-down"></i>'.
-        '</div><div class="main"><ul class="folders">';
+        $res .= '<img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg">';
+        $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1352,35 +1355,35 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         if ($total_accounts > 1) {
             $res .= '<li class="menu_combined_inbox"><a class="unread_link" href="?page=message_list&amp;list_path=combined_inbox">';
             if (!$this->get('hide_folder_icons')) {
-                $res .= '<i class="bi bi-box2-fill fs-5 me-2"></i>';
+                $res .= '<i class="bi bi-box2-fill menu-icon"></i>';
             }
-            $res .= $this->trans('Everything').'</a><span class="combined_inbox_count"></span></li>';
+            $res .= '<span class="nav-label">'.$this->trans('Everything').'</span</a><span class="combined_inbox_count"></span></li>';
         }
         $res .= '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-envelope-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-envelope-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Unread').'</a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Unread').'</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li>';
         $res .= '<li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-flag-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-flag-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Flagged').'</a> <span class="flagged_count"></span></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Flagged').'</span></a> <span class="flagged_count"></span></li>';
         $res .= '<li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-envelope-x-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-envelope-x-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Junk').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Junk').'</span></a></li>';
         $res .= '<li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-trash3-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-trash3-fill menu-icon"></i>';
         }
-        $res .= $this->trans('Trash').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Trash').'</span></a></li>';
         $res .= '<li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-pencil-square fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
-        $res .= $this->trans('Drafts').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1399,7 +1402,7 @@ class Hm_Output_logout_menu_item extends Hm_Output_Module {
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-power fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Logout').'</a></li>';
+        $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1438,22 +1441,18 @@ class Hm_Output_email_menu_content extends Hm_Output_Module {
             $parts = explode('_', $src);
             array_pop($parts);
             $name = ucwords(implode(' ', $parts));
+            $class = $this->html_safe($src);
             if (!$single) {
-                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-source=".'.$this->html_safe($src).'">'.$this->trans($name).
+                $res .= '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".'.$this->html_safe($src).'">'.$this->trans($name).
                     '<i class="bi bi-chevron-down"></i></div>';
+                $class .= ' collapse';
             }
 
-            if ($single) {
-                $res .= '<div ';
-            }
-            else {
-                $res .= '<div style="display: none;" ';
-            }
-            $res .= 'class="'.$this->html_safe($src).'"><ul class="folders">';
+            $res .= '<div class="'.$class.'"><ul class="folders">';
             if ($name == 'Email' && count($this->get('imap_servers', array()))  > 1) {
                 $res .= '<li class="menu_email"><a class="unread_link" href="?page=message_list&amp;list_path=email">';
                 if (!$this->get('hide_folder_icons')) {
-                    $res .= '<i class="bi bi-globe-americas fs-5 me-2"></i>';
+                    $res .= '<i class="bi bi-globe-americas menu-icon"></i>';
                 }
                 $res .= $this->trans('All').'</a> <span class="unread_mail_count"></span></li>';
             }
@@ -1475,12 +1474,12 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
      * Opens an unordered list
      */
     protected function output() {
-        $res = '<div class="src_name d-flex justify-content-between pe-2" data-source=".settings">'.$this->trans('Settings').
+        $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '<ul style="display: none;" class="settings folders">';
+            '<ul class="collapse settings folders">';
         $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-house-door-fill fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-house-door-fill menu-icon"></i>';
         }
         $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
@@ -1543,7 +1542,7 @@ class Hm_Output_settings_servers_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_servers"><a class="unread_link" href="?page=servers">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-pc-display-horizontal fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-pc-display-horizontal menu-icon"></i>';
         }
         $res .= $this->trans('Servers').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1561,7 +1560,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
     protected function output() {
         $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-gear-wide-connected fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-gear-wide-connected menu-icon"></i>';
         }
         $res .= $this->trans('Site').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1582,7 +1581,7 @@ class Hm_Output_settings_save_link extends Hm_Output_Module {
         }
         $res = '<li class="menu_save"><a class="unread_link" href="?page=save">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-download fs-5 me-2"></i>';
+            $res .= '<i class="bi bi-download menu-icon"></i>';
         }
         $res .= $this->trans('Save').'</a></li>';
         $this->concat('formatted_folder_list', $res);
@@ -1616,7 +1615,7 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      */
     protected function output() {
         $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<a href="#" class="hide_folders">'.$this->trans('Hide folders').'<i class="bi bi-caret-left-fill fs-5"></i></a>';
+        $res .= '<div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -2410,5 +2409,36 @@ class Hm_Output_server_config_stepper_end_part extends Hm_Output_Module {
 class Hm_Output_server_config_stepper_accordion_end_part extends Hm_Output_Module {
     protected function output() {
         return '</div></div></div>';
+    }
+}
+
+class Hm_Output_privacy_settings extends Hm_Output_Module {
+    static $settings = [
+        'images_whitelist' => [
+            'type' => 'text',
+            'label' => 'External images whitelist',
+            'description' => 'Cypht automatically prevents untrusted external images from loading in messages. Add senders from whom you want to allow images to load.',
+            'separator' => ','
+        ]
+    ];
+
+    protected function output()
+    {
+        $res = '<tr><td data-target=".privacy_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-shield fs-5 me-2"></i>'.
+            $this->trans('Privacy').'</td></tr>';
+        $userSettings = $this->get('user_settings', array());
+        foreach (self::$settings as $key => $setting) {
+            $value = $userSettings[$key] ?? '';
+            ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
+            $res .= "<tr class='privacy_setting'>" .
+            "<td><label for='$key'>$label</label></td>" .
+            "<td>
+                <input type='$type' id='$key' name='$key' value='$value' class='form-control' />
+                <div class='setting_description'>$description</div>
+            </td>" .
+            "</tr>";
+        }
+        return $res;
     }
 }

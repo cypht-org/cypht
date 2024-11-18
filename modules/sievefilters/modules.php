@@ -28,7 +28,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
 
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $script = $client->getScript($this->request->post['sieve_script_name']);
             $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
             $this->out('conditions', json_encode(base64_decode($base64_obj)));
@@ -66,7 +66,7 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
         if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
             $factory = get_sieve_client_factory($this->config);
             try {
-                $client = $factory->init($this->user_config, $server);
+                $client = $factory->init($this->user_config, $server, $this->module_is_supported('nux'));
                 $sieve_filters_enabled = true;
                 $this->out('sieve_filters_client', $client);
             } catch (Exception $e) {
@@ -103,7 +103,7 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $script = $client->getScript($this->request->post['sieve_script_name']);
             $client->close();
             $this->out('script', $script);
@@ -136,7 +136,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         }
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
 
             $scripts = $client->listScripts();
             foreach ($scripts as $script) {
@@ -173,7 +173,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
 
             $scripts = $client->listScripts();
             foreach ($scripts as $script) {
@@ -212,7 +212,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
         $email_sender = $this->request->post['sender'];
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
 
             $current_script = $client->getScript('blocked_senders');
@@ -344,7 +344,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
 
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
 
             if(array_search('blocked_senders', $scripts, true) === false) {
@@ -482,7 +482,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
 
             if(array_search('blocked_senders', $scripts, true) === false) {
@@ -978,7 +978,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
 
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
             foreach ($scripts as $script) {
                 if ($script == 'main_script') {
@@ -1024,7 +1024,7 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         $factory = get_sieve_client_factory($this->config);
         try {
-            $client = $factory->init($this->user_config, $imap_account);
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $scripts = $client->listScripts();
             foreach ($scripts as $script) {
                 if ($script == $this->request->post['current_editing_script']) {
@@ -1342,5 +1342,48 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
                 }
             }
         }
+    }
+}
+
+/**
+ * @subpackage sievefilterstoggle/handler
+ */
+class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_account', 'script_state', 'sieve_script_name'));
+        if (!$success) {
+            $this->out('success', false);
+            return;
+        }
+        $imap_account = Hm_IMAP_List::dump($form['imap_account']);
+        $factory = get_sieve_client_factory($this->config);
+        $success = false;
+        try {
+            $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
+            $state = $form['script_state'] ? 'enabled': 'disabled';
+            $scripts = $client->listScripts();
+            foreach ($scripts as $key => $script) {
+                if ($script == 'main_script') {
+                    $client->removeScripts('main_script');
+                }
+                if ($script == $form['sieve_script_name']) {
+                    if (! $form['script_state']) {
+                        unset($scripts[$key]);
+                    }
+                    $client->renameScript($script, "s{$state}_");
+                    $success = true;
+                }
+            }
+            $scripts = $client->listScripts();
+            $main_script = generate_main_script($scripts);
+            save_main_script($client, $main_script, $scripts);
+            $client->activateScript('main_script');
+            $client->close();
+            
+            Hm_Msgs::add("Script $state");
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+        }
+        $this->out('success', $success);
     }
 }

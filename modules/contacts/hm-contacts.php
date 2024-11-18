@@ -142,13 +142,65 @@ class Hm_Contact_Store {
         $this->data = array();
     }
 
-    public function page($page, $size) {
+    public function page($page, $size, $data = null) {
         if ($page < 1) {
             return array();
         }
-        return array_slice($this->data, (($page - 1)*$size), $size, true);
+        if ($data === null) {
+            $data = $this->data;
+        }
+        return array_slice($data, (($page - 1)*$size), $size, true);
     }
 
+    public function group_by($column = 'group') {
+        if (!is_string($column) && !is_int($column) && !is_float($column)) {
+            trigger_error('group_by(): The key should be a string, an integer, or a float', E_USER_ERROR);
+            return null;
+        }
+    
+        $_key = $column;
+        $grouped = [];
+        $defaultGroup = 'Collected Recipients';
+    
+        foreach ($this->data as $value) {
+            $columnValue = null;
+    
+            if (is_array($value) && isset($value[$_key])) {
+                $columnValue = $value[$_key];
+            }
+            elseif (is_object($value) && method_exists($value, 'value') && $value->value($_key)) {
+                $columnValue = $value->value($_key);
+            }
+    
+            if ($columnValue === null) {
+                $columnValue = $defaultGroup;
+            }
+    
+            $grouped[$columnValue][] = $value;
+        }
+    
+        if (func_num_args() > 1) {
+            $args = func_get_args();
+            foreach ($grouped as $key => $values) {
+                $params = array_merge([ $values ], array_slice($args, 1));
+                $grouped[$key] = call_user_func_array([ $this, 'group_by' ], $params);
+            }
+        }
+    
+        return $grouped;
+    }
+    
+    
+
+    public function paginate_grouped($column, $page, $size) {
+        $grouped = $this->group_by($column);
+        $paginated = [];
+        foreach ($grouped as $key => $group) {
+            $paginated[$key] = $this->page($page, $size, $group);
+        }
+        return $paginated;
+    }
+    
     public function sort($fld) {
         $this->sort_fld = $fld;
         uasort($this->data, array($this, 'sort_callback'));
