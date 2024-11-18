@@ -382,6 +382,7 @@ button {
 }
 .inner_list {
   margin-bottom: 10px;
+  margin-top: 5px;
 }
 .folders a,
 .unread_link,.all_tags {
@@ -415,8 +416,10 @@ button {
   padding: 0.5rem;
   border-radius: var(--bs-border-radius);
   transition: all linear 0.3s;
-  margin-bottom: 10px;
   position: relative;
+}
+.folders li a {
+  display: block;
 }
 .inner_list li {
   margin: 2px;

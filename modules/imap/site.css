@@ -535,15 +535,13 @@
 .fade-in {
   animation-name: fadeIn;
 }
-li[class^="imap_"] .inner_list li[class^="imap_"] {
-    /* display: flex;
-    align-items: center; */
+li[class^="imap_"] .inner_list li[class^="imap_"], li.manage_folders_li {
     position: relative;
     display: flex;
     align-items: center;
     border-radius: 4px;
-    margin: 2px 0;
     transition: background-color .3s;
+    padding: 5px 7px;
 }
 .inner_list li[class^="imap_"] #main-link {
     flex-grow: 1;

@@ -18,7 +18,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test->run();
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals('<li class="menu_search mb-4"><form method="get"><div class="input-group"><a href="?page=search" class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></a><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" name="search_terms" placeholder="Search" /></div></form></li>', $res->output_data['formatted_folder_list']);
+        $this->assertEquals('<li class="menu_search mb-2"><form method="get"><div class="input-group"><a href="?page=search" class="input-group-text" id="basic-addon1"><i class="bi bi-search"></i></a><input type="hidden" name="page" value="search" /><input type="search" class="search_terms form-control form-control-sm" aria-describedby="basic-addon1" name="search_terms" placeholder="Search" /></div></form></li>', $res->output_data['formatted_folder_list']);
     }
     /**
      * @preserveGlobalState disabled
