@@ -474,7 +474,7 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             }
             $source .= '</select>';
         }
-        return '<div class="add_contact"><form class="add_contact_form" method="POST">'.
+        return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'"><div class="form-floating mb-2"><input type="hidden" name="contact_source" value="ldap" />'.$source.'<label for="ldap_displayname">'.$this->trans('Source').'</label></div>';

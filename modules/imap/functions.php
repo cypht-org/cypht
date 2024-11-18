@@ -1497,9 +1497,10 @@ if (!hm_exists('forward_dropdown')) {
 if (!hm_exists('parse_sieve_config_host')) {
 function parse_sieve_config_host($host) {
     $url = parse_url($host);
-    if(!isset($url['host'])) {
-        $host = $url['path'];
+    if ($url === false) {
+        return $host;
     }
+    $host = $url['host'] ?? $url['path'];
     $port = $url['port'] ?? '4190';
     return [$host, $port];
 }}
@@ -1551,7 +1552,7 @@ if (!hm_exists('connect_to_imap_server')) {
 
                 include_once APP_PATH.'modules/sievefilters/hm-sieve.php';
                 $sieveClientFactory = new Hm_Sieve_Client_Factory();
-                $client = $sieveClientFactory->init(null, $server);
+                $client = $sieveClientFactory->init(null, $server, $context->module_is_supported('nux'));
 
                 if (!$client && $show_errors) {
                     Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");

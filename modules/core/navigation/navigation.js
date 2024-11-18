@@ -34,9 +34,12 @@ window.addEventListener('load', function() {
 
 
 $(document).on('click', 'a', function(event) {
-    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank') {
+    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
         event.preventDefault();
-        navigate($(this).attr('href'));
+        const currentPage = new URL(window.location.href).searchParams.toString();
+        if (currentPage !== $(this).attr('href').split('?')[1]) {
+            navigate($(this).attr('href'));
+        }
     }
 });
 

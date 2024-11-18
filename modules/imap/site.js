@@ -347,26 +347,6 @@ var add_imap_combined_source = function(event) {
     return update_imap_combined_source(getListPathParam(), 1, event);
 };
 
-var imap_combined_unread_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_unread', Hm_Message_List.set_unread_state);
-};
-
-var imap_combined_flagged_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_flagged', Hm_Message_List.set_flagged_state);
-};
-
-var imap_combined_inbox_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_combined_inbox', Hm_Message_List.set_combined_inbox_state);
-};
-
-var imap_folder_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_folder_data', cache_folder_data);
-};
-
-var imap_tag_content = function(id, folder) {
-    return imap_message_list_content(id, folder, 'ajax_imap_tag_data', cache_folder_data);
-};
-
 var cache_imap_page = function() {
     var key = 'imap_'+Hm_Utils.get_url_page_number()+'_'+getListPathParam();
     var data = Hm_Message_List.filter_list();
@@ -411,6 +391,11 @@ async function select_imap_folder(path, reload, processInTheBackground = false, 
     await messages.load(reload, processInTheBackground).then(() => {        
         display_imap_mailbox(messages.rows, messages.links, path);
     });
+
+    if (path === 'unread') {
+        Hm_Message_List.set_unread_state();
+    }
+
     return messages;
 };
 
@@ -437,6 +422,8 @@ var setup_imap_folder_page = async function(listPath) {
 
     const hadLocalData = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number()).hasLocalData();
     await select_imap_folder(listPath);
+
+    handleMessagesDragAndDrop();
 
     if (hadLocalData) {
         await select_imap_folder(listPath, true, true)

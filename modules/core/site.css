@@ -1,8 +1,36 @@
+:root {
+  --nav-collapsed-size: 100px;
+  --nav-expanded-size: 320px;
+  --nav-size: var(--nav-expanded-size);
+}
+
 html,
 body {
   background-color: var(--bs-secondary-bg) !important;
   font-family: var(--bs-font-sans-serif);
   color: var(--bs-body-color) !important;
+}
+
+.cypht-layout {
+  display: grid;
+  width: 100%;
+  grid-template-areas: "nav main";
+  grid-template-columns: var(--nav-size) 1fr;
+  grid-template-rows: auto;
+  transition: all 0.1s linear;
+}
+
+.mobile .cypht-layout {
+  display: block;
+}
+
+main {
+  grid-area: main;
+}
+
+.login_form {
+  position: absolute;
+  inset: 0;
 }
 
 .folder_list,
@@ -31,9 +59,10 @@ a:hover {
   color: var(--bs-link-hover-color);
 }
 .folder_cell {
-  vertical-align: top;
+  position: relative;
+  grid-area: nav;
   height: 100%;
-  display: table-cell;
+  display: block;
   padding: 0px;
   margin: 0px;
 }
@@ -353,6 +382,7 @@ button {
 }
 .inner_list {
   margin-bottom: 10px;
+  margin-top: 5px;
 }
 .folders a,
 .unread_link,.all_tags {
@@ -365,13 +395,14 @@ button {
 }
 .folder_list {
   background-color: #fff;
-  margin-right: 20px;
   padding-right: 15px;
   padding-bottom: 40px;
-  min-width: 300px;
-  padding-top: 0px;
+  width: calc(var(--nav-size) - 20px);
   min-height: 100vh;
+  height: 100%;
   padding-top: 20px;
+  position: fixed;
+  overflow-y: auto;
 }
 
 .folders,
@@ -382,10 +413,10 @@ button {
   padding-right: 0px;
 }
 .folders li {
-  padding: 0.5rem;
+  padding: 0.3rem;
   border-radius: var(--bs-border-radius);
   transition: all linear 0.3s;
-  margin-bottom: 10px;
+  position: relative;
 }
 .inner_list li {
   margin: 2px;
@@ -736,9 +767,9 @@ button {
   padding: 5px;
 }
 .save_reminder {
-  clear: both;
-  float: right;
-  margin-right: 25px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .save_reminder img {
   opacity: 0.4;
@@ -1365,15 +1396,6 @@ div.unseen,
   --bs-popover-header-color: var(--bs-white);
 }
 
-.menu-toggle {
-  position: fixed;
-  top: 0;
-  left: -2rem;
-  z-index: 1000;
-  width: 5rem;
-  text-align: right;
-}
-
 .mobile nav {
   position: absolute;
   inset: 0;
@@ -1385,7 +1407,24 @@ div.unseen,
   transition: transform 0.3s;
 }
 
-nav .menu-toggle {
+.menu-toggle {
+  position: absolute;
+  top: 20px;
+  right: 0;
+  z-index: 999;
+  color: var(--bs-primary);
+}
+
+.mobile .menu-toggle {
+  position: fixed;
+  top: 0;
+  left: -2rem;
+  z-index: 1000;
+  width: 5rem;
+  text-align: right;
+}
+
+.mobile nav .menu-toggle {
   right: -2rem;
   left: unset;
   text-align: left;
@@ -1404,6 +1443,36 @@ body {
   height: 3rem;
   margin-bottom: 1rem;
   padding-left: 1rem;
+}
+
+/* Collapsed nabar state */
+
+nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, nav.collapsed .folder_list .src_name, nav.collapsed .folder_list .collapse {
+  display: none !important;
+}
+
+nav.collapsed .menu-toggle {
+  right: 22%;
+  top: 0;
+  margin: auto;
+}
+
+nav.collapsed .folders {
+  margin-top: 50px;
+}
+
+nav.collapsed li {
+  text-align: center;
+  justify-content: center;
+}
+
+nav.collapsed .menu-icon {
+  margin-right: unset;
+}
+
+nav.collapsed .total_unread_count {
+  position: absolute;
+  top: 0;
 }
 
 a[disabled] {

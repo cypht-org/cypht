@@ -226,7 +226,7 @@ var Hm_Ajax_Request = function() { return {
             }
             if (res.folder_status) {
                 for (const name in res.folder_status) {
-                    if (name === getPageNameParam()) {
+                    if (name === getListPathParam()) {
                         Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
                         Hm_Folders.update_unread_counts();
                         const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
@@ -303,9 +303,14 @@ function Hm_Modal(options) {
     };
 
     this.opts = { ...defaults, ...options };
+    this.modal = $(`#${this.opts.modalId}`);
 
     this.init = function () {
-        if (this.modal) {
+        if (this.modal.length) {
+            this.modalContent = this.modal.find('.modal-body');
+            this.modalTitle = this.modal.find('.modal-title');
+            this.modalFooter = this.modal.find('.modal-footer');
+            this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
             return;
         }
 
@@ -338,6 +343,7 @@ function Hm_Modal(options) {
     };
 
     this.open = () => {
+        this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
         this.bsModal.show();
     };
 
@@ -1081,12 +1087,15 @@ var Hm_Folders = {
                 if (!Hm_Folders.unread_counts[name]) {
                     Hm_Folders.unread_counts[name] = 0;
                 }
-                if (getListPathParam() == name && getPageNameParam() == 'message_list') {
-                    var title = document.title.replace(/^\[\d+\]/, '');
-                    document.title = '['+Hm_Folders.unread_counts[name]+'] '+title;
-                    /* HERE */
+                const count = Hm_Folders.unread_counts[name] || '';
+                if (count) {
+                    if (getListPathParam() == name && getPageNameParam() == 'message_list') {
+                        var title = document.title.replace(/^\[\d+\]/, '');
+                        document.title = '['+count+'] '+title;
+                        /* HERE */
+                    }
+                    $('.unread_'+name).html('&#160;'+count+'&#160;');
                 }
-                $('.unread_'+name).html('&#160;'+Hm_Folders.unread_counts[name]+'&#160;');
             }
         }
         Hm_Utils.save_to_local_storage('unread_counts', Hm_Utils.json_encode(Hm_Folders.unread_counts));

@@ -267,7 +267,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                                 <tr>
                                                     <td><strong>Tel :</strong></td>
                                                     <td>
-                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'">'.
+                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'" data-external="true">'.
                                                         $this->html_safe($contact->value('phone_number')).'</a>
                                                     </td>
                                                 </tr>
@@ -349,11 +349,13 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (array_key_exists('from', $lc_headers)) {
                 $imap_server_id = explode('_', $this->get('msg_list_path'))[1];
                 $server = Hm_IMAP_List::get($imap_server_id, false);
-                $addr_list = process_address_fld($lc_headers['from']);
-                $addr_list = array_filter($addr_list, function ($addr) use($server) {
-                    return $addr['email'] != $server['user'];
-                });
-                $size += count($addr_list);
+                if ($server) {
+                    $addr_list = process_address_fld($lc_headers['from']);
+                    $addr_list = array_filter($addr_list, function ($addr) use($server) {
+                        return $addr['email'] != $server['user'];
+                    });
+                    $size += count($addr_list);
+                }
             }
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';

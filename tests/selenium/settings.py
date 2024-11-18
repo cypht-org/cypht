@@ -36,7 +36,8 @@ class SettingsHelpers(WebTest):
         list_item = self.by_class('menu_settings')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
-        self.wait_for_navigation_to_complete()
+        if self.by_class('content_title').text != 'Site Settings':
+            self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
 
@@ -91,7 +92,8 @@ class SettingsTests(SettingsHelpers):
         list_item = self.by_class('menu_settings')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
-        self.wait_for_navigation_to_complete()
+        if self.by_class('content_title').text != 'Site Settings':
+            self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Site Settings'
 
     def list_style_test(self):
