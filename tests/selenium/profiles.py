@@ -16,7 +16,7 @@ class ProfileTest(SettingsHelpers):
         self.by_css('[data-bs-target=".settings"]').click()
         WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
         list_item = self.by_class('menu_profiles')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('profile_content_title').text == 'Profiles'
