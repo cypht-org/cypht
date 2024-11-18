@@ -1558,7 +1558,7 @@ class Hm_Output_settings_site_link extends Hm_Output_Module {
      * Outputs links to the Site Settings pages
      */
     protected function output() {
-        $res = '<li class="menu_settings"><a class="site_link" href="?page=settings">';
+        $res = '<li class="menu_settings"><a class="unread_link" href="?page=settings">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-gear-wide-connected menu-icon"></i>';
         }
