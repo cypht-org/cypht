@@ -1043,7 +1043,9 @@ var imap_folder_status = function() {
 };
 
 var imap_setup_tags = function() {
-    $(document).on('click', '.label-checkbox', function() {
+    $(document).on('click', '.label-checkbox', function(e) {
+        e.preventDefault();
+        Hm_Notices.show([hm_trans('Please wait, Adding tag to message...')]);
         var folder_id = $(this).data('id');
         var ids = [];
         if (getPageNameParam() == 'message') {
