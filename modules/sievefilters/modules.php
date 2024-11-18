@@ -1292,7 +1292,6 @@ class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
 class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
-        // exit(var_dump($settings['enable_sieve_filter']));
         if ((array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) || DEFAULT_ENABLE_SIEVE_FILTER) {
             $checked = ' checked="checked"';
             $reset = '';
