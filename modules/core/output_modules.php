@@ -15,7 +15,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
      * Add a search form to the top of the folder list
      */
     protected function output() {
-        $res = '<li class="menu_search mb-4"><form method="get">';
+        $res = '<li class="menu_search mb-2"><form method="get">';
         $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
             $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' . 
