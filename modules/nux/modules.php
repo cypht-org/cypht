@@ -412,6 +412,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         $server['profile']['is_default'],
                         $server['username'],
                         ($server['jmap']['server'] ?? $server['imap']['server']),
+                        $server['username'],
                         $smtp_server_id,
                         ($jmap_server_id ?? $imap_server_id),
                         $this

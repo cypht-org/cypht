@@ -674,10 +674,7 @@ class Hm_EWS {
             return $msg_text;
         } else {
             $message = $this->get_mime_message_by_id($itemId);
-            $content = $message->getHtmlContent();
-            if (empty($content)) {
-                $content = $message->getTextContent();
-            }
+            $content = (string) $message;
             return $content;
         }
     }

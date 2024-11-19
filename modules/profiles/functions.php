@@ -3,7 +3,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 if (!hm_exists('add_profile')) {
-    function add_profile($name, $signature, $reply_to, $is_default, $email, $server_mail, $smtp_server_id, $imap_server_id, $context, $remark = '') {
+    function add_profile($name, $signature, $reply_to, $is_default, $email, $server, $user, $smtp_server_id, $imap_server_id, $context, $remark = '') {
         $profile = array(
             'name' => $name,
             'sig' => $signature,
@@ -12,8 +12,8 @@ if (!hm_exists('add_profile')) {
             'replyto' => $reply_to,
             'default' => $is_default,
             'address' => $email,
-            'server' =>  $server_mail,
-            'user' => $email,
+            'server' =>  $server,
+            'user' => $user,
             'type' => 'imap'
         );
         $id = Hm_Profiles::add($profile);

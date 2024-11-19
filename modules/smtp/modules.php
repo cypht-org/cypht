@@ -1862,7 +1862,9 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 
 function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '') {
-    $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+    if (! empty($uploaded_files) && ! is_array($uploaded_files[0])) {
+        $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+    }
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
