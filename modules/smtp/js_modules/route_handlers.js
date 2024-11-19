@@ -2,6 +2,10 @@
 function applyComposePageHandlers() {
     init_resumable_upload()
 
+    if (window.HTMLEditor) {
+        useKindEditor();
+    }
+
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
     Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
     $('.draft_title').on("click", function() { $('.draft_list').toggle(); });
