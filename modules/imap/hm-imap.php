@@ -940,7 +940,7 @@ if (!class_exists('Hm_IMAP')) {
                             $lines = explode("\r\n", $vals[$i]);
                             foreach ($lines as $line) {
                                 $header = mb_strtolower(mb_substr($line, 0, mb_strpos($line, ':')));
-                                if (!$header || (!isset($flds[$header]) && $last_header)) {
+                                if ($last_header && (!$header || !isset($flds[$header]))) {
                                     ${$flds[$last_header]} .= str_replace("\t", " ", $line);
                                 }
                                 elseif (isset($flds[$header])) {

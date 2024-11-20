@@ -743,6 +743,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     });
     fixLtrInRtl();
 
+    handleExternalResources();
     handleAttachementDownload();
     handleViewMessagePart();
 };
@@ -764,7 +765,6 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     }
     const callbackFn = (...args) => {        
         markPrefetchedMessagesAsRead(uid);
-        observeMessageTextMutationAndHandleExternalResources();
         if (callback) {
             callback(...args);
         }
