@@ -120,6 +120,9 @@ class SettingsTests(SettingsHelpers):
     def msg_part_icons_test(self):
         self.checkbox_test('general_setting', 'msg_part_icons', True)
 
+    def review_sent_email_test(self):
+        self.checkbox_test('general_setting', 'review_sent_email', True)
+
     def simple_msg_parts_test(self):
         self.checkbox_test('general_setting', 'simple_msg_parts', False)
 
@@ -228,6 +231,7 @@ if __name__ == '__main__':
         'msg_list_icons_test',
         'msg_part_icons_test',
         'simple_msg_parts_test',
+        'review_sent_email_test',
         'text_only_test',
         'disable_delete_prompt_test',
         'no_password_save_test',

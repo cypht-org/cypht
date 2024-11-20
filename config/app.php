@@ -1020,6 +1020,13 @@ return [
 
     /*
     |
+    | Show the message after sending
+    | Defaults to true
+    */
+    'default_setting_review_sent_email' => env('DEFAULT_SETTING_REVIEW_SENT_EMAIL', true),
+
+    /*
+    |
     | Prefer text parts when viewing a message
     | Defaults to false
     */
