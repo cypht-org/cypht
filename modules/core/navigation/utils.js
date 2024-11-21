@@ -4,6 +4,7 @@ function showRoutingToast() {
 
 function hideRoutingToast() {
     window.routingToast.hide();
+    window.routingToast = null;
 }
 
 function getListPathParam() {
