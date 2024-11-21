@@ -398,6 +398,32 @@ class Hm_Handler_process_flagged_since_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the max per source setting for the Snoozed page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_snoozed_source_max_setting extends Hm_Handler_Module {
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process() {
+        process_site_setting('snoozed_per_source', $this, 'max_source_setting_callback', DEFAULT_SNOOZED_PER_SOURCE);
+    }
+}
+
+/**
+ * Process "since" setting for the Snoozed page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_snoozed_since_setting extends Hm_Handler_Module {
+    /**
+     * valid values are defined in the process_since_argument function
+     */
+    public function process() {
+        process_site_setting('snoozed_since', $this, 'since_setting_callback', DEFAULT_SNOOZED_SINCE);
+    }
+}
+
+/**
  * Process "since" setting for the Everything page in the settings page
  * @subpackage core/handler
  */

@@ -1062,6 +1062,20 @@ return [
 
     /*
     |
+    | Per source time limit for snoozed page
+    | Defaults to 1 week
+    */
+    'default_setting_snoozed_since' => env('DEFAULT_SETTING_SNOOZED_SINCE', '-1 week'),
+
+        /*
+    |
+    | Per source number limit for snoozed page
+    | Defaults 20
+    */
+    'default_setting_snoozed_per_source' => env('DEFAULT_SETTING_SNOOZED_PER_SOURCE', 20),
+
+    /*
+    |
     | Per source time limit for tags page
     | Defaults to 1 week
     */

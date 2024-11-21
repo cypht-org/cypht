@@ -56,6 +56,8 @@ class Hm_Environment {
         define('DEFAULT_IMAP_PER_PAGE', $config->get('default_setting_imap_per_page', 20));
         define('DEFAULT_JUNK_SINCE', $config->get('default_setting_junk_since', '-1 week'));
         define('DEFAULT_JUNK_PER_SOURCE', $config->get('default_setting_junk_per_source', 20));
+        define('DEFAULT_SNOOZED_SINCE', $config->get('default_setting_snoozed_since', '-1 week'));
+        define('DEFAULT_SNOOZED_PER_SOURCE', $config->get('default_setting_snoozed_per_source', 20));
         define('DEFAULT_TAGS_SINCE', $config->get('default_setting_tags_since', '-1 week'));
         define('DEFAULT_TAGS_PER_SOURCE', $config->get('default_setting_tags_per_source', 20));
         define('DEFAULT_TRASH_SINCE', $config->get('default_setting_trash_since', '-1 week'));
