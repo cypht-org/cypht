@@ -364,7 +364,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                         break;
                     }
                 }
-                if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
+                if ($uid && $this->user_config->get('review_sent_email_setting', true)) {
                     $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
                 }
             }
@@ -414,7 +414,7 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                 }
             }
         }
-        if ($this->get('msg_next_link') && !$this->user_config->get('review_sent_email_setting', false)) {
+        if ($this->get('msg_next_link') && !$this->user_config->get('review_sent_email_setting', true)) {
             $this->out('redirect_url', htmlspecialchars_decode($this->get('msg_next_link')));
         }
     }
@@ -2086,7 +2086,7 @@ class Hm_Handler_process_review_sent_email_setting extends Hm_Handler_Module {
         function review_sent_email_callback($val) {
             return $val;
         }
-        process_site_setting('review_sent_email', $this, 'review_sent_email_callback', false, true);
+        process_site_setting('review_sent_email', $this, 'review_sent_email_callback', DEFAULT_REVIEW_SENT_EMAIL, true);
     }
 }
 

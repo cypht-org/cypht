@@ -1298,13 +1298,15 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         $checked = '';
         $reset = '';
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('review_sent_email', $settings) && $settings['review_sent_email']) {
+        if (!array_key_exists('review_sent_email', $settings) || (array_key_exists('review_sent_email', $settings) && $settings['review_sent_email'])) {
             $checked = ' checked="checked"';
+        }
+        if($settings['review_sent_email'] !== DEFAULT_REVIEW_SENT_EMAIL) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="'.(DEFAULT_REVIEW_SENT_EMAIL ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
     }
 }
 
