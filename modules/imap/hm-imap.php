@@ -1434,6 +1434,10 @@ if (!class_exists('Hm_IMAP')) {
                     $results[$vals[0]] = $vals[1];
                 }
             }
+            if ($flags && is_array($results['Flags'])) {
+                $results['Flags'] = array_unique($results['Flags']);
+                $results['Flags'] = implode(' ', $results['Flags']);
+            }
             if ($status) {
                 return $this->cache_return_val($results, $cache_command);
             }
