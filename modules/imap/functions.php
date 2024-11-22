@@ -754,41 +754,49 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     continue;
                 }
             }
-            if ($imap->select_mailbox($folder)) {
-                $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
-                if (!empty($terms)) {
-                    foreach ($terms as $term) {
-                        if (preg_match('/(?:[^\x00-\x7F])/', $term[1]) === 1) {
-                            $imap->search_charset = 'UTF-8';
-                            break;
+            if (is_array($folder)) {
+                $lookUpFolders = $folder;
+            } else {
+                $lookUpFolders = [$folder];
+            }
+            
+            foreach ($lookUpFolders as $folder) {
+                if ($imap->select_mailbox($folder)) {
+                    $status['imap_'.$id.'_'.bin2hex($folder)] = $imap->folder_state;
+                    if (!empty($terms)) {
+                        foreach ($terms as $term) {
+                            if (preg_match('/(?:[^\x00-\x7F])/', $term[1]) === 1) {
+                                $imap->search_charset = 'UTF-8';
+                                break;
+                            }
                         }
-                    }
-                    if ($sent) {
-                        $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
+                        if ($sent) {
+                            $msgs = $imap->search($search_type, false, $terms, array(), true, false, true);
+                        }
+                        else {
+                            $msgs = $imap->search($search_type, false, $terms);
+                        }
                     }
                     else {
-                        $msgs = $imap->search($search_type, false, $terms);
+                        $msgs = $imap->search($search_type);
                     }
-                }
-                else {
-                    $msgs = $imap->search($search_type);
-                }
-                if ($msgs) {
-                    if ($limit) {
-                        rsort($msgs);
-                        $msgs = array_slice($msgs, 0, $limit);
-                    }
-                    foreach ($imap->get_message_list($msgs) as $msg) {
-                        if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
-                            $msg['flags'] .= ' \Attachment';
+                    if ($msgs) {
+                        if ($limit) {
+                            rsort($msgs);
+                            $msgs = array_slice($msgs, 0, $limit);
                         }
-                        if (mb_stristr($msg['flags'], 'deleted')) {
-                            continue;
+                        foreach ($imap->get_message_list($msgs) as $msg) {
+                            if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
+                                $msg['flags'] .= ' \Attachment';
+                            }
+                            if (mb_stristr($msg['flags'], 'deleted')) {
+                                continue;
+                            }
+                            $msg['server_id'] = $id;
+                            $msg['folder'] = bin2hex($folder);
+                            $msg['server_name'] = $server_details['name'];
+                            $msg_list[] = $msg;
                         }
-                        $msg['server_id'] = $id;
-                        $msg['folder'] = bin2hex($folder);
-                        $msg['server_name'] = $server_details['name'];
-                        $msg_list[] = $msg;
                     }
                 }
             }

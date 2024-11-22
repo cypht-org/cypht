@@ -22,7 +22,6 @@ class Hm_Tags {
 
     public static function registerFolder($tag_id, $serverId, $folder) {
         $tag = self::get($tag_id);
-        Hm_Msgs::add('Registering folder: '. json_encode($tag));
         if (isset($tag['server'])) {
             if (isset($tag['server'][$serverId])) {
                 if (!in_array($folder, $tag['server'][$serverId])) {
@@ -31,16 +30,13 @@ class Hm_Tags {
             } else {
                 $tag['server'][$serverId] = array($folder);
             }
-            Hm_Msgs::add('Tag already exists: '. json_encode($tag));
         } else {
             $tag['server'] = [$serverId => [$folder]];
-            Hm_Msgs::add('Tag created: '. json_encode($tag));
         }
         self::edit($tag_id, $tag);
-        Hm_Msgs::add('Tag edited: '. json_encode(self::getAll()));
     }
 
-    public function getFolders($tag_id, $serverId) {
+    public static function getFolders($tag_id, $serverId) {
         $tag = self::get($tag_id);
         if (isset($tag['server'][$serverId])) {
             return $tag['server'][$serverId];

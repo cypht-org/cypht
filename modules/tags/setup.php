@@ -20,6 +20,7 @@ add_handler('message_list', 'tag_data', true, 'tags', 'load_user_data', 'after')
 
 setup_base_ajax_page('ajax_imap_tag_data', 'core');
 add_handler('ajax_imap_tag_data', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_imap_tag_data', 'tag_data', true, 'tags', 'load_user_data', 'after');
 add_handler('ajax_imap_tag_data', 'imap_tag_content', true, 'tags', 'load_imap_servers_from_config', 'after');
 add_output('ajax_imap_tag_data', 'filter_tag_data', true);
 
@@ -39,10 +40,19 @@ add_handler('ajax_process_tag_update', 'process_tag_update',  true, 'tags');
 
 add_output('ajax_imap_message_content', 'tag_bar',  true, 'tags', 'filter_message_headers', 'after');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_tag', 'tags');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'save_imap_cache',  true, 'imap');
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'tag_data', true, 'tags', 'load_user_data', 'after');
+add_handler('ajax_imap_tag', 'add_tag_to_message',  true, 'tags', 'save_imap_cache', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_process_tag_update',
         'ajax_imap_tag_data',
+        'ajax_imap_tag',
         'tags'
     ),
     'allowed_output' => array(

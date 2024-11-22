@@ -11,6 +11,11 @@ if (!defined('DEBUG_MODE')) { die(); }
 require_once APP_PATH . 'modules/tags/functions.php';
 require_once APP_PATH . 'modules/tags/hm-tags.php';
 
+require_once APP_PATH . 'modules/imap/hm-imap.php';
+require_once APP_PATH . 'modules/imap/functions.php';
+
+require_once APP_PATH . 'modules/tags/handler_modules.php';
+
 /**
  * @subpackage tags/handler
  */
@@ -107,7 +112,10 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
         if ($ids && $tag_id) {
             $limit = $this->user_config->get('tag_per_source_setting', DEFAULT_TAGS_PER_SOURCE);
             $date = process_since_argument($this->user_config->get('tag_since_setting', DEFAULT_TAGS_SINCE));
-            $folders = array_map(fn () => 'ALL', $ids);
+            $folders = array_map(function ($serverId) use ($tag_id, &$ids) {
+                $taggedFolders = Hm_Tags::getFolders($tag_id, $serverId);
+                return $taggedFolders;
+            }, $ids);
             list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, $folders, $limit, array(array('SINCE', $date), array('HEADER X-Cypht-Tags', $tag_id)));
             $this->out('folder_status', $status);
             $this->out('imap_tag_data', $msg_list);
