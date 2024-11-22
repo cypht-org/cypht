@@ -1,11 +1,10 @@
 ---
 name: 🚀 Feature
-about: Well defined and described Features requests
+about: Suggest an idea for this project
+labels: feature
+title: 🚀 [Feature] 
 ---
+<!-- You can find the latest issue templates here https://github.com/ulfgebhardt/issue-templates -->
 
 ## 🚀 Feature
-<!-- Describe the Feature. -->
-
-### Design, Layout, Architecture
-<!-- Attach Screenshots and Drawings. -->
-<!-- Specify more details of the Feature with each Picture. -->
+<!-- Give a short summary of the Feature. Use Screenshots if you want. -->
