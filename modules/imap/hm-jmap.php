@@ -377,16 +377,73 @@ class Hm_JMAP {
         return $this->parse_folder_list_by_level($level);
     }
 
-    public function get_quota_root($mailbox) { 
+    /**
+     * Use the JMAP Quota/get method to fetch quota information for a specific quota root.
+     * 
+     * This method sends a request to the JMAP server to retrieve quota information
+     * for a specified quota root (e.g., a specific folder like INBOX or Sent).
+     * The response is parsed to extract details about the quota, including the used space and hard limit.
+     * 
+     * @param array $quota_root from get_quota_root
+     * @return array list of quota details
+     */
+    public function get_quota($quota_root='') {
         if (!is_array($this->session)) {
             throw new Exception("Not authenticated. Please authenticate first.");
         }
+        $quotas = array();
         $methods = [
             [
                 "Quota/get",
                 [
                     "accountId"=> (string)$this->account_id,
                     "name"     => $this->session['username'],
+                    "ids"      => [$quota_root]
+                ],
+                "0"
+            ]
+        ];
+        $response = $this->send_command($this->session['apiUrl'], $methods, 'POST');
+        if (!empty($response["methodResponses"][0][1]["list"])) {
+            $quota = $response["methodResponses"][0][1]["list"][0];    
+            if (isset($quota['used']) && isset($quota['hardLimit'])) {
+                $quotas[] = [
+                    'name'    => $quota['id'],
+                    'max'     => floatval($quota['hardLimit']),
+                    'current' => floatval($quota['used']),
+                ];
+            }
+        }
+
+        
+        foreach($quota_root as $key => $value) {
+            $quotas[$key] = $value;
+        }
+        return $quotas;
+    }
+
+    /**
+     * Use the JMAP Quota/get method to fetch quota root information for all available quotas.
+     * 
+     * This method sends a request to the JMAP server to retrieve quota information
+     * for all quotas associated with the account. The response is parsed to extract details about each quota,
+     * including the used space and hard limit.
+     * 
+     * @param string $mailbox The mailbox identifier for which the quota information is being fetched.
+     * @return array An array of quota details
+     */
+    public function get_quota_root($mailbox) { 
+        if (!is_array($this->session)) {
+            throw new Exception("Not authenticated. Please authenticate first.");
+        }
+        $quotas = array();
+        $methods = [
+            [
+                "Quota/get",
+                [
+                    "accountId"=> (string)$this->account_id,
+                    "name"     => $this->session['username'],
+                    "ids"      => null,
                     "scope"    => "folder",
                     "folder"   => $mailbox
                 ],
@@ -394,8 +451,22 @@ class Hm_JMAP {
             ]
         ];
         $response = $this->send_command($this->session['apiUrl'], $methods, 'POST');
-        return $response;
+        if (!empty($response["methodResponses"][0][1]["list"])) {
+            $quotasRes = $response["methodResponses"][0][1]["list"];    
+            foreach($quotasRes as $quota) {
+                if (isset($quota['used']) && isset($quota['hardLimit'])) {
+                    $quotas[] = [
+                        'name'    => $quota['id'],
+                        'max'     => floatval($quota['hardLimit']),
+                        'current' => floatval($quota['used']),
+                    ];
+                }
+            }
+        }
+    
+        return $quotas;
     }
+
     public function get_capability() {
         //TODO: Implement
     }
