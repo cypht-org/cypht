@@ -373,12 +373,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
                 $txt .= ' | ' . forward_dropdown($this, $reply_args);
             }
-            if ($msg_part === '0') {
-                $txt .= ' | <a class="normal_link hlink msg_part_link normal_link" data-message-part="" href="#">'.$this->trans('normal').'</a>';
-            }
-            else {
-                $txt .= ' | <a class="raw_link hlink msg_part_link raw_link" data-message-part="0" href="#">'.$this->trans('raw').'</a>';
-            }
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                 $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
