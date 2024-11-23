@@ -84,8 +84,11 @@ while (!$connected) {
 if (strcasecmp($session_type, 'DB')==0) {
     printf("Creating database table hm_user_session ...\n");
 
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
+    if ($db_driver == 'mysql') {
         $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));";
+    } elseif($db_driver == 'sqlite') {
+        //0 means unlocked, 1 means locked 
+        $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, lock INTEGER DEFAULT 0, date timestamp, primary key (hm_id));";
     } elseif ($db_driver == 'pgsql') {
         $stmt = "{$create_table} hm_user_session (hm_id varchar(255) primary key not null, data text, date timestamp);";
     } else {
