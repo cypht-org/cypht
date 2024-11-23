@@ -1358,44 +1358,6 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
     }
     return $res;
 }}
-if (!hm_exists('add_tag_to_message')) {
-function add_tag_to_message($imap, $msg_id, $folder, $tag) {
-    if (!$imap->select_mailbox($folder)) {
-        return false;
-    }
-    $msg = $imap->get_message_content($msg_id, 0);
-    preg_match("/^X-Cypht-Tags:(.+)\r?\n/i", $msg, $matches);
-
-    if (count($matches)) {
-        $msg = str_replace($matches[0], '', $msg);
-        $tags = explode(',', $matches[1]);
-        if(in_array($tag, $tags)) {
-            unset($tags[array_search(trim($tag), $tags)]);
-        }else{
-            $tags[] = trim($tag);
-        }
-    }else {
-        $tags = array($tag);
-    }
-
-    $msg = "X-Cypht-Tags:".implode(',',$tags)."\n".$msg;
-    $msg = str_replace("\r\n", "\n", $msg);
-    $msg = str_replace("\n", "\r\n", $msg);
-    $msg = rtrim($msg)."\r\n";
-
-    $res = false;
-    if ($imap->append_start($folder, strlen($msg))) {
-        $imap->append_feed($msg."\r\n");
-        if ($imap->append_end()) {
-            if ($imap->message_action('DELETE', array($msg_id))) {
-                $imap->message_action('EXPUNGE', array($msg_id));
-                $res = true;
-            }
-        }
-    }
-
-    return $res;
-}}
 
 /**
  * @subpackage imap/functions

@@ -20,6 +20,23 @@ class Hm_Tags {
         self::initRepo('tags', $hmod->user_config, $hmod->session, self::$data);
     }
 
+    public static function addMessage($tagId, $serverId, $folder, $messageId) {
+        $folders = self::getFolders($tagId, $serverId);
+        if (!in_array($folder, $folders)) {
+            self::registerFolder($tagId, $serverId, $folder);
+            $folders = self::getFolders($tagId, $serverId);
+        }
+        if (!isset($folders[$folder])) {
+            $folders[$folder] = [];
+        }
+        if (!in_array($messageId, $folders[$folder])) {
+            $folders[$folder][] = $messageId;
+        }
+        $tag = self::get($tagId);
+        $tag['server'][$serverId][$folder] = $folders[$folder];
+        return self::edit($tagId, $tag);
+    }
+
     public static function registerFolder($tag_id, $serverId, $folder) {
         $tag = self::get($tag_id);
         if (isset($tag['server'])) {
