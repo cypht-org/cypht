@@ -1461,7 +1461,7 @@ nav.collapsed .folders {
   margin-top: 50px;
 }
 
-nav.collapsed li {
+.cypht-layout nav.collapsed li {
   text-align: center;
   justify-content: center;
 }
