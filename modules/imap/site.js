@@ -1042,8 +1042,8 @@ var imap_folder_status = function() {
     }
 };
 
-var imap_setup_tags = function() {
-    $(document).on('click', '.label-checkbox', function() {
+function imap_setup_tags() {
+    $('.label-checkbox').on('click', function() {
         var folder_id = $(this).data('id');
         var ids = [];
         if (getPageNameParam() == 'message') {
@@ -1064,15 +1064,7 @@ var imap_setup_tags = function() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_tag'},
             {'name': 'tag_id', 'value': folder_id},
-            {'name': 'list_path', 'value': ids}],
-            function(res) {
-                if (!res.router_user_msgs[0].startsWith('ERR')) {
-                    Hm_Utils.search_from_local_storage("/^\d+_imap_.+/")?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
-                    Hm_Folders.reload_folders(true);
-                    var path = hm_list_parent()? hm_list_parent(): getListPathParam();
-                    // window.location.replace('?page=message_list&list_path='+path);
-                }
-            }
+            {'name': 'list_path', 'value': ids}]
         );
     });
 }
