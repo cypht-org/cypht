@@ -1,9 +1,11 @@
 function showRoutingToast() {
+    if (window.routingToast) hideRoutingToast();
     window.routingToast = showLoaderToast('Redirecting...');
 }
 
 function hideRoutingToast() {
     window.routingToast.hide();
+    window.routingToast = null;
 }
 
 function getListPathParam() {
