@@ -56,7 +56,7 @@ if ($db_driver == 'mysql') {
         error_log('The following required PostgreSQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
         exit(1);
     }
-} else {
+} elseif ($db_driver !== 'sqlite'){
     error_log("Unsupported DB driver: {$db_driver}");
     exit(1);
 }
