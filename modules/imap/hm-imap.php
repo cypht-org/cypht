@@ -892,7 +892,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)]";
             if ($include_preview) {
-                $command .= " BODY[0.1]";
+                $command .= " BODY.PEEK[0.1]";
             }
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
