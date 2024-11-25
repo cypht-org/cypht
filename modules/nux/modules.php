@@ -543,7 +543,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Help').'</h4></div>'.
-            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
+            $this->trans('Cypht is a webmail aggregator client. You can use it to access your E-mail accounts from any server or service that offers any of the main protocols: IMAP/SMTP, Exchange Web Services (EWS) or the newest protocol: JMAP (RFC8621).').' '.
         '</div></div></div>';
     }
 }
