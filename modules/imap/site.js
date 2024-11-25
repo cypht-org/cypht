@@ -780,8 +780,10 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
                         .append(msgResponse.msg_text)
                         .append(msgResponse.msg_parts);
         document.title = $('.header_subject th').text();
-        $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
-        $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+        if ($('.header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
+            $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+            $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+        }
 
         $('.reply_link, .reply_all_link, .forward_link').each(function() {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
