@@ -93,6 +93,8 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
 
         if ($this->request->post['all_folders']) {
             $msg_list = $this->all_folders_search($imap, $flags, $params, $limit);
+        } elseif ($this->request->post['all_special_folders']) {
+            $msg_list = $this->special_folders_search($imap, $flags, $params, $limit);
         } else if (!$imap->select_mailbox($this->folder)) {
             return;
         } else {
@@ -108,6 +110,20 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         $msg_list = array();
         foreach ($folders as $folder) {
             $this->folder = $folder['name'];
+            $imap->select_mailbox($this->folder);
+            $msgs = $this->imap_search($flags, $imap, $params, $limit);
+            $msg_list = array_merge($msg_list, $msgs);
+        }
+        return $msg_list;
+    }
+
+    private function special_folders_search($imap, $flags, $params, $limit) {
+        $specials = $this->user_config->get('special_imap_folders', array());
+        $folders = $specials[$this->imap_id] ?? [];
+
+        $msg_list = array();
+        foreach ($folders as $folder) {
+            $this->folder = $folder;
             $imap->select_mailbox($this->folder);
             $msgs = $this->imap_search($flags, $imap, $params, $limit);
             $msg_list = array_merge($msg_list, $msgs);
