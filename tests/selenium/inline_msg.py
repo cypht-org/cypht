@@ -14,8 +14,13 @@ class InlineMsgTests(SettingsHelpers):
         self.wait_with_folder_list()
 
     def set_inline_message_test(self):
+        self.by_css('[data-bs-target=".settings"]').click()
+        self.wait_for_settings_to_expand()
+        list_item = self.by_class('menu_settings')
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.checkbox_test('general_setting', 'inline_message', False, 'inline_message')
-        self.dropdown_test('general_setting', 'inline_message_style', 'right', 'inline', 'inline_message')
+        self.dropdown_test('general_setting', 'inline_message_style', 'right', 'inline')
 
     def navigate_msg_test(self):
         try:

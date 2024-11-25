@@ -126,6 +126,14 @@ class WebTest:
     def by_xpath(self, element_xpath):
         print(" - finding element by xpath {0}".format(element_xpath))
         return self.driver.find_element(By.XPATH, element_xpath)
+    
+    def element_exists(self, class_name):
+        print(" - checking if element exists by class {0}".format(class_name))
+        try:
+            self.by_class(class_name)
+            return True
+        except Exception:
+            return False
 
     def wait(self, el_type=By.TAG_NAME, el_value="body", timeout=60):
         print(" - waiting for page by {0}: {1} ...".format(el_type, el_value))
