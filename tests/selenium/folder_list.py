@@ -41,14 +41,13 @@ class FolderListTests(WebTest):
         assert self.by_class('content_title').text == 'Home'
 
     def collapse_section(self):
-        list_item = self.by_class('menu_settings')
-        link = list_item.find_element(By.TAG_NAME, 'a')
-        self.by_css('[data-bs-target=".settings"]').click()
-        assert link.is_displayed() == True
-        self.by_css('[data-bs-target=".settings"]').click()
-        # Wait for the transition to complete
-        WebDriverWait(self.driver, 10).until(lambda x: not link.is_displayed())
-        assert link.is_displayed() == False
+        section = self.by_css('.settings.folders.collapse')
+        expanded_class = section.get_attribute('class')
+        assert 'show' in expanded_class
+        self.load()
+        section = self.by_css('.settings.folders.collapse')
+        collapsed_class = section.get_attribute('class')
+        assert 'show' not in collapsed_class
 
     def hide_folders(self):
         self.driver.execute_script("window.scrollBy(0, 1000);")
@@ -61,18 +60,14 @@ class FolderListTests(WebTest):
         assert link.is_displayed() == False
 
     def show_folders(self):
+        self.wait(By.CLASS_NAME, 'menu-toggle')
         folder_toggle = self.by_class('menu-toggle')
         self.driver.execute_script("arguments[0].click();", folder_toggle)
-        self.wait(By.CLASS_NAME, 'main')
-        self.by_css('[data-bs-target=".settings"]').click()
-        list_item = self.by_class('menu_home')
-        a_tag = list_item.find_element(By.TAG_NAME, 'a')
-        self.driver.execute_script("arguments[0].scrollIntoView(true);", a_tag)
-        self.driver.execute_script("arguments[0].click();", a_tag)
-        self.wait_with_folder_list()
-        if self.by_class('content_title').text != 'Home':
+        self.load()
+        if not self.element_exists('content_title') or self.by_class('content_title').text != 'Home':
             self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
+        self.load()
 
 
 if __name__ == '__main__':

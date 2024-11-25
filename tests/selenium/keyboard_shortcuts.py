@@ -4,6 +4,7 @@ from base import WebTest, USER, PASS, SITE_URL
 from runner import test_runner
 from selenium.webdriver import Keys, ActionChains
 from settings import SettingsHelpers
+from selenium.webdriver.common.by import By
 from selenium.common.exceptions import ElementNotVisibleException, ElementNotInteractableException
 
 
@@ -13,6 +14,11 @@ class KeyboardShortcutTests(SettingsHelpers):
         WebTest.__init__(self)
         self.login(USER, PASS)
         self.wait_with_folder_list()
+        self.by_css('[data-bs-target=".settings"]').click()
+        self.wait_for_settings_to_expand()
+        list_item = self.by_class('menu_settings')
+        self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.checkbox_test('general_setting', 'enable_keyboard_shortcuts', False, 'keyboard_shortcuts')
 
     def send_keys(self, key_combo):
