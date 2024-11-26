@@ -875,7 +875,8 @@ function imap_refresh_oauth2_token($server, $config) {
  */
 if (!hm_exists('imap_move_same_server')) {
 function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_emails=false) {
-    $moved = array();
+    $moved = [];
+    $responses = [];
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
     $cache = Hm_IMAP_List::get_cache($hm_cache, $server_id);
@@ -894,16 +895,25 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                     }
                 }
             } else {
-                if ($imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
-                    foreach ($msgs as $msg) {
+                $action = $imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]));
+                if ($action['status']) {
+                    foreach ($msgs as $index => $msg) {
+                        $response = $action['responses'][$index];
                         $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                        $responses[] = [
+                            'oldUid' => $msg,
+                            'newUid' => $response['newUid'],
+                            'oldFolder' => hex2bin($folder),
+                            'newFolder' => hex2bin($dest_path[2]),
+                            'oldServer' => $server_id,
+                        ];
                     }
                 }
             }
 
         }
     }
-    return $moved;
+    return ['moved' => $moved, 'responses' => $responses];
 }}
 
 /**

@@ -1731,7 +1731,9 @@ if (!class_exists('Hm_IMAP')) {
         public function message_action($action, $uids, $mailbox=false, $keyword=false) {
             $status = false;
             $command = false;
-            $uid_strings = array();
+            $uid_strings = [];
+            $responses = [];
+            $parseResponseFn = fn ($response) => $response;
             if (is_array($uids)) {
                 if (count($uids) > 1000) {
                     while (count($uids) > 1000) {
@@ -1799,6 +1801,12 @@ if (!class_exists('Hm_IMAP')) {
                         if (!$this->is_clean($mailbox, 'mailbox')) {
                             return false;
                         }
+
+                        $parseResponseFn = function($response) {
+                            preg_match('/.*COPYUID \d+ (\d+) (\d+).*/', $response[0], $matches);
+                            return ['oldUid' => $matches[1], 'newUid' => $matches[2]];
+                        };
+
                         if ($this->is_supported('MOVE')) {
                             $command = "UID MOVE $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         }
@@ -1817,6 +1825,7 @@ if (!class_exists('Hm_IMAP')) {
                     $status = $this->check_response($res);
                 }
                 if ($status) {
+                    $responses[] = $parseResponseFn($res);
                     if (is_array($this->selected_mailbox)) {
                         $this->bust_cache($this->selected_mailbox['name']);
                     }
@@ -1825,7 +1834,8 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
-            return $status;
+            
+            return ['status' => $status, 'responses' => $responses];
         }
 
         /**

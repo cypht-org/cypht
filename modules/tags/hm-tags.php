@@ -60,4 +60,54 @@ class Hm_Tags {
         }
         return [];
     }
+
+    private static function getTagIdsWithMessage($messageId) {
+        $tags = self::getAll();
+        $tagIds = [];
+        foreach ($tags as $tagId => $tag) {
+            foreach ($tag['server'] as $serverId => $folders) {
+                foreach ($folders as $messages) {
+                    // Exclude folder indentifiers
+                    if (! is_array($messages)) {
+                        continue;
+                    }
+                    if (in_array($messageId, $messages)) {
+                        $tagIds[] = $tagId;
+                    }
+                }
+            }
+        }
+        return $tagIds;
+    }
+
+    public static function moveMessageToADifferentFolder($params) {
+        $oldId = $params['oldId'];
+        $newId = $params['newId'];
+        $oldFolder = $params['oldFolder'];
+        $newFolder = $params['newFolder'];
+        $oldServer = $params['oldServer'];
+        $newServer = $params['newServer'] ?? '';
+
+        $tagIds = self::getTagIdsWithMessage($oldId);
+        foreach ($tagIds as $tagId) {
+            $tag = self::get($tagId);
+            $folders = $tag['server'][$oldServer];
+            $messages = $folders[$oldFolder];
+            $newMessages = [];
+            foreach ($messages as $messageId) {
+                if ($messageId == $oldId) {
+                    continue;
+                }
+                $newMessages[] = $messageId;
+            }
+            $folders[$oldFolder] = $newMessages;
+            if (!isset($folders[$newFolder])) {
+                $folders[$newFolder] = [];
+            }
+            $folders[$newFolder][] = $newId;
+            $tag['server'][$oldServer] = $folders;
+            Hm_Msgs::add('Moving message from old id'.$oldId.' to '.$newId.' in tag '.$tag['name']);
+            self::edit($tagId, $tag);
+        }
+    }
 }

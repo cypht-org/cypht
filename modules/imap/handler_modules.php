@@ -270,11 +270,15 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
             $moved = array();
             if (count($same_server_ids) > 0) {
-                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path, $screen));
+                $action = imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path, $screen);
+                $moved = array_merge($moved, $action['moved']);
             }
             if (count($other_server_ids) > 0) {
                 $moved = array_merge($moved, imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->cache));
 
+            }
+            if (count($moved) > 0) {
+                $this->out('move_responses', $action['responses']);
             }
             if (count($moved) > 0 && count($moved) == count($msg_ids)) {
                 if ($form['imap_move_action'] == 'move') {
