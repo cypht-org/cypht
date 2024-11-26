@@ -227,7 +227,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if (isset($msg['preview_msg'])) {
             $preview_msg = $msg['preview_msg'];
         }
-       
+    
         if ($parent_list == 'sent') {
             $icon = 'sent';
             $from = $msg['to'];

@@ -875,7 +875,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $raw flag to disable decoding header values
          * @return array list of headers and values for the specified uids
          */
-        public function get_message_list($uids, $raw=false, $include_preview = false) {
+        public function get_message_list($uids, $raw=false, $include_content_body = false) {
             if (is_array($uids)) {
                 sort($uids);
                 $sorted_string = implode(',', $uids);
@@ -891,7 +891,7 @@ if (!class_exists('Hm_IMAP')) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)]";
-            if ($include_preview) {
+            if ($include_content_body) {
                 $command .= " BODY.PEEK[0.1]";
             }
             $command .= ")\r\n";
