@@ -113,7 +113,7 @@ var adv_select_imap_folder = function(el) {
     folders.show();
 
     folders.find('li').each(function(index) {
-        const wrapper = $('<div class="d-flex justify-content-between"></div>');
+        const wrapper = $('<div class="d-flex justify-content-between wrapper"></div>');
         $(this).wrapInner(wrapper);
         const allSpecialFoldersCheckbox = `
         <span class="form-check">
@@ -130,7 +130,7 @@ var adv_select_imap_folder = function(el) {
         const checkboxesWrapper = $('<div class="d-flex gap-3"></div>');
         checkboxesWrapper.append(allSpecialFoldersCheckbox);
         checkboxesWrapper.append(allFoldersCheckbox);
-        wrapper.append(checkboxesWrapper);
+        $(this).find('.wrapper').append(checkboxesWrapper);
     })
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
