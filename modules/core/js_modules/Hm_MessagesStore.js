@@ -123,6 +123,17 @@ class Hm_MessagesStore {
         }
         return false;
     }
+    
+    removeRow(uid) {
+        const rows = Object.entries(this.rows);
+        const row = this.#getRowByUid(uid);
+        if (row) {
+            const newRows = rows.filter((_, i) => i !== row.index);
+            this.rows = Object.fromEntries(newRows);
+            this.#saveToLocalStorage();
+        }
+        
+    }
 
     #fetch(hideLoadingState = false) {
         return new Promise((resolve, reject) => {

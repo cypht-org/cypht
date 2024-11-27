@@ -75,11 +75,14 @@ function handleMessagesDragAndDrop() {
                 {'name': 'imap_move_to', 'value': targetFolder},
                 {'name': 'imap_move_page', 'value': page},
                 {'name': 'imap_move_action', 'value': 'move'}],
-                (res) =>{
-                    for (const index in res.move_count) {
-                        $('.'+Hm_Utils.clean_selector(res.move_count[index])).remove();
-                        select_imap_folder(getListPathParam());
-                    }
+                async (res) =>{
+                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                    await store.load(false, true, true);
+                    const moveResponses = Object.values(res['move_responses']);
+                    moveResponses.forEach((response) => {
+                        store.removeRow(response.oldUid);
+                    });
+                    display_imap_mailbox(store.rows, store.links, getListPathParam());
                 }
             );
     

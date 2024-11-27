@@ -370,6 +370,7 @@ return array(
         'auto_advance_email_enabled' => array(FILTER_VALIDATE_BOOLEAN, false),
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'move_responses' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_get' => array(
