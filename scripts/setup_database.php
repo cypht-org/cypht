@@ -8,6 +8,28 @@ define('VENDOR_PATH', APP_PATH.'vendor/');
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
 
+/**
+ * Function to check required extensions for a database driver
+ */
+function checkRequiredExtensions($db_driver, $extensions) {
+    $missing_extensions = [];
+
+    foreach ($extensions as $extension) {
+        if (!extension_loaded($extension)) {
+            $missing_extensions[] = $extension;
+        }
+    }
+
+    if (!empty($missing_extensions)) {
+        error_log(
+            "The following required {$db_driver} extensions are missing: " .
+            implode(', ', $missing_extensions) .
+            ". Please install them.\n"
+        );
+        exit(1);
+    }
+}
+
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
@@ -29,34 +51,10 @@ $bad_driver = "Unsupported db driver: {$db_driver}";
 
 // Check if the required extensions for the configured DB driver are loaded
 if ($db_driver == 'mysql') {
-    $required_extensions = ['mysqli', 'mysqlnd', 'pdo_mysql'];
-    $missing_extensions = [];
-
-    foreach ($required_extensions as $extension) {
-        if (!extension_loaded($extension)) {
-            $missing_extensions[] = $extension;
-        }
-    }
-
-    if (!empty($missing_extensions)) {
-        error_log('The following required MySQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
-        exit(1);
-    }
+    checkRequiredExtensions('MySQL', ['mysqli', 'mysqlnd', 'pdo_mysql']);
 } elseif ($db_driver == 'pgsql') {
-    $required_extensions = ['pgsql', 'pdo_pgsql'];
-    $missing_extensions = [];
-
-    foreach ($required_extensions as $extension) {
-        if (!extension_loaded($extension)) {
-            $missing_extensions[] = $extension;
-        }
-    }
-
-    if (!empty($missing_extensions)) {
-        error_log('The following required PostgreSQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
-        exit(1);
-    }
-} elseif ($db_driver !== 'sqlite'){
+    checkRequiredExtensions('PostgreSQL', ['pgsql', 'pdo_pgsql']);
+} elseif ($db_driver !== 'sqlite') {
     error_log("Unsupported DB driver: {$db_driver}");
     exit(1);
 }
