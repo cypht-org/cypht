@@ -889,16 +889,25 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                     $email = current(array_column(process_address_fld($imap->get_message_headers($msg)['From']), "email"));
                     $uids = $imap->search('ALL', false, array(array('FROM', $email)));
                     foreach ($uids as $uid) {
-                        if ($imap->message_action(mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
+                        $result = $imap->message_action(mb_strtoupper($action), $uid, hex2bin($dest_path[2]));
+                        if ($result['status']) {
+                            $response = $result['responses'][0];
+                            $responses[] = [
+                                'oldUid' => $uid,
+                                'newUid' => $response['newUid'],
+                                'oldFolder' => hex2bin($folder),
+                                'newFolder' => hex2bin($dest_path[2]),
+                                'oldServer' => $server_id,
+                            ];
                             $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $uid, $folder);
                         }
                     }
                 }
             } else {
-                $action = $imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]));
-                if ($action['status']) {
+                $result = $imap->message_action(mb_strtoupper($action), $msgs, hex2bin($dest_path[2]));
+                if ($result['status']) {
                     foreach ($msgs as $index => $msg) {
-                        $response = $action['responses'][$index];
+                        $response = $result['responses'][$index];
                         $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                         $responses[] = [
                             'oldUid' => $msg,
@@ -957,7 +966,8 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                             $dest_imap->append_feed($msg."\r\n");
                             if ($dest_imap->append_end()) {
                                 if ($action == 'move') {
-                                    if ($imap->message_action('DELETE', array($msg_id))) {
+                                    $deleteResult = $imap->message_action('DELETE', array($msg_id));
+                                    if ($deleteResult['status']) {
                                         $imap->message_action('EXPUNGE', array($msg_id));
                                     }
                                 }
@@ -1339,9 +1349,12 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
         if ($imap->select_mailbox($snooze_folder) && $imap->append_start($snooze_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
-                if ($imap->select_mailbox($folder) && $imap->message_action('DELETE', array($msg_id))) {
-                    $imap->message_action('EXPUNGE', array($msg_id));
-                    $res = true;
+                if ($imap->select_mailbox($folder)) {
+                    $deleteResult = $imap->message_action('DELETE', array($msg_id));
+                    if ($deleteResult['status']) {
+                        $imap->message_action('EXPUNGE', array($msg_id));
+                        $res = true;
+                    }
                 }
             }
         }
@@ -1351,9 +1364,12 @@ function snooze_message($imap, $msg_id, $folder, $snooze_tag) {
         if ($imap->select_mailbox($original_folder) && $imap->append_start($original_folder, mb_strlen($msg))) {
             $imap->append_feed($msg."\r\n");
             if ($imap->append_end()) {
-                if ($imap->select_mailbox($snooze_folder) && $imap->message_action('DELETE', array($msg_id))) {
-                    $imap->message_action('EXPUNGE', array($msg_id));
-                    $res = true;
+                if ($imap->select_mailbox($snooze_folder)) {
+                    $deleteResult = $imap->message_action('DELETE', array($msg_id));
+                    if ($deleteResult['status']) {
+                        $imap->message_action('EXPUNGE', array($msg_id));
+                        $res = true;
+                    }
                 }
             }
         }

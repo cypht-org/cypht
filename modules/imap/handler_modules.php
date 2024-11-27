@@ -706,7 +706,7 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                                 if ($imap->append_start($folder, mb_strlen($msg))) {
                                     $imap->append_feed($msg."\r\n");
                                     if ($imap->append_end()) {
-                                        if ($imap->message_action('DELETE', array($uid))) {
+                                        if ($imap->message_action('DELETE', array($uid))['status']) {
                                             $imap->message_action('EXPUNGE', array($uid));
                                             Hm_Msgs::add('Attachment deleted');
                                             $this->out('redirect_url', '?page=message_list&list_path='.$this->request->get['list_path']);
@@ -999,12 +999,13 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 if ($imap->select_mailbox(hex2bin($form['folder']))) {
                     $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $imap->folder_state));
                     if ($trash_folder && $trash_folder != hex2bin($form['folder'])) {
-                        if ($imap->message_action('MOVE', array($form['imap_msg_uid']), $trash_folder)) {
+                        $moveResult = $imap->message_action('MOVE', array($form['imap_msg_uid']), $trash_folder);
+                        if ($moveResult['status']) {
                             $del_result = true;
                         }
                     }
                     else {
-                        if ($imap->message_action('DELETE', array($form['imap_msg_uid']))) {
+                        if ($imap->message_action('DELETE', array($form['imap_msg_uid']))['status']) {
                             $del_result = true;
                             $imap->message_action('EXPUNGE', array($form['imap_msg_uid']));
                         }
@@ -1084,8 +1085,11 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             }
 
             /* try to move the message */
-            if (!$errors && $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder)) {
-                Hm_Msgs::add("Message archived");
+            if (!$errors) {
+                $moveResult = $imap->message_action('MOVE', array($form['imap_msg_uid']), $archive_folder);
+                if ($moveResult['status']) {
+                    Hm_Msgs::add("Message archived");
+                }
             }
             else {
                 Hm_Msgs::add('ERRAn error occurred archiving the message');
@@ -1117,7 +1121,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
                     else {
                         $cmd = 'FLAG';
                     }
-                    if ($imap->message_action($cmd, array($form['imap_msg_uid']))) {
+                    if ($imap->message_action($cmd, array($form['imap_msg_uid']))['status']) {
                         $flag_result = true;
                     }
                 }
@@ -1260,7 +1264,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                 $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
 
                                 if ($form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
-                                    if (!$imap->message_action('MOVE', $uids, $trash_folder)) {
+                                    if (!$imap->message_action('MOVE', $uids, $trash_folder)['status']) {
                                         $errs++;
                                     }
                                     else {
@@ -1278,7 +1282,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                             $imap->create_mailbox($archive_folder);
                                         }
                                     }
-                                    if (!$imap->message_action('MOVE', $uids, $archive_folder)) {
+                                    if (!$imap->message_action('MOVE', $uids, $archive_folder)['status']) {
                                         $errs++;
                                     }
                                     else {
@@ -1288,7 +1292,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                     }
                                 }
                                 else {
-                                    if (!$imap->message_action(mb_strtoupper($form['action_type']), $uids)) {
+                                    if (!$imap->message_action(mb_strtoupper($form['action_type']), $uids)['status']) {
                                         $errs++;
                                     }
                                     else {

@@ -1753,7 +1753,7 @@ if (!class_exists('Hm_IMAP')) {
             foreach ($uid_strings as $uid_string) {
                 if ($uid_string) {
                     if (!$this->is_clean($uid_string, 'uid_list')) {
-                        return false;
+                        break;
                     }
                 }
                 switch ($action) {
@@ -1793,13 +1793,13 @@ if (!class_exists('Hm_IMAP')) {
                         break;
                     case 'COPY':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
                         $command = "UID COPY $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         break;
                     case 'MOVE':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
 
                         $parseResponseFn = function($response) {
@@ -1811,8 +1811,8 @@ if (!class_exists('Hm_IMAP')) {
                             $command = "UID MOVE $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         }
                         else {
-                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)) {
-                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)) {
+                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)['status']) {
+                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)['status']) {
                                     $command = "EXPUNGE\r\n";
                                 }
                             }

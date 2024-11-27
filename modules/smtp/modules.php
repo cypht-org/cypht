@@ -1737,7 +1737,7 @@ function delete_draft($id, $cache, $imap_server_id, $folder) {
         return false;
     }
     if ($imap->select_mailbox($folder)) {
-        if ($imap->message_action('DELETE', array($id))) {
+        if ($imap->message_action('DELETE', array($id))['status']) {
             $imap->message_action('EXPUNGE', array($id));
             return true;
         }
