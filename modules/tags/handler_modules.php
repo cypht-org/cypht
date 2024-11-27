@@ -196,7 +196,6 @@ class Hm_Handler_move_message extends Hm_Handler_Module {
     {
         $moveResponses = $this->get('move_responses', []);
         foreach ($moveResponses as $response) {
-            Hm_Msgs::add('Syncing Tags Repository: '. json_encode($response));
             Hm_Tags::moveMessageToADifferentFolder([
                 'oldId' => $response['oldUid'],
                 'newId' => $response['newUid'],

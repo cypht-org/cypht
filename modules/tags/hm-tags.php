@@ -94,19 +94,31 @@ class Hm_Tags {
             $folders = $tag['server'][$oldServer];
             $messages = $folders[$oldFolder];
             $newMessages = [];
+
             foreach ($messages as $messageId) {
                 if ($messageId == $oldId) {
                     continue;
                 }
                 $newMessages[] = $messageId;
             }
+
             $folders[$oldFolder] = $newMessages;
-            if (!isset($folders[$newFolder])) {
-                $folders[$newFolder] = [];
+
+            if ($newServer) {
+                if (!isset($tag['server'][$newServer])) {
+                    $tag['server'][$newServer] = [];
+                }
+                if (!isset($tag['server'][$newServer][$newFolder])) {
+                    $tag['server'][$newServer][$newFolder] = [];
+                }
+                $tag['server'][$newServer][$newFolder][] = $newId;
+            } else {
+                if (!isset($folders[$newFolder])) {
+                    $folders[$newFolder] = [];
+                }
+                $folders[$newFolder][] = $newId;
+                $tag['server'][$oldServer] = $folders;
             }
-            $folders[$newFolder][] = $newId;
-            $tag['server'][$oldServer] = $folders;
-            Hm_Msgs::add('Moving message from old id'.$oldId.' to '.$newId.' in tag '.$tag['name']);
             self::edit($tagId, $tag);
         }
     }

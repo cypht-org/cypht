@@ -936,7 +936,8 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
  */
 if (!hm_exists('imap_move_different_server')) {
 function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
-    $moved = array();
+    $moved = [];
+    $responses = [];
     $cache = Hm_IMAP_List::get_cache($hm_cache, $dest_path[1]);
     $dest_imap = Hm_IMAP_List::connect($dest_path[1], $cache);
     if ($dest_imap) {
@@ -964,7 +965,8 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                         }
                         if ($dest_imap->append_start(hex2bin($dest_path[2]), mb_strlen($msg), $seen)) {
                             $dest_imap->append_feed($msg."\r\n");
-                            if ($dest_imap->append_end()) {
+                            $uid = $dest_imap->append_end();
+                            if ($uid) {
                                 if ($action == 'move') {
                                     $deleteResult = $imap->message_action('DELETE', array($msg_id));
                                     if ($deleteResult['status']) {
@@ -972,6 +974,14 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                                     }
                                 }
                                 $moved[] = sprintf('imap_%s_%s_%s', $server_id, $msg_id, $folder);
+                                $responses[] = [
+                                    'oldUid' => $msg_id,
+                                    'newUid' => $uid,
+                                    'oldFolder' => hex2bin($folder),
+                                    'newFolder' => hex2bin($dest_path[2]),
+                                    'oldServer' => $server_id,
+                                    'newServer' => $dest_path[1],
+                                ];
                             }
                         }
                     }
@@ -979,7 +989,7 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
             }
         }
     }
-    return $moved;
+    return ['moved' => $moved, 'responses' => $responses];
 }}
 
 /**

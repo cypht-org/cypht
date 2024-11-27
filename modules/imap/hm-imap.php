@@ -1883,7 +1883,11 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function append_end() {
             $result = $this->get_response(false, true);
-            return $this->check_response($result, true);
+            $uid = $result[0][5];
+            if ($this->check_response($result, true)) {
+                return $uid;
+            }
+            return false;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
