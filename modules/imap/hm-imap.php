@@ -1733,7 +1733,7 @@ if (!class_exists('Hm_IMAP')) {
             $command = false;
             $uid_strings = [];
             $responses = [];
-            $parseResponseFn = fn ($response) => $response;
+            $parseResponseFn = function($response) {};
             if (is_array($uids)) {
                 if (count($uids) > 1000) {
                     while (count($uids) > 1000) {
@@ -1802,9 +1802,18 @@ if (!class_exists('Hm_IMAP')) {
                             break;
                         }
 
-                        $parseResponseFn = function($response) {
-                            preg_match('/.*COPYUID \d+ (\d+) (\d+).*/', $response[0], $matches);
-                            return ['oldUid' => $matches[1], 'newUid' => $matches[2]];
+                        $parseResponseFn = function($response) use ($uid_string, &$responses) {
+                            if (strpos($uid_string, ',') !== false) {
+                                preg_match('/.*COPYUID \d+ (\d+[:|,]\d+) (\d+[:|,]\d+).*/', $response[0], $matches);
+                                $oldUids = preg_split('/[:|,]/', $matches[1]);
+                                $newUids = preg_split('/[:|,]/', $matches[2]);
+                                foreach ($oldUids as $key => $oldUid) {
+                                    $responses[] = ['oldUid' => $oldUid, 'newUid' => $newUids[$key]];
+                                }
+                            } else {
+                                preg_match('/.*COPYUID \d+ (\d+) (\d+).*/', $response[0], $matches);
+                                $responses[] = ['oldUid' => $matches[1], 'newUid' => $matches[2]];
+                            }
                         };
 
                         if ($this->is_supported('MOVE')) {
@@ -1825,7 +1834,7 @@ if (!class_exists('Hm_IMAP')) {
                     $status = $this->check_response($res);
                 }
                 if ($status) {
-                    $responses[] = $parseResponseFn($res);
+                    $parseResponseFn($res);
                     if (is_array($this->selected_mailbox)) {
                         $this->bust_cache($this->selected_mailbox['name']);
                     }
