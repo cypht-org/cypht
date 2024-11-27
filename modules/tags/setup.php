@@ -48,6 +48,10 @@ add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_tag', 'tag_data', true, 'tags', 'load_user_data', 'after');
 add_handler('ajax_imap_tag', 'add_tag_to_message',  true, 'tags', 'save_imap_cache', 'after');
 
+/* Sync the Tags Repository when moving messages */
+add_handler('ajax_imap_move_copy_action', 'tag_data', true, 'tags', 'load_user_data', 'after');
+add_handler('ajax_imap_move_copy_action', 'move_message', true, 'tags', 'imap_process_move', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_process_tag_update',

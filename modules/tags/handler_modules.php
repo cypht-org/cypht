@@ -190,3 +190,20 @@ class Hm_Handler_tag_data extends Hm_Handler_Module {
         $this->out('tags', Hm_Tags::getAll());
     }
 }
+
+class Hm_Handler_move_message extends Hm_Handler_Module {
+    public function process()
+    {
+        $moveResponses = $this->get('move_responses', []);
+        foreach ($moveResponses as $response) {
+            Hm_Tags::moveMessageToADifferentFolder([
+                'oldId' => $response['oldUid'],
+                'newId' => $response['newUid'],
+                'oldFolder' => $response['oldFolder'],
+                'newFolder' => $response['newFolder'],
+                'oldServer' => $response['oldServer'],
+                'newServer' => $response['newServer'] ?? '',
+            ]);
+        }
+    }
+}

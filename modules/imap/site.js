@@ -928,8 +928,14 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
             {'name': 'imap_move_to', 'value': dest_id},
             {'name': 'imap_move_page', 'value': page},
             {'name': 'imap_move_action', 'value': action}],
-            function(res) {
+            async function(res) {
                 var index;
+                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                await store.load(false, true, true);
+                const moveResponses = Object.values(res['move_responses']);
+                moveResponses.forEach((response) => {
+                    store.removeRow(response.oldUid);
+                });
                 if (getPageNameParam() == 'message_list') {
                     Hm_Message_List.reset_checkboxes();
                     if (action == 'move' || action == 'screen_mail') {
@@ -938,7 +944,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
                         }
                     }
                     if (getListPathParam().substr(0, 4) === 'imap') {
-                        select_imap_folder(getListPathParam());
+                        display_imap_mailbox(store.rows, store.links, getListPathParam());
                     }
                     else {
                         Hm_Message_List.load_sources();

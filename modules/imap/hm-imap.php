@@ -1731,7 +1731,9 @@ if (!class_exists('Hm_IMAP')) {
         public function message_action($action, $uids, $mailbox=false, $keyword=false) {
             $status = false;
             $command = false;
-            $uid_strings = array();
+            $uid_strings = [];
+            $responses = [];
+            $parseResponseFn = function($response) {};
             if (is_array($uids)) {
                 if (count($uids) > 1000) {
                     while (count($uids) > 1000) {
@@ -1751,7 +1753,7 @@ if (!class_exists('Hm_IMAP')) {
             foreach ($uid_strings as $uid_string) {
                 if ($uid_string) {
                     if (!$this->is_clean($uid_string, 'uid_list')) {
-                        return false;
+                        break;
                     }
                 }
                 switch ($action) {
@@ -1791,20 +1793,35 @@ if (!class_exists('Hm_IMAP')) {
                         break;
                     case 'COPY':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
                         $command = "UID COPY $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         break;
                     case 'MOVE':
                         if (!$this->is_clean($mailbox, 'mailbox')) {
-                            return false;
+                            break;
                         }
+
+                        $parseResponseFn = function($response) use ($uid_string, &$responses) {
+                            if (strpos($uid_string, ',') !== false) {
+                                preg_match('/.*COPYUID \d+ (\d+[:|,]\d+) (\d+[:|,]\d+).*/', $response[0], $matches);
+                                $oldUids = preg_split('/[:|,]/', $matches[1]);
+                                $newUids = preg_split('/[:|,]/', $matches[2]);
+                                foreach ($oldUids as $key => $oldUid) {
+                                    $responses[] = ['oldUid' => $oldUid, 'newUid' => $newUids[$key]];
+                                }
+                            } else {
+                                preg_match('/.*COPYUID \d+ (\d+) (\d+).*/', $response[0], $matches);
+                                $responses[] = ['oldUid' => $matches[1], 'newUid' => $matches[2]];
+                            }
+                        };
+
                         if ($this->is_supported('MOVE')) {
                             $command = "UID MOVE $uid_string \"".$this->utf7_encode($mailbox)."\"\r\n";
                         }
                         else {
-                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)) {
-                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)) {
+                            if ($this->message_action('COPY', $uids, $mailbox, $keyword)['status']) {
+                                if ($this->message_action('DELETE', $uids, $mailbox, $keyword)['status']) {
                                     $command = "EXPUNGE\r\n";
                                 }
                             }
@@ -1817,6 +1834,7 @@ if (!class_exists('Hm_IMAP')) {
                     $status = $this->check_response($res);
                 }
                 if ($status) {
+                    $parseResponseFn($res);
                     if (is_array($this->selected_mailbox)) {
                         $this->bust_cache($this->selected_mailbox['name']);
                     }
@@ -1825,7 +1843,8 @@ if (!class_exists('Hm_IMAP')) {
                     }
                 }
             }
-            return $status;
+            
+            return ['status' => $status, 'responses' => $responses];
         }
 
         /**
@@ -1873,7 +1892,11 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function append_end() {
             $result = $this->get_response(false, true);
-            return $this->check_response($result, true);
+            $uid = $result[0][5];
+            if ($this->check_response($result, true)) {
+                return $uid;
+            }
+            return false;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
