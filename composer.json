@@ -67,7 +67,7 @@
         "ext-gd": "To use 2fa, this needs to be installed for the QR code display",
         "ext-memcached": "To use Memcached for caching, this needs to be installed",
         "ext-gnupg": "To use the PGP module set, this needs to be installed",
-        "ext-imagick": "To use 2fa, this needs to be installed for the QR code display"
+        "ext-imagick": "To use 2fa, this needs to be installed for the QR code display "
     },
     "config": {
         "platform": {
