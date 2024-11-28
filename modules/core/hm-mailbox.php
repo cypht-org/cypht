@@ -135,6 +135,9 @@ class Hm_Mailbox {
             return $this->connection->rename_mailbox($old_folder, $new_folder);
         } else {
             $folder = decode_folder_str($folder);
+            if ($parent) {
+                $parent = decode_folder_str($parent);
+            }
             return $this->connection->rename_folder($folder, $new_name, $parent);
         }
     }

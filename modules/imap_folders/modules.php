@@ -206,7 +206,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
                 if ($form['folder'] && $form['new_folder'] && $mailbox->rename_folder($form['folder'], $form['new_folder'], $parent)) {
-                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER) && $mailbox->is_imap()) {
                         $imap_servers = $this->user_config->get('imap_servers');
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
@@ -263,7 +263,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
         if ($success) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER) && $mailbox->is_imap()) {
                     $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
                         Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');

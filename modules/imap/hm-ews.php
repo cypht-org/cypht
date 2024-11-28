@@ -17,6 +17,7 @@ use garethp\ews\API\ExchangeWebServices;
 use garethp\ews\API\ItemUpdateBuilder;
 use garethp\ews\API\Type;
 use garethp\ews\MailAPI;
+use garethp\ews\Utilities;
 
 use ZBateson\MailMimeParser\MailMimeParser;
 
@@ -40,7 +41,7 @@ class Hm_EWS {
 
     public function connect(array $config) {
         try {
-            $this->ews = ExchangeWebServices::fromUsernameAndPassword($config['server'], $config['username'], $config['password'], ['version' => ExchangeWebServices::VERSION_2016]);
+            $this->ews = ExchangeWebServices::fromUsernameAndPassword($config['server'], $config['username'], $config['password'], ['version' => ExchangeWebServices::VERSION_2016, 'trace' => 1]);
             $this->api = new MailAPI($this->ews);
             $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::INBOX);
             $this->authed = true;
@@ -181,34 +182,58 @@ class Hm_EWS {
 
     public function rename_folder($folder, $new_name, $parent = null) {
         $result = [];
+        if ($this->is_distinguished_folder($folder)) {
+            $folder = new Type\DistinguishedFolderIdType($folder);
+        } else {
+            $folder = new Type\FolderIdType($folder);
+        }
         $new_folder = new Type\FolderType();
         $new_folder->displayName = $new_name;
-        if ($parent) {
-            $new_folder->parentFolderId = new Type\FolderIdType($parent);
-        }
-        $setFolderField = new Type\SetFolderFieldType();
-        $setFolderField->folder = $new_folder;
-        $fieldURI = new Type\FieldURI();
-        $fieldURI->fieldURI = 'folder:displayName';
-        $setFolderField->fieldURI = $fieldURI;
-        $updates = new Type\NonEmptyArrayOfFolderChangeDescriptionsType();
-        $updates->set('setFolderField', [$setFolderField]);
-        $change = new Type\FolderChangeType();
-        $change->folderId = new Type\FolderIdType($folder);
-        $change->updates = $updates;
         $request = [
             'FolderChanges' => [
-                $change
+                'FolderChange' => [
+                    'FolderId' => $folder->toArray(false),
+                    'Updates' => [
+                        'SetFolderField' => [
+                            'FieldURI' => [
+                                'FieldURI' => 'folder:DisplayName',
+                            ],
+                            'Folder' => $new_folder,
+                        ],
+                    ],
+                ],
             ],
         ];
         try {
-            $resp = $this->ews->UpdateFolder($request);
-            // TODO: EWS: resolve internal server error issue and return status
-            return true;
+            $request = Type::buildFromArray($request);
+            $this->ews->UpdateFolder($request);
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
         }
+        if ($parent) {
+            if ($this->is_distinguished_folder($parent)) {
+                $parent = new Type\DistinguishedFolderIdType($parent);
+            } else {
+                $parent = new Type\FolderIdType($parent);
+            }
+            $request = [
+                'FolderIds' => Utilities\getFolderIds([$folder]),
+                'ToFolderId' => $parent->toArray(true),
+            ];
+            try {
+                $request = Type::buildFromArray($request);
+                $this->ews->MoveFolder($request);
+            } catch (\Exception $e) {
+                var_dump($folder->toArray(true));
+                echo $this->ews->getClient()->__getLastRequest();
+                echo $this->ews->getClient()->__getLastResponse();
+                exit;
+                Hm_Msgs::add('ERR' . $e->getMessage());
+                return false;
+            }
+        }
+        return true;
     }
 
     public function delete_folder($folder) {
