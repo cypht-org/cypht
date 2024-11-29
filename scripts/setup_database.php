@@ -130,19 +130,22 @@ function add_missing_columns($conn, $table_name, $required_columns, $db_driver) 
 $tables = [
     'hm_user_session' => [
         'mysql' => [
-            'hm_id' => 'varchar(255) PRIMARY KEY',
-            'data' => 'longblob',
-            'date' => 'timestamp',
+            'hm_id'   => 'varchar(255) PRIMARY KEY',
+            'data'    => 'longblob',
+            'hm_version' => 'INT DEFAULT 1',
+            'date'    => 'timestamp',
         ],
         'sqlite' => [
             'hm_id' => 'varchar(255) PRIMARY KEY',
             'data' => 'longblob',
             'lock' => 'INTEGER DEFAULT 0',
+            'hm_version' => 'INT DEFAULT 1',
             'date' => 'timestamp',
         ],
         'pgsql' => [
             'hm_id' => 'varchar(255) PRIMARY KEY',
             'data' => 'text',
+            'hm_version' => 'INT DEFAULT 1',
             'date' => 'timestamp',
         ],
     ],
