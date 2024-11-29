@@ -507,7 +507,11 @@ class Hm_Mailbox {
     }
 
     public function get_state() {
-        return $this->connection->get_state();
+        if ($this->is_imap()) {
+            return $this->connection->get_state();
+        } else {
+            return $this->authed() ? 'authenticated' : 'disconnected';
+        }
     }
 
     public function get_capability() {

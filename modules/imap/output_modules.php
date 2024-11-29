@@ -729,7 +729,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
+            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
                 '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
         }
         return $res;
