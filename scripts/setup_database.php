@@ -45,6 +45,7 @@ $db_driver = $config->get('db_driver');
 
 $connected = false;
 $create_table = "CREATE TABLE IF NOT EXISTS";
+$alter_table = "ALTER TABLE";
 $bad_driver = "Unsupported db driver: {$db_driver}";
 
 // NOTE: these sql commands could be db agnostic if we change the blobs to text
@@ -81,56 +82,114 @@ while (!$connected) {
     }
 }
 
-if (strcasecmp($session_type, 'DB')==0) {
-    printf("Creating database table hm_user_session ...\n");
-
-    if ($db_driver == 'mysql') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));";
-    } elseif($db_driver == 'sqlite') {
-        //0 means unlocked, 1 means locked 
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, lock INTEGER DEFAULT 0, date timestamp, primary key (hm_id));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255) primary key not null, data text, date timestamp);";
-    } else {
-        die($bad_driver);
-    }
-
-    $conn->exec($stmt);
-}
-if (strcasecmp($auth_type, 'DB')==0) {
-
-    printf("Creating database table hm_user ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user (username varchar(255), hash varchar(255), primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user (username varchar(255) primary key not null, hash varchar(255));";
-    } else {
-        die($bad_driver);
-    }
-
+function get_existing_columns($conn, $table_name, $db_driver) {
+    $columns = [];
     try {
-        $rows = $conn->exec($stmt);
-        printf("{$stmt}\n");
-    } catch (PDOException $e) {
-        print($e);
-        exit (1);
-    }
+        if ($db_driver == 'mysql') {
+            $query = "SHOW COLUMNS FROM {$table_name};";
+        } elseif ($db_driver == 'pgsql') {
+            $query = "SELECT column_name FROM information_schema.columns WHERE table_name = '{$table_name}';";
+        } elseif ($db_driver == 'sqlite') {
+            $query = "PRAGMA table_info({$table_name});";
+        } else {
+            throw new Exception("Unsupported DB driver for column retrieval.");
+        }
 
+        $stmt = $conn->query($query);
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($db_driver == 'sqlite') {
+                $columns[] = $row['name'];
+            } else {
+                $columns[] = $row['Field'] ?? $row['column_name'];
+            }
+        }
+    } catch (Exception $e) {
+        printf("Error retrieving columns: %s\n", $e->getMessage());
+    }
+    return $columns;
 }
-if (strcasecmp($user_config_type, 'DB')==0) {
 
-    printf("Creating database table hm_user_settings ...\n");
+function add_missing_columns($conn, $table_name, $required_columns, $db_driver) {
+    global $alter_table;
+    $existing_columns = get_existing_columns($conn, $table_name, $db_driver);
 
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user_settings(username varchar(255), settings longblob, primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_settings (username varchar(255) primary key not null, settings text);";
-    } else {
-        die($bad_driver);
+    foreach ($required_columns as $column_name => $column_def) {
+        if (!in_array($column_name, $existing_columns)) {
+            printf("Adding column %s to table %s ...\n", $column_name, $table_name);
+            $query = "{$alter_table} {$table_name} ADD COLUMN {$column_name} {$column_def};";
+            try {
+                $conn->exec($query);
+            } catch (PDOException $e) {
+                printf("Error adding column %s: %s\n", $column_name, $e->getMessage());
+                exit(1);
+            }
+        }
     }
+}
 
-    $conn->exec($stmt);
+$tables = [
+    'hm_user_session' => [
+        'mysql' => [
+            'hm_id' => 'varchar(255) PRIMARY KEY',
+            'data' => 'longblob',
+            'date' => 'timestamp',
+        ],
+        'sqlite' => [
+            'hm_id' => 'varchar(255) PRIMARY KEY',
+            'data' => 'longblob',
+            'lock' => 'INTEGER DEFAULT 0',
+            'date' => 'timestamp',
+        ],
+        'pgsql' => [
+            'hm_id' => 'varchar(255) PRIMARY KEY',
+            'data' => 'text',
+            'date' => 'timestamp',
+        ],
+    ],
+    'hm_user' => [
+        'mysql' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'hash' => 'varchar(255)',
+        ],
+        'sqlite' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'hash' => 'varchar(255)',
+        ],
+        'pgsql' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'hash' => 'varchar(255)',
+        ],
+    ],
+    'hm_user_settings' => [
+        'mysql' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'settings' => 'longblob',
+        ],
+        'sqlite' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'settings' => 'longblob',
+        ],
+        'pgsql' => [
+            'username' => 'varchar(255) PRIMARY KEY',
+            'settings' => 'text',
+        ],
+    ],
+];
+
+if (strcasecmp($session_type, 'DB')==0) {
+    foreach ($tables as $table_name => $definitions) {
+        $required_columns = $definitions[$db_driver];
+    
+        // Create table if it doesn't exist
+        $columns = implode(', ', array_map(fn($col, $def) => "$col $def", array_keys($required_columns), $required_columns));
+        $query = "{$create_table} {$table_name} ({$columns});";
+        $conn->exec($query);
+    
+        // Add any missing columns using ALTER TABLE
+        add_missing_columns($conn, $table_name, $required_columns, $db_driver);
+    }
+    
+    print("\nDatabase setup and migration finished\n");
 }
 
 print("\nDb setup finished\n");
