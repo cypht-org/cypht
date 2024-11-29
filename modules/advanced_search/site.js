@@ -85,12 +85,18 @@ var expand_adv_folder = function(res) {
     }
 };
 
-$(document).on("change", "input#all_folders", function() {
+$(document).on("change", "input[name='all_folders'],input[name='all_special_folders']", function() {
     const folderLi = $(this).closest('li');
+    const divergentCheckboxName = this.name === 'all_folders' ? 'all_special_folders' : 'all_folders';
+    const divergentCheckbox = $(this).closest('div').find(`input[name='${divergentCheckboxName}']`)
+    
     if ($(this).is(':checked')) {
         folderLi.find('a').attr('disabled', 'disabled');
+        divergentCheckbox.prop('checked', false);
+        divergentCheckbox.attr('disabled', 'disabled');
     } else {
         folderLi.find('a').removeAttr('disabled');
+        divergentCheckbox.removeAttr('disabled');
     }
 });
 
@@ -106,16 +112,25 @@ var adv_select_imap_folder = function(el) {
     list_container.show();
     folders.show();
 
-    folders.find('li').each(function() {
-        const wrapper = $('<div class="d-flex justify-content-between"></div>');
+    folders.find('li').each(function(index) {
+        const wrapper = $('<div class="d-flex justify-content-between wrapper"></div>');
         $(this).wrapInner(wrapper);
-        const allFoldersCheckbox = `
+        const allSpecialFoldersCheckbox = `
         <span class="form-check">
-            <label class="form-check-label" for="all_folders">All Folders</label>
-            <input class="form-check-input" type="checkbox" id="all_folders">
+            <label class="form-check-label" for="all_special_folders-${index}">All special folders</label>
+            <input class="form-check-input" type="checkbox" name="all_special_folders" id="all_special_folders-${index}">
         </span>
         `;
-        wrapper.append(allFoldersCheckbox);
+        const allFoldersCheckbox = `
+        <span class="form-check">
+            <label class="form-check-label" for="all_folders-${index}">All folders</label>
+            <input class="form-check-input" type="checkbox" name="all_folders" id="all_folders-${index}">
+        </span>
+        `;
+        const checkboxesWrapper = $('<div class="d-flex gap-3"></div>');
+        checkboxesWrapper.append(allSpecialFoldersCheckbox);
+        checkboxesWrapper.append(allFoldersCheckbox);
+        $(this).find('.wrapper').append(checkboxesWrapper);
     })
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
@@ -212,13 +227,18 @@ var adv_expand_sections = function() {
 var get_adv_sources = function() {
     const sources = [];
 
-    const searchInAllFolders = $('.adv_folder_list li input:checked')
+    const searchInAllFolders = $('.adv_folder_list li input[name="all_folders"]:checked');
     searchInAllFolders.each(function() {
         const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text()});
+        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), allFolders: true});
+    });
+
+    const searchInSpecialFolders = $('.adv_folder_list li input[name="all_special_folders"]:checked');
+    searchInSpecialFolders.each(function() {
+        const li = $(this).closest('li');
+        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), specialFolders: true});
     });
     
-
     const selected_sources = $('div', $('.adv_source_list'));
     if (!selected_sources) {
         return sources;
@@ -230,7 +250,7 @@ var get_adv_sources = function() {
             sources.push({'source': source, 'label': $('a', $(this)).text()});
         }
     });
-    return [sources, searchInAllFolders.length > 0];
+    return sources;
 };
 
 var get_adv_terms = function() {
@@ -328,7 +348,7 @@ var process_advanced_search = function() {
         Hm_Notices.show([err_msg('You must enter at least one search term')]);
         return;
     }
-    const [sources, allFolders] = get_adv_sources();
+    const sources = get_adv_sources();
     if (sources.length == 0) {
         Hm_Notices.show([err_msg('You must select at least one source')]);
         return;
@@ -349,7 +369,7 @@ var process_advanced_search = function() {
     search_summary({ 'terms': terms, 'targets': targets, 'sources': sources,
             'times': times, 'other': other });
 
-    send_requests(build_adv_search_requests(terms, sources, targets, times, other), allFolders);
+    send_requests(build_adv_search_requests(terms, sources, targets, times, other));
 };
 
 var save_search_details = function(terms, sources, targets, times, other) {
@@ -384,7 +404,7 @@ var adv_group_vals = function(data, type) {
     return groups;
 };
 
-var send_requests = function(requests, allFolders) {
+var send_requests = function(requests) {
     var request;
     $('tr', Hm_Utils.tbody()).remove();
     Hm_Utils.save_to_local_storage('formatted_advanced_search_data', '');
@@ -399,9 +419,14 @@ var send_requests = function(requests, allFolders) {
             {'name': 'adv_start', 'value': request['time']['from']},
             {'name': 'adv_end', 'value': request['time']['to']},
             {'name': 'adv_source_limit', 'value': request['other']['limit']},
-            {'name': 'adv_charset', 'value': request['other']['charset']},
-            {'name': 'all_folders', 'value': allFolders}
+            {'name': 'adv_charset', 'value': request['other']['charset']}
         ];
+
+        if (request['all_folders']) {
+            params.push({name: 'all_folders', value: true});
+        } else if (request['all_special_folders']) {
+            params.push({name: 'all_special_folders', value: true});
+        }
 
         for (var i=0, len=request['terms'].length; i < len; i++) {
             params.push({'name': 'adv_terms[]', 'value': request['terms'][i]});
@@ -449,22 +474,29 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
     var target_vals;
     var requests = []
     var term_groups = adv_group_vals(terms, 'term');
-    var target_groups = adv_group_vals(targets, 'target');
+    var target_groups = adv_group_vals(targets, 'target');    
 
     for (var tv=0, tvlen=term_groups.length; tv < tvlen; tv++) {
         term_vals = term_groups[tv];
         for (var tag=0, taglen=target_groups.length; tag < taglen; tag++) {
             target_vals = target_groups[tag];
             for (var s=0, slen=sources.length; s < slen; s++) {
-                source = sources[s]['source'];
+                source = sources[s];
                 for (var ti=0, tilen=times.length; ti < tilen; ti++) {
                     time = times[ti];
-                    requests.push({'source': source, 'time': time, 'other': other,
-                        'targets': target_vals, 'terms': term_vals});
+                    const config = {'source': source.source, 'time': time, 'other': other,
+                        'targets': target_vals, 'terms': term_vals};
+                    if (source.allFolders) {
+                        config['all_folders'] = true;
+                    } else if (source.specialFolders) {
+                        config['all_special_folders'] = true;
+                    }                    
+                    requests.push(config);
                 }
             }
         }
-    }
+    }    
+    
     return requests;
 };
 

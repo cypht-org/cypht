@@ -36,7 +36,7 @@ class SettingsHelpers(WebTest):
         list_item = self.by_class('menu_settings')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
         self.wait_with_folder_list()
-        if self.by_class('content_title').text != 'Site Settings':
+        if not self.element_exists('content_title') or self.by_class('content_title').text != 'Site Settings':
             self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
             self.by_css('[data-target=".'+section+'"]').click()
@@ -86,14 +86,13 @@ class SettingsTests(SettingsHelpers):
         self.wait()
 
     def load_settings_page(self):
-        self.wait_on_class('main')
+        self.wait(By.CSS_SELECTOR, '[data-bs-target=".settings"]')
         self.by_css('[data-bs-target=".settings"]').click()
         self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_settings')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
-        self.wait_with_folder_list()
-        if self.by_class('content_title').text != 'Site Settings':
-            self.wait_for_navigation_to_complete()
+        self.wait_on_class('settings_table')
+        print(self.by_class('content_title').text)
         assert self.by_class('content_title').text == 'Site Settings'
 
     def list_style_test(self):
@@ -119,6 +118,9 @@ class SettingsTests(SettingsHelpers):
 
     def msg_part_icons_test(self):
         self.checkbox_test('general_setting', 'msg_part_icons', True)
+
+    def review_sent_email_test(self):
+        self.checkbox_test('general_setting', 'review_sent_email', True)
 
     def simple_msg_parts_test(self):
         self.checkbox_test('general_setting', 'simple_msg_parts', False)
@@ -228,6 +230,7 @@ if __name__ == '__main__':
         'msg_list_icons_test',
         'msg_part_icons_test',
         'simple_msg_parts_test',
+        'review_sent_email_test',
         'text_only_test',
         'disable_delete_prompt_test',
         'no_password_save_test',

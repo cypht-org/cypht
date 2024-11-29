@@ -849,16 +849,17 @@ function Message_List() {
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);
         if (prev) {
-            const prevSubject = $(prev['0']).find('.subject');
-            phref = prevSubject.find('a').prop('href');
-            const subject = new Option(prevSubject.text()).innerHTML;
+            const prevSubject = $(prev['0']).find('.subject a');
+            phref = prevSubject.prop('href');
+            const subject = prevSubject.text();
             const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next) {
-            const nextSubject = $(next['0']).find('.subject');
-            nhref = nextSubject.find('a').prop('href');
-            const subject = new Option(nextSubject.text()).innerHTML;
+            const nextSubject = $(next['0']).find('.subject a');
+            nhref = nextSubject.prop('href');
+            const subject = nextSubject.text();
+            
             const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }

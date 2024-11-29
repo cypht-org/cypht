@@ -266,11 +266,16 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             list($msg_ids, $dest_path, $same_server_ids, $other_server_ids) = process_move_to_arguments($form);
             $moved = array();
             if (count($same_server_ids) > 0) {
-                $moved = array_merge($moved, imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path, $screen));
+                $action = imap_move_same_server($same_server_ids, $form['imap_move_action'], $this->cache, $dest_path, $screen);
+                $moved = array_merge($moved, $action['moved']);
             }
             if (count($other_server_ids) > 0) {
-                $moved = array_merge($moved, imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->cache));
+                $action = imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->cache);
+                $moved = array_merge($moved, $action['moved']);
 
+            }
+            if (count($moved) > 0) {
+                $this->out('move_responses', $action['responses']);
             }
             if (count($moved) > 0 && count($moved) == count($msg_ids)) {
                 if ($form['imap_move_action'] == 'move') {
@@ -356,7 +361,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                         break;
                     }
                 }
-                if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
+                if ($uid && $this->user_config->get('review_sent_email_setting', true)) {
                     $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
                 }
             }
@@ -404,7 +409,7 @@ class Hm_Handler_imap_mark_as_answered extends Hm_Handler_Module {
                 }
             }
         }
-        if ($this->get('msg_next_link') && !$this->user_config->get('review_sent_email_setting', false)) {
+        if ($this->get('msg_next_link') && !$this->user_config->get('review_sent_email_setting', true)) {
             $this->out('redirect_url', htmlspecialchars_decode($this->get('msg_next_link')));
         }
     }
@@ -721,7 +726,12 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
         $offset = 0;
         $msgs = array();
         $list_page = 1;
+        $include_content_body = false;
         $include_preview = $this->user_config->get('active_preview_message_setting', false);
+        $ceo_use_detect_ceo_fraud = $this->user_config->get('ceo_use_detect_ceo_fraud_setting', false);
+        if ($include_preview || $ceo_use_detect_ceo_fraud) {
+            $include_content_body = true;
+        }
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
@@ -746,14 +756,41 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                     $existingEmails = array_map(function($c){
                         return $c->value('email_address');
                     },$contact_list);
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_preview);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, $existingEmails, $include_content_body);
                 } else {
-                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_preview);
+                    list($total, $results) = $mailbox->get_messages(hex2bin($form['folder']), $sort, $rev, $filter, $offset, $limit, $keyword, null, $include_content_body);
                 }
                 foreach ($results as $msg) {
                     $msg['server_id'] = $form['imap_server_id'];
                     $msg['server_name'] = $details['name'];
-                    $msgs[] = $msg;
+                    $msg['folder'] = $form['folder'];
+                    $uid = $msg['uid'];
+
+                    if ($ceo_use_detect_ceo_fraud && hex2bin($form['folder']) == 'INBOX') {
+                        if ($this->isCeoFraud($msg['to'], $msg['subject'], $msg['preview_msg'])) {
+                            
+                            $folder = "Suspicious emails";
+                            if (!count($mailbox->get_mailbox_status($folder))) {
+                                $mailbox->create_folder($folder);
+                            }
+                            $dest_folder = bin2hex($folder);
+                            $server_ids = array(
+                                $form['imap_server_id'] => [
+                                    $form['folder'] => $uid
+                                ]
+                            );
+                            imap_move_same_server($server_ids, "move", $this->cache, [null, null, $dest_folder]);
+                            $msg = [];
+                            $total--;
+                        }
+                    }
+                    
+                    if ($msg) {
+                        if (! $include_preview && isset($msg['preview_msg'])) {
+                            $msg['preview_msg'] = "";
+                        }
+                        $msgs[] = $msg;
+                    }
                 }
                 if ($folder = $mailbox->get_selected_folder()) {
                     $folder['detail']['exists'] = $total;
@@ -767,6 +804,61 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
+    public function isCeoFraud($email, $subject, $msg) {          
+        // 1. Check Suspicious Terms or Requests
+        $suspiciousTerms = explode(",", $this->user_config->get("ceo_suspicious_terms_setting"));
+        if ($this->detectSuspiciousTerms($msg, $suspiciousTerms) || $this->detectSuspiciousTerms($subject, $suspiciousTerms)) {
+           
+            // 2. check ceo_rate_limit
+            $amounts = $this->extractAmountFromEmail($msg);
+            $amountLimit = $this->user_config->get("ceo_amount_limit_setting");
+            $isUpperAmount = array_reduce($amounts, function ($carry, $value) use ($amountLimit) {
+                return $carry || $value > $amountLimit;
+            }, false);
+            
+            if ($isUpperAmount) {
+                if ($this->user_config->get("ceo_use_trusted_contact_setting")) {
+                    $contacts = $this->get('contact_store');
+                    $contact_list = $contacts->getAll();
+                    $existingEmails = array_map(function($c){
+                        return $c->value('email_address');
+                    },$contact_list);
+                    if (!$this->isEmailInTrustedDomainList(array_values($existingEmails), $email)) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    private function detectSuspiciousTerms($msg, $suspiciousTerms) {
+        foreach ($suspiciousTerms as $phrase) {
+            if (stripos($msg, trim($phrase)) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private function isEmailInTrustedDomainList($trustedDomain, $email) {
+        if (in_array($email, $trustedDomain)) {
+            return true;
+        }
+        return false;
+    }
+    private function extractAmountFromEmail($emailBody) {
+        $pattern = '/\b\d+(?:,\d+)?\.?\d*\s*(?:USD|dollars?|US\$?|EUR|euros?|€|JPY|yen|¥|GBP|pounds?|£|CAD|CAD\$|AUD|AUD\$)/i';
+    
+        preg_match_all($pattern, $emailBody, $matches);
+    
+        if ($matches) {
+            return array_map(function($value) { 
+                return floatval(preg_replace('/[^0-9]/', '', $value)); 
+            }, $matches[0]);
+        }
+    }
+    
 }
 
 /**
@@ -854,7 +946,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && ! $mailbox->is_imap() && empty($archive_folder)) {
             // EWS supports archiving to user archive folders
-            $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']));
+            $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {
             if (!$archive_folder) {
                 Hm_Msgs::add('No archive folder configured for this IMAP server');
@@ -886,7 +978,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
 
                 /* try to move the message */
                 if (! $errors) {
-                    $status = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $archive_folder);
+                    $status = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $archive_folder)['status'];
                 }
             }
         }
@@ -921,7 +1013,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
                 else {
                     $cmd = 'FLAG';
                 }
-                if ($mailbox->message_action(hex2bin($form['folder']), $cmd, array($form['imap_msg_uid']))) {
+                if ($mailbox->message_action(hex2bin($form['folder']), $cmd, array($form['imap_msg_uid']))['status']) {
                     $flag_result = true;
                 }
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
@@ -971,43 +1063,6 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             $msg = 'Some messages have been snoozed';
         } else {
             $msg = 'ERRFailed to snooze selected messages';
-        }
-        Hm_Msgs::add($msg);
-    }
-}
-
-/**
- * Add tag/label to message
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_add_tag_message extends Hm_Handler_Module {
-    /**
-     * Use IMAP to tag the selected message uid
-     */
-    public function process() {
-        list($success, $form) = $this->process_form(array('tag_id', 'imap_server_ids'));
-        if (!$success) {
-            return;
-        }
-        $taged_messages = 0;
-        $ids = explode(',', $form['imap_server_ids']);
-        foreach ($ids as $msg_part) {
-            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
-            if ($mailbox && $mailbox->authed()) {
-                $folder = hex2bin($folder);
-                if (add_tag_to_message($mailbox, $msg_id, $folder, $form['tag_id'])) {
-                    $taged_messages++;
-                }
-            }
-        }
-        $this->out('taged_messages', $taged_messages);
-        if ($taged_messages == count($ids)) {
-            $msg = 'Tag added';
-        } elseif ($taged_messages > 0) {
-            $msg = 'Some messages have been taged';
-        } else {
-            $msg = 'ERRFailed to tag selected messages';
         }
         Hm_Msgs::add($msg);
     }
@@ -1097,7 +1152,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                             $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
 
                             if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)) {
+                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)['status']) {
                                     $errs++;
                                 }
                                 else {
@@ -1115,7 +1170,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                         $mailbox->create_folder($archive_folder);
                                     }
                                 }
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $archive_folder)) {
+                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $archive_folder)['status']) {
                                     $errs++;
                                 }
                                 else {
@@ -1125,7 +1180,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                 }
                             }
                             else {
-                                if (! $mailbox->message_action(hex2bin($folder), mb_strtoupper($form['action_type']), $uids)) {
+                                if (! $mailbox->message_action(hex2bin($folder), mb_strtoupper($form['action_type']), $uids)['status']) {
                                     $errs++;
                                 }
                                 else {
@@ -1196,7 +1251,11 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
             $folders = array($folder);
         } else {
-            $data_sources = imap_data_sources('', $this->session->get('custom_imap_sources', user:true));
+            $userCustomSources = $this->session->get('custom_imap_sources', user:true);
+            if (! $userCustomSources) {
+                $userCustomSources = [];
+            }
+            $data_sources = imap_data_sources('', $userCustomSources);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
@@ -2020,7 +2079,7 @@ class Hm_Handler_process_review_sent_email_setting extends Hm_Handler_Module {
         function review_sent_email_callback($val) {
             return $val;
         }
-        process_site_setting('review_sent_email', $this, 'review_sent_email_callback', false, true);
+        process_site_setting('review_sent_email', $this, 'review_sent_email_callback', DEFAULT_REVIEW_SENT_EMAIL, true);
     }
 }
 
@@ -2101,6 +2160,7 @@ class Hm_Handler_process_setting_move_messages_in_screen_email extends Hm_Handle
         process_site_setting('move_messages_in_screen_email', $this, 'process_move_messages_in_screen_email_enabled_callback', true, true);
     }
 }
+
 class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Module {
     public function process() {
         function process_active_preview_message_callback($val) { return $val; }
@@ -2108,4 +2168,20 @@ class Hm_Handler_process_setting_active_preview_message extends Hm_Handler_Modul
     }
 }
 
-
+/**
+ * Process setting_ceo_detection_fraud in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
+    public function process() {
+        function process_ceo_use_detect_ceo_fraud_callback($val) { return $val; }
+        function process_ceo_use_trusted_contact_callback($val) { return $val; }
+        function process_ceo_suspicious_terms_callback($val) { return $val; }
+        function process_ceo_amount_limit_callback($val) { return $val; }
+        
+        process_site_setting('ceo_use_detect_ceo_fraud', $this, 'process_ceo_use_detect_ceo_fraud_callback');
+        process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
+        process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');
+        process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
+    }
+}

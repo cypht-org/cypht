@@ -1125,17 +1125,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $res = '';
         if ($html == 1) {
-            $res .= '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
-                '<link href="'.WEB_ROOT.'modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
-                '<script type="text/javascript">KindEditor.ready(function(K) { window.kindEditor = K.create("#compose_body", {items:'.
-                "['formatblock', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'bold',".
-                "'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'pagebreak', 'link', 'unlink',".
-                "'justifyleft', 'justifycenter', 'justifyright',".
-                "'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', '|',".
-                "'undo', 'redo', 'preview', 'print', '|', 'selectall', 'cut', 'copy', 'paste',".
-                "'plainpaste', 'wordpaste', '|', 'source', 'fullscreen']".
-                ",basePath: '".WEB_ROOT."modules/smtp/assets/kindeditor/'".
-                '})});;</script>';
+            // TODO: The client should be provided all relevant configs so it can tell what appropriate js code to execute. This should not be handled by backend modules.
+            $res .= '<script type="text/javascript">window.HTMLEditor = true</script>';
         }
 
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
@@ -1150,7 +1141,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
-                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
+                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
                         '<div id="to_contacts"></div>'.
                     '</div>'.
                 '</div>'.
@@ -1741,7 +1732,7 @@ if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
     $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id);
     if ($mailbox && $mailbox->authed()) {
-        if ($mailbox->message_action($folder, 'DELETE', array($id))) {
+        if ($mailbox->message_action($folder, 'DELETE', array($id))['status']) {
             $mailbox->message_action($folder, 'EXPUNGE', array($id));
             return true;
         }

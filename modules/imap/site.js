@@ -764,6 +764,7 @@ var imap_message_view_finished = function(msg_uid, detail, skip_links) {
     });
     fixLtrInRtl();
 
+    handleExternalResources();
     handleAttachementDownload();
     handleViewMessagePart();
 };
@@ -785,7 +786,6 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
     }
     const callbackFn = (...args) => {        
         markPrefetchedMessagesAsRead(uid);
-        observeMessageTextMutationAndHandleExternalResources();
         if (callback) {
             callback(...args);
         }
@@ -801,8 +801,10 @@ var imap_setup_message_view_page = function(uid, details, list_path, callback) {
                         .append(msgResponse.msg_text)
                         .append(msgResponse.msg_parts);
         document.title = $('.header_subject th').text();
-        $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
-        $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+        if ($('.header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
+            $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+            $('.close_inline_msg').on("click", function() { msg_inline_close(); });
+        }
 
         $('.reply_link, .reply_all_link, .forward_link').each(function() {
             $(this).data("href", $(this).attr("href")).removeAttr("href");
@@ -947,8 +949,14 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
             {'name': 'imap_move_to', 'value': dest_id},
             {'name': 'imap_move_page', 'value': page},
             {'name': 'imap_move_action', 'value': action}],
-            function(res) {
+            async function(res) {
                 var index;
+                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                await store.load(false, true, true);
+                const moveResponses = Object.values(res['move_responses']);
+                moveResponses.forEach((response) => {
+                    store.removeRow(response.oldUid);
+                });
                 if (getPageNameParam() == 'message_list') {
                     Hm_Message_List.reset_checkboxes();
                     if (action == 'move' || action == 'screen_mail') {
@@ -957,7 +965,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
                         }
                     }
                     if (getListPathParam().substr(0, 4) === 'imap') {
-                        select_imap_folder(getListPathParam());
+                        display_imap_mailbox(store.rows, store.links, getListPathParam());
                     }
                     else {
                         Hm_Message_List.load_sources();
@@ -1063,8 +1071,8 @@ var imap_folder_status = function() {
     }
 };
 
-var imap_setup_tags = function() {
-    $(document).on('click', '.label-checkbox', function() {
+function imap_setup_tags() {
+    $('.label-checkbox').on('click', function() {
         var folder_id = $(this).data('id');
         var ids = [];
         if (getPageNameParam() == 'message') {
@@ -1085,15 +1093,7 @@ var imap_setup_tags = function() {
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_tag'},
             {'name': 'tag_id', 'value': folder_id},
-            {'name': 'imap_server_ids', 'value': ids}],
-            function(res) {
-                if (!res.router_user_msgs[0].startsWith('ERR')) {
-                    Hm_Utils.search_from_local_storage("/^\d+_imap_.+/")?.forEach((source) => Hm_Utils.save_to_local_storage(source, 1));
-                    Hm_Folders.reload_folders(true);
-                    var path = hm_list_parent()? hm_list_parent(): getListPathParam();
-                    window.location.replace('?page=message_list&list_path='+path);
-                }
-            }
+            {'name': 'list_path', 'value': ids}]
         );
     });
 }

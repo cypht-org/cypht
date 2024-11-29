@@ -173,7 +173,9 @@ class Hm_EWS {
             $parent = new Type\FolderIdType($parent);
         }
         try {
-            return $this->api->createFolders([$folder], $parent);
+            $result = $this->api->createFolders([$folder], $parent);
+            print_r($result);
+            exit;
         } catch(\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
@@ -282,10 +284,12 @@ class Hm_EWS {
                 ],
                 'Value' => $flags,
             ]));
-            $this->api->sendMail($msg, [
+            $result = $this->api->sendMail($msg, [
                 'MessageDisposition' => 'SaveOnly',
                 'SavedItemFolderId' => $folder->toArray(true),
             ]);
+            print_r($result);
+            exit;
             return true;
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
@@ -548,22 +552,42 @@ class Hm_EWS {
 
     public function message_action($action, $itemIds, $folder=false, $keyword=false) {
         if (empty($itemIds)) {
-            return true;
+            return ['status' => true, 'responses' => []];
         }
         if (! is_array($itemIds)) {
             $itemIds = [$itemIds];
         }
+        $change = null;
+        $status = false;
+        $responses = [];
         switch ($action) {
             case 'ARCHIVE':
-                return $this->archive_items($itemIds);
+                $status = $this->archive_items($itemIds);
+                break;
             case 'DELETE':
-                return $this->delete_items($itemIds);
+                $status = $this->delete_items($itemIds);
+                break;
             case 'HARDDELETE':
-                return $this->delete_items($itemIds, true);
+                $status = $this->delete_items($itemIds, true);
+                break;
             case 'COPY':
-                return $this->copy_items($itemIds, $folder);
+                $newIds = $this->copy_items($itemIds, $folder);
+                if ($newIds) {                
+                    foreach ($newIds as $key => $newId) {
+                        $responses[] = ['oldUid' => $itemIds[$key], 'newUid' => $newId];
+                    }
+                    $status = true;
+                }
+                break;
             case 'MOVE':
-                return $this->move_items($itemIds, $folder);
+                $newIds = $this->move_items($itemIds, $folder);
+                if ($newIds) {
+                    foreach ($newIds as $key => $newId) {
+                        $responses[] = ['oldUid' => $itemIds[$key], 'newUid' => $newId];
+                    }
+                    $status = true;
+                }
+                break;
             case 'READ':
                 $change = ItemUpdateBuilder::buildUpdateItemChanges('Message', 'message', ['IsRead' => true]);
                 break;
@@ -604,10 +628,11 @@ class Hm_EWS {
             case 'CUSTOM':
                 // TODO: unsupported out of the box, we can emulate via custom extended properties
                 $change = null;
+                $status = true;
                 break;
             case 'EXPUNGE':
                 // not needed for EWS
-                return true;
+                return ['status' => true, 'responses' => $responses];
             default:
                 $change = null;
         }
@@ -620,10 +645,10 @@ class Hm_EWS {
                     'Updates' => $change,
                 ];
             }
-            return $this->api->updateItems($changes);
+            $status = $this->api->updateItems($changes);
         }
 
-        return false;
+        return ['status' => $status, 'responses' => $responses];
     }
 
     public function get_message_headers($itemId) {
@@ -982,9 +1007,15 @@ class Hm_EWS {
         $request = Type::buildFromArray($request);
         try {
             $result = $this->ews->CopyItem($request);
+            if (! is_array($result)) {
+                $result = [$result];
+            }
+            $result = array_map(function($itemId) {
+                return $itemId->get('id');
+            }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
-            $result = false;
+            $result = [];
         }
         return $result;
     }
@@ -1007,9 +1038,15 @@ class Hm_EWS {
         $request = Type::buildFromArray($request);
         try {
             $result = $this->ews->MoveItem($request);
+            if (! is_array($result)) {
+                $result = [$result];
+            }
+            $result = array_map(function($itemId) {
+                return $itemId->get('id');
+            }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
-            $result = false;
+            $result = [];
         }
         return $result;
     }

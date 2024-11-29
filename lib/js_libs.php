@@ -6,7 +6,8 @@ define('JS_LIBS', [
     'resumable' => 'third_party/resumable.min.js',
     'ays-beforeunload-shim' =>  'third_party/ays-beforeunload-shim.js',
     'jquery-are-you-sure' => 'third_party/jquery.are-you-sure.js',
-    'sortable' => 'third_party/sortable.min.js'
+    'sortable' => 'third_party/sortable.min.js',
+    'kindeditor' => 'third_party/kindeditor/kindeditor-all-min.js',
 ]);
 
 function get_js_libs($exclude_deps = []) {

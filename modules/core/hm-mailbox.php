@@ -350,9 +350,7 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             if ($this->connection->append_start($folder, mb_strlen($msg), $seen, $draft)) {
                 $this->connection->append_feed($msg."\r\n");
-                if (! $this->connection->append_end()) {
-                    return true;
-                }
+                return $this->connection->append_end();
             }
         } else {
             return $this->connection->store_message($folder, $msg, $seen, $draft);
@@ -365,12 +363,12 @@ class Hm_Mailbox {
             return;
         }
         if ($this->is_imap() && $trash_folder && $trash_folder != $folder) {
-            if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)) {
+            if ($this->connection->message_action('MOVE', [$msg_id], $trash_folder)['status']) {
                 return true;
             }
         }
         else {
-            if ($this->connection->message_action('DELETE', array($msg_id))) {
+            if ($this->connection->message_action('DELETE', array($msg_id))['status']) {
                 $this->connection->message_action('EXPUNGE', array($msg_id));
                 return true;
             }
@@ -380,7 +378,7 @@ class Hm_Mailbox {
 
     public function message_action($folder, $action, $uids, $mailbox=false, $keyword=false) {
         if (! $this->select_folder($folder)) {
-            return;
+            return ['status' => false, 'responses' => []];
         }
         return $this->connection->message_action($action, $uids, $mailbox, $keyword);
     }
@@ -444,7 +442,7 @@ class Hm_Mailbox {
                     if ($this->connection->append_start($folder, mb_strlen($msg))) {
                         $this->connection->append_feed($msg."\r\n");
                         if ($this->connection->append_end()) {
-                            if ($this->connection->message_action('DELETE', array($uid))) {
+                            if ($this->connection->message_action('DELETE', array($uid))['status']) {
                                 $this->connection->message_action('EXPUNGE', array($uid));
                                 return true;
                             }

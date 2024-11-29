@@ -234,7 +234,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if (isset($msg['preview_msg'])) {
             $preview_msg = $msg['preview_msg'];
         }
-       
+    
         if ($parent_list == 'sent') {
             $icon = 'sent';
             $from = $msg['to'];
@@ -877,7 +877,8 @@ function imap_refresh_oauth2_token($server, $config) {
  */
 if (!hm_exists('imap_move_same_server')) {
 function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_emails=false) {
-    $moved = array();
+    $moved = [];
+    $responses = [];
     $keys = array_keys($ids);
     $server_id = array_pop($keys);
     $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $hm_cache);
@@ -889,22 +890,40 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                     $email = current(array_column(process_address_fld($mailbox->get_message_headers(hex2bin($folder), $msg)['From']), "email"));
                     $uids = $mailbox->search(hex2bin($folder), 'ALL', false, array(array('FROM', $email)));
                     foreach ($uids as $uid) {
-                        if ($mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $uid, hex2bin($dest_path[2]))) {
+                        $result = $mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $uid, hex2bin($dest_path[2]));
+                        if ($result['status']) {
+                            $response = $result['responses'][0];
+                            $responses[] = [
+                                'oldUid' => $uid,
+                                'newUid' => $response['newUid'],
+                                'oldFolder' => hex2bin($folder),
+                                'newFolder' => hex2bin($dest_path[2]),
+                                'oldServer' => $server_id,
+                            ];
                             $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $uid, $folder);
                         }
                     }
                 }
             } else {
-                if ($mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $msgs, hex2bin($dest_path[2]))) {
-                    foreach ($msgs as $msg) {
+                $result = $mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $msgs, hex2bin($dest_path[2]));
+                if ($result['status']) {
+                    foreach ($msgs as $index => $msg) {
+                        $response = $result['responses'][$index];
                         $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
+                        $responses[] = [
+                            'oldUid' => $msg,
+                            'newUid' => $response['newUid'],
+                            'oldFolder' => hex2bin($folder),
+                            'newFolder' => hex2bin($dest_path[2]),
+                            'oldServer' => $server_id,
+                        ];
                     }
                 }
             }
 
         }
     }
-    return $moved;
+    return ['moved' => $moved, 'responses' => $responses];
 }}
 
 /**
@@ -918,7 +937,8 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
  */
 if (!hm_exists('imap_move_different_server')) {
 function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
-    $moved = array();
+    $moved = [];
+    $responses = [];
     $dest_mailbox = Hm_IMAP_List::get_connected_mailbox($dest_path[1], $hm_cache);
     if ($dest_mailbox && $dest_mailbox->authed()) {
         foreach ($ids as $server_id => $folders) {
@@ -942,20 +962,29 @@ function imap_move_different_server($ids, $action, $dest_path, $hm_cache) {
                         if (!$seen) {
                             $mailbox->message_action(hex2bin($folder), 'UNREAD', array($msg_id));
                         }
-                        if ($dest_mailbox->store_message(hex2bin($dest_path[2]), $msg, $seen)) {
+                        if ($uid = $dest_mailbox->store_message(hex2bin($dest_path[2]), $msg, $seen)) {
                             if ($action == 'move') {
-                                if ($mailbox->message_action(hex2bin($folder), 'DELETE', array($msg_id))) {
+                                $deleteResult = $mailbox->message_action(hex2bin($folder), 'DELETE', array($msg_id));
+                                if ($deleteResult['status']) {
                                     $mailbox->message_action(hex2bin($folder), 'EXPUNGE', array($msg_id));
                                 }
                             }
                             $moved[] = sprintf('imap_%s_%s_%s', $server_id, $msg_id, $folder);
+                            $responses[] = [
+                                'oldUid' => $msg_id,
+                                'newUid' => $uid,
+                                'oldFolder' => hex2bin($folder),
+                                'newFolder' => hex2bin($dest_path[2]),
+                                'oldServer' => $server_id,
+                                'newServer' => $dest_path[1],
+                            ];
                         }
                     }
                 }
             }
         }
     }
-    return $moved;
+    return ['moved' => $moved, 'responses' => $responses];
 }}
 
 /**
@@ -1310,7 +1339,8 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
             $mailbox->create_folder($snooze_folder);
         }
         if ($mailbox->store_message($snooze_folder, $msg)) {
-            if ($mailbox->message_action($folder, 'DELETE', array($msg_id))) {
+            $deleteResult = $mailbox->message_action($folder, 'DELETE', array($msg_id));
+            if ($deleteResult['status']) {
                 $mailbox->message_action($folder, 'EXPUNGE', array($msg_id));
                 $res = true;
             }
@@ -1319,44 +1349,13 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
         $snooze_headers = parse_snooze_header($matches[0]);
         $original_folder = $snooze_headers['from'];
         if ($mailbox->store_message($original_folder, $msg)) {
-            if ($mailbox->message_action($snooze_folder, 'DELETE', array($msg_id))) {
+            $deleteResult = $mailbox->message_action($snooze_folder, 'DELETE', array($msg_id));
+            if ($deleteResult['status']) {
                 $mailbox->message_action($snooze_folder, 'EXPUNGE', array($msg_id));
                 $res = true;
             }
         }
     }
-    return $res;
-}}
-if (!hm_exists('add_tag_to_message')) {
-function add_tag_to_message($mailbox, $msg_id, $folder, $tag) {
-    $msg = $mailbox->get_message_content($folder, $msg_id);
-    preg_match("/^X-Cypht-Tags:(.+)\r?\n/i", $msg, $matches);
-
-    if (count($matches)) {
-        $msg = str_replace($matches[0], '', $msg);
-        $tags = explode(',', $matches[1]);
-        if(in_array($tag, $tags)) {
-            unset($tags[array_search(trim($tag), $tags)]);
-        }else{
-            $tags[] = trim($tag);
-        }
-    }else {
-        $tags = array($tag);
-    }
-
-    $msg = "X-Cypht-Tags:".implode(',',$tags)."\n".$msg;
-    $msg = str_replace("\r\n", "\n", $msg);
-    $msg = str_replace("\n", "\r\n", $msg);
-    $msg = rtrim($msg)."\r\n";
-
-    $res = false;
-    if ($mailbox->store_message($folder, $msg)) {
-        if ($mailbox->message_action($folder, 'DELETE', array($msg_id))) {
-            $mailbox->message_action($folder, 'EXPUNGE', array($msg_id));
-            $res = true;
-        }
-    }
-
     return $res;
 }}
 
