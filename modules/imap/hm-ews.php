@@ -96,9 +96,8 @@ class Hm_EWS {
                     'basename' => $name,
                     'realname' => $name,
                     'namespace' => '',
-                    // TODO - flags
-                    'marked' => false, 
-                    'noselect' => false,
+                    'marked' => false, // doesn't seem to be used anywhere but imap returns it
+                    'noselect' => false, // all EWS folders are selectable 
                     'can_have_kids' => true,
                     'has_kids' => $folder->get('childFolderCount') > 0,
                     'children' => $folder->get('childFolderCount'),
@@ -145,11 +144,18 @@ class Hm_EWS {
         try {
             if ($this->is_distinguished_folder($folder)) {
                 $folder = new Type\DistinguishedFolderIdType($folder);
-            } else {
+                $result = $this->api->getFolder($folder->toArray(true));
+            } elseif (base64_encode(base64_decode($folder, true)) === $folder) {
                 $folder = new Type\FolderIdType($folder);
+                $result = $this->api->getFolder($folder->toArray(true));
+            } else {
+                $result = $this->api->getFolderByDisplayName($folder, Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+                if (! $result) {
+                    throw new Exception('Folder not found.');
+                }
             }
-            $result = $this->api->getFolder($folder->toArray(true));
             return [
+                'id' => $result->get('folderId')->get('id'),
                 'name' => $result->get('displayName'),
                 'messages' => $result->get('totalCount'),
                 'uidvalidity' => false,
@@ -173,9 +179,14 @@ class Hm_EWS {
             $parent = new Type\FolderIdType($parent);
         }
         try {
-            $result = $this->api->createFolders([$folder], $parent);
-            print_r($result);
-            exit;
+            $request = [
+                'Folders' => ['Folder' => [
+                    'DisplayName' => $folder
+                ]],
+                'ParentFolderId' => $parent->toArray(true),
+            ];
+            $result = $this->ews->CreateFolder($request);
+            return $result->get('id');
         } catch(\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
@@ -288,9 +299,7 @@ class Hm_EWS {
                 'MessageDisposition' => 'SaveOnly',
                 'SavedItemFolderId' => $folder->toArray(true),
             ]);
-            print_r($result);
-            exit;
-            return true;
+            return $result->get('id');
         } catch (\Exception $e) {
             Hm_Msgs::add('ERR' . $e->getMessage());
             return false;
@@ -386,7 +395,7 @@ class Hm_EWS {
                         $qs[] = "Subject:($term[1])";
                         break;
                     default:
-                        // TODO: check for other types of terms
+                        // noop
                 }
             }
         } elseif (! empty($keyword)) {

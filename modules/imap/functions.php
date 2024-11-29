@@ -1335,8 +1335,11 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
     $res = false;
     $snooze_folder = 'Snoozed';
     if ($snooze_tag) {
-        if (!count($mailbox->get_folder_status($snooze_folder))) {
-            $mailbox->create_folder($snooze_folder);
+        $status = $mailbox->get_folder_status($snooze_folder);
+        if (! count($status)) {
+            $snooze_folder = $mailbox->create_folder($snooze_folder);
+        } else {
+            $snooze_folder = $status['id'];
         }
         if ($mailbox->store_message($snooze_folder, $msg)) {
             $deleteResult = $mailbox->message_action($folder, 'DELETE', array($msg_id));

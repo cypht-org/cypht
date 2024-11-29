@@ -837,6 +837,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->check_response($response, true)) {
                 $attributes = $this->parse_status_response($response);
                 $this->check_mailbox_state_change($attributes);
+                $attributes['id'] = $mailbox;
             }
             return $attributes;
         }

@@ -119,7 +119,11 @@ class Hm_Mailbox {
         }
         if ($this->is_imap()) {
             $new_folder = prep_folder_name($this->connection, $folder, false, $parent);
-            return $this->connection->create_mailbox($new_folder);
+            if ($this->connection->create_mailbox($new_folder)) {
+                return $new_folder;
+            } else {
+                return false;
+            }
         } else {
             return $this->connection->create_folder($folder, $parent);
         }
@@ -249,7 +253,7 @@ class Hm_Mailbox {
      * Get messages in a folder applying filters, sorting and pagination
      * @return array - [total results found, results for a single page]
      */
-    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[], $include_preview = false) {
+    public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=50, $keyword=false, $trusted_senders=[], $include_preview = false) {
         if (! $this->select_folder($folder)) {
             return;
         }

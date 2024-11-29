@@ -1083,9 +1083,11 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
             if ($mailbox && $mailbox->authed()) {
                 $folder = 'Snoozed';
-                if (! count($mailbox->get_folder_status($folder))) {
+                $status = $mailbox->get_folder_status($folder);
+                if (! count($status)) {
                     continue;
                 }
+                $folder = $status['id'];
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
                     $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
