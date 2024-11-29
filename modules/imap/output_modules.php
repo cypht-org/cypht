@@ -185,7 +185,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
-            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%d',
+            $reply_args = sprintf('&amp;list_path=%s&amp;uid=%s',
                 $this->html_safe($this->get('msg_list_path')),
                 $this->html_safe($this->get('msg_text_uid'))
             );
@@ -458,6 +458,10 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $type = 'JMAP';
             }
 
+            if (array_key_exists('type', $vals) && $vals['type'] == 'ews') {
+                continue;
+            }
+
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
@@ -725,7 +729,7 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
     protected function output() {
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
+            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
                 '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
         }
         return $res;
@@ -1444,6 +1448,166 @@ class Hm_Output_stepper_setup_server_jmap_imap_common extends Hm_Output_Module {
                 </label>
             </div>
         ';
+
+        return $res;
+    }
+}
+
+class Hm_Output_server_config_ews extends Hm_Output_Module {
+    protected function output() {
+        $hasEWSActivated = in_array('imap', $this->get('router_module_list'), true);
+
+        if(! $hasEWSActivated){
+            return '';
+        }
+
+        $ews_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return array_key_exists('type', $v) && $v['type'] == 'ews'; }));
+
+        $res = '<div class="ews_server_setup">
+                <div data-target=".ews_server_config_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
+                    <a href="#" class="pe-auto">
+                        <i class="bi bi-envelope-fill me-3"></i>
+                        <b>' . $this->trans('Exchange Servers') . '</b>
+                    </a>
+                    <div class="server_count"><span class="ews_server_count"> ' . $ews_servers_count .'</span> ' . $this->trans('EWS') . '</div>
+                </div>
+                <div class="ews_server_config_section px-4 pt-3 me-0">
+                    <div class="d-none col-12 col-xl-7 mb-4" id="ews_form">
+                        <form class="me-0" method="POST">
+                        <div>
+                            <input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />
+                            <input type="hidden" name="ews_server_id" id="ews_server_id" />
+                            <div class="form-floating mb-3">
+                                <input required type="text" id="ews_profile_name" name="ews_profile_name" class="txt_fld form-control" value="" placeholder="'.$this->trans('Name').'">
+                                <label class="" for="ews_profile_name">'.$this->trans('Name').'</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input required type="text" id="ews_server" name="ews_server" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Server Address').'">
+                                <label class="" for="ews_server">'.$this->trans('Server Address').'</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input required type="text" id="ews_email" name="ews_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
+                                <label class="" for="ews_email">'.$this->trans('Email or Username').'</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" id="ews_password" name="ews_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                <label class="" for="ews_password">'.$this->trans('Password').'</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="hidden" name="ews_hide_from_c_page" value="0">
+                                <input class="form-check-input" type="checkbox" role="switch" id="ews_hide_from_c_page" name="ews_hide_from_c_page" value="1">
+                                <label class="form-check-label" for="ews_hide_from_c_page">
+                                    '.$this->trans('Hide From Combined Pages').'
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mt-3">
+                                <input type="hidden" name="ews_create_profile" value="0">
+                                <input class="form-check-input" type="checkbox" role="switch" onchange="handleCreateProfileCheckboxChange(this)" id="ews_create_profile" name="ews_create_profile" value="1" checked>
+                                <label class="form-check-label" for="ews_create_profile">'.$this->trans('Create Profile').'</label>
+                            </div>
+                            <div class="ms-3">
+                                <div class="form-floating mb-2">
+                                    <input type="text" id="ews_profile_reply_to" name="ews_profile_reply_to" class="txt_fld form-control" value="" placeholder="'.$this->trans('Reply to').'">
+                                    <label class="" for="ews_profile_reply_to">'.$this->trans('Reply to').'</label>
+                                </div>
+                                <div class="form-floating mb-2">
+                                    <input type="text" id="ews_profile_signature" name="ews_profile_signature" class="txt_fld form-control" value="" placeholder="'.$this->trans('Signature').'">
+                                    <label class="" for="ews_profile_signature">'.$this->trans('Signature').'</label>
+                                </div>
+                                <div class="form-check">
+                                    <input type="hidden" name="ews_profile_is_default" value="0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="ews_profile_is_default" name="ews_profile_is_default" value="1" checked>
+                                    <label class="form-check-label" for="ews_profile_is_default">'.$this->trans('Set this profile default').'</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="step_config-actions mt-4 d-flex justify-content-between">
+                            <input type="submit" class="btn btn-primary px-3" value="'.$this->trans('Save').'">
+                        </div>
+                        </form>
+                    </div>
+                    <button class="ews-btn btn btn-primary px-4" id="add_new_ews_button"><i class="bi bi-plus-square-fill me-2"></i> '.$this->trans('Add a new server').'</button>';
+
+        $list = $this->get('imap_servers', array());
+        foreach ($list as $index => $vals) {
+            if (! array_key_exists('type', $vals) || $vals['type'] != 'ews') {
+                continue;
+            }
+
+            $server_id = $vals['id'];
+
+            if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
+                $disabled = 'disabled="disabled"';
+                $user_pc = $vals['user'];
+                $pass_pc = $this->trans('[saved]');
+                $pass_value = '*************';
+            }
+            elseif (array_key_exists('nopass', $vals)) {
+                if (array_key_exists('user', $vals)) {
+                    $user_pc = $vals['user'];
+                }
+                else {
+                    $user_pc = '';
+                }
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
+                $pass_value = '';
+            }
+            else {
+                $user_pc = '';
+                $pass_pc = $this->trans('Password');
+                $disabled = '';
+                $pass_value = '';
+            }
+            $res .= '<div class="ews_server mt-3 mb-3">';
+            $res .= '<form class="imap_connect" method="POST">';
+            $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+            $res .= '<input type="hidden" name="imap_server_id" class="imap_server_id" value="'.$this->html_safe($server_id).'" />';
+            $res .= '<div class="row m-0 p-0 credentials-container"><div class="col-xl-2 col-lg-2 col-md-6">';
+            $res .= sprintf('
+                <div class="text-muted"><strong>%s</strong></div>
+                <div class="server_subtitle">%s</div>',
+                $this->html_safe($vals['name']), $this->html_safe($vals['server']));
+
+            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4  ">';
+
+            $res .= '<div class="form-floating">';
+            $res .= '<input '.$disabled.' id="imap_user_'.$server_id.'" class="form-control credentials" type="text" name="imap_user" value="'.$this->html_safe($user_pc).'" placeholder="'.$this->trans('Username').'">';
+            $res .= '<label for="imap_user_'.$server_id.'">'.$this->trans('Username').'</label></div>';
+            $res .= '</div><div class="col-md-6 col-lg-4">';
+            $res .= '<div class="form-floating">';
+            $res .= '<input '.$disabled.' id="imap_pass_'.$server_id.'" class="form-control credentials imap_password" type="password" name="imap_pass" value="'.$pass_value.'" placeholder="'.$pass_pc.'">';
+            $res .= '<label for="imap_pass_'.$server_id.'">'.$this->trans('Password').'</label></div>';
+            $res .= '</div><div class="col-md-6 col-lg-4">';
+
+            $res .= '</div></div></div><div class="col-lg-3 d-flex justify-content-start align-items-center">';
+
+            // Buttons
+            $disabled = isset($vals['default']) ? ' disabled': '';
+            if (!isset($vals['user']) || !$vals['user']) {
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Save').'" class="save_imap_connection btn btn-primary btn-sm me-2" />';
+            } else {
+                $keysToRemove = array('object', 'connected', 'default', 'nopass');
+                $serverDetails = array_diff_key($vals, array_flip($keysToRemove));
+
+                $res .= '<input type="submit" value="'.$this->trans('Edit').'" class="edit_ews_server_connection btn btn-outline-success btn-sm me-2"'.$disabled.' data-server-details=\''.$this->html_safe(json_encode($serverDetails)).'\' data-id="'.$this->html_safe($serverDetails['name']).'" data-type="ews" />';
+                $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2" />';
+                $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2"'.$disabled.' />';
+            }
+
+            // Hide/Unhide Buttons
+            $hidden = array_key_exists('hide', $vals) && $vals['hide'];
+            $res .= '<input type="submit" '.($hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Hide').'" class="hide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+            $res .= '<input type="submit" '.(!$hidden ? 'style="display: none;" ' : '').'value="'.$this->trans('Unhide').'" class="unhide_imap_connection btn btn-outline-secondary btn-sm me-2" />';
+
+            $res .= '<input type="hidden" value="ajax_imap_debug" name="hm_ajax_hook" />';
+            $res .= '</div></div></div></form>';
+        }
+
+        $res .= '
+                </div>
+            </div>';
 
         return $res;
     }

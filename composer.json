@@ -46,6 +46,7 @@
         "ext-openssl": "*",
         "ext-session": "*",
         "ezyang/htmlpurifier": "^4.17",
+        "garethp/php-ews": "dev-master",
         "henrique-borba/php-sieve-manager": "^1.0",
         "league/commonmark": "^2.4",
         "paragonie/random_compat": "^2.0.18",

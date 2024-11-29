@@ -124,7 +124,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_list_sources() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div></div>', list_sources(array(array('group' => 'background', 'type' => 'imap', 'folder' => 'foo')), $mod));
-        $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah foo</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap', 'folder' => bin2hex('foo'))), $mod));
+        $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah foo</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap', 'folder' => bin2hex('foo'), 'folder_name' => 'foo')), $mod));
         $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah INBOX</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap')), $mod));
     }
     /**

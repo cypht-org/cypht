@@ -336,13 +336,14 @@ var is_valid_recipient = function(recipient) {
 
 var process_compose_form = function(){
     var msg_uid = getMessageUidParam();
-    var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-    var class_name = 'imap_' + detail.server_id + '_' + msg_uid + '_' + detail.folder;
-    var key = 'imap_' + Hm_Utils.get_url_page_number() + '_' + getListPathParam();
-    var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
-
-    if (next_message) {
-        $('.compose_next_email_data').val(next_message);
+    if (getListPathParam()) {
+        var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        var class_name = 'imap_' + detail.server_id + '_' + msg_uid + '_' + detail.folder;
+        var key = 'imap_' + Hm_Utils.get_url_page_number() + '_' + getListPathParam();
+        var next_message = Hm_Message_List.prev_next_links(key, class_name)[1];
+        if (next_message) {
+            $('.compose_next_email_data').val(next_message);
+        }
     }
 
     var uploaded_files = $("input[name='uploaded_files[]']").map(function () { return $(this).val(); }).get();
@@ -352,6 +353,7 @@ var process_compose_form = function(){
     $('.smtp_send_archive').addClass('disabled_input');
     $('.smtp_send').on("click", function () { return false; });
 }
+
 var force_send_message = function() {
     // Check if the force_send input already exists
     var forceSendInput = document.getElementById('force_send');

@@ -75,6 +75,7 @@ var imapServersPageHandler = function() {
     $('.hide_imap_connection').on('click', imap_hide);
     $('.unhide_imap_connection').on('click', imap_unhide);
     $('.test_imap_connect').on('click', imap_test_action);
+    $('.edit_ews_server_connection').on('click', ews_edit_action);
 
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');
     if (dsp === 'block' || dsp === 'none') {
@@ -84,6 +85,26 @@ var imapServersPageHandler = function() {
     if (jdsp === 'block' || jdsp === 'none') {
         $('.jmap_section').css('display', jdsp);
     }
+
+    $('.ews-btn').on('click', function() {
+        $(this).hide().prev().removeClass('d-none');
+    });
+};
+
+var ews_edit_action = function(event) {
+    event.preventDefault();
+    Hm_Notices.hide(true);
+    var details = $(this).data('server-details');
+
+    $('.ews-btn').trigger('click');
+    $('#ews_profile_name').val(details.name).trigger('focus');
+    $('#ews_email').val(details.user);
+    $('#ews_password').val('');
+    $('#ews_profile_reply_to').val('');
+    $('#ews_create_profile').trigger("click", true);
+    $('#ews_server').val(details.server);
+    $('#ews_server_id').val(details.id);
+    $('#ews_hide_from_c_page').prop("checked", details.hide);
 };
 
 var set_message_content = function(path, msg_uid) {
