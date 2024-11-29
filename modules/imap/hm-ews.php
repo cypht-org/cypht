@@ -225,10 +225,6 @@ class Hm_EWS {
                 $request = Type::buildFromArray($request);
                 $this->ews->MoveFolder($request);
             } catch (\Exception $e) {
-                var_dump($folder->toArray(true));
-                echo $this->ews->getClient()->__getLastRequest();
-                echo $this->ews->getClient()->__getLastResponse();
-                exit;
                 Hm_Msgs::add('ERR' . $e->getMessage());
                 return false;
             }
