@@ -28,6 +28,8 @@ class Hm_DB_Session extends Hm_PHP_Session {
     */
     private $lock_timeout = 10;
 
+    private $version = 1;
+
     /**
      * Create a new session
      * @return boolean|integer|array
@@ -77,17 +79,12 @@ class Hm_DB_Session extends Hm_PHP_Session {
      */
     public function start_existing($key) {
         $this->session_key = $key;
-        if (!$this->acquire_lock($key)) {
-            Hm_Debug::add('DB SESSION: Failed to acquire lock');
-            return;
-        }
         $data = $this->get_session_data($key);
         if (is_array($data)) {
             Hm_Debug::add('LOGGED IN');
             $this->active = true;
             $this->data = $data;
         }
-        $this->release_lock($key);
     }
 
     /**
@@ -96,9 +93,16 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return mixed array results or false on failure
      */
     public function get_session_data($key) {
-        $results = Hm_DB::execute($this->dbh, 'select data from hm_user_session where hm_id=?', [$key]);
-        if (is_array($results) && array_key_exists('data', $results)) {
-            return $this->plaintext($results['data']);
+        $results = Hm_DB::execute($this->dbh, 'select data, hm_version from hm_user_session where hm_id=?', [$key]);
+        if (is_array($results)) {
+            if (array_key_exists('data', $results) && array_key_exists('hm_version', $results)) {
+                $this->version = $results['hm_version'];
+                $data = $results['data'];
+                if (is_resource($data)) {
+                    $data = stream_get_contents($data);
+                }
+                return $this->plaintext($data);
+            }
         }
         Hm_Debug::add('DB SESSION failed to read session data');
         return false;
@@ -141,9 +145,25 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $res = false;
         $params = [':key' => $this->session_key, ':data' => $this->ciphertext($this->data)];
         if ($type == 'update') {
-            $res = Hm_DB::execute($this->dbh, 'update hm_user_session set data=:data where hm_id=:key', $params);
+            if ($this->version === null) {
+                Hm_Debug::add('DB SESSION: Missing hm_version for session key ' . $this->session_key);
+                return false;
+            }
+            $params[':hm_version'] = $this->version;
+            if (!$this->acquire_lock($this->session_key)) {
+                Hm_Debug::add('Failed to acquire lock on session');
+                return false;
+            }
+            $res = Hm_DB::execute($this->dbh, 'update hm_user_session set data=:data, hm_version=hm_version+1 where hm_id=:key and hm_version=:hm_version', $params);
+            if ($res === 0) {
+                Hm_Debug::add('Optimistic Locking: hm_version mismatch, session data not updated');
+                $this->release_lock($this->session_key);
+                return false;
+            }
+            $this->release_lock($this->session_key);
         } elseif ($type == 'insert') {
-            $res = Hm_DB::execute($this->dbh, 'insert into hm_user_session values(:key, :data, current_date)', $params);
+            $res = Hm_DB::execute($this->dbh, 'insert into hm_user_session (hm_id, data, hm_version, date) values(:key, :data, 1, current_date)', $params);
+            Hm_Debug::add('Session insert params: ' . json_encode($params));
         }
         if (!$res) {
             Hm_Debug::add('DB SESSION failed to write session data');
@@ -192,44 +212,55 @@ class Hm_DB_Session extends Hm_PHP_Session {
      * @return bool true if lock acquired, false otherwise
      */
     private function acquire_lock($key) {
-        $lock_name = 'session_lock_' . substr(hash('sha256', $key), 0, 51);        
+        $lock_name = 'session_lock_' . substr(hash('sha256', $key), 0, 51);
+        // Polling parameters
+        $max_attempts = 5;
+        $retry_interval = 500000;
+        $attempts = 0;
         $query = '';
         $params = [];
-
-        switch ($this->db_driver) {
-            case 'mysql':
-                $query = 'SELECT GET_LOCK(:lock_name, :timeout)';
-                $params = [':lock_name' => $lock_name, ':timeout' => $this->lock_timeout];
-                break;
-
-            case 'pgsql':
-                $query = 'SELECT pg_try_advisory_lock(:hash_key)';
-                $params = [':hash_key' => crc32($lock_name)];
-                break;
-
-            case 'sqlite':
-                $query = 'UPDATE hm_user_session SET lock=1 WHERE hm_id=? AND lock=0';
-                $params = [$key];
-                break;
-
-            default:
-                Hm_Debug::add('DB SESSION: Unsupported db_driver for locking: ' . $this->db_driver);
-                return false;
+        while ($attempts < $max_attempts) {
+            switch ($this->db_driver) {
+                case 'mysql':
+                    $query = 'SELECT GET_LOCK(:lock_name, :timeout)';
+                    $params = [':lock_name' => $lock_name, ':timeout' => $this->lock_timeout];
+                    break;
+                case 'pgsql':
+                    $query = 'SELECT pg_try_advisory_lock(:hash_key)';
+                    $params = [':hash_key' => crc32($lock_name)];
+                    break;
+                case 'sqlite':
+                    $query = 'UPDATE hm_user_session SET lock=1 WHERE hm_id=? AND lock=0';
+                    $params = [$key];
+                    break;
+                default:
+                    Hm_Debug::add('DB SESSION: Unsupported db_driver for locking: ' . $this->db_driver);
+                    return false;
+            }
+            $result = Hm_DB::execute($this->dbh, $query, $params);
+            if ($this->db_driver == 'mysql') {
+                if (isset($result['GET_LOCK(?, ?)']) && $result['GET_LOCK(?, ?)'] == 1) {
+                    return true;
+                }
+            }
+            if ($this->db_driver == 'pgsql') {
+                if (isset($result['pg_try_advisory_lock']) && $result['pg_try_advisory_lock'] === true) {
+                    return true;
+                }
+            }
+            if ($this->db_driver == 'sqlite') {
+                if (isset($result[0]) && $result[0] == 1) {
+                    return true;
+                }
+            }
+            $attempts++;
+            if ($attempts < $max_attempts) {
+                usleep($retry_interval);
+            }
         }
-
-        $result = Hm_DB::execute($this->dbh, $query, $params);
-        if ($this->db_driver == 'mysql') {
-            return isset($result['GET_LOCK(?, ?)']) && $result['GET_LOCK(?, ?)'] == 1;
-        }
-        if ($this->db_driver == 'pgsql') {
-            return isset($result['pg_try_advisory_lock']) && $result['pg_try_advisory_lock'] === true;
-        }
-
-        if ($this->db_driver == 'sqlite') {
-            return isset($result[0]) && $result[0] == 1;
-        }
+        Hm_Debug::add('DB SESSION: Failed to acquire lock after ' . $max_attempts . ' attempts.');
         return false;
-    }
+    }    
 
     /**
      * Release a lock for the session (unified for all DB types)
@@ -239,24 +270,20 @@ class Hm_DB_Session extends Hm_PHP_Session {
     private function release_lock($key) {
         $query = '';
         $params = [];
-    
         $lock_name = "session_lock_" . substr(hash('sha256', $key), 0, 51);
         switch ($this->db_driver) {
             case 'mysql':
                 $query = 'SELECT RELEASE_LOCK(:lock_name)';
                 $params = [':lock_name' => $lock_name];
                 break;
-    
             case 'pgsql':
                 $query = 'SELECT pg_advisory_unlock(:hash_key)';
                 $params = [':hash_key' => crc32($lock_name)];
                 break;
-    
             case 'sqlite':
                 $query = 'UPDATE hm_user_session SET lock=0 WHERE hm_id=?';
                 $params = [$key];
                 break;
-    
             default:
                 Hm_Debug::add('DB SESSION: Unsupported db_driver for unlocking: ' . $this->db_driver);
                 return false;
@@ -268,7 +295,6 @@ class Hm_DB_Session extends Hm_PHP_Session {
         if ($this->db_driver == 'pgsql') {
             return isset($result['pg_advisory_unlock']) && $result['pg_advisory_unlock'] === true;
         }
-
         if ($this->db_driver == 'sqlite') {
             return isset($result[0]) && $result[0] == 1;
         }
