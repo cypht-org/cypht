@@ -82,6 +82,7 @@ var expand_adv_folder = function(res) {
         $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
         $('a', list_container).not('.adv_folder_link').off('click');
         $('a', list_container).not('.adv_folder_link').on("click", function() { adv_folder_select($(this).data('id')); return false; });
+        modifyInnerLists();
     }
 };
 
@@ -131,7 +132,9 @@ var adv_select_imap_folder = function(el) {
         checkboxesWrapper.append(allSpecialFoldersCheckbox);
         checkboxesWrapper.append(allFoldersCheckbox);
         $(this).find('.wrapper').append(checkboxesWrapper);
-    })
+    });
+
+    modifyInnerLists();
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
     $('.adv_folder_list').html(folders.html());
@@ -146,6 +149,20 @@ var adv_select_imap_folder = function(el) {
         return false;
     });
 };
+
+function modifyInnerLists() {
+    $('.adv_folder_list').find('.inner_list li').each(function(index) {
+        const subFoldersCheckbox = `
+        <span class="form-check form-text">
+            <label class="form-check-label" for="include_subfolders-${index}">Include subfolders</label>
+            <input class="form-check-input" type="checkbox" name="include_subfolders" id="include_subfolders-${index}">
+        </span>
+        `;
+        $(this).wrapInner('<div class="d-flex wrapper"></div>');
+        $(this).find('.wrapper').append(subFoldersCheckbox);
+        $(this).find('#main-link').css('flex-grow', 0)
+    });
+}
 
 var adv_folder_select = function(id) {
     if ($('.'+id, $('.adv_source_list')).length > 0) {
@@ -164,17 +181,19 @@ var adv_folder_select = function(id) {
     var parent_class = '.'+parts[0]+'_'+parts[1]+'_';
     var account = $('a', $(parent_class, container)).first().text();
     var label = account+' &gt; '+folder;
-    add_source_to_list(id, label);
+    const includeSubfolders = $(`.${id}`).closest('li').find('input[name="include_subfolders"]').is(':checked');
+    
+    add_source_to_list(id, label, includeSubfolders);
     $('.adv_folder_list').html('');
     $('.close_adv_folders').remove();
     $('.adv_folder_list').hide();
 };
 
-var add_source_to_list = function(id, label) {
+var add_source_to_list = function(id, label, includeSubfolders) {
     var close = $(globals.close_html);
     close.addClass('adv_remove_source');
     close.attr('data-target', id);
-    var row = '<div class="'+id+'">'+close.prop('outerHTML')+label;
+    var row = '<div class="'+id+'" data-subfolders="'+includeSubfolders+'">'+close.prop('outerHTML')+label;
     row += '<input type="hidden" value="'+id+'" /></div>';
     $('.adv_source_list').append(row);
     $('.adv_remove_source').off('click');
@@ -247,7 +266,7 @@ var get_adv_sources = function() {
         const source = this.className;
         const mailboxSource = source.split('_').slice(0, 2).join('_');
         if (!sources.find(s => s.source.indexOf(mailboxSource) > -1)) {
-            sources.push({'source': source, 'label': $('a', $(this)).text()});
+            sources.push({'source': source, 'label': $('a', $(this)).text(), subFolders: $(this).data('subfolders')});
         }
     });
     return sources;
@@ -426,6 +445,8 @@ var send_requests = function(requests) {
             params.push({name: 'all_folders', value: true});
         } else if (request['all_special_folders']) {
             params.push({name: 'all_special_folders', value: true});
+        } else if (request['sub_folders']) {
+            params.push({name: 'include_subfolders', value: true});
         }
 
         for (var i=0, len=request['terms'].length; i < len; i++) {
@@ -490,7 +511,9 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
                         config['all_folders'] = true;
                     } else if (source.specialFolders) {
                         config['all_special_folders'] = true;
-                    }                    
+                    } else if (source.subFolders) {
+                        config['sub_folders'] = true;
+                    }
                     requests.push(config);
                 }
             }
