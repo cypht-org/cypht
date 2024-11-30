@@ -91,10 +91,15 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             }
         }
 
-        if ($this->request->post['all_folders']) {
+        $searchInAllFolders = $this->request->post['all_folders'] ?? false;
+        $searchInSpecialFolders = $this->request->post['all_special_folders'] ?? false;
+        $includeSubfolders = $this->request->post['include_subfolders'] ?? false;
+        if ($searchInAllFolders) {
             $msg_list = $this->all_folders_search($imap, $flags, $params, $limit);
-        } elseif ($this->request->post['all_special_folders']) {
+        } elseif ($searchInSpecialFolders) {
             $msg_list = $this->special_folders_search($imap, $flags, $params, $limit);
+        } else if ($includeSubfolders) {
+            $msg_list = $this->all_folders_search($imap, $flags, $params, $limit, $this->folder);
         } else if (!$imap->select_mailbox($this->folder)) {
             return;
         } else {
@@ -105,8 +110,8 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         $this->out('imap_server_ids', array($this->imap_id));
     }
 
-    private function all_folders_search($imap, $flags, $params, $limit) {
-        $folders = $imap->get_mailbox_list();
+    private function all_folders_search($imap, $flags, $params, $limit, $parent = '') {
+        $folders = $imap->get_mailbox_list(mailbox:$parent);
         $msg_list = array();
         foreach ($folders as $folder) {
             $this->folder = $folder['name'];
