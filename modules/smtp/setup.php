@@ -9,6 +9,7 @@ add_module_to_all_pages('handler', 'smtp_default_server', true, 'smtp', 'load_us
 add_handler('compose', 'load_smtp_reply_to_details', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_is_imap_draft', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'smtp_from_replace', true, 'smtp', 'load_user_data', 'after');
+add_handler('compose', 'smtp_subject_replace', true, 'smtp', 'load_user_data', 'after');
 add_handler('compose', 'load_smtp_servers_from_config', true, 'smtp', 'load_smtp_reply_to_details', 'after');
 add_handler('compose', 'add_smtp_servers_to_page_data', true, 'smtp', 'load_smtp_servers_from_config', 'after');
 add_handler('compose', 'process_compose_form_submit', true, 'smtp', 'load_smtp_servers_from_config', 'after');
@@ -125,6 +126,7 @@ return array(
         'compose_to' => FILTER_DEFAULT,
         'mailto_uri' => FILTER_DEFAULT,
         'compose_from' => FILTER_DEFAULT,
+        'compose_subject' => FILTER_DEFAULT,
         'resumableChunkNumber' => FILTER_VALIDATE_INT,
         'resumableTotalChunks' => FILTER_VALIDATE_INT,
         'resumableChunkSize' => FILTER_VALIDATE_INT,
