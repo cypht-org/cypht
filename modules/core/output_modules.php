@@ -1327,7 +1327,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg">';
+        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg"></a>';
         $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
@@ -1392,24 +1392,24 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
     }
 }
 
-/**
- * Outputs the logout link in the Main menu of the folder list
- * @subpackage core/output
- */
-class Hm_Output_logout_menu_item extends Hm_Output_Module {
-    protected function output() {
-        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-power fs-5 me-2"></i>';
-        }
-        $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
+// /**
+//  * Outputs the logout link in the Main menu of the folder list
+//  * @subpackage core/output
+//  */
+// class Hm_Output_logout_menu_item extends Hm_Output_Module {
+//     protected function output() {
+//         $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
+//         if (!$this->get('hide_folder_icons')) {
+//             $res .= '<i class="bi bi-power fs-5 me-2"></i>';
+//         }
+//         $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
 
-        if ($this->format == 'HTML5') {
-            return $res;
-        }
-        $this->concat('formatted_folder_list', $res);
-    }
-}
+//         if ($this->format == 'HTML5') {
+//             return $res;
+//         }
+//         $this->concat('formatted_folder_list', $res);
+//     }
+// }
 
 /**
  * Close the Main menu section of the folder list
@@ -1477,11 +1477,6 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
             '<ul class="collapse settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-house-door-fill menu-icon"></i>';
-        }
-        $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1614,8 +1609,22 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      * Adds collapse and reload links
      */
     protected function output() {
-        $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
+        $res = '<div class="sidebar-footer">';
+        $res .= '<a class="logout_link" href="#" title="'. $this->trans('Logout') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-power menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Logout') .'</span>';
+        $res .= '</a>';
+        $res .= '<a href="#" class="update_message_list" title="'. $this->trans('Reload') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-arrow-clockwise menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Reload') . '</span>';
+        $res .= '</a>';
+        /** Sidebar footer end */
+
+        $res .= '<div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
         if ($this->format == 'HTML5') {
             return $res;
         }

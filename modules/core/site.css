@@ -78,10 +78,10 @@ a:hover {
   min-height: 100vh;
 }
 
-.selected_menu {
+li.selected_menu {
   background-color: var(--bs-primary-bg-subtle);
 }
-.selected_menu a {
+li.selected_menu a {
   color: var(--bs-link-color) !important;
 }
 
@@ -469,11 +469,6 @@ button {
   padding-bottom: 100px;
 }
 
-.folder_list .update_message_list {
-  font-size: 80%;
-  padding-top: 10px;
-  float: right;
-}
 .src_name {
   white-space: nowrap;
   overflow: hidden;
@@ -972,10 +967,6 @@ div.unseen,
   margin-right: 0px;
   width: 100%;
 }
-.mobile .folder_list li a {
-  font-size: 110%;
-  padding-top: 10px;
-}
 .mobile .folder_list li {
   padding-top: 5px;
   padding-bottom: 5px;
@@ -1023,9 +1014,6 @@ div.unseen,
   width: 24px;
   height: 24px;
   vertical-align: -13px;
-}
-.mobile .update_message_list {
-  margin-right: 20px;
 }
 .mobile .msg_text {
   width: 100%;
@@ -1121,9 +1109,6 @@ div.unseen,
 }
 .mobile .search_form select {
   width: 30px;
-}
-.mobile .search_terms {
-  max-width: 250px;
 }
 .mobile .search_content {
   padding-top: 30px;
@@ -1410,24 +1395,25 @@ div.unseen,
 .menu-toggle {
   position: absolute;
   top: 20px;
-  right: 0;
+  right: 15px;
   z-index: 999;
   color: var(--bs-primary);
 }
 
 .mobile .menu-toggle {
   position: fixed;
-  top: 0;
-  left: -2rem;
+  right: unset;
+  left: 20px;
   z-index: 1000;
-  width: 5rem;
   text-align: right;
+  top: 15px;
 }
 
 .mobile nav .menu-toggle {
-  right: -2rem;
+  right: 20px;
   left: unset;
   text-align: left;
+  top: 20px;
 }
 
 body {
@@ -1452,9 +1438,9 @@ nav.collapsed .app-logo, nav.collapsed .menu_search, nav.collapsed .nav-label, n
 }
 
 nav.collapsed .menu-toggle {
-  right: 22%;
-  top: 0;
+  right: 32%;
   margin: auto;
+  /* margin-left: 32px; */
 }
 
 nav.collapsed .folders {
@@ -1473,6 +1459,30 @@ nav.collapsed .menu-icon {
 nav.collapsed .total_unread_count {
   position: absolute;
   top: 0;
+}
+
+nav.collapsed .sidebar-footer {
+  flex-direction: column;
+  padding: 0;
+  padding-left: 20px;
+  gap: 15px;
+}
+
+nav.collapsed .sidebar-footer a {
+  text-align: center;
+}
+
+/* End collapsed navbar state */
+
+.sidebar-footer {
+  margin-top: 35px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 15px 0 25px;
+}
+
+.logout_link {
+  color: rgba(var(--bs-body-color-rgb), 0.7);
 }
 
 a[disabled] {
