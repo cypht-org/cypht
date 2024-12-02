@@ -16,7 +16,7 @@ $worker->work();
 ```
 
 #Adding scheduler
-you can use register or command on `$scheduler`, we prepared the class `Hm_ConsoleKernel` for that:
+you can use register or command on `$scheduler`, we prepared the class `Hm_Kernel` for that:
 ```
 <?php
 // Register a task with custom name, description, tags, and timezone

@@ -50,34 +50,34 @@ class Hm_Container
                 // Register Hm_DB
                 self::$container->set('db.connection', Hm_DB::connect(self::$container->get('config')));
         
-                self::$container->register('db', Hm_DB::class)->setShared(true);
+                self::$container->register('db', Hm_DB::class)->setPublic(true);
             } else if ($config->get('queue_driver') === 'redis') {
                 // Register Hm_Redis
                 $redis = new Hm_Redis($config);
                 $redis->connect();
                 self::$container->set('redis.connection', $redis->getInstance());
-                self::$container->register('redis', Hm_Redis::class)->setArgument(0, self::$container->get('config'))->setShared(true);
+                self::$container->register('redis', Hm_Redis::class)->setArgument(0, self::$container->get('config'))->setPublic(true);
             } else if ($config->get('queue_enabled') && $config->get('queue_driver') === 'sqs') {
                 // Register Hm_AmazonSQS
                 self::$container->set('amazon.sqs.connection', Hm_AmazonSQS::connect(self::$container->get('config')));
                 self::$container->register('amazon.sqs', Hm_AmazonSQS::class)
-                    ->setShared(true);
+                    ->setPublic(true);
             }
         }
 
         // Register Hm_CommandServiceProvider
         self::$container->register('command.serviceProvider', Hm_CommandServiceProvider::class)
-            ->setShared(true);
+            ->setPublic(true);
 
         // Register Hm_QueueServiceProvider
         self::$container->register('queue.ServiceProvider', Hm_QueueServiceProvider::class)
-            ->setShared(true);
+            ->setPublic(true);
 
         self::$container->register('scheduler.ServiceProvider', Hm_SchedulerServiceProvider::class)
-            ->setShared(true);
+            ->setPublic(true);
 
         self::$container->register('event.ServiceProvider', Hm_EventServiceProvider::class)
-            ->setShared(true);
+            ->setPublic(true);
 
         return self::$container;
     }
