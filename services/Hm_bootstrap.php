@@ -1,6 +1,6 @@
 <?php
 
-use Services\Hm_ConsoleKernel;
+use Services\Hm_Kernel;
 use Services\Core\Hm_Container;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -62,6 +62,6 @@ $queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider');
 $queueServiceProvider->register($config, $session);
 
 // Create a new Kernel instance
-$kernel = (new Hm_ConsoleKernel($containerBuilder->get('scheduler')))->schedule();
+$kernel = (new Hm_Kernel($containerBuilder->get('scheduler')))->schedule();
 
 return [$containerBuilder, $config];
