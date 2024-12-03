@@ -1479,6 +1479,7 @@ nav.collapsed .sidebar-footer a {
   display: flex;
   justify-content: space-between;
   padding: 0 15px 0 25px;
+  font-size: 0.8rem;
 }
 
 .logout_link {

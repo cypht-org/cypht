@@ -1392,25 +1392,6 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
     }
 }
 
-// /**
-//  * Outputs the logout link in the Main menu of the folder list
-//  * @subpackage core/output
-//  */
-// class Hm_Output_logout_menu_item extends Hm_Output_Module {
-//     protected function output() {
-//         $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
-//         if (!$this->get('hide_folder_icons')) {
-//             $res .= '<i class="bi bi-power fs-5 me-2"></i>';
-//         }
-//         $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
-
-//         if ($this->format == 'HTML5') {
-//             return $res;
-//         }
-//         $this->concat('formatted_folder_list', $res);
-//     }
-// }
-
 /**
  * Close the Main menu section of the folder list
  * @subpackage core/output

@@ -15,7 +15,7 @@ add_handler('ajax_imap_message_content', 'vcalendar_check',  true, 'calendar', '
 /*add_output('ajax_imap_message_content', 'vcalendar_add_output', true, 'calendar', 'filter_message_headers', 'after');*/
 add_output('calendar', 'calendar_content', true, 'calendar', 'content_section_start', 'after');
 add_output('calendar', 'add_cal_event_form', true, 'calendar', 'content_section_start', 'after');
-add_output('ajax_hm_folders', 'calendar_page_link', true, 'calendar', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'calendar_page_link', true, 'calendar', 'main_menu_content', 'before');
 
 return array(
     'allowed_pages' => array(
