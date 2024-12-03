@@ -34,6 +34,9 @@ function imap_sources($callback, $mod, $folder = 'sent') {
         elseif ($inbox) {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
+        elseif ($folder=="snoozed"){
+            $sources[] = array('callback' => $callback, 'folder' => bin2hex('Snoozed'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        }
         else {
             $sources[] = array('callback' => $callback, 'folder' => bin2hex('SPECIAL_USE_CHECK'), 'nodisplay' => true, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
