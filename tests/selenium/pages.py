@@ -97,7 +97,7 @@ class PageTests(WebTest):
     def home(self):
         self.by_css('[data-bs-target=".settings"]').click()
         list_item = self.by_class('menu_home')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        list_item.click()
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
