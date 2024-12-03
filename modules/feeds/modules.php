@@ -173,107 +173,120 @@ class Hm_Handler_feed_list_content extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('feed_server_ids'));
         $search = false;
-        if ($success) {
-            $cache = false;
-            if (array_key_exists('feed_search', $this->request->post)) {
-                $terms = $this->session->get('search_terms', false);
-                $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
-                $fld = $this->session->get('search_fld', 'TEXT');
-                $search = true;
+        $dataSources = array_map(fn ($feed) => $feed['id'], Hm_Feed_List::dump());
+        if (!$success && empty($dataSources)) {
+            return;
+        }
+        $cache = false;
+        if (array_key_exists('feed_search', $this->request->post)) {
+            $terms = $this->session->get('search_terms', false);
+            $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
+            $fld = $this->session->get('search_fld', 'TEXT');
+            $search = true;
+        }
+        else {
+            $terms = false;
+        }
+        $ids = isset($form['feed_server_ids']) ? explode(',', $form['feed_server_ids']): $dataSources;
+        $res = array();
+        $unread_only = false;
+        $login_time = $this->session->get('login_time', false);
+        if ($login_time) {
+            $this->out('login_time', $login_time);
+        }
+        if ($this->get('list_path') == 'unread') {
+            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
+            $unread_only = true;
+            $cutoff_timestamp = strtotime($date);
+            if ($login_time && $login_time > $cutoff_timestamp) {
+                $cutoff_timestamp = $login_time;
             }
-            else {
-                $terms = false;
-            }
-            $ids = explode(',', $form['feed_server_ids']);
-            $res = array();
-            $unread_only = false;
-            $login_time = $this->session->get('login_time', false);
-            if ($login_time) {
-                $this->out('login_time', $login_time);
-            }
-            if ($this->get('list_path') == 'unread') {
-                $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_UNREAD_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
-                $unread_only = true;
-                $cutoff_timestamp = strtotime($date);
-                if ($login_time && $login_time > $cutoff_timestamp) {
-                    $cutoff_timestamp = $login_time;
-                }
-            }
-            elseif ($this->get('list_path') == 'combined_inbox') {
-                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
-                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
-                $cutoff_timestamp = strtotime($date);
-            }
-            else {
-                $limit = $this->user_config->get('feed_limit_setting', DEFAULT_FEED_LIMIT);
-                $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_FEED_SINCE));
-                $cutoff_timestamp = strtotime($date);
-            }
-            if (!$search || ($search && $terms)) {
-                foreach($ids as $id) {
-                    $feed_data = Hm_Feed_List::dump($id);
-                    if ($feed_data) {
-                        $cache = feed_memcached_fetch($this, $feed_data);
-                        $data = false;
-                        if (is_array($cache) && count($cache) > 0) {
-                            $data = $cache;
+        }
+        elseif ($this->get('list_path') == 'combined_inbox') {
+            $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
+            $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
+            $cutoff_timestamp = strtotime($date);
+        }
+        else {
+            $limit = $this->user_config->get('feed_limit_setting', DEFAULT_FEED_LIMIT);
+            $date = process_since_argument($this->user_config->get('feed_since_setting', DEFAULT_FEED_SINCE));
+            $cutoff_timestamp = strtotime($date);
+        }
+        if (!$search || ($search && $terms)) {
+            foreach($ids as $id) {
+                $feed_data = Hm_Feed_List::dump($id);
+                if ($feed_data) {
+                    $cache = feed_memcached_fetch($this, $feed_data);
+                    $data = false;
+                    if (is_array($cache) && count($cache) > 0) {
+                        $data = $cache;
+                    }
+                    else {
+                        $feed = is_news_feed($feed_data['server'], $limit);
+                        if ($feed && $feed->parsed_data) {
+                            $data = $feed->parsed_data;
+                            $cache = false;
                         }
-                        else {
-                            $feed = is_news_feed($feed_data['server'], $limit);
-                            if ($feed && $feed->parsed_data) {
-                                $data = $feed->parsed_data;
-                                $cache = false;
+                    }
+                    if (is_array($data)) {
+                        foreach ($data as $item) {
+                            if (array_key_exists('id', $item) && !array_key_exists('guid', $item)) {
+                                $item['guid'] = $item['id'];
                             }
-                        }
-                        if (is_array($data)) {
-                            foreach ($data as $item) {
-                                if (array_key_exists('id', $item) && !array_key_exists('guid', $item)) {
-                                    $item['guid'] = $item['id'];
-                                }
-                                elseif (array_key_exists('link', $item) && !array_key_exists('guid', $item)) {
-                                    $item['guid'] = $item['link'];
-                                }
-                                if (array_key_exists('link_self', $item) || !array_key_exists('guid', $item)) {
+                            elseif (array_key_exists('link', $item) && !array_key_exists('guid', $item)) {
+                                $item['guid'] = $item['link'];
+                            }
+                            if (array_key_exists('link_self', $item) || !array_key_exists('guid', $item)) {
+                                continue;
+                            }
+                            if (!Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
+                                if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
                                     continue;
                                 }
-                                if (!Hm_Feed_Uid_Cache::is_unread(md5($item['guid']))) {
-                                    if (isset($item['pubdate']) && strtotime($item['pubdate']) < $cutoff_timestamp) {
-                                        continue;
-                                    }
-                                    elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
-                                        continue;
-                                    }
-                                    if (isset($item['guid']) && $unread_only && Hm_Feed_Uid_Cache::is_read(md5($item['guid']))) {
-                                        continue;
-                                    }
-                                }
-                                if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
+                                elseif (isset($item['dc:date']) && strtotime($item['dc:date']) < $cutoff_timestamp) {
                                     continue;
                                 }
-                                else {
-                                    $item['server_id'] = $id;
-                                    $item['server_name'] = $feed_data['name'];
-                                    $res[] = $item;
+                                if (isset($item['guid']) && $unread_only && Hm_Feed_Uid_Cache::is_read(md5($item['guid']))) {
+                                    continue;
                                 }
+                            }
+                            if ($terms && !search_feed_item($item, $terms, $since, $fld)) {
+                                continue;
+                            }
+                            else {
+                                $item['server_id'] = $id;
+                                $item['server_name'] = $feed_data['name'];
+                                $res[] = $item;
                             }
                         }
                     }
                 }
             }
-            if (!$cache) {
-                # TODO: fix potential warning about feed_data
-                feed_memcached_save($this, $feed_data, $res);
-            }
-            $this->out('feed_list_data', $res);
-            if (isset($this->request->get['list_path'])) {
-                $this->out('feed_list_parent', $this->request->get['list_path']);
-            }
-            elseif (isset($this->request->get['page']) && $this->request->get['page'] == 'search') {
-                $this->out('feed_list_parent', 'search');
-            }
-            $this->out('feed_server_ids', $form['feed_server_ids']);
         }
+        if (!$cache) {
+            # TODO: fix potential warning about feed_data
+            feed_memcached_save($this, $feed_data, $res);
+        }
+
+        usort($res, function($a, $b) {
+            if (isset($a['pubdate']) && isset($b['pubdate'])) {
+                return strtotime($b['pubdate']) - strtotime($a['pubdate']);
+            }
+            elseif (isset($a['dc:date']) && isset($b['dc:date'])) {
+                return strtotime($b['dc:date']) - strtotime($a['dc:date']);
+            }
+            return 0;
+        });
+
+        $this->out('feed_list_data', $res);
+        if (isset($this->request->get['list_path'])) {
+            $this->out('feed_list_parent', $this->request->get['list_path']);
+        }
+        elseif (isset($this->request->get['page']) && $this->request->get['page'] == 'search') {
+            $this->out('feed_list_parent', 'search');
+        }
+        $this->out('feed_server_ids', $form['feed_server_ids']);
     }
 }
 
