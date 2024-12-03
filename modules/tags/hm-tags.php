@@ -39,16 +39,8 @@ class Hm_Tags {
 
     public static function registerFolder($tag_id, $serverId, $folder) {
         $tag = self::get($tag_id);
-        if (isset($tag['server'])) {
-            if (isset($tag['server'][$serverId])) {
-                if (!in_array($folder, $tag['server'][$serverId])) {
-                    $tag['server'][$serverId][] = $folder;
-                }
-            } else {
-                $tag['server'][$serverId] = array($folder);
-            }
-        } else {
-            $tag['server'] = [$serverId => [$folder]];
+        if (! isset($tag['server'][$serverId][$folder])) {
+            $tag['server'][$serverId][$folder] = [];
         }
         self::edit($tag_id, $tag);
     }

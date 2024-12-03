@@ -33,6 +33,7 @@ class Hm_Handler_add_tag_to_message extends Hm_Handler_Module {
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
             $folder = hex2bin($folder);
+            $msg_id = hex2bin($msg_id);
             $tagged = Hm_Tags::addMessage($form['tag_id'], $imap_server_id, $folder, $msg_id);
             if ($tagged) {
                 $taged_messages++;
@@ -135,18 +136,16 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
                 foreach ($ids as $serverId) {
                     $folders = Hm_Tags::getFolders($tag_id, $serverId);
                     if (!empty($folders)) {
-                        $cache = Hm_IMAP_List::get_cache($this->cache, $serverId);
-                        $imap = Hm_IMAP_List::connect($serverId, $cache);
+                        $mailbox = Hm_IMAP_List::get_connected_mailbox($serverId, $this->cache);
                         $server_details = Hm_IMAP_List::dump($serverId);
-                        if (imap_authed($imap)) {
+                        if ($mailbox && $mailbox->authed()) {
                             foreach ($folders as $folder => $messageIds) {
-                                $imap->select_mailbox($folder);
                                 $messages = array_map(function($msg) use ($serverId, $folder, $server_details) {
                                     $msg['server_id'] = $serverId;
                                     $msg['folder'] = bin2hex($folder);
                                     $msg['server_name'] = $server_details['name'];
                                     return $msg;
-                                }, $imap->get_message_list($messageIds));
+                                }, $mailbox->get_message_list($folder, $messageIds));
                                 $msg_list = array_merge($msg_list, $messages);
                             }
                         }

@@ -545,7 +545,7 @@ class Hm_Mailbox {
 
     public function get_message_list($folder, $msg_ids) {
         if (! $this->select_folder($folder)) {
-            return;
+            return [];
         }
         if ($this->is_imap()) {
             return $this->connection->get_message_list($msg_ids);
@@ -579,6 +579,9 @@ class Hm_Mailbox {
             }
         } else {
             $this->folder_state = $this->get_folder_status($folder);
+            if (! $this->folder_state) {
+                return false;
+            }
             $this->selected_folder = ['id' => $folder, 'name' => $this->folder_state['name'], 'detail' => []];
         }
         return true;
