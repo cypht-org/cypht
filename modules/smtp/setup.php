@@ -85,9 +85,9 @@ setup_base_ajax_page('ajax_smtp_delete_draft', 'core');
 add_handler('ajax_smtp_delete_draft', 'process_delete_draft', true, 'smtp', 'load_user_data', 'after');
 
 /* folder list link */
-add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'compose_page_link', true, 'smtp', 'main_menu_content', 'before');
 add_handler('ajax_hm_folders', 'smtp_auto_bcc_check',  true, 'smtp', 'load_imap_servers_from_config', 'after');
-add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'sent_folder_link', true, 'smtp', 'main_menu_content', 'before');
 
 add_handler('ajax_update_server_pw', 'load_smtp_servers_from_config', true, 'smtp', 'load_user_data', 'after');
 

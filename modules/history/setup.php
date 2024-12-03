@@ -9,7 +9,7 @@ add_output('history', 'history_heading', true, 'history', 'content_section_start
 add_output('history', 'history_content', true, 'history', 'history_heading', 'after');
 add_output('history', 'history_footer', true, 'history', 'history_content', 'after');
 
-add_output('ajax_hm_folders', 'history_page_link', true, 'history', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'history_page_link', true, 'history', 'main_menu_content', 'before');
 
 add_handler('ajax_imap_message_content', 'history_record_imap_message', true, 'history', 'imap_message_content', 'after');
 add_handler('ajax_feed_item_content', 'history_record_feed_message', true, 'history', 'feed_item_content', 'after');

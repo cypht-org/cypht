@@ -6,7 +6,7 @@ $(() => {
         });
 
         const menuToggle = `
-        <div class="menu-toggle rounded-pill p-2 fw-bold cursor-pointer">
+        <div class="menu-toggle rounded-pill fw-bold cursor-pointer">
             <i class="bi bi-list fs-5 fw-bold"></i>
         </div>
         `

@@ -156,7 +156,6 @@ add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
 add_output('ajax_hm_folders', 'main_menu_content', true);
-add_output('ajax_hm_folders', 'logout_menu_item', true);
 add_output('ajax_hm_folders', 'main_menu_end', true);
 add_output('ajax_hm_folders', 'email_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_start', true);

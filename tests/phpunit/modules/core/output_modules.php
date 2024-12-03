@@ -852,10 +852,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_main_menu_start() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -870,18 +870,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $res = $test->run();
         $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill menu-icon"></i><span class="nav-label">Unread</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill menu-icon"></i><span class="nav-label">Flagged</span></a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill menu-icon"></i><span class="nav-label">Junk</span></a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill menu-icon"></i><span class="nav-label">Trash</span></a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square menu-icon"></i><span class="nav-label">Drafts</span></a></li>'), $res->output_response);
     }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_logout_menu_item() {
-        $test = new Output_Test('logout_menu_item', 'core');
-        $res = $test->run();
-        $this->assertEquals(array('<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i><span class="nav-label">Logout</span></a></li>'), $res->output_response);
-        $test->rtype = 'AJAX';
-        $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i><span class="nav-label">Logout</span></a></li>'), $res->output_response);
-    }
+
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -917,10 +906,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill menu-icon"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill menu-icon"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -983,10 +972,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
