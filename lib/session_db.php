@@ -230,14 +230,14 @@ class Hm_DB_Session extends Hm_PHP_Session {
                     $params = [':hash_key' => crc32($lock_name)];
                     break;
                 case 'sqlite':
-                    $query = 'UPDATE hm_user_session SET lock=1 WHERE hm_id=? AND lock=0';
-                    $params = [$key];
+                    $query = 'UPDATE hm_user_session SET lock=1 WHERE hm_id=:hm_id AND lock=0';
+                    $params = [':hm_id' => $key];
                     break;
                 default:
                     Hm_Debug::add('DB SESSION: Unsupported db_driver for locking: ' . $this->db_driver);
                     return false;
-            }
-            $result = Hm_DB::execute($this->dbh, $query, $params);
+            }   
+            $result = Hm_DB::execute($this->dbh, $query, $params, ($this->db_driver == 'sqlite') ? 'modify' : false);
             if ($this->db_driver == 'mysql') {
                 if (isset($result['GET_LOCK(?, ?)']) && $result['GET_LOCK(?, ?)'] == 1) {
                     return true;
@@ -249,7 +249,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
                 }
             }
             if ($this->db_driver == 'sqlite') {
-                if (isset($result[0]) && $result[0] == 1) {
+                if ($result >= 1) {
                     return true;
                 }
             }
@@ -281,8 +281,8 @@ class Hm_DB_Session extends Hm_PHP_Session {
                 $params = [':hash_key' => crc32($lock_name)];
                 break;
             case 'sqlite':
-                $query = 'UPDATE hm_user_session SET lock=0 WHERE hm_id=?';
-                $params = [$key];
+                $query = 'UPDATE hm_user_session SET lock=0 WHERE hm_id=:hm_id';
+                $params = [':hm_id' => $key];
                 break;
             default:
                 Hm_Debug::add('DB SESSION: Unsupported db_driver for unlocking: ' . $this->db_driver);
