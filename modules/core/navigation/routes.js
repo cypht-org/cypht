@@ -12,7 +12,7 @@ const modulesRoutes = [
     },
     {
         page: 'message',
-        handler: 'applyImapMessageContentPageHandlers'
+        handler: 'applyMessagePageHandlers'
     },
     {
         page: 'compose',

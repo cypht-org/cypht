@@ -45,7 +45,6 @@ function applyImapMessageContentPageHandlers(routeParams) {
         preFetchMessageContent(false, prevMessageUid, routeParams.list_path);
     }
 
-    if (window.feedMessageContentPageHandler) feedMessageContentPageHandler(routeParams);
     if (window.githubMessageContentPageHandler) githubMessageContentPageHandler(routeParams);
     if (window.pgpMessageContentPageHandler) pgpMessageContentPageHandler();
     if (window.wpMessageContentPageHandler) wpMessageContentPageHandler(routeParams);

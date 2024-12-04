@@ -227,12 +227,6 @@ var expand_feed_settings = function() {
     }
 };
 
-function feedMessageContentPageHandler(routeParams) {
-    if (routeParams.list_path.substr(0, 4) == 'feed') {
-        feed_item_view();
-    }
-}
-
 function feedServersPageHandler() {
     $('.feed_delete').on('click', feed_delete_action);
     $('.test_feed_connect').on('click', feed_test_action);
