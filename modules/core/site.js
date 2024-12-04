@@ -840,11 +840,11 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(msgUid) {
+    this.prev_next_links = function(msgUid, lisPath = getListPathParam()) {
         let phref;
         let nhref;
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number());
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);
@@ -2339,7 +2339,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
     const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];

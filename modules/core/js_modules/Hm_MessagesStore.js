@@ -153,14 +153,18 @@ class Hm_MessagesStore {
 
     #getRequestConfig() {
         let hook;
-        let serverId;
+        let imapServerId;
+        let feedServerId;
         let folder;
         const config = [];
         if (this.path.startsWith('imap')) {
             hook = "ajax_imap_folder_display";
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
-            serverId = detail.server_id;
+            imapServerId = detail.server_id;
             folder = detail.folder;
+        } else if (this.path.startsWith('feeds')) {
+            hook = "ajax_feed_combined";
+            feedServerId = this.path.split('_')[1];
         } else {
             switch (this.path) {
                 case 'unread':
@@ -170,6 +174,8 @@ class Hm_MessagesStore {
                     hook = "ajax_imap_flagged";
                     break;
                 case 'combined_inbox':
+                    hook = "ajax_combined_message_list";
+                    break;
                 case 'email':
                     hook = "ajax_imap_combined_inbox";
                     break;
@@ -186,11 +192,14 @@ class Hm_MessagesStore {
         if (hook) {
             config.push({ name: "hm_ajax_hook", value: hook });
         }
-        if (serverId) {
-            config.push({ name: "imap_server_id", value: serverId });
+        if (imapServerId) {
+            config.push({ name: "imap_server_id", value: imapServerId });
         }
         if (folder) {
             config.push({ name: "folder", value: folder });
+        }
+        if (feedServerId) {
+            config.push({ name: "feed_server_ids", value: feedServerId });
         }
         return config;
     }

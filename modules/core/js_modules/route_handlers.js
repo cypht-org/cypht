@@ -57,3 +57,19 @@ function applyInfoPageHandlers() {
         clearTimeout(timer);
     }
 }
+
+function applyMessagePageHandlers(routeParams) {
+    const path = routeParams.list_path.substr(0, 4);
+    
+    switch (path) {
+        case 'imap':
+            applyImapMessageContentPageHandlers(routeParams);
+            break;
+        case 'feed':
+            applyFeedMessageContentPageHandlers(routeParams);
+            break;
+    
+        default:
+            break;
+    }
+}
