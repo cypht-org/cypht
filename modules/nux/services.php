@@ -62,9 +62,9 @@ Nux_Quick_Services::add('office365', array(
     'name' => 'Office365',
     'scope' => 'wl.imap',
     'smtp' => array(
-        'server' => 'outlook.office365.com',
+        'server' => 'smtp.office365.com',
         'port' => 587,
-        'tls'=> 'yes'
+        'tls'=> false
     )
 ));
 

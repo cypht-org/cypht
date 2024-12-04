@@ -39,4 +39,14 @@ return [
         'token_uri'      => env('OUTLOOK_TOKEN_URI', 'https://login.live.com/oauth20_token.srf'),
         'refresh_uri'    => env('OUTLOOK_REFRESH_URI', 'https://login.live.com/oauth20_token.srf')
     ],
+
+    //[office365]
+    'office365' => [
+        'client_id'      => env('OFFICE365_CLIENT_ID', ''),
+        'client_secret'  => env('OFFICE365_CLIENT_SECRET', ''),
+        'client_uri'     => env('OFFICE365_CLIENT_URI', 'http://localhost/?page=home'),
+        'auth_uri'       => env('OFFICE365_AUTH_URI', 'https://login.live.com/oauth20_authorize.srf'),
+        'token_uri'      => env('OFFICE365_TOKEN_URI', 'https://login.live.com/oauth20_token.srf'),
+        'refresh_uri'    => env('OFFICE365_REFRESH_URI', 'https://login.live.com/oauth20_token.srf')
+    ],
 ];

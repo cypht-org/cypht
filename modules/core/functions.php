@@ -255,6 +255,7 @@ function get_oauth2_data($config) {
     return [
         'gmail' => $config->get('gmail',[]),
         'outlook' => $config->get('outlook',[]),
+        'office365' => $config->get('office365',[]),
     ];
 }}
 
