@@ -95,18 +95,6 @@ var display_feeds_combined = function(res) {
     $('.total').text($('.message_table tbody tr').length);
 };
 
-var feeds_combined_inbox_content= function(id) {
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_feed_combined'},
-        {'name': 'feed_server_ids', 'value': id}],
-        display_feeds_combined_inbox,
-        [],
-        false,
-        Hm_Message_List.set_combined_inbox_state
-    );
-    return false;
-};
-
 var display_feeds_combined_inbox = function(res) {
     Hm_Message_List.update(res.formatted_message_list);
 };

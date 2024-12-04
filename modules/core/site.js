@@ -2339,7 +2339,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
     const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];

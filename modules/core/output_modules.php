@@ -2432,3 +2432,18 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
         return $res;
     }
 }
+
+class Hm_output_combined_message_list extends Hm_Output_Module {
+    protected function output() {
+        $messageList = [];
+        $style = $this->get('news_list_style') ? 'news' : 'email';
+        if ($this->get('imap_combined_inbox_data')) {
+            $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, false, $style));
+        }
+        if ($this->get('feed_list_data')) {
+            $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
+        }
+        $this->out('formatted_message_list', $messageList);
+        $this->out('page_links', 'There is no pagination in this view, please visit the individual mail boxes.');
+    }
+}

@@ -319,6 +319,9 @@ add_handler('ajax_share_folders', 'load_imap_folders_permissions',  true);
 add_output('ajax_share_folders', 'get_list_imap_folders_permissions',  true);
 add_handler('ajax_share_folders', 'set_acl_to_imap_folders',  true);
 
+add_handler('ajax_combined_message_list', 'load_imap_servers_from_config',  true);
+add_handler('ajax_combined_message_list', 'imap_combined_inbox', true);
+
 /* allowed input */
 return array(
     'allowed_pages' => array(

@@ -659,22 +659,23 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
  * @subpackage feeds/output
  */
 class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
-    protected function output() {
+    public static function formatMessageList($mod) {
         $res = array();
         $login_time = false;
-        if ($this->get('login_time')) {
-            $login_time = $this->get('login_time');
+        if ($mod->get('login_time')) {
+            $login_time = $mod->get('login_time');
         }
-        if ($this->get('feed_list_parent') == 'feeds' ||
-            $this->get('feed_list_parent') == 'search' ||
-            $this->get('feed_list_parent') == 'combined_inbox') {
+        if ($mod->get('feed_list_parent') == 'feeds' ||
+            $mod->get('feed_list_parent') == 'search' ||
+            $mod->get('feed_list_parent') == 'combined_inbox') {
             $src_callback = 'feed_source_callback';
         }
         else {
             $src_callback = 'safe_output_callback';
         }
-        $show_icons = $this->get('msg_list_icons');
-        foreach ($this->get('feed_list_data', array()) as $item) {
+        $show_icons = $mod->get('msg_list_icons');
+    
+        foreach ($mod->get('feed_list_data', array()) as $item) {
             $row_style = 'feeds';
             if (isset($item['id']) && !isset($item['guid'])) {
                 $item['guid'] = $item['id'];
@@ -685,7 +686,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
             }
             if (isset($item['guid'])) {
                 if (!array_key_exists('title', $item) || !trim($item['title'])) {
-                    $item['title'] = $this->trans('[No Subject]');
+                    $item['title'] = $mod->trans('[No Subject]');
                 }
                 $icon = 'rss';
                 $id = sprintf("feeds_%s_%s", $item['server_id'], md5($item['guid']));
@@ -702,22 +703,22 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $timestamp = 0;
                 }
                 if ($date) {
-                    $date = translate_time_str($date, $this);
+                    $date = translate_time_str($date, $mod);
                 }
                 $url = '?page=message&uid='.urlencode(md5($item['guid'])).'&list_path=feeds_'.$item['server_id'];
-                if ($this->in('feed_list_parent', array('combined_inbox', 'unread', 'feeds', 'search'))) {
-                    $url .= '&list_parent='.$this->html_safe($this->get('feed_list_parent', ''));
+                if ($mod->in('feed_list_parent', array('combined_inbox', 'unread', 'feeds', 'search'))) {
+                    $url .= '&list_parent='.$mod->html_safe($mod->get('feed_list_parent', ''));
                 }
                 else {
                     $url .= '&list_parent=feeds_'.$item['server_id'];
                 }
-                if ($this->get('news_list_style')) {
+                if ($mod->get('news_list_style')) {
                     $style = 'news';
                 }
                 else {
                     $style = 'email';
                 }
-                if ($this->get('is_mobile')) {
+                if ($mod->get('is_mobile')) {
                     $style = 'news';
                 }
                 if (Hm_Feed_Uid_Cache::is_read(md5($item['guid']))) {
@@ -749,7 +750,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                     $from = display_value('dc:creator', $item, 'from');
                 }
                 elseif ($style == 'email') {
-                    $from = $this->trans('[No From]');
+                    $from = $mod->trans('[No From]');
                     $nofrom = ' nofrom';
                 }
                 else {
@@ -770,7 +771,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this,
+                        $mod,
                         $row_style
                     );
                 }
@@ -785,13 +786,18 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                         ),
                         $id,
                         $style,
-                        $this,
+                        $mod,
                         $row_style
                     );
                 }
             }
         }
-        $this->out('formatted_message_list', $res);
+    
+        return $res;
+    }
+
+    protected function output() {
+        $this->out('formatted_message_list', self::formatMessageList($this));
     }
 }
 
