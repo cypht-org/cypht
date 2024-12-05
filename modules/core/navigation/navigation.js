@@ -85,14 +85,15 @@ async function navigate(url) {
 function renderPage(href) {
     window.dispatchEvent(new CustomEvent('page-change'));
 
-    const searchParams = new URL(href, window.location.origin).searchParams;
+    const url = new URL(href, window.location.origin);
+    const searchParams = url.searchParams;
     const page = searchParams.get('page');
 
     if (page) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());
         if (route) {
-            const unMountCallback = route.handler(routeParams);
+            const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
             return unMountCallback;
         }
     }

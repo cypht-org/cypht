@@ -21,15 +21,16 @@ function applyServersPageHandlers() {
     if (window.wpServersPageHandler) wpServersPageHandler();
 }
 
-function applySettingsPageHandlers() {
-    Hm_Utils.expand_core_settings();
+function applySettingsPageHandlers(routeParams, hash) {
+    if (hash) {
+        Hm_Utils.toggle_page_section(`.${hash}`);
+    }
+    
     $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     $('.reset_default_value_checkbox').on("click", reset_default_value_checkbox);
     $('.reset_default_value_select').on("click", reset_default_value_select);
     $('.reset_default_value_input').on("click", reset_default_value_input);
     $('.reset_default_timezone').on("click", reset_default_timezone);
-
-    if (window.expand_feed_settings) expand_feed_settings();
     if (window.smtpSettingsPageHandler) smtpSettingsPageHandler();
 }
 
@@ -52,6 +53,11 @@ function applyInfoPageHandlers() {
         if (window.feed_status_update) feed_status_update();
         if (window.github_repo_update) github_repo_update();
     }, 100);
+
+    $('.config_map_page').on("click", function() {
+        var target = $(this).data('target');
+        $('.'+target).toggle();
+    });
 
     return () => {
         clearTimeout(timer);

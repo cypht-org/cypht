@@ -70,7 +70,7 @@ class Hm_MessagesStore {
      */
     markRowAsRead(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.value;
+        const row = this.getRowByUid(uid)?.value;
         
         if (row) {
             const htmlRow = $(row[1]['0']);
@@ -96,7 +96,7 @@ class Hm_MessagesStore {
      */
     getNextRowForMessage(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid)?.index;
         
         if (row !== false) {
             const nextRow = rows[row + 1];
@@ -114,7 +114,7 @@ class Hm_MessagesStore {
      */
     getPreviousRowForMessage(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid)?.index;
         if (row) {
             const previousRow = rows[row - 1];
             if (previousRow) {
@@ -126,7 +126,7 @@ class Hm_MessagesStore {
     
     removeRow(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid);
+        const row = this.getRowByUid(uid);
         if (row) {
             const newRows = rows.filter((_, i) => i !== row.index);
             this.rows = Object.fromEntries(newRows);
@@ -226,7 +226,7 @@ class Hm_MessagesStore {
      * @param {String} uid 
      * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
-    #getRowByUid(uid) {
+    getRowByUid(uid) {
         const rows = Object.entries(this.rows);
         const row = rows.find(([key, value]) => $(value['0']).attr('data-uid') == uid);
         

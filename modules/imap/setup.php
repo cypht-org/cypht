@@ -369,7 +369,7 @@ return array(
         'imap_delete_error' => array(FILTER_VALIDATE_BOOLEAN, false),
         'move_count' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'show_pagination_links' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'snoozed_messages' => array(FILTER_VALIDATE_INT, false),
+        'snoozed_messages' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'auto_advance_email_enabled' => array(FILTER_VALIDATE_BOOLEAN, false),
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
