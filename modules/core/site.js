@@ -1142,7 +1142,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            Hm_Utils.expand_core_settings();
             return true;
         }
         return false;
@@ -1427,41 +1426,6 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(class_name, $(class_name).css('display'));
         }
         return false;
-    },
-
-    expand_core_settings: function() {
-        var sections = Hm_Utils.get_core_settings();
-        var key;
-        var dsp;
-        for (key in sections) {
-            dsp = sections[key];
-            if (!dsp) {
-                dsp = 'none';
-            }
-            $(key).css('display', dsp);
-            Hm_Utils.save_to_local_storage(key, dsp);
-        }
-    },
-
-    get_core_settings: function() {
-        var dsp;
-        var results = {}
-        var i;
-        var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
-        for (i=0;i<sections.length;i++) {
-            dsp = Hm_Utils.get_from_local_storage(sections[i]);
-            if (hash) {
-                if (hash.replace('#', '.') != sections[i]) {
-                    dsp = 'none';
-                }
-                else {
-                    dsp = 'table-row';
-                }
-            }
-            results[sections[i]] = dsp;
-        }
-        return results;
     },
 
     get_from_local_storage: function(key) {

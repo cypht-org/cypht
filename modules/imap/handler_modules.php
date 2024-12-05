@@ -1147,7 +1147,7 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
         if (!$success) {
             return;
         }
-        $snoozed_messages = 0;
+        $snoozed_messages = [];
         $snooze_tag = null;
         if ($form['imap_snooze_until'] != 'unsnooze') {
             $at = date('D, d M Y H:i:s O');
@@ -1162,14 +1162,14 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             if (imap_authed($imap)) {
                 $folder = hex2bin($folder);
                 if (snooze_message($imap, $msg_id, $folder, $snooze_tag)) {
-                    $snoozed_messages++;
+                    $snoozed_messages[] = $msg_id;
                 }
             }
         }
         $this->out('snoozed_messages', $snoozed_messages);
-        if ($snoozed_messages == count($ids)) {
+        if (count($snoozed_messages) == count($ids)) {
             $msg = 'Messages snoozed';
-        } elseif ($snoozed_messages > 0) {
+        } elseif (count($snoozed_messages) > 0) {
             $msg = 'Some messages have been snoozed';
         } else {
             $msg = 'ERRFailed to snooze selected messages';

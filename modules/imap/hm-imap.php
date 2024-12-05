@@ -1892,11 +1892,14 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function append_end() {
             $result = $this->get_response(false, true);
-            $uid = $result[0][5];
             if ($this->check_response($result, true)) {
-                return $uid;
+                $res = preg_grep('/APPENDUID/', array_map('json_encode', $result));
+                if ($res) {
+                    $line = json_decode(reset($res), true);
+                    return $line[5];
+                }
             }
-            return false;
+            return $result;
         }
 
         /* ------------------ HELPERS ------------------------------------------ */
