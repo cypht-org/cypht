@@ -35,6 +35,14 @@ class Blueprint
     public function id($name = 'id') { return $this->bigIncrements($name); }
 
     /**
+     * Create a "blob" column.
+     *
+     * @param  string  $name The name of the column.
+     * @return $this
+     */
+    public function blob($name) { return $this->addColumn('blob', $name); }
+
+    /**
      * Create a "bigIncrements" column.
      *
      * @param  string  $name The name of the column.
@@ -49,6 +57,30 @@ class Blueprint
      * @return $this
      */
     public function bigInteger($name) { return $this->addColumn('bigInteger', $name); }
+
+    /**
+     * Create a "string" column with an optional length.
+     * MySQL: VARCHAR($length), PostgreSQL: VARCHAR($length), SQLite: TEXT
+     *
+     * @param  string  $name   The name of the column.
+     * @param  int     $length The length of the column (default is 255).
+     * @return $this
+     */
+    public function string($name, $length = 255)
+    {
+        return $this->addColumn('string', $name, compact('length'));
+    }
+    /**
+     * Create an "unsignedBigInteger" column.
+     * MySQL: UNSIGNED BIGINT, PostgreSQL: BIGINT (no unsigned in PG), SQLite: INTEGER
+     *
+     * @param  string  $name The name of the column.
+     * @return $this
+     */
+    public function unsignedBigInteger($name)
+    {
+        return $this->addColumn('unsignedBigInteger', $name);
+    }
 
     /**
      * Create a "binary" column.
@@ -118,6 +150,18 @@ class Blueprint
      * @return $this
      */
     public function double($name, $precision = 8, $scale = 2) { return $this->addColumn('double', $name, compact('precision', 'scale')); }
+
+    /**
+     * Set a default value for the current column.
+     *
+     * @param  mixed  $value The default value.
+     * @return $this
+     */
+    public function default($value)
+    {
+        $this->columns[count($this->columns) - 1]['default'] = $value;
+        return $this;
+    }
 
     /**
      * Create an "enum" column with allowed values.
@@ -235,6 +279,14 @@ class Blueprint
     public function longText($name) { return $this->addColumn('longText', $name); }
 
     /**
+     * Create a "longBlob" column.
+     *
+     * @param  string  $name The name of the column.
+     * @return $this
+     */
+    public function longBlob($name) { return $this->addColumn('longblob', $name); }
+
+    /**
      * Create a "macAddress" column.
      *
      * @param  string  $name The name of the column.
@@ -298,17 +350,14 @@ class Blueprint
      * @return $this
      */
     public function nullableTimestamp($name) { return $this->nullable('timestamp', $name); }
-
+    
     /**
-     * Set a default value for the current column.
+     * Create a "timestamp" column.
      *
-     * @param  mixed  $value The default value.
+     * @param  string  $name The name of the column.
      * @return $this
      */
-    public function default($value) {
-        $this->columns[count($this->columns) - 1]['default'] = $value;
-        return $this;
-    }
+    public function timestamp($name) { return $this->addColumn('timestamp', $name, ['type' => 'timestamp']); }
 
     /**
      * Add a comment to the column.
@@ -335,11 +384,26 @@ class Blueprint
     /**
      * Add a primary key constraint to the specified columns.
      *
-     * @param  array  $columns The columns to be used as primary key.
+     * @param  mixed  $columns The columns to be used as primary key.
      * @return $this
      */
-    public function primary($columns) {
-        $this->primaryKeys = array_merge($this->primaryKeys, (array)$columns);
+    public function primary($columns = null) {
+        if ($columns === null) {
+            $column = &$this->columns[count($this->columns) - 1];
+            $column['primary'] = true;
+            $this->primaryKeys[] = $column['name'];
+        }
+        else {
+            $columns = (array)$columns;
+            foreach ($columns as $column) {
+                $this->primaryKeys[] = $column;
+                foreach ($this->columns as &$col) {
+                    if ($col['name'] == $column) {
+                        $col['primary'] = true;
+                    }
+                }
+            }
+        }
         return $this;
     }
 
