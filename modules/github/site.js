@@ -1,5 +1,9 @@
 'use strict';
 
+/*
+TODO: Remove every data source callback from the server, afterwards, remove the above section
+*/
+
 var load_github_data = function(id) {
     if (getListPathParam() == 'github_all') {
         Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_github_data'}, {'name': 'github_repo', 'value': id}], display_github_data, [], false, cache_github_all);
@@ -41,6 +45,10 @@ var cache_github_all = function() {
         Hm_Message_List.set_message_list_state('formatted_github_all')
     }
 };
+
+/*
+End of the section to be removed
+*/
 
 var github_item_view = function(list_path, uid, callback) {
     if (!list_path) {
@@ -100,36 +108,3 @@ var github_repo_update = function() {
 var update_github_status_display = function(res) {
     $('.github_'+Hm_Utils.clean_selector(res.github_status_repo)).html(res.github_status_display);
 };
-
-function githubServersPageHandler() {
-    var dsp = Hm_Utils.get_from_local_storage('.github_connect_section');
-    if (dsp == 'block' || dsp == 'none') {
-        $('.github_connect_section').css('display', dsp);
-    }
-    $('.github_disconnect').on("click", function(e) {
-        if (!hm_delete_prompt()) {
-            e.preventDefault();
-            return false;
-        }
-        return true;
-    });
-    $('.github_remove_repo').on("click", function(e) {
-        if (!hm_delete_prompt()) {
-            e.preventDefault();
-            return false;
-        }
-        return true;
-    });
-}
-
-function githubMessageContentPageHandler(routeParams) {
-    if (routeParams.list_path.substr(0, 6) == 'github') {
-        github_item_view();
-    }
-}
-
-function githubMessageListPageHandler(routeParams) {
-    if (routeParams.list_path === 'github_all') {
-        Hm_Message_List.page_caches.github_all = 'formatted_github_all';
-    }
-}

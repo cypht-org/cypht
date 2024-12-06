@@ -17,7 +17,6 @@ function applyImapMessageListPageHandlers(routeParams) {
         Hm_Message_List.toggle_rows();
     });
 
-    if (window.githubMessageListPageHandler) githubMessageListPageHandler(routeParams);
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
     if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);
 
@@ -45,7 +44,6 @@ function applyImapMessageContentPageHandlers(routeParams) {
         preFetchMessageContent(false, prevMessageUid, routeParams.list_path);
     }
 
-    if (window.githubMessageContentPageHandler) githubMessageContentPageHandler(routeParams);
     if (window.pgpMessageContentPageHandler) pgpMessageContentPageHandler();
     if (window.wpMessageContentPageHandler) wpMessageContentPageHandler(routeParams);
 }

@@ -64,16 +64,25 @@ function applyInfoPageHandlers() {
     }
 }
 
+function applyMessaleListPageHandlers(routeParams) {
+    if (routeParams.list_path === 'github_all') {
+        return applyGithubMessageListPageHandler(routeParams);
+    }
+
+    // TODO: Refactor this handler to be more modular(applicable only for the imap list type)
+    return applyImapMessageListPageHandlers(routeParams);
+}
+
 function applyMessagePageHandlers(routeParams) {
     const path = routeParams.list_path.substr(0, 4);
     
     switch (path) {
         case 'imap':
-            applyImapMessageContentPageHandlers(routeParams);
-            break;
+            return applyImapMessageContentPageHandlers(routeParams);
         case 'feed':
-            applyFeedMessageContentPageHandlers(routeParams);
-            break;
+            return applyFeedMessageContentPageHandlers(routeParams);
+        case 'gith':
+            return applyGithubMessageContentPageHandlers(routeParams);
     
         default:
             break;

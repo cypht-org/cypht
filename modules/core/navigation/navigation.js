@@ -60,6 +60,17 @@ async function navigate(url) {
         const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
         $('main').replaceWith(main);
         document.title = title.replace(/<[^>]*>/g, '');
+        
+        // load custom javascript
+        const head = html.match(/<head[^>]*>((.|[\n\r])*)<\/head>/i)[0];
+        $(document.head).find('script').remove();
+        $('<div>').append(head).find('script').each(function() {
+            if (!this.src) {
+                const newScript = document.createElement('script');
+                newScript.textContent = this.textContent;
+                document.head.appendChild(newScript);
+            }
+        });
 
         window.location.next = url;
 
