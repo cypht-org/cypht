@@ -5,6 +5,8 @@ namespace Database\Core;
 class Blueprint
 {
     private $columns = [];
+    protected $modifiedColumns = [];
+    protected $droppedColumns = [];
     private $primaryKeys = [];
     private $uniqueKeys = [];
     private $indexes = [];
@@ -24,7 +26,15 @@ class Blueprint
         return $this;
     }
 
-    // Column Types
+    public function modifyColumn($name, $type, $options = [])
+    {
+        $this->modifiedColumns[] = ['name' => $name, 'type' => $type, 'options' => $options];
+    }
+
+    public function dropColumn($name)
+    {
+        $this->droppedColumns[] = $name;
+    }
 
     /**
      * Create an auto-incrementing "id" column.
@@ -48,7 +58,7 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function bigIncrements($name) { return $this->addColumn('bigIncrements', $name); }
+    public function bigIncrements($name) { return $this->addColumn('bigInteger', $name, ['autoIncrement' => true, 'primary' => true])->primary(); }
 
     /**
      * Create a "bigInteger" column.
@@ -79,7 +89,7 @@ class Blueprint
      */
     public function unsignedBigInteger($name)
     {
-        return $this->addColumn('unsignedBigInteger', $name);
+        return $this->addColumn('bigInteger', $name, ['unsigned' => true]);
     }
 
     /**
@@ -204,7 +214,10 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function foreignUlid($name) { return $this->addColumn('foreignUlid', $name); }
+    public function foreignUlid($name)
+    { 
+        return $this->addColumn('char', $name, ['length' => 26, 'nullable' => true]);
+    }
 
     /**
      * Create a "foreignUuid" column.
@@ -212,7 +225,9 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function foreignUuid($name) { return $this->addColumn('foreignUuid', $name); }
+    public function foreignUuid($name) {
+        return $this->addColumn('char', $name, ['length' => 36, 'nullable' => true]);
+    }
 
     /**
      * Create a "geography" column.
@@ -236,7 +251,7 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function increments($name) { return $this->addColumn('increments', $name); }
+    public function increments($name) { return $this->addColumn('integer', $name, ['autoIncrement' => true, 'primary' => true]); }
 
     /**
      * Create an "integer" column.
@@ -292,7 +307,9 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function macAddress($name) { return $this->addColumn('macAddress', $name); }
+    public function macAddress($name) {
+        return $this->addColumn('char', $name, ['length' => 17, 'nullable' => true]);
+    }
 
     /**
      * Create a "mediumIncrements" column (auto-incrementing integer).
@@ -324,7 +341,12 @@ class Blueprint
      * @param  string  $name The base name of the column.
      * @return $this
      */
-    public function morphs($name) { return $this->addColumn('morphs', $name); }
+    public function morphs($name)
+    { 
+        $this->addColumn('integer', $name . '_id');
+        $this->addColumn('string', $name . '_type');
+        return $this;
+    }
 
     /**
      * Create "nullableMorphs" columns for polymorphic relations.
@@ -332,16 +354,23 @@ class Blueprint
      * @param  string  $name The base name of the column.
      * @return $this
      */
-    public function nullableMorphs($name) { return $this->addColumn('nullableMorphs', $name); }
+    public function nullableMorphs($name)
+    {
+        $this->addColumn('integer', $name . '_id', ['nullable' => true]);
+        $this->addColumn('string', $name . '_type', ['nullable' => true]);
+        return $this;
+    }
 
     /**
      * Add a nullable constraint to the column.
      *
-     * @param  string  $type The column type (e.g., 'string', 'integer').
-     * @param  string  $name The name of the column.
      * @return $this
      */
-    public function nullable($type, $name) { return $this->addColumn($type, $name, ['nullable' => true]); }
+    public function nullable()
+    {
+        $column['options']['nullable'] = true;
+        return $this;
+    }
 
     /**
      * Create a nullable "timestamp" column.
@@ -349,7 +378,11 @@ class Blueprint
      * @param  string  $name The name of the column.
      * @return $this
      */
-    public function nullableTimestamp($name) { return $this->nullable('timestamp', $name); }
+    public function nullableTimestamp($name)
+    {
+        $this->addColumn('timestamp', $name, ['nullable' => true]);
+        return $this;
+    }
     
     /**
      * Create a "timestamp" column.
@@ -413,8 +446,23 @@ class Blueprint
      * @param  array  $columns The columns to be used for the unique constraint.
      * @return $this
      */
-    public function unique($columns) {
-        $this->uniqueKeys = array_merge($this->uniqueKeys, (array)$columns);
+    public function unique($columns = null) {
+        if ($columns === null) {
+            $column = &$this->columns[count($this->columns) - 1];
+            $column['unique'] = true;
+            $this->uniqueKeys[] = $column['name'];
+        }
+        else {
+            $columns = (array)$columns;
+            foreach ($columns as $column) {
+                $this->uniqueKeys[] = $column;
+                foreach ($this->columns as &$col) {
+                    if ($col['name'] == $column) {
+                        $col['unique'] = true;
+                    }
+                }
+            }
+        }
         return $this;
     }
 
@@ -449,6 +497,26 @@ class Blueprint
      */
     public function getColumns() {
         return $this->columns;
+    }
+
+    /**
+     * Get the modified columns.
+     *
+     * @return array
+     */
+    public function getModifiedColumns()
+    {
+        return $this->modifiedColumns;
+    }
+
+    /**
+     * Get the dropped columns.
+     *
+     * @return array
+     */
+    public function getDroppedColumns()
+    {
+        return $this->droppedColumns;
     }
 
     /**

@@ -92,11 +92,82 @@ class Schema
     {
         $blueprint = new Blueprint();
         $callback($blueprint);
+        
+        $columns = implode(', ', array_map(function($column) {
+            $columnDefinition = "`{$column['name']}` ";
+            
+            if (isset($column['length'])) {
+                if ($column['type'] == 'string') {
+                    if (self::$driver == 'sqlite') {
+                        $columnDefinition .= " TEXT";
+                    } else {
+                        $columnDefinition .= " VARCHAR"; 
+                    }
+                }
+                $columnDefinition .= "({$column['length']})";
+            }else {
+                $columnDefinition .= strtoupper($column['type']);
+            }
+    
+            if (isset($column['default'])) {
+                if (is_numeric($column['default'])) {
+                    $columnDefinition .= " DEFAULT {$column['default']}";
+                } else {
+                    $columnDefinition .= " DEFAULT '{$column['default']}'";
+                }
+            }
+    
+            if (isset($column['nullable']) && $column['nullable'] === false) {
+                $columnDefinition .= " NOT NULL";
+            } elseif (!isset($column['nullable']) || $column['nullable'] === true) {
+                $columnDefinition .= " NULL";
+            }
+    
+            if (isset($column['autoIncrement']) && $column['autoIncrement']) {
+                switch (self::$driver) {
+                    case 'mysql':
+                    case 'mssql':
+                        $columnDefinition .= " AUTO_INCREMENT";
+                        break;
+                    case 'pgsql':
+                        $columnDefinition .= " SERIAL";
+                        break;
+                    case 'sqlite':
+                        $columnDefinition .= " INTEGER PRIMARY KEY AUTOINCREMENT";
+                        break;
+                    default:
+                        throw new \Exception("Unsupported database driver for auto increment");
+                }
+            }
+    
+            if ($column['type'] === 'enum' && isset($column['allowed'])) {
+                $allowedValues = implode("', '", $column['allowed']);
+                $columnDefinition .= " CHECK (`{$column['name']}` IN ('$allowedValues'))";
+            }
+    
+            if (!empty($column['check'])) {
+                $columnDefinition .= " CHECK ({$column['check']})";
+            }
+    
+            if (!empty($column['unsigned'])) {
+                switch (self::$driver) {
+                    case 'mysql':
+                        $columnDefinition .= " UNSIGNED";
+                        break;
+                    case 'pgsql':
+                    case 'sqlite':
+                    case 'mssql':
+                        $columnDefinition .= " CHECK ({$column['name']} >= 0)";
+                        break;
+                    default:
+                        throw new \Exception("Unsupported database driver for unsigned columns");
+                }
+            }
+    
+            return $columnDefinition;
+        }, $blueprint->getColumns()));
 
-        $columns = implode(', ', $blueprint->getColumns());
         $sql = "CREATE TABLE IF NOT EXISTS `$table` ($columns)";
-
-        // Executing the SQL statement depending on the database driver
         switch (self::$driver) {
             case 'mysql':
             case 'pgsql':
@@ -109,35 +180,183 @@ class Schema
             default:
                 throw new \Exception("Unsupported database driver");
         }
-
-        // Add primary key if defined in Blueprint
+    
+        // Add primary keys if defined
         if ($primaryKeys = $blueprint->getPrimaryKeys()) {
             $primaryKeySql = 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
             self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT pk_{$table} $primaryKeySql");
         }
-
-        // Add unique constraints if defined in Blueprint
+    
+        // Add unique constraints if defined
         foreach ($blueprint->getUniqueKeys() as $uniqueColumns) {
             $uniqueKeySql = 'UNIQUE (' . implode(',', (array)$uniqueColumns) . ')';
             self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT unique_{$table} (" . implode(',', (array)$uniqueColumns) . ")");
         }
-
-        // Add indexes if defined in Blueprint
+    
+        // Add indexes if defined
         foreach ($blueprint->getIndexes() as $indexColumns) {
             $indexSql = 'INDEX (' . implode(',', (array)$indexColumns) . ')';
             self::$pdo->exec("ALTER TABLE `$table` ADD $indexSql");
         }
-
-        // Add foreign keys if defined in Blueprint
+    
+        // Add foreign keys if defined
         foreach ($blueprint->getForeignKeys() as $foreignKey) {
             self::addForeignKey(
-                $table, 
-                $foreignKey['columns'], 
-                $foreignKey['on'], 
+                $table,
+                $foreignKey['columns'],
+                $foreignKey['on'],
                 $foreignKey['references']
             );
         }
     }
+    
+    /**
+     * Modify an existing table.
+     * @param string $table
+     * @param Closure $callback
+     * @return void
+     */
+    public static function table($table, Closure $callback)
+    {
+        if (!self::hasTable($table)) {
+            throw new \Exception("Table `$table` does not exist.");
+        }
+
+        $blueprint = new Blueprint();
+        $callback($blueprint);
+
+        foreach ($blueprint->getColumns() as $column) {
+            if (!self::hasColumn($table, $column['name'])) {
+                $type = self::getType($column);
+                self::addColumnToTable($table, $column['name'], $type, $column);
+
+                if(self::hasContraints($column)) {
+                    self::applyColumnConstraints($table, $column);
+                }
+            }
+            exit(var_dump(self::hasContraints($column)));
+        }
+
+        // Modify existing columns (if needed)
+        foreach ($blueprint->getModifiedColumns() as $column) {
+            $type = self::getType($column);
+            self::modifyColumn($table, $column['name'], $column['type'], $column);
+
+            if(self::hasContraints($column)) {
+                self::applyColumnConstraints($table, $column);
+            }
+        }
+
+        // Drop columns if defined
+        foreach ($blueprint->getDroppedColumns() as $column) {
+            self::dropColumn($table, $column);
+        }
+    }
+
+    private static function getType($column)
+    {
+        if ($column['type'] == 'string') {
+            if (self::$driver == 'sqlite') {
+                $type = " TEXT";
+            } else {
+                $type = " VARCHAR"; 
+            }
+        }else {
+            $type = strtoupper($column['type']);
+        }
+        return $type;
+    }
+
+    public static function hasContraints($column)
+    {
+        return isset($column['default']) || isset($column['nullable']) || isset($column['unsigned']) || isset($column['allowed']);
+    }
+
+    public static function applyColumnConstraints($table, $column)
+    {
+        $columnName = $column['name'];
+        $columnDefinition = '';
+        self::disableForeignKeyConstraints();
+
+        $alterSql = "ALTER TABLE `$table` MODIFY COLUMN `$columnName`";
+
+        if (isset($column['default'])) {
+            if (is_numeric($column['default'])) {
+                $columnDefinition .= " DEFAULT {$column['default']}";
+            } else {
+                $columnDefinition .= " DEFAULT '{$column['default']}'";
+            }
+        }
+
+        if (isset($column['nullable'])) {
+            if ($column['nullable'] === false) {
+                $columnDefinition .= " NOT NULL";
+            } else {
+                $columnDefinition .= " NULL";
+            }
+        }
+
+        if (isset($column['unsigned']) && $column['unsigned'] === true) {
+            $columnDefinition .= " UNSIGNED";
+        }
+
+        if (isset($column['type']) && $column['type'] === 'enum' && isset($column['allowed'])) {
+            $allowedValues = implode("', '", $column['allowed']);
+            $constraintName = "chk_{$table}_{$columnName}";
+            $alterSql = "ALTER TABLE `$table` ADD CONSTRAINT `$constraintName` CHECK (`$columnName` IN ('$allowedValues'))";
+        }
+
+        if ($columnDefinition) {
+            $alterSql .= $columnDefinition;
+        }
+        // Apply the changes to the database
+        if ($alterSql) {
+            self::$pdo->exec($alterSql);
+        }
+        self::enableForeignKeyConstraints();
+    }
+    
+    /**
+     * Add a column to an existing table
+     * @param string $table
+     * @param string $name
+     * @param string $type
+     * @param array $options
+     * @return void
+     */
+    protected static function addColumnToTable($table, $name, $type, $options)
+    {
+        $sql = "ALTER TABLE `$table` ADD COLUMN `$name` $type";
+        // Add additional options (nullable, default, etc.) here
+        self::$pdo->exec($sql);
+    }
+
+    /**
+     * Modify an existing column in a table
+     * @param string $table
+     * @param string $column
+     * @param string $type
+     * @param array $options
+     * @return void
+     */
+    protected static function modifyColumn($table, $column, $type, $options)
+    {
+        $sql = "ALTER TABLE `$table` MODIFY `$column` $type";
+        // Add additional options (nullable, default, etc.) here
+        self::$pdo->exec($sql);
+    }
+
+    /**
+     * Drop a column from a table
+     * @param string $table
+     * @param string $column
+     * @return void
+     */
+    protected static function dropColumn($table, $column)
+    {
+        self::$pdo->exec("ALTER TABLE `$table` DROP COLUMN `$column`");
+    }
+
 
     /**
      * Add a foreign key to a table

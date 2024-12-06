@@ -28,7 +28,7 @@ class MigrationRunner
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
-
+        Schema::setConnection($pdo);
         $this->ensureMigrationsTableExists();
     }
 
@@ -48,6 +48,23 @@ class MigrationRunner
             );
         ");
     }
+    /**
+     * Run the migration runner.
+     *
+     * @param string $action
+     * @return void
+     */
+    public function run($action)
+    {
+        if($action == 'migrate') {
+            $this->migrate();
+        } elseif($action == 'rollback') {
+            $this->rollback();
+        }else {
+            echo "Invalid argument. Use 'migrate' or 'rollback'.\n";
+            exit(1);
+        }
+    }
 
     /**
      * Run all the pending migrations.
@@ -55,9 +72,9 @@ class MigrationRunner
      *
      * @return void
      */
-    public function run()
+    public function migrate()
     {
-        $migrationFiles = glob(__DIR__ . '/database/migrations/*.php');
+        $migrationFiles = glob(MIGRATIONS_PATH . '/*.php');
 
         sort($migrationFiles);
 
@@ -71,7 +88,11 @@ class MigrationRunner
 
             try {
                 require_once $migrationFile;
-                $migration = new $migrationClass();
+                if (class_exists($migrationClass)) {
+                    $migration = new $migrationClass();
+                } else {
+                    $migration = require $migrationFile;
+                }
                 $migration->runUp();
 
                 $this->markMigrationAsRun($migrationClass);
@@ -92,24 +113,21 @@ class MigrationRunner
     public function rollback()
     {
         $batch = $this->getLastBatchNumber();
-
-        $migrationFiles = glob(__DIR__ . '/database/migrations/*.php');
-
+        $migrationFiles = glob(MIGRATIONS_PATH . '/*.php');
         sort($migrationFiles);
-
         $migrationFiles = array_reverse($migrationFiles);
-
         foreach ($migrationFiles as $migrationFile) {
             $migrationClass = '\\' . basename($migrationFile, '.php');
-
             if ($this->hasMigrationBeenRolledBack($migrationClass, $batch)) {
                 try {
                     require_once $migrationFile;
-                    $migration = new $migrationClass();
+                    if (class_exists($migrationClass)) {
+                        $migration = new $migrationClass();
+                    } else {
+                        $migration = require $migrationFile;
+                    }
                     $migration->runDown();
-
                     $this->markMigrationAsRolledBack($migrationClass);
-
                     echo "Rolling back migration: " . $migrationClass . "\n";
                 } catch (Exception $e) {
                     echo "Error rolling back migration: " . $migrationClass . " - " . $e->getMessage() . "\n";
@@ -155,9 +173,7 @@ class MigrationRunner
      */
     private function markMigrationAsRun($migrationClass)
     {
-        // Get the last batch number
         $batch = $this->getLastBatchNumber() + 1;
-
         $stmt = $this->pdo->prepare("INSERT INTO {$this->migrationsTable} (migration, batch) VALUES (:migration, :batch)");
         $stmt->execute(['migration' => $migrationClass, 'batch' => $batch]);
     }
