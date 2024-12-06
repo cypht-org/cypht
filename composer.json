@@ -19,6 +19,11 @@
     ],
     "homepage": "https://cypht.org",
     "license": "LGPL-2.1",
+    "autoload": {
+        "psr-4": {
+            "Database\\": "database/"
+        }
+    },
     "authors": [
         {
             "name": "Jason Munro",
