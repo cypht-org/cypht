@@ -14,6 +14,9 @@ return new class extends Migration {
     {
         Schema::table('hm_user_session', function (Blueprint $table) {
             $table->integer('hm_version')->default(1);
+            $table->addColumnIf('integer', 'lock', ['default' => 0], function () {
+                return env('DB_DRIVER') === 'sqlite';
+            })->default(0);
         });
     }
 

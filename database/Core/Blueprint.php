@@ -26,6 +26,26 @@ class Blueprint
         return $this;
     }
 
+    /**
+     * Add a column to the table if a condition is met.
+     *
+     * @param  string  $type  The type of the column.
+     * @param  string  $name  The name of the column.
+     * @param  array   $options  Additional options for the column.
+     * @param  bool|callable  $condition  A boolean or a callback that returns a boolean.
+     * @return $this
+     */
+    public function addColumnIf($type, $name, $options = [], $condition = true)
+    {
+        if (is_callable($condition)) {
+            $condition = $condition();
+        }
+        if ($condition) {
+            return $this->addColumn($type, $name, $options);
+        }
+        return $this;
+    }
+
     public function modifyColumn($name, $type, $options = [])
     {
         $this->modifiedColumns[] = ['name' => $name, 'type' => $type, 'options' => $options];
