@@ -58,21 +58,7 @@ if ($db_driver == 'mysql') {
         error_log('The following required PostgreSQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
         exit(1);
     }
-} elseif ($db_driver == 'sqlite') {
-    $required_extensions = ['sqlite3', 'pdo_sqlite'];
-    $missing_extensions = [];
-
-    foreach ($required_extensions as $extension) {
-        if (!extension_loaded($extension)) {
-            $missing_extensions[] = $extension;
-        }
-    }
-
-    if (!empty($missing_extensions)) {
-        error_log('The following required SQLite extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
-        exit(1);
-    }
-}else {
+} else {
     error_log("Unsupported DB driver: {$db_driver}");
     exit(1);
 }
