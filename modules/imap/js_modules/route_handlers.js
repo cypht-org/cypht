@@ -1,8 +1,6 @@
 function applyImapMessageListPageHandlers(routeParams) {
     const setupPageResult = setup_imap_folder_page(routeParams.list_path);
 
-    sortHandlerForMessageListAndSearchPage();
-
     imap_setup_snooze();
     imap_setup_tags();
 

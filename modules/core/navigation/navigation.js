@@ -9,6 +9,7 @@ function trackLocationSearchChanges() {
 window.addEventListener('popstate', function(event) {
     if (event.state) {
         $('main').replaceWith(event.state.main);
+        loadCustomScripts(event.state.head);
     }
     const unMountCallback = renderPage(window.location.href);
 
@@ -25,7 +26,7 @@ window.addEventListener('popstate', function(event) {
 
 window.addEventListener('load', function() {
     const unMountCallback = renderPage(window.location.href);
-    history.replaceState({ main: $('main').prop('outerHTML') }, "");
+    history.replaceState({ main: $('main').prop('outerHTML'), head: $('head').prop('outerHTML') }, "");
 
     if (unMountCallback) {
         unMountSubscribers[window.location.search] = unMountCallback;
@@ -63,20 +64,13 @@ async function navigate(url) {
         
         // load custom javascript
         const head = html.match(/<head[^>]*>((.|[\n\r])*)<\/head>/i)[0];
-        $(document.head).find('script').remove();
-        $('<div>').append(head).find('script').each(function() {
-            if (!this.src) {
-                const newScript = document.createElement('script');
-                newScript.textContent = this.textContent;
-                document.head.appendChild(newScript);
-            }
-        });
+        loadCustomScripts(head);
 
         window.location.next = url;
 
         const unMountCallback = renderPage(url);
 
-        history.pushState({ main }, "", url);
+        history.pushState({ main, head }, "", url);
         
         if (unMountCallback) {
             unMountSubscribers[url] = unMountCallback;
@@ -91,6 +85,18 @@ async function navigate(url) {
     } finally {
         hideRoutingToast();
     }
+}
+
+function loadCustomScripts(head) {
+    $(document.head).find('script').remove();
+    
+    $('<div>').append(head).find('script').each(function() {        
+        if (!this.src) {
+            const newScript = document.createElement('script');
+            newScript.textContent = this.textContent;
+            document.head.appendChild(newScript);
+        }
+    });
 }
 
 function renderPage(href) {

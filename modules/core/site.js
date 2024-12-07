@@ -1006,6 +1006,9 @@ function Message_List() {
     }
 
     this.process_row_click = function(e) {
+        if (e.target.tagName === 'A') {
+            return;
+        }
         document.getSelection().removeAllRanges();
         var target = $(e.target);
         var class_name = target[0].className;

@@ -26,10 +26,8 @@ function applyGithubMessageContentPageHandlers(routeParams) {
 function applyGithubMessageListPageHandler(routeParams) {
     /*
     TODO:
-    - Actually the message list for a particular repo is handled by the imap module, it should be moved to the github module
-    - Add background refresh processes for this handler
-    - Handle the refresh button click
-    */
+    - Actually the message list for a particular repo is handled by the imap module, it should be moved to the github module.
+    */   
     if (routeParams.list_path === 'github_all') {
         const dataSources = hm_data_sources().map((source) => source.id);
         dataSources.forEach((id) => {
@@ -40,5 +38,36 @@ function applyGithubMessageListPageHandler(routeParams) {
                 }
             })
         });
+
+        const abortController = new AbortController();
+        const refreshIntervalId = setInterval(() => {
+            refreshAll(dataSources, true, abortController);
+        }, 30000);
+
+        $('.refresh_link').on("click", function(e) {
+            e.preventDefault();
+            refreshAll(dataSources, false, abortController);
+        });
+
+        return () => {
+            clearInterval(refreshIntervalId);
+            abortController.abort();
+        }
     }
+}
+
+function refreshAll(dataSources, background = false, abortController) {
+    dataSources.forEach((id) => {
+        const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), {}, abortController);
+        messages.load(true, background).then(store => {
+            for (const index in Object.values(store.rows)) {
+                const row = messages.rows[index][0];
+                const rowUid = $(row).data('uid');
+                const rowExist = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`).length;
+                if (!rowExist) {
+                    Hm_Utils.rows().eq(index).before(row);
+                };
+            }
+        })
+    });
 }

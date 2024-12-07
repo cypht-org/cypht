@@ -65,6 +65,7 @@ function applyInfoPageHandlers() {
 }
 
 function applyMessaleListPageHandlers(routeParams) {
+    sortHandlerForMessageListAndSearchPage();
     if (routeParams.list_path === 'github_all') {
         return applyGithubMessageListPageHandler(routeParams);
     }
