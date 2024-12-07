@@ -86,7 +86,7 @@ class Hm_Handler_wp_load_sources extends Hm_Handler_Module {
                 $excluded = true;
             }
             if (!$excluded) {
-                $this->append('data_sources', array('callback' => 'load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+                $this->append('data_sources', array('load_wp_notices_for_combined_list', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
         }
     }
@@ -147,7 +147,7 @@ class Hm_Handler_wordpress_list_type extends Hm_Handler_Module {
                 $this->out('mailbox_list_title', array('WordPress.com Notifications'));
                 $this->out('message_list_since', $this->user_config->get('wordpress_since_setting', DEFAULT_WORDPRESS_SINCE));
                 $this->out('per_source_limit', 100);
-                $this->append('data_sources', array('callback' => 'load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
+                $this->append('data_sources', array('load_wp_notices', 'type' => 'wordpress', 'name' => 'WordPress.com Notifications', 'id' => 0));
             }
             else {
                 $this->out('list_path', $path, false);

@@ -626,7 +626,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                 $parts = explode('_', $path, 3);
                 $details = Hm_IMAP_List::dump($parts[1]);
                 $custom_link = 'add';
-                foreach (imap_data_sources(false, $this->user_config->get('custom_imap_sources', array())) as $vals) {
+                foreach (imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
                     if ($vals['id'] == $parts[1] && $vals['folder'] == $parts[2]) {
                         $custom_link = 'remove';
                         break;
@@ -1369,7 +1369,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             if (! $userCustomSources) {
                 $userCustomSources = [];
             }
-            $data_sources = imap_data_sources('', $userCustomSources);
+            $data_sources = imap_data_sources($userCustomSources);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
@@ -1408,7 +1408,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
             }
             $folders = array($folder);
         } else {
-            $data_sources = imap_data_sources('');
+            $data_sources = imap_data_sources();
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
@@ -1472,7 +1472,7 @@ class Hm_Handler_imap_unread extends Hm_Handler_Module {
             }
             $folders = array($folder);
         } else {
-            $data_sources = imap_data_sources('');
+            $data_sources = imap_data_sources();
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
@@ -1628,7 +1628,7 @@ class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
      * Output IMAP server array used on the search page
      */
     public function process() {
-        foreach(imap_data_sources('imap_search_page_content', $this->user_config->get('custom_imap_sources', array())) as $vals) {
+        foreach(imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
             $this->append('data_sources', $vals);
         }
     }
@@ -1644,61 +1644,20 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
      * Used by combined views excluding normal folder view and search pages
      */
     public function process() {
-        $callback = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
         }
         else {
             $path = '';
         }
-        switch ($path) {
-            case 'unread':
-                $callback = 'imap_combined_unread_content';
-                break;
-            case 'flagged':
-                $callback = 'imap_combined_flagged_content';
-                break;
-            case 'combined_inbox':
-                $callback = 'imap_combined_inbox_content';
-                break;
-            case 'email':
-                $callback = 'imap_all_mail_content';
-                break;
-            case 'sent':
-                $callback = 'imap_folder_content';
-                break;
-            case 'junk':
-                $callback = 'imap_folder_content';
-                break;
-            case 'trash':
-                $callback = 'imap_folder_content';
-                break;
-            case 'drafts':
-                $callback = 'imap_folder_content';
-                break;
-            case 'tag':
-                $callback = 'imap_tag_content';
-                break;
-            default:
-                $callback = 'imap_background_unread_content';
-                break;
+        if (in_array($path, ['sent', 'junk', 'trash', 'drafts'])) {
+            foreach (imap_sources($this, $path) as $vals) {
+                $this->append('data_sources', $vals);
+            }
         }
-        if ($callback) {
-            if ($callback != 'imap_background_unread_content') {
-                $this->out('move_copy_controls', true);
-            }
-            if (in_array($path, ['sent', 'junk', 'trash', 'drafts'])) {
-                foreach (imap_sources($callback, $this, $path) as $vals) {
-                    $this->append('data_sources', $vals);
-                }
-            }
-            else {
-                foreach (imap_data_sources($callback, $this->user_config->get('custom_imap_sources', array())) as $vals) {
-                    if ($callback == 'imap_background_unread_content') {
-                        $vals['group'] = 'background';
-                    }
-                    $this->append('data_sources', $vals);
-                }
+        else {
+            foreach (imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
+                $this->append('data_sources', $vals);
             }
         }
     }
@@ -2162,7 +2121,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
         } else {
-            $data_sources = imap_sources('', $this, $this->request->get['list_path']);
+            $data_sources = imap_sources($this, $this->request->get['list_path']);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
             $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }

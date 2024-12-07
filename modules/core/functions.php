@@ -111,12 +111,7 @@ function format_data_sources($array, $output_mod) {
         foreach ($sources as $values) {
             $items = array();
             foreach ($values as $name => $value) {
-                if ($name == 'callback') {
-                    $items[] = $output_mod->html_safe($name).':'.$output_mod->html_safe($value);
-                }
-                else {
-                    $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
-                }
+                $items[] = $output_mod->html_safe($name).':"'.$output_mod->html_safe($value).'"';
             }
             $objects[] = '{'.implode(',', $items).'}';
         }
