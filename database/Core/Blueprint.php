@@ -62,7 +62,7 @@ class Blueprint
      * @param  string  $name The name of the column (default is 'id').
      * @return $this
      */
-    public function id($name = 'id') { return $this->bigIncrements($name); }
+    public function id($name = 'id') { return $this->increments($name); }
 
     /**
      * Create a "blob" column.

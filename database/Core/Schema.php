@@ -48,7 +48,8 @@ class Schema
                 return $stmt->rowCount() > 0;
             case 'sqlite':
                 $stmt = self::$pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
-                return $stmt->rowCount() > 0;
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                return $result !== false;
             default:
                 return false;
         }
@@ -122,7 +123,6 @@ class Schema
             } elseif (!isset($column['nullable']) || $column['nullable'] === true) {
                 $columnDefinition .= " NULL";
             }
-    
             if (isset($column['autoIncrement']) && $column['autoIncrement']) {
                 switch (self::$driver) {
                     case 'mysql':
@@ -133,7 +133,7 @@ class Schema
                         $columnDefinition .= " SERIAL";
                         break;
                     case 'sqlite':
-                        $columnDefinition .= " INTEGER PRIMARY KEY AUTOINCREMENT";
+                        $columnDefinition .= "AUTOINCREMENT";
                         break;
                     default:
                         throw new \Exception("Unsupported database driver for auto increment");
@@ -167,7 +167,28 @@ class Schema
             return $columnDefinition;
         }, $blueprint->getColumns()));
 
-        $sql = "CREATE TABLE IF NOT EXISTS `$table` ($columns)";
+        $sql = "CREATE TABLE IF NOT EXISTS `$table` ($columns";
+
+        // Adding primary key constraint to the table creation statement (SQLite handles it in the CREATE TABLE statement)
+        if ($primaryKeys = $blueprint->getPrimaryKeys()) {
+            $primaryKeySql = 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+            $sql .= ', ' . $primaryKeySql;
+        }
+
+        // Adding unique constraints to the table creation statement
+        foreach ($blueprint->getUniqueKeys() as $uniqueColumns) {
+            $uniqueKeySql = 'UNIQUE (' . implode(',', (array)$uniqueColumns) . ')';
+            $sql .= ', ' . $uniqueKeySql;
+        }
+
+        // Adding indexes to the table creation statement
+        foreach ($blueprint->getIndexes() as $indexColumns) {
+            $indexSql = 'INDEX (' . implode(',', (array)$indexColumns) . ')';
+            $sql .= ', ' . $indexSql;
+        }
+
+        $sql .= ')';
+
         switch (self::$driver) {
             case 'mysql':
             case 'pgsql':
@@ -181,23 +202,23 @@ class Schema
                 throw new \Exception("Unsupported database driver");
         }
     
-        // Add primary keys if defined
-        if ($primaryKeys = $blueprint->getPrimaryKeys()) {
-            $primaryKeySql = 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
-            self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT pk_{$table} $primaryKeySql");
-        }
+        // // Add primary keys if defined
+        // if ($primaryKeys = $blueprint->getPrimaryKeys()) {
+        //     $primaryKeySql = 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
+        //     self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT pk_{$table} $primaryKeySql");
+        // }
     
-        // Add unique constraints if defined
-        foreach ($blueprint->getUniqueKeys() as $uniqueColumns) {
-            $uniqueKeySql = 'UNIQUE (' . implode(',', (array)$uniqueColumns) . ')';
-            self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT unique_{$table} (" . implode(',', (array)$uniqueColumns) . ")");
-        }
+        // // Add unique constraints if defined
+        // foreach ($blueprint->getUniqueKeys() as $uniqueColumns) {
+        //     $uniqueKeySql = 'UNIQUE (' . implode(',', (array)$uniqueColumns) . ')';
+        //     self::$pdo->exec("ALTER TABLE `$table` ADD CONSTRAINT unique_{$table} (" . implode(',', (array)$uniqueColumns) . ")");
+        // }
     
-        // Add indexes if defined
-        foreach ($blueprint->getIndexes() as $indexColumns) {
-            $indexSql = 'INDEX (' . implode(',', (array)$indexColumns) . ')';
-            self::$pdo->exec("ALTER TABLE `$table` ADD $indexSql");
-        }
+        // // Add indexes if defined
+        // foreach ($blueprint->getIndexes() as $indexColumns) {
+        //     $indexSql = 'INDEX (' . implode(',', (array)$indexColumns) . ')';
+        //     self::$pdo->exec("ALTER TABLE `$table` ADD $indexSql");
+        // }
     
         // Add foreign keys if defined
         foreach ($blueprint->getForeignKeys() as $foreignKey) {
@@ -224,7 +245,6 @@ class Schema
 
         $blueprint = new Blueprint();
         $callback($blueprint);
-
         foreach ($blueprint->getColumns() as $column) {
             if (!self::hasColumn($table, $column['name'])) {
                 $type = self::getType($column);
@@ -234,7 +254,7 @@ class Schema
                     self::applyColumnConstraints($table, $column);
                 }
             }
-            exit(var_dump(self::hasContraints($column)));
+            // exit(var_dump(self::hasContraints($column)));
         }
 
         // Modify existing columns (if needed)
@@ -327,6 +347,7 @@ class Schema
     protected static function addColumnToTable($table, $name, $type, $options)
     {
         $sql = "ALTER TABLE `$table` ADD COLUMN `$name` $type";
+
         // Add additional options (nullable, default, etc.) here
         self::$pdo->exec($sql);
     }
@@ -341,9 +362,75 @@ class Schema
      */
     protected static function modifyColumn($table, $column, $type, $options)
     {
-        $sql = "ALTER TABLE `$table` MODIFY `$column` $type";
-        // Add additional options (nullable, default, etc.) here
-        self::$pdo->exec($sql);
+        if (self::$driver === 'sqlite') {
+            self::modifyColumnForSQLite($table, $column, $type, $options);
+        }else {
+            $sql = "ALTER TABLE `$table` MODIFY `$column` $type";
+            //TODO: Add additional options (nullable, default, etc.) here
+            self::$pdo->exec($sql);
+        }
+    }
+
+    /**
+     * Modify an existing column in a table for SQLite
+     * we will need 4 steps to modify a column in SQLite
+     * @param string $table
+     * @param string $column
+     * @param string $type
+     * @param array $options
+     * @return void
+     */
+    protected static function modifyColumnForSQLite($table, $column, $type, $options)
+    {
+        $newTable = $table . '_new';
+        $columns = self::getTableColumnsForSQLite($table);
+        $columnsSql = [];
+        foreach ($columns as $col) {
+            if ($col['name'] !== $column) {
+                $columnsSql[] = "`{$col['name']}` {$col['type']}";
+            } else {
+                $columnsSql[] = "`{$col['name']}` $type";
+            }
+        }
+
+        // Create the new table
+        $columnsSql = implode(', ', $columnsSql);
+        $createTableSql = "CREATE TABLE `$newTable` ($columnsSql)";
+        self::$pdo->exec($createTableSql);
+
+        // Step 2: Copy data from the old table to the new table
+        $copyDataSql = "INSERT INTO `$newTable` SELECT * FROM `$table`";
+        self::$pdo->exec($copyDataSql);
+
+        // Step 3: Drop the old table
+        $dropOldTableSql = "DROP TABLE `$table`";
+        self::$pdo->exec($dropOldTableSql);
+
+        // Step 4: Rename the new table to the original table name
+        $renameTableSql = "ALTER TABLE `$newTable` RENAME TO `$table`";
+        self::$pdo->exec($renameTableSql);
+    }
+
+    /**
+     * Get the columns for a table in SQLite
+     * SQLite does not support the SHOW COLUMNS query
+     * @param string $table
+     * @return array
+     */
+    protected static function getTableColumnsForSQLite($table)
+    {
+        $stmt = self::$pdo->query("PRAGMA table_info(`$table`)");
+        $columns = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $columns[] = [
+                'name' => $row['name'],
+                'type' => $row['type'],
+                'nullable' => $row['notnull'] == 0,
+                'default' => $row['dflt_value'],
+                'primaryKey' => $row['pk'] == 1,
+            ];
+        }
+        return $columns;
     }
 
     /**
@@ -433,7 +520,11 @@ class Schema
      */
     public static function rename($from, $to)
     {
-        self::$pdo->exec("RENAME TABLE `$from` TO `$to`");
+        if (self::$driver === 'sqlite') {
+            self::$pdo->exec("ALTER TABLE `$from` RENAME TO `$to`");
+        } else {
+            self::$pdo->exec("RENAME TABLE `$from` TO `$to`");
+        }
     }
 
     /**
@@ -476,5 +567,10 @@ class Schema
             default:
                 throw new \Exception("Foreign key constraints not supported for the database driver");
         }
+    }
+
+    public static function getDriver()
+    {
+        return self::$driver;
     }
 }
