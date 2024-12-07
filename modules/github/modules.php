@@ -139,7 +139,7 @@ class Hm_Handler_github_event_detail extends Hm_Handler_Module {
                 $api = new Hm_API_Curl();
                 $data = $api->command($url, array('Authorization: token ' . $details['access_token']));
                 $event = array();
-                $uid = mb_substr($form['github_uid'], 9);
+                $uid = explode('_', $form['github_uid'])[2];
                 if (is_array($data)) {
                     foreach ($data as $item) {
                         if ($item['id'] == $uid) {

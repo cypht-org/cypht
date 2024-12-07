@@ -163,7 +163,10 @@ class Hm_MessagesStore {
 
         } else if (this.path.startsWith('feeds')) {
             hook = "ajax_feed_combined";
-            config.push({ name: "feed_server_ids", value: this.path.split('_')[1] });
+            const serverId = this.path.split('_')[1];
+            if (serverId) {
+                config.push({ name: "feed_server_ids", value: serverId });
+            }
         } else if (this.path.startsWith('github')) {
             hook = "ajax_github_data";
             config.push({ name: "github_repo", value: this.path.split('_')[1] });

@@ -66,6 +66,17 @@ function applyInfoPageHandlers() {
 
 function applyMessaleListPageHandlers(routeParams) {
     sortHandlerForMessageListAndSearchPage();
+    Hm_Message_List.set_row_events();
+
+    $('.core_msg_control').on("click", function(e) {
+        e.preventDefault();
+        Hm_Message_List.message_action($(this).data('action')); 
+    });
+    $('.toggle_link').on("click", function(e) {
+        e.preventDefault();
+        Hm_Message_List.toggle_rows();
+    });
+    
     if (routeParams.list_path === 'github_all') {
         return applyGithubMessageListPageHandler(routeParams);
     }
