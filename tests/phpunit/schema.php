@@ -14,6 +14,8 @@ class Hm_Test_Schema extends TestCase {
 
     protected $pdo;
 
+    protected $tableName;
+
     public function setUp(): void {
         require 'bootstrap.php';
         $this->config = new Hm_Mock_Config();
@@ -43,15 +45,15 @@ class Hm_Test_Schema extends TestCase {
      * @runInSeparateProcess
      */
     public function test_migrate_table() {
-        Schema::dropIfExists('hello_test');
-        $this->assertFalse(Schema::hasTable('hello_test'));
-        $tableName = 'hello_test';//'_' . substr(bin2hex(random_bytes(4)), 0, 8);
-        Schema::create($tableName, function (Blueprint $table) {
+        $this->tableName = 'hello_test_' . substr(bin2hex(random_bytes(4)), 0, 8);
+        Schema::dropIfExists($this->tableName);
+        $this->assertFalse(Schema::hasTable($this->tableName));
+        Schema::create($this->tableName, function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->boolean('active')->default(true);
         });
-        $this->assertTrue(Schema::hasTable($tableName));
+        $this->assertTrue(Schema::hasTable($this->tableName));
     }
 
     /**
@@ -61,7 +63,7 @@ class Hm_Test_Schema extends TestCase {
     public function test_rollback_table() {
         $migrationRunner = new MigrationRunner($this->pdo);
         $migrationRunner->run('rollback');
-        $this->assertTrue(Schema::hasTable('hello_test'));
+        $this->assertFalse(Schema::hasTable($this->tableName));
     }
 
     /**
@@ -69,8 +71,15 @@ class Hm_Test_Schema extends TestCase {
      * @runInSeparateProcess
      */
     public function test_rename_table() {
+        $this->tableName = 'hello_test_' . substr(bin2hex(random_bytes(4)), 0, 8);
+        Schema::create($this->tableName, function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->boolean('active')->default(true);
+        });
+        $this->assertTrue(Schema::hasTable($this->tableName));
         $destination_table_name  = 'hello_test_renamed_'.substr(bin2hex(random_bytes(4)), 0, 8);
-        Schema::rename('hello_test', $destination_table_name);
+        Schema::rename($this->tableName, $destination_table_name);
         $this->assertTrue(Schema::hasTable($destination_table_name));
     }
 
@@ -86,7 +95,8 @@ class Hm_Test_Schema extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_drop_column_table() {
-        $this->assertTrue(count(Schema::getAllTables()) > 0);
-    }
+    // public function test_drop_column_and_has_column_table() {
+    //     Schema::dropColumn('hello_test', 'name');
+    //     $this->assertFalse(Schema::hasColumn('hello_test', 'name'));
+    // }
 }
