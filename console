@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+// Load the application dependencies and bootstrap the application
+
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+list($containerBuilder, $config) = require __DIR__ . '/services/Hm_bootstrap.php';
+
+$application = new Application('Cypht Console', '1.0');
+
+$commandServiceProvider = $containerBuilder->get('command.serviceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+$commandServiceProvider->register($application);
+
+$queueServiceProvider = $containerBuilder->get('queue.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+$queueServiceProvider->register();
+
+$eventServiceProvider = $containerBuilder->get('event.ServiceProvider', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE);
+// $eventServiceProvider->setContainer($containerBuilder);
+$eventServiceProvider->register();
+
+// Run the console application
+$application->run();
