@@ -369,13 +369,20 @@ async function select_imap_folder(path, reload, processInTheBackground = false, 
     const messages = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), null, abortController);
     await messages.load(reload, processInTheBackground).then(() => {
         if (processInTheBackground) {
-            for (const index in messages.rows) {
-                const row = messages.rows[index][0];
+            const rows = Object.values(messages.rows);            
+            for (const index in rows) {
+                const row = rows[index]?.[0];               
                 const rowUid = $(row).data('uid');
-                const rowExist = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`).length;
-                if (!rowExist) {
-                    Hm_Utils.rows().eq(index).before(row);
-                };
+                const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
+                if (!tableRow.length) {
+                    if (Hm_Utils.rows().length >= index) {
+                        Hm_Utils.rows().eq(index).after(row);
+                    } else {
+                        Hm_Utils.tbody().append(row);
+                    }
+                } else if (tableRow.attr('class') !== $(row).attr('class')) {
+                    tableRow.replaceWith(row);
+                }
             }
             Hm_Utils.rows().each(function() {
                 if (!messages.getRowByUid($(this).data('uid'))) {

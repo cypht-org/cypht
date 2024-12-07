@@ -19,7 +19,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  * @return array
  */
 if (!hm_exists('imap_sources')) {
-function imap_sources($callback, $mod, $folder = 'sent') {
+function imap_sources($mod, $folder = 'sent') {
     $inbox = $mod->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
     $sources = array();
     $folder = $folder == 'drafts' ? 'draft': $folder;
@@ -29,13 +29,13 @@ function imap_sources($callback, $mod, $folder = 'sent') {
         }
         $folders = get_special_folders($mod, $index);
         if (array_key_exists($folder, $folders) && $folders[$folder]) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex($folders[$folder]), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+            $sources[] = array('folder' => bin2hex($folders[$folder]), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         elseif ($inbox) {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+            $sources[] = array('folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
         else {
-            $sources[] = array('callback' => $callback, 'folder' => bin2hex('SPECIAL_USE_CHECK'), 'nodisplay' => true, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+            $sources[] = array('folder' => bin2hex('SPECIAL_USE_CHECK'), 'nodisplay' => true, 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
         }
     }
     return $sources;
@@ -44,12 +44,11 @@ function imap_sources($callback, $mod, $folder = 'sent') {
 /**
  * Build a source list
  * @subpackage imap/functions
- * @param string $callback javascript callback function name
  * @param array $custom user specific assignments
  * @return array
  */
 if (!hm_exists('imap_data_sources')) {
-function imap_data_sources($callback, $custom=array()) {
+function imap_data_sources($custom=array()) {
     $sources = array();
     foreach (Hm_IMAP_List::dump() as $index => $vals) {
         if (array_key_exists('hide', $vals) && $vals['hide']) {
@@ -58,7 +57,7 @@ function imap_data_sources($callback, $custom=array()) {
         if (!array_key_exists('user', $vals)) {
             continue;
         }
-        $sources[] = array('callback' => $callback, 'folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
+        $sources[] = array('folder' => bin2hex('INBOX'), 'type' => 'imap', 'name' => $vals['name'], 'id' => $index);
     }
     foreach ($custom as $path => $type) {
         $parts = explode('_', $path, 3);
@@ -67,7 +66,7 @@ function imap_data_sources($callback, $custom=array()) {
         if ($type == 'add') {
             $details = Hm_IMAP_List::dump($parts[1]);
             if ($details) {
-                $sources[] = array('callback' => $callback, 'folder' => $parts[2], 'type' => 'imap', 'name' => $details['name'], 'id' => $parts[1]);
+                $sources[] = array('folder' => $parts[2], 'type' => 'imap', 'name' => $details['name'], 'id' => $parts[1]);
             }
         }
         elseif ($type == 'remove') {

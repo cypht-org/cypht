@@ -153,18 +153,23 @@ class Hm_MessagesStore {
 
     #getRequestConfig() {
         let hook;
-        let imapServerId;
-        let feedServerId;
-        let folder;
         const config = [];
         if (this.path.startsWith('imap')) {
             hook = "ajax_imap_folder_display";
+
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
-            imapServerId = detail.server_id;
-            folder = detail.folder;
+            config.push({ name: "imap_server_id", value: detail.server_id });
+            config.push({ name: "folder", value: detail.folder });
+
         } else if (this.path.startsWith('feeds')) {
             hook = "ajax_feed_combined";
-            feedServerId = this.path.split('_')[1];
+            const serverId = this.path.split('_')[1];
+            if (serverId) {
+                config.push({ name: "feed_server_ids", value: serverId });
+            }
+        } else if (this.path.startsWith('github')) {
+            hook = "ajax_github_data";
+            config.push({ name: "github_repo", value: this.path.split('_')[1] });
         } else {
             switch (this.path) {
                 case 'unread':
@@ -189,18 +194,8 @@ class Hm_MessagesStore {
             }
         }
         
-        if (hook) {
-            config.push({ name: "hm_ajax_hook", value: hook });
-        }
-        if (imapServerId) {
-            config.push({ name: "imap_server_id", value: imapServerId });
-        }
-        if (folder) {
-            config.push({ name: "folder", value: folder });
-        }
-        if (feedServerId) {
-            config.push({ name: "feed_server_ids", value: feedServerId });
-        }
+        config.push({ name: "hm_ajax_hook", value: hook });
+
         return config;
     }
 

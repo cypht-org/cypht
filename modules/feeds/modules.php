@@ -461,7 +461,7 @@ class Hm_Handler_add_feeds_to_page_data extends Hm_Handler_Module {
 class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
     public function process() {
         foreach (Hm_Feed_List::dump() as $index => $vals) {
-            $this->append('data_sources', array('callback' => 'feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
+            $this->append('data_sources', array('feeds_search_page_content', 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
 
     }
@@ -472,40 +472,19 @@ class Hm_Handler_load_feeds_for_search extends Hm_Handler_Module {
  */
 class Hm_Handler_load_feeds_for_message_list extends Hm_Handler_Module {
     public function process() {
-        $callback = false;
         $server_id = false;
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
-        }
-        else {
-            $path = '';
-        }
-        switch ($path) {
-            case 'unread':
-                if (!$this->user_config->get('unread_exclude_feeds_setting', DEFAULT_UNREAD_EXCLUDE_FEEDS)) {
-                    $callback = 'feeds_combined_content_unread';
-                }
-                break;
-            case 'combined_inbox':
-                $callback = 'feeds_combined_inbox_content';
-                break;
-            case 'feeds':
-                $callback = 'feeds_combined_content';
-                break;
-            default:
-                if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
-                    $server_id = $matches[1];
-                    $callback = 'load_feed_list';
-                }
-                break;
-        }
-        if ($callback) {
-            foreach (Hm_Feed_List::dump() as $index => $vals) {
-                if ($server_id !== false && $index != $server_id) {
-                    continue;
-                }
-                $this->append('data_sources', array('callback' => $callback, 'type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
+            if (preg_match("/^feeds_(.+)$/", $path, $matches)) {
+                $server_id = $matches[1];
             }
+        }
+
+        foreach (Hm_Feed_List::dump() as $index => $vals) {
+            if ($server_id !== false && $index != $server_id) {
+                continue;
+            }
+            $this->append('data_sources', array('type' => 'feeds', 'name' => $vals['name'], 'id' => $vals['id']));
         }
     }
 }
