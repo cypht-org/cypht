@@ -55,6 +55,16 @@ class Blueprint
     {
         $this->droppedColumns[] = $name;
     }
+    public function dropColumnIf($name, $condition = true)
+    {
+        if (is_callable($condition)) {
+            $condition = $condition();
+        }
+        if ($condition) {
+            $this->droppedColumns[] = $name;
+        }
+        return $this;
+    }
 
     /**
      * Create an auto-incrementing "id" column.

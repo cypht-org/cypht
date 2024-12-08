@@ -29,6 +29,9 @@ return new class extends Migration {
     {
         Schema::table('hm_user_session', function (Blueprint $table) {
             $table->dropColumn('hm_version');
+            $table->dropColumnIf('lock', function () {
+                return env('DB_DRIVER') === 'sqlite';
+            });
         });
     }
 };

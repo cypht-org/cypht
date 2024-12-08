@@ -23,6 +23,17 @@ class Schema
     protected static $driver;
 
     /**
+     * The quote character for the database driver
+     * @var array
+     */
+    protected static $driverQuoteMap = [
+        'mysql' => '`',
+        'pgsql' => '"',
+        'mssql' => '[',
+        'sqlite' => '`',
+    ];
+
+    /**
      * Set the PDO connection and determine the driver
      * @param PDO $pdo
      * @return void
@@ -64,13 +75,15 @@ class Schema
                 $stmt->execute(['table' => $table]);
                 return (bool) $stmt->fetchColumn();
             case 'sqlite':
-                $stmt = self::$pdo->query("SELECT name FROM sqlite_master WHERE type='table' AND name='$table'");
+                $stmt = self::$pdo->prepare("SELECT name FROM sqlite_master WHERE type='table' AND name=:table");
+                $stmt->execute(['table' => $table]);
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 return $result !== false;
             default:
                 return false;
         }
     }
+    
 
     /**
      * Check if a column exists in a table
@@ -129,35 +142,44 @@ class Schema
     {
         $blueprint = new Blueprint();
         $callback($blueprint);
-        $columns = implode(', ', array_map(function($column) {
-            $columnDefinition = "`{$column['name']}` ";
-            if (isset($column['length'])) {
-                if ($column['type'] == 'string') {
-                    if (self::$driver == 'sqlite') {
-                        $columnDefinition .= " TEXT";
+        $quotedTable = self::quoteIdentifier($table);
+        $columns = implode(', ', array_map(function ($column) {
+            $quotedColumn = self::quoteIdentifier($column['name']);
+            $columnDefinition = "$quotedColumn ";
+            // Handling column type definitions
+            switch ($column['type']) {
+                case 'string':
+                    $length = $column['length'] ?? 255;
+                    $columnDefinition .= (self::$driver === 'sqlite' ? "TEXT" : "VARCHAR($length)");
+                    break;
+    
+                case 'blob':
+                case 'longblob':
+                    $columnDefinition .= (self::$driver === 'pgsql') ? "BYTEA" : "LONGBLOB";
+                    break;
+    
+                case 'boolean':
+                    $default = isset($column['default']) ? ($column['default'] ? 'TRUE' : 'FALSE') : '';
+                    $columnDefinition .= "BOOLEAN" . ($default ? " DEFAULT $default" : '');
+                    break;
+    
+                default:
+                    if(self::$driver === 'pgsql' && isset($column['primary'])) {
+                        // $columnDefinition .= "INTEGER"; // SERIAL will automatically add incrementing integer
                     } else {
-                        $columnDefinition .= " VARCHAR"; 
+                        $columnDefinition .= strtoupper($column['type']);
                     }
-                    $columnDefinition .= "({$column['length']})";
-                }
-            } else {
-                $columnDefinition .= strtoupper($column['type']);
             }
-            if (isset($column['default'])) {
-                if (is_numeric($column['default'])) {
-                    $columnDefinition .= " DEFAULT {$column['default']}";
-                } else {
-                    $columnDefinition .= " DEFAULT '{$column['default']}'";
-                }
+            // Adding default values if applicable
+            if (isset($column['default']) && !in_array($column['type'], ['boolean'])) {
+                $default = is_numeric($column['default']) ? $column['default'] : "'{$column['default']}'";
+                $columnDefinition .= " DEFAULT {$default}";
             }
-            if (isset($column['nullable'])){
-                if($column['nullable'] === false) {
-                    $columnDefinition .= " NOT NULL";
-                } elseif ($column['nullable'] === true) {
-                    $columnDefinition .= " NULL";
-                }
+            // Handling nullable constraint
+            if(self::$driver === 'pgsql' && isset($column['primary'])) {
+                //No need to add NOT NULL constraint for primary key in postgres
             }else {
-                $columnDefinition .= " NOT NULL";
+                $columnDefinition .= isset($column['nullable']) && $column['nullable'] === true ? " NULL" : " NOT NULL";
             }
             if (isset($column['autoIncrement']) && $column['autoIncrement']) {
                 switch (self::$driver) {
@@ -169,69 +191,20 @@ class Schema
                         $columnDefinition .= " SERIAL PRIMARY KEY";
                         break;
                     case 'sqlite':
-                        //SQLite automatically treats INTEGER PRIMARY KEY columns as autoincrementing by default. 
-                        //So, you don’t need to add AUTOINCREMENT explicitly unless you want it to enforce uniqueness and ensure it doesn't reuse row IDs.
-                        // $columnDefinition .= " AUTOINCREMENT";
+                        $columnDefinition .= " PRIMARY KEY";
                         break;
-                    default:
-                        throw new \Exception("Unsupported database driver for auto increment");
-                }
-            }
-            if ($column['type'] === 'enum' && isset($column['allowed'])) {
-                $allowedValues = implode("', '", $column['allowed']);
-                $columnDefinition .= " CHECK (`{$column['name']}` IN ('$allowedValues'))";
-            }    
-            if (!empty($column['check'])) {
-                $columnDefinition .= " CHECK ({$column['check']})";
-            }
-            if (!empty($column['unsigned'])) {
-                switch (self::$driver) {
-                    case 'mysql':
-                        $columnDefinition .= " UNSIGNED";
-                        break;
-                    case 'pgsql':
-                    case 'sqlite':
-                    case 'mssql':
-                        $columnDefinition .= " CHECK ({$column['name']} >= 0)";
-                        break;
-                    default:
-                        throw new \Exception("Unsupported database driver for unsigned columns");
                 }
             }
     
             return $columnDefinition;
         }, $blueprint->getColumns()));
-        $sql = "CREATE TABLE IF NOT EXISTS `$table` ($columns";
-        // Adding primary key constraint to the table creation statement
+        $sql = "CREATE TABLE IF NOT EXISTS $quotedTable ($columns";
         if ($primaryKeys = $blueprint->getPrimaryKeys()) {
-            $primaryKeySql = 'PRIMARY KEY (' . implode(',', $primaryKeys) . ')';
-            $sql .= ', ' . $primaryKeySql;
-        }
-        // Adding unique constraints to the table creation statement
-        foreach ($blueprint->getUniqueKeys() as $uniqueColumns) {
-            $uniqueKeySql = 'UNIQUE (' . implode(',', (array)$uniqueColumns) . ')';
-            $sql .= ', ' . $uniqueKeySql;
-        }
-        // Adding indexes to the table creation statement
-        foreach ($blueprint->getIndexes() as $indexColumns) {
-            $indexSql = 'INDEX (' . implode(',', (array)$indexColumns) . ')';
-            $sql .= ', ' . $indexSql;
+            $primaryKeySql = 'PRIMARY KEY (' . implode(',', array_map([self::class, 'quoteIdentifier'], $primaryKeys)) . ')';
+            $sql .= ", $primaryKeySql";
         }
         $sql .= ')';
-        switch (self::$driver) {
-            case 'mysql':
-            case 'pgsql':
-            case 'mssql':
-                self::$pdo->exec($sql);
-                break;
-            case 'sqlite':
-                self::$pdo->exec($sql);
-                break;
-            default:
-                throw new \Exception("Unsupported database driver");
-        }
-    
-        // Adding foreign keys if defined
+        self::$pdo->exec($sql);
         foreach ($blueprint->getForeignKeys() as $foreignKey) {
             self::addForeignKey(
                 $table,
@@ -240,7 +213,7 @@ class Schema
                 $foreignKey['references']
             );
         }
-    }
+    }    
     
     /**
      * Modify an existing table.
@@ -250,37 +223,45 @@ class Schema
      */
     public static function table($table, Closure $callback)
     {
+        
         if (!self::hasTable($table)) {
-            throw new \Exception("Table `$table` does not exist.");
+            throw new \Exception("Table $table does not exist.");
         }
-    
         $blueprint = new Blueprint();
         $callback($blueprint);
-    
+
         foreach ($blueprint->getColumns() as $column) {
             if (!self::hasColumn($table, $column['name'])) {
                 $type = self::getType($column);
-                self::addColumnToTable($table, $column['name'], $type, $column);
+                $tableName = self::quoteIdentifier($table);
+                $columnName = self::quoteIdentifier($column['name']);
+                $sql = "ALTER TABLE $tableName ADD COLUMN $columnName $type";
+                self::$pdo->exec($sql);
             }
         }
-    
-        foreach ($blueprint->getModifiedColumns() as $column) {
+        foreach ($blueprint->getModifiedColumns() as $modifiedColumn) {
+            $tableName = self::quoteIdentifier($table);
+            $columnName = self::quoteIdentifier($modifiedColumn['name']);
+            $type = self::getType($modifiedColumn);
             if (self::$driver === 'sqlite') {
-                self::rebuildTableWithModifiedColumn($table, $column);
+                self::rebuildTableWithModifiedColumn($table, $modifiedColumn);
             } else {
-                $type = self::getType($column);
-                self::modifyColumn($table, $column['name'], $type, $column);
+                $sql = "ALTER TABLE $tableName ALTER COLUMN $columnName TYPE $type";
+                self::$pdo->exec($sql);
             }
         }
 
         foreach ($blueprint->getDroppedColumns() as $columnName) {
+            $tableName = self::quoteIdentifier($table);
+            $colName = self::quoteIdentifier($columnName);
             if (self::$driver === 'sqlite') {
                 self::rebuildTableWithoutColumn($table, $columnName);
             } else {
-                self::dropColumn($table, $columnName);
+                $sql = "ALTER TABLE $tableName DROP COLUMN $colName";
+                self::$pdo->exec($sql);
             }
         }
-    }
+    }    
 
     /**
      * Add a foreign key to a table
@@ -313,7 +294,8 @@ class Schema
     public static function dropIfExists($table)
     {
         if (self::hasTable($table)) {
-            self::$pdo->exec("DROP TABLE IF EXISTS `$table`");
+            $quotedTable = self::quoteIdentifier($table);
+            self::$pdo->exec("DROP TABLE IF EXISTS $quotedTable");
         }
     }
 
@@ -325,7 +307,8 @@ class Schema
     {
         $tables = self::getAllTables();
         foreach ($tables as $table) {
-            self::$pdo->exec("DROP TABLE IF EXISTS `$table`");
+            $quotedTable = self::quoteIdentifier($table);
+            self::$pdo->exec("DROP TABLE IF EXISTS $quotedTable");
         }
     }
 
@@ -337,9 +320,13 @@ class Schema
     {
         switch (self::$driver) {
             case 'mysql':
-            case 'pgsql':
-            case 'mssql':
                 $stmt = self::$pdo->query("SHOW TABLES");
+                return $stmt->fetchAll(PDO::FETCH_COLUMN);
+            case 'pgsql':
+                $stmt = self::$pdo->query("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public'");
+                return $stmt->fetchAll(PDO::FETCH_COLUMN);
+            case 'mssql':
+                $stmt = self::$pdo->query("SELECT table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE'");
                 return $stmt->fetchAll(PDO::FETCH_COLUMN);
             case 'sqlite':
                 $stmt = self::$pdo->query("SELECT name FROM sqlite_master WHERE type='table'");
@@ -357,10 +344,12 @@ class Schema
      */
     public static function rename($from, $to)
     {
-        if (self::$driver === 'sqlite') {
-            self::$pdo->exec("ALTER TABLE `$from` RENAME TO `$to`");
+        $quotedFrom = self::quoteIdentifier($from);
+        $quotedTo = self::quoteIdentifier($to);
+        if (self::$driver === 'sqlite' || self::$driver === 'pgsql') {
+            self::$pdo->exec("ALTER TABLE $quotedFrom RENAME TO $quotedTo");
         } else {
-            self::$pdo->exec("RENAME TABLE `$from` TO `$to`");
+            self::$pdo->exec("RENAME TABLE $quotedFrom TO $quotedTo");
         }
     }
 
@@ -414,7 +403,9 @@ class Schema
      */
     public static function dropColumn($table, $column)
     {
-        self::$pdo->exec("ALTER TABLE `$table` DROP COLUMN `$column`");
+        $quotedTable = self::quoteIdentifier($table);
+        $quotedColumn = self::quoteIdentifier($column);
+        self::$pdo->exec("ALTER TABLE $quotedTable DROP COLUMN $quotedColumn");
     }
 
     /**
@@ -424,81 +415,6 @@ class Schema
     public static function getDriver()
     {
         return self::$driver;
-    }
-
-    /**
-     * Add a column to an existing table
-     * @param string $table
-     * @param string $name
-     * @param string $type
-     * @param array $options
-     * @return void
-     */
-    protected static function addColumnToTable($table, $name, $type, $options)
-    {
-        $sql = "ALTER TABLE `$table` ADD COLUMN `$name` $type";
-
-        // TODO: Add additional options (nullable, default, etc.) here
-        self::$pdo->exec($sql);
-    }
-
-    /**
-     * Modify an existing column in a table
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param array $options
-     * @return void
-     */
-    protected static function modifyColumn($table, $column, $type, $options)
-    {
-        if (self::$driver === 'sqlite') {
-            self::modifyColumnForSQLite($table, $column, $type, $options);
-        }else {
-            $sql = "ALTER TABLE `$table` MODIFY `$column` $type";
-            //TODO: Add additional options (nullable, default, etc.) here
-            self::$pdo->exec($sql);
-        }
-    }
-
-    /**
-     * Modify an existing column in a table for SQLite
-     * we will need 4 steps to modify a column in SQLite
-     * @param string $table
-     * @param string $column
-     * @param string $type
-     * @param array $options
-     * @return void
-     */
-    protected static function modifyColumnForSQLite($table, $column, $type, $options)
-    {
-        $newTable = $table . '_new';
-        $columns = self::getTableColumnsForSQLite($table);
-        $columnsSql = [];
-        foreach ($columns as $col) {
-            if ($col['name'] !== $column) {
-                $columnsSql[] = "`{$col['name']}` {$col['type']}";
-            } else {
-                $columnsSql[] = "`{$col['name']}` $type";
-            }
-        }
-
-        // Create the new table
-        $columnsSql = implode(', ', $columnsSql);
-        $createTableSql = "CREATE TABLE `$newTable` ($columnsSql)";
-        self::$pdo->exec($createTableSql);
-
-        // Step 2: Copy data from the old table to the new table
-        $copyDataSql = "INSERT INTO `$newTable` SELECT * FROM `$table`";
-        self::$pdo->exec($copyDataSql);
-
-        // Step 3: Drop the old table
-        $dropOldTableSql = "DROP TABLE `$table`";
-        self::$pdo->exec($dropOldTableSql);
-
-        // Step 4: Rename the new table to the original table name
-        $renameTableSql = "ALTER TABLE `$newTable` RENAME TO `$table`";
-        self::$pdo->exec($renameTableSql);
     }
 
     /**
@@ -524,67 +440,52 @@ class Schema
     }
 
     /**
-     * Get the existing columns for a table
-     * @param string $table
-     * @return array
+     * Get the type for a column
+     * @param array $column
+     * @return string
      */
-    protected static function getExistingColumns($table)
+    protected static function getType($column)
     {
-        $sql = "PRAGMA table_info(`$table`)";
-        $stmt = self::$pdo->query($sql);
-    
-        $columns = [];
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            $columns[] = [
-                'name' => $row['name'],
-                'type' => $row['type'],
-                'nullable' => $row['notnull'] == 0,
-                'default' => $row['dflt_value'],
-            ];
+        $type = strtoupper($column['type']);
+        if (isset($column['length'])) {
+            return "$type({$column['length']})";
         }
-    
-        return $columns;
+        return $type;
     }
 
     /**
-     * Rebuild the table with the modified column
+     * Rebuild a table with a modified column
      * @param string $table
-     * @param array $modifiedColumn
+     * @param array $column
      * @return void
      */
     protected static function rebuildTableWithModifiedColumn($table, $modifiedColumn)
     {
         $columns = self::getTableColumnsForSQLite($table);
         $newColumns = [];
-
         foreach ($columns as $column) {
             if ($column['name'] === $modifiedColumn['name']) {
                 $newColumns[] = array_merge($column, $modifiedColumn);
             } else {
                 $newColumns[] = $column;
             }
-        }
-
+        }    
         $tempTable = "{$table}_temp_".substr(bin2hex(random_bytes(4)), 0, 8);
-
         self::$pdo->exec("ALTER TABLE `$table` RENAME TO `$tempTable`");
-
         self::create($table, function (Blueprint $blueprint) use ($newColumns) {
             foreach ($newColumns as $column) {
                 $blueprint->addColumn($column['type'], $column['name'], $column);
             }
-        });
-
-        $columnNames = implode(', ', array_column($columns, 'name'));
+        });    
+        $columnNames = implode(', ', array_column($newColumns, 'name'));
         self::$pdo->exec("INSERT INTO `$table` ($columnNames) SELECT $columnNames FROM `$tempTable`");
-
         self::$pdo->exec("DROP TABLE `$tempTable`");
-    } 
+    }       
 
     /**
-     * Rebuild the table without the dropped column
+     * Rebuild a table without a column
      * @param string $table
-     * @param string $droppedColumn
+     * @param string $column
      * @return void
      */
     protected static function rebuildTableWithoutColumn($table, $droppedColumn)
@@ -593,39 +494,31 @@ class Schema
         $remainingColumns = array_filter($columns, function ($column) use ($droppedColumn) {
             return $column['name'] !== $droppedColumn;
         });
-
         $tempTable = "{$table}_temp_".substr(bin2hex(random_bytes(4)), 0, 8);
-
         self::$pdo->exec("ALTER TABLE `$table` RENAME TO `$tempTable`");
-
         self::create($table, function (Blueprint $blueprint) use ($remainingColumns) {
             foreach ($remainingColumns as $column) {
                 $blueprint->addColumn($column['type'], $column['name'], $column);
             }
         });
-
         $columnNames = implode(', ', array_column($remainingColumns, 'name'));
         self::$pdo->exec("INSERT INTO `$table` ($columnNames) SELECT $columnNames FROM `$tempTable`");
-
         self::$pdo->exec("DROP TABLE `$tempTable`");
-    }
+    }    
 
     /**
-     * Get the column type for the database driver
-     * @param array $column
+     * Quote an identifier to prevent SQL injection.
+     * The quoting style depends on the database driver.
+     * 
+     * @param string $identifier
      * @return string
      */
-    private static function getType($column)
+    protected static function quoteIdentifier($identifier)
     {
-        if ($column['type'] == 'string') {
-            if (self::$driver == 'sqlite') {
-                $type = " TEXT";
-            } else {
-                $type = " VARCHAR"; 
-            }
-        }else {
-            $type = strtoupper($column['type']);
+        $quoteChar = self::$driverQuoteMap[self::$driver] ?? null;
+        if (!$quoteChar) {
+            throw new \Exception("Unsupported database driver for quoting identifiers");
         }
-        return $type;
+        return "{$quoteChar}{$identifier}{$quoteChar}";
     }
 }

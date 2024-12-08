@@ -39,15 +39,48 @@ class MigrationRunner
      */
     private function ensureMigrationsTableExists()
     {
-        $this->pdo->exec("
-            CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                migration VARCHAR(255) NOT NULL,
-                batch INT NOT NULL,
-                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            );
-        ");
-    }
+        $createTableSql = "";
+    
+        switch (Schema::getDriver()) {
+            case 'mysql':
+                $createTableSql = "
+                    CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        migration VARCHAR(255) NOT NULL,
+                        batch INT NOT NULL,
+                        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                    );
+                ";
+                break;
+    
+            case 'pgsql':
+                $createTableSql = "
+                    CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+                        id SERIAL PRIMARY KEY,
+                        migration VARCHAR(255) NOT NULL,
+                        batch INT NOT NULL,
+                        applied_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                    );
+                ";
+                break;
+    
+            case 'sqlite':
+                $createTableSql = "
+                    CREATE TABLE IF NOT EXISTS {$this->migrationsTable} (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        migration TEXT NOT NULL,
+                        batch INTEGER NOT NULL,
+                        applied_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    );
+                ";
+                break;
+    
+            default:
+                throw new \Exception("Unsupported database driver: " . self::$driver);
+        }
+    
+        $this->pdo->exec($createTableSql);
+    }    
     /**
      * Run the migration runner.
      *

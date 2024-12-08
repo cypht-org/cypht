@@ -23,7 +23,7 @@ jobs:
     strategy:
       matrix:
         php-versions: ['8.1']
-        database: ['mysql', 'sqlite']
+        database: ['mysql', 'postgres', 'sqlite']
 
     env:
         PHP_V: ${{ matrix.php-versions }}
