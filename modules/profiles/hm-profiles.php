@@ -109,4 +109,14 @@ class Hm_Profiles {
             }
         }
     }
+
+    public static function search($fld, $value) {
+        $res = array();
+        foreach (self::getAll() as $profile) {
+            if (!empty($profile[$fld]) && $profile[$fld] == $value) {
+                $res[] = $profile;
+            }
+        }
+        return $res;
+    }
 }
