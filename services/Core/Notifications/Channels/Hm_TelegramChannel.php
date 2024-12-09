@@ -3,10 +3,10 @@
 namespace Services\Core\Notifications\Channels;
 
 use Services\Core\Hm_Container;
-use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\Chatter;
+use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Message\ChatMessage;
-use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
-use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
+use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransportFactory;
 
 /**
  * Class Hm_TelegramChannel
@@ -15,11 +15,11 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
 class Hm_TelegramChannel extends Hm_NotificationChannel
 {
     /**
-     * The Notifier instance.
+     * The Chatter instance.
      *
-     * @var Notifier
+     * @var Chatter
      */
-    private $notifier;
+    private $chatter;
 
     /**
      * Constructor.
@@ -29,29 +29,25 @@ class Hm_TelegramChannel extends Hm_NotificationChannel
     {
         $config = Hm_Container::getContainer()->get('config');
         $telegramConfig = $config->get('telegram');
-        $telegramBotToken = $telegramConfig['bot_token'];
-        $telegramChatId = $telegramConfig['chat_id'];
-        $telegramTransport = new TelegramTransport($telegramBotToken, $telegramChatId);
-        $this->notifier = new Notifier([$telegramTransport]);
+        $telegramToken = $telegramConfig['bot_token'];
+        $telegramChatId = $telegramConfig['chat_id']; // ID du chat ou username (@username)
+        
+        $dsnString = sprintf('telegram://%s@default?channel=%s', $telegramToken, $telegramChatId);
+        $dsn = new Dsn($dsnString);
+        $factory = new TelegramTransportFactory();
+        $transport = $factory->create($dsn);
+        $this->chatter = new Chatter($transport);
     }
 
     /**
-     * Send a Telegram message using the Telegram Bot.
+     * Send a Telegram message.
      *
      * @param Hm_Notification $notification The notification object.
      */
     public function send($notification): void
     {
-        $telegramMessage = new ChatMessage($notification->getMessageText());
-
-        // Optionally add more Telegram message options (like parsing mode)
-        $telegramMessage->options(
-            (new TelegramOptions())
-                ->parseMode(TelegramOptions::PARSE_MODE_MARKDOWN_V2)
-        );
-
-        $this->notifier->send($telegramMessage->getNotification());
-
-        echo "Message sent via Telegram!";
+        $chatMessage = new ChatMessage($notification->getContent());
+        $this->chatter->send($chatMessage);
+        echo "Message sent to Telegram!";
     }
 }
