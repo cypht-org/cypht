@@ -30,9 +30,10 @@ class Hm_QueueWorker
         while ($item = $this->queue->pop())
         {
             try {
+                // exit(var_dump($this->queue));
                 $this->queue->process($item);
             } catch (\Exception $e) {
-                // $job->failed();
+                $item->failed();
                 // // Optionally release the job back to the queue with a delay
                 // $this->queue->release($job, 30); 
             }
