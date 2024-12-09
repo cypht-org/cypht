@@ -100,7 +100,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_js_search_data() {
         $test = new Output_Test('js_search_data', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var hm_search_terms = function() { return ""; };var hm_run_search = function() { return "0"; };</script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" id="search-data">var hm_search_terms = function() { return ""; };var hm_run_search = function() { return "0"; };</script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -444,10 +444,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
+        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };', implode($res->output_response));
+        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };', implode($res->output_response));
     }
     /**
      * @preserveGlobalState disabled
@@ -993,7 +993,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_section_start() {
         $test = new Output_Test('content_section_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<main class="container-fluid content_cell"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
+        $this->assertEquals(array('<main class="container-fluid content_cell" id="cypht-main"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

@@ -142,7 +142,7 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
      * adds two JS functions used on the search page
      */
     protected function output() {
-        return '<script type="text/javascript">'.
+        return '<script type="text/javascript" id="search-data">'.
             'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', ''), true).'"; };'.
             'var hm_run_search = function() { return "'.$this->html_safe($this->get('run_search', 0)).'"; };'.
             '</script>';
@@ -624,7 +624,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
-        $res = '<script type="text/javascript">'.
+        $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
@@ -1635,7 +1635,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
+        return '<main class="container-fluid content_cell" id="cypht-main"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
     }
 }
 
