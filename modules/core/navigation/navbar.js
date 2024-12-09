@@ -11,7 +11,7 @@ $(() => {
         </div>
         `
     
-        $('.mobile nav').before(menuToggle);
+        $('.mobile .cypht-layout nav').before(menuToggle);
     
         $(document).on('click', '.cypht-layout .menu-toggle', showMobileNavbar);
         $(document).on('click', '.cypht-layout nav .menu-toggle', hideMobileNavbar)
