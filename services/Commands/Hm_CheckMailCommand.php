@@ -35,9 +35,7 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
         $this->info("Checking for new mail...");
         $message = "Hello! You have a new mail on test@entreprise server.";
 
-        // $notification = (new Hm_NewMailNotification())
-        // ->greeting('New Mail Alert')
-        // ->line($message);
+        // $notification = new Hm_NewMailNotification($message);
         // $notification->sendNow();
         Hm_NewMailNotification::dispatch($message);
         // Hm_ProcessNewEmail::dispatch(email: 'muhngesteven@gmail.com');

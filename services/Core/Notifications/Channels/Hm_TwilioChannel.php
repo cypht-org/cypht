@@ -3,9 +3,10 @@
 namespace Services\Core\Notifications\Channels;
 
 use Services\Core\Hm_Container;
-use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\Chatter;
+use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
+use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransportFactory;
 
 /**
  * Class Hm_TwilioChannel
@@ -14,11 +15,11 @@ use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
 class Hm_TwilioChannel extends Hm_NotificationChannel
 {
     /**
-     * The Notifier instance.
+     * The Chatter instance.
      *
-     * @var Notifier
+     * @var Chatter
      */
-    private $notifier;
+    private $chatter;
 
     /**
      * Constructor.
@@ -28,8 +29,19 @@ class Hm_TwilioChannel extends Hm_NotificationChannel
     {
         $config = Hm_Container::getContainer()->get('config');
         $twilioConfig = $config->get('twilio');
-        $twilioTransport = new TwilioTransport($twilioConfig['sid'], $twilioConfig['token'], $twilioConfig['from']);
-        $this->notifier = new Notifier([$twilioTransport]);
+        $twilioAccountSid = $twilioConfig['sid'];
+        $twilioAuthToken = $twilioConfig['token'];
+        $twilioFrom = $twilioConfig['from'];
+        $dsnString = sprintf(
+            'twilio://%s:%s@default?from=%s',
+            $twilioAccountSid,
+            $twilioAuthToken,
+            $twilioFrom
+        );
+        $dsn = new Dsn($dsnString);
+        $factory = new TwilioTransportFactory();
+        $transport = $factory->create($dsn);
+        $this->chatter = new Chatter($transport);
     }
 
     /**
@@ -39,12 +51,18 @@ class Hm_TwilioChannel extends Hm_NotificationChannel
      * @param string $message The message content.
      * @param string $title The title or subject of the notification (optional).
      */
+    /**
+     * Send a Twilio SMS message.
+     *
+     * @param Hm_Notification $notification The notification object.
+     */
     public function send($notification): void
     {
-        $smsMessage = new SmsMessage($notification->getRecipient(), $notification->getMessageText());
-        // Send the message via Twilio
-        $this->notifier->send($smsMessage->getNotification());
+        $config = Hm_Container::getContainer()->get('config');
+        $twilioTo = $config->get('twilio')['to'];
 
+        $smsMessage = new SmsMessage($twilioTo, $notification->getContent());
+        $this->chatter->send($smsMessage);
         echo "Message sent via Twilio!";
     }
 }

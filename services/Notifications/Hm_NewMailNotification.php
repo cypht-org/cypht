@@ -20,6 +20,6 @@ class Hm_NewMailNotification extends Hm_Notification implements Hm_ShouldQueue
 
     public function via(): array
     {
-        return ['slack'];//, 'telegram','broadcast'
+        return ['telegram'];//, 'slack', 'telegram','broadcast'
     }
 }

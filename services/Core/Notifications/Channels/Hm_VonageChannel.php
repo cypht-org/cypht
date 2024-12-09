@@ -3,14 +3,19 @@
 namespace Services\Core\Notifications\Channels;
 
 use Services\Core\Hm_Container;
-use Symfony\Component\Notifier\Notifier;
+use Symfony\Component\Notifier\Chatter;
+use Symfony\Component\Notifier\Transport\Dsn;
 use Symfony\Component\Notifier\Message\SmsMessage;
-use Symfony\Component\Notifier\Bridge\Vonage\VonageOptions;
-use Symfony\Component\Notifier\Bridge\Vonage\VonageTransport;
+use Symfony\Component\Notifier\Bridge\Vonage\VonageTransportFactory;
 
 class Hm_VonageChannel extends Hm_NotificationChannel
 {
-    private $notifier;
+    /**
+     * The Chatter instance.
+     *
+     * @var Chatter
+     */
+    private $chatter;
 
     /**
      * Constructor.
@@ -20,28 +25,35 @@ class Hm_VonageChannel extends Hm_NotificationChannel
     {
         $config = Hm_Container::getContainer()->get('config');
         $vonageConfig = $config->get('vonage');
+
         $vonageApiKey = $vonageConfig['api_key'];
         $vonageApiSecret = $vonageConfig['api_secret'];
-        $vonageFromNumber = $vonageConfig['from'];
-        $vonageTransport = new VonageTransport($vonageApiKey, $vonageApiSecret, $vonageFromNumber);
-        $this->notifier = new Notifier([$vonageTransport]);
+        $vonageFrom = $vonageConfig['from'];
+        
+        $dsnString = sprintf(
+            'vonage://%s:%s@default?from=%s',
+            $vonageApiKey,
+            $vonageApiSecret,
+            $vonageFrom
+        );
+        $dsn = new Dsn($dsnString);
+        $factory = new VonageTransportFactory();
+        $transport = $factory->create($dsn);
+        $this->chatter = new Chatter($transport);
     }
 
     /**
-     * Send an SMS message using Vonage.
+     * Send a Vonage SMS message.
      *
      * @param Hm_Notification $notification The notification object.
      */
     public function send($notification): void
     {
-        $smsMessage = new SmsMessage($notification->getRecipient(), $notification->getMessageText());
+        $config = Hm_Container::getContainer()->get('config');
+        $vonageTo = $config->get('vonage')['to'];
 
-        // Optionally, you can configure options for Vonage (like TTL, etc.)
-        // $smsMessage->options(new VonageOptions());
-
-        // Send the message via Vonage
-        $this->notifier->send($smsMessage->getNotification());
-
-        echo "Message sent via Vonage (Nexmo)!";
+        $smsMessage = new SmsMessage($vonageTo, $notification->getContent());
+        $this->chatter->send($smsMessage);
+        echo "Message sent via Vonage!";
     }
 }
