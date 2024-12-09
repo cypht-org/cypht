@@ -49,7 +49,7 @@ class Hm_Handler_process_inline_message_setting extends Hm_Handler_Module {
  */
 class Hm_Output_inline_message_flag extends Hm_Output_Module {
     protected function output() {
-        return '<script type="text/javascript">var inline_msg_style = function() { return "'.
+        return '<script type="text/javascript" id="inline-msg-state">var inline_msg_style = function() { return "'.
             $this->get('inline_message_style', DEFAULT_INLINE_MESSAGE_STYLE).'";}; var inline_msg = function() { return '.
             ($this->get('inline_message_setting', DEFAULT_INLINE_MESSAGE) && !$this->get('is_mobile', false) ? 'true' : 'false').
             ';};</script>';

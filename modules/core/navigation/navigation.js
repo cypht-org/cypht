@@ -8,7 +8,7 @@ function trackLocationSearchChanges() {
 
 window.addEventListener('popstate', function(event) {
     if (event.state) {
-        $('main').replaceWith(event.state.main);
+        $('#cypht-main').replaceWith(event.state.main);
         loadCustomScripts(event.state.head);
     }
     const unMountCallback = renderPage(window.location.href);
@@ -26,7 +26,7 @@ window.addEventListener('popstate', function(event) {
 
 window.addEventListener('load', function() {
     const unMountCallback = renderPage(window.location.href);
-    history.replaceState({ main: $('main').prop('outerHTML'), head: $('head').prop('outerHTML') }, "");
+    history.replaceState({ main: $('#cypht-main').prop('outerHTML'), head: $('head').prop('outerHTML') }, "");
 
     if (unMountCallback) {
         unMountSubscribers[window.location.search] = unMountCallback;
@@ -59,7 +59,12 @@ async function navigate(url) {
         const html = await response.text();
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
-        $('main').replaceWith(main);
+
+        if ($(main).attr('id') === 'cypht-main') {
+            $('main#cypht-main').replaceWith(main);
+        } else {
+            $('main#cypht-main').replaceWith($(main).find('#cypht-main'));
+        }
         document.title = title.replace(/<[^>]*>/g, '');
         
         // load custom javascript
@@ -88,15 +93,10 @@ async function navigate(url) {
 }
 
 function loadCustomScripts(head) {
-    $(document.head).find('script').remove();
-    
-    $('<div>').append(head).find('script').each(function() {        
-        if (!this.src) {
-            const newScript = document.createElement('script');
-            newScript.textContent = this.textContent;
-            document.head.appendChild(newScript);
-        }
-    });
+    const newHead = $('<div>').append(head);
+    $(document.head).find('script#data-store').replaceWith(newHead.find('script#data-store'));
+    $(document.head).find('script#search-data').replaceWith(newHead.find('script#search-data'));
+    $(document.head).find('script#inline-msg-state').replaceWith(newHead.find('script#inline-msg-state'));
 }
 
 function renderPage(href) {
