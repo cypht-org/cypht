@@ -32,26 +32,12 @@ class Hm_NotificationDispatcher implements Hm_Factory
      */
     public static function send(Hm_Notification $notification): void
     {
-        $channels = $notification->via();
-        foreach ($channels as $channelName) {
-            if (isset(self::$channelClasses[$channelName])) {
-                $channelClass = self::channel($channelName);
-                $channel = new $channelClass();
-                if (is_subclass_of($notification, Hm_ShouldQueue::class)) {
-                    $driver = $notification->driver;
-                    $queueDriver = Hm_Container::getContainer()->get('queue.manager')->getDriver($driver);
-                    if ($queueDriver) {
-                        $queueDriver->push($notification);
-                    } else {
-                        throw new \Exception("Queue driver {$driver} not found.");
-                    }
-                } else {
-                    // Send notification immediately if not queued
-                    $channel->send($notification);
-                }
-            } else {
-                throw new \Exception("Channel {$channelName} is not registered or implemented.");
-            }
+        $driver = $notification->driver;
+        $queueDriver = Hm_Container::getContainer()->get('queue.manager')->getDriver($driver);
+        if ($queueDriver) {
+            $queueDriver->push($notification);
+        } else {
+            throw new \Exception("Queue driver {$driver} not found.");
         }
     }
 

@@ -11,15 +11,10 @@ class Hm_NewMailNotification extends Hm_Notification implements Hm_ShouldQueue
 {
     use Hm_Dispatchable, Hm_InteractsWithQueue;
 
-    public string $driver = 'redis';
-
-    // public function __construct(array $config = [])
-    // {
-    //     parent::__construct($config);
-    // }
+    public string $driver = 'database';
 
     public function via(): array
     {
-        return ['telegram'];//, 'slack', 'telegram','broadcast'
+        return ['telegram','slack'];//, 'slack', 'telegram','broadcast'
     }
 }
