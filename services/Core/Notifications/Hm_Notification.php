@@ -29,6 +29,7 @@ class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
     public function __construct($content = '')
     {
         $this->content = $content;
+        $this->driver = env('QUEUE_DRIVER');
     }
     /**
      * Notifcations can be sent through multiple channels.
@@ -43,7 +44,7 @@ class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
     public function handle(): void
     {
         dump("Processing ".self::class);
-        
+
         $this->sendNow();
     }
     public function failed(): void

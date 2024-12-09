@@ -9,5 +9,6 @@ abstract class Hm_BaseJob extends Hm_Queueable implements Hm_Job
 {
     public function __construct(protected array $data = []) {
         $this->data = $data;
+        $this->driver = env('QUEUE_DRIVER');
     }
 }
