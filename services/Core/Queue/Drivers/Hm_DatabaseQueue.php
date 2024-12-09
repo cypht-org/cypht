@@ -86,13 +86,7 @@ class Hm_DatabaseQueue implements Hm_ShouldQueue, Hm_Queueable
     public function process(Hm_QueueableClass $item): void
     {
         try {
-            // Check if the item is a notification, if so send it
-            if($item instanceof Hm_Notification) {
-                $item->send();
-            }else {
-                // Otherwise handle the job
-                $item->handle();
-            }
+            $item->handle();
         } catch (\Exception $e) {
             $item->incrementAttempts();
             if ($item->getAttempts() >= $item->tries) {

@@ -7,7 +7,6 @@ use Hm_Redis;
 use Exception;
 use Services\Contracts\Queue\Hm_Queueable;
 use Services\Contracts\Queue\Hm_ShouldQueue;
-use Services\Core\Notifications\Hm_Notification;
 use Services\Core\Queue\Hm_Queueable as Hm_QueueableClass;
 
 /**
@@ -106,13 +105,7 @@ class Hm_RedisQueue implements Hm_ShouldQueue, Hm_Queueable
      */
     public function process(Hm_QueueableClass $item): void {
         try {
-            // Check if the item is a notification, if so send it
-            if($item instanceof Hm_Notification) {
-                $item->send();
-            }else {
-                // Otherwise handle the job
-                $item->handle();
-            }
+            $item->handle();
         } catch (Exception $e) {
             $item->incrementAttempts();
             if ($item->getAttempts() >= $item->tries) {

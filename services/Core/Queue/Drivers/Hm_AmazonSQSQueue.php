@@ -6,7 +6,6 @@ use Hm_AmazonSQS;
 use Aws\Sqs\SqsClient;
 use Services\Contracts\Queue\Hm_Queueable;
 use Services\Contracts\Queue\Hm_ShouldQueue;
-use Services\Core\Notifications\Hm_Notification;
 use Services\Core\Queue\Hm_Queueable as Hm_QueueableClass;
 
 /**
@@ -72,19 +71,13 @@ class Hm_AmazonSQSQueue implements Hm_ShouldQueue, Hm_Queueable
             $item = unserialize($body);
 
             try {
-                // Check if the item is a notification, if so send it
-                if($item instanceof Hm_Notification) {
-                    $item->send();
-                }else {
-                    // Otherwise handle the job
-                    $item->handle();
-                }
+                $item->handle();
             } catch (\Exception $e) {
-                $this->fail($item, $e); // Log the failure
+                $this->fail($item, $e);
                 throw new \Exception("Failed to process job: " . $e->getMessage());
             }
 
-            return $item; // Return the job if it was processed successfully
+            return $item;
         }
 
         return null;
