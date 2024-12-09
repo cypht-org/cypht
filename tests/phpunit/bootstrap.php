@@ -11,6 +11,7 @@ if (!defined('DEBUG_MODE')) {
 /* determine current absolute path used for require statements */
 define('APP_PATH', dirname(dirname(dirname(__FILE__))).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
 define('WEB_ROOT', '');
 define('CONFIG_PATH', APP_PATH.'config/');
 

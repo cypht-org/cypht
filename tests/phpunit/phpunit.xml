@@ -58,6 +58,12 @@
     <testsuite name="db">
       <file>./db.php</file>
     </testsuite>
+    <testsuite name="schema">
+      <file>./schema.php</file>
+    </testsuite>
+    <testsuite name="blueprint">
+      <file>./blueprint.php</file>
+    </testsuite>
     <testsuite name="format">
       <file>./format.php</file>
     </testsuite>
