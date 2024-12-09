@@ -4,6 +4,7 @@
 
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
 
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
@@ -22,22 +23,17 @@ $user_config_type = $config->get('user_config_type');
 $db_driver = $config->get('db_driver');
 
 $connected = false;
-$create_table = "CREATE TABLE IF NOT EXISTS";
-$bad_driver = "Unsupported db driver: {$db_driver}";
-
 // NOTE: these sql commands could be db agnostic if we change the blobs to text
 
 // Check if the required extensions for the configured DB driver are loaded
 if ($db_driver == 'mysql') {
     $required_extensions = ['mysqli', 'mysqlnd', 'pdo_mysql'];
     $missing_extensions = [];
-
     foreach ($required_extensions as $extension) {
         if (!extension_loaded($extension)) {
             $missing_extensions[] = $extension;
         }
     }
-
     if (!empty($missing_extensions)) {
         error_log('The following required MySQL extensions are missing: ' . implode(', ', $missing_extensions) . ". Please install them.\n");
         exit(1);
@@ -83,53 +79,79 @@ while (!$connected) {
     }
 }
 
-if (strcasecmp($session_type, 'DB')==0) {
-    printf("Creating database table hm_user_session ...\n");
+runMigrations($conn, MIGRATIONS_PATH);
 
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255) primary key not null, data text, date timestamp);";
-    } else {
-        die($bad_driver);
+function runMigrations(PDO $pdo, string $migrationDir) {
+    global $db_driver;
+    switch ($db_driver) {
+        case 'mysql':
+            $createTableSql = "
+                CREATE TABLE IF NOT EXISTS migrations (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    migration VARCHAR(255) NOT NULL,
+                    batch INT NOT NULL,
+                    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            break;
+
+        case 'pgsql':
+            $createTableSql = "
+                CREATE TABLE IF NOT EXISTS migrations (
+                    id SERIAL PRIMARY KEY,
+                    migration VARCHAR(255) NOT NULL,
+                    batch INT NOT NULL,
+                    applied_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            break;
+
+        case 'sqlite':
+            $createTableSql = "
+                CREATE TABLE IF NOT EXISTS migrations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    migration TEXT NOT NULL,
+                    batch INTEGER NOT NULL,
+                    applied_at TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            break;
+
+        default:
+            throw new \Exception("Unsupported database driver: " . $db_driver);
     }
+    $pdo->exec($createTableSql);
+    $executed = $pdo->query("SELECT migration FROM migrations")
+                    ->fetchAll(PDO::FETCH_COLUMN);
 
-    $conn->exec($stmt);
+    $migrationFiles = glob($migrationDir . '/*.sql');
+    if ($db_driver !== 'sqlite') {
+        $migrationFiles = array_filter($migrationFiles, function ($file) {
+            return basename($file) !== '20241209040300_add_lock_to_hm_user_session_table.sql';
+        });
+    }
+    foreach ($migrationFiles as $file) {
+        if (in_array(basename($file), $executed)) {
+            continue;
+        }
+
+        try {
+            $sql = file_get_contents($file);
+            $pdo->exec($sql);
+            
+            $stmt = $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (:migration, :batch)");
+            $stmt->execute([
+                'migration' => basename($file),
+                'batch' => 1
+            ]);
+            echo "Migrated: " . basename($file) . PHP_EOL;
+        } catch (PDOException $e) {
+            die("Migration failed: " . $e->getMessage());
+        }
+    }
 }
-if (strcasecmp($auth_type, 'DB')==0) {
+// if (strcasecmp($session_type, 'DB')==0) {
 
-    printf("Creating database table hm_user ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user (username varchar(255), hash varchar(255), primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user (username varchar(255) primary key not null, hash varchar(255));";
-    } else {
-        die($bad_driver);
-    }
-
-    try {
-        $rows = $conn->exec($stmt);
-        printf("{$stmt}\n");
-    } catch (PDOException $e) {
-        print($e);
-        exit (1);
-    }
-
-}
-if (strcasecmp($user_config_type, 'DB')==0) {
-
-    printf("Creating database table hm_user_settings ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user_settings(username varchar(255), settings longblob, primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_settings (username varchar(255) primary key not null, settings text);";
-    } else {
-        die($bad_driver);
-    }
-
-    $conn->exec($stmt);
-}
+// }
 
 print("\nDb setup finished\n");
