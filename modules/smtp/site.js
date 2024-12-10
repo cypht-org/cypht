@@ -28,7 +28,7 @@ var smtp_test_action = function(event) {
         false,
         {'smtp_connect': 1}
     );
-};             
+};
 
 var smtp_delete_action = function(event) {
     if (!hm_delete_prompt()) {
@@ -69,7 +69,7 @@ var send_archive = function() {
     document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
-var save_compose_state = function(no_files, notice) {
+var save_compose_state = function(no_files, notice, schedule, callback) {
     var no_icon = true;
     if (notice) {
         no_icon = false;
@@ -82,6 +82,7 @@ var save_compose_state = function(no_files, notice) {
     var cc = $('.compose_cc').val();
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
+    var delivery_receipt = $('#compose_delivery_receipt').prop('checked');
 
     var draft_id = $('.compose_draft_id').val();
     if (globals.draft_state == body+subject+to+smtp+cc+bcc+uploaded_files) {
@@ -105,6 +106,8 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to},
+        {'name': 'schedule', 'value': schedule},
+        {'name': 'compose_delivery_receipt', 'value': delivery_receipt},
         {'name': 'uploaded_files', 'value': uploaded_files}],
         function(res) {
             if (res.draft_id) {
@@ -112,6 +115,15 @@ var save_compose_state = function(no_files, notice) {
             }
             if (res.draft_subject) {
                 $('.draft_list .draft_'+draft_id+' a').text(res.draft_subject);
+            }
+
+            if (schedule) {
+                $(".compose_form")[0].reset();
+                return;
+            }
+            
+            if (callback) {
+                callback(res);
             }
         },
         [],
@@ -138,7 +150,7 @@ function smtpServersPageHandler() {
     }
 }
 
-var reset_smtp_form = function() {
+var reset_smtp_form = function(save = true) {
     $('.compose_body').val('');
     $('.compose_subject').val('');
     $('.compose_to').val('');
@@ -146,7 +158,10 @@ var reset_smtp_form = function() {
     $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
     $('.uploaded_files').html('');
-    save_compose_state(true);
+    $('#compose_delivery_receipt').prop('checked', false);
+    if (save) {
+        save_compose_state(true);
+    }
 };
 
 var replace_cursor_positon = function (txtElement) {

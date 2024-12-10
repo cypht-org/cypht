@@ -1784,6 +1784,7 @@ var imap_smtp_edit_action = function(event) {
     }
 };
 
+
 var hasLeadingOrTrailingSpaces = function(str) {
     return str !== str.trim();
 };
@@ -1821,7 +1822,7 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
-    
+
     /* show any pending notices */
     Hm_Utils.show_sys_messages();
 
@@ -1834,7 +1835,7 @@ $(function() {
     if (hm_mailto()) {
         try { navigator.registerProtocolHandler("mailto", "?page=compose&compose_to=%s", "Cypht"); } catch(e) {}
     }
-
+    
     if (hm_mobile()) {
         swipe_event(document.body, function() { Hm_Folders.open_folder_list(); }, 'right');
         swipe_event(document.body, function() { Hm_Folders.hide_folder_list(); }, 'left');
@@ -2038,7 +2039,7 @@ function handleSmtpImapCheckboxChange(checkbox) {
     if ($('#srv_setup_stepper_is_sender').prop('checked') && $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').show();
         $('#srv_setup_stepper_profile_checkbox_bloc').show();
-        
+
     } else if(! $('#srv_setup_stepper_is_sender').prop('checked') || ! $('#srv_setup_stepper_is_receiver').prop('checked')) {
         $('#srv_setup_stepper_profile_bloc').hide();
         $('#srv_setup_stepper_profile_checkbox_bloc').hide();
@@ -2090,7 +2091,7 @@ function display_config_step(stepNumber) {
                     $(`#${item.key}-error`).text('Required');
                     isValid = false;
                 }
-                
+
             } else {
                 $(`#${item.key}-error`).text('');
             }
@@ -2381,7 +2382,7 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
                 if (mutation.addedNodes.length > 0) {
                     mutation.addedNodes.forEach(function (node) {
                         if (node.classList.contains('msg_text_inner')) {
-                            handleExternalResources(inline);                    
+                            handleExternalResources(inline);
                         }
                     });
                 }
@@ -2391,3 +2392,29 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+function setupNexterDate(callback) {
+    $(document).on('click', '.nexter_date_picker', function(e) {
+        document.querySelector('.nexter_input_date').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper', function(e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date', function(e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({'border': 'unset', 'border-top': '1px solid #ddd'});
+        }
+    });
+    $(document).on('change', '.nexter_input_date', function(e) {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input').val($(this).val()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input', callback);
+}
