@@ -586,12 +586,13 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
                 continue;
             }
 
+            $section = in_array($proto, ['imap', 'smtp']) ? 'server_config' : $proto;
             if ($server_data[$proto] === NULL) {
                 $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), mb_strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
                 $res .= sprintf($this->trans('You don\'t have any %s sources'), mb_strtoupper($proto_dsp));
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
@@ -600,7 +601,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
                 else {
                     $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Manage'));
             }
             $res .= '</li>';
         }
