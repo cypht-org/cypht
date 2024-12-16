@@ -142,7 +142,7 @@ class Hm_Output_js_search_data extends Hm_Output_Module {
      * adds two JS functions used on the search page
      */
     protected function output() {
-        return '<script type="text/javascript">'.
+        return '<script type="text/javascript" id="search-data">'.
             'var hm_search_terms = function() { return "'.$this->html_safe($this->get('search_terms', ''), true).'"; };'.
             'var hm_run_search = function() { return "'.$this->html_safe($this->get('run_search', 0)).'"; };'.
             '</script>';
@@ -624,7 +624,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
-        $res = '<script type="text/javascript">'.
+        $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
             'var hm_empty_folder = function() { return "'.$this->trans('So alone').'"; };'.
@@ -1327,7 +1327,7 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg">';
+        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg"></a>';
         $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
@@ -1384,25 +1384,6 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
-
-        if ($this->format == 'HTML5') {
-            return $res;
-        }
-        $this->concat('formatted_folder_list', $res);
-    }
-}
-
-/**
- * Outputs the logout link in the Main menu of the folder list
- * @subpackage core/output
- */
-class Hm_Output_logout_menu_item extends Hm_Output_Module {
-    protected function output() {
-        $res =  '<li class="menu_logout"><a class="unread_link logout_link" href="#">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-power fs-5 me-2"></i>';
-        }
-        $res .= '<span class="nav-label">'.$this->trans('Logout').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;
@@ -1477,11 +1458,6 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
             '<ul class="collapse settings folders">';
-        $res .= '<li class="menu_home"><a class="unread_link" href="?page=home">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-house-door-fill menu-icon"></i>';
-        }
-        $res .= $this->trans('Home').'</a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1614,8 +1590,22 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
      * Adds collapse and reload links
      */
     protected function output() {
-        $res = '<a href="#" class="update_message_list">'.$this->trans('[reload]').'</a>';
-        $res .= '<div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
+        $res = '<div class="sidebar-footer">';
+        $res .= '<a class="logout_link" href="#" title="'. $this->trans('Logout') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-power menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Logout') .'</span>';
+        $res .= '</a>';
+        $res .= '<a href="#" class="update_message_list" title="'. $this->trans('Reload') .'">';
+        if (!$this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-arrow-clockwise menu-icon"></i>';
+        }
+        $res .= '<span class="nav-label">' . $this->trans('Reload') . '</span>';
+        $res .= '</a>';
+        /** Sidebar footer end */
+
+        $res .= '<div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -1645,7 +1635,7 @@ class Hm_Output_content_section_start extends Hm_Output_Module {
      * Opens a main tag for the primary content section
      */
     protected function output() {
-        return '<main class="container-fluid content_cell"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
+        return '<main class="container-fluid content_cell" id="cypht-main"><div class="offline">'.$this->trans('Offline').'</div><div class="row m-0 position-relative">';
     }
 }
 
@@ -2440,5 +2430,20 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
             "</tr>";
         }
         return $res;
+    }
+}
+
+class Hm_output_combined_message_list extends Hm_Output_Module {
+    protected function output() {
+        $messageList = [];
+        $style = $this->get('news_list_style') ? 'news' : 'email';
+        if ($this->get('imap_combined_inbox_data')) {
+            $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, false, $style));
+        }
+        if ($this->get('feed_list_data')) {
+            $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
+        }
+        $this->out('formatted_message_list', $messageList);
+        $this->out('page_links', 'There is no pagination in this view, please visit the individual mail boxes.');
     }
 }

@@ -127,7 +127,7 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
     public function process() {
-        $data_sources = imap_data_sources('');
+        $data_sources = imap_data_sources();
         $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
         $tag_id = $this->request->post['folder'];
         if ($ids && $tag_id) {

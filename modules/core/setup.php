@@ -156,7 +156,6 @@ add_output('ajax_hm_folders', 'folder_list_content_start', true);
 add_output('ajax_hm_folders', 'main_menu_start', true);
 add_output('ajax_hm_folders', 'search_from_folder_list', true);
 add_output('ajax_hm_folders', 'main_menu_content', true);
-add_output('ajax_hm_folders', 'logout_menu_item', true);
 add_output('ajax_hm_folders', 'main_menu_end', true);
 add_output('ajax_hm_folders', 'email_menu_content', true);
 add_output('ajax_hm_folders', 'settings_menu_start', true);
@@ -189,6 +188,10 @@ add_handler('ajax_quick_servers_setup', 'http_headers', true, 'core');
 setup_base_ajax_page('ajax_privacy_settings', 'core');
 add_handler('ajax_privacy_settings', 'privacy_settings',  true, 'core');
 
+setup_base_ajax_page('ajax_combined_message_list', 'core');
+add_handler('ajax_combined_message_list', 'load_user_data', true, 'core');
+add_output('ajax_combined_message_list', 'combined_message_list', true, 'core');
+
 /* allowed input */
 return array(
     'allowed_pages' => array(
@@ -208,7 +211,8 @@ return array(
         'notfound',
         'search',
         'ajax_quick_servers_setup',
-        'ajax_privacy_settings'
+        'ajax_privacy_settings',
+        'ajax_combined_message_list'
     ),
     'allowed_output' => array(
         'date' => array(FILTER_DEFAULT, false),

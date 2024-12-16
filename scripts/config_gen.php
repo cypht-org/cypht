@@ -176,6 +176,7 @@ function get_module_assignments($settings) {
     $js = '';
     $css = '';
     $assets = array();
+    $core = false;
     $js_exclude_dependencies = explode(',', ($settings['js_exclude_deps'] ?? ''));
     $filters = array('allowed_output' => array(), 'allowed_get' => array(), 'allowed_cookie' => array(),
         'allowed_post' => array(), 'allowed_server' => array(), 'allowed_pages' => array());
@@ -185,9 +186,8 @@ function get_module_assignments($settings) {
         foreach ($mods as $mod) {
             printf("scanning module %s ...\n", $mod);
             if ($mod === 'core') {
-                foreach (glob('modules/core/navigation/*.js') as $js_module) {
-                    $js .= file_get_contents($js_module);
-                }
+                // We'll load the navigation modules last, after all other modules have been loaded, as they depend on the others.
+                $core = true;
             }
             $directoriesPattern = str_replace('/', DIRECTORY_SEPARATOR, "{*,*/*}");
             foreach (glob('modules' . DIRECTORY_SEPARATOR . $mod . DIRECTORY_SEPARATOR . 'js_modules' . DIRECTORY_SEPARATOR . $directoriesPattern . '*.js', GLOB_BRACE) as $js_module) {
@@ -213,6 +213,13 @@ function get_module_assignments($settings) {
                 $assets[] = sprintf("modules/%s/assets", $mod);
             }
         }
+
+        if ($core) {
+            foreach (glob('modules/core/navigation/*.js') as $js_module) {
+                $js .= file_get_contents($js_module);
+            }
+        }
+
         // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
         if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
             if (is_readable(sprintf("third_party/contact-group.css", 'third_party'))) {

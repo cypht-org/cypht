@@ -8,7 +8,8 @@ function trackLocationSearchChanges() {
 
 window.addEventListener('popstate', function(event) {
     if (event.state) {
-        $('main').replaceWith(event.state.main);
+        $('#cypht-main').replaceWith(event.state.main);
+        loadCustomScripts(event.state.head);
     }
     const unMountCallback = renderPage(window.location.href);
 
@@ -25,7 +26,7 @@ window.addEventListener('popstate', function(event) {
 
 window.addEventListener('load', function() {
     const unMountCallback = renderPage(window.location.href);
-    history.replaceState({ main: $('main').prop('outerHTML') }, "");
+    history.replaceState({ main: $('#cypht-main').prop('outerHTML'), head: $('head').prop('outerHTML') }, "");
 
     if (unMountCallback) {
         unMountSubscribers[window.location.search] = unMountCallback;
@@ -58,14 +59,23 @@ async function navigate(url) {
         const html = await response.text();
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
-        $('main').replaceWith(main);
+
+        if ($(main).attr('id') === 'cypht-main') {
+            $('main#cypht-main').replaceWith(main);
+        } else {
+            $('main#cypht-main').replaceWith($(main).find('#cypht-main'));
+        }
         document.title = title.replace(/<[^>]*>/g, '');
+        
+        // load custom javascript
+        const head = html.match(/<head[^>]*>((.|[\n\r])*)<\/head>/i)[0];
+        loadCustomScripts(head);
 
         window.location.next = url;
 
         const unMountCallback = renderPage(url);
 
-        history.pushState({ main }, "", url);
+        history.pushState({ main, head }, "", url);
         
         if (unMountCallback) {
             unMountSubscribers[url] = unMountCallback;
@@ -82,17 +92,25 @@ async function navigate(url) {
     }
 }
 
+function loadCustomScripts(head) {
+    const newHead = $('<div>').append(head);
+    $(document.head).find('script#data-store').replaceWith(newHead.find('script#data-store'));
+    $(document.head).find('script#search-data').replaceWith(newHead.find('script#search-data'));
+    $(document.head).find('script#inline-msg-state').replaceWith(newHead.find('script#inline-msg-state'));
+}
+
 function renderPage(href) {
     window.dispatchEvent(new CustomEvent('page-change'));
 
-    const searchParams = new URL(href, window.location.origin).searchParams;
+    const url = new URL(href, window.location.origin);
+    const searchParams = url.searchParams;
     const page = searchParams.get('page');
 
     if (page) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());
         if (route) {
-            const unMountCallback = route.handler(routeParams);
+            const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
             return unMountCallback;
         }
     }

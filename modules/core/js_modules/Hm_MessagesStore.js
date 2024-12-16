@@ -70,7 +70,7 @@ class Hm_MessagesStore {
      */
     markRowAsRead(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.value;
+        const row = this.getRowByUid(uid)?.value;
         
         if (row) {
             const htmlRow = $(row[1]['0']);
@@ -96,7 +96,7 @@ class Hm_MessagesStore {
      */
     getNextRowForMessage(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid)?.index;
         
         if (row !== false) {
             const nextRow = rows[row + 1];
@@ -114,7 +114,7 @@ class Hm_MessagesStore {
      */
     getPreviousRowForMessage(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid)?.index;
         if (row) {
             const previousRow = rows[row - 1];
             if (previousRow) {
@@ -126,7 +126,7 @@ class Hm_MessagesStore {
     
     removeRow(uid) {
         const rows = Object.entries(this.rows);
-        const row = this.#getRowByUid(uid);
+        const row = this.getRowByUid(uid);
         if (row) {
             const newRows = rows.filter((_, i) => i !== row.index);
             this.rows = Object.fromEntries(newRows);
@@ -153,14 +153,23 @@ class Hm_MessagesStore {
 
     #getRequestConfig() {
         let hook;
-        let serverId;
-        let folder;
         const config = [];
         if (this.path.startsWith('imap')) {
             hook = "ajax_imap_folder_display";
+
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
-            serverId = detail.server_id;
-            folder = detail.folder;
+            config.push({ name: "imap_server_id", value: detail.server_id });
+            config.push({ name: "folder", value: detail.folder });
+
+        } else if (this.path.startsWith('feeds')) {
+            hook = "ajax_feed_combined";
+            const serverId = this.path.split('_')[1];
+            if (serverId) {
+                config.push({ name: "feed_server_ids", value: serverId });
+            }
+        } else if (this.path.startsWith('github')) {
+            hook = "ajax_github_data";
+            config.push({ name: "github_repo", value: this.path.split('_')[1] });
         } else {
             switch (this.path) {
                 case 'unread':
@@ -170,6 +179,8 @@ class Hm_MessagesStore {
                     hook = "ajax_imap_flagged";
                     break;
                 case 'combined_inbox':
+                    hook = "ajax_combined_message_list";
+                    break;
                 case 'email':
                     hook = "ajax_imap_combined_inbox";
                     break;
@@ -183,15 +194,8 @@ class Hm_MessagesStore {
             }
         }
         
-        if (hook) {
-            config.push({ name: "hm_ajax_hook", value: hook });
-        }
-        if (serverId) {
-            config.push({ name: "imap_server_id", value: serverId });
-        }
-        if (folder) {
-            config.push({ name: "folder", value: folder });
-        }
+        config.push({ name: "hm_ajax_hook", value: hook });
+
         return config;
     }
 
@@ -217,7 +221,7 @@ class Hm_MessagesStore {
      * @param {String} uid 
      * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
-    #getRowByUid(uid) {
+    getRowByUid(uid) {
         const rows = Object.entries(this.rows);
         const row = rows.find(([key, value]) => $(value['0']).attr('data-uid') == uid);
         

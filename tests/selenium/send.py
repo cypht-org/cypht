@@ -14,6 +14,7 @@ class SendTest(WebTest):
 
     def load_compose_page(self):
         self.load()
+        self.wait_on_class('menu_compose')
         list_item = self.by_class('menu_compose')
         link = list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

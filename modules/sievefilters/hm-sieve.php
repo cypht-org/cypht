@@ -1,6 +1,8 @@
 
 <?php
 
+require_once APP_PATH.'modules/sievefilters/functions.php';
+
 class Hm_Sieve_Client_Factory {
     public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
     {

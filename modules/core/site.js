@@ -840,11 +840,11 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(msgUid) {
+    this.prev_next_links = function(msgUid, lisPath = getListPathParam()) {
         let phref;
         let nhref;
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number());
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);
@@ -1006,6 +1006,9 @@ function Message_List() {
     }
 
     this.process_row_click = function(e) {
+        if (e.target.tagName === 'A') {
+            return;
+        }
         document.getSelection().removeAllRanges();
         var target = $(e.target);
         var class_name = target[0].className;
@@ -1142,7 +1145,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            Hm_Utils.expand_core_settings();
             return true;
         }
         return false;
@@ -1427,41 +1429,6 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(class_name, $(class_name).css('display'));
         }
         return false;
-    },
-
-    expand_core_settings: function() {
-        var sections = Hm_Utils.get_core_settings();
-        var key;
-        var dsp;
-        for (key in sections) {
-            dsp = sections[key];
-            if (!dsp) {
-                dsp = 'none';
-            }
-            $(key).css('display', dsp);
-            Hm_Utils.save_to_local_storage(key, dsp);
-        }
-    },
-
-    get_core_settings: function() {
-        var dsp;
-        var results = {}
-        var i;
-        var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
-        for (i=0;i<sections.length;i++) {
-            dsp = Hm_Utils.get_from_local_storage(sections[i]);
-            if (hash) {
-                if (hash.replace('#', '.') != sections[i]) {
-                    dsp = 'none';
-                }
-                else {
-                    dsp = 'table-row';
-                }
-            }
-            results[sections[i]] = dsp;
-        }
-        return results;
     },
 
     get_from_local_storage: function(key) {
@@ -2339,7 +2306,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
     const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];

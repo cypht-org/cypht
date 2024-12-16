@@ -8,11 +8,11 @@ const modulesRoutes = [
     },
     {
         page: 'message_list',
-        handler: 'applyImapMessageListPageHandlers'
+        handler: 'applyMessaleListPageHandlers'
     },
     {
         page: 'message',
-        handler: 'applyImapMessageContentPageHandlers'
+        handler: 'applyMessagePageHandlers'
     },
     {
         page: 'compose',

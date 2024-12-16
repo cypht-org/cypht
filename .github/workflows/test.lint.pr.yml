@@ -29,12 +29,17 @@ jobs:
           # Configure which scopes are allowed (newline delimited).
           # Append a scope for each service here
           scopes: |
-            docu
+            docs
             docker
             release
             workflow
+            frontend
+            backend
+            frontend/backend
+            module/[a-z-]+
+            unit
+            e2e
             other
-            cypht
           # Configure that a scope must always be provided.
           requireScope: true
           # Configure which scopes (newline delimited) are disallowed in PR

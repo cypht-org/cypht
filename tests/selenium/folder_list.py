@@ -35,7 +35,7 @@ class FolderListTests(WebTest):
     def expand_section(self):
         self.by_css('[data-bs-target=".settings"]').click()
         list_item = self.by_class('menu_home')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        list_item.click()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Home'
@@ -56,8 +56,7 @@ class FolderListTests(WebTest):
         hide_button = self.by_class('menu-toggle')
         self.driver.execute_script("arguments[0].click();", hide_button)
         list_item = self.by_class('menu_home')
-        link = list_item.find_element(By.TAG_NAME, 'a')
-        assert link.is_displayed() == False
+        assert list_item.is_displayed() == False
 
     def show_folders(self):
         self.wait(By.CLASS_NAME, 'menu-toggle')

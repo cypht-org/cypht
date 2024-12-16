@@ -16,7 +16,7 @@ add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_star
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 add_output('settings', 'contact_auto_collect_setting', true, 'contacts', 'max_google_contacts_number', 'after');
 
-add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'main_menu_content', 'before');
 
 add_handler('compose', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_data', 'before');

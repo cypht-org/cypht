@@ -100,7 +100,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_js_search_data() {
         $test = new Output_Test('js_search_data', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<script type="text/javascript">var hm_search_terms = function() { return ""; };var hm_run_search = function() { return "0"; };</script>'), $res->output_response);
+        $this->assertEquals(array('<script type="text/javascript" id="search-data">var hm_search_terms = function() { return ""; };var hm_run_search = function() { return "0"; };</script>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -444,10 +444,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('js_data', 'core');
         $test->handler_response = array('disable_delete_prompt' => true);
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
+        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return true; };', implode($res->output_response));
         $test->handler_response = array();
         $res = $test->run();
-        $this->assertStringStartsWith('<script type="text/javascript">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };', implode($res->output_response));
+        $this->assertStringStartsWith('<script type="text/javascript" id="data-store">var globals = {};var hm_is_logged = function () { return 0; };var hm_empty_folder = function() { return "So alone"; };var hm_mobile = function() { return 0; };var hm_debug = function() { return "0"; };var hm_mailto = function() { return 0; };var hm_page_name = function() { return ""; };var hm_language_direction = function() { return "ltr"; };var hm_list_path = function() { return ""; };var hm_list_parent = function() { return ""; };var hm_msg_uid = function() { return Hm_Utils.get_from_global("msg_uid", ""); };var hm_encrypt_ajax_requests = function() { return ""; };var hm_encrypt_local_storage = function() { return ""; };var hm_web_root_path = function() { return ""; };var hm_flag_image_src = function() { return "<i class=\\"bi bi-star-half\\"></i>"; };var hm_check_dirty_flag = function() { return 0; };var hm_data_sources = function() { return []; };var hm_delete_prompt = function() { return confirm("Are you sure?"); };', implode($res->output_response));
     }
     /**
      * @preserveGlobalState disabled
@@ -852,10 +852,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_main_menu_start() {
         $test = new Output_Test('main_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<img class="app-logo" src="modules/core/assets/images/logo_dark.svg"><div class="main"><ul class="folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<a href="?page=home" class="menu_home"><img class="app-logo" src="modules/core/assets/images/logo_dark.svg"></a><div class="main"><ul class="folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -870,18 +870,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $res = $test->run();
         $this->assertEquals(array('folder_sources' => array(array('email_folders', 'baz')), 'formatted_folder_list' => '<li class="menu_unread d-flex align-items-center"><a class="unread_link d-flex align-items-center" href="?page=message_list&amp;list_path=unread"><i class="bi bi-envelope-fill menu-icon"></i><span class="nav-label">Unread</span></a><span class="total_unread_count badge rounded-pill text-bg-info ms-2 px-1"></span></li><li class="menu_flagged"><a class="unread_link" href="?page=message_list&amp;list_path=flagged"><i class="bi bi-flag-fill menu-icon"></i><span class="nav-label">Flagged</span></a> <span class="flagged_count"></span></li><li class="menu_junk"><a class="unread_link" href="?page=message_list&amp;list_path=junk"><i class="bi bi-envelope-x-fill menu-icon"></i><span class="nav-label">Junk</span></a></li><li class="menu_trash"><a class="unread_link" href="?page=message_list&amp;list_path=trash"><i class="bi bi-trash3-fill menu-icon"></i><span class="nav-label">Trash</span></a></li><li class="menu_drafts"><a class="unread_link" href="?page=message_list&amp;list_path=drafts"><i class="bi bi-pencil-square menu-icon"></i><span class="nav-label">Drafts</span></a></li>'), $res->output_response);
     }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_logout_menu_item() {
-        $test = new Output_Test('logout_menu_item', 'core');
-        $res = $test->run();
-        $this->assertEquals(array('<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i><span class="nav-label">Logout</span></a></li>'), $res->output_response);
-        $test->rtype = 'AJAX';
-        $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<li class="menu_logout"><a class="unread_link logout_link" href="#"><i class="bi bi-power fs-5 me-2"></i><span class="nav-label">Logout</span></a></li>'), $res->output_response);
-    }
+
     /**
      * @preserveGlobalState disabled
      * @runInSeparateProcess
@@ -917,10 +906,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill menu-icon"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders"><li class="menu_home"><a class="unread_link" href="?page=home"><i class="bi bi-house-door-fill menu-icon"></i>Home</a></li>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -983,10 +972,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<a href="#" class="update_message_list">[reload]</a><div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<a href="#" class="update_message_list">[reload]</a><div class="menu-toggle rounded-pill p-3 fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -1004,7 +993,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_content_section_start() {
         $test = new Output_Test('content_section_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<main class="container-fluid content_cell"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
+        $this->assertEquals(array('<main class="container-fluid content_cell" id="cypht-main"><div class="offline">Offline</div><div class="row m-0 position-relative">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

@@ -388,8 +388,31 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 
 async function select_imap_folder(path, reload, processInTheBackground = false, abortController = null) {    
     const messages = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), null, abortController);
-    await messages.load(reload, processInTheBackground).then(() => {        
-        display_imap_mailbox(messages.rows, messages.links, path);
+    await messages.load(reload, processInTheBackground).then(() => {
+        if (processInTheBackground) {
+            const rows = Object.values(messages.rows);            
+            for (const index in rows) {
+                const row = rows[index]?.[0];               
+                const rowUid = $(row).data('uid');
+                const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
+                if (!tableRow.length) {
+                    if (Hm_Utils.rows().length >= index) {
+                        Hm_Utils.rows().eq(index).after(row);
+                    } else {
+                        Hm_Utils.tbody().append(row);
+                    }
+                } else if (tableRow.attr('class') !== $(row).attr('class')) {
+                    tableRow.replaceWith(row);
+                }
+            }
+            Hm_Utils.rows().each(function() {
+                if (!messages.getRowByUid($(this).data('uid'))) {
+                    $(this).remove();
+                }
+            });
+        } else {
+            display_imap_mailbox(messages.rows, messages.links);
+        }
     });
 
     if (path === 'unread') {
@@ -418,7 +441,6 @@ var setup_imap_folder_page = async function(listPath) {
     $('.imap_keyword').on('search', function() {
         $('#imap_filter_form').trigger('submit');
     });
-    Hm_Ajax.add_callback_hook('ajax_message_action', function() { select_imap_folder(listPath, true); });
 
     const hadLocalData = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number()).hasLocalData();
     await select_imap_folder(listPath);
@@ -454,7 +476,8 @@ $('#imap_filter_form').on('submit', async function(event) {
     }
 });
 
-var display_imap_mailbox = function(rows, links, path = getListPathParam()) {
+var display_imap_mailbox = function(rows, links) {
+    Hm_Message_List.toggle_msg_controls();
     if (rows) {
         Hm_Message_List.update(rows);
         Hm_Message_List.check_empty_list();
@@ -865,16 +888,11 @@ var search_selected_for_imap = function() {
 };
 
 var unselect_non_imap_messages = function() {
-    var unselected = 0;
-    $('input[type=checkbox]').each(function() {
+    $('.message_table_body .checkbox_cell input[type=checkbox]').each(function() {
         if (this.checked && this.id.search('imap') == -1) {
             this.checked = false;
-            unselected++;
         }
     });
-    if (unselected > 0) {
-        Hm_Notices.show({0: 'ERR'+$('.move_to_string3').val()});
-    }
 };
 
 var imap_move_copy = function(e, action, context) {
@@ -1102,11 +1120,11 @@ var imap_setup_snooze = function() {
     $(document).on('click', '.snooze_date_picker', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
     });
-    $(document).on('click', '.snooze_helper', function(e) {
+    $('.snooze_helper').on('click', function(e) {
         e.preventDefault();
         $('.snooze_input').val($(this).attr('data-value')).trigger('change');
     });
-    $(document).on('input', '.snooze_input_date', function(e) {
+    $('.snooze_input_date').on('input', function(e) {
         var now = new Date();
         now.setMinutes(now.getMinutes() + 1);
         $(this).attr('min', now.toJSON().slice(0, 16));
@@ -1116,12 +1134,12 @@ var imap_setup_snooze = function() {
             $('.snooze_date_picker').css({'border': 'unset', 'border-top': '1px solid #ddd'});
         }
     });
-    $(document).on('change', '.snooze_input_date', function(e) {
+    $('.snooze_input_date').on('change', function(e) {
         if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
             $('.snooze_input').val($(this).val()).trigger('change');
         }
     });
-    $(document).on('change', '.snooze_input', function(e) {
+    $('.snooze_input').on('change', function(e) {
         $('.snooze_dropdown').hide();
         var ids = [];
         if (getPageNameParam() == 'message') {
@@ -1142,11 +1160,21 @@ var imap_setup_snooze = function() {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_snooze'},
             {'name': 'imap_snooze_ids', 'value': ids},
             {'name': 'imap_snooze_until', 'value': $(this).val()}],
-            function(res) {
-                if (res.snoozed_messages > 0) {
+            async function(res) {
+                const snoozedMessages = Object.values(res['snoozed_messages']);
+                if (snoozedMessages.length) {
+                    const path = getParam("list_parent") || getListPathParam();
+                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number());
+                    await store.load(false, true, true);
+                    
+                    snoozedMessages.forEach((msg) => {
+                        store.removeRow(msg);
+                    });
+                    if (getPageNameParam() == 'message_list') {
+                        display_imap_mailbox(store.rows, store.links, getListPathParam());
+                    }
+
                     Hm_Folders.reload_folders(true);
-                    var path = hm_list_parent()? hm_list_parent(): getListPathParam();
-                    window.location.replace('?page=message_list&list_path='+path);
                 }
             }
         );
