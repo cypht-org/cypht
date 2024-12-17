@@ -19,15 +19,19 @@ add_output('info', 'display_imap_capability', true, 'imap', 'server_capabilities
 add_output('info', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 /* servers page data */
+add_handler('servers', 'profile_data',  true, 'profiles', 'load_user_data', 'after');
+add_handler('servers', 'compose_profile_data',  true, 'profiles', 'profile_data', 'after');
 add_handler('servers', 'process_add_imap_server', true, 'imap', 'message_list_type', 'after');
 add_handler('servers', 'process_add_jmap_server', true, 'imap', 'process_add_imap_server', 'after');
 add_handler('servers', 'save_imap_servers',  true, 'imap', 'process_add_jmap_server', 'after');
+add_handler('servers', 'save_ews_server',  true, 'imap', 'save_imap_servers', 'after');
 add_output('servers', 'display_configured_imap_servers', true, 'imap', 'server_config_stepper_accordion_end_part', 'before');
 add_output('servers', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 
 add_output('servers', 'stepper_setup_server_jmap', true, 'imap', 'server_config_stepper_end_part', 'before');
 add_output('servers', 'stepper_setup_server_imap', true, 'imap', 'server_config_stepper_end_part', 'before');
 add_output('servers', 'stepper_setup_server_jmap_imap_common', true, 'imap', 'server_config_stepper_end_part', 'before');
+add_output('servers', 'server_config_ews', true, 'imap', 'server_config_stepper_accordion_end_part', 'after');
 
 /* settings page data */
 add_handler('settings', 'process_sent_since_setting', true, 'imap', 'date', 'after');
@@ -118,6 +122,10 @@ add_output('ajax_hm_folders', 'filter_imap_folders',  true, 'imap', 'folder_list
 
 /* ajax server setup callback data */
 setup_base_ajax_page('ajax_imap_debug', 'core');
+add_handler('ajax_imap_debug', 'profile_data',  true, 'profiles', 'load_user_data', 'after');
+add_handler('ajax_imap_debug', 'compose_profile_data',  true, 'profiles', 'profile_data', 'after');
+add_handler('ajax_imap_debug', 'profile_data',  true, 'smtp', 'compose_profile_data', 'after');
+add_handler('ajax_imap_debug', 'load_smtp_servers_from_config', true, 'smtp', 'profile_data', 'after');
 add_handler('ajax_imap_debug', 'load_imap_servers_from_config',  true);
 add_handler('ajax_imap_debug', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_debug', 'imap_hide', true);
@@ -442,6 +450,16 @@ return array(
         'tag_id' => FILTER_DEFAULT,
         'first_time_screen_emails' => FILTER_VALIDATE_INT,
         'move_messages_in_screen_email' => FILTER_VALIDATE_BOOLEAN,
+        'ews_server_id' => FILTER_DEFAULT,
+        'ews_profile_name'  => FILTER_DEFAULT,
+        'ews_email' => FILTER_DEFAULT,
+        'ews_password' => FILTER_UNSAFE_RAW,
+        'ews_server' => FILTER_DEFAULT,
+        'ews_hide_from_c_page' => FILTER_VALIDATE_INT,
+        'ews_create_profile' => FILTER_VALIDATE_INT,
+        'ews_profile_is_default' => FILTER_VALIDATE_INT,
+        'ews_profile_signature' => FILTER_DEFAULT,
+        'ews_profile_reply_to' => FILTER_DEFAULT,
         'imap_folder_uid' => FILTER_DEFAULT,
         'imap_folder' => FILTER_DEFAULT,
         'identifier' => FILTER_DEFAULT,

@@ -4,10 +4,11 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 if (!hm_exists('connect_to_smtp_server')) {
-    function connect_to_smtp_server($address, $name, $port, $user, $pass, $tls, $server_id = false) {
+    function connect_to_smtp_server($address, $name, $port, $user, $pass, $tls, $type, $server_id = false) {
         $smtp_list = array(
             'name' => $name,
             'server' => $address,
+            'type' => $type,
             'hide' => false,
             'port' => $port,
             'user' => $user,
@@ -25,13 +26,13 @@ if (!hm_exists('connect_to_smtp_server')) {
             }
         } else {
             $smtp_server_id =  Hm_SMTP_List::add($smtp_list);
-            if (! can_save_last_added_server('Hm_SMTP_List', $user)) {
+            if ($type != 'ews' && ! can_save_last_added_server('Hm_SMTP_List', $user)) {
                 return;
             }
         }
 
-        $smtp = Hm_SMTP_List::connect($smtp_server_id, false);
-        if (smtp_authed($smtp)) {
+        $mailbox = Hm_SMTP_List::connect($smtp_server_id, false);
+        if ($mailbox->authed()) {
             return $smtp_server_id;
         }
         else {

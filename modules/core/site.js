@@ -2001,9 +2001,9 @@ function resetQuickSetupForm() {
 
 function handleCreateProfileCheckboxChange(checkbox) {
     if(checkbox.checked) {
-        $('#srv_setup_stepper_profile_bloc').show();
+        $(checkbox).closest('.form-check').next().show();
     }else{
-        $('#srv_setup_stepper_profile_bloc').hide();
+        $(checkbox).closest('.form-check').next().hide();
     }
 }
 

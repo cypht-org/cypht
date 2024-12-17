@@ -11,6 +11,7 @@ require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
 require_once('hm-imap-bodystructure.php');
 require_once('hm-jmap.php');
+require_once('hm-ews.php');
 
 /**
  * IMAP connection manager
@@ -21,18 +22,17 @@ class Hm_IMAP_List {
     use Hm_Server_List;
 
     public static $use_cache = true;
+    protected static $user_config;
+    protected static $session;
 
     public static function init($user_config, $session) {
         self::initRepo('imap_servers', $user_config, $session, self::$server_list);
+        self::$user_config = $user_config;
+        self::$session = $session;
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        if (array_key_exists('type', $server) && $server['type'] == 'jmap') {
-            self::$server_list[$id]['object'] = new Hm_JMAP();
-        }
-        else {
-            self::$server_list[$id]['object'] = new Hm_IMAP();
-        }
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session);
         if (self::$use_cache && $cache && is_array($cache)) {
             self::$server_list[$id]['object']->load_cache($cache, 'array');
         }
@@ -57,6 +57,15 @@ class Hm_IMAP_List {
         }
         $res = $hm_cache->get('imap'.$id);
         return $res;
+    }
+
+    public static function get_connected_mailbox($id, $hm_cache = null) {
+        if ($hm_cache) {
+            $cache = self::get_cache($hm_cache, $id);
+        } else {
+            $cache = false;
+        }
+        return self::connect($id, $cache);
     }
 }
 
@@ -827,6 +836,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->check_response($response, true)) {
                 $attributes = $this->parse_status_response($response);
                 $this->check_mailbox_state_change($attributes);
+                $attributes['id'] = $mailbox;
             }
             return $attributes;
         }

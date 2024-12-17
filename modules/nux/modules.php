@@ -65,6 +65,8 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
     public function process() {
 
         $imap_servers = NULL;
+        $jmap_servers = NULL;
+        $ews_servers = NULL;
         $smtp_servers = NULL;
         $feed_servers = NULL;
         $profiles = NULL;
@@ -72,13 +74,17 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $modules = $this->config->get_modules();
 
         if (data_source_available($modules, 'imap')) {
-            $imap_servers = count(Hm_IMAP_List::dump(false));
+            $servers = Hm_IMAP_List::dump(false);
+            $imap_servers = count(array_filter($servers, function($server) { return empty($server['type']) || $server['type'] === 'imap'; }));
+            $jmap_servers = count(array_filter($servers, function($server) { return @$server['type'] === 'jmap'; }));
+            $ews_servers = count(array_filter($servers, function($server) { return @$server['type'] === 'ews'; }));
         }
         if (data_source_available($modules, 'feeds')) {
             $feed_servers = count(Hm_Feed_List::dump(false));
         }
         if (data_source_available($modules, 'smtp')) {
-            $smtp_servers = count(Hm_SMTP_List::dump(false));
+            $servers = Hm_SMTP_List::dump(false);
+            $smtp_servers = count(array_filter($servers, function($server) { return empty($server['type']) || $server['type'] === 'smtp'; }));
         }
         if (data_source_available($modules, 'profiles')) {
             Hm_Profiles::init($this);
@@ -87,6 +93,8 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
 
         $this->out('nux_server_setup', array(
             'imap' => $imap_servers,
+            'jmap' => $jmap_servers,
+            'ews' => $ews_servers,
             'feeds' => $feed_servers,
             'smtp' => $smtp_servers,
             'profiles' => $profiles
@@ -183,8 +191,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
                     return;
                 }
-                $imap = Hm_IMAP_List::connect($new_id, false);
-                if ($imap && $imap->get_state() == 'authenticated') {
+                $mailbox = Hm_IMAP_List::connect($new_id, false);
+                if ($mailbox && $mailbox->authed()) {
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
                             'name' => $details['name'],
@@ -404,6 +412,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         $server['profile']['is_default'],
                         $server['username'],
                         ($server['jmap']['server'] ?? $server['imap']['server']),
+                        $server['username'],
                         $smtp_server_id,
                         ($jmap_server_id ?? $imap_server_id),
                         $this
@@ -558,7 +567,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         }
         $server_data = $this->get('nux_server_setup', array());
         $tz = $this->get('tzone');
-        $protos = array('imap', 'smtp', 'feeds', 'profiles');
+        $protos = array('imap', 'jmap', 'ews', 'smtp', 'feeds', 'profiles');
 
         $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';

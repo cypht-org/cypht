@@ -60,8 +60,8 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 $current['pass'] = $form['password'];
                 unset($current['nopass']);
                 Hm_IMAP_List::edit($server['id'], $current);
-                $imap = Hm_IMAP_List::connect($server['id'], false);
-                if ($imap->get_state() == 'authenticated') {
+                $mailbox = Hm_IMAP_List::connect($server['id'], false);
+                if ($mailbox && $mailbox->authed()) {
                     Hm_Msgs::add('Password Updated');
                     $this->out('connect_status', true);
                 }
@@ -1086,7 +1086,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         Hm_Msgs::add("ERRSMTP module is not enabled");
                         return;
                     }
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, $smtpServerId);
+                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
                     if(!isset($this->smtp_server_id)){
                         Hm_Msgs::add("ERRCould not save server");
                         return;
@@ -1133,7 +1133,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         return;
                     }
 
-                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $this->smtp_server_id, $this->imap_server_id, $this);
+                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
                 }
 
                 if ($this->module_is_supported('imap_folders')) {

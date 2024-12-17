@@ -56,11 +56,10 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
             && array_key_exists('list_path', $this->request->get)
             && array_key_exists('uid', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                list ($msg_struct, $msg_struct_first, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($path[2]), $this->request->get['uid'], false, true);
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
@@ -78,7 +77,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
                             $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
@@ -126,14 +125,13 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
 
         if (array_key_exists('forward_as_attachment', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
-                $content = $imap->get_message_content($this->request->get['uid'], 0, false, false);
+                $content = $mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid']);
 
                 # Attachment Download
                 $attached_files = [];
@@ -143,7 +141,7 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 if (!is_dir($file_dir)) {
                     mkdir($file_dir);
                 }
-                $name = $msg_header['subject'] . '.eml';
+                $name = $msg_header['Subject'] . '.eml';
                 $file_path = $file_dir . $name;
                 $attached_files[$this->request->get['uid']][] = array(
                     'name' => $name,
@@ -151,8 +149,9 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                     'size' => strlen($content),
                     'tmp_name' => $file_path,
                     'filename' => $file_path,
-                    'basename' => $msg_header['subject']
+                    'basename' => $msg_header['Subject']
                 );
+                $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
                 file_put_contents($file_path, $content);
                 $this->session->set('uploaded_files', $attached_files);
                 $this->out('as_attr', true);
@@ -172,11 +171,10 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
         }
         if (array_key_exists('forward', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                list ($msg_struct, $msg_struct_first, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($path[2]), $this->request->get['uid'], false, true);
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
@@ -196,7 +194,7 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
                             $file_path = $file_dir . $new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
@@ -518,13 +516,17 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                         }
                     }
                 }
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
-                if (smtp_authed($smtp)) {
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
+                if ($mailbox && $mailbox->authed()) {
                     Hm_Msgs::add("Successfully authenticated to the SMTP server");
-                    return;
+                }
+                elseif ($mailbox && $mailbox->state() == 'connected') {
+                    Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
+                }
+                else {
+                    Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                 }
             }
-            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
         }
     }
 }
@@ -660,8 +662,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
-        $from_params = '';
-        $recipients_params = '';
 
         /* parse attachments */
         $uploaded_files = [];
@@ -678,11 +678,6 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
-
-        if ($this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt'])) {
-            $from_params      = 'RET=HDRS';
-            $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
-        }
 
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
@@ -703,8 +698,8 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
 
         /* try to connect */
-        $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (!smtp_authed($smtp)) {
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+        if (! $mailbox || ! $mailbox->authed()) {
             Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
             repopulate_compose_form($draft, $this);
             return;
@@ -726,7 +721,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg(), $from_params, $recipients_params);
+        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
             Hm_Msgs::add(sprintf("ERR%s", $err_msg));
             repopulate_compose_form($draft, $this);
@@ -737,7 +732,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime->get_mime_msg());
         }
 
         /* check for associated IMAP server to save a copy */
@@ -757,13 +752,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $msg_path = explode('_', $this->request->post['compose_msg_path']);
             $msg_uid = $this->request->post['compose_msg_uid'];
 
-            $imap = Hm_IMAP_List::connect($msg_path[1]);
-            if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($msg_path[1]);
+            if ($mailbox && $mailbox->authed()) {
                 $specials = get_special_folders($this, $msg_path[1]);
                 if (array_key_exists('archive', $specials) && $specials['archive']) {
                     $archive_folder = $specials['archive'];
-                    $imap->message_action('ARCHIVE', array($msg_uid));
-                    $imap->message_action('MOVE', array($msg_uid), $archive_folder);
+                    $mailbox->message_action(hex2bin($msg_path[2]), 'ARCHIVE', array($msg_uid));
+                    $mailbox->message_action(hex2bin($msg_path[2]), 'MOVE', array($msg_uid), $archive_folder);
                 }
             }
         }
@@ -1405,6 +1400,10 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
 
             $no_edit = false;
 
+            if (array_key_exists('type', $vals) && $vals['type'] == 'ews') {
+                continue;
+            }
+
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
                 $user_pc = $vals['user'];
@@ -1732,13 +1731,10 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
  */
 if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
-    $imap = Hm_IMAP_List::connect($imap_server_id);
-    if (! imap_authed($imap)) {
-        return false;
-    }
-    if ($imap->select_mailbox($folder)) {
-        if ($imap->message_action('DELETE', array($id))['status']) {
-            $imap->message_action('EXPUNGE', array($id));
+    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id);
+    if ($mailbox && $mailbox->authed()) {
+        if ($mailbox->message_action($folder, 'DELETE', array($id))['status']) {
+            $mailbox->message_action($folder, 'EXPUNGE', array($id));
             return true;
         }
     }
@@ -1858,7 +1854,9 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 
 function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '') {
-    $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+    if (! empty($uploaded_files) && ! is_array($uploaded_files[0])) {
+        $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+    }
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
         $atts['draft_subject'],
@@ -1912,9 +1910,10 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
     }
-    $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
-    $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
-    $draft_folder = $imap->select_mailbox($specials['draft']);
+    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_profile['id'], $mod_cache);
+    if (! $mailbox || ! $mailbox->authed()) {
+        return -1;
+    }
 
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name);
     $res = $mime->process_attachments();
@@ -1923,24 +1922,21 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($imap->append_start($specials['draft'], mb_strlen($msg), false, true)) {
-        $imap->append_feed($msg."\r\n");
-        if (!$imap->append_end()) {
-            Hm_Msgs::add('ERRAn error occurred saving the draft message');
-            return -1;
-        }
+    if (! $mailbox->store_message($specials['draft'], $msg, false, true)) {
+        Hm_Msgs::add('ERRAn error occurred saving the draft message');
+        return -1;
     }
 
-    $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
+    $messages = $mailbox->get_messages($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
 
     // Remove old version from the mailbox
     if ($id) {
-      $imap->message_action('DELETE', array($id));
-      $imap->message_action('EXPUNGE', array($id));
+      $mailbox->message_action($specials['draft'], 'DELETE', array($id));
+      $mailbox->message_action($specials['draft'], 'EXPUNGE', array($id));
     }
 
-    foreach ($mailbox_page[1] as $mail) {
-        $msg_header = $imap->get_message_headers($mail['uid']);
+    foreach ($messages[1] as $mail) {
+        $msg_header = $mailbox->get_message_headers($specials['draft'], $mail['uid']);
         // Convert all header keys to lowercase
         $msg_header_lower = array_change_key_case($msg_header, CASE_LOWER);
         $mime_headers_lower = array_change_key_case($mime->get_headers(), CASE_LOWER);
@@ -2141,14 +2137,6 @@ function profile_from_compose_smtp_id($profiles, $id) {
 /**
  * @subpackage smtp/functions
  */
-if (!hm_exists('smtp_authed')) {
-function smtp_authed($smtp) {
-    return is_object($smtp) && $smtp->state == 'authed';
-}}
-
-/**
- * @subpackage smtp/functions
- */
 if (!hm_exists('parse_mailto')) {
 function parse_mailto($str) {
     $res = array(
@@ -2188,6 +2176,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
+        'type' => 'smtp',
         'server' => $smtp_server,
         'port' => $smtp_port,
         'tls' => $smtp_tls,
