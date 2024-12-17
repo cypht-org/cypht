@@ -2436,7 +2436,7 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
 class Hm_output_combined_message_list extends Hm_Output_Module {
     protected function output() {
         $messageList = [];
-        $style = $this->get('news_list_style') ? 'news' : 'email';
+        $style = $this->get('news_list_style') || $this->get('is_mobile') ? 'news' : 'email';
         if ($this->get('imap_combined_inbox_data')) {
             $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, false, $style));
         }
