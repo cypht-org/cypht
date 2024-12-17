@@ -60,10 +60,13 @@ async function navigate(url) {
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
 
+        let cyphtMain;
         if ($(main).attr('id') === 'cypht-main') {
             $('main#cypht-main').replaceWith(main);
+            cyphtMain = main;
         } else {
             $('main#cypht-main').replaceWith($(main).find('#cypht-main'));
+            cyphtMain = $(main).find('#cypht-main').prop('outerHTML');
         }
         document.title = title.replace(/<[^>]*>/g, '');
         
@@ -75,7 +78,7 @@ async function navigate(url) {
 
         const unMountCallback = renderPage(url);
 
-        history.pushState({ main, head }, "", url);
+        history.pushState({ main: cyphtMain, head }, "", url);
         
         if (unMountCallback) {
             unMountSubscribers[url] = unMountCallback;

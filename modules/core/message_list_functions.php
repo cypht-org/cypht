@@ -307,7 +307,14 @@ function subject_callback($vals, $style, $output_mod) {
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
     if ($style == 'news') {
+        if ($output_mod->get('is_mobile')) {
+            return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
+        }
         return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
+    }
+
+    if ($output_mod->get('is_mobile')) {
+        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
     }
     return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
 }}

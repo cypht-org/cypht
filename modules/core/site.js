@@ -748,7 +748,6 @@ function Message_List() {
                 self.clear_read_messages();
             }
             self.set_row_events();
-            $('.combined_sort').show();
         }
         if (getPageNameParam() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
@@ -841,8 +840,9 @@ function Message_List() {
     };
 
     this.prev_next_links = function(msgUid, lisPath = getListPathParam()) {
-        let phref;
-        let nhref;
+        let prevUrl;
+        let nextUrl;
+                
         const target = $('.msg_headers tr').last();
         const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number());
         messages.load(false, true);
@@ -850,21 +850,23 @@ function Message_List() {
         const prev = messages.getPreviousRowForMessage(msgUid);
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject a');
-            phref = prevSubject.prop('href');
+            prevUrl = new URL(prevSubject.prop('href'));
+            prevUrl.searchParams.set('list_parent', lisPath);
             const subject = prevSubject.text();
-            const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+            const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
         }
         if (next) {
             const nextSubject = $(next['0']).find('.subject a');
-            nhref = nextSubject.prop('href');
+            nextUrl = new URL(nextSubject.prop('href'));
+            nextUrl.searchParams.set('list_parent', lisPath);
             const subject = nextSubject.text();
             
-            const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+            const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
             $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
         }
 
-        return [phref, nhref];
+        return [prevUrl?.href, nextUrl?.href];
     };
 
     this.check_empty_list = function() {
@@ -882,7 +884,6 @@ function Message_List() {
         }
         else {
             $('.empty_list').remove();
-            $('.combined_sort').show();
         }
         return count === 0;
     };
@@ -2275,7 +2276,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false);
     });
 }
 
@@ -2362,7 +2363,7 @@ const handleExternalResources = (inline) => {
                 if (inline) {
                     inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
                 } else {
-                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
                 }
             }).finally(() => {
                 popover.dispose();
