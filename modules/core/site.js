@@ -477,6 +477,7 @@ function Message_List() {
         'unread': 'formatted_unread_data',
         'flagged': 'formatted_flagged_data',
         'junk': 'formatted_junk_data',
+        'snoozed': 'formatted_snoozed_data',
         'trash': 'formatted_trash_data',
         'sent': 'formatted_sent_data',
         'drafts': 'formatted_drafts_data',
@@ -615,6 +616,9 @@ function Message_List() {
             remove = true;
         }
         if (action_type == 'unflag' && getListPathParam() == 'flagged') {
+            remove = true;
+        }
+        if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
             remove = true;
         }
         else if (action_type == 'delete' || action_type == 'archive') {
@@ -1057,6 +1061,7 @@ function Message_List() {
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
     this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
+    this.set_snoozed_state = function() { self.set_message_list_state('formatted_snoozed_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
     this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };

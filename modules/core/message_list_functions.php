@@ -50,6 +50,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('junk_per_source_setting', DEFAULT_JUNK_PER_SOURCE);
         $mailbox_list_title = array('Junk');
     }
+    elseif ($path == 'snoozed') {
+        $list_path = 'snoozed';
+        $message_list_since = $handler->user_config->get('snoozed_since_setting', DEFAULT_SNOOZED_SINCE);
+        $per_source_limit = $handler->user_config->get('snoozed_per_source_setting', DEFAULT_SNOOZED_PER_SOURCE);
+        $mailbox_list_title = array('Snoozed');
+    }
     elseif ($path == 'trash') {
         $list_path = 'trash';
         $message_list_since = $handler->user_config->get('trash_since_setting', DEFAULT_TRASH_SINCE);
