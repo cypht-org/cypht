@@ -2438,7 +2438,7 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
         $messageList = [];
         $style = $this->get('news_list_style') || $this->get('is_mobile') ? 'news' : 'email';
         if ($this->get('imap_combined_inbox_data')) {
-            $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, false, $style));
+            $messageList = array_merge($messageList, format_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox', $style));
         }
         if ($this->get('feed_list_data')) {
             $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));

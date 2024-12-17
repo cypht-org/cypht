@@ -42,7 +42,7 @@ var inline_imap_msg = function(details, uid, list_path, inline_msg_loaded_callba
     clear_open_msg(inline_msg_style());
     msg_container(inline_msg_style(), path);
 
-    imap_setup_message_view_page(uid, details, list_path, inline_msg_loaded_callback);
+    imap_setup_message_view_page(uid, details, list_path, list_path, inline_msg_loaded_callback);
     $('.part_encoding').hide();
     $('.part_charset').hide();
     $('div', $(path)).removeClass('unseen');
@@ -131,7 +131,7 @@ var capture_subject_click = function() {
             if ($('.header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
                 $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
                 $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-                $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, details, inline_msg_loaded_callback); });
+                $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, list_path, details, inline_msg_loaded_callback); });
             }
             update_imap_links(uid, details);
         };
