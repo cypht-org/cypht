@@ -66,11 +66,11 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
                     foreach ($msg_struct[0]['subs'] as $ind => $sub) {
                         if ($ind != '0.1') {
-                            $new_attachment['basename'] = $sub['description'];
-                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['basename'] = $sub['attributes']['name'];
+                            $new_attachment['name'] = $sub['attributes']['name'];
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
-                            $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
+                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . md5($this->session->get('username', false)) . DIRECTORY_SEPARATOR . $new_attachment['name'];
                             $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
@@ -134,15 +134,16 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                 if (array_key_exists(0, $msg_struct) && array_key_exists('subs', $msg_struct[0])) {
                     foreach ($msg_struct[0]['subs'] as $ind => $sub) {
                         if ($ind != '0.1') {
-                            $new_attachment['basename'] = $sub['description'];
-                            $new_attachment['name'] = $sub['description'];
+                            $new_attachment['basename'] = $sub['attributes']['name'];;
+                            $new_attachment['name'] = $sub['attributes']['name'];
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
-                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . $new_attachment['name'];
+                            $file_path = $this->config->get('attachment_dir') . DIRECTORY_SEPARATOR . md5($this->session->get('username', false)) . DIRECTORY_SEPARATOR . $new_attachment['name'];
                             $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
+                            $new_attachement['sub'] = json_encode($sub);
                             $attached_files[$this->request->get['uid']][] = $new_attachment;
                         }
                     }
