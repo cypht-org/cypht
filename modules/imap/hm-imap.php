@@ -901,7 +901,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED)]";
             if ($include_content_body) {
-                $command .= " BODY.PEEK[0.1]";
+                $command .= " BODY.PEEK[TEXT]<0.500>";
             }
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
@@ -938,9 +938,11 @@ if (!class_exists('Hm_IMAP')) {
                     $x_auto_bcc = '';
                     $x_snoozed = '';
                     $count = count($vals);
+                    $head_finded = false;
+                    $body_finded = false;
                     for ($i=0;$i<$count;$i++) {
-                        if ($vals[$i] == 'BODY[HEADER.FIELDS') {
-                                
+                        if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$head_finded) {
+                            $head_finded = true;
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -958,7 +960,8 @@ if (!class_exists('Hm_IMAP')) {
                                 }
                             }
                         }
-                        elseif ($vals[$i] == 'BODY[0.1') {
+                        elseif ($vals[$i] == 'BODY[TEXT' && !$body_finded) {
+                            $body_finded = true;
                             $content = '';
                             $i++;
                             $i++;
@@ -967,7 +970,10 @@ if (!class_exists('Hm_IMAP')) {
                                 $i++;
                             }
                             $i++;
-                            $flds['body'] = $content;
+                            $flds['body'] = $this->parseEmailBody($content);
+                            if (!$head_finded) {
+                                $i = 0;
+                            }
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
                             if (isset($vals[($i + 1)])) {
@@ -986,7 +992,6 @@ if (!class_exists('Hm_IMAP')) {
                             }
                         }
                     }
-
                     if ($uid) {
                         $cset = '';
                         if (mb_stristr($content_type, 'charset=')) {
@@ -1033,6 +1038,27 @@ if (!class_exists('Hm_IMAP')) {
             }
             $struct = $this->parse_bodystructure_response($result);
             return $struct;
+        }
+
+        private function parseEmailBody($raw_data) {
+            // Split content into parts
+            $parts = preg_split("/\r\n\r\n/", $raw_data, 2);
+        
+            // Check if metadata (MIME headers) are present
+            if (count($parts) > 1) {
+                // Focus only on the body after headings
+                $body = $parts[1];
+        
+                // Decode content if encoded as quoted-printable
+                if (strpos($parts[0], "Content-Transfer-Encoding: quoted-printable") !== false) {
+                    $body = quoted_printable_decode($body);
+                }
+        
+                // return the Cleansed Body
+                return trim($body);
+            }
+        
+            return $raw_data;
         }
 
         /**
