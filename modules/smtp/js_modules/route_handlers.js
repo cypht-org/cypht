@@ -1,5 +1,5 @@
 // TODO: This function is too large for a route handler, decouple it into multiple functions with action scope focused.
-function applyComposePageHandlers() {
+function applySmtpComposePageHandlers() {
     init_resumable_upload()
 
     if (window.HTMLEditor) {
@@ -244,11 +244,6 @@ function applyComposePageHandlers() {
             }
         });
     }
-
-    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
-    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
-    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
-    $('.compose_to').focus();
 
     if (window.pgpComposePageHandler) pgpComposePageHandler();
     if (window.profilesComposePageHandler) profilesComposePageHandler();

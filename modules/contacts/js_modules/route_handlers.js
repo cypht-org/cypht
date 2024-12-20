@@ -31,3 +31,10 @@ function applyContactsPageHandlers() {
     });
     contact_import_pagination();
 }
+
+function applyContactsAutocompleteComposePageHandlers() {
+    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
+    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
+    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
+    $('.compose_to').focus();
+}

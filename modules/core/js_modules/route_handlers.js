@@ -100,3 +100,10 @@ function applyMessagePageHandlers(routeParams) {
             break;
     }
 }
+
+function applyComposePageHandlers(routeParams) {
+    applySmtpComposePageHandlers(routeParams);
+    if (hm_module_is_supported('contacts')) {
+        applyContactsAutocompleteComposePageHandlers(routeParams);
+    }
+}
