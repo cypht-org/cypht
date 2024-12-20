@@ -87,35 +87,32 @@ var autocomplete_contact = function(e, class_name, list_div) {
             [{'name': 'hm_ajax_hook', 'value': 'ajax_autocomplete_contact'},
             {'name': 'contact_value', 'value': fld_val}],
             function(res) {
-                var active = $(document.activeElement).attr('class');
-                if (active == 'compose_to' || active == 'compose_bcc' || active == 'compose_cc') {
-                    if (res.contact_suggestions) {
-                        var i;
-                        var count = 0;
-                        $(list_div).html('');
-                        for (i in res.contact_suggestions) {
-                            var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
-
-                            div.html(suggestion.contact);
-                            if ($(class_name).val().match(div.text())) {
-                                continue;
-                            }
-                            if (count == 0) {
-                                first = 'first ';
-                            }
-                            else {
-                                first = '';
-                            }
-                            count++;
-                            $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion" data-id="'+suggestion.contact_id+'" data-type="'+suggestion.type+'" data-source="'+suggestion.source+'" unread_link">'+suggestion.contact+'</a>');
+                if (res.contact_suggestions) {
+                    var i;
+                    var count = 0;
+                    $(list_div).html('');
+                    for (i in res.contact_suggestions) {
+                        var suggestion = JSON.parse(res.contact_suggestions[i].replace(/&quot;/g, '"'))
+                        
+                        div.html(suggestion.contact);
+                        if ($(class_name).val().match(div.text())) {
+                            continue;
                         }
-                        if (count > 0) {
-                            $(list_div).show();
-                            setup_autocomplete_events(class_name, list_div, fld_val);
+                        if (count == 0) {
+                            first = 'first ';
                         }
                         else {
-                            $(list_div).hide();
+                            first = '';
                         }
+                        count++;
+                        $(list_div).append('<a tabindex="1" href="#" class="'+first+'contact_suggestion" data-id="'+suggestion.contact_id+'" data-type="'+suggestion.type+'" data-source="'+suggestion.source+'" unread_link">'+suggestion.contact+'</a>');
+                    }
+                    if (count > 0) {
+                        $(list_div).show();
+                        setup_autocomplete_events(class_name, list_div, fld_val);
+                    }
+                    else {
+                        $(list_div).hide();
                     }
                 }
             }, [], true
