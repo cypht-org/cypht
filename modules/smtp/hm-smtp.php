@@ -39,8 +39,8 @@ class Hm_SMTP_List {
         if (array_key_exists('no_auth', $server)) {
             $config['no_auth'] = true;
         }
-        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session);
-        if (! self::$server_list[$id]['object']->connect($config)) {
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        if (! self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }
         return false;
