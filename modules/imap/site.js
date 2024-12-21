@@ -300,7 +300,7 @@ var add_auto_folder = function(folder) {
 };
 
 var cache_folder_data = function() {
-    if (['sent', 'drafts', 'junk', 'trash','tag'].includes(getListPathParam())) {
+    if (['sent', 'drafts', 'junk','snoozed', 'trash','tag'].includes(getListPathParam())) {
         Hm_Message_List.set_message_list_state('formatted_'+getListPathParam()+'_data');
     }
 };
