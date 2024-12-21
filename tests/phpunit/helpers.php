@@ -101,8 +101,8 @@ class Hm_IMAP_List extends Hm_Server_Wrapper {
         global $user_config, $session;
         Hm_IMAP::$allow_connection = self::$state;
         Hm_IMAP::$allow_auth = self::$state;
-        self::$server_list[$id]['object'] = new Hm_Mailbox($id, $user_config, $session);
-        self::$server_list[$id]['object']->connect([]);
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, $user_config, $session, ['type' => 'imap']);
+        self::$server_list[$id]['object']->connect();
         self::$server_list[$id]['connected'] = true;
         return self::$server_list[$id]['object'];
     }

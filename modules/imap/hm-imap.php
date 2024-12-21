@@ -32,10 +32,6 @@ class Hm_IMAP_List {
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
-        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session);
-        if (self::$use_cache && $cache && is_array($cache)) {
-            self::$server_list[$id]['object']->load_cache($cache, 'array');
-        }
         $config = array(
             'server'    => $server['server'],
             'port'      => $server['port'],
@@ -45,10 +41,17 @@ class Hm_IMAP_List {
             'password'  => $pass,
             'use_cache' => self::$use_cache
         );
+
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
         }
-        return self::$server_list[$id]['object']->connect($config);
+
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        if (self::$use_cache && $cache && is_array($cache)) {
+            self::$server_list[$id]['object']->get_connection()->load_cache($cache, 'array');
+        }
+        
+        return self::$server_list[$id]['object']->connect();
     }
 
     public static function get_cache($hm_cache, $id) {
