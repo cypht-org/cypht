@@ -136,8 +136,18 @@ var Hm_Ajax_Request = function() { return {
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        const url = window.location.next ?? window.location.href;
-        xhr.open('POST', url)
+        const url = new URL(window.location.href);
+        if (window.location.next) {
+            url.search = window.location.next.split('?')[1];
+        }
+        for (const param of url.searchParams) {
+            const configItem = config.data.find(item => item.name === param[0]);
+            if (configItem) {
+                url.searchParams.set(configItem.name, configItem.value);
+            }
+        }
+        
+        xhr.open('POST', url.toString())
         if (config.signal) {
             config.signal.addEventListener('abort', function() {
                 xhr.abort();
@@ -495,11 +505,11 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(msgs) {
-        Hm_Utils.tbody().html('');
+    this.update = function(msgs, id) {
+        Hm_Utils.tbody(id).html('');
         for (const index in msgs) {
             const row = msgs[index][0];
-            Hm_Utils.tbody().append(row);
+            Hm_Utils.tbody(id).append(row);
         }
     };
 
@@ -1542,11 +1552,14 @@ var Hm_Utils = {
         }
     },
 
-    rows: function() {
-        return $('.message_table_body > tr').not('.inline_msg');
+    rows: function(id) {
+        return this.tbody(id).find('tr').not('.inline_msg');
     },
 
-    tbody: function() {
+    tbody: function(id) {
+        if (id) {
+            return $('#'+id);
+        }
         return $('.message_table_body');
     },
 

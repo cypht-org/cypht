@@ -19,10 +19,11 @@ class Hm_MessagesStore {
         this.path = path;
         this.list = path + '_' + page;
         this.rows = rows;
-        this.links = "";
         this.count = 0;
         this.flagAsReadOnOpen = true;
         this.abortController = abortController;
+        this.pages = 0;
+        this.page = page;
     }
 
     /**
@@ -41,7 +42,7 @@ class Hm_MessagesStore {
         const storedMessages = this.#retrieveFromLocalStorage();
         if (storedMessages && !reload) {
             this.rows = storedMessages.rows;
-            this.links = storedMessages.links;
+            this.pages = parseInt(storedMessages.pages);
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
             return this;
@@ -51,10 +52,10 @@ class Hm_MessagesStore {
             return this;
         }
 
-        const { formatted_message_list: updatedMessages, page_links: pageLinks, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
+        const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open } = await this.#fetch(hideLoadingState);
 
         this.count = folder_status && Object.values(folder_status)[0]?.messages;
-        this.links = pageLinks;
+        this.pages = parseInt(pages);
         this.rows = updatedMessages;
         this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
 
@@ -195,12 +196,13 @@ class Hm_MessagesStore {
         }
         
         config.push({ name: "hm_ajax_hook", value: hook });
+        config.push({ name: "list_page", value: this.page });
 
         return config;
     }
 
     #saveToLocalStorage() {
-        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ rows: this.rows, links: this.links, count: this.count }));
+        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ rows: this.rows, pages: this.pages, count: this.count }));
         Hm_Utils.save_to_local_storage('flagAsReadOnOpen', this.flagAsReadOnOpen);
     }
 
