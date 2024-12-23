@@ -1004,6 +1004,8 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             else {
                 $page_num = ($details['offset']/$details['limit']) + 1;
             }
+            $max_pages = ceil($details['detail']['exists']/$details['limit']);
+            $this->out('pages', $max_pages);
             $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
                 $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort')), $this->html_safe($this->get('list_keyword'))));
         }

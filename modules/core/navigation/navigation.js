@@ -76,6 +76,8 @@ async function navigate(url) {
 
         window.location.next = url;
 
+        scrollTo(0, 0);
+
         const unMountCallback = renderPage(url);
 
         history.pushState({ main: cyphtMain, head }, "", url);

@@ -82,7 +82,7 @@ function handleMessagesDragAndDrop() {
                     moveResponses.forEach((response) => {
                         store.removeRow(response.oldUid);
                     });
-                    display_imap_mailbox(store.rows, store.links, getListPathParam());
+                    display_imap_mailbox(store.rows, store.list);
                 }
             );
     

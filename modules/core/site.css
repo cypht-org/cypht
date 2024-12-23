@@ -1491,3 +1491,12 @@ a[disabled] {
   pointer-events: none;
   opacity: 0.6;
 }
+
+.pagination .btn {
+  background-color: #eee;
+}
+
+.pagination .btn.active {
+  background-color: var(--bs-primary);
+  color: var(--bs-white);
+}
