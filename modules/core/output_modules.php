@@ -1996,7 +1996,7 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
      * Close the table opened in Hm_Output_message_list_start
      */
     protected function output() {
-        $res = '</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>';
+        $res = '</tbody></table></div></div>';
         return $res;
     }
 }
@@ -2444,6 +2444,5 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
             $messageList = array_merge($messageList, $this->get('feed_list_data'), Hm_Output_filter_feed_list_data::formatMessageList($this));
         }
         $this->out('formatted_message_list', $messageList);
-        $this->out('page_links', 'There is no pagination in this view, please visit the individual mail boxes.');
     }
 }

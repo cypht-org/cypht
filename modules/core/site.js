@@ -243,7 +243,7 @@ var Hm_Ajax_Request = function() { return {
                         messages.load().then(() => {
                             if (messages.count != res.folder_status[name].messages) {
                                 messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.links);
+                                    display_imap_mailbox(messages.rows, messages.list);
                                 })
                             }
                         });
@@ -889,7 +889,6 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
-                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
