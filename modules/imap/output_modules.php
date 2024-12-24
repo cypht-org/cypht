@@ -976,7 +976,6 @@ class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
     protected function output() {
         if ($this->get('imap_combined_inbox_data')) {
             prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
-            $this->out('page_links', 'There is no pagination in this view, please visit the individual mail boxes.');
         }
         else {
             $this->out('formatted_message_list', array());
@@ -1006,8 +1005,6 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             }
             $max_pages = ceil($details['detail']['exists']/$details['limit']);
             $this->out('pages', $max_pages);
-            $this->out('page_links', build_page_links($details['limit'], $page_num, $details['detail']['exists'],
-                $this->get('imap_mailbox_page_path'), $this->html_safe($this->get('list_filter')), $this->html_safe($this->get('list_sort')), $this->html_safe($this->get('list_keyword'))));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());

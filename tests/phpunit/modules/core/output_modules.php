@@ -1139,6 +1139,6 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_message_list_end() {
         $test = new Output_Test('message_list_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('</tbody></table></div><div class="mb-5 page_links d-flex justify-content-center gap-3 align-content-center"></div></div>'), $res->output_response);
+        $this->assertEquals(array('</tbody></table></div></div>'), $res->output_response);
     }
 }

@@ -1,6 +1,6 @@
 function refreshNextButton(current) {
     const totalPages = $(".pagination .total").text();
-    if (current >= totalPages) {
+    if (parseInt(current) >= parseInt(totalPages)) {
         $(".pagination .next").prop('disabled', true);
     } else {
         $(".pagination .next").prop('disabled', false);
@@ -8,7 +8,7 @@ function refreshNextButton(current) {
 }
 
 function refreshPreviousButton(current) {
-    if (current <= 1) {
+    if (parseInt(current) <= 1) {
         $(".pagination .prev").prop('disabled', true);
     } else {
         $(".pagination .prev").prop('disabled', false);

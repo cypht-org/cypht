@@ -227,7 +227,6 @@ return array(
         'msg_text' => array(FILTER_UNSAFE_RAW, false),
         'msg_source' => array(FILTER_UNSAFE_RAW, false),
         'msg_parts' => array(FILTER_UNSAFE_RAW, false),
-        'page_links' => array(FILTER_UNSAFE_RAW, false),
         'pages' => array(FILTER_VALIDATE_INT, false),
         'folder_status' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'imap_server_id' => array(FILTER_DEFAULT, false),
