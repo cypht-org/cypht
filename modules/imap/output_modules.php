@@ -997,12 +997,6 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
             $details = $this->get('imap_folder_detail');
             $type = mb_stripos($details['name'], 'Sent') !== false ? 'sent' : false;
             prepare_imap_message_list($this->get('imap_mailbox_page'), $this, $type);
-            if ($details['offset'] == 0) {
-                $page_num = 1;
-            }
-            else {
-                $page_num = ($details['offset']/$details['limit']) + 1;
-            }
             $max_pages = ceil($details['detail']['exists']/$details['limit']);
             $this->out('pages', $max_pages);
         }
