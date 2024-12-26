@@ -174,10 +174,9 @@ class Hm_MessagesStore {
         } else {
             switch (this.path) {
                 case 'unread':
-                    hook = "ajax_imap_unread";
-                    break;
                 case 'flagged':
-                    hook = "ajax_imap_flagged";
+                    hook = "ajax_imap_filter_by_type";
+                    config.push({ name: "filter_type", value: this.path });
                     break;
                 case 'combined_inbox':
                     hook = "ajax_combined_message_list";

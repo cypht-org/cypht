@@ -894,34 +894,16 @@ class Hm_Output_filter_imap_search extends Hm_Output_Module {
 }
 
 /**
- * Format message headers for the Flagged page
+ * Format message headers for the unread and flagged page
  * @subpackage imap/output
  */
-class Hm_Output_filter_flagged_data extends Hm_Output_Module {
+class Hm_Output_filter_by_type extends Hm_Output_Module {
     /**
      * Build ajax response for the Flagged message list
      */
     protected function output() {
-        if ($this->get('imap_flagged_data')) {
-            prepare_imap_message_list($this->get('imap_flagged_data'), $this, 'flagged');
-        }
-        elseif (!$this->get('formatted_message_list')) {
-            $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format message headers for the Unread page
- * @subpackage imap/output
- */
-class Hm_Output_filter_unread_data extends Hm_Output_Module {
-    /**
-     * Build ajax response for the Unread message list
-     */
-    protected function output() {
-        if ($this->get('imap_unread_data')) {
-            prepare_imap_message_list($this->get('imap_unread_data'), $this, 'unread');
+        if ($this->get('imap_filter_by_type_data')) {
+            prepare_imap_message_list($this->get('imap_filter_by_type_data'), $this, $this->get('type'));
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());

@@ -1307,51 +1307,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
         }
 
-        // Ensure the end list is the same length as the limit
-        $addCountFromNext = 0;
-        $addCountFromPrevious = 0;
-        $messagesList = [];
-        foreach ($messagesLists as $index => $list) {
-            if (empty($list)) {
-                continue;
-            }
-            if (isset($messagesLists[$index + 1])) {
-                $next = $messagesLists[$index + 1];
-                // if (count($next) < $maxPerSource) {
-                //     $addCountFromNext = $maxPerSource - count($next);
-                // }
-                if (count($list) > $maxPerSource) {
-                    // $next = array_merge($next, array_slice($list, $maxPerSource - count($next)));
-                    $list = array_slice($list, 0, $maxPerSource);
-                } else if (count($list) < $maxPerSource) {
-                    $listOverflow = $maxPerSource - count($list);
-                    $list = array_merge($list, array_slice($next, 0, $listOverflow));
-                    $next = array_slice($next, $listOverflow, $maxPerSource);
-                }
-                $messagesLists[$index + 1] = ["changed"];
-            } else {
-                $list = array_slice($list, 0, $maxPerSource);
-            }
-
-            // Hm_Msgs::add('list curr: '. $index . ' : ' . count($list));
-
-            // if ($addCountFromNext > 0) {
-            //     $length = $maxPerSource + $addCountFromNext;
-            // } else {
-            //     $length = $maxPerSource + $addCountFromPrevious;
-            // }
-
-            // $current = array_slice($list, 0, $length);
-
-            // $addCountFromPrevious = 0;
-            // $addCountFromNext = 0;
-
-            // if (count($current) < $maxPerSource) {
-            //     $addCountFromPrevious = $maxPerSource - count($current);
-            // }
-
-            $messagesList = array_merge($messagesList, $list);
-        }
+        $messagesList = array_merge(...trimMessagesListsForEqualSizes($messagesLists, $maxPerSource));
 
         usort($messagesList, function($a, $b) {
             return strtotime($b['internal_date']) - strtotime($a['internal_date']);
@@ -1369,29 +1325,82 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
  * Get message headers for the Flagged page
  * @subpackage imap/handler
  */
-class Hm_Handler_imap_flagged extends Hm_Handler_Module {
+class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
     /**
      * Fetch flagged messages from an IMAP server
      */
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
-            $ids = explode(',', $form['imap_server_ids']);
-            $folder = bin2hex('INBOX');
-            if (array_key_exists('folder', $this->request->post)) {
-                $folder = $this->request->post['folder'];
-            }
-            $folders = array($folder);
+        $data_sources = imap_data_sources();
+        $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
+
+        $filter_type = $this->request->post['filter_type'];
+
+        if ($filter_type === 'flagged') {
+            $filter = 'FLAGGED';
+        } else if ($filter_type === 'unread') {
+            $filter = 'UNSEEN';
         } else {
-            $data_sources = imap_data_sources();
-            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
-            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
+            Hm_Msgs::add('ERRInvalid filter type');
+            return;
         }
+
+        $list_page = (int) $this->request->get['list_page'];
+        $keyword = $this->request->get['keyword'] ?? '';
         $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
-        $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
-        list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+
+        $maxPerSource = round($limit / count($data_sources));
+        $offset = 0;
+
+        if ($list_page && $list_page > 1) {
+            $offset = ($list_page - 1)*$maxPerSource;
+        }
+
+        $messagesLists = [];
+        $totalMessages = 0;
+        $searchTerms = [];
+        if ($keyword) {
+            $searchTerms[] = ['TEXT', $keyword];
+        }
+        foreach ($data_sources as $dataSource) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                $folder = $dataSource['folder'];
+                $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
+                $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
+
+                $uids = $mailbox->search(hex2bin($folder), $filter, false, $searchTerms);
+                $total = count($uids);
+                $uids = array_slice($uids, $offset, $limit);
+
+                $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
+                $messages = [];
+                foreach ($uids as $uid) {
+                    if (isset($headers[$uid])) {
+                        $messages[] = $headers[$uid];
+                    }
+                }
+
+                $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
+                    $msg['server_id'] = $dataSource['id'];
+                    $msg['server_name'] = $dataSource['name'];
+                    $msg['folder'] = $folder;
+                    return $msg;
+                }, $messages);
+                $totalMessages += $total;
+            }
+        }
+
+        $messagesList = array_merge(...trimMessagesListsForEqualSizes($messagesLists, $maxPerSource));
+
+        usort($messagesList, function($a, $b) {
+            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
+        });
+
+        $maxPages = ceil($totalMessages / $limit);
+        $this->out('pages', $maxPages);
         $this->out('folder_status', $status);
-        $this->out('imap_flagged_data', $msg_list);
+        $this->out('imap_filter_by_type_data', $messagesList);
+        $this->out('type', $filter_type);
         $this->out('imap_server_ids', implode(',', $ids));
     }
 }
@@ -2146,49 +2155,18 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         } else {
             $data_sources = imap_sources($this, $this->request->get['list_path']);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
-            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
         $path = $this->request->get['list_path'];
-        $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
-        // $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_UNREAD_SINCE));
-        // if (! isset($folders) || empty($folders)) {
-        //     $folder = bin2hex('INBOX');
-        //     if (array_key_exists('folder', $this->request->post)) {
-        //         $folder = $this->request->post['folder'];
-        //     }
-        //     if (hex2bin($folder) == 'SPECIAL_USE_CHECK' || hex2bin($folder) == 'INBOX') {
-        //         list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), true);
-        //     } else {
-        //         list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), $limit, array(array('SINCE', $date)), false);
-        //     }
+        $keyword = $this->request->get['keyword'] ?? '';
+        $list_page = (int) $this->request->get['list_page'] ?? 1;
 
-        //     $folders = array();
-        //     foreach ($msg_list as $msg) {
-        //         if (hex2bin($msg['folder']) != hex2bin($folder)) {
-        //             $folders[] = hex2bin($msg['folder']);
-        //         }
-        //     }
-        //     if (count($folders) > 0) {
-        //         $auto_folder = $folders[0];
-        //         $this->out('auto_'.$path.'_folder', $msg_list[0]['server_name'].' '.$auto_folder);
-        //     }
-        // } else {
-        //     list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)), false);
-        // }
-        // if (array_key_exists('keyword', $this->request->get)) {
-        //     $keyword = $this->request->get['keyword'];
-        //     $search_pattern = "/$keyword/i";
-        //     $search_result = array_filter($msg_list, function($filter_msg_list) use ($search_pattern) {
-        //         return preg_grep($search_pattern, $filter_msg_list);
-        //     });
-        //     $msg_list = $search_result;
-        // }
+        $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
 
         list($sort, $rev) = process_sort_arg($this->get('list_sort'));
+
         $maxPerSource = round($limit / count($data_sources));
         $offset = 0;
 
-        $list_page = (int) $this->request->get['list_page'];
         if ($list_page && $list_page > 1) {
             $offset = ($list_page - 1)*$maxPerSource;
         }
@@ -2202,7 +2180,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
                 $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
                 $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
 
-                list($total, $result) = $mailbox->get_messages(hex2bin($folder), $sort, $rev, 'ALL', $offset, $limit, '', null, false);
+                list($total, $result) = $mailbox->get_messages(hex2bin($folder), $sort, $rev, 'ALL', $offset, $limit, $keyword, null, false);
                 $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
                     $msg['server_id'] = $dataSource['id'];
                     $msg['server_name'] = $dataSource['name'];
@@ -2213,29 +2191,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
             }
         }
 
-        // Ensure the end list is the same length as the limit
-        $addCountFromNext = 0;
-        $addCountFromPrevious = 0;
-        $messagesList = [];
-        foreach ($messagesLists as $index => $list) {
-            if (isset($messagesLists[$index + 1])) {
-                $next = $messagesLists[$index + 1];
-                if (count($next) < $maxPerSource) {
-                    $addCountFromNext = $maxPerSource - count($next);
-                }
-            }
-
-            $current = array_slice($list, 0, $maxPerSource + $addCountFromNext + $addCountFromPrevious);
-
-            $addCountFromPrevious = 0;
-            $addCountFromNext = 0;
-
-            if (count($current) < $maxPerSource) {
-                $addCountFromPrevious = $maxPerSource - count($current);
-            }
-
-            $messagesList = array_merge($messagesList, $current);
-        }
+        $messagesList = array_merge(...trimMessagesListsForEqualSizes($messagesLists, $maxPerSource));
 
         usort($messagesList, function($a, $b) {
             return strtotime($b['internal_date']) - strtotime($a['internal_date']);

@@ -1585,3 +1585,42 @@ if (!hm_exists('connect_to_imap_server')) {
         }
     }
 }
+
+function trimMessagesListsForEqualSizes($messagesLists, $listSize) {
+    $addCountFromNext = 0;
+    $addCountFromPrevious = 0;
+    $endLists = [];
+    foreach ($messagesLists as $index => $list) {
+        if (isset($messagesLists[$index + 1])) {
+            $next = $messagesLists[$index + 1];
+            if (count($next) < $listSize) {
+                $addCountFromNext = $listSize - count($next);
+            }
+        }
+
+        $prev = end($endLists) ?: [];
+        $prevAdded = count($prev) ? count($prev) - $listSize : 0;
+
+        $size = $listSize + $addCountFromNext + $addCountFromPrevious;
+        if ($prevAdded < 0) {
+            $size += $prevAdded;
+        } else {
+            $size -= $prevAdded;
+        }
+
+        $current = array_slice($list, 0, $size);
+
+        $addCountFromPrevious = 0;
+        $addCountFromNext = 0;
+
+        if (count($current) < $listSize) {
+            $addCountFromPrevious = $listSize - count($current);
+        }
+
+        if (!empty($current)) {
+            $endLists[] = $current;
+        }
+    }
+
+    return $endLists;
+}
