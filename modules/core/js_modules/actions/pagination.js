@@ -20,7 +20,10 @@ async function nextPage() {
 
     const nextPage = parseInt(currentPage) + 1;
 
-    await changePage(nextPage, this);
+    const store = new Hm_MessagesStore(getListPathParam(), currentPage);
+    store.load(false, false, true);
+
+    await changePage(nextPage, this, store.offsets);
 }
 
 async function previousPage() {
@@ -28,19 +31,33 @@ async function previousPage() {
 
     const previousPage = parseInt(currentPage) - 1;
 
-    await changePage(previousPage, this);
+    let offsets = '';
+    if (previousPage > 1) {
+        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1);
+        store.load(false, false, true);
+        offsets = store.offsets;
+    }
+
+    await changePage(previousPage, this, offsets);
 
     if (previousPage > 1) {
         $(this).prop('disabled', false);
     }
 }
 
-async function changePage(toPage, button) {
+async function changePage(toPage, button, offsets) {
     $(button).prop('disabled', true);
     $(button).addClass('active');
 
     const url = new URL(window.location.href);
     url.searchParams.set('list_page', toPage);
+
+    if (offsets) {
+        url.searchParams.set('offsets', offsets);
+    } else {
+        url.searchParams.delete('offsets');
+    }
+
     history.pushState(history.state, "", url.toString());
     window.location.next = url.search;
 

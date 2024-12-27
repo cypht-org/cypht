@@ -1586,41 +1586,30 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
-function trimMessagesListsForEqualSizes($messagesLists, $listSize) {
-    $addCountFromNext = 0;
-    $addCountFromPrevious = 0;
-    $endLists = [];
-    foreach ($messagesLists as $index => $list) {
-        if (isset($messagesLists[$index + 1])) {
-            $next = $messagesLists[$index + 1];
-            if (count($next) < $listSize) {
-                $addCountFromNext = $listSize - count($next);
+function flattenMessagesLists($messagesLists, $listSize) {
+    $endList = [];
+    $sizesTaken = [];
+
+    $max = $listSize * count($messagesLists);
+
+    while (count($endList) < $listSize * count($messagesLists) && count(array_filter($messagesLists, fn ($list) => count($list) > 0)) > 0) {
+        foreach ($messagesLists as $index => $list) {
+            if (count($list) > 0) {
+                $part = array_slice($list, 0, $listSize);
+                $endList = array_merge($endList, $part);
+                $messagesLists[$index] = array_slice($list, $listSize);
+                $sizesTaken[$index] = $sizesTaken[$index] ? $sizesTaken[$index] + count($part) : count($part);
+                $totalTakens = array_sum(array_values($sizesTaken));
+                if ($totalTakens > $max) {
+                    $sizesTaken[$index] = $sizesTaken[$index] - ($totalTakens - $max);
+                }
+            } else {
+                $sizesTaken[$index] = $sizesTaken[$index] ? $sizesTaken[$index] : 0;
             }
-        }
-
-        $prev = end($endLists) ?: [];
-        $prevAdded = count($prev) ? count($prev) - $listSize : 0;
-
-        $size = $listSize + $addCountFromNext + $addCountFromPrevious;
-        if ($prevAdded < 0) {
-            $size += $prevAdded;
-        } else {
-            $size -= $prevAdded;
-        }
-
-        $current = array_slice($list, 0, $size);
-
-        $addCountFromPrevious = 0;
-        $addCountFromNext = 0;
-
-        if (count($current) < $listSize) {
-            $addCountFromPrevious = $listSize - count($current);
-        }
-
-        if (!empty($current)) {
-            $endLists[] = $current;
         }
     }
 
-    return $endLists;
+    $endList = array_slice($endList, 0, $max);
+
+    return ['messages' => $endList, 'offsets' => $sizesTaken];
 }

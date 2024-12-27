@@ -325,7 +325,6 @@ return array(
     'allowed_pages' => array(
         'ajax_imap_debug',
         'ajax_imap_status',
-        'ajax_imap_unread',
         'ajax_imap_folder_data',
         'ajax_imap_filter_by_type',
         'ajax_imap_folder_expand',
@@ -372,6 +371,7 @@ return array(
         'do_not_flag_as_read_on_open' => array(FILTER_VALIDATE_BOOLEAN, false),
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
+        'offsets' => array(FILTER_DEFAULT, false),
     ),
 
     'allowed_get' => array(
@@ -382,6 +382,7 @@ return array(
         'imap_msg_part' => FILTER_DEFAULT,
         'imap_msg_uid' => FILTER_DEFAULT,
         'imap_folder' => FILTER_DEFAULT,
+        'offsets' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_post' => array(
