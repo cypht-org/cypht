@@ -6,7 +6,7 @@ const paginationMarkup = (totalPages) => {
                 <i class="bi bi-chevron-left"></i>
             </button>
             <div>
-                <span class="current">${currentPage}</span>/<span class="total">${totalPages}</span>
+                <span class="current">${currentPage}</span>/<span class="max">${totalPages}</span>
             </div>
             <button class="btn rounded-circle btn-sm next">
                 <i class="bi bi-chevron-right"></i>
