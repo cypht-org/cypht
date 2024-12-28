@@ -1248,10 +1248,6 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
 
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
-            $folder = bin2hex('INBOX');
-            if (array_key_exists('folder', $this->request->post)) {
-                $folder = $this->request->post['folder'];
-            }
         } else {
             $userCustomSources = $this->session->get('custom_imap_sources', user:true);
             if (! $userCustomSources) {
@@ -1288,49 +1284,23 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $filter = mb_strtoupper($this->get('list_filter'));
         }
 
-        $messagesLists = [];
-        $totalMessages = 0;
-        foreach ($data_sources as $dataSource) {
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $this->cache);
-            if ($mailbox && $mailbox->authed()) {
-                $folder = $dataSource['folder'];
-                $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
-                $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
-
-                $uids = $mailbox->search(hex2bin($folder), $filter, false, [['SINCE', $date]]);
-                $total = count($uids);
-                // most recent messages at the top
-                $uids = array_reverse($uids);
-                $uids = array_slice($uids, $offset, $limit);
-
-                $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-                $messages = [];
-                foreach ($uids as $uid) {
-                    if (isset($headers[$uid])) {
-                        $messages[] = $headers[$uid];
-                    }
-                }
-
-                $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
-                    $msg['server_id'] = $dataSource['id'];
-                    $msg['server_name'] = $dataSource['name'];
-                    $msg['folder'] = $folder;
-                    return $msg;
-                }, $messages);
-                $totalMessages += $total;
-            }
+        $offsets = $this->request->get['offsets'] ?? '';
+        if ($offsets) {
+            $offsets = explode(',', $offsets);
         }
 
-        $list = flattenMessagesLists($messagesLists, $maxPerSource);
+        $result = getCombinedMessagesLists($data_sources, $this->cache, [['SINCE', $date]], $list_page, $limit, $offsets, $offset, $filter);
+
+        $list = flattenMessagesLists($result['lists'], $maxPerSource);
         $messagesList = $list['messages'];
 
         usort($messagesList, function($a, $b) {
             return strtotime($b['internal_date']) - strtotime($a['internal_date']);
         });
 
-        $maxPages = ceil($totalMessages / $limit);
+        $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
-        $this->out('folder_status', $status);
+        $this->out('folder_status', $result['status']);
         $this->out('imap_combined_inbox_data', $messagesList);
         $this->out('imap_server_ids', implode(',', $ids));
         $this->out('offsets', implode(',', $list['offsets']));
@@ -1374,8 +1344,6 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
             $offset = ($list_page - 1)*$maxPerSource;
         }
 
-        $messagesLists = [];
-        $totalMessages = 0;
         $searchTerms = [];
         if ($keyword) {
             $searchTerms[] = ['TEXT', $keyword];
@@ -1384,54 +1352,19 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
             $offsets = explode(',', $offsets);
         }
         $searchTerms[] = ['SINCE', $date];
-        foreach ($data_sources as $index => $dataSource) {
+        
+        $result = getCombinedMessagesLists($data_sources, $this->cache, $searchTerms, $list_page, $limit, $offsets, $offset, $filter);
 
-            if ($offsets && $list_page > 1) {
-                if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
-                    $offset = (int) $offsets[$index] * ($list_page - 1);
-                }
-            }
-
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $this->cache);
-            if ($mailbox && $mailbox->authed()) {
-                $folder = $dataSource['folder'];
-                $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
-                $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
-
-                $uids = $mailbox->search(hex2bin($folder), $filter, false, $searchTerms);
-                $total = count($uids);
-                // most recent messages at the top
-                $uids = array_reverse($uids);
-                $uids = array_slice($uids, $offset, $limit);
-
-                $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-                $messages = [];
-                foreach ($uids as $uid) {
-                    if (isset($headers[$uid])) {
-                        $messages[] = $headers[$uid];
-                    }
-                }
-
-                $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
-                    $msg['server_id'] = $dataSource['id'];
-                    $msg['server_name'] = $dataSource['name'];
-                    $msg['folder'] = $folder;
-                    return $msg;
-                }, $messages);
-                $totalMessages += $total;
-            }
-        }
-
-        $list = flattenMessagesLists($messagesLists, $maxPerSource);
+        $list = flattenMessagesLists($result['lists'], $maxPerSource);
         $messagesList = $list['messages'];
 
         usort($messagesList, function($a, $b) {
             return strtotime($b['internal_date']) - strtotime($a['internal_date']);
         });
 
-        $maxPages = ceil($totalMessages / $limit);
+        $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
-        $this->out('folder_status', $status);
+        $this->out('folder_status', $result['status']);
         $this->out('imap_filter_by_type_data', $messagesList);
         $this->out('type', $filter_type);
         $this->out('imap_server_ids', implode(',', $ids));
@@ -2159,11 +2092,10 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         $path = $this->request->get['list_path'];
         $keyword = $this->request->get['keyword'] ?? '';
         $list_page = (int) $this->request->get['list_page'] ?? 1;
+        $offsets = $this->request->get['offsets'] ?? '';
 
         $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
         $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
-
-        list($sort, $rev) = process_sort_arg($this->get('list_sort'));
 
         $maxPerSource = round($limit / count($data_sources));
         $offset = 0;
@@ -2172,56 +2104,28 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
             $offset = ($list_page - 1)*$maxPerSource;
         }
 
-        $messagesLists = [];
-        $totalMessages = 0;
         $searchTerms = [];
 
         if ($keyword) {
             $searchTerms[] = ['TEXT', $keyword];
         }
+        if ($offsets) {
+            $offsets = explode(',', $offsets);
+        }
         $searchTerms[] = ['SINCE', $date];
 
-        foreach ($data_sources as $dataSource) {
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $this->cache);
-            if ($mailbox && $mailbox->authed()) {
-                $folder = $dataSource['folder'];
-                $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
-                $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
+        $result = getCombinedMessagesLists($data_sources, $this->cache, $searchTerms, $list_page, $limit, $offsets, $offset, 'ALL');
 
-                $uids = $mailbox->search(hex2bin($folder), 'ALL', false, $searchTerms);
-                $total = count($uids);
-                // most recent messages at the top
-                $uids = array_reverse($uids);
-                $uids = array_slice($uids, $offset, $limit);
-
-                $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-                $messages = [];
-                foreach ($uids as $uid) {
-                    if (isset($headers[$uid])) {
-                        $messages[] = $headers[$uid];
-                    }
-                }
-
-                $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
-                    $msg['server_id'] = $dataSource['id'];
-                    $msg['server_name'] = $dataSource['name'];
-                    $msg['folder'] = $folder;
-                    return $msg;
-                }, $messages);
-                $totalMessages += $total;
-            }
-        }
-
-        $list = flattenMessagesLists($messagesLists, $maxPerSource);
+        $list = flattenMessagesLists($result['lists'], $maxPerSource);
         $messagesList = $list['messages'];
 
         usort($messagesList, function($a, $b) {
             return strtotime($b['internal_date']) - strtotime($a['internal_date']);
         });
 
-        $maxPages = ceil($totalMessages / $limit);
+        $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
-        $this->out('folder_status', $status);
+        $this->out('folder_status', $result['status']);
         $this->out('imap_'.$path.'_data', $messagesList);
         $this->out('imap_server_ids', implode(',', $ids));
         $this->out('offsets', implode(',', $list['offsets']));

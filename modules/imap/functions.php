@@ -1586,6 +1586,52 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
+function getCombinedMessagesLists($sources, $cache, $searchTerms, $listPage, $limit, $offsets = [], $defaultOffset = 0, $filter = 'ALL') {
+    $totalMessages = 0;
+    $offset = $defaultOffset;
+    $messagesLists = [];
+    $status = [];
+    foreach ($sources as $index => $dataSource) {
+
+        if ($offsets && $listPage > 1) {
+            if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
+                $offset = (int) $offsets[$index] * ($listPage - 1);
+            }
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
+        if ($mailbox && $mailbox->authed()) {
+            $folder = $dataSource['folder'];
+            $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
+            $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
+
+            $uids = $mailbox->search(hex2bin($folder), $filter, false, $searchTerms);
+            $total = count($uids);
+            // most recent messages at the top
+            $uids = array_reverse($uids);
+            $uids = array_slice($uids, $offset, $limit);
+
+            $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
+            $messages = [];
+            foreach ($uids as $uid) {
+                if (isset($headers[$uid])) {
+                    $messages[] = $headers[$uid];
+                }
+            }
+
+            $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
+                $msg['server_id'] = $dataSource['id'];
+                $msg['server_name'] = $dataSource['name'];
+                $msg['folder'] = $folder;
+                return $msg;
+            }, $messages);
+            $totalMessages += $total;
+        }
+    }
+    
+    return ['lists' => $messagesLists, 'total' => $totalMessages, 'status' => $status];
+}
+
 function flattenMessagesLists($messagesLists, $listSize) {
     $endList = [];
     $sizesTaken = [];
