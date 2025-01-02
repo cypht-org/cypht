@@ -168,6 +168,10 @@ class Hm_Output_server_information extends Hm_Output_Module {
     protected function output() {
         $server_info = $this->get('server_info', array());
         if (!empty($server_info)) {
+            $commit_hash = $server_info['commit_hash'];
+            $commit_date = $this->getCommitDate($commit_hash);
+            $server_info['commit_date'] = $this->formatCommitDate($commit_date);
+
             return '<div class="server_info p-3"><table class="info table table-borderless">'.
                 '<tr><th class="text-secondary fw-light text-nowrap">Server Name</th><td>'.$server_info['HTTP_HOST'].'</td></tr>'.
                 '<tr><th class="text-secondary fw-light text-nowrap">Server Scheme</th><td>'.$server_info['REQUEST_SCHEME'].'</td></tr>'.
@@ -181,6 +185,27 @@ class Hm_Output_server_information extends Hm_Output_Module {
                 '</table></div>';
         }
         return '';
+    }
+
+    /**
+     * Fetches the commit date based on the commit hash
+     * @param string $commit_hash The commit hash
+     * @return string The commit date
+     */
+    protected function getCommitDate($commit_hash) {
+        $command = 'git log -1 --format=%cd ' . escapeshellarg($commit_hash);
+        $commit_date = shell_exec($command);
+        return trim($commit_date);
+    }
+
+    /**
+     * Formats the commit date to a more readable format like "Nov 27, 2024"
+     * @param string $commit_date The original commit date
+     * @return string The formatted commit date
+     */
+    protected function formatCommitDate($commit_date) {
+        $date = new DateTime($commit_date);
+        return $date->format('M d, Y');
     }
 }
 
