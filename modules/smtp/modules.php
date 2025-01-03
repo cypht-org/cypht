@@ -322,6 +322,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
         $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
         $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
+
         if ($schedule == "undefined") {
             $schedule = "";
         }
@@ -2056,9 +2057,17 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
     }
-    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_profile['id'], $mod_cache);
-    if (! $mailbox || ! $mailbox->authed()) {
-        return -1;
+    $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
+    $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
+        
+    if (!empty($atts['schedule'])) {
+        $folder ='Scheduled';
+        if (!count($imap->get_mailbox_status($folder))) {
+            $imap->create_mailbox($folder);
+        }
+        $atts['schedule'] = get_scheduled_date($atts['schedule']);
+    } else {
+        $folder = $specials['draft'];
     }
     
     if (!empty($atts['schedule'])) {
@@ -2071,20 +2080,24 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $folder = $specials['draft'];
     }
 
-    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name);
-    $res = $mime->process_attachments();
 
+    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
+    $res = $mime->process_attachments();
+    
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if (! $mailbox->store_message($folder, $msg, false, true)) {
-        Hm_Msgs::add('ERRAn error occurred saving the draft message');
-        return -1;
+    if ($imap->append_start($folder, mb_strlen($msg), false, true)) {
+        $imap->append_feed($msg."\r\n");
+        if (!$imap->append_end()) {
+            Hm_Msgs::add('ERRAn error occurred saving the draft message');
+            return -1;
+        }
     }
 
-    $messages = $mailbox->get_messages($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
-        
+    $mailbox_page = $imap->get_mailbox_page($folder, 'ARRIVAL', true, 'DRAFT', 0, 10);
+
     // Remove old version from the mailbox
     if ($id) {
       $mailbox->message_action($specials['draft'], 'DELETE', array($id));
