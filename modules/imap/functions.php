@@ -1644,13 +1644,13 @@ function flattenMessagesLists($messagesLists, $listSize) {
                 $part = array_slice($list, 0, $listSize);
                 $endList = array_merge($endList, $part);
                 $messagesLists[$index] = array_slice($list, $listSize);
-                $sizesTaken[$index] = $sizesTaken[$index] ? $sizesTaken[$index] + count($part) : count($part);
+                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] + count($part) : count($part);
                 $totalTakens = array_sum(array_values($sizesTaken));
                 if ($totalTakens > $max) {
                     $sizesTaken[$index] = $sizesTaken[$index] - ($totalTakens - $max);
                 }
             } else {
-                $sizesTaken[$index] = $sizesTaken[$index] ? $sizesTaken[$index] : 0;
+                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] : 0;
             }
         }
     }
