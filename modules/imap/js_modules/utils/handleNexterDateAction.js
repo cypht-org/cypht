@@ -7,14 +7,11 @@ function processNextActionDate(e) {
         }
         isReloading = true;
 
-        showRoutingToast();
-
         try {
             Hm_Folders.reload_folders(true);
             let path = getListPathParam();
             await navigate(`?page=message_list&list_path=${path}`);
         } finally {
-            hideRoutingToast();
             isReloading = false;
         }
     };
