@@ -252,9 +252,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $nofrom = ' nofrom';
         }
         $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
+        $is_scheduled = !empty($msg['x_schedule']) && hex2bin($msg['folder']) == 'Scheduled';
         if ($is_snoozed) {
-            $snooze_header = parse_snooze_header('X-Snoozed: '.$msg['x_snoozed']);
+            $snooze_header = parse_nexter_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
+            $timestamp = strtotime($date);
+        } elseif ($is_scheduled) {
+            $date = $msg['x_schedule'];
             $timestamp = strtotime($date);
         } else {
             if ($list_sort == 'date') {
@@ -331,9 +335,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags, null, $preview_msg),
-                    array('date_callback', $date, $timestamp, $is_snoozed),
-                    array('icon_callback', $flags),
-                    array('dates_holders_callback', $msg['internal_date'], $msg['date']),
+                    array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
+                    array('icon_callback', $flags)
                 ),
                 $id,
                 $style,
@@ -1343,7 +1346,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
     preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
-        $old_folder = parse_snooze_header($matches[0])['from'];
+        $old_folder = parse_nexter_header($matches[0], 'X-Snoozed')['from'];
     }
     if ($snooze_tag) {
         $from = $old_folder ?? $folder;
@@ -1370,7 +1373,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
             }
         }
     } else {
-        $snooze_headers = parse_snooze_header($matches[0]);
+        $snooze_headers = parse_nexter_header($matches[0], 'X-Snoozed');
         $original_folder = $snooze_headers['from'];
         if ($mailbox->store_message($original_folder, $msg)) {
             $deleteResult = $mailbox->message_action($snooze_folder, 'DELETE', array($msg_id));
@@ -1457,21 +1460,21 @@ function snooze_formats() {
  */
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
-    $values = snooze_formats();
+    $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+                <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <ul class="dropdown-menu nexter_dropdown snooze_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
-        $labels = get_snooze_date($format, true);
-        $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
+        $labels = get_scheduled_date($format, true);
+        $txt .= '<li><a href="#" class="nexter_date_helper_snooze dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';
-    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
-    $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="snooze_input" style="display:none;"></li>';
+    $txt .= '<li><label for="nexter_input_date_snooze" class="nexter_date_picker_snooze dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<input id="nexter_input_date_snooze" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="nexter_input_date_snooze" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<input class="nexter_input_snooze" style="display:none;"></li>';
     if ($unsnooze) {
-        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper_snooze dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
     $txt .= '</ul></div>';
 
@@ -1605,126 +1608,41 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
-/**
- * @param array $sources
- * @param object $cache
- * @param array $search
- */
-function getCombinedMessagesLists($sources, $cache, $search) {
-    $defaultSearch = [
-        'filter' => 'ALL',
-        'sort' => 'ARRIVAL',
-        'reverse' => true,
-        'terms' => [],
-        'limit' => 10,
-        'offsets' => [],
-        'defaultOffset' => 0,
-        'listPage' => 1
-    ];
-    $search = array_merge($defaultSearch, $search);
-
-    $filter = $search['filter'];
-    $sort = $search['sort'];
-    $reverse = $search['reverse'];
-    $searchTerms = $search['terms'];
-    $limit = $search['limit'];
-    $offsets = $search['offsets'];
-    $listPage = $search['listPage'];
-
-    $totalMessages = 0;
-    $offset = $search['defaultOffset'];
-    $messagesLists = [];
-    $status = [];
-    foreach ($sources as $index => $dataSource) {
-
-        if ($offsets && $listPage > 1) {
-            if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
-                $offset = (int) $offsets[$index] * ($listPage - 1);
-            }
-        }
-
-        $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
-        if ($mailbox && $mailbox->authed()) {
-            $connection = $mailbox->get_connection();
-
-            $folder = $dataSource['folder'];
-            $mailbox->select_folder(hex2bin($folder));
-            $state = $connection->get_mailbox_status(hex2bin($folder));
-            $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
-
-            if ($mailbox->is_imap()) {
-                if ($connection->is_supported( 'SORT' )) {
-                    $sortedUids = $connection->get_message_sort_order($sort, $reverse, $filter);
-                } else {
-                    $sortedUids = $connection->sort_by_fetch($sort, $reverse, $filter);
-                }
-
-                $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
-            } else {
-                // EWS
-                $uids = $connection->search($folder, $sort, $reverse, $filter, 0, $limit, $searchTerms);
-            }
-
-            $total = count($uids);
-            $uids = array_slice($uids, $offset, $limit);
-
-            $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-            $messages = [];
-            foreach ($uids as $uid) {
-                if (isset($headers[$uid])) {
-                    $messages[] = $headers[$uid];
-                }
-            }
-
-            $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
-                $msg['server_id'] = $dataSource['id'];
-                $msg['server_name'] = $dataSource['name'];
-                $msg['folder'] = $folder;
-                return $msg;
-            }, $messages);
-            $totalMessages += $total;
-        }
+if (!hm_exists('save_sent_msg')) {
+function save_sent_msg($handler, $imap_id, $imap, $imap_details, $msg, $msg_id, $show_errors = true) {
+    $specials = get_special_folders($handler, $imap_id);
+    if (array_key_exists('sent', $specials) && $specials['sent']) {
+        $sent_folder = $specials['sent'];
     }
-    
-    return ['lists' => $messagesLists, 'total' => $totalMessages, 'status' => $status];
-}
 
-function flattenMessagesLists($messagesLists, $listSize) {
-    $endList = [];
-    $sizesTaken = [];
+    if (!$sent_folder) {
+        $auto_sent = $imap->get_special_use_mailboxes('sent');
+        if (!array_key_exists('sent', $auto_sent)) {
+            return;
+        }
+        $sent_folder = $auto_sent['sent'];
+    }
+    if (!$sent_folder) {
+        Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
+    }
+    $uid = null;
+    if ($sent_folder) {
+        Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
+        if ($imap->append_start($sent_folder, strlen($msg), true)) {
+            $imap->append_feed($msg."\r\n");
+            if (!$imap->append_end() && $show_errors) {
+                Hm_Msgs::add('ERRAn error occurred saving the sent message');
+            }
+        }
 
-    $max = $listSize * count($messagesLists);
-
-    while (count($endList) < $listSize * count($messagesLists) && count(array_filter($messagesLists, fn ($list) => count($list) > 0)) > 0) {
-        foreach ($messagesLists as $index => $list) {
-            if (count($list) > 0) {
-                $part = array_slice($list, 0, $listSize);
-                $endList = array_merge($endList, $part);
-                $messagesLists[$index] = array_slice($list, $listSize);
-                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] + count($part) : count($part);
-                $totalTakens = array_sum(array_values($sizesTaken));
-                if ($totalTakens > $max) {
-                    $sizesTaken[$index] = $sizesTaken[$index] - ($totalTakens - $max);
-                }
-            } else {
-                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] : 0;
+        $mailbox_page = $imap->get_mailbox_page($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
+        foreach ($mailbox_page[1] as $mail) {
+            $msg_header = $imap->get_message_headers($mail['uid']);
+            if ($msg_header['Message-Id'] === $msg_id) {
+                $uid = $mail['uid'];
+                break;
             }
         }
     }
-
-    $endList = array_slice($endList, 0, $max);
-
-    return ['messages' => $endList, 'offsets' => $sizesTaken];
-}
-
-function sortCombinedMessages($list, $sort) {
-    usort($list, function($a, $b) use ($sort) {
-        $sortField = str_replace(['arrival', '-'], ['internal_date', ''], $sort);
-        if (strpos($sort, '-') === 0) {
-            return strtotime($a[$sortField]) - strtotime($b[$sortField]);
-        }
-        return strtotime($b[$sortField]) - strtotime($a[$sortField]);
-    });
-
-    return $list;
-}
+    return $uid;
+}}

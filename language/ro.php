@@ -617,6 +617,7 @@ return array(
     'You must provide a name for your script' => false,
     'Empty script' => false,
     'Please create a profile for saving sent messages option' => false,
+    'You have %d scheduled messages that won\'t be executed if you quit' => false,
     'Attachment storage unavailable, please contact your site administrator' => false,
     'Your subject is empty!' => false,
     'Your body is empty!' => false,

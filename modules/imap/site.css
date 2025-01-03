@@ -126,7 +126,7 @@
 .header_links {
   padding-top: 10px !important;
 }
-.header_links #dropdownMenuSnooze {
+.header_links #dropdownMenuNexterDate {
   padding: 0;
   border: unset;
   font-variant: inherit;
@@ -134,7 +134,7 @@
   font-size: inherit;
   vertical-align: baseline;
 }
-.header_links #dropdownMenuSnooze:hover {
+.header_links #dropdownMenuNexterDate:hover {
   background-color: inherit;
   color: inherit;
 }
