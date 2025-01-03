@@ -2,18 +2,28 @@
 function applySmtpComposePageHandlers() {
     init_resumable_upload()
 
+    let isScheduledMode = null;
+
+    setupActionSchedule(function () {
+        let schedule = $('.nexter_input').val();
+        $('.smtp_send_placeholder').trigger('click');
+
+        save_compose_state(false, true, schedule);
+        isScheduledMode = schedule;
+    });
+
     if (window.HTMLEditor) {
         useKindEditor();
     }
 
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
-    Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
-    $('.draft_title').on("click", function() { $('.draft_list').toggle(); });
-    $('.toggle_recipients').on("click", function() { return toggle_recip_flds(); });
+    Hm_Timer.add_job(function () { save_compose_state(); }, interval, true);
+    $('.draft_title').on("click", function () { $('.draft_list').toggle(); });
+    $('.toggle_recipients').on("click", function () { return toggle_recip_flds(); });
     $('.smtp_reset').on("click", reset_smtp_form);
-    $('.delete_draft').on("click", function() { smtp_delete_draft($(this).data('id')); });
-    $('.smtp_save').on("click", function() { save_compose_state(false, true); });
-    $('.smtp_send_archive').on("click", function() { send_archive(false, true); });
+    $('.delete_draft').on("click", function () { smtp_delete_draft($(this).data('id')); });
+    $('.smtp_save').on("click", function () { save_compose_state(false, true); });
+    $('.smtp_send_archive').on("click", function () { send_archive(false, true); });
 
     const modal = new Hm_Modal({
         modalId: 'emptySubjectBodyModal',
@@ -85,7 +95,7 @@ function applySmtpComposePageHandlers() {
         ========================================
         */
         function showModal() {
-            if (! modal.modalContent.html()) {
+            if (!modal.modalContent.html()) {
                 modal.addFooterBtn(hm_trans('Send anyway'), 'btn-warning', handleSendAnyway);
                 if (showBtnSendAnywayDontWarnFuture) {
                     modal.addFooterBtn(hm_trans("Send anyway and don't warn in the future"), 'btn-warning', handleSendAnywayAndDontWarnMe);
@@ -99,26 +109,26 @@ function applySmtpComposePageHandlers() {
             return new Promise((resolve) => {
                 const checkValue = () => {
                     if ($(selector).val() !== targetValue) {
-                        resolve();  
+                        resolve();
                     } else {
-                        setTimeout(checkValue, 100); 
+                        setTimeout(checkValue, 100);
                     }
                 };
-                checkValue();  
+                checkValue();
             });
         }
 
         async function handleSendAnyway() {
 
             if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            await waitForValueChange('.compose_draft_id', '0');
+                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                await waitForValueChange('.compose_draft_id', '0');
             }
 
-            
-        
             if (handleMissingAttachment()) {
-                document.getElementsByClassName("smtp_send")[0].click();
+                if (isScheduledMode == null) {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                }
             } else {
                 e.preventDefault();
             }
@@ -162,53 +172,53 @@ function applySmtpComposePageHandlers() {
             return true;
         }
     });
-    $('.compose_form').on('submit', function() {
+    $('.compose_form').on('submit', function () {
         process_compose_form();
     });
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
     if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
-        replace_cursor_positon ($('textarea[name="compose_body"]'));
+        replace_cursor_positon($('textarea[name="compose_body"]'));
     }
     if (window.location.href.search('&forward=1') !== -1) {
-        setTimeout(function() {
+        setTimeout(function () {
             save_compose_state();
         }, 100);
     }
     if ($('.sys_messages').text() != 'Message Sent') {
         get_smtp_profile($('.compose_server').val());
     }
-    $('.compose_server').on('change', function() {
+    $('.compose_server').on('change', function () {
         get_smtp_profile($('.compose_server').val());
     });
-    if($('.compose_attach_button').attr('disabled') == 'disabled'){
+    if ($('.compose_attach_button').attr('disabled') == 'disabled') {
         check_attachment_dir_access();
     };
 
     $('.compose_container').attr('ondrop', 'move_recipient_to_section(event)').attr('ondragover', 'allow_drop(event)');
-    $('.compose_to, .compose_cc, .compose_bcc').on('keypress', function(e) {
-        if(e.which == 13) {
+    $('.compose_to, .compose_cc, .compose_bcc').on('keypress', function (e) {
+        if (e.which == 13) {
             e.preventDefault();
             text_to_bubbles(this);
         }
     });
-    $('.compose_to, .compose_cc, .compose_bcc').on('blur', function(e) {
+    $('.compose_to, .compose_cc, .compose_bcc').on('blur', function (e) {
         e.preventDefault();
         text_to_bubbles(this);
     });
-    $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function(e) {
-        $('.compose_to, .compose_cc, .compose_bcc').each(function() {
+    $('.compose_subject, .compose_body, .compose_server, .smtp_send_placeholder, .smtp_send_archive').on('focus', function (e) {
+        $('.compose_to, .compose_cc, .compose_bcc').each(function () {
             bubbles_to_text(this);
         });
     });
-    $('.compose_to, .compose_cc, .compose_bcc').on('focus', function(e) {
+    $('.compose_to, .compose_cc, .compose_bcc').on('focus', function (e) {
         text_to_bubbles(this);
     });
-    $('.compose_container').on('click', function() {
+    $('.compose_container').on('click', function () {
         $(this).find('input').focus();
     });
-    $(document).on('click', '.bubble_close', function(e) {
+    $(document).on('click', '.bubble_close', function (e) {
         e.stopPropagation();
         $(".bubble_dropdown-content").remove();
         $(this).parent().remove();
@@ -222,7 +232,7 @@ function applySmtpComposePageHandlers() {
     var excludedEmail = null;
 
     const excludeEmail = function () {
-        var newRecipients = recipientsInput.val().split(',').filter(function(email) {
+        var newRecipients = recipientsInput.val().split(',').filter(function (email) {
             if (email.includes(selectedEmail)) {
                 excludedEmail = email;
                 return false;
@@ -234,7 +244,7 @@ function applySmtpComposePageHandlers() {
 
     if (recipientsInput.val().includes(selectedEmail)) {
         excludeEmail();
-        $(document).on('change', '#compose_smtp_id', function() {
+        $(document).on('change', '#compose_smtp_id', function () {
             if ($(this).val() !== selectedVal) {
                 if (!recipientsInput.val().includes(selectedEmail)) {
                     recipientsInput.val(recipientsInput.val() + ', ' + excludedEmail);
@@ -244,6 +254,12 @@ function applySmtpComposePageHandlers() {
             }
         });
     }
+
+
+    $('.compose_to').on('keyup', function (e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
+    $('.compose_cc').on('keyup', function (e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
+    $('.compose_bcc').on('keyup', function (e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
+    $('.compose_to').focus();
 
     if (window.pgpComposePageHandler) pgpComposePageHandler();
     if (window.profilesComposePageHandler) profilesComposePageHandler();
