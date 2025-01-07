@@ -1641,7 +1641,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
         else {
             $path = '';
         }
-        if (in_array($path, ['sent', 'junk', 'trash', 'drafts'])) {
+        if (in_array($path, ['sent', 'junk', 'snoozed','trash', 'drafts'])) {
             foreach (imap_sources($this, $path) as $vals) {
                 $this->append('data_sources', $vals);
             }
