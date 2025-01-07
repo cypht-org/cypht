@@ -1,22 +1,9 @@
 function processNextActionDate(e) {
-    let isReloading = false;
-
     let reload_and_redirect = async function () {
-        if (isReloading) {
-            return;
-        }
-        isReloading = true;
-
-        try {
-            Hm_Folders.reload_folders(true);
-            let path = getListPathParam();
-            await navigate(`?page=message_list&list_path=${path}`);
-        } finally {
-            isReloading = false;
-        }
+        Hm_Folders.reload_folders(true);
+        let path = getListPathParam();
+        await navigate(`?page=message_list&list_path=${path}`);
     };
-
-
 
     let collectCheckedIds = function () {
         let ids = [];
