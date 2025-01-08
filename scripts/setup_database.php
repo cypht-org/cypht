@@ -160,10 +160,9 @@ function initializeDatabase(PDO $pdo, string $schemaFile, string $migrationDir) 
     echo "Database schema initialized.\n";
 
     ensureMigrationsTable($pdo);
-
+    
     $migrationFiles = glob($migrationDir .'/'.$db_driver.'/*.sql');
     $stmt = $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (:migration, :batch)");
-
     foreach ($migrationFiles as $file) {
         $stmt->execute([
             'migration' => basename($file),
