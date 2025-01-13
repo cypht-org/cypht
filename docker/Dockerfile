@@ -35,7 +35,8 @@ docker-php-ext-install \
     pdo \
     pdo_pgsql \
     pdo_mysql \
-    mysqli
+    mysqli \
+    soap
 docker-php-ext-configure zip
 docker-php-ext-install zip
 curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
