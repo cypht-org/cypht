@@ -30,10 +30,10 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
         try {
             $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
             $script = $client->getScript($this->request->post['sieve_script_name']);
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
-            $this->out('conditions', json_encode(base64_decode($base64_obj)));
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
-            $this->out('actions', json_encode(base64_decode($base64_obj)));
+            $list = prepare_sieve_script ($script, 1, "encode");
+            $this->out('conditions', $list);
+            $list = prepare_sieve_script ($script, 2, "encode");
+            $this->out('actions', $list);
             if (mb_strstr($script, 'allof')) {
                 $this->out('test_type', 'ALLOF');
             } else {
@@ -203,9 +203,11 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
     public function process() {
+        $imap_account = null;
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
             if ($idx == $this->request->post['imap_server_id']) {
                 $imap_account = $mailbox;
+                break;
             }
         }
 
@@ -216,8 +218,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             $scripts = $client->listScripts();
 
             $current_script = $client->getScript('blocked_senders');
-            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-            $blocked_list = json_decode(base64_decode($base64_obj));
+            $blocked_list = prepare_sieve_script ($current_script);
 
             $domain = get_domain($this->request->post['sender']);
             $blocked_wildcard = '@'.$domain;
@@ -357,8 +358,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
             $current_script = $client->getScript('blocked_senders');
             $unblock_sender = false;
             if ($current_script != '') {
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)));
+                $blocked_list = prepare_sieve_script ($current_script);
                 foreach ($blocked_list as $blocked_sender) {
                     if ($blocked_sender != $email_sender) {
                         $blocked_senders[] = $blocked_sender;
@@ -492,9 +492,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $blocked_list_actions = [];
             $unblock_sender = false;
             if ($current_script != '') {
-                $script_split = preg_split('#\r?\n#', $current_script, 0);
-                $base64_obj = str_replace("# ", "", $script_split[1]);
-                $blocked_list = json_decode(base64_decode($base64_obj));
+                $blocked_list = prepare_sieve_script ($current_script);
                 foreach ($blocked_list as $blocked_sender) {
                     if ($blocked_sender != $email_sender) {
                         $blocked_senders[] = $blocked_sender;
@@ -502,10 +500,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                     }
                     $unblock_sender = true;
                 }
-                $base64_obj_actions = str_replace("# ", "", $script_split[2]);
-                if ($base64_obj_actions) {
-                    $blocked_list_actions = json_decode(base64_decode($base64_obj_actions), true);
-                }
+                $blocked_list_actions = prepare_sieve_script ($current_script, 2);
             }
             if (isset($this->request->post['change_behavior']) && $unblock_sender) {
                 $unblock_sender = false;
@@ -1339,9 +1334,7 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
     }
 }
 
-/**
- * @subpackage sievefilterstoggle/handler
- */
+
 class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_account', 'script_state', 'sieve_script_name'));
@@ -1373,11 +1366,49 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
-            
+
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
         }
         $this->out('success', $success);
+    }
+}
+class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+        if (!$success) {
+            return;
+        }
+
+        Hm_IMAP_List::init($this->user_config, $this->session);
+        $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
+        
+        $factory = get_sieve_client_factory($this->config);
+        try {
+            $client = $factory->init($this->user_config, $imap_account);
+
+            $blocked_senders = [];
+            $current_script = $client->getScript('blocked_senders');
+            if ($current_script != '') {
+                $blocked_list = prepare_sieve_script ($current_script);
+                foreach ($blocked_list as $blocked_sender) {
+                    $blocked_senders[] = $blocked_sender;
+                }
+            }
+            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
+                        
+        } catch (Exception $e) {
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            return;
+        }
+    }
+}
+
+
+class Hm_Output_list_block_sieve_output extends Hm_Output_Module {
+    public function output() {
+        $list_block_sieve = $this->get('ajax_list_block_sieve', "");
+        $this->out('ajax_list_block_sieve', $list_block_sieve);
     }
 }

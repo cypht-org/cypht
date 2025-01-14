@@ -284,6 +284,22 @@ if (!hm_exists('get_sieve_client_factory')) {
     }
 }
 
+if (!hm_exists('prepare_sieve_script ')) {
+    function prepare_sieve_script ($script, $index = 1, $action = "decode")
+    {
+        $blocked_list = [];
+        if ($script != '') {
+            $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[$index]);
+            if ($action == "decode") {
+                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)));
+            } else {
+                $blocked_list = json_encode(base64_decode($base64_obj));
+            }
+        }
+        return $blocked_list;
+    }
+}
+
 if (!hm_exists('get_domain')) {
     function get_domain($email)
     {
@@ -424,8 +440,7 @@ if (!hm_exists('get_blocked_senders_array')) {
             $blocked_senders = [];
             $current_script = $client->getScript('blocked_senders');
             if ($current_script != '') {
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
-                $blocked_list = json_decode(base64_decode($base64_obj));
+                $blocked_list = prepare_sieve_script ($current_script);
                 if (!$blocked_list) {
                     return [];
                 }

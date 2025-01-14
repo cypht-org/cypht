@@ -76,6 +76,11 @@ add_handler('ajax_sieve_unblock_sender', 'load_smtp_servers_from_config', true, 
 add_handler('ajax_sieve_unblock_sender', 'sieve_unblock_sender',  true);
 add_output('ajax_sieve_unblock_sender', 'sieve_block_unblock_output',  true);
 
+/* liste of sieve blocked */
+setup_base_ajax_page('ajax_list_block_sieve', 'core');
+add_handler('ajax_list_block_sieve', 'list_block_sieve_script',  true);
+add_output('ajax_list_block_sieve', 'list_block_sieve_output',  true);
+
 /* get mailboxes script */
 setup_base_ajax_page('ajax_sieve_get_mailboxes', 'core');
 add_handler('ajax_sieve_get_mailboxes', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
@@ -124,6 +129,8 @@ return array(
         'ajax_sieve_block_domain',
         'ajax_sieve_block_change_behaviour',
         'ajax_sieve_toggle_script_state',
+        'ajax_list_block_sieve',
+        'message_list',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
@@ -136,6 +143,7 @@ return array(
         'sieve_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'imap_extensions_display' => array(FILTER_UNSAFE_RAW, false),
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
+        'ajax_list_block_sieve' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
