@@ -235,7 +235,6 @@ var move_recipient_to_section = function(e) {
     target.find('.bubbles').append($('#'+id));
     var input = target.find('input');
     input.focus();
-    resize_input(input[0]);
 };
 
 var allow_drop = function(e) {
@@ -264,12 +263,6 @@ var bubbles_to_text = function(input) {
     $(input).css('width', '95%');
 };
 
-var resize_input = function(input) {
-    $(input).css('width', 'auto');
-    var input_width = $(input).parent().outerWidth() - $(input).position().left;
-    $(input).css('width', input_width);
-};
-
 var text_to_bubbles = function(input) {
     var contact_id = input.getAttribute("data-id");
     var contact_type = input.getAttribute("data-type");
@@ -292,7 +285,6 @@ var text_to_bubbles = function(input) {
         }
         $(input).val(invalid_recipients);
     }
-    resize_input(input);
 };
 
 var bubble_index = 0;
