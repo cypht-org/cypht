@@ -1714,8 +1714,17 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
-            foreach (process_address_fld($headers[$fld]) as $address) {
-                $addresses[] = $address['email'];
+            $header = $headers[$fld];
+            if (is_array($header)) {
+                foreach ($header as $value) {
+                    foreach (process_address_fld($value) as $address) {
+                        $addresses[] = $address['email'];
+                    }
+                }
+            } else {
+                foreach (process_address_fld($header) as $address) {
+                    $addresses[] = $address['email'];
+                }
             }
         }
     }
