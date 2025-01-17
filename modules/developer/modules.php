@@ -51,7 +51,7 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
         }
 
         if ($commit_hash != '-') {
-            // Get right commit date (not merge date) if not a local commit
+            // Get the correct commit date (merged PR date or commit date)
             $ch = Hm_Functions::c_init();
             if ($ch) {
                 Hm_Functions::c_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/cypht-org/cypht/commits/'.$commit_hash);
@@ -63,6 +63,23 @@ class Hm_Handler_process_server_info extends Hm_Handler_Module {
                     if (!mb_strstr($curl_result, 'No commit found for SHA')) {
                         $json_commit = json_decode($curl_result);
                         $commit_date = $json_commit->commit->author->date;
+
+                        // Now check if this commit is part of a PR and if it was merged
+                        $pr_ch = Hm_Functions::c_init();
+                        if ($pr_ch) {
+                            Hm_Functions::c_setopt($pr_ch, CURLOPT_URL, 'https://api.github.com/repos/cypht-org/cypht/commits/'.$commit_hash.'/pulls');
+                            Hm_Functions::c_setopt($pr_ch, CURLOPT_RETURNTRANSFER, 1);
+                            Hm_Functions::c_setopt($pr_ch, CURLOPT_CONNECTTIMEOUT, 1);
+                            Hm_Functions::c_setopt($pr_ch, CURLOPT_USERAGENT, $this->request->server["HTTP_USER_AGENT"]);
+                            $pr_curl_result = Hm_Functions::c_exec($pr_ch);
+
+                            if (trim($pr_curl_result)) {
+                                $json_pr = json_decode($pr_curl_result);
+                                if (isset($json_pr[0]->merged_at)) {
+                                    $commit_date = $json_pr[0]->merged_at;
+                                }
+                            }
+                        }
                     }
                 }
             }
