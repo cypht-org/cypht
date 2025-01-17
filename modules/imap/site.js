@@ -451,7 +451,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     handleMessagesDragAndDrop();
 
     if (hadLocalData) {
-        await select_imap_folder(listPath, true, true)
+        await select_imap_folder(listPath, listPage, true)
     }
 
     // Update browser title

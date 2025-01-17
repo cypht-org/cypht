@@ -200,7 +200,7 @@ class Hm_MessagesStore {
         }
         
         config.push({ name: "hm_ajax_hook", value: hook });
-        config.push({ name: "list_page", value: Number(this.page) });
+        config.push({ name: "list_page", value: this.page });
 
         return config;
     }
