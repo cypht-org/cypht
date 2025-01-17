@@ -1882,7 +1882,7 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $header_flds[] = '<th></th>';
             }
         }
-        $res = '<div class="p-3"><table class="message_table table pt-5">';
+        $res = '<div class="p-3"><table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
                 $res .= '<colgroup>'.implode('', $col_flds).'</colgroup>';

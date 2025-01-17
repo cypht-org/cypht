@@ -239,26 +239,21 @@ var imap_flag_message = function(state, supplied_uid, supplied_detail) {
 };
 
 var imap_status_update = function() {
-    var id;
-    var i;
-    if ($('.imap_server_ids').length) {
-        var ids = $('.imap_server_ids').val().split(',');
-        if ( ids && ids !== '') {
-            var process_result = function(res) {
-                var id = res.imap_status_server_id;
-                $('.imap_status_'+id).html(res.imap_status_display);
-                $('.imap_detail_'+id).html(res.sieve_detail_display);
-                $('.imap_capabilities_'+id).html(res.imap_extensions_display);
-            };
-            for (i=0;i<ids.length;i++) {
-                id=ids[i];
-                Hm_Ajax.request(
-                    [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
-                    {'name': 'imap_server_ids', 'value': id}],
-                    process_result
-                );
-            }
-        }
+    const dataSources = hm_data_sources() ?? [];
+    
+    if (dataSources.length) {
+        dataSources.forEach((source) => {
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
+                {'name': 'imap_server_ids', 'value': source.id}],
+                (res) => {
+                    const id = res.imap_status_server_id;
+                    $('.imap_status_'+id).html(res.imap_status_display);
+                    $('.imap_detail_'+id).html(res.sieve_detail_display);
+                    $('.imap_capabilities_'+id).html(res.imap_extensions_display);
+                }
+            );
+        })
     }
     return false;
 };
@@ -456,7 +451,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     handleMessagesDragAndDrop();
 
     if (hadLocalData) {
-        await select_imap_folder(listPath, true, true)
+        await select_imap_folder(listPath, listPage, true)
     }
 
     // Update browser title
