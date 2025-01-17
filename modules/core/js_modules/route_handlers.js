@@ -39,6 +39,8 @@ function applySearchPageHandlers(routeParams) {
     sortHandlerForMessageListAndSearchPage();
     $('.search_reset').on("click", Hm_Utils.reset_search_form);
 
+    performSearch(routeParams);
+
     if (window.inlineMessageMessageListAndSearchPageHandler) inlineMessageMessageListAndSearchPageHandler(routeParams);
     if (window.savedSearchesSearchPageHandler) savedSearchesSearchPageHandler();
 }
