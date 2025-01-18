@@ -113,8 +113,6 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
     }
 }
 
-
-
 /**
  * @subpackage smtp/handler
  */
@@ -209,7 +207,6 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
         }
     }
 }
-
 
 /**
  * @subpackage smtp/handler
@@ -321,8 +318,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $draft_notice = array_key_exists('draft_notice', $this->request->post) ? $this->request->post['draft_notice'] : false;
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
         $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
-        $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
 
+        $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
         if ($schedule == "undefined") {
             $schedule = "";
         }
@@ -906,97 +903,6 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
 }
 
 /**
- * Send scheduled messages
- * @subpackage smtp/handler
- */
-class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
-    /**
-     * Send delayed messages
-     * This should use cron
-     */
-   public function process() {
-    if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
-        return;
-    }
-
-    $servers = Hm_IMAP_List::dump();
-    $scheduled_msg_count = 0;
-
-    foreach (array_keys($servers) as $server_id) {
-        $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
-        $imap = Hm_IMAP_List::connect($server_id, $cache);
-
-        if (imap_authed($imap)) {
-            $folder = 'Scheduled';
-            $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
-
-            foreach ($ret[1] as $msg) {
-                $msg_headers = $imap->get_message_headers($msg['uid']);
-
-                try {
-                    if (!empty($msg_headers['X-Schedule'])) {
-                        $scheduled_msg_count++;
-                    } else {
-                        continue;
-                    }
-
-                    if (send_scheduled_message($this, $imap, $msg, $server_id)) {
-                        $scheduled_msg_count--;
-                    }
-                } catch (Exception $e) {
-                    Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
-                }
-            }
-        }
-    }
-
-    $this->out('scheduled_msg_count', $scheduled_msg_count);
-}}
-
-/**
- * Changes the schedule of the message
- * @subpackage smtp/handler
- */
-class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
-    public function process() {        
-        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
-            return;
-        }
-        list($success, $form) = $this->process_form(array('schedule_date', 'scheduled_msg_ids'));
-        if (!$success) {
-            return;
-        }
-        $scheduled_msg_count = 0;
-        $new_schedule_date = $form['schedule_date'];
-        if ($form['schedule_date'] != 'now') {
-            $new_schedule_date = get_scheduled_date($form['schedule_date']);
-        }       
-        $ids = explode(',', $form['scheduled_msg_ids']);
-        foreach ($ids as $msg_part) {
-            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
-            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (imap_authed($imap)) {
-                $folder = hex2bin($folder);
-                if (reschedule_message_sending($this, $imap, $msg_id, $folder, $new_schedule_date, $imap_server_id)) {
-                    $scheduled_msg_count++;
-                }
-            }
-        }
-        $this->out('scheduled_msg_count', $scheduled_msg_count);
-        if ($scheduled_msg_count == count($ids)) {
-            $msg = 'Operation successful';
-        } elseif ($scheduled_msg_count > 0) {
-            $msg = 'Some messages have been scheduled for sending';
-        } else {
-            $msg = 'ERRFailed to schedule sending for messages';
-        }
-        Hm_Msgs::add($msg);
-        $this->save_hm_msgs();
-    }
-}
-
-/**
  * @subpackage keyboard_shortcuts/output
  */
 class Hm_Output_attachment_setting extends Hm_Output_Module {
@@ -1347,6 +1253,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 }
             }
         }
+
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
             '<div class="btn-group dropup">
@@ -1356,6 +1263,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 </button>'.
                 schedule_dropdown($this).
             '</div>';
+
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
             $res .= '<input class="smtp_send_archive btn btn-primary mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
         }
@@ -1649,6 +1557,97 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                  </div>
            </div>
         ';
+    }
+}
+
+/**
+ * Send scheduled messages
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
+    /**
+     * Send delayed messages
+     * This should use cron
+     */
+   public function process() {
+    if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+        return;
+    }
+
+    $servers = Hm_IMAP_List::dump();
+    $scheduled_msg_count = 0;
+
+    foreach (array_keys($servers) as $server_id) {
+        $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
+        $imap = Hm_IMAP_List::connect($server_id, $cache);
+
+        if (imap_authed($imap)) {
+            $folder = 'Scheduled';
+            $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
+
+            foreach ($ret[1] as $msg) {
+                $msg_headers = $imap->get_message_headers($msg['uid']);
+
+                try {
+                    if (!empty($msg_headers['X-Schedule'])) {
+                        $scheduled_msg_count++;
+                    } else {
+                        continue;
+                    }
+
+                    if (send_scheduled_message($this, $imap, $msg, $server_id)) {
+                        $scheduled_msg_count--;
+                    }
+                } catch (Exception $e) {
+                    Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
+                }
+            }
+        }
+    }
+
+    $this->out('scheduled_msg_count', $scheduled_msg_count);
+}}
+
+/**
+ * Changes the schedule of the message
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
+    public function process() {        
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            return;
+        }
+        list($success, $form) = $this->process_form(array('schedule_date', 'scheduled_msg_ids'));
+        if (!$success) {
+            return;
+        }
+        $scheduled_msg_count = 0;
+        $new_schedule_date = $form['schedule_date'];
+        if ($form['schedule_date'] != 'now') {
+            $new_schedule_date = get_scheduled_date($form['schedule_date']);
+        }       
+        $ids = explode(',', $form['scheduled_msg_ids']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+
+            $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $this->config);
+            if ($mailbox->connect()) {
+                $folder = hex2bin($folder);
+                if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date, $imap_server_id)) {
+                    $scheduled_msg_count++;
+                }
+            }
+        }
+        $this->out('scheduled_msg_count', $scheduled_msg_count);
+        if ($scheduled_msg_count == count($ids)) {
+            $msg = 'Operation successful';
+        } elseif ($scheduled_msg_count > 0) {
+            $msg = 'Some messages have been scheduled for sending';
+        } else {
+            $msg = 'ERRFailed to schedule sending for messages';
+        }
+        Hm_Msgs::add($msg);
+        $this->save_hm_msgs();
     }
 }
 
@@ -2033,11 +2032,13 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $from = false;
     $name = '';
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
+
     if ($profile  && $profile['type'] == 'imap' && $mod->module_is_supported('imap')) {
         $from = $profile['replyto'];
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
+
     if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
@@ -2057,19 +2058,11 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
     }
-    $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
-    $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
-        
-    if (!empty($atts['schedule'])) {
-        $folder ='Scheduled';
-        if (!count($imap->get_mailbox_status($folder))) {
-            $imap->create_mailbox($folder);
-        }
-        $atts['schedule'] = get_scheduled_date($atts['schedule']);
-    } else {
-        $folder = $specials['draft'];
+    $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $mod->config);
+    if (! $mailbox || ! $mailbox->connect()) {
+        return -1;
     }
-    
+
     if (!empty($atts['schedule'])) {
         $folder ='Scheduled';
         if (!count($mailbox->get_folder_status($folder))) {
@@ -2080,32 +2073,28 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $folder = $specials['draft'];
     }
 
-
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
     $res = $mime->process_attachments();
-    
+
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($imap->append_start($folder, mb_strlen($msg), false, true)) {
-        $imap->append_feed($msg."\r\n");
-        if (!$imap->append_end()) {
-            Hm_Msgs::add('ERRAn error occurred saving the draft message');
-            return -1;
-        }
+    if ($mailbox->store_message($folder, $msg, false, true)) {
+        Hm_Msgs::add('ERRAn error occurred saving the draft message');
+        return -1;
     }
 
-    $mailbox_page = $imap->get_mailbox_page($folder, 'ARRIVAL', true, 'DRAFT', 0, 10);
+    $messages = $mailbox->get_messages($folder, 'ARRIVAL', true, 'DRAFT', 0, 10);
 
     // Remove old version from the mailbox
     if ($id) {
-      $mailbox->message_action($specials['draft'], 'DELETE', array($id));
-      $mailbox->message_action($specials['draft'], 'EXPUNGE', array($id));
+      $mailbox->message_action($folder, 'DELETE', array($id));
+      $mailbox->message_action($folder, 'EXPUNGE', array($id));
     }
-    if (!empty($messages[1])) {
-        foreach ($messages[1] as $mail) {
-        $msg_header = $mailbox->get_message_headers($specials['draft'], $mail['uid']);
+
+    foreach ($messages[1] as $mail) {
+        $msg_header = $mailbox->get_message_headers($folder, $mail['uid']);
         // Convert all header keys to lowercase
         $msg_header_lower = array_change_key_case($msg_header, CASE_LOWER);
         $mime_headers_lower = array_change_key_case($mime->get_headers(), CASE_LOWER);
@@ -2119,7 +2108,8 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
                 return $mail['uid'];
             }
         }
-    }}
+    }
+    return -1;
 }}
 
 /**

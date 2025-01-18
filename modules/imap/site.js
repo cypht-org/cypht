@@ -1224,7 +1224,6 @@ $(function() {
         setTimeout(search_selected_for_imap, 100);
     });
 
-
     if (hm_is_logged()) {
         imap_unsnooze_messages();
         setInterval(imap_unsnooze_messages, 60000);
