@@ -1120,6 +1120,9 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<div class="p-3">';
+        $res .= '<div class="p-3" id="sieve_accounts">';
+        $res .= get_classic_filter_modal_content();
+        $res .= get_script_modal_content();
         return $res;
     }
 }
@@ -1211,57 +1214,45 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
 /**
  * @subpackage sievefilters/output
  */
-class Hm_Output_sievefilters_settings_accounts extends Hm_Output_Module {
+class Hm_Output_account_sieve_filters extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('sieve_filters_enabled')) {
-            return '<div class="empty_list">' . $this->trans('Sieve filter is deactivated') . '</div>';
+        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host'])) {
+            return;
         }
-        $mailboxes = $this->get('imap_accounts', array());
-        $res = get_classic_filter_modal_content();
-        $res .= get_script_modal_content();
-        $sieve_supported = 0;
-        foreach($mailboxes as $mailbox) {
-            if (empty($mailbox['sieve_config_host'])) {
-                continue;
-            }
-            $sieve_supported++;
-            $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
-            $num_filters = $result['count'];
-            $res .= '<div class="sievefilters_accounts_item">';
-            $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
-            $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
-            $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
-            $res .= '<table class="filter_details table my-3"><tbody>';
-            $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
-            $res .= $result['list'];
-            $res .= '</tbody></table>';
-            $res .= '<div class="mb-3 d-none">
+        $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
+        $num_filters = $result['count'];
+        $res = '<div class="sievefilters_accounts_item">';
+        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
+        $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
+        $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
+        $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';
+        $res .= '<table class="filter_details table my-3"><tbody>';
+        $res .= '<tr><th class="text-secondary fw-light col-sm-1">Priority</th><th class="text-secondary fw-light col-sm-9">Name</th><th class="text-secondary fw-light col-sm-2">Actions</th></tr>';
+        $res .= $result['list'];
+        $res .= '</tbody></table>';
+        $res .= '<div class="mb-3 d-none">
+                        <div class="d-block">
+                            <h3 class="mb-1">If conditions are not met</h3>
+                            <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
+                        </div>
+                 </div>
+                    <div class="col-sm-12 mt-5 d-none" style="background-color: #f7f2ef;">
+                        <div class="d-flex p-3">
                             <div class="d-block">
-                                <h3 class="mb-1">If conditions are not met</h3>
-                                <small>Define the actions if conditions are not met. If no actions are provided the next filter will be executed. If there are no other filters to be executed, the email will be delivered as expected.</small>
+                               <h5 class="mt-0">Actions</h5>
+                            </div>
+                      <div class="text-end flex-grow-1">
+                                <button class="filter_modal_add_else_action_btn me-2">Add Action</button>
                             </div>
                         </div>
-                        <div class="col-sm-12 mt-5 d-none" style="background-color: #f7f2ef;">
-                            <div class="d-flex p-3">
-                                <div class="d-block">
-                                    <h5 class="mt-0">Actions</h5>
-                                </div>
-                                <div class="text-end flex-grow-1">
-                                    <button class="filter_modal_add_else_action_btn me-2">Add Action</button>
-                                </div>
-                            </div>
-                            <div class="d-block">
-                                <table class="filter_else_actions_modal_table">
-                                </table>
-                            </div>
-                        </div>';
-            $res .= '</div></div></div>';
-        }
-        if ($sieve_supported == 0) {
-            $res .= '<div class="empty_list">None of the configured IMAP servers support Sieve</div>';
-        }
-        return $res;
+                        <div class="d-block">
+                            <table class="filter_else_actions_modal_table">
+                            </table>
+                        </div>
+                    </div>';
+        $res .= '</div></div></div>';
+
+        $this->out('sieve_detail_display', $res);
     }
 }
 
@@ -1410,5 +1401,21 @@ class Hm_Output_list_block_sieve_output extends Hm_Output_Module {
     public function output() {
         $list_block_sieve = $this->get('ajax_list_block_sieve', "");
         $this->out('ajax_list_block_sieve', $list_block_sieve);
+    }
+}
+
+class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
+{
+    public function process()
+    {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+
+        if (!$success) {
+            return;
+        }
+        $accounts = $this->get('imap_accounts');
+        if (isset($accounts[$form['imap_server_id']])) {
+            $this->out('mailbox', $accounts[$form['imap_server_id']]);
+        }
     }
 }
