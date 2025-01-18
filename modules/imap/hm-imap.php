@@ -1074,6 +1074,7 @@ if (!class_exists('Hm_IMAP')) {
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
                                          'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
+                        $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
                             $headers[$uid] = array_map('trim', $headers[$uid]);

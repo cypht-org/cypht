@@ -332,41 +332,9 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $sent_folder = false;
         $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
-            $specials = get_special_folders($this, $imap_id);
-            if (array_key_exists('sent', $specials) && $specials['sent']) {
-                $sent_folder = $specials['sent'];
-            }
-
-            if (!$sent_folder) {
-                $auto_sent = $mailbox->get_special_use_mailboxes('sent');
-                if (!array_key_exists('sent', $auto_sent)) {
-                    return;
-                }
-                $sent_folder = $auto_sent['sent'];
-            }
-            if (!$sent_folder) {
-                Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
-            }
-            if ($sent_folder) {
-                Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-                if (! $mailbox->store_message($sent_folder, $msg)) {
-                    Hm_Msgs::add('ERRAn error occurred saving the sent message');
-                }
-                $uid = null;
-                $mailbox_page = $mailbox->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
-                foreach ($mailbox_page[1] as $mail) {
-                    $msg_header = $mailbox->get_message_headers($sent_folder, $mail['uid']);
-                    if ($msg_header['Message-Id'] === $mime->get_headers()['Message-Id']) {
-                        $uid = $mail['uid'];
-                        break;
-                    }
-                }
-            }
-            $uid = save_sent_msg($this, $imap_id, $imap, $imap_details, $msg, $mime->get_headers()['Message-Id']);
-            if ($uid) {
-                if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
-                    $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
-                }
+            $uid = save_sent_msg($this, $imap_id, $mailbox, $imap_details, $msg, $mime->get_headers()['Message-Id']);
+            if ($uid && $this->user_config->get('review_sent_email_setting', false)) {
+                $this->out('redirect_url', '?page=message&uid='.$uid.'&list_path=imap_'.$imap_id.'_'.bin2hex($sent_folder));
             }
         }
     }
