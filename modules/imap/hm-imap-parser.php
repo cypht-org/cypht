@@ -257,7 +257,7 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
      * @param bool $lsub flag to use LSUB
      * @return array IMAP LIST/LSUB commands
      */
-    protected function build_list_commands($lsub, $mailbox, $keyword) {
+    protected function build_list_commands($lsub, $mailbox, $keyword, $children_capability=true) {
         $commands = array();
         if ($lsub) {
             $imap_command = 'LSUB';
@@ -297,7 +297,12 @@ class Hm_IMAP_Parser extends Hm_IMAP_Base {
             else {
                 $status = '';
             }
-            $commands[] = array($imap_command.' "'.$namespace."\" \"$keyword\"$status\r\n", $namespace);
+
+            if (!$children_capability && $namespace) {
+                $commands[] = array($imap_command.' " " "'.$namespace."$keyword\"$status\r\n", $namespace);
+            } else {
+                $commands[] = array($imap_command.' "'.$namespace."\" \"$keyword\"$status\r\n", $namespace);
+            }
         }
         return $commands;
     }

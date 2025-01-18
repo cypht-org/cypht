@@ -205,7 +205,7 @@ class Hm_Mailbox {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->get_mailbox_list($only_subscribed);
+            return $this->connection->get_mailbox_list($only_subscribed, children_capability: $this->connection->server_support_children_capability());
         } else {
             return $this->connection->get_folders(null, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? []);
         }

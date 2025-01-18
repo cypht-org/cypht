@@ -526,14 +526,15 @@ if (!class_exists('Hm_IMAP')) {
          * @param bool $lsub flag to limit results to subscribed folders only
          * @return array associative array of folder details
          */
-        public function get_mailbox_list($lsub=false, $mailbox='', $keyword='*') {
+        public function get_mailbox_list($lsub=false, $mailbox='', $keyword='*', $children_capability=true) {
             /* defaults */
             $folders = array();
             $excluded = array();
             $parents = array();
             $delim = false;
             $inbox = false;
-            $commands = $this->build_list_commands($lsub, $mailbox, $keyword);
+            $commands = $this->build_list_commands($lsub, $mailbox, $keyword, $children_capability);
+
             $cache_command = implode('', array_map(function($v) { return $v[0]; }, $commands)).(string)$mailbox.(string)$keyword;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -546,6 +547,11 @@ if (!class_exists('Hm_IMAP')) {
 
                 $this->send_command($command);
                 $result = $this->get_response($this->folder_max, true);
+
+                if (!$children_capability) {
+                    $delim = $result[0][count($result[0]) - 2];
+                    $result = $this->preprocess_folders($result, $mailbox, $delim);
+                }
 
                 /* loop through the "parsed" response. Each iteration is one folder */
                 foreach ($result as $vals) {
@@ -700,6 +706,68 @@ if (!class_exists('Hm_IMAP')) {
             /* sort and return the list */
             uksort($folders, array($this, 'fsort'));
             return $this->cache_return_val($folders, $cache_command);
+        }
+
+        /**
+         * Preprocess the folder list to determine if a folder has children
+         * @param array $result the folder list
+         * @param string $mailbox the mailbox to limit the results to
+         * @param string $delim the folder delimiter
+         * @return array the processed folder list
+         */
+        function preprocess_folders($result, $mailbox, $delim) {
+            $folderPaths = [];
+            $processedResult = [];
+        
+            // Step 1: Extract all folder paths from the array (using the last element in each sub-array)
+            foreach ($result as $entry) {
+                if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
+                    $folderPaths[] = $entry[count($entry) - 1];
+                }
+            }
+        
+            // Step 2: Process each folder to determine if it has subfolders
+            foreach ($result as $entry) {
+                if (isset($entry[count($entry) - 1]) && is_string($entry[count($entry) - 1])) {
+                    $currentFolder = $entry[count($entry) - 1];
+                    $hasChildren = false;
+        
+                    // Check if any other folder starts with the current folder followed by the delimiter
+                    foreach ($folderPaths as $path) {
+                        if (strpos($path, $currentFolder . $delim) === 0) {
+                            $hasChildren = true;
+                            break;
+                        }
+                    }
+        
+                    // Add the appropriate flag (\HasChildren or \HasNoChildren)
+                    $entry = array_merge(
+                        array_slice($entry, 0, 3),
+                        [$hasChildren ? "\\HasChildren" : "\\HasNoChildren"],
+                        array_slice($entry, 3)
+                    );
+        
+                    // Root folder processing
+                    if (empty($mailbox)) {
+                        if (strpos($currentFolder, $delim) === false) {
+                            $processedResult[] = $entry;
+                        }
+                    } else {
+                        // Process subfolders of the given mailbox
+                        $expectedPrefix = $mailbox . $delim;
+                        if (strpos($currentFolder, $expectedPrefix) === 0) {
+                            $remainingPath = substr($currentFolder, strlen($expectedPrefix));
+                            // Include only direct subfolders (no further delimiters in the remaining path)
+                            if (strpos($remainingPath, $delim) === false) {
+                                $processedResult[] = $entry;
+                            }
+                        }
+                    }
+                } else {
+                    $processedResult[] = $entry;
+                }
+            }
+            return $processedResult;
         }
 
         /**
@@ -2411,7 +2479,13 @@ if (!class_exists('Hm_IMAP')) {
          */
         public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false) {
             $result = array();
-            $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
+            $folders = array();
+            if ($this->server_support_children_capability()) {
+                $folders = $this->get_mailbox_list($only_subscribed, $level, '%');
+            } else {
+                $folders = $this->get_mailbox_list($only_subscribed, $level, "*", false);
+            }
+            
             foreach ($folders as $name => $folder) {
                 $result[$name] = array(
                     'name' => $folder['name'],
@@ -2428,7 +2502,7 @@ if (!class_exists('Hm_IMAP')) {
                 }
             }
             if ($only_subscribed || $with_input) {
-                $subscribed_folders = array_column($this->get_mailbox_list(true), 'name');
+                $subscribed_folders = array_column($this->get_mailbox_list(true, children_capability:$this->server_support_children_capability()), 'name');
                 foreach ($result as $key => $folder) {
                     $result[$key]['subscribed'] = in_array($folder['name'], $subscribed_folders);
                     if (!$with_input) {
@@ -2485,6 +2559,39 @@ if (!class_exists('Hm_IMAP')) {
             }
 
             return true;
+        }
+
+        protected function server_support_children_capability() {
+            $test_command = 'CAPABILITY'."\r\n";
+            $this->send_command($test_command);
+            $response = $this->get_response(false, true);
+            $status = $this->check_response($response, true);
+
+            // Keywords that indicate the header search is not supported
+            $keywords = ['CHILDREN'];
+
+            if (!$status) {
+                return false;
+            }
+
+            // Flatten the response array to a single array of strings
+            $flattened_response = array_reduce($response, 'array_merge', []);
+
+            // Check if all keywords are present in the flattened response
+            $sequence_match = true;
+            foreach ($keywords as $keyword) {
+                if (!in_array($keyword, $flattened_response)) {
+                    $sequence_match = false;
+                    break;
+                }
+            }
+
+            // If all keywords are found, the header search is not supported
+            if ($sequence_match) {
+                return true;
+            }
+
+            return false;
         }
     }
 }
