@@ -1134,6 +1134,9 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
+        $res .= '<div class="p-3" id="sieve_accounts">';
+        $res .= get_classic_filter_modal_content();
+        $res .= get_script_modal_content();
         return $res;
     }
 }
@@ -1163,51 +1166,41 @@ class Hm_Handler_load_behaviour extends Hm_Handler_Module
  */
 class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
     protected function output() {
-        if (!$this->get('sieve_filters_enabled')) {
-            return '<div class="empty_list">' . $this->trans('Sieve filter is deactivated') . '</div>';
+        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host'])) {
+            return;
         }
-        $mailboxes = $this->get('imap_accounts', array());
-        $res = get_classic_filter_modal_content();
-        $res .= get_script_modal_content();
-        $res .= '<div class="p-3">';
-        foreach($mailboxes as $idx => $mailbox) {
-            if (empty($mailbox['sieve_config_host'])) {
-                continue;
-            }
-            $behaviours = $this->get('sieve_block_default_behaviour');
-            $reject_messages = $this->get('sieve_block_default_reject_message');
-            $default_behaviour = 'Discard';
-            $default_reject_message = '';
-            if (array_key_exists($idx, $behaviours)) {
-                $default_behaviour = $behaviours[$idx];
-            }
-            if (array_key_exists($idx, $reject_messages)) {
-                $default_reject_message = $reject_messages[$idx];
-            }
+        $behaviours = $this->get('sieve_block_default_behaviour');
+        $reject_messages = $this->get('sieve_block_default_reject_message');
+        $default_behaviour = 'Discard';
+        $default_reject_message = '';
+        if (array_key_exists($mailbox['id'], $behaviours)) {
+            $default_behaviour = $behaviours[$mailbox['id']];
+        }
+        if (array_key_exists($mailbox['id'], $reject_messages)) {
+            $default_reject_message = $reject_messages[$mailbox['id']];
+        }
 
-            $default_behaviour_html = '<div class="col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="'.$idx.'">'
-            .'<option value="Discard"'.($default_behaviour == 'Discard'? ' selected': '').'>Discard</option>'
-            .'<option value="Reject"'.($default_behaviour == 'Reject'? ' selected': '').'>'.$this->trans('Reject').'</option>'
-            .'<option value="Move" '.($default_behaviour == 'Move'? ' selected': '').'>'.$this->trans('Move To Blocked Folder').'</option></select>';
-            if ($default_behaviour == 'Reject') {
-                $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="'.$default_reject_message.'" placeholder="'.$this->trans('Reject message').'" />';
-            }
-            $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">'.$this->trans('Submit').'</button></div></div>';
-            $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
-            $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
-            $res .= '<div class="sievefilters_accounts_item">';
-            $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between">' . $mailbox['name'];
-            $res .= '<span class="filters_count"><span id="filter_num_'.$idx.'">'.$num_blocked.'</span> '.$this->trans('blocked'). '</span></div>';
-            $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
-            $res .=  $default_behaviour_html;
-            $res .= '<table class="filter_details table"><tbody>';
-            $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
-            $res .= get_blocked_senders($mailbox, $idx, 'x-circle-fill', 'globe-europe-africa', $this->get('site_config'), $this->get('user_config'), $this);
-            $res .= '</tbody></table>';
-            $res .= '</div></div></div>';
+        $default_behaviour_html = '<div class="col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="' . $mailbox['id'] . '">'
+            . '<option value="Discard"' . ($default_behaviour == 'Discard' ? ' selected' : '') . '>Discard</option>'
+            . '<option value="Reject"' . ($default_behaviour == 'Reject' ? ' selected' : '') . '>' . $this->trans('Reject') . '</option>'
+            . '<option value="Move" ' . ($default_behaviour == 'Move' ? ' selected' : '') . '>' . $this->trans('Move To Blocked Folder') . '</option></select>';
+        if ($default_behaviour == 'Reject') {
+            $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="' . $default_reject_message . '" placeholder="' . $this->trans('Reject message') . '" />';
         }
-        $res .= '</div></div>';
-        return $res;
+        $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">' . $this->trans('Submit') . '</button></div></div>';
+        $blocked_senders = get_blocked_senders_array($mailbox, $this->get('site_config'), $this->get('user_config'));
+        $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
+        $res = '<div class="sievefilters_accounts_item">';
+        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between">' . $mailbox['name'];
+        $res .= '<span class="filters_count"><span id="filter_num_' . $mailbox['id'] . '">' . $num_blocked . '</span> ' . $this->trans('blocked') . '</span></div>';
+        $res .= '<div class="sievefilters_accounts filter_block py-3 d-none"><div class="filter_subblock">';
+        $res .= $default_behaviour_html;
+        $res .= '<table class="filter_details table"><tbody>';
+        $res .= '<tr><th class="col-sm-6">Sender</th><th class="col-sm-3">Behavior</th><th class="col-sm-3">Actions</th></tr>';
+        $res .= get_blocked_senders($mailbox, $mailbox['id'], 'x-circle-fill', 'globe-europe-africa', $this->get('site_config'), $this->get('user_config'), $this);
+        $res .= '</tbody></table>';
+        $res .= '</div></div></div>';
+        $this->out('sieve_detail_display', $res);
     }
 }
 

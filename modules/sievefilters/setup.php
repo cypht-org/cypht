@@ -24,9 +24,11 @@ add_output('ajax_account_sieve_filters', 'account_sieve_filters', true, 'sievefi
 
 // block list
 add_output('block_list', 'blocklist_settings_start', true, 'sievefilters', 'content_section_start', 'after');
-add_output('block_list', 'blocklist_settings_accounts', true, 'sievefilters', 'blocklist_settings_start', 'after');
-add_handler('block_list', 'load_behaviour', true, 'sievefilters', 'load_user_data', 'after');
-add_handler('block_list', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
+setup_base_ajax_page('ajax_block_account_sieve_filters', 'core');
+add_handler('ajax_block_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
+add_handler('ajax_block_account_sieve_filters', 'load_behaviour', true, 'sievefilters', 'settings_load_imap', 'after');
+add_handler('ajax_block_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'load_behaviour', 'after');
+add_output('ajax_block_account_sieve_filters', 'blocklist_settings_accounts', true, 'sievefilters');
 
 /* save filter */
 setup_base_ajax_page('ajax_sieve_save_filter', 'core');
@@ -134,6 +136,7 @@ return array(
         'ajax_list_block_sieve',
         'message_list',
         'ajax_account_sieve_filters',
+        'ajax_block_account_sieve_filters',
     ),
     'allowed_output' => array(
         'imap_server_ids' => array(FILTER_UNSAFE_RAW, false),
