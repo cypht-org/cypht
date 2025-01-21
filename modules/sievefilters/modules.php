@@ -1120,7 +1120,7 @@ class Hm_Output_sievefilters_settings_start extends Hm_Output_Module {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Filters').'</div>';
         $res .= '<div class="p-3">';
-        $res .= '<div class="p-3" id="sieve_accounts">';
+        $res .= '<div class="p-3" id="sieve_accounts"></div>';
         $res .= get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         return $res;
@@ -1134,7 +1134,7 @@ class Hm_Output_blocklist_settings_start extends Hm_Output_Module {
     protected function output() {
         $socked_connected = $this->get('socket_connected', false);
         $res = '<div class="sievefilters_settings p-0"><div class="content_title px-3">'.$this->trans('Block List').'</div>';
-        $res .= '<div class="p-3" id="sieve_accounts">';
+        $res .= '<div class="p-3" id="sieve_accounts"></div>';
         $res .= get_classic_filter_modal_content();
         $res .= get_script_modal_content();
         return $res;
@@ -1166,7 +1166,7 @@ class Hm_Handler_load_behaviour extends Hm_Handler_Module
  */
 class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
     protected function output() {
-        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host'])) {
+        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host']) || !$this->get('sieve_filters_enabled')) {
             return;
         }
         $behaviours = $this->get('sieve_block_default_behaviour');
@@ -1209,7 +1209,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
  */
 class Hm_Output_account_sieve_filters extends Hm_Output_Module {
     protected function output() {
-        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host'])) {
+        if (! ($mailbox = $this->get('mailbox')) || empty($mailbox['sieve_config_host']) || !$this->get('sieve_filters_enabled')) {
             return;
         }
         $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
@@ -1246,6 +1246,19 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $res .= '</div></div></div>';
 
         $this->out('sieve_detail_display', $res);
+        error_log('Session after: ' . print_r($_SESSION, true));
+    }
+}
+
+/**
+ * @subpackage sievefilters/output
+ */
+class Hm_Output_check_filter_status extends Hm_Output_Module {
+    protected function output() {
+        if (!$this->get('sieve_filters_enabled')) {
+            $res = '<div class="empty_list">' . $this->trans('Sieve filter is deactivated') . '</div>';
+            $this->out('sieve_detail_display', $res);
+        }
     }
 }
 
@@ -1409,6 +1422,7 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         $accounts = $this->get('imap_accounts');
         if (isset($accounts[$form['imap_server_id']])) {
             $this->out('mailbox', $accounts[$form['imap_server_id']]);
+            $this->session->close_early();
         }
     }
 }

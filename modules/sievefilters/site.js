@@ -319,12 +319,6 @@ function cleanUpSieveFiltersPage() {
     bootstrap.Modal.getInstance(document.getElementById('myEditScript')).dispose();
     document.getElementById('myEditScript').remove();
     document.getElementById('myEditFilterModal').remove();
-    // cleanUpFiltersPage();
-}
-
-function cleanUpFiltersPage() {
-    alert("I am called");
-    $(document).off('click', '.sievefilters_accounts_title');
 }
 
 function sieveFiltersPageHandler() {
