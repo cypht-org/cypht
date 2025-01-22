@@ -2,14 +2,8 @@
 function applySmtpComposePageHandlers() {
     init_resumable_upload()
 
-    let isScheduledMode = null;
-
     setupActionSchedule(function () {
-        let schedule = $('.nexter_input').val();
         $('.smtp_send_placeholder').trigger('click');
-
-        save_compose_state(false, true, schedule);
-        isScheduledMode = schedule;
     });
 
     if (window.HTMLEditor) {
@@ -119,16 +113,21 @@ function applySmtpComposePageHandlers() {
         }
 
         async function handleSendAnyway() {
+            // if ($('.compose_draft_id').val() == '0') {
+            //     Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+            //     await waitForValueChange('.compose_draft_id', '0');
+            // }
 
-            if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            await waitForValueChange('.compose_draft_id', '0');
-            }
-
-            
-        
             if (handleMissingAttachment()) {
-                if (isScheduledMode == null) {
+                if ($('.nexter_input').val()) {
+                    save_compose_state(false, true, $('.nexter_input').val(), function(res) {
+                        if (!res.router_user_msgs[0].startsWith('ERR')) {
+                            reset_smtp_form(false);
+                            Hm_Folders.reload_folders(true);
+                            Hm_Utils.redirect();
+                        }
+                    });
+                } else {
                     document.getElementsByClassName("smtp_send")[0].click();
                 }
             } else {
@@ -259,4 +258,23 @@ function applySmtpComposePageHandlers() {
 
     if (window.pgpComposePageHandler) pgpComposePageHandler();
     if (window.profilesComposePageHandler) profilesComposePageHandler();
+
+    var scheduled_msg_count = 0;
+    var sendScheduledMessages = function() { 
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_send_scheduled_messages'}],
+            function(res) {
+                scheduled_msg_count = res.scheduled_msg_count;
+            },
+        );
+    }
+
+    // sendScheduledMessages();
+    // setInterval(sendScheduledMessages, 60000);
+    // window.onbeforeunload = () => {
+    //     if (scheduled_msg_count == 0) {
+    //       return;
+    //     }
+    //     return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
+    // };
 }
