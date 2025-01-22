@@ -12,8 +12,8 @@ if (!hm_exists('add_profile')) {
             'replyto' => $reply_to,
             'default' => $is_default,
             'address' => $email,
-            'server' =>  $imap_server_id,
-            'user' => $email,
+            'server' =>  $server,
+            'user' => $user,
             'type' => 'imap'
         );
         $id = Hm_Profiles::add($profile);

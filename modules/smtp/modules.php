@@ -318,11 +318,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $draft_notice = array_key_exists('draft_notice', $this->request->post) ? $this->request->post['draft_notice'] : false;
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
         $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
-
         $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
-        if ($schedule == "undefined") {
-            $schedule = "";
-        }
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
@@ -2037,8 +2033,8 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $from = $profile['replyto'];
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
+        $imap_profile = Hm_IMAP_List::dump($imap_profile['id'], true); // Change this later
     }
-
     if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
@@ -2048,7 +2044,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
             $from = $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'];
         }
     }
-    if (!$imap_profile || empty($imap_profile)) {
+    if (empty($imap_profile)) {
         return -1;
     }
 
@@ -2058,7 +2054,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
         return -1;
     }
-    $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $mod->config);
+    $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
     if (! $mailbox || ! $mailbox->connect()) {
         return -1;
     }

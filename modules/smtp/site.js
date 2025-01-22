@@ -94,8 +94,7 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
         return;
     }
     $('.compose_draft_id').val(0)
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
         {'name': 'draft_id', 'value': draft_id},
         {'name': 'draft_smtp', 'value': smtp},
@@ -106,9 +105,9 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to},
-        {'name': 'schedule', 'value': schedule},
-        {'name': 'compose_delivery_receipt', 'value': delivery_receipt},
-        {'name': 'uploaded_files', 'value': uploaded_files}],
+        {'name': 'uploaded_files', 'value': uploaded_files},
+        {'name': 'schedule', 'value': schedule ?? ''},
+        {'name': 'compose_delivery_receipt', 'value': delivery_receipt ?? ''}],
         function(res) {
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
@@ -117,11 +116,6 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
                 $('.draft_list .draft_'+draft_id+' a').text(res.draft_subject);
             }
 
-            if (schedule) {
-                $(".compose_form")[0].reset();
-                return;
-            }
-            
             if (callback) {
                 callback(res);
             }
