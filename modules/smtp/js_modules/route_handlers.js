@@ -113,10 +113,10 @@ function applySmtpComposePageHandlers() {
         }
 
         async function handleSendAnyway() {
-            // if ($('.compose_draft_id').val() == '0') {
-            //     Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            //     await waitForValueChange('.compose_draft_id', '0');
-            // }
+            if ($('.saving_draft').val() !== '0') {
+                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                await waitForValueChange('.saving_draft', '0');
+            }
 
             if (handleMissingAttachment()) {
                 if ($('.nexter_input').val()) {
