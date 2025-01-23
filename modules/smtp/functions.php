@@ -66,9 +66,9 @@ if (!hm_exists('get_reply_type')) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('send_scheduled_message')) {
-function send_scheduled_message($handler, $imap, $folder, $msg_id, $send_now = false) {    
-    $msg_headers = $imap->get_message_headers($folder, $msg_id);    
-    $imap_details = $imap->get_config();       
+function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now = false) {    
+    $msg_headers = $mailbox->get_message_headers($folder, $msg_id);    
+    $mailbox_details = $mailbox->get_config();       
 
     try {
         if (empty($msg_headers['X-Schedule'])) {
@@ -78,10 +78,10 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $send_now = f
         if (new DateTime($msg_headers['X-Schedule']) <= new DateTime() || $send_now) {
             $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
             if (!$profile) {
-                $profiles = Hm_Profiles::search('server', $imap_details['server']);
+                $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
 
                 if (!$profiles) {
-                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with IMAP server: %s', $imap_details['server']));
+                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with MAILBOX server: %s', $mailbox_details['server']));
                     return false;
                 }
                 $profile = $profiles[0];
@@ -99,14 +99,14 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $send_now = f
                     }
                 }
 
-                $msg_content = $imap->get_message_content($folder, $msg_id, 0);
+                $msg_content = $mailbox->get_message_content($folder, $msg_id, 0);
                 $from = process_address_fld($msg_headers['From']);
 
                 $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
 
                 if (!$err_msg) {
-                    $imap->delete_message($folder, $msg_id, false);
-                    save_sent_msg($handler, $imap->get_config()['id'], $imap, $imap_details, $msg_content, $msg_id, false);
+                    $mailbox->delete_message($folder, $msg_id, false);
+                    save_sent_msg($handler, $mailbox->get_config()['id'], $mailbox, $mailbox_details, $msg_content, $msg_id, false);
                     return true; 
                 }
             }
@@ -121,11 +121,11 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $send_now = f
  * @subpackage smtp/functions
  */
 if (!hm_exists('reschedule_message_sending')) {
-function reschedule_message_sending($handler, $imap, $msg_id, $folder, $new_date) {
+function reschedule_message_sending($handler, $mailbox, $msg_id, $folder, $new_date) {
     if ($new_date == 'now') {
-        return send_scheduled_message($handler, $imap, $folder, $msg_id, true);
+        return send_scheduled_message($handler, $mailbox, $folder, $msg_id, true);
     }
-    $msg = $imap->get_message_content($folder, $msg_id, 0);
+    $msg = $mailbox->get_message_content($folder, $msg_id, 0);
     $new_date = get_scheduled_date($new_date);
     preg_match("/^X-Schedule:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
 
@@ -139,12 +139,12 @@ function reschedule_message_sending($handler, $imap, $msg_id, $folder, $new_date
     $msg = rtrim($msg)."\r\n";
 
     $schedule_folder = 'Scheduled';
-    if (!count($imap->get_folder_status($schedule_folder))) {
+    if (!count($mailbox->get_folder_status($schedule_folder))) {
         return;
     }
     $res = false;
-    if ($imap->store_message($schedule_folder, $msg)) {
-        if ($imap->delete_message($folder, $msg_id, false)) {
+    if ($mailbox->store_message($schedule_folder, $msg)) {
+        if ($mailbox->delete_message($folder, $msg_id, false)) {
             $res = true;
         }
     }

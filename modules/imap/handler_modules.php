@@ -1723,7 +1723,8 @@ class Hm_Handler_load_imap_servers_from_config extends Hm_Handler_Module {
                 'port' => $auth_server['port'],
                 'tls' => $auth_server['tls'],
                 'user' => $auth_server['username'],
-                'pass' => $auth_server['password']
+                'pass' => $auth_server['password'],
+                'type' => 'imap',
             );
             if (! empty($auth_server['sieve_config_host'])) {
                 $imap_details['sieve_config_host'] = $auth_server['sieve_config_host'];

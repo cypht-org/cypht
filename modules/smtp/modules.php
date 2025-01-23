@@ -1566,37 +1566,36 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
      * Send delayed messages
      * This should use cron
      */
-   public function process() {
-    if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
-        return;
-    }
+    public function process() {
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            return;
+        }
 
-    $servers = Hm_IMAP_List::dump();
-    $scheduled_msg_count = 0;
+        $servers = Hm_IMAP_List::dumpForMailbox();
+        $scheduled_msg_count = 0;
 
-    foreach (array_keys($servers) as $server_id) {
-        $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
-        $imap = Hm_IMAP_List::connect($server_id, $cache);
-        
-        if ($imap->authed()) {
-            $folder = 'Scheduled';
-            $ret = $imap->get_messages($folder, 'DATE', false, 'ALL');
-            foreach ($ret[1] as $msg) {
-                $msg_headers = $imap->get_message_headers($folder, $msg['uid']);
-                if (! empty($msg_headers['X-Schedule'])) {
-                    $scheduled_msg_count++;
-                } else {
-                    continue;
-                }
-                if (send_scheduled_message($this, $imap, $folder, $msg['uid'])) {
-                    $scheduled_msg_count++;
+        foreach ($servers as $server_id => $config) {
+            $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
+            if ($mailbox && $mailbox->connect()) {
+                $folder = 'Scheduled';
+                $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
+                foreach ($ret[1] as $msg) {
+                    $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
+                    if (! empty($msg_headers['X-Schedule'])) {
+                        $scheduled_msg_count++;
+                    } else {
+                        continue;
+                    }
+                    if (send_scheduled_message($this, $mailbox, $folder, $msg['uid'])) {
+                        $scheduled_msg_count++;
+                    }
                 }
             }
         }
-    }
 
-    $this->out('scheduled_msg_count', $scheduled_msg_count);
-}}
+        $this->out('scheduled_msg_count', $scheduled_msg_count);
+    }
+}
 
 /**
  * Changes the schedule of the message
