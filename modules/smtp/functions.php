@@ -66,7 +66,7 @@ if (!hm_exists('get_reply_type')) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('send_scheduled_message')) {
-function send_scheduled_message($handler, $imap, $folder, $msg_id, $server_id, $send_now = false) {    
+function send_scheduled_message($handler, $imap, $folder, $msg_id, $send_now = false) {    
     $msg_headers = $imap->get_message_headers($folder, $msg_id);    
     $imap_details = $imap->get_config();       
 
@@ -89,7 +89,7 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $server_id, $
 
             $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
 
-            if ($smtp) {
+            if ($smtp && $smtp->authed()) {
                 $delivery_receipt = isset($msg_headers['X-Delivery']);
 
                 $recipients = [];
@@ -106,7 +106,7 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $server_id, $
 
                 if (!$err_msg) {
                     $imap->delete_message($folder, $msg_id, false);
-                    save_sent_msg($handler, $server_id, $imap, $imap_details, $msg_content, $msg_id, false);
+                    save_sent_msg($handler, $imap->get_config()['id'], $imap, $imap_details, $msg_content, $msg_id, false);
                     return true; 
                 }
             }
@@ -121,9 +121,9 @@ function send_scheduled_message($handler, $imap, $folder, $msg_id, $server_id, $
  * @subpackage smtp/functions
  */
 if (!hm_exists('reschedule_message_sending')) {
-function reschedule_message_sending($handler, $imap, $msg_id, $folder, $new_date, $server_id) {
+function reschedule_message_sending($handler, $imap, $msg_id, $folder, $new_date) {
     if ($new_date == 'now') {
-        return send_scheduled_message($handler, $imap, $folder, $msg_id, $server_id, true);
+        return send_scheduled_message($handler, $imap, $folder, $msg_id, true);
     }
     $msg = $imap->get_message_content($folder, $msg_id, 0);
     $new_date = get_scheduled_date($new_date);
