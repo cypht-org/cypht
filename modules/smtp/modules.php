@@ -1159,6 +1159,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
                 '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
+                '<input type="hidden" class="saving_draft" name="draft_id" value="0" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
 
                 '<div class="to_outer">'.

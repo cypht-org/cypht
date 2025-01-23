@@ -93,7 +93,7 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
     if (!body && !subject && !to && !cc && !bcc) {
         return;
     }
-    $('.compose_draft_id').val(0)
+    $('.saving_draft').val(1);
     Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
         {'name': 'draft_id', 'value': draft_id},
@@ -109,6 +109,7 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
         {'name': 'schedule', 'value': schedule ?? ''},
         {'name': 'compose_delivery_receipt', 'value': delivery_receipt ?? ''}],
         function(res) {
+            $('.saving_draft').val(0);
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
@@ -121,7 +122,11 @@ var save_compose_state = function(no_files, notice, schedule, callback) {
             }
         },
         [],
-        no_icon
+        no_icon,
+        false,
+        function () {
+            $('.saving_draft').val(0);
+        }
     );
 };
 
