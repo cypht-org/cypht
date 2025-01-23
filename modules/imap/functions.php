@@ -1702,16 +1702,13 @@ function save_sent_msg($handler, $imap_id, $imap, $imap_details, $msg, $msg_id, 
     $uid = null;
     if ($sent_folder) {
         Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-        if ($imap->append_start($sent_folder, strlen($msg), true)) {
-            $imap->append_feed($msg."\r\n");
-            if (!$imap->append_end() && $show_errors) {
-                Hm_Msgs::add('ERRAn error occurred saving the sent message');
-            }
+        if (! $imap->store_message($sent_folder, $msg)) {
+            Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
 
-        $mailbox_page = $imap->get_mailbox_page($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
+        $mailbox_page = $imap->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
         foreach ($mailbox_page[1] as $mail) {
-            $msg_header = $imap->get_message_headers($mail['uid']);
+            $msg_header = $imap->get_message_headers($sent_folder, $mail['uid']);
             if ($msg_header['Message-Id'] === $msg_id) {
                 $uid = $mail['uid'];
                 break;

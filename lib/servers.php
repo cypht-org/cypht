@@ -273,4 +273,14 @@ trait Hm_Server_List {
         }
         return false;
     }
+
+    public static function getForMailbox($id) {
+        $server = self::get($id, true);
+        if ($server) {
+            $server['password'] = $server['pass'];
+            $server['username'] = $server['user'];
+            return $server;
+        }
+        return false;
+    }
 }

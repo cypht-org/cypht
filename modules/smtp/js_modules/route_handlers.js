@@ -121,7 +121,7 @@ function applySmtpComposePageHandlers() {
             if (handleMissingAttachment()) {
                 if ($('.nexter_input').val()) {
                     save_compose_state(false, true, $('.nexter_input').val(), function(res) {
-                        if (!res.router_user_msgs[0].startsWith('ERR')) {
+                        if (res.draft_id) {
                             reset_smtp_form(false);
                             Hm_Folders.reload_folders(true);
                             Hm_Utils.redirect();
