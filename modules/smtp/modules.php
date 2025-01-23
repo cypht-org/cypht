@@ -557,8 +557,8 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         }
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
         $specials = get_special_folders($this, $imap_profile['id']);
-        if (!array_key_exists('sent', $specials) || !$specials['sent']) {
-            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account');
+        if ($imap_profile && (!array_key_exists('sent', $specials) || !$specials['sent'])) {
+            Hm_Msgs::add('ERRPlease configure a sent folder for account ' . $imap_profile['name']);
         }
     }
 }
@@ -1609,7 +1609,7 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
  * @subpackage smtp/handler
  */
 class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
-    public function process() {        
+    public function process() {
         if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
             return;
         }
@@ -1625,9 +1625,10 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
         $ids = explode(',', $form['scheduled_msg_ids']);
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $imap_server = Hm_IMAP_List::getForMailbox($imap_server_id);
 
-            $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $this->config);
-            if ($mailbox->connect()) {
+            $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $imap_server);
+            if ($mailbox && $mailbox->connect()) {
                 $folder = hex2bin($folder);
                 if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date, $imap_server_id)) {
                     $scheduled_msg_count++;
@@ -1889,19 +1890,17 @@ function delete_draft($id, $cache, $imap_server_id, $folder) {
  */
 if (!hm_exists('find_imap_by_smtp')) {
 function find_imap_by_smtp($imap_profiles, $smtp_profile) {
-    $id = 0;
     foreach ($imap_profiles as $profile) {
         if ($smtp_profile['user'] == $profile['user']) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
         if (explode('@', $smtp_profile['user'])[0]
             == explode('@', $profile['user'])[0]) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
         if ($smtp_profile['user'] == $profile['name']) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
-        $id++;
     }
 }}
 
@@ -2033,7 +2032,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $from = $profile['replyto'];
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
-        $imap_profile = Hm_IMAP_List::dump($imap_profile['id'], true); // Change this later
     }
     if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
@@ -2048,6 +2046,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         return -1;
     }
 
+    $imap_profile = Hm_IMAP_List::getForMailbox($imap_profile['id']);
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if ((!array_key_exists('draft', $specials) || !$specials['draft']) && !array_key_exists('schedule', $atts)) {
@@ -2072,11 +2071,16 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
     $res = $mime->process_attachments();
 
+    if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {
+        Hm_Msgs::add("ERRNo valid recipients found");
+        return -1;
+    }
+
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($mailbox->store_message($folder, $msg, false, true)) {
+    if (! $mailbox->store_message($folder, $msg, false, true)) {
         Hm_Msgs::add('ERRAn error occurred saving the draft message');
         return -1;
     }
