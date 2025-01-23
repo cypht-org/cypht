@@ -384,3 +384,23 @@ function smtpSettingsPageHandler() {
         );
     });
 }
+
+$(function() {
+    var scheduled_msg_count = 0;
+    var sendScheduledMessages = function() { 
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_send_scheduled_messages'}],
+            function(res) {
+                scheduled_msg_count = res.scheduled_msg_count;
+            },
+        );
+    }
+
+    sendScheduledMessages();
+    setInterval(sendScheduledMessages, 60000);
+    window.onbeforeunload = (e) => {
+        if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {
+            return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
+        }
+    };
+});

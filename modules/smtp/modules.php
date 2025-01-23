@@ -1576,26 +1576,19 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
     foreach (array_keys($servers) as $server_id) {
         $cache = Hm_IMAP_List::get_cache($this->cache, $server_id);
         $imap = Hm_IMAP_List::connect($server_id, $cache);
-
-        if (imap_authed($imap)) {
+        
+        if ($imap->authed()) {
             $folder = 'Scheduled';
-            $ret = $imap->get_mailbox_page($folder, 'DATE', false, 'ALL');
-
+            $ret = $imap->get_messages($folder, 'DATE', false, 'ALL');
             foreach ($ret[1] as $msg) {
-                $msg_headers = $imap->get_message_headers($msg['uid']);
-
-                try {
-                    if (!empty($msg_headers['X-Schedule'])) {
-                        $scheduled_msg_count++;
-                    } else {
-                        continue;
-                    }
-
-                    if (send_scheduled_message($this, $imap, $msg, $server_id)) {
-                        $scheduled_msg_count--;
-                    }
-                } catch (Exception $e) {
-                    Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
+                $msg_headers = $imap->get_message_headers($folder, $msg['uid']);
+                if (! empty($msg_headers['X-Schedule'])) {
+                    $scheduled_msg_count++;
+                } else {
+                    continue;
+                }
+                if (send_scheduled_message($this, $imap, $folder, $msg['uid'])) {
+                    $scheduled_msg_count++;
                 }
             }
         }
@@ -1630,7 +1623,7 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $imap_server);
             if ($mailbox && $mailbox->connect()) {
                 $folder = hex2bin($folder);
-                if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date, $imap_server_id)) {
+                if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date)) {
                     $scheduled_msg_count++;
                 }
             }
