@@ -9,7 +9,6 @@ on:
         required: false
         default: "latest"
         type: string
-
   schedule:
     - cron: "0 0 * * *"
   push:
@@ -21,14 +20,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    env:
-      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
     strategy:
       matrix:
-        include:
-          - php_version: ${{ inputs.php_version }}
+        php_version: [ "${{ inputs.php_version }}" ]
 
     steps:
       - name: Checkout repository
@@ -36,40 +30,38 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Debugging steps for DOCKER_USERNAME
-      - name: Verify DOCKER_USERNAME is set
-        run: |
-          if [ -z "$DOCKER_USERNAME" ]; then
-            echo "DOCKER_USERNAME is empty or not set!"
-            exit 1
-          else
-            echo "DOCKER_USERNAME is set."
-          fi
-
-      - name: Output partial DOCKER_USERNAME
-        run: |
-          echo "Partial DOCKER_USERNAME: ${DOCKER_USERNAME:0:3}***"
-
-      - name: Debug DOCKER_USERNAME length
-        run: |
-          echo "Length of DOCKER_USERNAME: ${#DOCKER_USERNAME}"
-
-      - name: Encode and Debug DOCKER_USERNAME
-        run: |
-          echo "Encoded DOCKER_USERNAME: $(echo -n "$DOCKER_USERNAME" | base64)"
-
-      - name: Log Environment Variables
-        run: env
-
+      # Log in to Docker Hub using the username and Docker Token
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}       # Your Docker Hub username
+          password: ${{ secrets.DOCKER_PASSWORD }}           # Your Docker Hub access token
 
+      # Set up Docker Buildx (after login)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # Check if DOCKER_USERNAME secret is available
+      - name: Check if DOCKER_USERNAME secret is available
+        run: |
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then
+            echo "DOCKER_USERNAME secret is NOT set or accessible!"
+            exit 1
+          else
+            echo "DOCKER_USERNAME secret is accessible."
+          fi
+
+      # Check if DOCKER_TOKEN secret is available
+      - name: Check if DOCKER_TOKEN secret is available
+        run: |
+          if [ -z "${{ secrets.DOCKER_TOKEN }}" ]; then
+            echo "DOCKER_TOKEN secret is NOT set or accessible!"
+            exit 1
+          else
+            echo "DOCKER_TOKEN secret is accessible."
+          fi
+
+      # Build and push Docker image
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
@@ -78,7 +70,6 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: cypht/cypht-daily:${{ matrix.php_version }}
-          debug: true
 
       - name: Log out from Docker Hub
         run: docker logout
