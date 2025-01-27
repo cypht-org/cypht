@@ -4,8 +4,8 @@ on:
   schedule:
     - cron: "0 0 * * *"
 jobs:
-  if: github.repository_owner == 'cypht-org'
   build-and-push:
+    if: github.repository_owner == 'cypht-org'
     runs-on: ubuntu-latest
 
     steps:
