@@ -1279,7 +1279,7 @@ div.unseen,
 .mobile .imap_sort {
   width: 100%;
 }
-.snoozed_date {
+.nexter_date {
   color: var(--bs-primary) !important;
 }
 

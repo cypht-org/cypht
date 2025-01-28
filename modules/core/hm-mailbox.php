@@ -569,7 +569,7 @@ class Hm_Mailbox {
         }
     }
 
-    protected function select_folder($folder) {
+    public function select_folder($folder) {
         if ($this->is_imap()) {
             if (isset($this->connection->selected_mailbox['name']) && $this->connection->selected_mailbox['name'] == $folder) {
                 return true;
@@ -585,5 +585,9 @@ class Hm_Mailbox {
             $this->selected_folder = ['id' => $folder, 'name' => $this->folder_state['name'], 'detail' => []];
         }
         return true;
+    }
+
+    public function get_config() {
+        return $this->config;
     }
 }

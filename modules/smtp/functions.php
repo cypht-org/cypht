@@ -61,3 +61,92 @@ if (!hm_exists('get_reply_type')) {
         return false;
     }
 }
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('send_scheduled_message')) {
+function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now = false) {    
+    $msg_headers = $mailbox->get_message_headers($folder, $msg_id);    
+    $mailbox_details = $mailbox->get_config();       
+
+    try {
+        if (empty($msg_headers['X-Schedule'])) {
+            return false;
+        }
+
+        if (new DateTime($msg_headers['X-Schedule']) <= new DateTime() || $send_now) {
+            $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
+            if (!$profile) {
+                $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
+
+                if (!$profiles) {
+                    Hm_Debug::add(sprintf('ERRCannot find profiles corresponding with MAILBOX server: %s', $mailbox_details['server']));
+                    return false;
+                }
+                $profile = $profiles[0];
+            }
+
+            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
+
+            if ($smtp && $smtp->authed()) {
+                $delivery_receipt = isset($msg_headers['X-Delivery']);
+
+                $recipients = [];
+                foreach (['To', 'Cc', 'Bcc'] as $fld) {
+                    if (array_key_exists($fld, $msg_headers)) {
+                        $recipients = array_merge($recipients, Hm_MIME_Msg::find_addresses($msg_headers[$fld]));
+                    }
+                }
+
+                $msg_content = $mailbox->get_message_content($folder, $msg_id, 0);
+                $from = process_address_fld($msg_headers['From']);
+
+                $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
+
+                if (!$err_msg) {
+                    $mailbox->delete_message($folder, $msg_id, false);
+                    save_sent_msg($handler, $mailbox->get_config()['id'], $mailbox, $mailbox_details, $msg_content, $msg_id, false);
+                    return true; 
+                }
+            }
+        }
+    } catch (Exception $e) {
+        Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
+    }
+    return false; 
+}}
+
+/**
+ * @subpackage smtp/functions
+ */
+if (!hm_exists('reschedule_message_sending')) {
+function reschedule_message_sending($handler, $mailbox, $msg_id, $folder, $new_date) {
+    if ($new_date == 'now') {
+        return send_scheduled_message($handler, $mailbox, $folder, $msg_id, true);
+    }
+    $msg = $mailbox->get_message_content($folder, $msg_id, 0);
+    $new_date = get_scheduled_date($new_date);
+    preg_match("/^X-Schedule:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
+
+    if (count($matches)) {
+        $msg = str_replace($matches[0], "X-Schedule: {$new_date}\n", $msg);
+    } else {
+        return;
+    }
+    $msg = str_replace("\r\n", "\n", $msg);
+    $msg = str_replace("\n", "\r\n", $msg);
+    $msg = rtrim($msg)."\r\n";
+
+    $schedule_folder = 'Scheduled';
+    if (!count($mailbox->get_folder_status($schedule_folder))) {
+        return;
+    }
+    $res = false;
+    if ($mailbox->store_message($schedule_folder, $msg)) {
+        if ($mailbox->delete_message($folder, $msg_id, false)) {
+            $res = true;
+        }
+    }
+    return $res; 
+}}

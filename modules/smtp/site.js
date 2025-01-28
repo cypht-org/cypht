@@ -28,7 +28,7 @@ var smtp_test_action = function(event) {
         false,
         {'smtp_connect': 1}
     );
-};             
+};
 
 var smtp_delete_action = function(event) {
     if (!hm_delete_prompt()) {
@@ -69,7 +69,7 @@ var send_archive = function() {
     document.getElementsByClassName("smtp_send_placeholder")[0].click();
 }
 
-var save_compose_state = function(no_files, notice) {
+var save_compose_state = function(no_files, notice, schedule, callback) {
     var no_icon = true;
     if (notice) {
         no_icon = false;
@@ -82,6 +82,7 @@ var save_compose_state = function(no_files, notice) {
     var cc = $('.compose_cc').val();
     var bcc = $('.compose_bcc').val();
     var inreplyto = $('.compose_in_reply_to').val();
+    var delivery_receipt = $('#compose_delivery_receipt').prop('checked');
 
     var draft_id = $('.compose_draft_id').val();
     if (globals.draft_state == body+subject+to+smtp+cc+bcc+uploaded_files) {
@@ -92,9 +93,8 @@ var save_compose_state = function(no_files, notice) {
     if (!body && !subject && !to && !cc && !bcc) {
         return;
     }
-    $('.compose_draft_id').val(0)
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
+    $('.saving_draft').val(1);
+    Hm_Ajax.request([{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_save_draft'},
         {'name': 'draft_body', 'value': body},
         {'name': 'draft_id', 'value': draft_id},
         {'name': 'draft_smtp', 'value': smtp},
@@ -105,17 +105,28 @@ var save_compose_state = function(no_files, notice) {
         {'name': 'draft_in_reply_to', 'value': inreplyto},
         {'name': 'delete_uploaded_files', 'value': no_files},
         {'name': 'draft_to', 'value': to},
-        {'name': 'uploaded_files', 'value': uploaded_files}],
+        {'name': 'uploaded_files', 'value': uploaded_files},
+        {'name': 'schedule', 'value': schedule ?? ''},
+        {'name': 'compose_delivery_receipt', 'value': delivery_receipt ?? ''}],
         function(res) {
+            $('.saving_draft').val(0);
             if (res.draft_id) {
                 $('.compose_draft_id').val(res.draft_id);
             }
             if (res.draft_subject) {
                 $('.draft_list .draft_'+draft_id+' a').text(res.draft_subject);
             }
+
+            if (callback) {
+                callback(res);
+            }
         },
         [],
-        no_icon
+        no_icon,
+        false,
+        function () {
+            $('.saving_draft').val(0);
+        }
     );
 };
 
@@ -138,7 +149,7 @@ function smtpServersPageHandler() {
     }
 }
 
-var reset_smtp_form = function() {
+var reset_smtp_form = function(save = true) {
     $('.compose_body').val('');
     $('.compose_subject').val('');
     $('.compose_to').val('');
@@ -146,7 +157,10 @@ var reset_smtp_form = function() {
     $('.compose_bcc').val('');
     $('.ke-content', $('iframe').contents()).html('');
     $('.uploaded_files').html('');
-    save_compose_state(true);
+    $('#compose_delivery_receipt').prop('checked', false);
+    if (save) {
+        save_compose_state(true);
+    }
 };
 
 var replace_cursor_positon = function (txtElement) {
@@ -375,3 +389,25 @@ function smtpSettingsPageHandler() {
         );
     });
 }
+
+$(function() {
+    if (hm_is_logged()) {
+        var scheduled_msg_count = 0;
+        var sendScheduledMessages = function() { 
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_send_scheduled_messages'}],
+                function(res) {
+                    scheduled_msg_count = res.scheduled_msg_count;
+                },
+            );
+        }
+
+        sendScheduledMessages();
+        setInterval(sendScheduledMessages, 60000);
+        window.onbeforeunload = (e) => {
+            if (scheduled_msg_count > 0 && e.currentTarget.location.hostname !== document.location.hostname) {
+                return sprintf(hm_trans("You have %d scheduled messages that won\'t be executed if you quit"), scheduled_msg_count);
+            }
+        };
+    }
+});

@@ -2,6 +2,10 @@
 function applySmtpComposePageHandlers() {
     init_resumable_upload()
 
+    setupActionSchedule(function () {
+        $('.smtp_send_placeholder').trigger('click');
+    });
+
     if (window.HTMLEditor) {
         useKindEditor();
     }
@@ -109,16 +113,23 @@ function applySmtpComposePageHandlers() {
         }
 
         async function handleSendAnyway() {
-
-            if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            await waitForValueChange('.compose_draft_id', '0');
+            if ($('.saving_draft').val() !== '0') {
+                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                await waitForValueChange('.saving_draft', '0');
             }
 
-            
-        
             if (handleMissingAttachment()) {
-                document.getElementsByClassName("smtp_send")[0].click();
+                if ($('.nexter_input').val()) {
+                    save_compose_state(false, true, $('.nexter_input').val(), function(res) {
+                        if (res.draft_id) {
+                            reset_smtp_form(false);
+                            Hm_Folders.reload_folders(true);
+                            Hm_Utils.redirect();
+                        }
+                    });
+                } else {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                }
             } else {
                 e.preventDefault();
             }

@@ -637,3 +637,99 @@ function privacy_setting_callback($val, $key, $mod) {
     }
     return $val;
 }
+
+if (!hm_exists('get_scheduled_date')) {
+function get_scheduled_date($format, $only_label = false) {
+    if ($format == 'later_in_day') {
+        $date_string = 'today 18:00';
+        $label = 'Later in the day';
+    } elseif ($format == 'tomorrow') {
+        $date_string = '+1 day 08:00';
+        $label = 'Tomorrow';
+    } elseif ($format == 'next_weekend') {
+        $date_string = 'next Saturday 08:00';
+        $label = 'Next weekend';
+    } elseif ($format == 'next_week') {
+        $date_string = 'next week 08:00';
+        $label = 'Next week';
+    } elseif ($format == 'next_month') {
+        $date_string = 'next month 08:00';
+        $label = 'Next month';
+    } else {
+        $date_string = $format;
+        $label = 'Certain date';
+    }
+    $time = strtotime($date_string);
+    if ($only_label) {
+        return [$label, date('D, H:i', $time)];
+    }
+    return date('D, d M Y H:i', $time);
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('nexter_formats')) {
+function nexter_formats() {
+    $values = array(
+        'tomorrow',
+        'next_weekend',
+        'next_week',
+        'next_month'
+    );
+    if (date('H') <= 16) {
+        array_push($values, 'later_in_day');
+    }
+    return $values;
+}}
+
+if (!hm_exists('schedule_dropdown')) {
+function schedule_dropdown($output, $send_now = false) {
+    $values = nexter_formats();
+
+    $txt = '';
+    if ($send_now) {
+        $txt .= '<div class="dropdown d-inline-block">
+                <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Schedule sending').'</button>';
+    }
+    $txt .= '<ul class="dropdown-menu nexter_dropdown schedule_dropdown" aria-labelledby="dropdownMenuNexterDate">';
+    foreach ($values as $format) {
+        $labels = get_scheduled_date($format, true);
+        $txt .= '<li><a href="#" class="nexter_date_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
+    }
+    $txt .= '<li><hr class="dropdown-divider"></li>';
+    $txt .= '<li><label for="nexter_input_date" class="nexter_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<input id="nexter_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="nexter_input_date" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<input class="nexter_input" style="display:none;"></li>';
+    if ($send_now) {
+        $txt .= '<li><hr class="dropdown-divider"></li>';
+        $txt .= '<li><a href="#" data-value="now" class="nexter_date_helper dropdown-item"">'.$output->trans('Send now').'</a></li>';
+    }
+    $txt .= '</ul>';
+    if ($send_now) {
+        $txt .= '</div>';
+    }
+
+    return $txt;
+}}
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('parse_nexter_header')) {
+    function parse_nexter_header($header, $name)
+    {
+        $header = str_replace("$name: ", '', $header);
+        $result = [];
+        foreach (explode(';', $header) as $kv)
+        {
+            $kv = trim($kv);
+            $spacePos = strpos($kv, ' ');
+            if ($spacePos > 0) {
+                $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+            } else {
+                $result[$kv] = true;
+            }
+        }
+        return $result;
+    }}
