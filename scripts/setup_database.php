@@ -4,66 +4,35 @@
 
 define('APP_PATH', dirname(dirname(__FILE__)).'/');
 define('VENDOR_PATH', APP_PATH.'vendor/');
+define('MIGRATIONS_PATH', APP_PATH.'database/migrations');
 
 require VENDOR_PATH.'autoload.php';
 require APP_PATH.'lib/framework.php';
-
-/**
- * Function to check required extensions for a database driver
- */
-function checkRequiredExtensions($db_driver, $extensions) {
-    $missing_extensions = [];
-
-    foreach ($extensions as $extension) {
-        if (!extension_loaded($extension)) {
-            $missing_extensions[] = $extension;
-        }
-    }
-
-    if (!empty($missing_extensions)) {
-        error_log(
-            "The following required {$db_driver} extensions are missing: " .
-            implode(', ', $missing_extensions) .
-            ". Please install them.\n"
-        );
-        exit(1);
-    }
-}
 
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
 /* get config object */
 $config = new Hm_Site_Config_File();
-/* set the default since and per_source values */
 $environment->define_default_constants($config);
 
 $session_type = $config->get('session_type');
 $auth_type = $config->get('auth_type');
 $user_config_type = $config->get('user_config_type');
 $db_driver = $config->get('db_driver');
+define('SCHEMA_PATH', APP_PATH.'database/'.$db_driver.'_schema.sql');
 
 $connected = false;
-$create_table = "CREATE TABLE IF NOT EXISTS";
-$bad_driver = "Unsupported db driver: {$db_driver}";
 
 // NOTE: these sql commands could be db agnostic if we change the blobs to text
+// Check required extensions for the DB driver
+checkRequiredExtensions($db_driver);
 
-// Check if the required extensions for the configured DB driver are loaded
-if ($db_driver == 'mysql') {
-    checkRequiredExtensions('MySQL', ['mysqli', 'mysqlnd', 'pdo_mysql']);
-} elseif ($db_driver == 'pgsql') {
-    checkRequiredExtensions('PostgreSQL', ['pgsql', 'pdo_pgsql']);
-} elseif ($db_driver !== 'sqlite') {
-    error_log("Unsupported DB driver: {$db_driver}");
-    exit(1);
-}
-
-$connection_tries=0;
-$max_tries=10;
+$connection_tries = 0;
+$max_tries = 10;
 
 while (!$connected) {
-    $connection_tries = $connection_tries + 1;
+    $connection_tries++;
 
     $conn = Hm_DB::connect($config);
 
@@ -81,53 +50,160 @@ while (!$connected) {
     }
 }
 
-if (strcasecmp($session_type, 'DB')==0) {
-    printf("Creating database table hm_user_session ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255), data longblob, date timestamp, primary key (hm_id));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_session (hm_id varchar(255) primary key not null, data text, date timestamp);";
-    } else {
-        die($bad_driver);
-    }
-
-    $conn->exec($stmt);
-}
-if (strcasecmp($auth_type, 'DB')==0) {
-
-    printf("Creating database table hm_user ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user (username varchar(255), hash varchar(255), primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user (username varchar(255) primary key not null, hash varchar(255));";
-    } else {
-        die($bad_driver);
-    }
-
-    try {
-        $rows = $conn->exec($stmt);
-        printf("{$stmt}\n");
-    } catch (PDOException $e) {
-        print($e);
-        exit (1);
-    }
-
-}
-if (strcasecmp($user_config_type, 'DB')==0) {
-
-    printf("Creating database table hm_user_settings ...\n");
-
-    if ($db_driver == 'mysql' || $db_driver == 'sqlite') {
-        $stmt = "{$create_table} hm_user_settings(username varchar(255), settings longblob, primary key (username));";
-    } elseif ($db_driver == 'pgsql') {
-        $stmt = "{$create_table} hm_user_settings (username varchar(255) primary key not null, settings text);";
-    } else {
-        die($bad_driver);
-    }
-
-    $conn->exec($stmt);
-}
+// Setup database and run migrations
+setupDatabase($conn, SCHEMA_PATH, MIGRATIONS_PATH);
 
 print("\nDb setup finished\n");
+
+/**
+ * Checks for required extensions based on the DB driver.
+ */
+function checkRequiredExtensions(string $db_driver) {
+    $extensions = match ($db_driver) {
+        'mysql' => ['mysqli', 'mysqlnd', 'pdo_mysql'],
+        'pgsql' => ['pgsql', 'pdo_pgsql'],
+        'sqlite' => [],
+        default => [],
+    };
+
+    $missing_extensions = array_filter($extensions, fn($ext) => !extension_loaded($ext));
+
+    if (!empty($missing_extensions)) {
+        error_log('Missing required extensions: ' . implode(', ', $missing_extensions));
+        exit(1);
+    }
+}
+
+/**
+ * Initializes the database and runs migrations.
+ */
+function setupDatabase(PDO $pdo, string $schemaFile, string $migrationDir) {
+    if (isDatabaseEmpty($pdo)) {
+        echo "Database is empty. Initializing...\n";
+        initializeDatabase($pdo, $schemaFile, $migrationDir);
+    } else {
+        echo "Database detected. Running migrations...\n";
+        ensureMigrationsTable($pdo);
+        runMigrations($pdo, $migrationDir);
+    }
+}
+
+/**
+ * Checks if the database is empty (no tables exist).
+ */
+function isDatabaseEmpty(PDO $pdo): bool {
+    global $db_driver;
+
+    $checkTablesSql = match ($db_driver) {
+        'mysql' => "SHOW TABLES;",
+        'pgsql' => "SELECT table_name FROM information_schema.tables WHERE table_schema='public';",
+        'sqlite' => "SELECT name FROM sqlite_master WHERE type='table';",
+        default => throw new Exception("Unsupported database driver: " . $db_driver),
+    };
+
+    $tables = $pdo->query($checkTablesSql)->fetchAll(PDO::FETCH_COLUMN);
+
+    return empty($tables);
+}
+
+/**
+ * Ensures the `migrations` table exists for existing databases.
+ */
+function ensureMigrationsTable(PDO $pdo) {
+    global $db_driver;
+
+    try {
+        $pdo->query("SELECT 1 FROM migrations LIMIT 1");
+    } catch (PDOException $e) {
+        echo "Migrations table not found. Creating it...\n";
+
+        $createTableSql = match ($db_driver) {
+            'mysql' => "
+                CREATE TABLE migrations (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    migration VARCHAR(255) NOT NULL,
+                    batch INT NOT NULL,
+                    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                );
+            ",
+            'pgsql' => "
+                CREATE TABLE migrations (
+                    id SERIAL PRIMARY KEY,
+                    migration VARCHAR(255) NOT NULL,
+                    batch INT NOT NULL,
+                    applied_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
+                );
+            ",
+            'sqlite' => "
+                CREATE TABLE migrations (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    migration TEXT NOT NULL,
+                    batch INTEGER NOT NULL,
+                    applied_at TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            ",
+            default => throw new Exception("Unsupported database driver: " . $db_driver),
+        };
+
+        $pdo->exec($createTableSql);
+        echo "Migrations table created.\n";
+    }
+}
+
+/**
+ * Initializes the database schema and populates migrations for new installations.
+ */
+function initializeDatabase(PDO $pdo, string $schemaFile, string $migrationDir) {
+    global $db_driver;
+    $schemaSql = file_get_contents($schemaFile);
+    $pdo->exec($schemaSql);
+    echo "Database schema initialized.\n";
+
+    ensureMigrationsTable($pdo);
+    
+    $migrationFiles = glob($migrationDir .'/'.$db_driver.'/*.sql');
+    $stmt = $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (:migration, :batch)");
+    foreach ($migrationFiles as $file) {
+        $stmt->execute([
+            'migration' => basename($file),
+            'batch' => 0, // Mark as pre-applied
+        ]);
+    }
+
+    echo "Migrations table populated for new installation.\n";
+}
+
+/**
+ * Executes pending migrations for existing databases.
+ */
+function runMigrations(PDO $pdo, string $migrationDir) {
+    echo "Running migrations...\n";
+    global $db_driver;
+
+    $executed = $pdo->query("SELECT migration FROM migrations")->fetchAll(PDO::FETCH_COLUMN);
+    $migrationFiles = glob($migrationDir .'/'.$db_driver.'/*.sql');
+    $stmt = $pdo->prepare("INSERT INTO migrations (migration, batch) VALUES (:migration, :batch)");
+
+    foreach ($migrationFiles as $file) {
+        $migrationName = basename($file);
+        if (in_array($migrationName, $executed)) {
+            continue;
+        }
+
+        try {
+            $sql = file_get_contents($file);
+            $pdo->exec($sql);
+
+            $stmt->execute([
+                'migration' => $migrationName,
+                'batch' => 1
+            ]);
+
+            echo "Migrated: $migrationName\n";
+        } catch (PDOException $e) {
+            die("Migration failed for $migrationName: " . $e->getMessage());
+        }
+    }
+
+    echo "Migrations completed.\n";
+}

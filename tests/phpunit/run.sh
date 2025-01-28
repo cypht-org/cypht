@@ -20,7 +20,7 @@ if [ "$DB" = "sqlite" ]; then
     export DB_CONNECTION_TYPE=socket
     export DB_SOCKET=${FILE}
 
-    cat ${SCRIPT_DIR}/data/schema.sql | sqlite3 ${FILE}
+    cat ${SCRIPT_DIR}/data/schema_sqlite.sql | sqlite3 ${FILE}
     cat ${SCRIPT_DIR}/data/seed.sql | sqlite3 ${FILE}
 
 elif [ "$DB" = "mysql" ]; then
@@ -33,7 +33,7 @@ elif [ "$DB" = "mysql" ]; then
 elif [ "$DB" = "postgres" ]; then
     export DB_DRIVER=pgsql
     # Load schema.sql
-    PGPASSWORD=cypht_test psql -h 127.0.0.1 -U cypht_test -d cypht_test -f ${SCRIPT_DIR}/data/schema.sql
+    PGPASSWORD=cypht_test psql -h 127.0.0.1 -U cypht_test -d cypht_test -f ${SCRIPT_DIR}/data/schema_postgres.sql
     # Load seed.sql
     PGPASSWORD=cypht_test psql -h 127.0.0.1 -U cypht_test -d cypht_test -f ${SCRIPT_DIR}/data/seed_postgres.sql
 
