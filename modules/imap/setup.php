@@ -462,5 +462,6 @@ return array(
         'ceo_suspicious_terms' => FILTER_DEFAULT,
         'ceo_rate_limit' => FILTER_VALIDATE_INT,
         'filter_type' => FILTER_DEFAULT,
+        'list_page' => FILTER_DEFAULT,
     )
 );
