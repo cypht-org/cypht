@@ -1276,7 +1276,7 @@ div.unseen,
 .mobile .imap_sort {
   width: 100%;
 }
-.nexter_date {
+.delayed_date {
   color: var(--bs-primary) !important;
 }
 
