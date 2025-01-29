@@ -1589,9 +1589,34 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
-function getCombinedMessagesLists($sources, $cache, $searchTerms, $listPage, $limit, $offsets = [], $defaultOffset = 0, $filter = 'ALL') {
+/**
+ * @param array $sources
+ * @param object $cache
+ * @param array $search
+ */
+function getCombinedMessagesLists($sources, $cache, $search) {
+    $defaultSearch = [
+        'filter' => 'ALL',
+        'sort' => 'ARRIVAL',
+        'reverse' => true,
+        'terms' => [],
+        'limit' => 10,
+        'offsets' => [],
+        'defaultOffset' => 0,
+        'listPage' => 1
+    ];
+    $search = array_merge($defaultSearch, $search);
+
+    $filter = $search['filter'];
+    $sort = $search['sort'];
+    $reverse = $search['reverse'];
+    $searchTerms = $search['terms'];
+    $limit = $search['limit'];
+    $offsets = $search['offsets'];
+    $listPage = $search['listPage'];
+
     $totalMessages = 0;
-    $offset = $defaultOffset;
+    $offset = $search['defaultOffset'];
     $messagesLists = [];
     $status = [];
     foreach ($sources as $index => $dataSource) {
@@ -1604,11 +1629,22 @@ function getCombinedMessagesLists($sources, $cache, $searchTerms, $listPage, $li
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
         if ($mailbox && $mailbox->authed()) {
+            $imap = $mailbox->get_connection();
+
             $folder = $dataSource['folder'];
-            $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
+            $mailbox->select_folder(hex2bin($folder));
+            $state = $imap->get_mailbox_status(hex2bin($folder));
             $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
 
-            $uids = $mailbox->search(hex2bin($folder), $filter, false, $searchTerms);
+            // TODO: Ensure that two subsequent search requests do not get called. The one with sorted uids should be enough, accepting search terms.
+            if ($imap->is_supported( 'SORT' )) {
+                $sortedUids = $imap->get_message_sort_order($sort, $reverse, $filter);
+            } else {
+                $sortedUids = $imap->sort_by_fetch($sort, $reverse, $filter);
+            }
+            $sortedUids = array_reverse($sortedUids);
+
+            $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
             $total = count($uids);
             // most recent messages at the top
             $uids = array_reverse($uids);
