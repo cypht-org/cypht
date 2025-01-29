@@ -639,32 +639,44 @@ function privacy_setting_callback($val, $key, $mod) {
 }
 
 if (!hm_exists('get_scheduled_date')) {
-function get_scheduled_date($format, $only_label = false) {
-    if ($format == 'later_in_day') {
-        $date_string = 'today 18:00';
-        $label = 'Later in the day';
-    } elseif ($format == 'tomorrow') {
-        $date_string = '+1 day 08:00';
-        $label = 'Tomorrow';
-    } elseif ($format == 'next_weekend') {
-        $date_string = 'next Saturday 08:00';
-        $label = 'Next weekend';
-    } elseif ($format == 'next_week') {
-        $date_string = 'next week 08:00';
-        $label = 'Next week';
-    } elseif ($format == 'next_month') {
-        $date_string = 'next month 08:00';
-        $label = 'Next month';
-    } else {
-        $date_string = $format;
-        $label = 'Certain date';
+    function get_scheduled_date($format, $only_label = false) {
+        switch ($format) {
+            case 'later_in_day':
+                $date_string = 'today 18:00';
+                $label = 'Later in the day';
+                break;
+            case 'tomorrow':
+                $date_string = '+1 day 08:00';
+                $label = 'Tomorrow';
+                break;
+            case 'next_weekend':
+                $date_string = 'next Saturday 08:00';
+                $label = 'Next weekend';
+                break;
+            case 'next_week':
+                $date_string = 'next week 08:00';
+                $label = 'Next week';
+                break;
+            case 'next_month':
+                $date_string = 'next month 08:00';
+                $label = 'Next month';
+                break;
+            default:
+                $date_string = $format;
+                $label = 'Certain date';
+                break;
+        }
+
+        $time = strtotime($date_string);
+
+        if ($only_label) {
+            return [$label, date('D, H:i', $time)];
+        }
+
+        return date('D, d M Y H:i', $time);
     }
-    $time = strtotime($date_string);
-    if ($only_label) {
-        return [$label, date('D, H:i', $time)];
-    }
-    return date('D, d M Y H:i', $time);
-}}
+}
+
 
 /**
  * @subpackage imap/functions
@@ -721,15 +733,16 @@ if (!hm_exists('parse_nexter_header')) {
     {
         $header = str_replace("$name: ", '', $header);
         $result = [];
-        foreach (explode(';', $header) as $kv)
+        foreach (explode(';', $header) as $keyValue)
         {
-            $kv = trim($kv);
-            $spacePos = strpos($kv, ' ');
+            $keyValue = trim($keyValue);
+            $spacePos = strpos($keyValue, ' ');
             if ($spacePos > 0) {
-                $result[rtrim(substr($kv, 0, $spacePos), ':')] = trim(substr($kv, $spacePos+1));
+                $result[rtrim(substr($keyValue, 0, $spacePos), ':')] = trim(substr($keyValue, $spacePos+1));
             } else {
-                $result[$kv] = true;
+                $result[$keyValue] = true;
             }
         }
         return $result;
-    }}
+    }
+}
