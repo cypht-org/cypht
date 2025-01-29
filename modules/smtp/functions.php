@@ -68,8 +68,8 @@ if (!hm_exists('get_reply_type')) {
 if (!hm_exists('send_scheduled_message')) {
 function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now = false) {    
     $msg_headers = $mailbox->get_message_headers($folder, $msg_id);    
-    $mailbox_details = $mailbox->get_config();       
-
+    $mailbox_details = $mailbox->get_config();  
+    $imap_profile = Hm_IMAP_List::fetch($mailbox_details['user'], $mailbox_details['server']);
     try {
         if (empty($msg_headers['X-Schedule'])) {
             return false;
@@ -87,9 +87,9 @@ function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now 
                 $profile = $profiles[0];
             }
 
-            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
+            $smtp = new Hm_Mailbox($imap_profile['id'], $handler->user_config, $handler->session, $imap_profile);
 
-            if ($smtp && $smtp->authed()) {
+            if ($smtp && $smtp->connect()) {
                 $delivery_receipt = isset($msg_headers['X-Delivery']);
 
                 $recipients = [];
