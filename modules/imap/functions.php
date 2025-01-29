@@ -1683,32 +1683,32 @@ function flattenMessagesLists($messagesLists, $listSize) {
 }
 
 if (!hm_exists('save_sent_msg')) {
-function save_sent_msg($handler, $imap_id, $imap, $imap_details, $msg, $msg_id, $show_errors = true) {
+function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_id, $show_errors = true) {
     $specials = get_special_folders($handler, $imap_id);
     if (array_key_exists('sent', $specials) && $specials['sent']) {
         $sent_folder = $specials['sent'];
     }
 
     if (!$sent_folder) {
-        $auto_sent = $imap->get_special_use_mailboxes('sent');
+        $auto_sent = $mailbox->get_special_use_mailboxes('sent');
         if (!array_key_exists('sent', $auto_sent)) {
             return;
         }
         $sent_folder = $auto_sent['sent'];
     }
     if (!$sent_folder) {
-        Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
+        Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for server %s %s", $mailbox->server_type(), $imap_details['server']));
     }
     $uid = null;
     if ($sent_folder) {
-        Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
-        if (! $imap->store_message($sent_folder, $msg)) {
+        Hm_Debug::add(sprintf("Attempting to save sent message for server %s in folder %s", $mailbox->server_type(), $imap_details['server'], $sent_folder));
+        if (! $mailbox->store_message($sent_folder, $msg)) {
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
 
         $mailbox_page = $imap->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
         foreach ($mailbox_page[1] as $mail) {
-            $msg_header = $imap->get_message_headers($sent_folder, $mail['uid']);
+            $msg_header = $mailbox->get_message_headers($sent_folder, $mail['uid']);
             if ($msg_header['Message-Id'] === $msg_id) {
                 $uid = $mail['uid'];
                 break;
