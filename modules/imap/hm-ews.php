@@ -570,6 +570,9 @@ class Hm_EWS {
         $status = false;
         $responses = [];
         switch ($action) {
+            case 'JUNK' :
+                $status = $this->move_items_to_junk($itemIds);
+                break;
             case 'ARCHIVE':
                 $status = $this->archive_items($itemIds);
                 break;
@@ -963,6 +966,39 @@ class Hm_EWS {
             $request = Type::buildFromArray($request);
             try {
                 $result = $result && $this->ews->ArchiveItem($request);
+            } catch (\Exception $e) {
+                Hm_Msgs::add('ERR' . $e->getMessage());
+                $result = false;
+            }
+        }
+        return $result;
+    }
+
+    protected function move_items_to_junk($itemIds) {
+        $result = true;
+        $folders = $this->get_parent_folders_of_items($itemIds);
+        foreach ($folders as $folder => $itemIds) {
+            if ($this->is_distinguished_folder($folder)) {
+                $folder = new Type\DistinguishedFolderIdType($folder);
+            } else {
+                $folder = new Type\FolderIdType($folder);
+            }
+
+            $junkFolder = new Type\DistinguishedFolderIdType(Type\DistinguishedFolderIdType::JUNK);
+            $request = [
+                'SourceFolderId' => $folder->toArray(true),
+                'DestinationFolderId' => $junkFolder->toArray(true),
+                'ItemIds' => [
+                    'ItemId' => $itemIds = array_map(function($itemId) {
+                        return (new Type\ItemIdType($itemId))->toArray();
+                    }, $itemIds),
+                ]
+            ];
+    
+            $request = Type::buildFromArray($request);
+    
+            try {
+                $result = $result && $this->ews->MoveItem($request);
             } catch (\Exception $e) {
                 Hm_Msgs::add('ERR' . $e->getMessage());
                 $result = false;
