@@ -206,7 +206,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= $this->html_safe($value).'</th></tr>';
                         }
                         elseif ($fld == 'x-snoozed') {
-                            $snooze_header = parse_nexter_header($value, 'X-Snoozed');
+                            $snooze_header = parse_delayed_header($value, 'X-Snoozed');
                             $txt .= '<tr class="header_'.$fld.'"><th>';
                             $txt .= $this->trans('Snoozed').'</th><td>'.$this->trans('Until').' '.$this->html_safe($snooze_header['until']).' <a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper">Unsnooze</a></td></tr>';
                         }

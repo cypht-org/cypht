@@ -728,8 +728,8 @@ function schedule_dropdown($output, $send_now = false) {
 /**
  * @subpackage imap/functions
  */
-if (!hm_exists('parse_nexter_header')) {
-    function parse_nexter_header($header, $name)
+if (!hm_exists('parse_delayed_header')) {
+    function parse_delayed_header($header, $name)
     {
         $header = str_replace("$name: ", '', $header);
         $result = [];
