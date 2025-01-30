@@ -1636,18 +1636,14 @@ function getCombinedMessagesLists($sources, $cache, $search) {
             $state = $imap->get_mailbox_status(hex2bin($folder));
             $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
 
-            // TODO: Ensure that two subsequent search requests do not get called. The one with sorted uids should be enough, accepting search terms.
             if ($imap->is_supported( 'SORT' )) {
                 $sortedUids = $imap->get_message_sort_order($sort, $reverse, $filter);
             } else {
                 $sortedUids = $imap->sort_by_fetch($sort, $reverse, $filter);
             }
-            $sortedUids = array_reverse($sortedUids);
 
             $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
             $total = count($uids);
-            // most recent messages at the top
-            $uids = array_reverse($uids);
             $uids = array_slice($uids, $offset, $limit);
 
             $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
@@ -1697,4 +1693,16 @@ function flattenMessagesLists($messagesLists, $listSize) {
     $endList = array_slice($endList, 0, $max);
 
     return ['messages' => $endList, 'offsets' => $sizesTaken];
+}
+
+function sortCombinedMessages($list, $sort) {
+    usort($list, function($a, $b) use ($sort) {
+        $sortField = str_replace(['arrival', '-'], ['internal_date', ''], $sort);
+        if (strpos($sort, '-') === 0) {
+            return strtotime($a[$sortField]) - strtotime($b[$sortField]);
+        }
+        return strtotime($b[$sortField]) - strtotime($a[$sortField]);
+    });
+
+    return $list;
 }

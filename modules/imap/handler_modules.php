@@ -1298,11 +1298,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -1372,11 +1368,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -2143,11 +2135,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
