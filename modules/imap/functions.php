@@ -1629,20 +1629,26 @@ function getCombinedMessagesLists($sources, $cache, $search) {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
         if ($mailbox && $mailbox->authed()) {
-            $imap = $mailbox->get_connection();
+            $connection = $mailbox->get_connection();
 
             $folder = $dataSource['folder'];
             $mailbox->select_folder(hex2bin($folder));
-            $state = $imap->get_mailbox_status(hex2bin($folder));
+            $state = $connection->get_mailbox_status(hex2bin($folder));
             $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
 
-            if ($imap->is_supported( 'SORT' )) {
-                $sortedUids = $imap->get_message_sort_order($sort, $reverse, $filter);
+            if ($mailbox->is_imap()) {
+                if ($connection->is_supported( 'SORT' )) {
+                    $sortedUids = $connection->get_message_sort_order($sort, $reverse, $filter);
+                } else {
+                    $sortedUids = $connection->sort_by_fetch($sort, $reverse, $filter);
+                }
+
+                $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
             } else {
-                $sortedUids = $imap->sort_by_fetch($sort, $reverse, $filter);
+                // EWS
+                $uids = $connection->search($folder, $sort, $reverse, $filter, 0, $limit, $searchTerms);
             }
 
-            $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
             $total = count($uids);
             $uids = array_slice($uids, $offset, $limit);
 
