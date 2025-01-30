@@ -12,8 +12,7 @@ function performSearch(routeParams) {
                         Object.values(response.formatted_message_list).forEach((message) => {
                             Hm_Utils.tbody().append(message['0']);
                         });
-                        // sort by arrival date
-                        Hm_Message_List.sort(4);
+                        Hm_Message_List.sort(getParam('sort') || 'arrival');
                     }
                     Hm_Message_List.check_empty_list();
                 }

@@ -343,6 +343,14 @@ function date_callback($vals, $style, $output_mod) {
     return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $snooze_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
 
+function dates_holders_callback($vals) {
+    $res = '<td class="dates d-none">';
+    $res .= '<input type="hidden" name="arrival" class="arrival" value="'. $vals[0] .'" arial-label="Arrival date" />';
+    $res .= '<input type="hidden" name="date" class="date" value="'. $vals[1] .'" arial-label="Sent date" />';
+    $res .= '</td>';
+    return $res;
+}
+
 /**
  * Callback for an icon in a message list row
  * @subpackage core/functions
