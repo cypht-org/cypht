@@ -1059,7 +1059,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                     $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
                     if (isset($msg_headers['X-Snoozed'])) {
                         try {
-                            $snooze_headers = parse_nexter_header($msg_headers['X-Snoozed'], 'X-Snoozed');
+                            $snooze_headers = parse_delayed_header($msg_headers['X-Snoozed'], 'X-Snoozed');
                             if (new DateTime($snooze_headers['until']) <= new DateTime()) {
                                 snooze_message($mailbox, $msg['uid'], $folder, null);
                             }

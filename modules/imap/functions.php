@@ -254,7 +254,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
         $is_scheduled = !empty($msg['x_schedule']) && hex2bin($msg['folder']) == 'Scheduled';
         if ($is_snoozed) {
-            $snooze_header = parse_nexter_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
+            $snooze_header = parse_delayed_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
             $timestamp = strtotime($date);
         } elseif ($is_scheduled) {
@@ -1346,7 +1346,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
     preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
-        $old_folder = parse_nexter_header($matches[0], 'X-Snoozed')['from'];
+        $old_folder = parse_delayed_header($matches[0], 'X-Snoozed')['from'];
     }
     if ($snooze_tag) {
         $from = $old_folder ?? $folder;
@@ -1373,7 +1373,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
             }
         }
     } else {
-        $snooze_headers = parse_nexter_header($matches[0], 'X-Snoozed');
+        $snooze_headers = parse_delayed_header($matches[0], 'X-Snoozed');
         $original_folder = $snooze_headers['from'];
         if ($mailbox->store_message($original_folder, $msg)) {
             $deleteResult = $mailbox->message_action($snooze_folder, 'DELETE', array($msg_id));
@@ -1706,7 +1706,7 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
 
-        $mailbox_page = $imap->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
+        $mailbox_page = $mailbox->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
         foreach ($mailbox_page[1] as $mail) {
             $msg_header = $mailbox->get_message_headers($sent_folder, $mail['uid']);
             if ($msg_header['Message-Id'] === $msg_id) {
