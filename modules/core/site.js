@@ -2412,15 +2412,17 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
 };
 
 function setupActionSchedule(callback) {
-    $(document).on('click', '.nexter_date_picker', function (e) {
+    $('.nexter_date_picker').off('click').on('click', function (e) {
         document.querySelector('.nexter_input_date').showPicker();
     });
-    $(document).on('click', '.nexter_date_helper', function (e) {
+
+    $('.nexter_date_helper').off('click').on('click', function (e) {
         e.preventDefault();
         $('.nexter_input').val($(this).attr('data-value')).trigger('change');
     });
-    $(document).on('input', '.nexter_input_date', function (e) {
-        var now = new Date();
+
+    $('.nexter_input_date').off('input').on('input', function (e) {
+        let now = new Date();
         now.setMinutes(now.getMinutes() + 1);
         $(this).attr('min', now.toJSON().slice(0, 16));
         if (new Date($(this).val()).getTime() <= now.getTime()) {
@@ -2429,36 +2431,53 @@ function setupActionSchedule(callback) {
             $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
         }
     });
-    $(document).on('change', '.nexter_input_date', function (e) {
+
+    $('.nexter_input_date').off('change').on('change', function (e) {
         if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
             $('.nexter_input').val($(this).val()).trigger('change');
         }
     });
-    $(document).on('change', '.nexter_input', callback);
+
+    $('.nexter_input').off('change').on('change', callback);
 }
 
 function setupActionSnooze(callback) {
-    $(document).on('click', '.nexter_date_picker_snooze', function (e) {
-        document.querySelector('.nexter_input_date_snooze').showPicker();
-    });
-    $(document).on('click', '.nexter_date_helper_snooze', function (e) {
-        e.preventDefault();
-        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
-    });
-    $(document).on('input', '.nexter_input_date_snooze', function (e) {
-        var now = new Date();
-        now.setMinutes(now.getMinutes() + 1);
-        $(this).attr('min', now.toJSON().slice(0, 16));
-        if (new Date($(this).val()).getTime() <= now.getTime()) {
-            $('.nexter_date_picker_snooze').css('border', '1px solid red');
-        } else {
-            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
-        }
-    });
-    $(document).on('change', '.nexter_input_date_snooze', function (e) {
-        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.nexter_input_snooze').val($(this).val()).trigger('change');
-        }
-    });
-    $(document).on('change', '.nexter_input_snooze', callback);
+    $(document)
+        .off('click', '.nexter_date_picker_snooze')
+        .on('click', '.nexter_date_picker_snooze', function () {
+            document.querySelector('.nexter_input_date_snooze').showPicker();
+        });
+
+    $(document)
+        .off('click', '.nexter_date_helper_snooze')
+        .on('click', '.nexter_date_helper_snooze', function (e) {
+            e.preventDefault();
+            $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+        });
+
+    $(document)
+        .off('input', '.nexter_input_date_snooze')
+        .on('input', '.nexter_input_date_snooze', function () {
+            var now = new Date();
+            now.setMinutes(now.getMinutes() + 1);
+            $(this).attr('min', now.toJSON().slice(0, 16));
+
+            if (new Date($(this).val()).getTime() <= now.getTime()) {
+                $('.nexter_date_picker_snooze').css('border', '1px solid red');
+            } else {
+                $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+            }
+        });
+
+    $(document)
+        .off('change', '.nexter_input_date_snooze')
+        .on('change', '.nexter_input_date_snooze', function () {
+            if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+                $('.nexter_input_snooze').val($(this).val()).trigger('change');
+            }
+        });
+
+    $(document)
+        .off('change', '.nexter_input_snooze')
+        .on('change', '.nexter_input_snooze', callback);
 }
