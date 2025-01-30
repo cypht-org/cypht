@@ -132,12 +132,13 @@ function message_list_meta($input, $output_mod) {
  */
 if (!hm_exists('combined_sort_dialog')) {
 function combined_sort_dialog($mod) {
-    $dt_sort = $mod->get('default_sort_order', 'arrival');
-    $sorts = array(
-        '4' => $dt_sort == 'arrival' ? $mod->trans('Arrival Date') : $mod->trans('Sent Date'),
-        '2' => $mod->trans('From'),
-        '3' => $mod->trans('Subject'),
-    );
+    $sorts = [
+        'arrival' => $mod->trans('Arrival Date'),
+        'date' => $mod->trans('Sent Date'),
+        'from' => $mod->trans('From'),
+        'to' => $mod->trans('To'),
+        'subject' => $mod->trans('Subject')
+    ];
 
     $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {

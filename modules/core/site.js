@@ -1810,7 +1810,9 @@ var hasLeadingOrTrailingSpaces = function(str) {
 var Hm_Message_List = new Message_List();
 
 function sortHandlerForMessageListAndSearchPage() {
-    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
+    $('.combined_sort').on("change", function() {
+        sortCombinedLists($(this).val());
+    });
     $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
     if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
         $('.menu_unread > a').css('font-weight', 'normal');
