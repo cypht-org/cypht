@@ -465,11 +465,12 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     return [interval, backgroundAbortController];
 };
 
-$('#imap_filter_form').on('submit', async function(event) {
+$(document).on('submit', '#imap_filter_form', async function(event) { 
     event.preventDefault();
     const url = new URL(location.href);
     url.search = $(this).serialize();
     history.replaceState(null, '', url);
+    location.next = url.search;
     try {
         const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
         await messages.load(true);

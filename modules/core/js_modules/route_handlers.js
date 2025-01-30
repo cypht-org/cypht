@@ -38,6 +38,7 @@ function applySearchPageHandlers(routeParams) {
     Hm_Message_List.select_combined_view();
     sortHandlerForMessageListAndSearchPage();
     $('.search_reset').on("click", Hm_Utils.reset_search_form);
+    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
 
     performSearch(routeParams);
 
@@ -86,6 +87,11 @@ function applyMessaleListPageHandlers(routeParams) {
     if (routeParams.list_path === 'github_all') {
         return applyGithubMessageListPageHandler(routeParams);
     }
+    
+
+    $('.combined_sort').on("change", function() {
+        sortCombinedLists($(this).val());
+    });
 
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)
     return applyImapMessageListPageHandlers(routeParams);

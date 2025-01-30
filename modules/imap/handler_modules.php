@@ -1261,6 +1261,8 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
         }
 
+        list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
+
         $filter = 'ALL';
         $offset = 0;
         $list_page = 1;
@@ -1284,14 +1286,19 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $offsets = explode(',', $offsets);
         }
 
-        $result = getCombinedMessagesLists($data_sources, $this->cache, [['SINCE', $date]], $list_page, $limit, $offsets, $offset, $filter);
+        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+            'terms' => [['SINCE', $date]],
+            'listPage' => $list_page,
+            'limit' => $limit,
+            'offsets' => $offsets,
+            'defaultOffset' => $offset,
+            'filter' => $filter,
+            'sort' => $sort,
+            'reverse' => $reverse
+        ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -1328,6 +1335,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
             return;
         }
 
+        list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
         $list_page = (int) $this->request->get['list_page'];
         $offsets = $this->request->get['offsets'] ?? '';
         $keyword = $this->request->get['keyword'] ?? '';
@@ -1348,14 +1356,19 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
         }
         $searchTerms[] = ['SINCE', $date];
         
-        $result = getCombinedMessagesLists($data_sources, $this->cache, $searchTerms, $list_page, $limit, $offsets, $offset, $filter);
+        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+            'terms' => $searchTerms,
+            'listPage' => $list_page,
+            'limit' => $limit,
+            'offsets' => $offsets,
+            'defaultOffset' => $offset,
+            'filter' => $filter,
+            'sort' => $sort,
+            'reverse' => $reverse
+        ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -2091,6 +2104,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
 
         $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
         $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
+        list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
         $maxPerSource = round($limit / count($data_sources));
         $offset = 0;
@@ -2109,14 +2123,19 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         }
         $searchTerms[] = ['SINCE', $date];
 
-        $result = getCombinedMessagesLists($data_sources, $this->cache, $searchTerms, $list_page, $limit, $offsets, $offset, 'ALL');
+        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+            'listPage' => $list_page,
+            'limit' => $limit,
+            'offsets' => $offsets,
+            'defaultOffset' => $offset,
+            'terms' => $searchTerms,
+            'sort' => $sort,
+            'reverse' => $reverse,
+            'filter' => 'ALL'
+        ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = $list['messages'];
-
-        usort($messagesList, function($a, $b) {
-            return strtotime($b['internal_date']) - strtotime($a['internal_date']);
-        });
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
