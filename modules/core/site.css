@@ -119,9 +119,6 @@ table {
 td {
   vertical-align: top;
 }
-.search_content .combined_sort {
-  display: none;
-}
 .offline {
   display: none;
   cursor: pointer;

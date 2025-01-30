@@ -2561,7 +2561,7 @@ if (!class_exists('Hm_IMAP')) {
             return true;
         }
 
-        protected function server_support_children_capability() {
+        public function server_support_children_capability() {
             $test_command = 'CAPABILITY'."\r\n";
             $this->send_command($test_command);
             $response = $this->get_response(false, true);
