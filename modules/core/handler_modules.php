@@ -1159,7 +1159,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         return;
                     }
 
-                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
+                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $onlyJmap? $jmapAddress: $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
                 }
 
                 if ($this->module_is_supported('imap_folders')) {

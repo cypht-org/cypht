@@ -528,11 +528,21 @@ function Message_List() {
         var aval;
         var bval;
         var sort_result = listitems.sort(function(a, b) {
-            const sortField = fld.replace('-', '');
-            if (['arrival', 'date'].includes(sortField)) {
-                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
-                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
-                if (fld.startsWith('-')) {
+            switch (Math.abs(fld)) {
+                case 1:
+                case 2:
+                case 3:
+                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
+                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
+                    break;
+                case 4:
+                default:
+                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
+                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
+                    break;
+            }
+            if (fld == 4 || fld == -4 || !fld) {
+                if (fld == -4) {
                     return aval - bval;
                 }
                 return bval - aval;
@@ -1801,6 +1811,7 @@ var hasLeadingOrTrailingSpaces = function(str) {
 var Hm_Message_List = new Message_List();
 
 function sortHandlerForMessageListAndSearchPage() {
+    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
     $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
     if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
         $('.menu_unread > a').css('font-weight', 'normal');
@@ -2399,3 +2410,74 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+function setupActionSchedule(callback) {
+    $('.nexter_date_picker').off('click').on('click', function (e) {
+        document.querySelector('.nexter_input_date').showPicker();
+    });
+
+    $('.nexter_date_helper').off('click').on('click', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+
+    $('.nexter_input_date').off('input').on('input', function (e) {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+
+    $('.nexter_input_date').off('change').on('change', function (e) {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input').val($(this).val()).trigger('change');
+        }
+    });
+
+    $('.nexter_input').off('change').on('change', callback);
+}
+
+function setupActionSnooze(callback) {
+    $(document)
+        .off('click', '.nexter_date_picker_snooze')
+        .on('click', '.nexter_date_picker_snooze', function () {
+            document.querySelector('.nexter_input_date_snooze').showPicker();
+        });
+
+    $(document)
+        .off('click', '.nexter_date_helper_snooze')
+        .on('click', '.nexter_date_helper_snooze', function (e) {
+            e.preventDefault();
+            $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+        });
+
+    $(document)
+        .off('input', '.nexter_input_date_snooze')
+        .on('input', '.nexter_input_date_snooze', function () {
+            var now = new Date();
+            now.setMinutes(now.getMinutes() + 1);
+            $(this).attr('min', now.toJSON().slice(0, 16));
+
+            if (new Date($(this).val()).getTime() <= now.getTime()) {
+                $('.nexter_date_picker_snooze').css('border', '1px solid red');
+            } else {
+                $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+            }
+        });
+
+    $(document)
+        .off('change', '.nexter_input_date_snooze')
+        .on('change', '.nexter_input_date_snooze', function () {
+            if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+                $('.nexter_input_snooze').val($(this).val()).trigger('change');
+            }
+        });
+
+    $(document)
+        .off('change', '.nexter_input_snooze')
+        .on('change', '.nexter_input_snooze', callback);
+}
