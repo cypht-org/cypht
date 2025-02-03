@@ -1290,7 +1290,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array('SINCE', $date), array($fld, $terms)));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array(search_since_based_on_setting($this->user_config), $date), array($fld, $terms)));
             $this->out('imap_search_results', $msg_list);
             $this->out('folder_status', $status);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -1329,7 +1329,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
             $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_ALL_SINCE));
         }
-        list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array(search_since_based_on_setting($this->user_config), $date)));
         $this->out('folder_status', $status);
         $this->out('imap_combined_inbox_data', $msg_list);
         $this->out('imap_server_ids', implode(',', $ids));
@@ -1360,7 +1360,7 @@ class Hm_Handler_imap_flagged extends Hm_Handler_Module {
         }
         $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
         $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
-        list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array('SINCE', $date)));
+        list($status, $msg_list) = merge_imap_search_results($ids, 'FLAGGED', $this->session, $this->cache, array_map(fn ($folder) => hex2bin($folder), $folders), $limit, array(array(search_since_based_on_setting($this->user_config), $date)));
         $this->out('folder_status', $status);
         $this->out('imap_flagged_data', $msg_list);
         $this->out('imap_server_ids', implode(',', $ids));

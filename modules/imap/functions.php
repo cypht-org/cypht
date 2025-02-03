@@ -1110,6 +1110,19 @@ function process_sort_arg($sort, $default = 'arrival') {
 /**
  * @subpackage imap/functions
  */
+if (!hm_exists('search_since_based_on_setting')) {
+function search_since_based_on_setting($config) {
+    if ($config->get('default_sort_order_setting', 'arrival') === 'arrival') {
+        return 'SINCE';
+    } else {
+        return 'SENTSINCE';
+    }
+}}
+
+
+/**
+ * @subpackage imap/functions
+ */
 if (!hm_exists('imap_server_type')) {
 function imap_server_type($id) {
     $type = 'IMAP';

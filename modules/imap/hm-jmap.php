@@ -1171,6 +1171,7 @@ class Hm_JMAP {
         $converted_terms = array();
         $map = array(
             'SINCE' => 'after',
+            'SENTSINCE' => 'after', // JMAP protocol does not seem to support searching by sentAt date, so we resort to receivedAt date
             'SUBJECT' => 'subject',
             'TO' => 'to',
             'FROM' => 'from',
@@ -1179,7 +1180,7 @@ class Hm_JMAP {
         );
         foreach ($terms as $vals) {
             if (array_key_exists($vals[0], $map)) {
-                if ($vals[0] == 'SINCE') {
+                if ($vals[0] == 'SINCE' || $vals[0] == 'SENTSINCE') {
                     $vals[1] = gmdate("Y-m-d\TH:i:s\Z", strtotime($vals[1]));
                 }
                 $converted_terms[$map[$vals[0]]] = $vals[1];
