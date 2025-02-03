@@ -376,6 +376,9 @@ class Hm_EWS {
                     case 'SINCE':
                         $qs[] = "Received:>$term[1]";
                         break;
+                    case 'SENTSINCE':
+                        $qs[] = "Sent:>$term[1]";
+                        break;
                     case 'FROM':
                         $qs[] = "From:($term[1])";
                         break;

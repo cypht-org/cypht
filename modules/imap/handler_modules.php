@@ -1222,7 +1222,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
             if (array_key_exists('folder', $this->request->post)) {
                 $folder = $this->request->post['folder'];
             }
-            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array('SINCE', $date), array($fld, $terms)));
+            list($status, $msg_list) = merge_imap_search_results($ids, 'ALL', $this->session, $this->cache, array(hex2bin($folder)), MAX_PER_SOURCE, array(array(search_since_based_on_setting($this->user_config), $date), array($fld, $terms)));
             $this->out('imap_search_results', $msg_list);
             $this->out('folder_status', $status);
             $this->out('imap_server_ids', $form['imap_server_ids']);
@@ -1287,7 +1287,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         }
 
         $result = getCombinedMessagesLists($data_sources, $this->cache, [
-            'terms' => [['SINCE', $date]],
+            'terms' => [[search_since_based_on_setting($this->user_config), $date]],
             'listPage' => $list_page,
             'limit' => $limit,
             'offsets' => $offsets,
@@ -1354,7 +1354,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
         if ($offsets) {
             $offsets = explode(',', $offsets);
         }
-        $searchTerms[] = ['SINCE', $date];
+        $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
         
         $result = getCombinedMessagesLists($data_sources, $this->cache, [
             'terms' => $searchTerms,
@@ -2121,7 +2121,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         if ($offsets) {
             $offsets = explode(',', $offsets);
         }
-        $searchTerms[] = ['SINCE', $date];
+        $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
 
         $result = getCombinedMessagesLists($data_sources, $this->cache, [
             'listPage' => $list_page,
