@@ -1298,7 +1298,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -1368,7 +1368,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
@@ -2135,7 +2135,7 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         ]);
 
         $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort']);
+        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
 
         $maxPages = ceil($result['total'] / $limit);
         $this->out('pages', $maxPages);
