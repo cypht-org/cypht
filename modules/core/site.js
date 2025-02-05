@@ -523,40 +523,31 @@ function Message_List() {
         });
     };
 
-    this.sort = function(fld) {
+    this.sort = function (fld) {
         var listitems = Hm_Utils.rows();
         var aval;
         var bval;
-        var sort_result = listitems.sort(function(a, b) {
-            switch (Math.abs(fld)) {
-                case 1:
-                case 2:
-                case 3:
-                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    break;
-                case 4:
-                default:
-                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
-                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
-                    break;
-            }
-            if (fld == 4 || fld == -4 || !fld) {
-                if (fld == -4) {
+        var sort_result = listitems.sort(function (a, b) {
+            const sortField = fld.replace('-', '');
+            if (['arrival', 'date'].includes(sortField)) {
+                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
+                if (fld.startsWith('-')) {
                     return aval - bval;
                 }
                 return bval - aval;
             }
-            else {
-                if (fld && fld < 0) {
-                    return bval.toUpperCase().localeCompare(aval.toUpperCase());
-                }
-                return aval.toUpperCase().localeCompare(bval.toUpperCase());
+
+            aval = $(`td.${sortField}`, a).text().replace(/^\s+/g, '');
+            bval = $(`td.${sortField}`, b).text().replace(/^\s+/g, '');
+            if (fld.startsWith('-')) {
+                return bval.toUpperCase().localeCompare(aval.toUpperCase());
             }
+            return aval.toUpperCase().localeCompare(bval.toUpperCase());
         });
         this.sort_fld = fld;
         Hm_Utils.tbody().html('');
-        for (var i = 0, len=sort_result.length; i < len; i++) {
+        for (var i = 0, len = sort_result.length; i < len; i++) {
             Hm_Utils.tbody().append(sort_result[i]);
         }
         this.save_updated_list();
