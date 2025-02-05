@@ -528,22 +528,31 @@ function Message_List() {
         var aval;
         var bval;
         var sort_result = listitems.sort(function(a, b) {
-            const sortField = fld.replace('-', '');
-            if (['arrival', 'date'].includes(sortField)) {
-                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
-                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
-                if (fld.startsWith('-')) {
+            switch (Math.abs(fld)) {
+                case 1:
+                case 2:
+                case 3:
+                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
+                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
+                    break;
+                case 4:
+                default:
+                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
+                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
+                    break;
+            }
+            if (fld == 4 || fld == -4 || !fld) {
+                if (fld == -4) {
                     return aval - bval;
                 }
                 return bval - aval;
             }
-
-            aval = $(`td.${sortField}`, a).text().replace(/^\s+/g, '');
-            bval = $(`td.${sortField}`, b).text().replace(/^\s+/g, '');
-            if (fld.startsWith('-')) {
-                return bval.toUpperCase().localeCompare(aval.toUpperCase());
+            else {
+                if (fld && fld < 0) {
+                    return bval.toUpperCase().localeCompare(aval.toUpperCase());
+                }
+                return aval.toUpperCase().localeCompare(bval.toUpperCase());
             }
-            return aval.toUpperCase().localeCompare(bval.toUpperCase());
         });
         this.sort_fld = fld;
         Hm_Utils.tbody().html('');
@@ -2405,3 +2414,67 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+function setupActionSchedule(callback) {
+    function eventHandler() {
+        document.querySelector('.nexter_input_date')?.showPicker();
+    }
+
+    $('.nexter_date_picker').on('click', eventHandler);
+
+    $('.nexter_date_helper').on('click', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+
+    $('.nexter_input_date').on('input', function () {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+
+    $('.nexter_input_date').on('change', function () {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input').val($(this).val()).trigger('change');
+        }
+    });
+
+    $('.nexter_input').on('change', callback);
+}
+
+function setupActionSnooze(callback) {
+    function eventHandler() {
+        document.querySelector('.nexter_input_date_snooze')?.showPicker();
+    }
+    $('.nexter_date_picker_snooze').on('click', eventHandler);
+
+    $('.nexter_date_helper_snooze').on('click', function (e) {
+        e.preventDefault();
+        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+    });
+
+    $('.nexter_input_date_snooze').on('input', function () {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker_snooze').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+
+    $('.nexter_input_date_snooze').on('change', function () {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input_snooze').val($(this).val()).trigger('change');
+        }
+    });
+
+    $('.nexter_input_snooze').on('change', callback);
+}
