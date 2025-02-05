@@ -60,7 +60,8 @@ function imap_data_sources($custom=array()) {
         if (!array_key_exists('user', $vals)) {
             continue;
         }
-        $sources[] = array('folder' => bin2hex('INBOX'), 'folder_name' => 'INBOX', 'type' => $vals['type'] ?? 'imap', 'name' => $vals['name'], 'id' => $index);
+        $sieve = ! empty($vals['sieve_config_host']);
+        $sources[] = array('folder' => bin2hex('INBOX'), 'folder_name' => 'INBOX', 'type' => $vals['type'] ?? 'imap', 'name' => $vals['name'], 'id' => $index,  'sieve' => $sieve);
     }
     foreach ($custom as $path => $type) {
         $parts = explode('_', $path, 3);

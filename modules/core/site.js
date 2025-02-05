@@ -1725,6 +1725,12 @@ var hm_spinner = function(type = 'border', size = '') {
     </div>`
 };
 
+var hm_spinner_text = function(text, id = 'spinner-text') {
+    return `<div class="d-flex justify-content-between align-items-center p-2 border-bottom" id="${id}">
+        <span class="mailbox-name text-primary">${text}</span>
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+    </div>`;
+};
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
