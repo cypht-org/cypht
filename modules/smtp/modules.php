@@ -190,9 +190,9 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                     foreach ($msg_struct[0]['subs'] as $ind => $sub) {
                         if ($ind != '0.1') {
                             $new_attachment['basename'] = $sub['description'];
-                            $new_attachment['name'] = $sub['attributes']['name'];
+                            $new_attachment['name'] = $sub['attributes']['name'] ?? $sub['attributes']['filename']; // some file types (i.e. pdf) use the filename attribute instead of name.
                             $new_attachment['size'] = $sub['size'];
-                            $new_attachment['type'] = $sub['type'];
+                            $new_attachment['type'] = $sub['type'] . "/" . $sub['subtype'];
                             $file_path = $file_dir . $new_attachment['name'];
                             $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
