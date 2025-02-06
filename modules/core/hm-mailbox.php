@@ -586,4 +586,8 @@ class Hm_Mailbox {
         }
         return true;
     }
+
+    public function get_config() {
+        return $this->config;
+    }
 }

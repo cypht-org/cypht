@@ -541,9 +541,12 @@ class Hm_EWS {
                 'message_id' => $message->get('internetMessageId'),
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
+                'x_schedule' => null,
+                'x_profile_id' => null,
+                'x_delivery' => null,
             ];
             foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
-                foreach (['x-gm-msgid' => 'google_msg_id', 'x-gm-thrid' => 'google_thread_id', 'x-gm-labels' => 'google_labels', 'x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'list-archive' => 'list_archive', 'content-type' => 'content-type', 'x-priority' => 'x-priority'] as $hname => $key) {
+                foreach (['x-gm-msgid' => 'google_msg_id', 'x-gm-thrid' => 'google_thread_id', 'x-gm-labels' => 'google_labels', 'x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'content-type' => 'content-type', 'x-priority' => 'x-priority'] as $hname => $key) {
                     if (strtolower($header->get('headerName')) == $hname) {
                         $msg[$key] = (string) $header;
                     }

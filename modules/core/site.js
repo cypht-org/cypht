@@ -523,11 +523,11 @@ function Message_List() {
         });
     };
 
-    this.sort = function(fld) {
+    this.sort = function (fld) {
         var listitems = Hm_Utils.rows();
         var aval;
         var bval;
-        var sort_result = listitems.sort(function(a, b) {
+        var sort_result = listitems.sort(function (a, b) {
             const sortField = fld.replace('-', '');
             if (['arrival', 'date'].includes(sortField)) {
                 aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
@@ -547,7 +547,7 @@ function Message_List() {
         });
         this.sort_fld = fld;
         Hm_Utils.tbody().html('');
-        for (var i = 0, len=sort_result.length; i < len; i++) {
+        for (var i = 0, len = sort_result.length; i < len; i++) {
             Hm_Utils.tbody().append(sort_result[i]);
         }
         this.save_updated_list();
@@ -1725,12 +1725,6 @@ var hm_spinner = function(type = 'border', size = '') {
     </div>`
 };
 
-var hm_spinner_text = function(text, id = 'spinner-text') {
-    return `<div class="d-flex justify-content-between align-items-center p-2 border-bottom" id="${id}">
-        <span class="mailbox-name text-primary">${text}</span>
-        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
-    </div>`;
-};
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
@@ -2405,3 +2399,67 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+function setupActionSchedule(callback) {
+    function eventHandler() {
+        document.querySelector('.nexter_input_date')?.showPicker();
+    }
+
+    $('.nexter_date_picker').on('click', eventHandler);
+
+    $('.nexter_date_helper').on('click', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+
+    $('.nexter_input_date').on('input', function () {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+
+    $('.nexter_input_date').on('change', function () {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input').val($(this).val()).trigger('change');
+        }
+    });
+
+    $('.nexter_input').on('change', callback);
+}
+
+function setupActionSnooze(callback) {
+    function eventHandler() {
+        document.querySelector('.nexter_input_date_snooze')?.showPicker();
+    }
+    $('.nexter_date_picker_snooze').on('click', eventHandler);
+
+    $('.nexter_date_helper_snooze').on('click', function (e) {
+        e.preventDefault();
+        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+    });
+
+    $('.nexter_input_date_snooze').on('input', function () {
+        let now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker_snooze').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+
+    $('.nexter_input_date_snooze').on('change', function () {
+        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
+            $('.nexter_input_snooze').val($(this).val()).trigger('change');
+        }
+    });
+
+    $('.nexter_input_snooze').on('change', callback);
+}
