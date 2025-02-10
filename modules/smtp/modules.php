@@ -1621,7 +1621,7 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             $imap_server = Hm_IMAP_List::getForMailbox($imap_server_id);
 
             $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $imap_server);
-            if ($mailbox && $mailbox->connect()) {
+                if ($mailbox->get_connection() != null && $mailbox->connect()) {
                 $folder = hex2bin($folder);
                 if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date)) {
                     $scheduled_msg_count++;

@@ -123,8 +123,7 @@ function applySmtpComposePageHandlers() {
                     save_compose_state(false, true, $('.nexter_input').val(), function(res) {
                         if (res.draft_id) {
                             reset_smtp_form(false);
-                            Hm_Folders.reload_folders(true);
-                            Hm_Utils.redirect();
+                            Hm_Notices.show([hm_trans('Operation successful')]);
                         }
                     });
                 } else {

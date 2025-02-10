@@ -69,7 +69,6 @@ if (!hm_exists('send_scheduled_message')) {
 function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now = false) {    
     $msg_headers = $mailbox->get_message_headers($folder, $msg_id);    
     $mailbox_details = $mailbox->get_config();  
-    $imap_profile = Hm_IMAP_List::fetch($mailbox_details['user'], $mailbox_details['server']);
     try {
         if (empty($msg_headers['X-Schedule'])) {
             return false;
@@ -86,10 +85,13 @@ function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now 
                 }
                 $profile = $profiles[0];
             }
-
-            $smtp = new Hm_Mailbox($imap_profile['id'], $handler->user_config, $handler->session, $imap_profile);
-
-            if ($smtp && $smtp->connect()) {
+            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
+            
+            if (! $smtp || ! $smtp->authed()) {
+                Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+                return;
+            }
+            
                 $delivery_receipt = isset($msg_headers['X-Delivery']);
 
                 $recipients = [];
@@ -103,13 +105,11 @@ function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now 
                 $from = process_address_fld($msg_headers['From']);
 
                 $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
-
                 if (!$err_msg) {
                     $mailbox->delete_message($folder, $msg_id, false);
                     save_sent_msg($handler, $mailbox->get_config()['id'], $mailbox, $mailbox_details, $msg_content, $msg_id, false);
                     return true; 
                 }
-            }
         }
     } catch (Exception $e) {
         Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
