@@ -1381,7 +1381,7 @@ div.unseen,
   --bs-popover-header-color: var(--bs-white);
 }
 
-.mobile nav {
+.mobile nav.folder_cell {
   position: absolute;
   inset: 0;
   width: 100%;
