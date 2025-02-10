@@ -320,7 +320,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('subject_callback', $subject, $url, $flags, $icon, $preview_msg),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
-                    array('date_callback', $date, $timestamp),
+                    array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
                 $id,
@@ -336,7 +336,8 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags, null, $preview_msg),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
-                    array('icon_callback', $flags)
+                    array('icon_callback', $flags),
+                    array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
                 $id,
                 $style,
@@ -1608,9 +1609,34 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
-function getCombinedMessagesLists($sources, $cache, $searchTerms, $listPage, $limit, $offsets = [], $defaultOffset = 0, $filter = 'ALL') {
+/**
+ * @param array $sources
+ * @param object $cache
+ * @param array $search
+ */
+function getCombinedMessagesLists($sources, $cache, $search) {
+    $defaultSearch = [
+        'filter' => 'ALL',
+        'sort' => 'ARRIVAL',
+        'reverse' => true,
+        'terms' => [],
+        'limit' => 10,
+        'offsets' => [],
+        'defaultOffset' => 0,
+        'listPage' => 1
+    ];
+    $search = array_merge($defaultSearch, $search);
+
+    $filter = $search['filter'];
+    $sort = $search['sort'];
+    $reverse = $search['reverse'];
+    $searchTerms = $search['terms'];
+    $limit = $search['limit'];
+    $offsets = $search['offsets'];
+    $listPage = $search['listPage'];
+
     $totalMessages = 0;
-    $offset = $defaultOffset;
+    $offset = $search['defaultOffset'];
     $messagesLists = [];
     $status = [];
     foreach ($sources as $index => $dataSource) {
@@ -1623,14 +1649,27 @@ function getCombinedMessagesLists($sources, $cache, $searchTerms, $listPage, $li
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
         if ($mailbox && $mailbox->authed()) {
+            $connection = $mailbox->get_connection();
+
             $folder = $dataSource['folder'];
-            $state = $mailbox->get_connection()->get_mailbox_status(hex2bin($folder));
+            $mailbox->select_folder(hex2bin($folder));
+            $state = $connection->get_mailbox_status(hex2bin($folder));
             $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
 
-            $uids = $mailbox->search(hex2bin($folder), $filter, false, $searchTerms);
+            if ($mailbox->is_imap()) {
+                if ($connection->is_supported( 'SORT' )) {
+                    $sortedUids = $connection->get_message_sort_order($sort, $reverse, $filter);
+                } else {
+                    $sortedUids = $connection->sort_by_fetch($sort, $reverse, $filter);
+                }
+
+                $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
+            } else {
+                // EWS
+                $uids = $connection->search($folder, $sort, $reverse, $filter, 0, $limit, $searchTerms);
+            }
+
             $total = count($uids);
-            // most recent messages at the top
-            $uids = array_reverse($uids);
             $uids = array_slice($uids, $offset, $limit);
 
             $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
@@ -1680,6 +1719,18 @@ function flattenMessagesLists($messagesLists, $listSize) {
     $endList = array_slice($endList, 0, $max);
 
     return ['messages' => $endList, 'offsets' => $sizesTaken];
+}
+
+function sortCombinedMessages($list, $sort) {
+    usort($list, function($a, $b) use ($sort) {
+        $sortField = str_replace(['arrival', '-'], ['internal_date', ''], $sort);
+        if (strpos($sort, '-') === 0) {
+            return strtotime($a[$sortField]) - strtotime($b[$sortField]);
+        }
+        return strtotime($b[$sortField]) - strtotime($a[$sortField]);
+    });
+
+    return $list;
 }
 
 if (!hm_exists('save_sent_msg')) {

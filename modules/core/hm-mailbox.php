@@ -74,6 +74,9 @@ class Hm_Mailbox {
     }
 
     public function authed() {
+        if (! $this->connection) {
+            return false;
+        }
         if ($this->is_imap()) {
             return $this->connection->get_state() == 'authenticated' || $this->connection->get_state() == 'selected';
         } elseif ($this->is_smtp()) {

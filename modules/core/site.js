@@ -528,21 +528,11 @@ function Message_List() {
         var aval;
         var bval;
         var sort_result = listitems.sort(function(a, b) {
-            switch (Math.abs(fld)) {
-                case 1:
-                case 2:
-                case 3:
-                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    break;
-                case 4:
-                default:
-                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
-                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
-                    break;
-            }
-            if (fld == 4 || fld == -4 || !fld) {
-                if (fld == -4) {
+            const sortField = fld.replace('-', '');
+            if (['arrival', 'date'].includes(sortField)) {
+                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
+                if (fld.startsWith('-')) {
                     return aval - bval;
                 }
                 return bval - aval;
@@ -1735,6 +1725,12 @@ var hm_spinner = function(type = 'border', size = '') {
     </div>`
 };
 
+var hm_spinner_text = function(text, id = 'spinner-text') {
+    return `<div class="d-flex justify-content-between align-items-center p-2 border-bottom" id="${id}">
+        <span class="mailbox-name text-primary">${text}</span>
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+    </div>`;
+};
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
@@ -1811,7 +1807,6 @@ var hasLeadingOrTrailingSpaces = function(str) {
 var Hm_Message_List = new Message_List();
 
 function sortHandlerForMessageListAndSearchPage() {
-    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
     $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
     if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
         $('.menu_unread > a').css('font-weight', 'normal');
