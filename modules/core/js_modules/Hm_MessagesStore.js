@@ -15,16 +15,16 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, rows = {}, abortController = new AbortController()) {
+    constructor(path, page = 1, rows = {}, abortController = new AbortController(), count = 0, pages = 0, offsets = '') {
         this.path = path;
         this.list = path + '_' + page;
         this.rows = rows;
-        this.count = 0;
+        this.count = count;
         this.flagAsReadOnOpen = true;
         this.abortController = abortController;
-        this.pages = 0;
+        this.pages = pages;
         this.page = page;
-        this.offsets = '';
+        this.offsets = offsets;
     }
 
     /**
@@ -137,8 +137,9 @@ class Hm_MessagesStore {
             const newRows = rows.filter((_, i) => i !== row.index);
             this.rows = Object.fromEntries(newRows);
             this.#saveToLocalStorage();
+            return true;
         }
-        
+        return false;
     }
 
     #fetch(hideLoadingState = false) {

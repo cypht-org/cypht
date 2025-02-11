@@ -141,8 +141,7 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     if (Hm_Utils.get_from_global('msg_uid', false)) {
                         return;
                     }
-                    var msg_cache_key = 'imap_'+detail.server_id+'_'+getMessageUidParam()+'_'+detail.folder;
-                    remove_from_cached_imap_pages(msg_cache_key);
+                    remove_from_cached_imap_pages();
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         Hm_Utils.redirect(nlink.attr('href'));
@@ -363,20 +362,46 @@ var fetch_cached_imap_page = function() {
     return [ page, links ];
 }
 
-var remove_from_cached_imap_pages = function(msg_cache_key) {
-    var keys = ['imap_'+Hm_Utils.get_url_page_number()+'_'+getListPathParam()];
-    if (hm_list_parent()) {
-        keys.push('imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_parent());
-        if (['combined_inbox', 'unread', 'flagged', 'advanced_search', 'search', 'sent'].includes(hm_list_parent())) {
-            keys.push('formatted_'+hm_list_parent());
-        }
-    }
-    keys.forEach(function(key) {
-        var data = Hm_Utils.get_from_local_storage(key);
-        if (data) {
-            var page_data = $('<div></div>').append(data);
-            page_data.find('.'+msg_cache_key).remove();
-            Hm_Utils.save_to_local_storage(key, page_data.html());
+var remove_from_cached_imap_pages = async function() {
+    // Delete the message 
+    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+    await store.load(false, true);
+    store.removeRow(getMessageUidParam());
+
+    // Delete the message content itself from storage
+    Hm_Utils.delete_from_local_storage(getMessageUidParam()+'_'+getListPathParam());
+
+    // The same message can be in combined inbox, unread so we need to remove it from there as well
+    const sources = [
+        'combined_inbox',
+        'unread',
+        'flagged',
+        'advanced_search',
+        'search',
+        'sent',
+        'junk',
+        'snoozed',
+        'trash'
+    ];
+    sources.forEach((source) => {
+        const localStorageEntries = Hm_Utils.search_from_local_storage(source);
+        for (let i = 0; i < localStorageEntries.length; i++) {
+            const entryData = JSON.parse(localStorageEntries[i].value);
+            const prefix = Hm_Utils.get_local_storage_prefix();
+            let entryKey = localStorageEntries[i].key;
+            entryKey = entryKey.slice(prefix.length);
+
+            const lastUnderscore = entryKey.lastIndexOf("_");
+            const path = entryKey.slice(0, lastUnderscore);
+            const pageNumber = entryKey.slice(lastUnderscore + 1);
+            if (isNaN(parseInt(pageNumber))) {
+                continue;
+            }
+
+            const store = new Hm_MessagesStore(path, pageNumber, entryData.rows, new AbortController(), entryData.count, entryData.pages, entryData.offsets);
+            if (store.removeRow(getMessageUidParam())) {
+                break;
+            }
         }
     });
 }
