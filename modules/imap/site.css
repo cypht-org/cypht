@@ -280,7 +280,8 @@
 }
 .jmap_section,
 .sent_setting,
-.imap_section {
+.imap_section,
+.ews_server_config_section {
   display: none;
 }
 .imap_server_setup .content_title {

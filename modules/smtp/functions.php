@@ -66,9 +66,9 @@ if (!hm_exists('get_reply_type')) {
  * @subpackage smtp/functions
  */
 if (!hm_exists('send_scheduled_message')) {
-function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now = false) {    
-    $msg_headers = $mailbox->get_message_headers($folder, $msg_id);    
-    $mailbox_details = $mailbox->get_config();  
+function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_now = false) {    
+    $msg_headers = $imapMailbox->get_message_headers($folder, $msg_id);    
+    $mailbox_details = $imapMailbox->get_config();  
     try {
         if (empty($msg_headers['X-Schedule'])) {
             return false;
@@ -85,31 +85,32 @@ function send_scheduled_message($handler, $mailbox, $folder, $msg_id, $send_now 
                 }
                 $profile = $profiles[0];
             }
-            $smtp = Hm_SMTP_List::connect($profile['smtp_id'], false);
-            
-            if (! $smtp || ! $smtp->authed()) {
+            $smtpConfig = Hm_SMTP_List::dumpForMailbox($profile['smtp_id']);
+            $smtpMailbox = new Hm_Mailbox($profile['smtp_id'], $handler->user_config, $handler->session, $smtpConfig);
+
+            if (! $smtpMailbox->authed()) {
                 Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                 return;
             }
-            
-                $delivery_receipt = isset($msg_headers['X-Delivery']);
 
-                $recipients = [];
-                foreach (['To', 'Cc', 'Bcc'] as $fld) {
-                    if (array_key_exists($fld, $msg_headers)) {
-                        $recipients = array_merge($recipients, Hm_MIME_Msg::find_addresses($msg_headers[$fld]));
-                    }
+            $delivery_receipt = isset($msg_headers['X-Delivery']);
+
+            $recipients = [];
+            foreach (['To', 'Cc', 'Bcc'] as $fld) {
+                if (array_key_exists($fld, $msg_headers)) {
+                    $recipients = array_merge($recipients, Hm_MIME_Msg::find_addresses($msg_headers[$fld]));
                 }
+            }
 
-                $msg_content = $mailbox->get_message_content($folder, $msg_id, 0);
-                $from = process_address_fld($msg_headers['From']);
+            $msg_content = $imapMailbox->get_message_content($folder, $msg_id, 0);
+            $from = process_address_fld($msg_headers['From']);
 
-                $err_msg = $smtp->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
-                if (!$err_msg) {
-                    $mailbox->delete_message($folder, $msg_id, false);
-                    save_sent_msg($handler, $mailbox->get_config()['id'], $mailbox, $mailbox_details, $msg_content, $msg_id, false);
-                    return true; 
-                }
+            $err_msg = $smtpMailbox->send_message($from[0]['email'], $recipients, $msg_content, $delivery_receipt);
+            if (!$err_msg) {
+                $imapMailbox->delete_message($folder, $msg_id, false);
+                save_sent_msg($handler, $imapMailbox->get_config()['id'], $imapMailbox, $mailbox_details, $msg_content, $msg_id, false);
+                return true; 
+            }
         }
     } catch (Exception $e) {
         Hm_Debug::add(sprintf('ERRCannot send message: %s', $msg_headers['subject']));
