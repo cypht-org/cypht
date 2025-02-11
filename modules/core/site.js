@@ -1,5 +1,14 @@
 'use strict';
 
+$.fn.fadeOutAndRemove = function(timeout = 600) {
+    this.fadeOut(timeout)
+    var tm = setTimeout(() => {
+        this.remove();
+        clearTimeout(tm)
+    }, timeout);
+    return this;
+};
+
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
