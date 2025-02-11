@@ -1576,7 +1576,7 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
 
         foreach ($servers as $server_id => $config) {
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
-            if ($mailbox->authed()) {
+            if ($mailbox->connect()) {
                 $folder = 'Scheduled';
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
@@ -1621,7 +1621,7 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
             $imap_server = Hm_IMAP_List::getForMailbox($imap_server_id);
 
             $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $imap_server);
-                if ($mailbox->authed()) {
+                if ($mailbox->connect()) {
                 $folder = hex2bin($folder);
                 if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date)) {
                     $scheduled_msg_count++;
@@ -2047,7 +2047,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         return -1;
     }
     $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
-    if (! $mailbox->authed()) {
+    if (! $mailbox->connect()) {
         return -1;
     }
     

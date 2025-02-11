@@ -673,7 +673,7 @@ if (!hm_exists('get_scheduled_date')) {
             return [$label, date('D, H:i', $time)];
         }
 
-        return date('D, d M Y H:i', $time);
+        return date('D, d M Y H:i T', $time);
     }
 }
 

@@ -2425,8 +2425,9 @@ function setupActionSchedule(callback) {
         }
     });
     $(document).on('change', '.nexter_input_date', function (e) {
-        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.nexter_input').val($(this).val()).trigger('change');
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input').val(selectedDate.toISOString()).trigger('change');
         }
     });
     $(document).on('change', '.nexter_input', callback);
@@ -2451,8 +2452,9 @@ function setupActionSnooze(callback) {
         }
     });
     $(document).on('change', '.nexter_input_date_snooze', function (e) {
-        if ($(this).val() && new Date().getTime() < new Date($(this).val()).getTime()) {
-            $('.nexter_input_snooze').val($(this).val()).trigger('change');
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input_snooze').val(selectedDate.toISOString()).trigger('change');
         }
     });
     $(document).on('change', '.nexter_input_snooze', callback);
