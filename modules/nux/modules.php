@@ -405,6 +405,8 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         continue;
                     }
 
+                    Hm_Profiles::init($this);
+
                     add_profile(
                         $server_name,
                         $server['profile']['signature'],
