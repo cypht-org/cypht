@@ -44,8 +44,8 @@ $(document).on('click', 'a', function(event) {
     }
 });
 
-async function navigate(url) {
-    showRoutingToast();
+async function navigate(url, loaderMessage) {
+    showRoutingToast(loaderMessage);
 
     try {
         const response = await fetch(url, {

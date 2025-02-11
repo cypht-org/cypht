@@ -1,6 +1,6 @@
-function showRoutingToast() {
+function showRoutingToast(message = 'Redirecting...') {
     if (window.routingToast) hideRoutingToast();
-    window.routingToast = showLoaderToast('Redirecting...');
+    window.routingToast = showLoaderToast(message);
 }
 
 function hideRoutingToast() {

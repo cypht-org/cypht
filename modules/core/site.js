@@ -1492,7 +1492,7 @@ var Hm_Utils = {
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
-            $(class_name).toggle();
+            $(`[data-bs-target="${class_name}"]`).trigger('click');            
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         }
         return false;
