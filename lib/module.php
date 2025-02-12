@@ -439,7 +439,7 @@ abstract class Hm_Handler_Module {
     }
 
     public function save_hm_msgs() {
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));

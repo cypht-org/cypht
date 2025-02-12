@@ -54,7 +54,7 @@ trait Hm_Dispatch_Redirect {
      * @return void
      */
     private function forward_messages($session, $request) {
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
             $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }

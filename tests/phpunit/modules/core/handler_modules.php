@@ -35,7 +35,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 
         $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'SMTP')));
         $res = $test->run();
-        $this->assertEquals(array('ERRUnable to authenticate to the SMTP server'), Hm_Msgs::get());
+        $this->assertEquals(array('Unable to authenticate to the SMTP server'), Hm_Msgs::get());
         $this->assertFalse($res->handler_response['connect_status']);
         Hm_Msgs::flush();
 
@@ -49,7 +49,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 
         $test->input = array('missing_pw_servers' => array('a1' => array('id' => 'a1', 'type' => 'IMAP')));
         $res = $test->run();
-        $this->assertEquals(array('ERRUnable to authenticate to the IMAP server'), Hm_Msgs::get());
+        $this->assertEquals(array('Unable to authenticate to the IMAP server'), Hm_Msgs::get());
         $this->assertFalse($res->handler_response['connect_status']);
         Hm_Msgs::flush();
 
@@ -482,7 +482,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
         $test->prep();
         $test->ses_obj->auth_state = false;
         $test->run_only();
-        $this->assertEquals(array('ERRIncorrect password, could not save settings to the server'), Hm_Msgs::get());
+        $this->assertEquals(array('Incorrect password, could not save settings to the server'), Hm_Msgs::get());
         Hm_Msgs::flush();
         $test->prep();
         $test->ses_obj->auth_state = true;
@@ -492,7 +492,7 @@ class Hm_Test_Core_Handler_Modules extends TestCase {
 
         $test->post = array('save_and_logout' => true);
         $test->run();
-        $this->assertEquals(array('ERRYour password is required to save your settings to the server'), Hm_Msgs::get());
+        $this->assertEquals(array('Your password is required to save your settings to the server'), Hm_Msgs::get());
         Hm_Msgs::flush();
     }
     /**
