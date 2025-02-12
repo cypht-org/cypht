@@ -145,7 +145,7 @@ class Hm_Test_Core_Functions extends TestCase {
         $handler_mod->session->auth_state = false;
         save_user_settings($handler_mod, array('password' => 'foo'), false);
         $msgs = Hm_Msgs::get();
-        $this->assertEquals('ERRIncorrect password, could not save settings to the server', $msgs[3]);
+        $this->assertEquals('Incorrect password, could not save settings to the server', $msgs[3]);
 
     }
     /**

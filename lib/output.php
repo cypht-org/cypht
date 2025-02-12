@@ -81,7 +81,7 @@ trait Hm_List {
      * Return all messages
      * @return array all messages
      */
-    public static function get() {
+    public static function getRaw() {
         return self::$msgs;
     }
 
@@ -110,6 +110,12 @@ trait Hm_List {
         return $str;
     }
 
+    public static function get() {
+        return array_map(function ($msg) {
+            return $msg['text'];
+        }, self::$msgs);
+    }
+
     /**
      * Log all messages
      * @return bool
@@ -132,13 +138,15 @@ class Hm_Msgs { use Hm_List; }
  */
 class Hm_Debug {
 
-    use Hm_List;
+    use Hm_List {
+        add as protected self_add;
+    }
 
     /**
      * @override
      */
     public static function add($string, $type = 'danger') {
-        Hm_List::add($string, $type);
+        self::self_add($string, $type);
     }
 
     /**
@@ -146,11 +154,11 @@ class Hm_Debug {
      * @return void
      */
     public static function load_page_stats() {
-        self::add(sprintf("PHP version %s", phpversion()));
-        self::add(sprintf("Zend version %s", zend_version()));
-        self::add(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)));
-        self::add(sprintf("PID: %d", getmypid()));
-        self::add(sprintf("Included files: %d", count(get_included_files())));
+        self::add(sprintf("PHP version %s", phpversion()), 'info');
+        self::add(sprintf("Zend version %s", zend_version()), 'info');
+        self::add(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)), 'info');
+        self::add(sprintf("PID: %d", getmypid()), 'info');
+        self::add(sprintf("Included files: %d", count(get_included_files())), 'info');
     }
 }
 
