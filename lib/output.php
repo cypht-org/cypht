@@ -74,7 +74,11 @@ trait Hm_List {
      * @return void
      */
     public static function add($string, $type = 'success') {
-        self::$msgs[] = ['type' => $type, 'text' => self::str($string, false)];
+        $string = self::str($string, false);
+        $texts = self::get();
+        if (! in_array($string, $texts, true)) {
+            self::$msgs[] = ['type' => $type, 'text' => $string];
+        }
     }
 
     /**
