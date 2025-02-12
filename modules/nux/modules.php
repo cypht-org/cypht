@@ -472,8 +472,8 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             return '';
         }
         $notice = $this->trans('Please ensure your YAML or CSV  file follows the correct format');
-        $yaml_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
-        $csv_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.csv';
+        $yaml_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.yaml';
+        $csv_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.csv';
 
         return '<div class="quick_add_multiple_section">' .
             '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .
