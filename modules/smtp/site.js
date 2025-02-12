@@ -21,7 +21,6 @@ var check_attachment_dir_access = function() {
 var smtp_test_action = function(event) {
     event.preventDefault();
     var form = $(this).closest('.smtp_connect');
-    Hm_Notices.hide(true);
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_smtp_debug'},
             {'name': 'smtp_server_id', 'value': $('.smtp_server_id', form).val()}],
@@ -35,7 +34,6 @@ var smtp_delete_action = function(event) {
         return false;
     }
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).closest('.smtp_connect');
     Hm_Ajax.request(
         form.serializeArray(),

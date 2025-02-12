@@ -5,7 +5,6 @@ var imap_delete_action = function(event) {
         return false;
     }
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
         form.serializeArray(),
@@ -43,7 +42,6 @@ var imap_hide_action = function(form, server_id, hide) {
 
 var imap_hide = function(event) {
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     var server_id = $('.imap_server_id', form).val();
     imap_hide_action(form, server_id, 1);
@@ -51,7 +49,6 @@ var imap_hide = function(event) {
 
 var imap_unhide = function(event) {
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     var server_id = $('.imap_server_id', form).val();
     imap_hide_action(form, server_id, 0);
@@ -60,7 +57,6 @@ var imap_unhide = function(event) {
 var imap_test_action = function(event) {    
     $('.imap_folder_data').empty();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     Hm_Ajax.request(
         [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_debug'},
@@ -93,7 +89,6 @@ var imapServersPageHandler = function() {
 
 var ews_edit_action = function(event) {
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.ews-btn').trigger('click');

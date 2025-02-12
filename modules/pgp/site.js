@@ -195,9 +195,6 @@ var Hm_Pgp = {
         if (Hm_Pgp.error_msg) {
             Hm_Pgp.show_error();
         }
-        else {
-            Hm_Notices.hide(true);
-        }
     },
 
     show_error: function() {

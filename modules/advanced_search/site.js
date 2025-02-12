@@ -361,7 +361,6 @@ var get_adv_other = function() {
 };
 
 var process_advanced_search = function() {
-    Hm_Notices.hide(true);
     var terms = get_adv_terms();
     if (terms.length == 0) {
         Hm_Notices.show('You must enter at least one search term', 'warning');
