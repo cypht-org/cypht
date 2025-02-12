@@ -114,7 +114,9 @@ function applyMessagePageHandlers(routeParams) {
 }
 
 function applyComposePageHandlers(routeParams) {
-    applySmtpComposePageHandlers(routeParams);
+    if (hm_is_logged()) {
+        applySmtpComposePageHandlers(routeParams);
+    }
     if (hm_module_is_supported('contacts')) {
         applyContactsAutocompleteComposePageHandlers(routeParams);
     }
