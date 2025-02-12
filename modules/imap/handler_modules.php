@@ -348,7 +348,7 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
                 Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for IMAP %s", $imap_details['server']));
             }
             if ($sent_folder) {
-                Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder));
+                Hm_Debug::add(sprintf("Attempting to save sent message for IMAP server %s in folder %s", $imap_details['server'], $sent_folder), 'info');
                 if (! $mailbox->store_message($sent_folder, $msg)) {
                     Hm_Msgs::add('An error occurred saving the sent message', 'danger');
                 }
@@ -1096,7 +1096,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                                 snooze_message($mailbox, $msg['uid'], $folder, null);
                             }
                         } catch (Exception $e) {
-                            Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
+                            Hm_Debug::add(sprintf('Cannot unsnooze message: %s', $msg_headers['subject']));
                         }
                     }
                 }
@@ -1791,7 +1791,7 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
                 $results = imap_refresh_oauth2_token($server, $this->config);
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
-                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $server_id));
+                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $server_id), 'info');
                         $updated++;
                     }
                 }
@@ -1863,7 +1863,7 @@ class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
             return;
         }
         $this->cache->del('imap'.$form['imap_server_id']);
-        Hm_Debug::add(sprintf('Busted cache for IMAP server %s', $form['imap_server_id']));
+        Hm_Debug::add(sprintf('Busted cache for IMAP server %s', $form['imap_server_id']), 'info');
     }
 }
 

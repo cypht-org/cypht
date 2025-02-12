@@ -130,12 +130,12 @@ trait Hm_Dispatch_Redirect {
      */
     static public function page_redirect($url, $status = false) {
         if (DEBUG_MODE) {
-            Hm_Debug::add(sprintf('Redirecting to %s', $url));
+            Hm_Debug::add(sprintf('Redirecting to %s', $url), 'info');
             Hm_Debug::load_page_stats();
             Hm_Debug::show();
         }
         if ($status == 303) {
-            Hm_Debug::add('Redirect loop found');
+            Hm_Debug::add('Redirect loop found', 'warning');
             Hm_Functions::cease('Redirect loop discovered');
         }
         Hm_Functions::header('HTTP/1.1 303 Found');
@@ -197,7 +197,7 @@ class Hm_Dispatch {
             return;
         }
         if (is_readable(APP_PATH.'modules/site/lib.php')) {
-            Hm_Debug::add('Including site module set lib.php');
+            Hm_Debug::add('Including site module set lib.php', 'info');
             require APP_PATH.'modules/site/lib.php';
         }
     }
@@ -337,7 +337,7 @@ class Hm_Dispatch {
             $this->page = 'home';
         }
         $this->module_exec->page = $this->page;
-        Hm_Debug::add('Page ID: '.$this->page);
+        Hm_Debug::add('Page ID: '.$this->page, 'info');
     }
 
     /**

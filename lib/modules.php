@@ -179,7 +179,7 @@ trait Hm_Modules {
         self::add_page($page);
 
         if (array_key_exists($module, self::$module_list[$page])) {
-            Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module));
+            Hm_Debug::add(sprintf("Already registered module for %s re-attempted: %s", $page, $module), 'warning');
             return true;
         }
         $source === false ? $source = self::$source : false;

@@ -227,16 +227,16 @@ class Hm_Output_pgp_settings_link extends Hm_Output_Module {
 if (!hm_exists('validate_public_key')) {
 function validate_public_key($file_location) {
     if (!class_exists('gnupg')) {
-        Hm_Debug::add('Gnupg PECL extension not found');
+        Hm_Debug::add('Gnupg PECL extension not found', 'warning');
         return false;
     }
     if (!is_readable($file_location)) {
-        Hm_Debug::add('Uploaded public key not readable');
+        Hm_Debug::add('Uploaded public key not readable', 'warning');
         return false;
     }
     $data = file_get_contents($file_location);
     if (!$data) {
-        Hm_Debug::add('Uploaded public key not readable');
+        Hm_Debug::add('Uploaded public key not readable', 'warning');
         return false;
     }
     $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();
