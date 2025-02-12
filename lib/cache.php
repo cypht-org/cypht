@@ -201,11 +201,11 @@ trait Hm_Cache_Base {
      */
     private function configured() {
         if (!$this->server || !$this->port) {
-            Hm_Debug::add(sprintf('%s enabled but no server or port found', $this->type));
+            Hm_Debug::add(sprintf('%s enabled but no server or port found', $this->type), 'warning');
             return false;
         }
         if (!$this->supported) {
-            Hm_Debug::add(sprintf('%s enabled but not supported by PHP', $this->type));
+            Hm_Debug::add(sprintf('%s enabled but not supported by PHP', $this->type), 'warning');
             return false;
         }
         return true;
@@ -399,7 +399,7 @@ class Hm_Cache {
         if (!$this->check_redis($config) && !$this->check_memcache($config)) {
             $this->check_session($config);
         }
-        Hm_Debug::add(sprintf('CACHE backend using: %s', $this->type));
+        Hm_Debug::add(sprintf('CACHE backend using: %s', $this->type), 'info');
     }
 
     /**
@@ -454,16 +454,16 @@ class Hm_Cache {
     protected function log($key, $msg_type) {
         switch ($msg_type) {
         case 'save':
-            Hm_Debug::add(sprintf('CACHE: saving "%s" using %s', $key, $this->type));
+            Hm_Debug::add(sprintf('CACHE: saving "%s" using %s', $key, $this->type), 'info');
             break;
         case 'hit':
-            Hm_Debug::add(sprintf('CACHE: hit for "%s" using %s', $key, $this->type));
+            Hm_Debug::add(sprintf('CACHE: hit for "%s" using %s', $key, $this->type), 'info');
             break;
         case 'miss':
-            Hm_Debug::add(sprintf('CACHE: miss for "%s" using %s', $key, $this->type));
+            Hm_Debug::add(sprintf('CACHE: miss for "%s" using %s', $key, $this->type), 'warning');
             break;
         case 'del':
-            Hm_Debug::add(sprintf('CACHE: deleting "%s" using %s', $key, $this->type));
+            Hm_Debug::add(sprintf('CACHE: deleting "%s" using %s', $key, $this->type), 'info');
             break;
         }
     }
@@ -633,7 +633,7 @@ class Hm_Cache_Setup {
      */
     public function setup_cache() {
         $cache_class = $this->get_cache_class();
-        Hm_Debug::add(sprintf('Using %s for cache', $cache_class));
+        Hm_Debug::add(sprintf('Using %s for cache', $cache_class), 'info');
         return new $cache_class($this->config, $this->session);
     }
 

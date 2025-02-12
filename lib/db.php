@@ -146,7 +146,7 @@ class Hm_DB {
             self::$dbh[$key] = new PDO($dsn, self::$config['db_user'], self::$config['db_pass']);
             self::$dbh[$key]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             self::$dbh[$key]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn));
+            Hm_Debug::add(sprintf('Connecting to dsn: %s', $dsn), "info");
             return self::$dbh[$key];
         } catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());

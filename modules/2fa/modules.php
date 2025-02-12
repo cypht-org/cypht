@@ -61,7 +61,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
 
         list($secret, $simple) = get_2fa_key($this->config);
         if (!$secret) {
-            Hm_Debug::add('2FA module set enabled, but no shared secret configured');
+            Hm_Debug::add('2FA module set enabled, but no shared secret configured', 'warning');
             return;
         }
 
@@ -118,7 +118,7 @@ class Hm_Handler_2fa_setup_check extends Hm_Handler_Module {
 
         list($secret, $simple) = get_2fa_key($this->config);
         if (!$secret) {
-            Hm_Debug::add('2FA module set enabled, but no shared secret configured');
+            Hm_Debug::add('2FA module set enabled, but no shared secret configured', 'warning');
             return;
         }
 

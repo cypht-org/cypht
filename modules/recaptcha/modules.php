@@ -16,7 +16,7 @@ class Hm_Handler_process_recaptcha extends Hm_Handler_Module {
         $rconf = recaptcha_config($this->config);
         if (!is_array($rconf) || count($rconf) == 0) {
             $this->out('recaptcha_config', array('site_key' => ''));
-            Hm_Debug::add('Recaptcha module activated, but not configured');
+            Hm_Debug::add('Recaptcha module activated, but not configured', 'warning');
             return;
         }
         $this->out('recaptcha_config', $rconf);

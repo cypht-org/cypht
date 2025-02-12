@@ -511,7 +511,7 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
                         if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']));
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']), 'info');
                             Hm_SMTP_List::save();
                         }
                     }
@@ -2077,7 +2077,7 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
             if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id));
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id), 'info');
                 Hm_SMTP_List::save();
             }
         }
@@ -2209,7 +2209,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
         $attributes['no_auth'] = true;
     }
     Hm_SMTP_List::add($attributes);
-    Hm_Debug::add('Default SMTP server added');
+    Hm_Debug::add('Default SMTP server added', 'info');
 }}
 
 /**

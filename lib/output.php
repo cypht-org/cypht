@@ -135,6 +135,13 @@ class Hm_Debug {
     use Hm_List;
 
     /**
+     * @override
+     */
+    public static function add($string, $type = 'danger') {
+        Hm_List::add($string, $type);
+    }
+
+    /**
      * Add page execution stats to the Hm_Debug list
      * @return void
      */

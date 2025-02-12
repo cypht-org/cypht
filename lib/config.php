@@ -338,7 +338,7 @@ class Hm_User_Config_DB extends Hm_Config {
      */
     private function new_settings($username) {
         $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', [$username, '']);
-        Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username));
+        Hm_Debug::add(sprintf("created new row in hm_user_settings for %s", $username), 'success');
         $this->config = [];
         return $res ? true : false;
     }
@@ -417,7 +417,7 @@ class Hm_User_Config_DB extends Hm_Config {
         $this->connect();
         if (Hm_DB::execute($this->dbh, 'select settings from hm_user_settings where username=?', [$username])) {
             Hm_DB::execute($this->dbh, 'update hm_user_settings set settings=? where username=?', [$config, $username]);
-            Hm_Debug::add(sprintf("Saved user data to DB for %s", $username));
+            Hm_Debug::add(sprintf("Saved user data to DB for %s", $username), 'success');
             $res = true;
         } else {
             $res = Hm_DB::execute($this->dbh, 'insert into hm_user_settings values(?,?)', [$username, $config]);
@@ -518,19 +518,19 @@ function load_user_config_object($config) {
     switch ($type) {
         case 'DB':
             $user_config = new Hm_User_Config_DB($config);
-            Hm_Debug::add("Using DB user configuration");
+            Hm_Debug::add("Using DB user configuration", 'info');
             break;
         case 'custom':
             if (class_exists($class)) {
                 $user_config = new $class($config);
-                Hm_Debug::add("Using custom user configuration: {$class}");
+                Hm_Debug::add("Using custom user configuration: {$class}", 'info');
                 break;
             } else {
                 Hm_Debug::add("User configuration class does not exist: {$class}");
             }
         default:
             $user_config = new Hm_User_Config_File($config);
-            Hm_Debug::add("Using file based user configuration");
+            Hm_Debug::add("Using file based user configuration", "info");
             break;
     }
     return $user_config;

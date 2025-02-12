@@ -72,7 +72,7 @@ if (!class_exists('Hm_Functions')) {
          */
         public static function setcookie($name, $value, $lifetime = 0, $path = '', $domain = '', $secure = false, $html_only = false, $same_site = 'Strict') {
             $prefix = ($lifetime != 0 && $lifetime < time()) ? 'Deleting' : 'Setting';
-            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only));
+            Hm_Debug::add(sprintf('%s cookie: name: %s, lifetime: %s, path: %s, domain: %s, secure: %s, html_only %s',$prefix, $name, $lifetime, $path, $domain, $secure, $html_only), 'info');
             return setcookie($name, $value, [
                 'expires' => $lifetime,
                 'path' => $path,
@@ -265,7 +265,7 @@ function hm_exists($name) {
     $caller = array_shift($bt);
     $module = hm_get_module_from_path($caller['file']);
     if (function_exists($name)) {
-        Hm_Debug::add(sprintf('Function in %s replaced: %s', $module, $name));
+        Hm_Debug::add(sprintf('Function in %s replaced: %s', $module, $name), 'warning');
         return true;
     }
     return false;
