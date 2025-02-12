@@ -1075,12 +1075,12 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             */
             if($isSender){
                 if (!$this->module_is_supported('smtp')) {
-                    Hm_Msgs::add("ERRSMTP module is not enabled");
+                    Hm_Msgs::add("SMTP module is not enabled",'danger');
                     return;
                 }
                 $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
                 if(!isset($this->smtp_server_id)){
-                    Hm_Msgs::add("ERRCould not save server");
+                    Hm_Msgs::add("Could not save server", 'danger');
                     return;
                 }
             }
@@ -1168,21 +1168,21 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     };
                 }
 
-                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
-                    if (!$this->module_is_supported('profiles')) {
-                        Hm_Msgs::add("Profiles module is not enabled", "danger");
-                        return;
-                    }
-
-                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
-                }
-
                 if ($this->module_is_supported('imap_folders')) {
                     $this->out('imap_server_id', $this->imap_server_id);
                     $this->out('imap_service_name', $provider);
                 }
                 $this->out('just_saved_credentials', true);
                 Hm_Msgs::add("Server saved");
+            }
+
+            if ($createProfile && $this->smtp_server_id && ($this->imap_server_id || $this->jmap_server_id)) {
+                if (!$this->module_is_supported('profiles')) {
+                    Hm_Msgs::add("Profiles module is not enabled", "danger");
+                    return;
+                }
+
+                add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id ?? $this->jmap_server_id, $this);
             }
         }
     }
