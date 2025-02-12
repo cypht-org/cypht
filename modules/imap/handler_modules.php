@@ -1120,7 +1120,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         }
 
                         foreach ($folders as $folder => $uids) {
-                            $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
+                            $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
 
                             if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
                                 if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)['status']) {
