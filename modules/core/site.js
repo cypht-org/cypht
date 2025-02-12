@@ -229,7 +229,6 @@ var Hm_Ajax_Request = function() { return {
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
-                Hm_Notices.hide(true);
             }
             if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
                 Object.values(res.router_user_msgs).forEach((msg) => {
@@ -448,10 +447,6 @@ class Hm_Alert {
         }, dismissTime * 1000);
     }
 
-    clearAll() {
-        this.container.innerHTML = '';
-    }
-
     #getIcon(type) {
         const icons = {
             success: 'check-circle-fill',
@@ -475,11 +470,8 @@ var Hm_Notices = {
      * @param {*} type : The type of message to display (primary, secondary, success, danger, warning, info)
      */
     show: function(msg, type = 'success', dismissible = true, dismissTime = 10) {
+        msg = hm_trans(msg);
         this.hm_alert.createAlert(msg, type, dismissible, dismissTime);
-    },
-
-    hide: function() {
-        this.hm_alert.clearAll();
     },
 
     /**
@@ -1756,10 +1748,6 @@ var decrease_servers = function(section) {
     }
 };
 
-var err_msg = function(msg) {
-    return "ERR"+hm_trans(msg);
-};
-
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1810,7 +1798,6 @@ var fillJmapData = function(details) {
 var imap_smtp_edit_action = function(event) {
     resetQuickSetupForm();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.imap-jmap-smtp-btn').trigger('click');
