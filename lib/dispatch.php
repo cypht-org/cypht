@@ -114,7 +114,7 @@ trait Hm_Dispatch_Redirect {
         if (!empty($request->cookie['hm_msgs'])) {
             $msgs = @json_decode(base64_decode($request->cookie['hm_msgs']), true);
             if (is_array($msgs)) {
-                array_walk($msgs, function($v, $k) { Hm_Msgs::add($v, $k); });
+                array_walk($msgs, function($v) { Hm_Msgs::add($v['text'], $v['type']); });
             }
             $session->delete_cookie($request, 'hm_msgs');
             return true;

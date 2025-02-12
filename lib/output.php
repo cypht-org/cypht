@@ -73,8 +73,8 @@ trait Hm_List {
      * @param string $string message to add
      * @return void
      */
-    public static function add($string, $type = 'info') {
-        self::$msgs[$type] = self::str($string, false);
+    public static function add($string, $type = 'success') {
+        self::$msgs[] = ['type' => $type, 'text' => self::str($string, false)];
     }
 
     /**
@@ -115,7 +115,10 @@ trait Hm_List {
      * @return bool
      */
     public static function show() {
-        return Hm_Functions::error_log(print_r(self::$msgs, true));
+        $msgs = array_map(function ($msg) {
+            return strtoupper($msg['type']) . ': ' . $msg['text'];
+        }, self::$msgs);
+        return Hm_Functions::error_log(print_r($msgs, true));
     }
 }
 

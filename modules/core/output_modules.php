@@ -360,7 +360,7 @@ class Hm_Output_msgs extends Hm_Output_Module {
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="d-none position-fixed top-0 col-sm-4 col-md-3 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'"></div>';
+        $res .= '<div class="position-fixed top-0 col-sm-4 col-md-3 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'"></div>';
         $res .= '<script type="text/javascript">var hm_msgs = '.json_encode($msgs).'</script>';
         return $res;
     }

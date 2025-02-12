@@ -1501,8 +1501,9 @@ var Hm_Utils = {
      * Shows pending messages added with the add_sys_message method
      */
     show_sys_messages: function() {
-        hm_msg.forEach((v, k) => {
-            alert.createAlert(v, k);
+        const hm_alert = new Hm_Alert();
+        hm_msgs.forEach((msg) => {
+            hm_alert.createAlert(msg.text, msg.type);
         });
     },
 
@@ -1515,9 +1516,8 @@ var Hm_Utils = {
         if (!msg) {
             return;
         }
-        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-        this.show_sys_messages();
+        const hm_alert = new Hm_Alert();
+        hm_alert.createAlert(msg, type);
     },
 
     clear_sys_messages: function () {
@@ -1838,9 +1838,6 @@ $(function() {
     /* fire up the job scheduler */
     Hm_Timer.fire();
 
-    /* Use this to create alerts */
-    var alert = new Hm_Alert();
-    
     /* show any pending notices */
     Hm_Utils.show_sys_messages();
 
@@ -2425,8 +2422,9 @@ class Hm_Alert {
      * @param {string} message - The message to display.
      * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
      * @param {boolean} dismissible - Whether the alert can be dismissed.
+     * @param {integer} dismissTime - Number of seconds before alert auto-closes
      */
-    createAlert(message, type = 'primary', dismissible = true) {
+    createAlert(message, type = 'primary', dismissible = true, dismissTime = 10) {
         if (!this.container) {
             return;
         }
@@ -2442,7 +2440,7 @@ class Hm_Alert {
         iconContainer.appendChild(icon);
 
         const messageElement = document.createElement('div');
-        messageElement.className = 'flex-grow-1  pe-2';
+        messageElement.className = 'flex-grow-1  pe-4';
         messageElement.textContent = message;
 
         alert.appendChild(iconContainer);
@@ -2460,7 +2458,8 @@ class Hm_Alert {
         
         this.container.appendChild(alert);
         
-        // Auto close after 10 seconds with animation
+        dismissTime *= 1000;
+        // Auto close with animation
         setTimeout(() => {
             alert.style.opacity = '0';
             alert.style.transform = 'translateY(-20px)';
@@ -2468,7 +2467,7 @@ class Hm_Alert {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             }, 500);
-        }, 10000);
+        }, dismissTime);
     }
 
     toggleVisibility() {
