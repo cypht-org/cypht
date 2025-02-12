@@ -495,6 +495,7 @@ button {
   padding-bottom: 10px;
   padding-top: 20px;
   letter-spacing: -1px;
+  gap: 1rem;
 }
 .header_subject .content_title {
   color: #555;
@@ -987,6 +988,7 @@ div.unseen,
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
+  gap: 0.5rem;
 }
 .mobile .list_meta,
 .mobile .search_form {
@@ -1509,4 +1511,8 @@ a[disabled] {
 
 .mobile .search_content .message_table {
   margin-top: 10rem;
+}
+
+.search_content .refresh_link {
+  display: none;
 }
