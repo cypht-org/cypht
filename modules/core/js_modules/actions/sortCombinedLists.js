@@ -10,6 +10,6 @@ async function sortCombinedLists(sortValue) {
         Hm_Utils.tbody().attr('id', messagesStore.list);
         display_imap_mailbox(messagesStore.rows, null, messagesStore.list);
     } catch (error) {
-        Hm_Utils.add_sys_message('Failed to load messages', 'danger');
+        Hm_Notices.show('Failed to load messages', 'danger');
     }
 }

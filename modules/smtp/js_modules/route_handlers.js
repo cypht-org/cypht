@@ -111,7 +111,7 @@ function applySmtpComposePageHandlers() {
         async function handleSendAnyway() {
 
             if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+            Hm_Notices.show('Please wait, sending message...', 'info');
             await waitForValueChange('.compose_draft_id', '0');
             }
 
