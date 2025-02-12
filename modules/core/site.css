@@ -737,6 +737,7 @@ button {
   color: #999;
   display: inline;
   padding-left: 15px;
+  width: 100%;
 }
 .search_form input,
 .search_form select {
@@ -985,6 +986,7 @@ div.unseen,
   display: flex;
   max-height: 35rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 .mobile .list_meta,
 .mobile .search_form {
@@ -1095,20 +1097,24 @@ div.unseen,
   margin: 0px;
   margin-top: 5px;
 }
+.mobile .search_form > form {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
 .mobile .search_form label {
   display: none;
 }
 .mobile .search_update {
   clear: both;
 }
-.mobile .search_content .refresh_list {
-  display: none;
+.mobile .search_content .list_controls {
+  display: none !important;
 }
 .mobile .search_content .content_title {
   max-height: 500px;
 }
 .mobile .search_form select {
-  width: 30px;
+  width: calc(50% - 0.5rem);
 }
 .mobile .search_content {
   padding-top: 30px;
@@ -1499,4 +1505,8 @@ a[disabled] {
 .pagination .btn.active {
   background-color: var(--bs-primary);
   color: var(--bs-white);
+}
+
+.mobile .search_content .message_table {
+  margin-top: 10rem;
 }
