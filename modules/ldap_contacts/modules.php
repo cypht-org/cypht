@@ -25,7 +25,7 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
             $addresses = Hm_Address_Field::parse($form['contact_value']);
             $config = $ldap_config[$source];
             if (count($config) == 0) {
-                Hm_Msgs::add('ERRUnable to add contact');
+                Hm_Msgs::add('Unable to add contact', 'danger');
                 return;
             }
             $ldap = new Hm_LDAP_Contacts($config);
@@ -49,7 +49,7 @@ class Hm_Handler_process_add_ldap_contact_from_message extends Hm_Handler_Module
                             Hm_Msgs::add('Contact Added');
                         }
                         else {
-                            Hm_Msgs::add('ERRUnable to add contact');
+                            Hm_Msgs::add('Unable to add contact', 'danger');
                         }
                     }
                 }
@@ -71,7 +71,7 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
             $config = $ldap_config[$form['contact_source']];
             $contact = $contacts->get($form['contact_id']);
             if (!$contact) {
-                Hm_Msgs::add('ERRUnable to find contact to delete');
+                Hm_Msgs::add('Unable to find contact to delete', 'danger');
             }
             $ldap = new Hm_LDAP_Contacts($config);
             if ($ldap->connect()) {
@@ -81,11 +81,11 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
                     $this->out('contact_deleted', 1);
                 }
                 else {
-                    Hm_Msgs::add('ERRCould not delete contact');
+                    Hm_Msgs::add('Could not delete contact', 'danger');
                 }
             }
             else {
-                Hm_Msgs::add('ERRCould not delete contact');
+                Hm_Msgs::add('Could not delete contact', 'danger');
             }
         }
     }
@@ -162,7 +162,7 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
                 $rdn = sprintf('cn=%s', $entry['cn']);
                 $parent = $config['base_dn'];
                 if (!$ldap->rename($old_dn, $rdn, $parent)) {
-                    Hm_Msgs::add('ERRUnable to update contact');
+                    Hm_Msgs::add('Unable to update contact', 'danger');
                     return;
                 }
             }
@@ -170,7 +170,7 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
                 Hm_Msgs::add('Contact Updated');
             }
             else {
-                Hm_Msgs::add('ERRUnable to update contact');
+                Hm_Msgs::add('Unable to update contact', 'danger');
             }
         }
     }
@@ -196,7 +196,7 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
                 Hm_Msgs::add('Contact Added');
             }
             else {
-                Hm_Msgs::add('ERRCould not add contact');
+                Hm_Msgs::add('Could not add contact', 'danger');
             }
         }
     }

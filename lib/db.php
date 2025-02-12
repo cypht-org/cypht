@@ -107,7 +107,7 @@ class Hm_DB {
             }
             return $sql->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $oops) {
-            Hm_Msgs::add('ERRDatabase error. Please try again.');
+            Hm_Msgs::add('Database error. Please try again.', 'danger');
             Hm_Debug::add($oops->getMessage());
             return false;
         }
@@ -150,7 +150,7 @@ class Hm_DB {
             return self::$dbh[$key];
         } catch (Exception $oops) {
             Hm_Debug::add($oops->getMessage());
-            Hm_Msgs::add('ERRUnable to connect to the database. Please check your configuration settings and try again.');
+            Hm_Msgs::add('Unable to connect to the database. Please check your configuration settings and try again.', 'danger');
             self::$dbh[$key] = false;
             return false;
         }

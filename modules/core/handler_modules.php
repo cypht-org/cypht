@@ -51,7 +51,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 else {
                     unset($current['pass']);
                     Hm_SMTP_List::edit($server['id'], $current);
-                    Hm_Msgs::add('ERRUnable to authenticate to the SMTP server');
+                    Hm_Msgs::add('Unable to authenticate to the SMTP server', 'warning');
                     $this->out('connect_status', false);
                 }
                 break;
@@ -68,7 +68,7 @@ class Hm_Handler_process_pw_update extends Hm_Handler_Module {
                 else {
                     unset($current['pass']);
                     Hm_IMAP_List::edit($server['id'], $current);
-                    Hm_Msgs::add('ERRUnable to authenticate to the IMAP server');
+                    Hm_Msgs::add('Unable to authenticate to the IMAP server', 'warning');
                     $this->out('connect_status', false);
                 }
                 break;
@@ -646,7 +646,7 @@ class Hm_Handler_login extends Hm_Handler_Module {
         if ($success) {
             $this->session->check($this->request, rtrim($form['username']), $form['password']);
             if (!$this->session->is_active()) {
-                Hm_Msgs::add("ERRInvalid username or password");
+                Hm_Msgs::add("Invalid username or password", "warning");
             }
             $this->session->set('username', rtrim($form['username']));
             if ($this->config->get('redirect_after_login')) {
@@ -760,7 +760,7 @@ class Hm_Handler_logout extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('logout', $this->request->post) && !$this->session->loaded) {
             $this->session->destroy($this->request);
-            Hm_Msgs::add('Session destroyed on logout');
+            Hm_Msgs::add('Session destroyed on logout', 'info');
         }
         elseif (array_key_exists('save_and_logout', $this->request->post)) {
             list($success, $form) = $this->process_form(array('password'));
@@ -775,17 +775,17 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                     $pass = $form['password'];
                 }
                 else {
-                    Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+                    Hm_Msgs::add('Incorrect password, could not save settings to the server', 'warning');
                     $pass = false;
                 }
                 if ($user && $path && $pass) {
                     $this->user_config->save($user, $pass);
                     $this->session->destroy($this->request);
-                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout');
+                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
                 }
             }
             else {
-                Hm_Msgs::add('ERRYour password is required to save your settings to the server');
+                Hm_Msgs::add('Your password is required to save your settings to the server', 'warning');
             }
         }
     }
@@ -1075,7 +1075,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
             */
             if(isset($onlyJmap) && $onlyJmap) {
                 if (!$this->module_is_supported('jmap')) {
-                    Hm_Msgs::add("ERRJMAP module is not enabled");
+                    Hm_Msgs::add("JMAP module is not enabled", "danger");
                     return;
                 }
 
@@ -1096,7 +1096,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 );
 
                 if(!isset($this->jmap_server_id)) {
-                    Hm_Msgs::add("ERRCould not save JMAP server");
+                    Hm_Msgs::add("Could not save JMAP server", "warning");
                     return;
                 };
 
@@ -1109,12 +1109,12 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                  */
                 if($isSender){
                     if (!$this->module_is_supported('smtp')) {
-                        Hm_Msgs::add("ERRSMTP module is not enabled");
+                        Hm_Msgs::add("SMTP module is not enabled", "danger");
                         return;
                     }
                     $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
                     if(!isset($this->smtp_server_id)){
-                        Hm_Msgs::add("ERRCould not save server");
+                        Hm_Msgs::add("Could not save SMTP server", "warning");
                         return;
                     }
                 }
@@ -1124,7 +1124,7 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                  */
                 if($isReceiver){
                     if (!$this->module_is_supported('imap')) {
-                        Hm_Msgs::add("ERRIMAP module is not enabled");
+                        Hm_Msgs::add("IMAP module is not enabled", "danger");
                         return;
                     }
 
@@ -1148,14 +1148,14 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         if($isSender && isset($this->smtp_server_id)){
                             delete_smtp_server($this->smtp_server_id, $this);
                         }
-                        Hm_Msgs::add("ERRCould not save server");
+                        Hm_Msgs::add("Could not save IMAP server", "warning");
                         return;
                     };
                 }
 
                 if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
                     if (!$this->module_is_supported('profiles')) {
-                        Hm_Msgs::add("ERRProfiles module is not enabled");
+                        Hm_Msgs::add("Profiles module is not enabled", "danger");
                         return;
                     }
 

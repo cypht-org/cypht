@@ -219,7 +219,7 @@ class Hm_Carddav {
             return $data;
         }
         catch (Exception $oops) {
-            Hm_Msgs::add('ERRUnable to access CardDav server');
+            Hm_Msgs::add('Unable to access CardDav server', 'warning');
             Hm_Debug::add(sprintf('CARDDAV: Could not parse XML: %s', $xml));
         }
         return false;

@@ -55,7 +55,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
         }
 
         /*if(!extension_loaded('imagick')){
-            Hm_Msgs::add('ERR2FA The imagick extension is required to use 2fa feature, please contact your administrator for fixing this');
+            Hm_Msgs::add('2FA The imagick extension is required to use 2fa feature, please contact your administrator for fixing this', 'warning');
             return;
         }*/
 
@@ -72,7 +72,7 @@ class Hm_Handler_2fa_check extends Hm_Handler_Module {
 
         $old_setting = $this->user_config->get('enable_2fa_setting', 0);
         if ($old_setting && $this->session->loaded) {
-            Hm_Msgs::add('ERR2FA disabled because of a security issue. Go to "Settings" -> "Site" to re-enable');
+            Hm_Msgs::add('2FA disabled because of a security issue. Go to "Settings" -> "Site" to re-enable', 'warning');
         }
         $passed = false;
         $backup_codes = $this->user_config->get('2fa_backup_codes_setting', array());

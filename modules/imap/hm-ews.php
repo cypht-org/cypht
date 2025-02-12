@@ -128,7 +128,7 @@ class Hm_EWS {
                         $special[$type] = $distinguishedFolder->get('folderId')->get('id');
                     }
                 } catch (\Exception $e) {
-                    Hm_Msgs::add('ERR' . $e->getMessage());
+                    Hm_Msgs::add($e->getMessage(), 'danger');
                 }
             }
         }
@@ -167,7 +167,7 @@ class Hm_EWS {
             // since this is used for missing folders check, we skip error reporting
             return [];
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             return [];
         }
     }
@@ -188,7 +188,7 @@ class Hm_EWS {
             $result = $this->ews->CreateFolder($request);
             return $result->get('id');
         } catch(\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
         }
     }
@@ -221,7 +221,7 @@ class Hm_EWS {
             $request = Type::buildFromArray($request);
             $this->ews->UpdateFolder($request);
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
         }
         if ($parent) {
@@ -238,7 +238,7 @@ class Hm_EWS {
                 $request = Type::buildFromArray($request);
                 $this->ews->MoveFolder($request);
             } catch (\Exception $e) {
-                Hm_Msgs::add('ERR' . $e->getMessage());
+                Hm_Msgs::add($e->getMessage(), 'danger');
                 return false;
             }
         }
@@ -249,7 +249,7 @@ class Hm_EWS {
         try {
             return $this->api->deleteFolder(new Type\FolderIdType($folder));
         } catch(\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
         }
     }
@@ -301,7 +301,7 @@ class Hm_EWS {
             ]);
             return $result->get('id');
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
         }
     }
@@ -967,7 +967,7 @@ class Hm_EWS {
             try {
                 $result = $result && $this->ews->ArchiveItem($request);
             } catch (\Exception $e) {
-                Hm_Msgs::add('ERR' . $e->getMessage());
+                Hm_Msgs::add($e->getMessage(), 'danger');
                 $result = false;
             }
         }
@@ -996,7 +996,7 @@ class Hm_EWS {
                 }
             }
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             $result = false;
         }
         return $result;
@@ -1026,7 +1026,7 @@ class Hm_EWS {
                 return $itemId->get('id');
             }, $result);
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             $result = [];
         }
         return $result;
@@ -1057,7 +1057,7 @@ class Hm_EWS {
                 return $itemId->get('id');
             }, $result);
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERR' . $e->getMessage());
+            Hm_Msgs::add($e->getMessage(), 'danger');
             $result = [];
         }
         return $result;

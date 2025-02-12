@@ -87,7 +87,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
 
                 if ($header !== $expectedHeader) {
                     fclose($csv);
-                    Hm_Msgs::add('ERRInvalid CSV file, please use a valid header: '.implode(', ', $expectedHeader));
+                    Hm_Msgs::add('Invalid CSV file, please use a valid header: '.implode(', ', $expectedHeader), 'danger');
                     return;
                 }
 
@@ -140,16 +140,19 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                 fclose($csv);
                 $contacts->save();
                 $this->session->record_unsaved('Contact Created');
+                $type = 'danger';
                 if (isset($import_result) && (!$create_count && !$update_count)) {
-                    $message = 'ERR'.$create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $type = 'warning';
                 } elseif (isset($import_result) && ($create_count || $update_count)) {
                     $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $type = 'success';
                 } else {
-                    $message = 'ERRAn error occured';
+                    $message = 'An error occured';
                 }
 
                 $this->session->set('imported_contact', $import_result);
-                Hm_Msgs::add($message);
+                Hm_Msgs::add($message, $type);
             }
         }
     }

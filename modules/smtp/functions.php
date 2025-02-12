@@ -37,7 +37,7 @@ if (!hm_exists('connect_to_smtp_server')) {
         }
         else {
             Hm_SMTP_List::del($smtp_server_id);
-            Hm_Msgs::add('ERRAuthentication failed');
+            Hm_Msgs::add('Authentication failed', 'danger');
             return null;
         }
     }

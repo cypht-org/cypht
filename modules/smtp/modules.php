@@ -49,7 +49,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
     }
     public function process() {
         if (!$this->module_is_supported('imap')) {
-            Hm_Msgs::add('ERRIMAP module unavailable.');
+            Hm_Msgs::add('IMAP module unavailable.', 'danger');
             return;
         }
         if (array_key_exists('imap_draft', $this->request->get)
@@ -108,7 +108,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 }
                 return;
             }
-            Hm_Msgs::add('ERRCould not load the IMAP mailbox.');
+            Hm_Msgs::add('Could not load the IMAP mailbox.', 'danger');
         }
     }
 }
@@ -274,7 +274,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
 
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
             if ($file['error'] != 0) {
-                Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('Error '.$file['error'].' in file '.$this->request->get['resumableFilename'], 'danger');
                 continue;
             }
 
@@ -290,7 +290,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
 
             // move the temporary file
             if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
-                Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename'], 'danger');
             } else {
                 // check if all the parts present, and create the final destination file
                 $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
@@ -351,7 +351,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
                 $this->out('draft_id', $new_draft_id);
             }
             elseif ($draft_notice) {
-                Hm_Msgs::add('ERRUnable to save draft');
+                Hm_Msgs::add('Unable to save draft', 'danger');
             }
             return;
         }
@@ -365,7 +365,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         Hm_SMTP_List::init($this->user_config, $this->session);
         if (Hm_SMTP_List::count() == 0 && $this->page == 'compose') {
-            Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
+            Hm_Msgs::add('You need at least one configured SMTP server to send outbound messages', 'warning');
         }
         $draft = array();
         $draft_id = next_draft_key($this->session);
@@ -390,7 +390,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
-            Hm_Msgs::add('ERRAttachment storage unavailable, please contact your site administrator');
+            Hm_Msgs::add('Attachment storage unavailable, please contact your site administrator', 'warning');
         }
 
         $this->out('compose_draft', $draft, false);
@@ -429,7 +429,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
         if (isset($this->request->post['submit_smtp_server'])) {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
-                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
+                Hm_Msgs::add('You must supply a name, a server and a port', 'warning');
             }
             else {
                 $tls = false;
@@ -448,7 +448,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 }
                 else {
                     $this->session->set('add_form_vals', $form);
-                    Hm_Msgs::add(sprintf('ERRCould not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('Could not add server: %s', $errstr), 'danger');
                 }
             }
         }
@@ -521,10 +521,10 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     Hm_Msgs::add("Successfully authenticated to the SMTP server");
                 }
                 elseif ($mailbox && $mailbox->state() == 'connected') {
-                    Hm_Msgs::add("ERRConnected, but failed to authenticate to the SMTP server");
+                    Hm_Msgs::add("Connected, but failed to authenticate to the SMTP server", "warning");
                 }
                 else {
-                    Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+                    Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
                 }
             }
         }
@@ -540,18 +540,18 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         $profile_value = $this->request->post['profile_value'];
 
         if (!mb_strstr($profile_value, '.')) {
-            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            Hm_Msgs::add('Please create a profile for saving sent messages', 'warning');
             return;
         }
         $profile = profile_from_compose_smtp_id($profiles, $profile_value);
         if (!$profile) {
-            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            Hm_Msgs::add('Please create a profile for saving sent messages', 'warning');
             return;
         }
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
         $specials = get_special_folders($this, $imap_profile['id']);
         if (!array_key_exists('sent', $specials) || !$specials['sent']) {
-            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account');
+            Hm_Msgs::add('Please configure a sent folder for this IMAP account', 'warning');
         }
     }
 }
@@ -647,7 +647,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* missing field */
         list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
-            Hm_Msgs::add('ERRRequired field missing');
+            Hm_Msgs::add('Required field missing', 'warning');
             return;
         }
 
@@ -682,7 +682,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (!$smtp_details) {
-            Hm_Msgs::add('ERRCould not use the selected SMTP server');
+            Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -700,7 +700,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* try to connect */
         $mailbox = Hm_SMTP_List::connect($smtp_id, false);
         if (! $mailbox || ! $mailbox->authed()) {
-            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -715,7 +715,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
-            Hm_Msgs::add("ERRNo valid recipients found");
+            Hm_Msgs::add("No valid recipients found", "warning");
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -723,7 +723,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* send the message */
         $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+            Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -1929,7 +1929,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $specials = get_special_folders($mod, $imap_profile['id']);
 
     if (!array_key_exists('draft', $specials) || !$specials['draft']) {
-        Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
+        Hm_Msgs::add('There is no draft directory configured for this account.', 'warning');
         return -1;
     }
     $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_profile['id'], $mod_cache);
@@ -1945,7 +1945,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     $msg = rtrim($msg)."\r\n";
 
     if (! $mailbox->store_message($specials['draft'], $msg, false, true)) {
-        Hm_Msgs::add('ERRAn error occurred saving the draft message');
+        Hm_Msgs::add('An error occurred saving the draft message', 'danger');
         return -1;
     }
 
@@ -2228,6 +2228,6 @@ function recip_count_check($headers, $omod) {
         $recip_count += count(process_address_fld($headers['cc']));
     }
     if ($recip_count > MAX_RECIPIENT_WARNING) {
-        Hm_Msgs::add('ERRMessage contains more than the maximum number of recipients, proceed with caution');
+        Hm_Msgs::add('Message contains more than the maximum number of recipients, proceed with caution', 'warning');
     }
 }}

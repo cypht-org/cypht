@@ -41,7 +41,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
             }
             $client->close();
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -70,7 +70,7 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
                 $sieve_filters_enabled = true;
                 $this->out('sieve_filters_client', $client);
             } catch (Exception $e) {
-                Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             }
         }
         $this->out('sieve_filters_enabled', $sieve_filters_enabled);
@@ -108,7 +108,7 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
             $client->close();
             $this->out('script', $script);
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
     }
 }
@@ -155,7 +155,7 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
             $client->close();
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
     }
 }
@@ -193,7 +193,7 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
             $client->close();
             Hm_Msgs::add('Script removed');
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
     }
 }
@@ -269,7 +269,7 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             $client->activateScript('main_script');
             $client->close();
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -294,7 +294,7 @@ class Hm_Handler_sieve_get_mailboxes_script extends Hm_Handler_Module {
         }
         $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
         if (! $mailbox || ! $mailbox->authed()) {
-            Hm_Msgs::add('ERRIMAP Authentication Failed');
+            Hm_Msgs::add('IMAP Authentication Failed', 'danger');
             return;
         }
         $mailboxes = [];
@@ -427,7 +427,7 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
                 Hm_Msgs::add('Sender Blocked');
             }
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -453,7 +453,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $form['imap_msg_uid'] = $this->request->post['imap_msg_uid'];
             $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->post['imap_server_id'], $this->cache);
             if (! $mailbox || ! $mailbox->authed()) {
-                Hm_Msgs::add('ERRIMAP Authentication Failed');
+                Hm_Msgs::add('IMAP Authentication Failed', 'danger');
                 return;
             }
             $msg_header = $mailbox->get_message_headers(hex2bin($this->request->post['folder']), $form['imap_msg_uid']);
@@ -463,7 +463,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
         } else {
-            Hm_Msgs::add('ERRSender not found');
+            Hm_Msgs::add('Sender not found', 'warning');
             return;
         }
 
@@ -581,7 +581,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 }
             }
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -990,7 +990,7 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
             $client->activateScript('main_script');
             $client->close();
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -1025,7 +1025,7 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
                 $this->request->post['script']
             );
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
@@ -1366,7 +1366,7 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
 
             Hm_Msgs::add("Script $state");
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
         }
         $this->out('success', $success);
     }
@@ -1396,7 +1396,7 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
             $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
                         
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }

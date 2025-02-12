@@ -1578,11 +1578,11 @@ if (!hm_exists('connect_to_imap_server')) {
                 $client = $sieveClientFactory->init(null, $server, $context->module_is_supported('nux'));
 
                 if (!$client && $show_errors) {
-                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                    Hm_Msgs::add("Failed to authenticate to the Sieve host", "warning");
                 }
             } catch (Exception $e) {
                 if ($show_errors) {
-                    Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                    Hm_Msgs::add("Failed to authenticate to the Sieve host", "warning");
                 }
                 if (! $server_id) {
                     Hm_IMAP_List::del($imap_server_id);
@@ -1598,7 +1598,7 @@ if (!hm_exists('connect_to_imap_server')) {
         } else {
             Hm_IMAP_List::del($imap_server_id);
             if ($show_errors) {
-                Hm_Msgs::add('ERRAuthentication failed');
+                Hm_Msgs::add('Authentication failed', 'warning');
             }
             return null;
         }
