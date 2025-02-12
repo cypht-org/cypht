@@ -68,13 +68,13 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
 
         if (($profile = Hm_Profiles::get($form['profile_id']))) {
             if (array_key_exists('autocreate', $profile)) {
-                Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
+                Hm_Msgs::add('Automatically created profile cannot be deleted', 'warning');
                 return;
             }
             Hm_Profiles::del($form['profile_id']);
             Hm_Msgs::add('Profile Deleted');
         } else {
-            Hm_Msgs::add('ERRProfile ID not found');
+            Hm_Msgs::add('Profile ID not found', 'warning');
             return;
         }
     }
@@ -140,7 +140,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
                     ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
                     ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
                 ) {
-                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    Hm_Msgs::add('Profile with this email address or reply-to address already exists', 'warning');
                     return;
                 }
             }

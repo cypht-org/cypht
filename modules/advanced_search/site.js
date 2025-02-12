@@ -361,25 +361,24 @@ var get_adv_other = function() {
 };
 
 var process_advanced_search = function() {
-    Hm_Notices.hide(true);
     var terms = get_adv_terms();
     if (terms.length == 0) {
-        Hm_Notices.show([err_msg('You must enter at least one search term')]);
+        Hm_Notices.show('You must enter at least one search term', 'warning');
         return;
     }
     const sources = get_adv_sources();
     if (sources.length == 0) {
-        Hm_Notices.show([err_msg('You must select at least one source')]);
+        Hm_Notices.show('You must select at least one source', 'warning');
         return;
     }
     var targets = get_adv_targets();
     if (targets.length == 0) {
-        Hm_Notices.show([err_msg('You must have at least one target')]);
+        Hm_Notices.show('You must have at least one target', 'warning');
         return;
     }
     var times = get_adv_times();
     if (times.length == 0) {
-        Hm_Notices.show([err_msg('You must enter at least one time range')]);
+        Hm_Notices.show('You must enter at least one time range', 'warning');
         return;
     }
     var other = get_adv_other();

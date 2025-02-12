@@ -73,15 +73,15 @@ trait Hm_List {
      * @param string $string message to add
      * @return void
      */
-    public static function add($string) {
-        self::$msgs[] = self::str($string, false);
+    public static function add($string, $type = 'success') {
+        self::$msgs[] = ['type' => $type, 'text' => self::str($string, false)];
     }
 
     /**
      * Return all messages
      * @return array all messages
      */
-    public static function get() {
+    public static function getRaw() {
         return self::$msgs;
     }
 
@@ -110,12 +110,21 @@ trait Hm_List {
         return $str;
     }
 
+    public static function get() {
+        return array_map(function ($msg) {
+            return $msg['text'];
+        }, self::$msgs);
+    }
+
     /**
      * Log all messages
      * @return bool
      */
     public static function show() {
-        return Hm_Functions::error_log(print_r(self::$msgs, true));
+        $msgs = array_map(function ($msg) {
+            return strtoupper($msg['type']) . ': ' . $msg['text'];
+        }, self::$msgs);
+        return Hm_Functions::error_log(print_r($msgs, true));
     }
 }
 
@@ -129,18 +138,27 @@ class Hm_Msgs { use Hm_List; }
  */
 class Hm_Debug {
 
-    use Hm_List;
+    use Hm_List {
+        add as protected self_add;
+    }
+
+    /**
+     * @override
+     */
+    public static function add($string, $type = 'danger') {
+        self::self_add($string, $type);
+    }
 
     /**
      * Add page execution stats to the Hm_Debug list
      * @return void
      */
     public static function load_page_stats() {
-        self::add(sprintf("PHP version %s", phpversion()));
-        self::add(sprintf("Zend version %s", zend_version()));
-        self::add(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)));
-        self::add(sprintf("PID: %d", getmypid()));
-        self::add(sprintf("Included files: %d", count(get_included_files())));
+        self::add(sprintf("PHP version %s", phpversion()), 'info');
+        self::add(sprintf("Zend version %s", zend_version()), 'info');
+        self::add(sprintf("Peak Memory: %d", (memory_get_peak_usage(true)/1024)), 'info');
+        self::add(sprintf("PID: %d", getmypid()), 'info');
+        self::add(sprintf("Included files: %d", count(get_included_files())), 'info');
     }
 }
 

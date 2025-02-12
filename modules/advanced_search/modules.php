@@ -52,19 +52,19 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         }
         if (!$this->validate_date($form['adv_start']) ||
             !$this->validate_date($form['adv_end'])) {
-            Hm_Msgs::add('ERRInvalid date format');
+            Hm_Msgs::add('Invalid date format', 'warning');
             return;
         }
         $flags = array('ALL');
         if (array_key_exists('adv_flags', $this->request->post)) {
             if (!$this->validate_flags($this->request->post['adv_flags'])) {
-                Hm_Msgs::add('ERRInvalid flag');
+                Hm_Msgs::add('Invalid flag', 'warning');
                 return;
             }
             $flags = $this->request->post['adv_flags'];
         }
         if (!$this->validate_source($form['adv_source'])) {
-            Hm_Msgs::add('ERRInvalid source');
+            Hm_Msgs::add('Invalid source', 'warning');
             return;
         }
         $charset = false;

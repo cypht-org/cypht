@@ -68,7 +68,7 @@ async function changePage(toPage, button, offsets) {
         display_imap_mailbox(messagesStore.rows, null, messagesStore.list);
         $(".pagination .current").text(toPage);
     } catch (error) {
-        Hm_Utils.add_sys_message("Failed to fetch content", "danger");
+        Hm_Notices.show("Failed to fetch content", "danger");
     } finally {
         $(button).removeClass('active');
         refreshNextButton(toPage);

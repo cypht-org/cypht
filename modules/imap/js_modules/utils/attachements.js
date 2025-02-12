@@ -13,7 +13,7 @@ function handleAttachementDownload() {
                 URL.revokeObjectURL(url);
             });
         } catch (error) {
-            Hm_Notices.show([`ERR${error.message}`]);
+            Hm_Notices.show(error.message, 'danger');
         } finally {
             loaderInstance.hide();
         }

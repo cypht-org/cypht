@@ -415,7 +415,7 @@ if (!class_exists('Hm_IMAP')) {
                 }
                 elseif (mb_strpos($line, 'NO') !== false || mb_strpos($line, 'BAD') !== false) {
                     $this->debug[] = 'SETACL failed: ' . $line;
-                    Hm_Msgs::add('ERRSETACL failed:' . $line);
+                    Hm_Msgs::add('SETACL failed:' . $line, 'danger');
                     return false;
                 }
             }
@@ -449,7 +449,7 @@ if (!class_exists('Hm_IMAP')) {
                     return true;
                 } else {
                     $this->debug[] = 'DELETEACL failed: ' . $line;
-                    Hm_Msgs::add('ERRDELETEACL failed: ailure: can\'t delete acl');
+                    Hm_Msgs::add('DELETEACL failed: can\'t delete acl', 'danger');
                     return false;
                 }
             }

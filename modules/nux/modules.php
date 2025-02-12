@@ -146,14 +146,14 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occurred');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occurred');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -220,7 +220,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 }
                 else {
                     Hm_IMAP_List::del($new_id);
-                    Hm_Msgs::add('ERRAuthentication failed');
+                    Hm_Msgs::add('Authentication failed', 'danger');
                 }
             }
         }
@@ -285,7 +285,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
 
         if ($success) {
             if (! check_file_upload($this->request, 'accounts_sample')) {
-                Hm_Msgs::add('ERRError while uploading accounts sample');
+                Hm_Msgs::add('Error while uploading accounts sample', 'danger');
                 return;
             }
             try {
@@ -313,11 +313,11 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                     }
                 }
             } catch (\Exception $e) {
-                Hm_Msgs::add('ERR' . $e->getMessage());
+                Hm_Msgs::add($e->getMessage(), 'danger');
                 return;
             }
             if(empty($servers)) {
-                Hm_Msgs::add('ERRImported file is empty');
+                Hm_Msgs::add('Imported file is empty', 'warning');
                 return;
             }
             $errors = [];
@@ -421,7 +421,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                 $successes[] = $server_name;
             }
             foreach (array_unique($errors) as $error) {
-                Hm_Msgs::add("ERR$error");
+                Hm_Msgs::add("$error", 'danger');
             }
             foreach ($successes as $success) {
                 Hm_Msgs::add("Server $success imported successfully");

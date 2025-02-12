@@ -292,17 +292,17 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             elseif (count($moved) > 0) {
                 if ($form['imap_move_action'] == 'move') {
                     if ($screen) {
-                        Hm_Msgs::add('Some Emails moved to Screen email folder');
+                        Hm_Msgs::add('Some Emails moved to Screen email folder', 'warning');
                     } else {
-                        Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)');
+                        Hm_Msgs::add('Some messages moved (only IMAP message types can be moved)', 'warning');
                     }
                 }
                 else {
-                    Hm_Msgs::add('Some messages copied (only IMAP message types can be copied)');
+                    Hm_Msgs::add('Some messages copied (only IMAP message types can be copied)', 'warning');
                 }
             }
             elseif (count($moved) == 0) {
-                Hm_Msgs::add('ERRUnable to move/copy selected messages');
+                Hm_Msgs::add('Unable to move/copy selected messages', 'danger');
             }
             $this->out('move_count', $moved);
         }
@@ -417,12 +417,12 @@ class Hm_Handler_process_imap_source_update extends Hm_Handler_Module {
             $sources = $this->user_config->get('custom_imap_sources');
             if ($form['combined_source_state'] == 1) {
                 $sources[$form['list_path']] = 'add';
-                Hm_Msgs::add('Folder added to combined pages');
+                Hm_Msgs::add('Folder added to combined pages', 'info');
                 $this->session->record_unsaved('Added folder to combined pages');
             }
             else {
                 $sources[$form['list_path']] = 'remove';
-                Hm_Msgs::add('Folder removed from combined pages');
+                Hm_Msgs::add('Folder removed from combined pages', 'info');
                 $this->session->record_unsaved('Removed folder from combined pages');
             }
             $this->session->set('custom_imap_sources', $sources, true);
@@ -464,7 +464,7 @@ class Hm_Handler_imap_show_message extends Hm_Handler_Module {
                     Hm_Functions::cease();
                 }
             }
-            Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+            Hm_Msgs::add('An Error occurred trying to download the message', 'danger');
         }
     }
 }
@@ -493,7 +493,7 @@ class Hm_Handler_imap_download_message extends Hm_Handler_Module {
                     Hm_Functions::cease();
                 }
             }
-            Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+            Hm_Msgs::add('An Error occurred trying to download the message', 'danger');
         }
     }
 }
@@ -595,7 +595,7 @@ class Hm_Handler_imap_remove_attachment extends Hm_Handler_Module {
                     }
                 }
             }
-            Hm_Msgs::add('ERRAn Error occurred trying to remove attachment to the message');
+            Hm_Msgs::add('An Error occurred trying to remove attachment to the message', 'danger');
         }
     }
 }
@@ -665,7 +665,7 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('folder', $folder);
             }
             else {
-                Hm_Msgs::add(sprintf('ERRCould not authenticate to the selected %s server (%s)', $mailbox->server_type(), $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']));
+                Hm_Msgs::add(sprintf('Could not authenticate to the selected %s server (%s)', $mailbox->server_type(), $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']), 'warning');
             }
         }
     }
@@ -872,7 +872,7 @@ class Hm_Handler_imap_delete_message extends Hm_Handler_Module {
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
             }
             if (!$del_result) {
-                Hm_Msgs::add('ERRAn error occurred trying to delete this message');
+                Hm_Msgs::add('An error occurred trying to delete this message', 'danger');
                 $this->out('imap_delete_error', true);
             }
             else {
@@ -915,14 +915,14 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
             $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {
             if (!$archive_folder) {
-                Hm_Msgs::add('No archive folder configured for this IMAP server');
+                Hm_Msgs::add('No archive folder configured for this IMAP server', 'warning');
                 $errors++;
             }
 
             if (! $errors && $mailbox && $mailbox->authed()) {
                 $archive_exists = count($mailbox->get_folder_status($archive_folder));
                 if (!$archive_exists) {
-                    Hm_Msgs::add('Configured archive folder for this IMAP server does not exist');
+                    Hm_Msgs::add('Configured archive folder for this IMAP server does not exist', 'warning');
                     $errors++;
                 }
 
@@ -933,9 +933,9 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
                         if (! $mailbox->create_folder($archive_folder)) {
                             $debug = $mailbox->get_debug();
                             if (! empty($debug['debug'])) {
-                                Hm_Msgs::add('ERR' . array_pop($debug['debug']));
+                                Hm_Msgs::add(array_pop($debug['debug']), 'danger');
                             } else {
-                                Hm_Msgs::add('ERRCould not create configured archive folder for the original folder of the message');
+                                Hm_Msgs::add('Could not create configured archive folder for the original folder of the message', 'danger');
                             }
                             $errors++;
                         }
@@ -952,7 +952,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         if ($status) {
             Hm_Msgs::add("Message archived");
         } else {
-            Hm_Msgs::add('ERRAn error occurred archiving the message');
+            Hm_Msgs::add('An error occurred archiving the message', 'danger');
         }
 
         $this->save_hm_msgs();
@@ -985,7 +985,7 @@ class Hm_Handler_flag_imap_message extends Hm_Handler_Module {
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
             }
             if (!$flag_result) {
-                Hm_Msgs::add('ERRAn error occurred trying to flag this message');
+                Hm_Msgs::add('An error occurred trying to flag this message', 'danger');
             }
         }
     }
@@ -1023,14 +1023,17 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
             }
         }
         $this->out('snoozed_messages', $snoozed_messages);
+        $type = 'success';
         if (count($snoozed_messages) == count($ids)) {
             $msg = 'Messages snoozed';
         } elseif (count($snoozed_messages) > 0) {
             $msg = 'Some messages have been snoozed';
+            $type = 'warning';
         } else {
-            $msg = 'ERRFailed to snooze selected messages';
+            $msg = 'Failed to snooze selected messages';
+            $type = 'danger';
         }
-        Hm_Msgs::add($msg);
+        Hm_Msgs::add($msg, $type);
     }
 }
 
@@ -1064,7 +1067,7 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
                                 snooze_message($mailbox, $msg['uid'], $folder, null);
                             }
                         } catch (Exception $e) {
-                            Hm_Debug::add(sprintf('ERR Cannot unsnooze message: %s', $msg_headers['subject']));
+                            Hm_Debug::add(sprintf('Cannot unsnooze message: %s', $msg_headers['subject']));
                         }
                     }
                 }
@@ -1102,7 +1105,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                 if ($specials['trash']) {
                                     $trash_folder = $specials['trash'];
                                 } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('ERRNo trash folder configured for %s', $server_details['name']));
+                                    Hm_Msgs::add(sprintf('No trash folder configured for %s', $server_details['name']), 'warning');
                                 }
                             }
                         }
@@ -1111,7 +1114,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                                 if($specials['archive']) {
                                     $archive_folder = $specials['archive'];
                                 } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('ERRNo archive folder configured for %s', $server_details['name']));
+                                    Hm_Msgs::add(sprintf('No archive folder configured for %s', $server_details['name']), 'warning');
                                 }
                             }
                         }
@@ -1162,7 +1165,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                     }
                 }
                 if ($errs > 0) {
-                    Hm_Msgs::add(sprintf('ERRAn error occurred trying to %s some messages!', $form['action_type'], $server));
+                    Hm_Msgs::add(sprintf('An error occurred trying to %s some messages!', $form['action_type'], $server), 'danger');
                 }
                 $this->out('move_count', $moved);
                 if (count($status) > 0) {
@@ -1395,7 +1398,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_jmap_name', 'new_jmap_address'));
             if (!$success) {
                 $this->out('old_form', $form);
-                Hm_Msgs::add('ERRYou must supply a name and a JMAP server URL');
+                Hm_Msgs::add('You must supply a name and a JMAP server URL', 'warning');
                 return;
             }
             $hidden = false;
@@ -1416,7 +1419,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
-                Hm_Msgs::add('ERRCould not access supplied URL');
+                Hm_Msgs::add('Could not access supplied URL', 'warning');
             }
         }
     }
@@ -1439,7 +1442,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
             );
             if (!$success) {
                 $this->out('old_form', $form);
-                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
+                Hm_Msgs::add('You must supply a name, a server and a port', 'warning');
             }
             else {
                 $tls = false;
@@ -1466,7 +1469,7 @@ class Hm_Handler_process_add_imap_server extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                 }
                 else {
-                    Hm_Msgs::add(sprintf('ERRCould not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('Could not add server: %s', $errstr), 'danger');
                 }
             }
         }
@@ -1534,7 +1537,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 $form['ews_server_id'],
             );
             if(empty($imap_server_id)) {
-                Hm_Msgs::add("ERRCould not save server");
+                Hm_Msgs::add("Could not save EWS server", 'danger');
                 return;
             }
             $smtp_server_id = connect_to_smtp_server(
@@ -1760,7 +1763,7 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
                 $results = imap_refresh_oauth2_token($server, $this->config);
                 if (!empty($results)) {
                     if (Hm_IMAP_List::update_oauth2_token($server_id, $results[1], $results[0])) {
-                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $server_id));
+                        Hm_Debug::add(sprintf('Oauth2 token refreshed for IMAP server id %s', $server_id), 'info');
                         $updated++;
                     }
                 }
@@ -1832,7 +1835,7 @@ class Hm_Handler_imap_bust_cache extends Hm_Handler_Module {
             return;
         }
         $this->cache->del('imap'.$form['imap_server_id']);
-        Hm_Debug::add(sprintf('Busted cache for IMAP server %s', $form['imap_server_id']));
+        Hm_Debug::add(sprintf('Busted cache for IMAP server %s', $form['imap_server_id']), 'info');
     }
 }
 
@@ -1855,7 +1858,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
                         $client->connect($imap_details['user'], $imap_details['pass'], $imap_details['sieve_tls'], "", "PLAIN");
                     } catch (Exception $e) {
-                        Hm_Msgs::add("ERRFailed to authenticate to the Sieve host");
+                        Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
                         return;
                     }
                 }
@@ -1868,11 +1871,11 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                         Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
                     }
                     else {
-                        Hm_Msgs::add(sprintf("ERRFailed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
+                        Hm_Msgs::add(sprintf("Failed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']), "danger");
                     }
                 }
                 else {
-                    Hm_Msgs::add('ERRUsername and password are required');
+                    Hm_Msgs::add('Username and password are required', 'warning');
                     $this->out('old_form', $form);
                 }
             }

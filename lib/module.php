@@ -146,7 +146,7 @@ trait Hm_Module_Output {
             $val = $this->output[$name];
             if (!is_null($default) && $typed) {
                 if (gettype($default) != gettype($val)) {
-                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name));
+                    Hm_Debug::add(sprintf('TYPE CONVERSION: %s to %s for %s', gettype($val), gettype($default), $name), 'info');
                     settype($val, gettype($default));
                 }
             }
@@ -439,7 +439,7 @@ abstract class Hm_Handler_Module {
     }
 
     public function save_hm_msgs() {
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
             Hm_Msgs::flush();
             $this->session->secure_cookie($this->request, 'hm_msgs', base64_encode(json_encode($msgs)));
@@ -499,7 +499,7 @@ abstract class Hm_Output_Module {
             }
         }
         else {
-            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string));
+            Hm_Debug::add(sprintf('TRANSLATION NOT FOUND :%s:', $string), 'warning');
         }
         return str_replace('\n', '<br />', strip_tags($string));
     }

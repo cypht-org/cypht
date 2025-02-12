@@ -72,7 +72,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
         if ($this->existing && count($this->data) == 0) {
             $this->destroy($request);
         } else {
-            Hm_Debug::add('LOGGED IN');
+            Hm_Debug::add('LOGGED IN', 'success');
             $this->active = true;
         }
     }
@@ -88,7 +88,7 @@ abstract class Hm_PHP_Session_Data extends Hm_Session {
                 $this->data = $data;
             } elseif (!$this->loaded) {
                 $this->destroy($request);
-                Hm_Debug::add('Mismatched session level encryption key');
+                Hm_Debug::add('Mismatched session level encryption key', 'warning');
             }
         }
     }

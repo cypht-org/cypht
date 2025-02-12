@@ -229,10 +229,11 @@ var Hm_Ajax_Request = function() { return {
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
-                Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
-                Hm_Notices.show(res.router_user_msgs);
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+                Object.values(res.router_user_msgs).forEach((msg) => {
+                    Hm_Notices.show(msg.text, msg.type);
+                });
             }
             if (res.folder_status) {
                 for (const name in res.folder_status) {
@@ -266,7 +267,7 @@ var Hm_Ajax_Request = function() { return {
 
     fail: function(xhr, not_callable) {
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show([err_msg('Server Error')]);
+            Hm_Notices.show('Server Error', 'danger');
         }
         else {
             $('.offline').show();
@@ -386,41 +387,100 @@ function Hm_Modal(options) {
     this.init();
 }
 
+class Hm_Alert {
+    constructor() {
+        this.container = document.querySelector('.sys_messages');
+        if (! this.container) {
+            console.error('Hm_Alert: .sys_messages container not found.');
+        }
+    }
+
+    /**
+     * Create an alert message and append it to the container.
+     *
+     * @param {string} message - The message to display.
+     * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
+     * @param {boolean} dismissible - Whether the alert can be dismissed.
+     * @param {integer} dismissTime - Number of seconds before alert auto-closes
+     */
+    createAlert(message, type = 'primary', dismissible = true, dismissTime = 10) {
+        if (!this.container) {
+            return;
+        }
+
+        const alert = document.createElement('div');
+        alert.className = `d-flex align-items-center alert shadow-lg bg-white fade show flex-sm-row p-2 mb-1`;
+        alert.setAttribute('role', 'alert');
+
+        const icon = document.createElement('i');
+        icon.className = `fs-3 text-${type} bi bi-${this.#getIcon(type)}`;
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'd-flex justify-content-center align-items-center px-2';
+        iconContainer.appendChild(icon);
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex-grow-1 pe-4';
+        messageElement.textContent = message;
+
+        alert.appendChild(iconContainer);
+        alert.appendChild(messageElement);
+
+        if (dismissible) {
+            alert.classList.add('alert-dismissible');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = `btn-close`;
+            closeButton.setAttribute('data-bs-dismiss', 'alert');
+            closeButton.setAttribute('aria-label', 'Close');
+            alert.appendChild(closeButton);
+        }
+        
+        this.container.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 500);
+        }, dismissTime * 1000);
+    }
+
+    #getIcon(type) {
+        const icons = {
+            success: 'check-circle-fill',
+            danger: 'exclamation-triangle-fill',
+            warning: 'exclamation-octagon-fill',
+            primary: 'info-circle-fill',
+            info: 'info-circle-fill',
+            secondary: 'shield-fill-exclamation',
+        };
+
+        return icons[type] || 'info-circle';
+    }
+}
+
 /* user notification manager */
 var Hm_Notices = {
-    hide_id: false,
+    hm_alert: new Hm_Alert(),
 
-    show: function(msgs) {
-        var message = '';
-        var type = '';
-        for (var i in msgs) {
-            if (msgs[i].match(/^ERR/)) {
-                message = msgs[i].substring(3);
-                type = 'danger';
-            }
-            else {
-                type = 'info';
-                message = msgs[i];
-            }
-
-            Hm_Utils.add_sys_message(message, type);
-        }
+    /**
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display (primary, secondary, success, danger, warning, info)
+     */
+    show: function(msg, type = 'success', dismissible = true, dismissTime = 10) {
+        msg = hm_trans(msg);
+        this.hm_alert.createAlert(msg, type, dismissible, dismissTime);
     },
 
-    hide: function(now) {
-        if (Hm_Notices.hide_id) {
-            clearTimeout(Hm_Notices.hide_id);
-        }
-        if (now) {
-            $('.sys_messages').addClass('d-none');
-            Hm_Utils.clear_sys_messages();
-        }
-        else {
-            Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').addClass('d-none');
-                Hm_Utils.clear_sys_messages();
-            }, 5000);
-        }
+    /**
+     * Shows pending messages on page load
+     */
+    showPendingMessages() {
+        hm_msgs.forEach((msg) => {
+            this.hm_alert.createAlert(msg.text, msg.type);
+        });
     }
 };
 
@@ -1497,31 +1557,6 @@ var Hm_Utils = {
         $('#unsaved_changes').val(state);
     },
 
-    /**
-     * Shows pending messages added with the add_sys_message method
-     */
-    show_sys_messages: function() {
-        $('.sys_messages').removeClass('d-none');
-    },
-
-    /**
-     *
-     * @param {*} msg : The alert message to display
-     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
-     */
-    add_sys_message: function(msg, type = 'info') {
-        if (!msg) {
-            return;
-        }
-        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-        this.show_sys_messages();
-    },
-
-    clear_sys_messages: function () {
-        $('.sys_messages').html('');
-    },
-
     cancel_logout_event: function() {
         $('.cancel_logout').on("click", function() { $('.confirm_logout').hide(); return false; });
     },
@@ -1713,10 +1748,6 @@ var decrease_servers = function(section) {
     }
 };
 
-var err_msg = function(msg) {
-    return "ERR"+hm_trans(msg);
-};
-
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1767,7 +1798,6 @@ var fillJmapData = function(details) {
 var imap_smtp_edit_action = function(event) {
     resetQuickSetupForm();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.imap-jmap-smtp-btn').trigger('click');
@@ -1835,9 +1865,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
-    
+
     /* show any pending notices */
-    Hm_Utils.show_sys_messages();
+    Hm_Notices.showPendingMessages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -1866,7 +1896,7 @@ $(function() {
     $(document).on('paste', '.warn_on_paste', function (e) {
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         if (hasLeadingOrTrailingSpaces(paste)) {
-            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+            Hm_Notices.show('Pasted text has leading or trailing spaces', 'warning');
         }
     });
 

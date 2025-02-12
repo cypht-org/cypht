@@ -364,7 +364,7 @@ function save_user_settings($handler, $form, $logout) {
         $pass = $form['password'];
     }
     else {
-        Hm_Msgs::add('ERRIncorrect password, could not save settings to the server');
+        Hm_Msgs::add('Incorrect password, could not save settings to the server', 'warning');
         $pass = false;
     }
     if ($user && $path && $pass) {
@@ -372,8 +372,8 @@ function save_user_settings($handler, $form, $logout) {
         $handler->session->set('changed_settings', array());
         if ($logout) {
             $handler->session->destroy($handler->request);
-            Hm_Msgs::add('Saved user data on logout');
-            Hm_Msgs::add('Session destroyed on logout');
+            Hm_Msgs::add('Saved user data on logout', 'info');
+            Hm_Msgs::add('Session destroyed on logout', 'info');
         }
         else {
             Hm_Msgs::add('Settings saved');
@@ -559,7 +559,7 @@ function can_save_last_added_server($list, $user) {
     if (in_server_list($list, $new_id, $user)) {
         $list::del($new_id);
         $type = explode('_', $list)[1];
-        Hm_Msgs::add('ERRThis ' . $type . ' server and username are already configured');
+        Hm_Msgs::add('This ' . $type . ' server and username are already configured', 'warning');
         return false;
     }
     return true;

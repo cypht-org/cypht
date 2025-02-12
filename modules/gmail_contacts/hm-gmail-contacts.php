@@ -25,7 +25,7 @@ class Hm_Gmail_Contact_XML {
     public function __construct($xml) {
         $this->xml = $xml;
         if (!Hm_Functions::function_exists('xml_parser_create')) {
-            Hm_Debug::add('Gmail contacts enabled, but no PHP XML support found');
+            Hm_Debug::add('Gmail contacts enabled, but no PHP XML support found', 'warning');
             return;
         }
         $this->xml_support = true;

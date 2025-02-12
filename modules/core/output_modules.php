@@ -355,22 +355,13 @@ class Hm_Output_msgs extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         $logged_out_class = '';
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
-        foreach ($msgs as $msg) {
-            if (preg_match("/ERR/", $msg)) {
-                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
-            }
-            else {
-                $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
-            }
-            $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        }
-        $res .= '</div>';
+        $res .= '<div class="position-fixed top-0 col-sm-4 col-md-3 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'"></div>';
+        $res .= '<script type="text/javascript">var hm_msgs = '.json_encode($msgs).'</script>';
         return $res;
     }
 }

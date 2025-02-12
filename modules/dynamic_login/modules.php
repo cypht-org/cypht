@@ -36,7 +36,7 @@ class Hm_Handler_process_dynamic_login extends Hm_Handler_login {
                     $this->config->set('imap_auth_tls', $details['tls']);
                     $this->session->auth_class = 'Hm_Auth_IMAP';
                     $this->session->site_config = $this->config;
-                    Hm_Debug::add('Dynamic login override, using Hm_Auth_IMAP');
+                    Hm_Debug::add('Dynamic login override, using Hm_Auth_IMAP', 'info');
                     $auth_details = $details;
                     $this->session->set('auth_class', 'Hm_Auth_IMAP');
                 }
