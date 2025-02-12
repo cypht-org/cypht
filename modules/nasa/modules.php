@@ -19,7 +19,7 @@ class Hm_Handler_process_nasa_connection extends Hm_Handler_Module {
             $api = new Hm_API_Curl();
             $result = $api->command(sprintf(APOD_URL, $form['api_key']));
             if (empty($result) || (array_key_exists('error', $result) && !empty($result['error']))) {
-                Hm_Msgs::add(sprintf('ERR%s', $result['error']['message']));
+                Hm_Msgs::add(sprintf('%s', $result['error']['message']), 'danger');
                 $this->out('nasa_action_status', false);
             }
             else {

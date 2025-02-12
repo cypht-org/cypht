@@ -26,13 +26,13 @@ class Hm_Handler_process_recaptcha extends Hm_Handler_Module {
         }
         if (!array_key_exists('g-recaptcha-response', $this->request->post)) {
             $this->request->post = array();
-            Hm_Msgs::add('ERRRecaptcha failed');
+            Hm_Msgs::add('Recaptcha failed', 'danger');
             return;
         }
         if (!check_recaptcha($rconf['secret'], $this->request->post['g-recaptcha-response'],
             $this->request->server['REMOTE_ADDR'])) {
             $this->request->post = array();
-            Hm_Msgs::add('ERRRecaptcha failed');
+            Hm_Msgs::add('Recaptcha failed', 'danger');
             return;
         }
     }

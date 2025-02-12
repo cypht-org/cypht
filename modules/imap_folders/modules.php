@@ -100,12 +100,12 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         }
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if (!is_object($mailbox) || ! $mailbox->authed()) {
-            Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
+            Hm_Msgs::add('Unable to connect to the selected IMAP server', 'danger');
             return;
         }
         $new_folder = $mailbox->prep_folder_name($form['folder']);
         if (! $new_folder || ! $mailbox->get_folder_status($new_folder)) {
-            Hm_Msgs::add('ERRSelected folder not found');
+            Hm_Msgs::add('Selected folder not found', 'warning');
             return;
         }
         $specials = $this->user_config->get('special_imap_folders', array());
@@ -132,7 +132,7 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
         if ($success) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if (!is_object($mailbox) || ! $mailbox->authed()) {
-                Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
+                Hm_Msgs::add('Unable to connect to the selected IMAP server', 'danger');
                 return;
             }
             $specials = $this->user_config->get('special_imap_folders', array());
@@ -185,7 +185,7 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred creating the folder');
+                    Hm_Msgs::add('An error occurred creating the folder', 'danger');
                 }
             }
         }
@@ -236,9 +236,9 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                                     );
                                 }
                                 $client->close();
-                                Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well');
+                                Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well', 'info');
                             } catch (Exception $e) {
-                                Hm_Msgs::add("ERRFailed to rename folder in sieve scripts");
+                                Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
                             }
                         }
                     }
@@ -247,7 +247,7 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred renaming the folder');
+                    Hm_Msgs::add('An error occurred renaming the folder', 'danger');
                 }
             }
         }
@@ -266,7 +266,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER) && $mailbox->is_imap()) {
                     $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
                     if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
-                        Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
+                        Hm_Msgs::add('This folder can\'t be deleted because it is used in a filter.', 'warning');
                         return;
                     }
                 }
@@ -276,7 +276,7 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred deleting the folder');
+                    Hm_Msgs::add('An error occurred deleting the folder', 'danger');
                 }
             }
         }
@@ -349,7 +349,7 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
                     Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $mailbox->get_folder_name($folder)));
                     $this->cache->del('imap_folders_imap_'.$imap_server_id.'_');
                 } else {
-                    Hm_Msgs::add(sprintf('ERRAn error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder));
+                    Hm_Msgs::add(sprintf('An error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder), 'danger');
                 }
                 $this->out('imap_folder_subscription', $success);
             }
@@ -854,7 +854,7 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
             $client->close();
             return $folders;
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }

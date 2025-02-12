@@ -80,12 +80,12 @@ class Hm_Handler_feed_connect extends Hm_Handler_Module {
                     $feed = is_news_feed($feed_data['server']);
                     if ($feed) {
                         $failed = false;
-                        Hm_Msgs::add("Successfully connected to the feed");
+                        Hm_Msgs::add("Successfully connected to the feed", "info");
                     }
                 }
             }
             if ($failed) {
-                Hm_Msgs::add("ERRFailed to connect to the feed");
+                Hm_Msgs::add("Failed to connect to the feed", "warning");
             }
         }
     }
@@ -370,7 +370,7 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('new_feed_name', 'new_feed_address'));
             if ($success) {
                 if (feed_exists($form['new_feed_address'])) {
-                    Hm_Msgs::add(sprintf('ERRFeed url %s already exists', $form['new_feed_address']));
+                    Hm_Msgs::add(sprintf('Feed url %s already exists', $form['new_feed_address']), 'warning');
                 } else {
                     $connection_test = address_from_url($form['new_feed_address']);
                     if ($con = @fsockopen($connection_test, 80, $errno, $errstr, 2)) {
@@ -385,11 +385,11 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                                     $found = true;
                                 }
                                 else {
-                                    Hm_Msgs::add('ERRCould not find an RSS or ATOM feed at that address');
+                                    Hm_Msgs::add('Could not find an RSS or ATOM feed at that address', 'warning');
                                 }
                             }
                             else {
-                                Hm_Msgs::add('ERRCould not find a feed at that address');
+                                Hm_Msgs::add('Could not find a feed at that address', 'warning');
                             }
                         }
                         else {
@@ -405,12 +405,12 @@ class Hm_Handler_process_add_feed extends Hm_Handler_Module {
                         }
                     }
                     else {
-                        Hm_Msgs::add(sprintf('ERRCould not add feed: %s', $errstr));
+                        Hm_Msgs::add(sprintf('Could not add feed: %s', $errstr), 'danger');
                     }
                 }
             }
             else {
-                Hm_Msgs::add('ERRFeed Name and Address are required');
+                Hm_Msgs::add('Feed Name and Address are required', 'warning');
             }
             if ($found) {
                 $this->out('reload_folders', true);

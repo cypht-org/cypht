@@ -1501,7 +1501,9 @@ var Hm_Utils = {
      * Shows pending messages added with the add_sys_message method
      */
     show_sys_messages: function() {
-        $('.sys_messages').removeClass('d-none');
+        hm_msg.forEach((v, k) => {
+            alert.createAlert(v, k);
+        });
     },
 
     /**
@@ -1835,6 +1837,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
+
+    /* Use this to create alerts */
+    var alert = new Hm_Alert();
     
     /* show any pending notices */
     Hm_Utils.show_sys_messages();
@@ -2405,3 +2410,94 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+class Hm_Alert {
+    constructor() {
+        this.container = document.querySelector('.sys_messages');
+        if (! this.container) {
+            console.error('Hm_Alert: .sys_messages container not found.');
+        }
+    }
+
+    /**
+     * Create an alert message and append it to the container.
+     *
+     * @param {string} message - The message to display.
+     * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
+     * @param {boolean} dismissible - Whether the alert can be dismissed.
+     */
+    createAlert(message, type = 'primary', dismissible = true) {
+        if (!this.container) {
+            return;
+        }
+
+        const alert = document.createElement('div');
+        alert.className = `d-flex align-items-center alert bg-${type} fade show flex-sm-row p-2 mb-1 text-light`;
+        alert.setAttribute('role', 'alert');
+
+        const icon = document.createElement('i');
+        icon.className = 'fs-3 bi bi-' + this.#getIcon(type);
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'd-flex justify-content-center align-items-center px-2';
+        iconContainer.appendChild(icon);
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex-grow-1  pe-2';
+        messageElement.textContent = message;
+
+        alert.appendChild(iconContainer);
+        alert.appendChild(messageElement);
+
+        if (dismissible) {
+            alert.classList.add('alert-dismissible');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = 'btn-close btn-close-white';
+            closeButton.setAttribute('data-bs-dismiss', 'alert');
+            closeButton.setAttribute('aria-label', 'Close');
+            alert.appendChild(closeButton);
+        }
+        
+        this.container.appendChild(alert);
+        
+        // Auto close after 10 seconds with animation
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 500);
+        }, 10000);
+    }
+
+    toggleVisibility() {
+        if (this.container) {
+            this.container.classList.toggle('d-none');
+        }
+    }
+
+    #getIcon(type) {
+        let icon = '';
+        switch (type) {
+            case 'success':
+                icon = 'check-circle';
+                break;
+            case 'danger':
+                icon = 'exclamation-triangle';
+                break;
+            case 'warning':
+                icon = 'exclamation-circle';
+                break;
+            case 'primary':
+            case 'info':
+                icon = 'info-circle';
+                break;
+            case 'secondary':
+                icon = 'shield-exclamation';
+                break;
+        }
+
+        return icon;
+    }
+}

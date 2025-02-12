@@ -56,7 +56,7 @@ class Hm_Handler_wordpress_msg_action extends Hm_Handler_Module {
                     }
                     $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                     if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
-                        Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                        Hm_Msgs::add('Unable to update read status of WordPress notification', 'danger');
                     }
                 }
             }
@@ -117,7 +117,7 @@ class Hm_Handler_get_wp_notice_data extends Hm_Handler_Module {
                         $post = array('counts['.$wp_id.']' => 5);
                         $res = wp_fetch_content($wp_details, WPCOM_READ_URL, $post);
                         if (!is_array($res) || !array_key_exists('success', $res) || $res['success'] != 1) {
-                            Hm_Msgs::add('ERRUnable to update read status of WordPress notification');
+                            Hm_Msgs::add('nable to update read status of WordPress notification', 'danger');
                         }
                     }
                     $this->out('wp_notice_details', $details);
@@ -203,14 +203,14 @@ class Hm_Handler_process_wordpress_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occured');
+                    Hm_Msgs::add('An Error Occured', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occured');
+                Hm_Msgs::add('An Error Occured', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');

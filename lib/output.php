@@ -73,8 +73,8 @@ trait Hm_List {
      * @param string $string message to add
      * @return void
      */
-    public static function add($string) {
-        self::$msgs[] = self::str($string, false);
+    public static function add($string, $type = 'info') {
+        self::$msgs[$type] = self::str($string, false);
     }
 
     /**

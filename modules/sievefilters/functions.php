@@ -114,7 +114,7 @@ if (!hm_exists('get_mailbox_filters')) {
                 }
             }
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return ['count' => 0, 'list' => ''];
         }
 
@@ -455,7 +455,7 @@ if (!hm_exists('get_blocked_senders_array')) {
             }
             return $blocked_senders;
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return [];
         }
     }
@@ -527,7 +527,7 @@ if (!hm_exists('get_blocked_senders')){
             }
             return $ret;
         } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return '';
         }
     }

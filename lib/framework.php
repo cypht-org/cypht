@@ -140,7 +140,7 @@ if (!class_exists('Hm_Functions')) {
             if (extension_loaded('curl')) {
                 return curl_init();
             } else {
-                Hm_Msgs::add('ERRPlease enable the cURL extension.');
+                Hm_Msgs::add('Please enable the cURL extension.', 'warning');
                 return false;
             }
         }
@@ -152,7 +152,7 @@ if (!class_exists('Hm_Functions')) {
             $response = curl_exec($handle);
             if ($response === false) {
                 $error = curl_error($handle);
-                Hm_Msgs::add('ERRcURL error: '.$error);
+                Hm_Msgs::add('cURL error: '.$error, 'danger');
             }
             return $response;
         }

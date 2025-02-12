@@ -327,7 +327,7 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @runInSeparateProcess
      */
     public function test_msgs() {
-        Hm_Msgs::add('ERRfoo');
+        Hm_Msgs::add('foo', 'danger');
         Hm_Msgs::add('foo');
         $test = new Output_Test('msgs', 'core');
         $test->handler_response = array('router_login_state' => false);

@@ -29,7 +29,7 @@ class Hm_Handler_pgp_delete_public_key extends Hm_Handler_Module {
         }
         $keys = $this->user_config->get('pgp_public_keys', array());
         if (!array_key_exists($form['delete_public_key_id'], $keys)) {
-            Hm_Msgs::add('ERRCould not find public key to remove');
+            Hm_Msgs::add('Could not find public key to remove', 'warning');
             return;
         }
         unset($keys[$form['delete_public_key_id']]);
@@ -53,7 +53,7 @@ class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
         }
         $fingerprint = validate_public_key($this->request->files['public_key']['tmp_name']);
         if (!$fingerprint) {
-            Hm_Msgs::add('ERRUnable to import public key');
+            Hm_Msgs::add('Unable to import public key', 'danger');
             return;
         }
         $keys = $this->user_config->get('pgp_public_keys', array());
