@@ -91,7 +91,7 @@ async function navigate(url) {
         
         trackLocationSearchChanges();
     } catch (error) {
-        Hm_Notices.show([`ERR${error.message}`]);
+        Hm_Notices.show(error.message, 'danger');
     } finally {
         hideRoutingToast();
     }

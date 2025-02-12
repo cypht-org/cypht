@@ -2,7 +2,7 @@
 
 var get_smtp_profile = function(profile_value) {
     if (typeof profile_value === "undefined" || profile_value == "0" || profile_value == "") {
-        Hm_Notices.show([err_msg('Please create a profile for saving sent messages option')]);
+        Hm_Notices.show('Please create a profile for saving sent messages option', 'warning');
     }
     else {
         Hm_Ajax.request(
@@ -15,7 +15,7 @@ var get_smtp_profile = function(profile_value) {
 };
 
 var check_attachment_dir_access = function() {
-    Hm_Notices.show([err_msg('Attachment storage unavailable, please contact your site administrator')]);
+    Hm_Notices.show('Attachment storage unavailable, please contact your site administrator', 'warning');
 };
 
 var smtp_test_action = function(event) {

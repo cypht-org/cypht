@@ -32,7 +32,7 @@ function profilesComposePageHandler() {
                 insert_sig(ta[0], profile_signatures[server_id]);
             }
         } else {
-            Hm_Notices.show(['ERR'+$('#sign_msg').val()]);
+            Hm_Notices.show($('#sign_msg').val(), 'danger');
         }
     });
 }
