@@ -4,7 +4,7 @@ async function sortCombinedLists(sortValue) {
     
     history.pushState(null, null, url.toString());
     location.next = url.search;
-    const messagesStore = new Hm_MessagesStore(getListPathParam(), getParam('page'));
+    const messagesStore = new Hm_MessagesStore(getListPathParam(), getParam('page'), getParam('keyword'));
     try {
         await messagesStore.load(true);
         Hm_Utils.tbody().attr('id', messagesStore.list);

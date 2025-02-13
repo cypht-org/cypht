@@ -9,17 +9,17 @@ function hideRoutingToast() {
 }
 
 function getListPathParam() {
-    return new URLSearchParams(window.location.search).get('list_path')
+    return new URLSearchParams(window.location.next || window.location.search).get('list_path')
 }
 
 function getMessageUidParam() {
-    return new URLSearchParams(window.location.search).get('uid')
+    return new URLSearchParams(window.location.next || window.location.search).get('uid')
 }
 
 function getPageNameParam() {
-    return new URLSearchParams(window.location.search).get('page')
+    return new URLSearchParams(window.location.next || window.location.search).get('page')
 }
 
 function getParam(param) {
-    return new URLSearchParams(window.location.search).get(param)
+    return new URLSearchParams(window.location.next || window.location.search).get(param)
 }

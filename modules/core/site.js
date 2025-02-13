@@ -249,7 +249,7 @@ var Hm_Ajax_Request = function() { return {
                     if (name === getListPathParam()) {
                         Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
                         Hm_Folders.update_unread_counts();
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
+                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), getParam('keyword'));
                         messages.load().then(() => {
                             if (messages.count != res.folder_status[name].messages) {
                                 messages.load(true).then(() => {
@@ -918,7 +918,7 @@ function Message_List() {
         let nextUrl;
                 
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number());
+        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number(), getParam('keyword'));
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);

@@ -377,7 +377,7 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 }
 
 async function select_imap_folder(path, page = 1,reload, processInTheBackground = false, abortController = null) {
-    const messages = new Hm_MessagesStore(path, page, null, abortController);
+    const messages = new Hm_MessagesStore(path, page, getParam('keyword'), null, abortController);
     await messages.load(reload, processInTheBackground).then(() => {
         if (processInTheBackground) {
             const rows = Object.values(messages.rows);            
@@ -440,7 +440,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         $('#imap_filter_form').trigger('submit');
     });
 
-    const hadLocalData = new Hm_MessagesStore(listPath, listPage).hasLocalData();
+    const hadLocalData = new Hm_MessagesStore(listPath, listPage, getParam('keyword')).hasLocalData();
     await select_imap_folder(listPath, listPage);
 
     handleMessagesDragAndDrop();
@@ -466,10 +466,14 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
     url.search = $(this).serialize();
     history.replaceState(null, '', url);
     location.next = url.search;
-    try {
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
-        await messages.load(true);
+    try {        
+        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), getParam('keyword'));
+        await messages.load(!messages.hasLocalData());
+        Hm_Utils.tbody().attr('id', messages.list);
         display_imap_mailbox(messages.rows, messages.list);
+        if (messages.pages) {
+            showPagination(messages.pages);
+        }
     } catch (error) {
         // Show error message. TODO: No message utility yet, implement it later.
     }
@@ -512,7 +516,7 @@ async function markPrefetchedMessagesAsRead(uid) {
     const detail = Hm_Utils.parse_folder_path(listPath, 'imap');
     const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
 
-    const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number());
+    const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), getParam('keyword'));
     await messages.load(false, true);
     if (!messages.flagAsReadOnOpen) {
         return;
@@ -967,7 +971,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
             {'name': 'imap_move_action', 'value': action}],
             async function(res) {
                 var index;
-                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), getParam('keyword'));
                 await store.load(false, true, true);
                 const moveResponses = Object.values(res['move_responses']);
                 moveResponses.forEach((response) => {
@@ -1162,7 +1166,7 @@ var imap_setup_snooze = function() {
                 const snoozedMessages = Object.values(res['snoozed_messages']);
                 if (snoozedMessages.length) {
                     const path = getParam("list_parent") || getListPathParam();
-                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number());
+                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), getParam('keyword'));
                     await store.load(false, true, true);
                     
                     snoozedMessages.forEach((msg) => {

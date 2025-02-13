@@ -15,9 +15,9 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, rows = {}, abortController = new AbortController()) {
+    constructor(path, page = 1, filter = '', rows = {}, abortController = new AbortController()) {
         this.path = path;
-        this.list = path + '_' + page;
+        this.list = path + '_' + (filter ? filter + '_': '') + page;
         this.rows = rows;
         this.count = 0;
         this.flagAsReadOnOpen = true;
