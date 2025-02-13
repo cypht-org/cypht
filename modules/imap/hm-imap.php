@@ -972,7 +972,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
             if ($include_content_body) {
-                $command .= " BODY.PEEK[0.1]";
+                $command .= " BODY.PEEK[1]";
             }
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
@@ -1032,7 +1032,7 @@ if (!class_exists('Hm_IMAP')) {
                                 }
                             }
                         }
-                        elseif ($vals[$i] == 'BODY[0.1') {
+                        elseif ($vals[$i] == 'BODY[1') {
                             $content = '';
                             $i++;
                             $i++;
