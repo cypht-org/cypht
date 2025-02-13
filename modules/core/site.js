@@ -1497,9 +1497,11 @@ var Hm_Utils = {
         return false;
     },
 
-    get_from_local_storage: function(key) {
-        var prefix = window.location.pathname;
-        key = prefix+key;
+    get_from_local_storage: function(key, prefix=true) {
+        if (prefix) {
+            const prefix = window.location.pathname;
+            key = prefix+key;
+        }
         var res = false;
         if (hm_encrypt_local_storage()) {
              res = Hm_Crypt.decrypt(sessionStorage.getItem(key));
@@ -1516,16 +1518,19 @@ var Hm_Utils = {
         for (let i = 0; i < sessionStorage.length; i++) {
             const key = sessionStorage.key(i);
             if (key_pattern.test(key)) {
-                const value = get_from_local_storage(key);
+                const value = Hm_Utils.get_from_local_storage(key, false);
                 results.push({ key: key, value: value });
             }
         }
         return results;
     },
 
+    get_local_storage_prefix: function() {
+        return window.location.pathname;
+    },
+
     save_to_local_storage: function(key, val) {
-        var prefix = window.location.pathname;
-        key = prefix+key;
+        key = Hm_Utils.get_local_storage_prefix()+key;
         if (hm_encrypt_local_storage()) {
             val = Hm_Crypt.encrypt(val);
         }
@@ -1540,6 +1545,13 @@ var Hm_Utils = {
             }
         }
         return false;
+    },
+
+    delete_from_local_storage: function(key) {
+        key = Hm_Utils.get_local_storage_prefix()+key;
+        if ('sessionStorage' in window) {
+            sessionStorage.removeItem(key);
+        }
     },
 
     clean_selector: function(str) {
