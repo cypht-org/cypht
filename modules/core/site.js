@@ -247,8 +247,6 @@ var Hm_Ajax_Request = function() { return {
             if (res.folder_status) {
                 for (const name in res.folder_status) {
                     if (name === getListPathParam()) {
-                        Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
-                        Hm_Folders.update_unread_counts();
                         const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
                         messages.load().then(() => {
                             if (messages.count != res.folder_status[name].messages) {

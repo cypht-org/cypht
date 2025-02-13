@@ -525,7 +525,7 @@ function getMessageStorageKey(uid) {
 async function markPrefetchedMessagesAsRead(uid) {
     const listPath = getListPathParam();
     const detail = Hm_Utils.parse_folder_path(listPath, 'imap');
-    const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
+    const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;    
 
     const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
     await messages.load(false, true);
@@ -756,6 +756,9 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
             Hm_Message_List.adjust_unread_total(-1);
         }
     }
+
+    markPrefetchedMessagesAsRead(msg_uid);
+
     $('.all_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
     $('.small_headers').on("click", function() { return Hm_Utils.toggle_long_headers(); });
     $('#flag_msg').on("click", function() { return imap_flag_message($(this).data('state')); });
@@ -820,16 +823,10 @@ var imap_setup_message_view_page = function(uid, details, list_path, listParent,
     if (!uid) {
         uid = getMessageUidParam();
     }
-    const callbackFn = (...args) => {        
-        markPrefetchedMessagesAsRead(uid);
-        if (callback) {
-            callback(...args);
-        }
-    };
     
     const msg_content = get_local_message_content(uid, list_path);
     if (!msg_content) {
-        get_message_content(false, uid, list_path, listParent, details, callbackFn);
+        get_message_content(false, uid, list_path, listParent, details, callback);
     }
     else {
         const msgResponse = JSON.parse(msg_content);
