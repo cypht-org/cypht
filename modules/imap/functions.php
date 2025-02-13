@@ -1753,17 +1753,9 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
     $uid = null;
     if ($sent_folder) {
         Hm_Debug::add(sprintf("Attempting to save sent message for server %s in folder %s", $mailbox->server_type(), $imap_details['server'], $sent_folder));
-        if (! $mailbox->store_message($sent_folder, $msg)) {
+        $uid = $mailbox->store_message($sent_folder, $msg);
+        if (! $uid) {
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
-        }
-
-        $mailbox_page = $mailbox->get_messages($sent_folder, 'ARRIVAL', true, 'ALL', 0, 10);
-        foreach ($mailbox_page[1] as $mail) {
-            $msg_header = $mailbox->get_message_headers($sent_folder, $mail['uid']);
-            if ($msg_header['Message-Id'] === $msg_id) {
-                $uid = $mail['uid'];
-                break;
-            }
         }
     }
     return $uid;
