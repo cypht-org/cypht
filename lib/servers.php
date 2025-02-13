@@ -273,4 +273,30 @@ trait Hm_Server_List {
         }
         return false;
     }
+
+    private static function appendPasswordAndUsername(array $server) {
+        $server['password'] = $server['pass'];
+        $server['username'] = $server['user'];
+        return $server;
+    }
+
+    public static function getForMailbox($id) {
+        $server = self::get($id, true);
+        if ($server) {
+            return self::appendPasswordAndUsername($server);
+        }
+        return false;
+    }
+
+    public static function dumpForMailbox($id = false) {
+        $list = self::dump($id, true);
+        if ($id !== false) {
+            return self::appendPasswordAndUsername($list);
+        }
+        foreach ($list as $index => $server) {
+            $server = self::appendPasswordAndUsername($server);
+            $list[$index] = $server;
+        }
+        return $list;
+    }
 }

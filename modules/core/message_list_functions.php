@@ -336,11 +336,11 @@ function subject_callback($vals, $style, $output_mod) {
  */
 if (!hm_exists('date_callback')) {
 function date_callback($vals, $style, $output_mod) {
-    $snooze_class = isset($vals[2]) && $vals[2]? ' snoozed_date': '';
+    $delayed_class = isset($vals[2]) && $vals[2]? ' delayed_date': '';
     if ($style == 'news') {
-        return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $snooze_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+        return sprintf('<div class="msg_date%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></div>', $delayed_class, $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
     }
-    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $snooze_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
+    return sprintf('<td class="msg_date%s" title="%s">%s<input type="hidden" class="msg_timestamp" value="%s" /></td>', $delayed_class, $output_mod->html_safe(date('r', $vals[1])), $output_mod->html_safe($vals[0]), $output_mod->html_safe($vals[1]));
 }}
 
 function dates_holders_callback($vals) {

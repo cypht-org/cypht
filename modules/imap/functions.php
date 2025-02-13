@@ -252,9 +252,13 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
             $nofrom = ' nofrom';
         }
         $is_snoozed = !empty($msg['x_snoozed']) && hex2bin($msg['folder']) == 'Snoozed';
+        $is_scheduled = !empty($msg['x_schedule']) && hex2bin($msg['folder']) == 'Scheduled';
         if ($is_snoozed) {
-            $snooze_header = parse_snooze_header('X-Snoozed: '.$msg['x_snoozed']);
+            $snooze_header = parse_delayed_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
+            $timestamp = strtotime($date);
+        } elseif ($is_scheduled) {
+            $date = $msg['x_schedule'];
             $timestamp = strtotime($date);
         } else {
             if ($list_sort == 'date') {
@@ -316,7 +320,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('subject_callback', $subject, $url, $flags, $icon, $preview_msg),
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
-                    array('date_callback', $date, $timestamp),
+                    array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
                 $id,
@@ -331,7 +335,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'source', $source, $icon),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('subject_callback', $subject, $url, $flags, null, $preview_msg),
-                    array('date_callback', $date, $timestamp, $is_snoozed),
+                    array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('icon_callback', $flags),
                     array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
@@ -1343,7 +1347,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
     preg_match("/^X-Snoozed:.*(\r?\n[ \t]+.*)*\r?\n?/im", $msg, $matches);
     if (count($matches)) {
         $msg = str_replace($matches[0], '', $msg);
-        $old_folder = parse_snooze_header($matches[0])['from'];
+        $old_folder = parse_delayed_header($matches[0], 'X-Snoozed')['from'];
     }
     if ($snooze_tag) {
         $from = $old_folder ?? $folder;
@@ -1370,7 +1374,7 @@ function snooze_message($mailbox, $msg_id, $folder, $snooze_tag) {
             }
         }
     } else {
-        $snooze_headers = parse_snooze_header($matches[0]);
+        $snooze_headers = parse_delayed_header($matches[0], 'X-Snoozed');
         $original_folder = $snooze_headers['from'];
         if ($mailbox->store_message($original_folder, $msg)) {
             $deleteResult = $mailbox->message_action($snooze_folder, 'DELETE', array($msg_id));
@@ -1457,21 +1461,21 @@ function snooze_formats() {
  */
 if (!hm_exists('snooze_dropdown')) {
 function snooze_dropdown($output, $unsnooze = false) {
-    $values = snooze_formats();
+    $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+                <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Snooze').'</button>
+                <ul class="dropdown-menu nexter_dropdown snooze_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {
-        $labels = get_snooze_date($format, true);
-        $txt .= '<li><a href="#" class="snooze_helper dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
+        $labels = get_scheduled_date($format, true);
+        $txt .= '<li><a href="#" class="nexter_date_helper_snooze dropdown-item d-flex justify-content-between gap-5" data-value="'.$format.'"><span>'.$output->trans($labels[0]).'</span> <span class="text-end">'.$labels[1].'</span></a></li>';
     }
     $txt .= '<li><hr class="dropdown-divider"></li>';
-    $txt .= '<li><label for="snooze_input_date" class="snooze_date_picker dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
-    $txt .= '<input id="snooze_input_date" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="snooze_input_date" style="visibility: hidden; position: absolute; height: 0;">';
-    $txt .= '<input class="snooze_input" style="display:none;"></li>';
+    $txt .= '<li><label for="nexter_input_date_snooze" class="nexter_date_picker_snooze dropdown-item cursor-pointer">'.$output->trans('Pick a date').'</label>';
+    $txt .= '<input id="nexter_input_date_snooze" type="datetime-local" min="'.date('Y-m-d\Th:m').'" class="nexter_input_date_snooze" style="visibility: hidden; position: absolute; height: 0;">';
+    $txt .= '<input class="nexter_input_snooze" style="display:none;"></li>';
     if ($unsnooze) {
-        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze snooze_helper dropdown-item"">'.$output->trans('Unsnooze').'</a>';
+        $txt .= '<a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper_snooze dropdown-item"">'.$output->trans('Unsnooze').'</a>';
     }
     $txt .= '</ul></div>';
 
@@ -1728,3 +1732,31 @@ function sortCombinedMessages($list, $sort) {
 
     return $list;
 }
+
+if (!hm_exists('save_sent_msg')) {
+function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_id, $show_errors = true) {
+    $specials = get_special_folders($handler, $imap_id);
+    if (array_key_exists('sent', $specials) && $specials['sent']) {
+        $sent_folder = $specials['sent'];
+    }
+
+    if (!$sent_folder) {
+        $auto_sent = $mailbox->get_special_use_mailboxes('sent');
+        if (!array_key_exists('sent', $auto_sent)) {
+            return;
+        }
+        $sent_folder = $auto_sent['sent'];
+    }
+    if (!$sent_folder) {
+        Hm_Debug::add(sprintf("Unable to save sent message, no sent folder for server %s %s", $mailbox->server_type(), $imap_details['server']));
+    }
+    $uid = null;
+    if ($sent_folder) {
+        Hm_Debug::add(sprintf("Attempting to save sent message for server %s in folder %s", $mailbox->server_type(), $imap_details['server'], $sent_folder));
+        $uid = $mailbox->store_message($sent_folder, $msg);
+        if (! $uid) {
+            Hm_Msgs::add('ERRAn error occurred saving the sent message');
+        }
+    }
+    return $uid;
+}}

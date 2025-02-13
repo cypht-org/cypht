@@ -1168,6 +1168,15 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     };
                 }
 
+                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
+                    if (!$this->module_is_supported('profiles')) {
+                        Hm_Msgs::add("Profiles module is not enabled", "danger");
+                        return;
+                    }
+
+                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $onlyJmap? $jmapAddress: $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
+                }
+
                 if ($this->module_is_supported('imap_folders')) {
                     $this->out('imap_server_id', $this->imap_server_id);
                     $this->out('imap_service_name', $provider);

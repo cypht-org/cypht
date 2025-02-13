@@ -639,6 +639,7 @@ return array(
     'You must provide a name for your script' => '请提供脚本名称',
     'Empty script' => '空脚本',
     'Please create a profile for saving sent messages option' => '请创建用于保存已发送信息选项的配置文件',
+    'You have %d scheduled messages that won\'t be executed if you quit' => false,
     'Attachment storage unavailable, please contact your site administrator' => '附件存储不可用，请联系您的网站管理员',
     'Your subject is empty!' => '主题为空！',
     'Your body is empty!' => '内容为空！',
