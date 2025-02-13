@@ -8,18 +8,19 @@ function hideRoutingToast() {
     window.routingToast = null;
 }
 
+// Undefined is used as the default value instead of null to comply with the route handlers, which also use undefined as the default value.
 function getListPathParam() {
-    return new URLSearchParams(window.location.next || window.location.search).get('list_path')
+    return new URLSearchParams(window.location.next || window.location.search).get('list_path') ?? undefined;
 }
 
 function getMessageUidParam() {
-    return new URLSearchParams(window.location.next || window.location.search).get('uid')
+    return new URLSearchParams(window.location.next || window.location.search).get('uid') ?? undefined;
 }
 
 function getPageNameParam() {
-    return new URLSearchParams(window.location.next || window.location.search).get('page')
+    return new URLSearchParams(window.location.next || window.location.search).get('page') ?? undefined;
 }
 
 function getParam(param) {
-    return new URLSearchParams(window.location.next || window.location.search).get(param)
+    return new URLSearchParams(window.location.next || window.location.search).get(param) ?? undefined;
 }

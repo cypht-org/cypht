@@ -140,6 +140,17 @@ class Hm_MessagesStore {
         }
         
     }
+    
+    updateRow(uid, html) {
+        const rows = Object.entries(this.rows);
+        const row = this.getRowByUid(uid)?.value;
+        if (row) {
+            const objectRows = Object.fromEntries(rows);
+            objectRows[row[0]]['0'] = html;
+            this.rows = objectRows;
+            this.#saveToLocalStorage();
+        }
+    }
 
     #fetch(hideLoadingState = false) {
         return new Promise((resolve, reject) => {

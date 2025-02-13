@@ -249,11 +249,11 @@ var Hm_Ajax_Request = function() { return {
                     if (name === getListPathParam()) {
                         Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
                         Hm_Folders.update_unread_counts();
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), getParam('keyword'));
+                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
                         messages.load().then(() => {
                             if (messages.count != res.folder_status[name].messages) {
                                 messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.list);
+                                    display_imap_mailbox(messages.rows, messages.list, messages);
                                 })
                             }
                         });
@@ -575,11 +575,21 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(msgs, id) {
+    this.update = function(msgs, id, store) {
         Hm_Utils.tbody(id).html('');
         for (const index in msgs) {
             const row = msgs[index][0];
-            Hm_Utils.tbody(id).append(row);
+            Hm_Utils.tbody(id).append(row).find('a').each(function() {
+                const link = $(this);
+                const filterParams = ["keyword", "filter"];
+                const url = new URL(link.attr('href'), location.href);
+                filterParams.forEach(param => {
+                    url.searchParams.set(param, getParam(param));
+                });
+                link.attr('href', url.toString());
+                const row = link.closest('tr');
+                store.updateRow(row.data('uid'), row.prop('outerHTML'));
+            });
         }
     };
 
@@ -918,7 +928,7 @@ function Message_List() {
         let nextUrl;
                 
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number(), getParam('keyword'));
+        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);

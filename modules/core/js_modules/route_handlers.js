@@ -70,7 +70,7 @@ function applyInfoPageHandlers() {
 function applyMessaleListPageHandlers(routeParams) {
     sortHandlerForMessageListAndSearchPage();
     Hm_Message_List.set_row_events();
-    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, routeParams.keyword);
+    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`);
     Hm_Utils.tbody().attr('id', messagesStore.list);
 
     $('.core_msg_control').on("click", function(e) {
