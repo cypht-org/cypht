@@ -729,6 +729,11 @@ function Message_List() {
         var class_name = false;
         var index;
         for (index in selected) {
+            const uid = selected[index].split('_')[2];
+            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+            store.load();
+            store.removeRow(uid);
+            
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
@@ -915,9 +920,6 @@ function Message_List() {
                 false,
                 true
             );
-        }
-        if (!updated) {
-            self.update_after_action(action_type, selected);
         }
     };
 
