@@ -1127,7 +1127,7 @@ function imap_setup_tags() {
 }
 
 var imap_setup_snooze = function() {
-    $(document).on('click', '.snooze_date_picker', function(e) {
+    $('.snooze_date_picker').on('click', function(e) {
         document.querySelector('.snooze_input_date').showPicker();
     });
     $('.snooze_helper').on('click', function(e) {
