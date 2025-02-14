@@ -194,7 +194,7 @@ class Hm_Output_server_information extends Hm_Output_Module {
                 '<tr><th class="text-secondary fw-light text-nowrap">Zend version</th><td>'.$server_info['zend_version'].'</td></tr>'.
                 '<tr><th class="text-secondary fw-light text-nowrap">SAPI</th><td>'.$server_info['sapi'].'</td></tr>'.
                 '<tr><th class="text-secondary fw-light text-nowrap">Enabled Modules</th><td>'.str_replace(',', ', ', implode(',', $this->get('router_module_list'))).'</td></tr>'.
-                '<tr><th class="text-secondary fw-light text-nowrap">Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
+                '<tr><th class="text-secondary fw-light text-nowrap">Git version</th><td>'.$server_info['branch_name'].' at revision <a href="'.$server_info['commit_url'].'" data-external="true">'.$server_info['commit_hash'].'</a> ('.$server_info['commit_date'].')</td></tr>'.
                 '</table></div>';
         }
         return '';

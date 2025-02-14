@@ -31,7 +31,7 @@ class Hm_SMTP_List {
             'tls'       => $server['tls'],
             'username'  => $user,
             'password'  => $pass,
-            'type'      => array_key_exists('type', $server) ? $server['type'] : 'smtp',
+            'type'      => array_key_exists('type', $server) && !empty($server['type']) ? $server['type'] : 'smtp',
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];

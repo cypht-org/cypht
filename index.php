@@ -22,6 +22,7 @@ define('CACHE_ID', '');
 define('SITE_ID', '');
 define('JS_HASH', '');
 define('CSS_HASH', '');
+define('ASSETS_PATH', APP_PATH.'assets/');
 
 /* show all warnings in debug mode */
 if (DEBUG_MODE) {

@@ -115,7 +115,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_message_since_dropdown() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<select name="foo" id="foo" class="message_list_since form-select form-select-sm w-auto" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select>', message_since_dropdown('-1 week', 'foo', $mod));
+        $this->assertEquals('<select name="foo" id="foo" class="message_list_since form-select form-select-sm" data-default-value="-1 week"><option value="today">Today</option><option selected="selected" value="-1 week">Last 7 days</option><option value="-2 weeks">Last 2 weeks</option><option value="-4 weeks">Last 4 weeks</option><option value="-6 weeks">Last 6 weeks</option><option value="-6 months">Last 6 months</option><option value="-1 year">Last year</option><option value="-5 years">Last 5 years</option></select>', message_since_dropdown('-1 week', 'foo', $mod));
     }
     /**
      * @preserveGlobalState disabled
@@ -160,7 +160,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_search_field_selection() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('TEXT', $mod));
-        $this->assertEquals('<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld"><option value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('foo', $mod));
+        $this->assertEquals('<select class="form-select form-select-sm" id="search_fld" name="search_fld"><option selected="selected" value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('TEXT', $mod));
+        $this->assertEquals('<select class="form-select form-select-sm" id="search_fld" name="search_fld"><option value="TEXT">Entire message</option><option value="BODY">Message body</option><option value="SUBJECT">Subject</option><option value="FROM">From</option><option value="TO">To</option><option value="CC">Cc</option></select>', search_field_selection('foo', $mod));
     }
 }

@@ -446,7 +446,7 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
         '-1 year' => 'Last year',
         '-5 years' => 'Last 5 years'
     );
-    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm w-auto" data-default-value="'.$original_default_value.'">';
+    $res = '<select name="'.$name.'" id="'.$name.'" class="message_list_since form-select form-select-sm" data-default-value="'.$original_default_value.'">';
     $reset = '';
     foreach ($times as $val => $label) {
         $res .= '<option';
@@ -606,7 +606,7 @@ function search_field_selection($current, $output_mod) {
         'TO' => 'To',
         'CC' => 'Cc',
     );
-    $res = '<select class="form-select form-select-sm w-auto" id="search_fld" name="search_fld">';
+    $res = '<select class="form-select form-select-sm" id="search_fld" name="search_fld">';
     foreach ($flds as $val => $name) {
         $res .= '<option ';
         if ($current == $val) {

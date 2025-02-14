@@ -20,7 +20,7 @@ async function nextPage() {
 
     const nextPage = parseInt(currentPage) + 1;
 
-    const store = new Hm_MessagesStore(getListPathParam(), currentPage);
+    const store = new Hm_MessagesStore(getListPathParam(), currentPage, `${getParam('keyword')}_${getParam('filter')}`);
     store.load(false, false, true);
 
     await changePage(nextPage, this, store.offsets);
@@ -33,7 +33,7 @@ async function previousPage() {
 
     let offsets = '';
     if (previousPage > 1) {
-        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1);
+        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1, `${getParam('keyword')}_${getParam('filter')}`);
         store.load(false, false, true);
         offsets = store.offsets;
     }
@@ -61,11 +61,11 @@ async function changePage(toPage, button, offsets) {
     history.pushState(history.state, "", url.toString());
     window.location.next = url.search;
 
-    const messagesStore = new Hm_MessagesStore(getListPathParam(), toPage);
+    const messagesStore = new Hm_MessagesStore(getListPathParam(), toPage, `${getParam('keyword')}_${getParam('filter')}`);
     try {
         await messagesStore.load();
         Hm_Utils.tbody().attr('id', messagesStore.list);
-        display_imap_mailbox(messagesStore.rows, null, messagesStore.list);
+        display_imap_mailbox(messagesStore.rows, null, messagesStore.list, messagesStore);
         $(".pagination .current").text(toPage);
     } catch (error) {
         Hm_Notices.show("Failed to fetch content", "danger");

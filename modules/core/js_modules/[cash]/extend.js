@@ -40,14 +40,6 @@ $.fn.fadeOut = function(timeout = 600) {
     return this.css("opacity", 0)
     .css("transition", `opacity ${timeout}ms`)
 };
-$.fn.fadeOutAndRemove = function(timeout = 600) {
-    this.fadeOut(timeout)
-    var tm = setTimeout(() => {
-        this.remove();
-        clearTimeout(tm)
-    }, timeout);
-    return this;
-};
 
 $.fn.modal = function(action) {
     const modalElement = this[0];
