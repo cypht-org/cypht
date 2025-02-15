@@ -1576,18 +1576,20 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
 
         foreach ($servers as $server_id => $config) {
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
-            if ($mailbox->connect()) {
-                $folder = 'Scheduled';
-                $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
-                foreach ($ret[1] as $msg) {
-                    $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
-                    if (! empty($msg_headers['X-Schedule'])) {
-                        $scheduled_msg_count++;
-                    } else {
-                        continue;
-                    }
-                    if (send_scheduled_message($this, $mailbox, $folder, $msg['uid'])) {
-                        $scheduled_msg_count++;
+            if (!is_null($mailbox->get_connection())) {
+                if ($mailbox->connect()) {
+                    $folder = 'Scheduled';
+                    $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
+                    foreach ($ret[1] as $msg) {
+                        $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
+                        if (! empty($msg_headers['X-Schedule'])) {
+                            $scheduled_msg_count++;
+                        } else {
+                            continue;
+                        }
+                        if (send_scheduled_message($this, $mailbox, $folder, $msg['uid'])) {
+                            $scheduled_msg_count++;
+                        }
                     }
                 }
             }
