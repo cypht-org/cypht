@@ -1120,7 +1120,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         }
 
                         foreach ($folders as $folder => $uids) {
-                            $status['imap_'.$server.'_'.$folder] = $imap->folder_state;
+                            $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
 
                             if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
                                 if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)['status']) {
@@ -1213,6 +1213,13 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
      * Returns list of message data for the Everthing page
      */
     public function process() {
+        $defaultGetParams = [
+            'list_page' => 1,
+            'sort' => 'arrival',
+            'offsets' => ''
+        ];
+        $this->request->get = array_merge($defaultGetParams, $this->request->get);
+
         list($success, $form) = $this->process_form(array('imap_server_ids'));
 
         if ($success) {
@@ -1292,6 +1299,14 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
      * Fetch flagged messages from an IMAP server
      */
     public function process() {
+        $defaultGetParams = [
+            'list_page' => 1,
+            'sort' => 'arrival',
+            'offsets' => '',
+            'keyword' => ''
+        ];
+        $this->request->get = array_merge($defaultGetParams, $this->request->get);
+
         $data_sources = imap_data_sources();
         $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
 
@@ -1311,8 +1326,8 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
 
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
         $list_page = (int) $this->request->get['list_page'];
-        $offsets = $this->request->get['offsets'] ?? '';
-        $keyword = $this->request->get['keyword'] ?? '';
+        $offsets = $this->request->get['offsets'];
+        $keyword = $this->request->get['keyword'];
 
         $maxPerSource = round($limit / count($data_sources));
         $offset = 0;
@@ -2065,17 +2080,25 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
      * Returns list of message data for the sent page
      */
     public function process() {
+        $defaultParams = [
+            'list_page' => 1,
+            'keyword' => '',
+            'offsets' => '',
+            'sort' => 'arrival'
+        ];
+        $this->request->get = array_merge($defaultParams, $this->request->get);
+        $path = $this->request->get['list_path'];
+        $keyword = $this->request->get['keyword'];
+        $list_page = (int) $this->request->get['list_page'];
+        $offsets = $this->request->get['offsets'];
+
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
         } else {
-            $data_sources = imap_sources($this, $this->request->get['list_path']);
+            $data_sources = imap_sources($this, $path);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
         }
-        $path = $this->request->get['list_path'];
-        $keyword = $this->request->get['keyword'] ?? '';
-        $list_page = (int) $this->request->get['list_page'] ?? 1;
-        $offsets = $this->request->get['offsets'] ?? '';
 
         $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
         $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));

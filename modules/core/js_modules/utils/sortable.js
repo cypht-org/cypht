@@ -76,13 +76,13 @@ function handleMessagesDragAndDrop() {
                 {'name': 'imap_move_page', 'value': page},
                 {'name': 'imap_move_action', 'value': 'move'}],
                 async (res) =>{
-                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
                     await store.load(false, true, true);
                     const moveResponses = Object.values(res['move_responses']);
                     moveResponses.forEach((response) => {
                         store.removeRow(response.oldUid);
                     });
-                    display_imap_mailbox(store.rows, store.list);
+                    display_imap_mailbox(store.rows, store.list, store);
                 }
             );
     

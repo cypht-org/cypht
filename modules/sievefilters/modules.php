@@ -1319,7 +1319,7 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
                         continue;
                     }
 
-                    $client = initialize_sieve_client_factory(null, null, $imap_account);
+                    $client = initialize_sieve_client_factory($this->config, null, $imap_account);
 
                     if ($client) {
                         $this->out('sieve_server_capabilities', $client->getCapabilities());

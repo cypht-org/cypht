@@ -840,7 +840,8 @@ if (!hm_exists('get_sieve_linked_mailbox')) {
         list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
         $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
         try {
-            $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
+            $tls = isset($imap_account['sieve_tls']) ? $imap_account['sieve_tls'] : false;
+            $client->connect($imap_account['user'], $imap_account['pass'], $tls, "", "PLAIN");
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {
