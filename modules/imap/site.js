@@ -136,13 +136,15 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
             {'name': 'imap_msg_uid', 'value': uid},
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
-            function(res) {
+            async function(res) {
                 if (!res.imap_delete_error) {
                     if (Hm_Utils.get_from_global('msg_uid', false)) {
                         return;
                     }
-                    var msg_cache_key = 'imap_'+detail.server_id+'_'+getMessageUidParam()+'_'+detail.folder;
-                    remove_from_cached_imap_pages(msg_cache_key);
+                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
+                    await store.load(false, true);
+                    store.removeRow(getMessageUidParam());
+
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         Hm_Utils.redirect(nlink.attr('href'));
@@ -361,24 +363,6 @@ var fetch_cached_imap_page = function() {
     var page = Hm_Utils.get_from_local_storage(key);
     var links = Hm_Utils.get_from_local_storage(key+'_page_links');
     return [ page, links ];
-}
-
-var remove_from_cached_imap_pages = function(msg_cache_key) {
-    var keys = ['imap_'+Hm_Utils.get_url_page_number()+'_'+getListPathParam()];
-    if (hm_list_parent()) {
-        keys.push('imap_'+Hm_Utils.get_url_page_number()+'_'+hm_list_parent());
-        if (['combined_inbox', 'unread', 'flagged', 'advanced_search', 'search', 'sent'].includes(hm_list_parent())) {
-            keys.push('formatted_'+hm_list_parent());
-        }
-    }
-    keys.forEach(function(key) {
-        var data = Hm_Utils.get_from_local_storage(key);
-        if (data) {
-            var page_data = $('<div></div>').append(data);
-            page_data.find('.'+msg_cache_key).remove();
-            Hm_Utils.save_to_local_storage(key, page_data.html());
-        }
-    });
 }
 
 async function select_imap_folder(path, page = 1,reload, processInTheBackground = false, abortController = null) {
