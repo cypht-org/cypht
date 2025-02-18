@@ -65,7 +65,7 @@ async function changePage(toPage, button, offsets) {
     try {
         await messagesStore.load();
         Hm_Utils.tbody().attr('id', messagesStore.list);
-        display_imap_mailbox(messagesStore.rows, null, messagesStore.list, messagesStore);
+        display_imap_mailbox(messagesStore.rows, messagesStore.list, messagesStore);
         $(".pagination .current").text(toPage);
     } catch (error) {
         Hm_Notices.show("Failed to fetch content", "danger");
