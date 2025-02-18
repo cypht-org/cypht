@@ -1267,7 +1267,11 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             $offsets = explode(',', $offsets);
         }
 
-        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+        $result = getCombinedMessagesLists($data_sources, [
+            'cache' => $this->cache,
+            'session' => $this->session,
+            'config' => $this->user_config,
+        ], [
             'terms' => [[search_since_based_on_setting($this->user_config), $date]],
             'listPage' => $list_page,
             'limit' => $limit,
@@ -1345,7 +1349,11 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
         }
         $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
         
-        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+        $result = getCombinedMessagesLists($data_sources, [
+            'cache' => $this->cache,
+            'session' => $this->session,
+            'config' => $this->user_config,
+        ], [
             'terms' => $searchTerms,
             'listPage' => $list_page,
             'limit' => $limit,
@@ -2121,7 +2129,11 @@ class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
         }
         $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
 
-        $result = getCombinedMessagesLists($data_sources, $this->cache, [
+        $result = getCombinedMessagesLists($data_sources, [
+            'cache' => $this->cache,
+            'session' => $this->session,
+            'config' => $this->user_config,
+        ], [
             'listPage' => $list_page,
             'limit' => $limit,
             'offsets' => $offsets,
