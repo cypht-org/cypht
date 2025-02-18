@@ -1,6 +1,12 @@
 <?php
 
+use React\ChildProcess\Process;
+use React\EventLoop\Loop;
+use React\Promise\Promise;
 use ZBateson\MailMimeParser\Message;
+
+use function React\Async\await;
+use function React\Async\parallel;
 
 /**
  * IMAP modules
@@ -1611,10 +1617,10 @@ if (!hm_exists('connect_to_imap_server')) {
 
 /**
  * @param array $sources
- * @param object $cache
+ * @param array $context
  * @param array $search
  */
-function getCombinedMessagesLists($sources, $cache, $search) {
+function getCombinedMessagesLists($sources, $context, $search) {
     $defaultSearch = [
         'filter' => 'ALL',
         'sort' => 'ARRIVAL',
@@ -1625,71 +1631,57 @@ function getCombinedMessagesLists($sources, $cache, $search) {
         'defaultOffset' => 0,
         'listPage' => 1
     ];
-    $search = array_merge($defaultSearch, $search);
+    $search = array_merge($defaultSearch, $search);    
+    
+    $promises = array_map(function ($dataSource, $index) use ($context, $search) {
+        return function () use ($dataSource, $context, $search, $index) {
+            return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
+                $process = new Process('php ' . __DIR__ . '/workers/messages_list.php');
+                $process->start(Loop::get());
+                $process->stdin->write(json_encode([
+                    'index' => $index,
+                    'search' => $search,
+                    'dataSource' => $dataSource,
+                    'cache' => serialize($context['cache']),
+                    'session' => serialize($context['session']),
+                    'config' => serialize($context['config'])
+                ]));
+                $process->stdin->end();
 
-    $filter = $search['filter'];
-    $sort = $search['sort'];
-    $reverse = $search['reverse'];
-    $searchTerms = $search['terms'];
-    $limit = $search['limit'];
-    $offsets = $search['offsets'];
-    $listPage = $search['listPage'];
+                $process->stdout->on('data', function ($output) use ($resolve) {
+                    $resolve(json_decode($output, true));
+                });
+
+                $process->on('exit', function ($exitCode) use ($reject) {
+                    $reject(new \Exception('Worker exited with code ' . $exitCode));
+                });
+        });
+    };
+    }, $sources, array_keys($sources));
+
+    $promise = parallel($promises);
+    
+    try {
+        $results = await($promise);
+    } catch (\Exception $e) {
+        Hm_Msgs::add($e->getMessage(), 'error');
+        return ['lists' => [], 'total' => 0, 'status' => []];
+    }
 
     $totalMessages = 0;
-    $offset = $search['defaultOffset'];
     $messagesLists = [];
     $status = [];
-    foreach ($sources as $index => $dataSource) {
-
-        if ($offsets && $listPage > 1) {
-            if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
-                $offset = (int) $offsets[$index] * ($listPage - 1);
-            }
-        }
-
-        $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
-        if ($mailbox && $mailbox->authed()) {
-            $connection = $mailbox->get_connection();
-
-            $folder = $dataSource['folder'];
-            $mailbox->select_folder(hex2bin($folder));
-            $state = $connection->get_mailbox_status(hex2bin($folder));
-            $status['imap_'.$dataSource['id'].'_'.$folder] = $state;
-
-            if ($mailbox->is_imap()) {
-                if ($connection->is_supported( 'SORT' )) {
-                    $sortedUids = $connection->get_message_sort_order($sort, $reverse, $filter);
-                } else {
-                    $sortedUids = $connection->sort_by_fetch($sort, $reverse, $filter);
-                }
-
-                $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
-            } else {
-                // EWS
-                $uids = $connection->search($folder, $sort, $reverse, $filter, 0, $limit, $searchTerms);
-            }
-
-            $total = count($uids);
-            $uids = array_slice($uids, $offset, $limit);
-
-            $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-            $messages = [];
-            foreach ($uids as $uid) {
-                if (isset($headers[$uid])) {
-                    $messages[] = $headers[$uid];
-                }
-            }
-
-            $messagesLists[] = array_map(function($msg) use ($dataSource, $folder) {
-                $msg['server_id'] = $dataSource['id'];
-                $msg['server_name'] = $dataSource['name'];
-                $msg['folder'] = $folder;
-                return $msg;
-            }, $messages);
-            $totalMessages += $total;
-        }
+    foreach ($results as $result) {
+        $totalMessages += $result['total'];
+        $status['imap_'.$result['dataSource']['id'].'_'.$result['folder']] = $result['status'];
+        $messagesLists[] = array_map(function($msg) use ($result) {
+            $msg['server_id'] = $result['dataSource']['id'];
+            $msg['server_name'] = $result['dataSource']['name'];
+            $msg['folder'] = $result['folder'];
+            return $msg;
+        }, $result['messages']);
     }
-    
+
     return ['lists' => $messagesLists, 'total' => $totalMessages, 'status' => $status];
 }
 
