@@ -1,4 +1,9 @@
 <?php
+
+if (mb_strtolower(php_sapi_name()) !== 'cli') {
+    die("Must be run from the command line\n");
+}
+
 const APP_PATH = '';
 
 require 'lib/framework.php';
