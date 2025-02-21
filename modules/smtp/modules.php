@@ -1576,7 +1576,7 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
 
         foreach ($servers as $server_id => $config) {
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
-            if ($mailbox->connect()) {
+            if ($mailbox || $mailbox->connect()) {
                 $folder = 'Scheduled';
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
