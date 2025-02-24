@@ -1636,7 +1636,20 @@ function getCombinedMessagesLists($sources, $context, $search) {
     $promises = array_map(function ($dataSource, $index) use ($context, $search) {
         return function () use ($dataSource, $context, $search, $index) {
             return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
-                $process = new Process('php ' . __DIR__ . '/workers/messages_list.php');
+                $cmd = 'php ' . __DIR__ . '/workers/messages_list.php';
+                if (APP_PATH) {
+                    $cmd .= ' -p ' . APP_PATH;
+                }
+                if (env('WORKER_CUSTOM_IMPORTS')) {
+                    $cmd .= ' -i ' . env('WORKER_CUSTOM_IMPORTS');
+                }
+                if (CACHE_ID) {
+                    $cmd .= ' -c ' . CACHE_ID;
+                }
+                if (SITE_ID) {
+                    $cmd .= ' -s ' . SITE_ID;
+                }
+                $process = new Process($cmd);
                 $process->start(Loop::get());
                 $process->stdin->write(json_encode([
                     'index' => $index,
