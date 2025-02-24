@@ -4,15 +4,31 @@ if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
-const APP_PATH = '';
+$options = getopt('p:i:c:s:', ['app_path:', 'imports:', 'cache_id:', 'site_id:']);
 
-require 'lib/framework.php';
+$appPath = $options['app_path'] ?? $options['p'] ?? '';
+$imports = $options['imports'] ?? $options['i'] ?? '';
+$cacheId = $options['cache_id'] ?? $options['c'] ?? '';
+$siteId = $options['site_id'] ?? $options['s'] ?? '';
 
-require 'modules/core/message_functions.php';
-require 'modules/core/message_list_functions.php';
+define('APP_PATH', $appPath);
+define('CACHE_ID', $cacheId);
+define('SITE_ID', $siteId);
 
-require 'modules/imap/hm-imap.php';
-require 'modules/core/hm-mailbox.php';
+require $appPath . 'lib/framework.php';
+
+require $appPath . 'modules/core/message_functions.php';
+require $appPath . 'modules/core/message_list_functions.php';
+
+require $appPath . 'modules/imap/hm-imap.php';
+require $appPath . 'modules/core/hm-mailbox.php';
+
+if ($imports) {
+    $imports = explode(',', $imports);
+    foreach ($imports as $import) {
+        require $import;
+    }
+}
 
 $input = trim(fgets(STDIN));
 $data = json_decode($input, true);
