@@ -2465,22 +2465,23 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
 
     protected function output()
     {
-        $res = '<tr><td data-target=".privacy_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
-            '<i class="bi bi-shield fs-5 me-2"></i>'.
-            $this->trans('Privacy').'</td></tr>';
-        $userSettings = $this->get('user_settings', array());
-        foreach (self::$settings as $key => $setting) {
-            $value = $userSettings[$key] ?? '';
-            ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
-            $res .= "<tr class='privacy_setting'>" .
-            "<td><label for='$key'>$label</label></td>" .
-            "<td>
-                <input type='$type' id='$key' name='$key' value='$value' class='form-control' />
-                <div class='setting_description'>$description</div>
-            </td>" .
-            "</tr>";
-        }
-        return $res;
+        return getSettingsSectionOutput('privacy', $this->trans('Privacy'), 'shield', self::$settings, $this->get('user_settings', array()));
+    }
+}
+
+class Hm_Output_engine_settings extends Hm_Output_Module {
+    static $settings = [
+        'enable_child_processes' => [
+            'type' => 'checkbox',
+            'label' => 'Enable child processes',
+            'description' => 'Enable child processes for long running tasks to improve performance.',
+            'default' => true
+        ],
+    ];
+
+    protected function output()
+    {
+        return getSettingsSectionOutput('engine', $this->trans('Engine'), 'heart-pulse-fill', self::$settings, $this->get('user_settings', array()));
     }
 }
 
