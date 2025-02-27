@@ -746,3 +746,47 @@ if (!hm_exists('parse_delayed_header')) {
         return $result;
     }
 }
+
+function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settingsOptions, $userSettings) {
+    $res = '<tr><td data-target=".'. $section .'_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+        '<i class="bi bi-'. $sectionIcon . ' fs-5 me-2"></i>'. $sectionLabel .'</td></tr>';
+    foreach ($settingsOptions as $key => $setting) {
+        $value = $userSettings[$key] ?? '';
+        ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
+
+        if ($type === 'checkbox') {
+            $input = '<input type="checkbox" id="'.$key.'" name="'.$key.'" '.($value ? 'checked' : '').' class="form-check-input">';
+        } else {
+            $input = '<input type="'.$type.'" id="'.$key.'" name="'.$key.'" value="'.$value.'" class="form-control">';
+        }
+
+        $res .= "<tr class='{$section}_setting'>" .
+        "<td><label for='$key'>$label</label></td>" .
+        "<td>
+            <div>
+                $input
+            </div>
+            <div class='setting_description'>$description</div>
+        </td>" .
+        "</tr>";
+    }
+    return $res;
+}
+
+function engineSettingCallback($val, $key, $mod) {
+    $setting = Hm_Output_engine_settings::$settings[$key];
+    $key .= '_setting';
+    $user_setting = $mod->user_config->get($key);
+    $update = $mod->request->post['update'];
+
+    if ($update) {
+        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
+        $mod->user_config->set($key, $val);
+
+        $user_data = $mod->session->get('user_data', array());
+        $user_data[$key] = $val;
+        $mod->session->set('user_data', $user_data);
+        $mod->session->record_unsaved('Engine settings updated');
+    }
+    return $val;
+}
