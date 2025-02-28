@@ -1635,7 +1635,7 @@ function getCombinedMessagesLists($sources, $context, $search) {
     ];
     $search = array_merge($defaultSearch, $search);
     
-    if ($context['config']->get('enable_child_processes_setting', false)) {
+    if ($context['config']->get('enable_child_processes_setting', true)) {
         $promises = array_map(function ($dataSource, $index) use ($context, $search) {
             return function () use ($dataSource, $context, $search, $index) {
                 return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
