@@ -47,6 +47,9 @@ class Hm_Mailbox {
     }
 
     public function connect() {
+        if (! $this->connection) {
+            return false;
+        }
         return $this->connection->connect($this->config);
     }
 
