@@ -265,13 +265,20 @@ class Hm_User_Config_File extends Hm_Config {
     public function save($username, $key) {
         $this->shuffle();
         $destination = $this->get_path($username);
+        $folder = dirname($destination);
+        if (!is_dir($folder)) {
+            throw new Exception("\"Users\" folder doesn't exist, please contact your site administrator.");
+        }
         $removed = $this->filter_servers();
         if (!$this->crypt) {
             $data = json_encode($this->config);
         } else {
             $data = Hm_Crypt::ciphertext(json_encode($this->config), $key);
         }
-        file_put_contents($destination, $data);
+        $result = file_put_contents($destination, $data);
+        if ($result === false) {
+            throw new Exception("Unable to write user config data - please check Cypht setup.");
+        }
         $this->restore_servers($removed);
     }
 
