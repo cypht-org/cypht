@@ -418,7 +418,6 @@ function sieveFiltersPageHandler() {
             return false;
         }
 
-        Hm_Utils.clear_sys_messages();
         conditions.forEach(function (elem, key) {
             if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
                 let order = ordinal_number(key + 1);

@@ -1119,20 +1119,6 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 $this->out('just_saved_credentials', true);
                 return;
             } else {
-                /*
-                 *  Connect to SMTP server if user wants to send emails
-                 */
-                if($isSender){
-                    if (!$this->module_is_supported('smtp')) {
-                        Hm_Msgs::add("SMTP module is not enabled", "danger");
-                        return;
-                    }
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
-                    if(!isset($this->smtp_server_id)){
-                        Hm_Msgs::add("Could not save SMTP server", "warning");
-                        return;
-                    }
-                }
 
                 /*
                  *  Connect to IMAP server if user wants to receive emails
@@ -1166,15 +1152,6 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         Hm_Msgs::add("Could not save IMAP server", "warning");
                         return;
                     };
-                }
-
-                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
-                    if (!$this->module_is_supported('profiles')) {
-                        Hm_Msgs::add("Profiles module is not enabled", "danger");
-                        return;
-                    }
-
-                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $onlyJmap? $jmapAddress: $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
                 }
 
                 if ($this->module_is_supported('imap_folders')) {
