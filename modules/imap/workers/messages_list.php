@@ -38,6 +38,7 @@ $index = $data['index'];
 $search = $data['search'];
 $dataSource = $data['dataSource'];
 $cache = unserialize($data['cache']);
+$cache->reconnect();
 $session = unserialize($data['session']);
 $user_config = unserialize($data['config']);
 
