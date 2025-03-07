@@ -1673,9 +1673,15 @@ function getCombinedMessagesLists($sources, $context, $search) {
                         }
                     });
 
-                    $process->on('exit', function ($exitCode, $signal) use ($reject) {
-                        $reject(new \Exception($signal . ' Error code: ' . $exitCode));
+                    $process->stderr->on('data', function ($errorOutput) {
+                        Hm_Functions::error_log('Worker error output: ' . $errorOutput);
                     });
+
+                    $process->on('exit', function ($exitCode, $signal) use ($reject) {
+                        if ($exitCode != 0) {
+                            error_log(sprintf(' worker exited with abornaml exit code' . $exitCode ));
+                            $reject(new \Exception($signal . ' Error code: ' . $exitCode));
+                    }});
             });
         };
         }, $sources, array_keys($sources));
