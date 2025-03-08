@@ -27,7 +27,8 @@ class SettingsHelpers(WebTest):
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        assert self.by_class('sys_messages').text == 'Settings updated'
+        alert_message = self.by_class('sys_messages').find_element(By.XPATH, ".//div[contains(@class, 'flex-grow-1')]").text
+        assert alert_message.strip() == 'Settings updated'
 
     def settings_section(self, section):
         if not self.by_class('settings').is_displayed():
