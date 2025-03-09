@@ -77,6 +77,7 @@ COPY language/ language/
 COPY lib/ lib/
 COPY modules/ modules/
 COPY scripts/ scripts/
+COPY database/ database/
 COPY third_party/ third_party/
 COPY index.php index.php
 
