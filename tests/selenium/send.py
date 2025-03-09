@@ -33,6 +33,7 @@ class SendTest(WebTest):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
         send_button.click()
         self.wait_with_folder_list()
+        self.wait_on_class('sys_messages')
         sys_messages_element = self.by_class('sys_messages')
         sys_messages = sys_messages_element.text
         expected_messages = [
