@@ -1317,7 +1317,7 @@ return [
     | Display message style inline from the message list
     | Defaults to right
     */
-    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE', 'right'),
+    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE_STYLE', 'right'),
 
     /*
     |
