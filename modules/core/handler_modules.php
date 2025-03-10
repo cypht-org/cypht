@@ -1127,7 +1127,9 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                         Hm_Msgs::add("SMTP module is not enabled", "danger");
                         return;
                     }
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
+                    if(!isset($this->smtp_server_id)){
+                        $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
+                    }
                     if(!isset($this->smtp_server_id)){
                         Hm_Msgs::add("Could not save SMTP server", "warning");
                         return;
