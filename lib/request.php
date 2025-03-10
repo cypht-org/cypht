@@ -176,7 +176,7 @@ class Hm_Request {
             return;
         }
         if (!empty($this->server['HTTP_USER_AGENT'])) {
-            if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos|opera mini)/i", $this->server['HTTP_USER_AGENT'])) {
+            if (preg_match("/(iphone|ipod|ipad|android|blackberry|webos|opera mini)/i", $this->server['HTTP_USER_AGENT'] ?? '')) {
                 $this->mobile = true;
             }
         }
