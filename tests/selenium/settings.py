@@ -27,6 +27,7 @@ class SettingsHelpers(WebTest):
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
+        self.wait_on_class('sys_messages')
         assert self.by_class('sys_messages').text == 'Settings updated'
 
     def settings_section(self, section):
