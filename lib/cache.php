@@ -266,6 +266,13 @@ class Hm_Redis {
     }
 
     /**
+     * @return boolean
+     */
+    public function reconnect() {
+        return $this->connect();
+    }
+
+    /**
      * @return void
      */
     private function auth() {
@@ -343,6 +350,13 @@ class Hm_Memcached {
     }
 
     /**
+     * @return boolean
+     */
+    public function reconnect() {
+        return $this->connect();
+    }
+
+    /**
      * @return mixed
      */
     public function last_err() {
@@ -375,6 +389,13 @@ class Hm_Noop_Cache {
 
     public function set($key, $val, $lifetime, $crypt_key) {
         return false;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function reconnect(){
+        return true;
     }
 }
 
@@ -609,6 +630,14 @@ class Hm_Cache {
     protected function generic_set($key, $val, $lifetime) {
         $this->log($key, 'save');
         return $this->backend->set($this->key_hash($key), $val, $lifetime, $this->session->enc_key);
+    }
+
+    /**
+     * Manually reconnect to cache service
+     * @return boolean
+     */
+    public function reconnect() {
+        return $this->backend->reconnect();
     }
 }
 
