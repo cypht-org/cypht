@@ -82,7 +82,9 @@ function applyMessaleListPageHandlers(routeParams) {
         Hm_Message_List.toggle_rows();
     });
 
-    get_list_block_sieve();
+    if (hm_module_is_supported('sievefilters')) {
+        get_list_block_sieve();
+    }
 
     if (routeParams.list_path === 'github_all') {
         return applyGithubMessageListPageHandler(routeParams);
