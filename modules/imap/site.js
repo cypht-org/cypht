@@ -1358,27 +1358,6 @@ var add_email_in_contact_trusted = function(list_email) {
     }
 };
 
-
-function get_list_block_sieve() {
-    sessionStorage.removeItem('list_blocked');
-    var detail = Hm_Utils.parse_folder_path(hm_list_path());
-    var list_blocked_senders = [];
-    var page = hm_page_name();
-    if (page == 'message_list') {
-        Hm_Ajax.request(
-            [
-                { name: 'hm_ajax_hook', value: 'ajax_list_block_sieve' },
-                { name: 'imap_server_id', 'value': detail.server_id},
-            ],
-            function (res) {
-                if (res.ajax_list_block_sieve) {
-                    sessionStorage.setItem('list_blocked', res.ajax_list_block_sieve);
-                }
-            }
-        );
-    }
-};
-
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 
 $('.screen-email-like').on("click", function() {
