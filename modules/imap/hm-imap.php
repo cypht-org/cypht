@@ -6,6 +6,8 @@
  * @subpackage imap
  */
 
+use ZBateson\MailMimeParser\MailMimeParser;
+
 require_once('hm-imap-base.php');
 require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
@@ -972,7 +974,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
             if ($include_content_body) {
-                $command .= " BODY.PEEK[0.1]";
+                $command .= " BODY.PEEK[TEXT]<0.500>";
             }
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
@@ -1012,9 +1014,11 @@ if (!class_exists('Hm_IMAP')) {
                     $x_profile_id = '';
                     $x_delivery = '';
                     $count = count($vals);
+                    $header_founded = false;
+                    $body_founded = false;
                     for ($i=0;$i<$count;$i++) {
-                        if ($vals[$i] == 'BODY[HEADER.FIELDS') {
-                                
+                        if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
+                            $header_founded = true;
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -1032,7 +1036,8 @@ if (!class_exists('Hm_IMAP')) {
                                 }
                             }
                         }
-                        elseif ($vals[$i] == 'BODY[0.1') {
+                        elseif ($vals[$i] == 'BODY[TEXT' && !$body_founded) {
+                            $body_founded = true;
                             $content = '';
                             $i++;
                             $i++;
@@ -1041,7 +1046,18 @@ if (!class_exists('Hm_IMAP')) {
                                 $i++;
                             }
                             $i++;
+                            if (! empty($content)) {
+                                if (substr($content, 0, 3) == "<0>") {
+                                    $content = substr($content, 3);
+                                }
+                                $parser = new MailMimeParser();
+                                $str_parser = $parser->parse($content, false);
+                                $content = $str_parser->getTextContent();
+                            }
                             $flds['body'] = $content;
+                            if (!$header_founded) {
+                                $i = 0;
+                            }
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
                             if (isset($vals[($i + 1)])) {
@@ -1060,7 +1076,6 @@ if (!class_exists('Hm_IMAP')) {
                             }
                         }
                     }
-
                     if ($uid) {
                         $cset = '';
                         if (mb_stristr($content_type, 'charset=')) {

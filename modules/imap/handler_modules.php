@@ -1779,6 +1779,10 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
         if (array_key_exists('imap_server_id', $this->request->post)) {
             $active[] = $this->request->post['imap_server_id'];
         }
+        if (count($active)===0) {
+            $data_sources = imap_data_sources();
+            $active = array_map(function($ds) { return $ds['id']; }, $data_sources);
+        }
         $updated = 0;
         foreach ($active as $server_id) {
             $server = Hm_IMAP_List::dump($server_id, true);
