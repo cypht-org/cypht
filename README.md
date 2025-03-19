@@ -4,10 +4,10 @@
 #### Cypht
 [https://cypht.org](https://cypht.org)
 
-All your email, from all your accounts, in one place. Supports IMAP/SMTP, 
-[JMAP](https://github.com/cypht-org/cypht/issues/180) and 
-[EWS](https://github.com/cypht-org/cypht/issues/247). Cypht is like a 
-news reader, but for E-mail. Cypht does not replace your existing accounts - it 
+All your email, from all your accounts, in one place. Supports IMAP/SMTP,
+[JMAP](https://github.com/cypht-org/cypht/issues/180) and
+[EWS](https://github.com/cypht-org/cypht/issues/247). Cypht is like a
+news reader, but for E-mail. Cypht does not replace your existing accounts - it
 combines them into one. And it's also a news reader.
 
 ![screenshot](https://github.com/cypht-org/cypht-website/blob/master/static/img/Inbox.PNG "Inbox View").
@@ -24,9 +24,7 @@ customize the program without hacking the code.
 
 
 Installation instructions
-* Cypht master: [https://cypht.org/install](https://cypht.org/install)
-* Version 1: [https://cypht.org/install-1x](https://cypht.org/install-1x)
-* Version 2: [https://cypht.org/install-2x](https://cypht.org/install-2x)
+* All Cypht latest and master versions: [https://cypht.org/install](https://cypht.org/install)
 
 Security details: [https://cypht.org/security](https://cypht.org/security)
 
