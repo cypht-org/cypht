@@ -23,8 +23,8 @@ sets (which is obviously way cooler sounding than plugins), that are executed
 by the framework. Modules provide a flexible way to add new features or
 customize the program without hacking the code.
 
-
-Installation instructions [https://cypht.org/install.html](https://cypht.org/install.html)
+Installation instructions
+* All Cypht latest and master versions: [https://cypht.org/install](https://cypht.org/install)
 
 Security details: [https://cypht.org/security.html](https://cypht.org/security.html)
 
