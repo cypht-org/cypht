@@ -40,14 +40,17 @@ class Hm_Handler_add_tag_to_message extends Hm_Handler_Module {
             }
         }
         $this->out('taged_messages', $taged_messages);
+        $type = 'success';
         if ($taged_messages == count($ids)) {
             $msg = 'Tag added';
         } elseif ($taged_messages > 0) {
             $msg = 'Some messages have been taged';
+            $type = 'warning';
         } else {
             $msg = 'ERRFailed to tag selected messages';
+            $type = 'danger';
         }
-        Hm_Msgs::add($msg);
+        Hm_Msgs::add($msg, $type);
     }
 }
 
@@ -116,7 +119,7 @@ class Hm_Handler_process_tag_delete extends Hm_Handler_Module {
             Hm_Tags::del($tag['id']);
             Hm_Msgs::add('Tag Deleted');
         } else {
-            Hm_Msgs::add('ERRTag ID not found');
+            Hm_Msgs::add('Tag ID not found', 'warning');
             return;
         }
     }
@@ -164,7 +167,7 @@ class Hm_Handler_imap_tag_content extends Hm_Handler_Module {
 
                 $this->out('imap_tag_data', $msg_list);
             } catch (\Throwable $th) {
-                Hm_Msgs::add('ERRFailed to load tag messages: '.$th->getMessage());
+                Hm_Msgs::add('Failed to load tag messages: '.$th->getMessage(), 'danger');
             }
         }
     }

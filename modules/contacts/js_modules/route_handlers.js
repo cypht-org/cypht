@@ -19,7 +19,7 @@ function applyContactsPageHandlers() {
         const allowed_characters = ['+','-','(',')'];
         for (let chain_counter = 0; chain_counter < contact_phone.length; chain_counter++) {
             if(!(regex_number.test(contact_phone[chain_counter])) && !(allowed_characters.indexOf(contact_phone[chain_counter]) > -1)){
-                Hm_Notices.show([hm_trans("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!")]);
+                Hm_Notices.show("This phone number appears to contain invalid character (s).\nIf you are sure ignore this warning and continue!", "warning");
                 $(this).off();
             }
         }

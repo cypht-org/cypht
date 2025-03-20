@@ -16,17 +16,17 @@ class Hm_Handler_process_recover_settings_form extends Hm_Handler_login {
         if ($success) {
             $user = $this->session->get('username');
             if (!$this->session->auth($user, $form['new_password_recover'])) {
-                Hm_Msgs::add('ERRError validating your current password');
+                Hm_Msgs::add('Error validating your current password', 'warning');
                 return;
             }
             $data = $this->session->get('old_settings_str');
             if (!$data) {
-                Hm_Msgs::add('ERRNo old settings to recover');
+                Hm_Msgs::add('No old settings to recover', 'warning');
                 return;
             }
             $settings = $this->user_config->decode(Hm_Crypt::plaintext($data, $form['old_password_recover']));
             if (!is_array($settings) || count($settings) == 0) {
-                Hm_Msgs::add('ERRUnable to recover your settings');
+                Hm_Msgs::add('Unable to recover your settings', 'danger');
                 return;
             }
             foreach ($settings as $name => $val) {
@@ -50,7 +50,7 @@ class Hm_Handler_check_for_lost_settings extends Hm_Handler_login {
             in_array($this->session->auth_class, array('Hm_Auth_IMAP', true))) {
             $this->session->set('load_recover_options', true);
             $this->session->set('old_settings_str', $this->user_config->encrypted_str);
-            Hm_Msgs::add('ERRUnable to load your settings! You may be able to recover them on the "Recover Settings" page in the Main menu.');
+            Hm_Msgs::add('Unable to load your settings! You may be able to recover them on the "Recover Settings" page in the Main menu.', 'danger');
         }
         $this->out('load_recover_options', $this->session->get('load_recover_options'));
         $this->out('auth_type', $this->session->auth_class);

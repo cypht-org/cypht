@@ -76,11 +76,11 @@ var folder_page_delete = function() {
     var val = $('#delete_source').val();
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val(), 'danger');
         return;
     }
     if (!val.length) {
-        Hm_Notices.show({0: 'ERR'+$('#delete_folder_error').val()});
+        Hm_Notices.show($('#delete_folder_error').val(), 'danger');
         return;
     }
     if (!confirm($('#delete_folder_confirm').val())) {
@@ -104,20 +104,22 @@ var folder_page_rename = function() {
     var val = $('#rename_value').val();
     var par = $('#rename_parent_source').val().trim();
     var folder = $('#rename_source').val().trim();
-    var notices = {};
+    var notices = [];
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val(), 'danger');
         return;
     }
     if (!val.length) {
-        notices[0] = 'ERR'+$('#rename_folder_error').val();
+        notices.push($('#rename_folder_error').val());
     }
     if (!folder.length) {
-        notices[1] = 'ERR'+$('#folder_name_error').val();
+        notices.push($('#folder_name_error').val());
     }
-    if (!$.isEmptyObject(notices)) {
-        Hm_Notices.show(notices);
+    if (notices.length) {
+        notices.forEach((msg) => {
+            Hm_Notices.show(msg, danger);
+        });
         return;
     }
     Hm_Ajax.request(
@@ -239,11 +241,11 @@ var folder_page_create = function() {
     var folder = $('#create_value').val().trim();
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val());
         return;
     }
     if (!folder.length) {
-        Hm_Notices.show({0: 'ERR'+$('#folder_name_error').val()});
+        Hm_Notices.show($('#folder_name_error').val());
         return;
     }
     Hm_Ajax.request(

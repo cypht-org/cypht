@@ -26,7 +26,7 @@ class Hm_Environment {
         }
         $envFile = static::get('CYPHT_DOTENV');
         if (!file_exists($envFile)) {
-            Hm_Msgs::add('ERR.env file not found at: "' . $envFile . '"');
+            Hm_Msgs::add('.env file not found at: "' . $envFile . '"', 'danger');
             return;
         }
         $dotenvLoader->load($envFile);

@@ -168,7 +168,7 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                 $result = $oauth2->request_token($details['token_url'], $this->request->get['code'], array('Accept: application/json'));
                 if (count($result) > 0 && array_key_exists('access_token', $result)) {
                     $this->load_repositories($result['access_token']);
-                    Hm_Msgs::add('Github connection established');
+                    Hm_Msgs::add('Github connection established', 'info');
                     $this->user_config->set('github_connect_details', $result);
                     $user_data = $this->user_config->dump();
                     $this->session->set('user_data', $user_data);
@@ -177,14 +177,14 @@ class Hm_Handler_process_github_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occurred');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(''.ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occurred');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -274,11 +274,11 @@ class Hm_Handler_github_process_add_repo extends Hm_Handler_Module {
                         Hm_Msgs::add('Added repository');
                     }
                     else {
-                        Hm_Msgs::add('ERRRepository is already added');
+                        Hm_Msgs::add('Repository is already added', 'warning');
                     }
                 }
                 else {
-                    Hm_Msgs::add('ERRCould not find that repository/owner combination at github.com');
+                    Hm_Msgs::add('Could not find that repository/owner combination at github.com', 'warning');
                 }
             }
         }

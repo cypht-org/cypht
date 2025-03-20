@@ -122,7 +122,8 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'pass' => $result['access_token'],
                         'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
                         'refresh_token' => $result['refresh_token'],
-                        'auth' => 'xoauth2'
+			'auth' => 'xoauth2',
+			'type' => $details['type']
                     ));
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
@@ -134,7 +135,8 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'user' => $details['email'],
                             'pass' => $result['access_token'],
                             'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
-                            'refresh_token' => $result['refresh_token']
+			    'refresh_token' => $result['refresh_token'],
+			    'type' => 'smtp'
                         ));
                         $this->session->record_unsaved('SMTP server added');
                     }
@@ -146,14 +148,14 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occurred');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occurred');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -182,6 +184,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     'tls' => $details['tls'],
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
+		    'type' => $details['type']
                 );
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
@@ -200,7 +203,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                             'port' => $details['smtp']['port'],
                             'tls' => $details['smtp']['tls'],
                             'user' => $form['nux_email'],
-                            'pass' => $form['nux_pass']
+			    'pass' => $form['nux_pass'],
+			    'type' => 'smtp'
                         ));
                         if (can_save_last_added_server('Hm_SMTP_List', $form['nux_email'])) {
                             $this->session->record_unsaved('SMTP server added');
@@ -220,7 +224,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 }
                 else {
                     Hm_IMAP_List::del($new_id);
-                    Hm_Msgs::add('ERRAuthentication failed');
+                    Hm_Msgs::add('Authentication failed', 'danger');
                 }
             }
         }
@@ -285,7 +289,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
 
         if ($success) {
             if (! check_file_upload($this->request, 'accounts_sample')) {
-                Hm_Msgs::add('ERRError while uploading accounts sample');
+                Hm_Msgs::add('Error while uploading accounts sample', 'danger');
                 return;
             }
             try {
@@ -313,11 +317,11 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                     }
                 }
             } catch (\Exception $e) {
-                Hm_Msgs::add('ERR' . $e->getMessage());
+                Hm_Msgs::add($e->getMessage(), 'danger');
                 return;
             }
             if(empty($servers)) {
-                Hm_Msgs::add('ERRImported file is empty');
+                Hm_Msgs::add('Imported file is empty', 'warning');
                 return;
             }
             $errors = [];
@@ -386,6 +390,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $server['username'],
                             $server['password'],
                             $server['smtp']['tls'],
+			    $server['type'],
                             false
                         );
                         if (! $smtp_server_id) {
@@ -405,6 +410,8 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         continue;
                     }
 
+                    Hm_Profiles::init($this);
+
                     add_profile(
                         $server_name,
                         $server['profile']['signature'],
@@ -421,7 +428,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                 $successes[] = $server_name;
             }
             foreach (array_unique($errors) as $error) {
-                Hm_Msgs::add("ERR$error");
+                Hm_Msgs::add("$error", 'danger');
             }
             foreach ($successes as $success) {
                 Hm_Msgs::add("Server $success imported successfully");
@@ -470,8 +477,8 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             return '';
         }
         $notice = $this->trans('Please ensure your YAML or CSV  file follows the correct format');
-        $yaml_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
-        $csv_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.csv';
+        $yaml_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.yaml';
+        $csv_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.csv';
 
         return '<div class="quick_add_multiple_section">' .
             '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .

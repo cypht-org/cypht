@@ -11,6 +11,9 @@ window.addEventListener('popstate', function(event) {
         $('#cypht-main').replaceWith(event.state.main);
         loadCustomScripts(event.state.head);
     }
+
+    window.location.next = window.location.search;
+    
     const unMountCallback = renderPage(window.location.href);
 
     if (unMountCallback) {
@@ -44,8 +47,8 @@ $(document).on('click', 'a', function(event) {
     }
 });
 
-async function navigate(url) {
-    showRoutingToast();
+async function navigate(url, loaderMessage) {
+    showRoutingToast(loaderMessage);
 
     try {
         const response = await fetch(url, {
@@ -91,7 +94,7 @@ async function navigate(url) {
         
         trackLocationSearchChanges();
     } catch (error) {
-        Hm_Notices.show([`ERR${error.message}`]);
+        Hm_Notices.show(error.message, 'danger');
     } finally {
         hideRoutingToast();
     }
@@ -114,6 +117,7 @@ function renderPage(href) {
     if (page) {
         const route = ROUTES.find(route => route.page === page);
         const routeParams = Object.fromEntries(searchParams.entries());
+        
         if (route) {
             const unMountCallback = route.handler(routeParams, url.hash?.substring(1));
             return unMountCallback;

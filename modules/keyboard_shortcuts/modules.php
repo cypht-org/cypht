@@ -37,17 +37,17 @@ class Hm_Handler_process_edit_shortcut extends Hm_Handler_Module {
             $shortcuts = $this->get('keyboard_shortcut_data');
             $codes = keycodes();
             if (!array_key_exists($form['shortcut_id'], $shortcuts)) {
-                Hm_Msgs::add('ERRUnknown shortcut');
+                Hm_Msgs::add('Unknown shortcut', 'warning');
                 return;
             }
             if (!array_search($form['shortcut_key'], $codes)) {
-                Hm_Msgs::add('ERRUnknown shortcut key');
+                Hm_Msgs::add('Unknown shortcut key', 'warning');
                 return;
             }
             $meta_list = array();
             foreach ($form['shortcut_meta'] as $meta) {
                 if (!in_array($meta, array('meta', 'alt', 'shift', 'control', 'none'))) {
-                    Hm_Msgs::add('ERRUknown modifier key');
+                    Hm_Msgs::add('Uknown modifier key', 'warning');
                     return;
                 }
                 if ($meta != 'none') {

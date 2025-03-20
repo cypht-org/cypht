@@ -259,7 +259,7 @@ function blockListPageHandlers() {
                 {'name': 'change_behavior', 'value': true}
             ],
             function(res) {
-                if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0])) {
+                if (/^(Sender|Domain) Behavior Changed$/.test(res.router_user_msgs[0].text)) {
                     window.location = window.location;
                 }
             }
@@ -414,17 +414,16 @@ function sieveFiltersPageHandler() {
 
         let idx = 0;
         if (conditions.length === 0) {
-            Hm_Utils.add_sys_message(hm_trans('You must provide at least one condition'), 'danger');
+            Hm_Notices.show('You must provide at least one condition', 'warning');
             return false;
         }
 
-        Hm_Utils.clear_sys_messages();
         conditions.forEach(function (elem, key) {
             if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Utils.add_sys_message('The ' + order + ' condition (' + elem + ') must be provided', 'danger');
+                Hm_Notices.show('The ' + order + ' condition (' + elem + ') must be provided', 'warning');
                 validation_failed = true;
             }
              conditions_parsed.push(
@@ -453,7 +452,7 @@ function sieveFiltersPageHandler() {
         }).get();
 
         if (actions_type.length === 0) {
-            Hm_Utils.add_sys_message(hm_trans('You must provide at least one action'), 'danger');
+            Hm_Notices.show('You must provide at least one action', 'warning');
             return false;
         }
 
@@ -464,7 +463,7 @@ function sieveFiltersPageHandler() {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Utils.add_sys_message('The ' + order + ' action (' + elem + ') must be provided', 'danger');
+                Hm_Notices.show('The ' + order + ' action (' + elem + ') must be provided', 'waring');
                 validation_failed = true;
             }
             actions_parsed.push(
@@ -489,7 +488,7 @@ function sieveFiltersPageHandler() {
             )
         }
         if ($('.modal_sieve_filter_name').val() == "") {
-            Hm_Utils.add_sys_message(hm_trans('Filter name is required'), 'danger');
+            Hm_Notices.show('Filter name is required', 'danger');
             return false;
         }
 
@@ -526,11 +525,11 @@ function sieveFiltersPageHandler() {
 
     function save_script(imap_account) {
         if ($('.modal_sieve_script_name').val() === "") {
-            Hm_Utils.add_sys_message(hm_trans('You must provide a name for your script'), 'danger');
+            Hm_Notices.show('You must provide a name for your script', 'warning');
             return false;
         }
         if ($('.modal_sieve_script_textarea').val() === "") {
-            Hm_Utils.add_sys_message(hm_trans('Empty script'), 'danger');
+            Hm_Notices.show('Empty script', 'warning');
             return false;
         }
         Hm_Ajax.request(
@@ -1003,6 +1002,25 @@ function sieveFiltersPageHandler() {
     });
     load_sieve_filters('ajax_account_sieve_filters');
 }
+
+function get_list_block_sieve() {
+    sessionStorage.removeItem('list_blocked');
+    let detail = Hm_Utils.parse_folder_path(hm_list_path());
+    let list_blocked_senders = [];
+    if (getPageNameParam() == 'message_list') {
+        Hm_Ajax.request(
+            [
+                { name: 'hm_ajax_hook', value: 'ajax_list_block_sieve' },
+                { name: 'imap_server_id', 'value': detail.server_id},
+            ],
+            function (res) {
+                if (res.ajax_list_block_sieve) {
+                    sessionStorage.setItem('list_blocked', res.ajax_list_block_sieve);
+                }
+            }
+        );
+    }
+};
 
 $(function () {
     $(document).on('change', '#block_action', function(e) {

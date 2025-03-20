@@ -355,22 +355,13 @@ class Hm_Output_msgs extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         $logged_out_class = '';
         if (!$this->get('router_login_state') && !empty($msgs)) {
             $logged_out_class = ' logged_out';
         }
-        $res .= '<div class="d-none position-fixed top-0 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'">';
-        foreach ($msgs as $msg) {
-            if (preg_match("/ERR/", $msg)) {
-                $res .= sprintf('<div class="alert alert-danger alert-dismissible fade show" role="alert"><i class="bi bi-exclamation-triangle me-2"></i><span class="danger">%s</span>', $this->trans(mb_substr((string) $msg, 3)));
-            }
-            else {
-                $res .= sprintf('<div class="alert alert-success alert-dismissible fade show" role="alert"><i class="bi bi-check-circle me-2"></i><span class="info">%s</span>', $this->trans($msg));
-            }
-            $res .= '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>';
-        }
-        $res .= '</div>';
+        $res .= '<div class="position-fixed top-0 col-sm-4 col-md-3 end-0 mt-3 me-3 sys_messages'.$logged_out_class.'"></div>';
+        $res .= '<script type="text/javascript">var hm_msgs = '.json_encode($msgs).'</script>';
         return $res;
     }
 }
@@ -2474,22 +2465,23 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
 
     protected function output()
     {
-        $res = '<tr><td data-target=".privacy_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
-            '<i class="bi bi-shield fs-5 me-2"></i>'.
-            $this->trans('Privacy').'</td></tr>';
-        $userSettings = $this->get('user_settings', array());
-        foreach (self::$settings as $key => $setting) {
-            $value = $userSettings[$key] ?? '';
-            ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
-            $res .= "<tr class='privacy_setting'>" .
-            "<td><label for='$key'>$label</label></td>" .
-            "<td>
-                <input type='$type' id='$key' name='$key' value='$value' class='form-control' />
-                <div class='setting_description'>$description</div>
-            </td>" .
-            "</tr>";
-        }
-        return $res;
+        return getSettingsSectionOutput('privacy', $this->trans('Privacy'), 'shield', self::$settings, $this->get('user_settings', array()));
+    }
+}
+
+class Hm_Output_engine_settings extends Hm_Output_Module {
+    static $settings = [
+        'enable_child_processes' => [
+            'type' => 'checkbox',
+            'label' => 'Enable child processes',
+            'description' => 'Enable child processes for long running tasks to improve performance.',
+            'default' => true
+        ],
+    ];
+
+    protected function output()
+    {
+        return getSettingsSectionOutput('engine', $this->trans('Engine'), 'heart-pulse-fill', self::$settings, $this->get('user_settings', array()));
     }
 }
 

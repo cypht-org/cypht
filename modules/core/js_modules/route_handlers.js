@@ -70,7 +70,7 @@ function applyInfoPageHandlers() {
 function applyMessaleListPageHandlers(routeParams) {
     sortHandlerForMessageListAndSearchPage();
     Hm_Message_List.set_row_events();
-    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page);
+    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`);
     Hm_Utils.tbody().attr('id', messagesStore.list);
 
     $('.core_msg_control').on("click", function(e) {
@@ -82,7 +82,7 @@ function applyMessaleListPageHandlers(routeParams) {
         Hm_Message_List.toggle_rows();
     });
 
-    get_list_block_sieve();
+    if (window.get_list_block_sieve) get_list_block_sieve();
 
     if (routeParams.list_path === 'github_all') {
         return applyGithubMessageListPageHandler(routeParams);
@@ -114,7 +114,9 @@ function applyMessagePageHandlers(routeParams) {
 }
 
 function applyComposePageHandlers(routeParams) {
-    applySmtpComposePageHandlers(routeParams);
+    if (hm_is_logged()) {
+        applySmtpComposePageHandlers(routeParams);
+    }
     if (hm_module_is_supported('contacts')) {
         applyContactsAutocompleteComposePageHandlers(routeParams);
     }

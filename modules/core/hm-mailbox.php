@@ -47,6 +47,9 @@ class Hm_Mailbox {
     }
 
     public function connect() {
+        if (! $this->connection) {
+            return false;
+        }
         return $this->connection->connect($this->config);
     }
 
@@ -74,6 +77,9 @@ class Hm_Mailbox {
     }
 
     public function authed() {
+        if (! $this->connection) {
+            return false;
+        }
         if ($this->is_imap()) {
             return $this->connection->get_state() == 'authenticated' || $this->connection->get_state() == 'selected';
         } elseif ($this->is_smtp()) {
@@ -585,5 +591,9 @@ class Hm_Mailbox {
             $this->selected_folder = ['id' => $folder, 'name' => $this->folder_state['name'], 'detail' => []];
         }
         return true;
+    }
+
+    public function get_config() {
+        return $this->config;
     }
 }

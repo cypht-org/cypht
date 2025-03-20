@@ -28,7 +28,7 @@ class Hm_Handler_idle_time_check extends Hm_Handler_Module {
             }
         }
         if ($logout) {
-            Hm_Debug::add('IDLETIMER: timer exceeded, logged out');
+            Hm_Debug::add('IDLETIMER: timer exceeded, logged out', 'warning');
             $this->session->destroy($this->request);
         }
         else {
@@ -48,7 +48,7 @@ class Hm_Handler_process_idle_time extends Hm_Handler_Module {
         }
         $max = $this->user_config->get('idle_time', 1)*60;
         if ($max && $idle_time >= $max) {
-            Hm_Debug::add('IDLETIMER: Logged out after idle period');
+            Hm_Debug::add('IDLETIMER: Logged out after idle period', 'warning');
             $this->session->destroy($this->request);
         }
     }

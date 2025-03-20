@@ -65,7 +65,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->session_key = Hm_Crypt::unique_id();
         $this->secure_cookie($request, $this->cname, $this->session_key,  '', '', 'Lax');
         if ($this->insert_session_row()) {
-            Hm_Debug::add('LOGGED IN');
+            Hm_Debug::add('LOGGED IN', 'success');
             $this->active = true;
             return;
         }
@@ -81,7 +81,7 @@ class Hm_DB_Session extends Hm_PHP_Session {
         $this->session_key = $key;
         $data = $this->get_session_data($key);
         if (is_array($data)) {
-            Hm_Debug::add('LOGGED IN');
+            Hm_Debug::add('LOGGED IN', 'success');
             $this->active = true;
             $this->data = $data;
         }

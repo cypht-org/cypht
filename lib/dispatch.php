@@ -54,7 +54,7 @@ trait Hm_Dispatch_Redirect {
      * @return void
      */
     private function forward_messages($session, $request) {
-        $msgs = Hm_Msgs::get();
+        $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
             $session->secure_cookie($request, 'hm_msgs', base64_encode(json_encode($msgs)));
         }
@@ -114,7 +114,7 @@ trait Hm_Dispatch_Redirect {
         if (!empty($request->cookie['hm_msgs'])) {
             $msgs = @json_decode(base64_decode($request->cookie['hm_msgs']), true);
             if (is_array($msgs)) {
-                array_walk($msgs, function($v) { Hm_Msgs::add($v); });
+                array_walk($msgs, function($v) { Hm_Msgs::add($v['text'], $v['type']); });
             }
             $session->delete_cookie($request, 'hm_msgs');
             return true;
@@ -130,12 +130,12 @@ trait Hm_Dispatch_Redirect {
      */
     static public function page_redirect($url, $status = false) {
         if (DEBUG_MODE) {
-            Hm_Debug::add(sprintf('Redirecting to %s', $url));
+            Hm_Debug::add(sprintf('Redirecting to %s', $url), 'info');
             Hm_Debug::load_page_stats();
             Hm_Debug::show();
         }
         if ($status == 303) {
-            Hm_Debug::add('Redirect loop found');
+            Hm_Debug::add('Redirect loop found', 'warning');
             Hm_Functions::cease('Redirect loop discovered');
         }
         Hm_Functions::header('HTTP/1.1 303 Found');
@@ -197,7 +197,7 @@ class Hm_Dispatch {
             return;
         }
         if (is_readable(APP_PATH.'modules/site/lib.php')) {
-            Hm_Debug::add('Including site module set lib.php');
+            Hm_Debug::add('Including site module set lib.php', 'info');
             require APP_PATH.'modules/site/lib.php';
         }
     }
@@ -337,7 +337,7 @@ class Hm_Dispatch {
             $this->page = 'home';
         }
         $this->module_exec->page = $this->page;
-        Hm_Debug::add('Page ID: '.$this->page);
+        Hm_Debug::add('Page ID: '.$this->page, 'info');
     }
 
     /**

@@ -109,4 +109,19 @@ class Hm_Profiles {
             }
         }
     }
+
+    /**
+ * @param string $field The name of the field to search within.
+ * @param mixed $value The value to search for within the specified field.
+ * @return array An array containing profiles that match the search criteria.
+ */
+    public static function search($field, $value) {
+        $res = array();
+        foreach (self::getAll() as $profile) {
+            if (!empty($profile[$field]) && $profile[$field] == $value) {
+                $res[] = $profile;
+            }
+        }
+        return $res;
+    }
 }

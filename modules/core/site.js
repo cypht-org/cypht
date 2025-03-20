@@ -1,5 +1,14 @@
 'use strict';
 
+$.fn.fadeOutAndRemove = function(timeout = 600) {
+    this.fadeOut(timeout)
+    var tm = setTimeout(() => {
+        this.remove();
+        clearTimeout(tm)
+    }, timeout);
+    return this;
+};
+
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
@@ -229,21 +238,20 @@ var Hm_Ajax_Request = function() { return {
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
-                Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
-                Hm_Notices.show(res.router_user_msgs);
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+                Object.values(res.router_user_msgs).forEach((msg) => {
+                    Hm_Notices.show(msg.text, msg.type);
+                });
             }
             if (res.folder_status) {
                 for (const name in res.folder_status) {
                     if (name === getListPathParam()) {
-                        Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
-                        Hm_Folders.update_unread_counts();
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
+                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
                         messages.load().then(() => {
                             if (messages.count != res.folder_status[name].messages) {
                                 messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.list);
+                                    display_imap_mailbox(messages.rows, messages.list, messages);
                                 })
                             }
                         });
@@ -266,7 +274,7 @@ var Hm_Ajax_Request = function() { return {
 
     fail: function(xhr, not_callable) {
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show([err_msg('Server Error')]);
+            Hm_Notices.show('Server Error', 'danger');
         }
         else {
             $('.offline').show();
@@ -386,41 +394,100 @@ function Hm_Modal(options) {
     this.init();
 }
 
+class Hm_Alert {
+    constructor() {
+        this.container = document.querySelector('.sys_messages');
+        if (! this.container) {
+            console.error('Hm_Alert: .sys_messages container not found.');
+        }
+    }
+
+    /**
+     * Create an alert message and append it to the container.
+     *
+     * @param {string} message - The message to display.
+     * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
+     * @param {boolean} dismissible - Whether the alert can be dismissed.
+     * @param {integer} dismissTime - Number of seconds before alert auto-closes
+     */
+    createAlert(message, type = 'primary', dismissible = true, dismissTime = 10) {
+        if (!this.container) {
+            return;
+        }
+
+        const alert = document.createElement('div');
+        alert.className = `d-flex align-items-center alert shadow-lg bg-white fade show flex-sm-row p-2 mb-1`;
+        alert.setAttribute('role', 'alert');
+
+        const icon = document.createElement('i');
+        icon.className = `fs-3 text-${type} bi bi-${this.#getIcon(type)}`;
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'd-flex justify-content-center align-items-center px-2';
+        iconContainer.appendChild(icon);
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex-grow-1 pe-4';
+        messageElement.textContent = message;
+
+        alert.appendChild(iconContainer);
+        alert.appendChild(messageElement);
+
+        if (dismissible) {
+            alert.classList.add('alert-dismissible');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = `btn-close`;
+            closeButton.setAttribute('data-bs-dismiss', 'alert');
+            closeButton.setAttribute('aria-label', 'Close');
+            alert.appendChild(closeButton);
+        }
+        
+        this.container.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 500);
+        }, dismissTime * 1000);
+    }
+
+    #getIcon(type) {
+        const icons = {
+            success: 'check-circle-fill',
+            danger: 'exclamation-triangle-fill',
+            warning: 'exclamation-octagon-fill',
+            primary: 'info-circle-fill',
+            info: 'info-circle-fill',
+            secondary: 'shield-fill-exclamation',
+        };
+
+        return icons[type] || 'info-circle';
+    }
+}
+
 /* user notification manager */
 var Hm_Notices = {
-    hide_id: false,
+    hm_alert: new Hm_Alert(),
 
-    show: function(msgs) {
-        var message = '';
-        var type = '';
-        for (var i in msgs) {
-            if (msgs[i].match(/^ERR/)) {
-                message = msgs[i].substring(3);
-                type = 'danger';
-            }
-            else {
-                type = 'info';
-                message = msgs[i];
-            }
-
-            Hm_Utils.add_sys_message(message, type);
-        }
+    /**
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display (primary, secondary, success, danger, warning, info)
+     */
+    show: function(msg, type = 'success', dismissible = true, dismissTime = 10) {
+        msg = hm_trans(msg);
+        this.hm_alert.createAlert(msg, type, dismissible, dismissTime);
     },
 
-    hide: function(now) {
-        if (Hm_Notices.hide_id) {
-            clearTimeout(Hm_Notices.hide_id);
-        }
-        if (now) {
-            $('.sys_messages').addClass('d-none');
-            Hm_Utils.clear_sys_messages();
-        }
-        else {
-            Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').addClass('d-none');
-                Hm_Utils.clear_sys_messages();
-            }, 5000);
-        }
+    /**
+     * Shows pending messages on page load
+     */
+    showPendingMessages() {
+        hm_msgs.forEach((msg) => {
+            this.hm_alert.createAlert(msg.text, msg.type);
+        });
     }
 };
 
@@ -506,11 +573,21 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(msgs, id) {
+    this.update = function(msgs, id, store) {
         Hm_Utils.tbody(id).html('');
         for (const index in msgs) {
             const row = msgs[index][0];
-            Hm_Utils.tbody(id).append(row);
+            Hm_Utils.tbody(id).append(row).find('a').each(function() {
+                const link = $(this);
+                const filterParams = ["keyword", "filter"];
+                const url = new URL(link.attr('href'), location.href);
+                filterParams.forEach(param => {
+                    url.searchParams.set(param, getParam(param));
+                });
+                link.attr('href', url.toString());
+                const row = link.closest('tr');
+                store.updateRow(row.data('uid'), row.prop('outerHTML'));
+            });
         }
     };
 
@@ -652,6 +729,11 @@ function Message_List() {
         var class_name = false;
         var index;
         for (index in selected) {
+            const uid = selected[index].split('_')[2];
+            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+            store.load();
+            store.removeRow(uid);
+            
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
@@ -839,9 +921,6 @@ function Message_List() {
                 true
             );
         }
-        if (!updated) {
-            self.update_after_action(action_type, selected);
-        }
     };
 
     this.prev_next_links = function(msgUid, lisPath = getListPathParam()) {
@@ -849,7 +928,7 @@ function Message_List() {
         let nextUrl;
                 
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number());
+        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);
@@ -1423,7 +1502,7 @@ var Hm_Utils = {
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
-            $(class_name).toggle();
+            $(`[data-bs-target="${class_name}"]`).trigger('click');            
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         }
         return false;
@@ -1495,31 +1574,6 @@ var Hm_Utils = {
 
     set_unsaved_changes: function(state) {
         $('#unsaved_changes').val(state);
-    },
-
-    /**
-     * Shows pending messages added with the add_sys_message method
-     */
-    show_sys_messages: function() {
-        $('.sys_messages').removeClass('d-none');
-    },
-
-    /**
-     *
-     * @param {*} msg : The alert message to display
-     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
-     */
-    add_sys_message: function(msg, type = 'info') {
-        if (!msg) {
-            return;
-        }
-        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-        this.show_sys_messages();
-    },
-
-    clear_sys_messages: function () {
-        $('.sys_messages').html('');
     },
 
     cancel_logout_event: function() {
@@ -1713,10 +1767,6 @@ var decrease_servers = function(section) {
     }
 };
 
-var err_msg = function(msg) {
-    return "ERR"+hm_trans(msg);
-};
-
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1767,7 +1817,6 @@ var fillJmapData = function(details) {
 var imap_smtp_edit_action = function(event) {
     resetQuickSetupForm();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.imap-jmap-smtp-btn').trigger('click');
@@ -1835,9 +1884,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
-    
+
     /* show any pending notices */
-    Hm_Utils.show_sys_messages();
+    Hm_Notices.showPendingMessages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -1866,7 +1915,7 @@ $(function() {
     $(document).on('paste', '.warn_on_paste', function (e) {
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         if (hasLeadingOrTrailingSpaces(paste)) {
-            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+            Hm_Notices.show('Pasted text has leading or trailing spaces', 'warning');
         }
     });
 
@@ -2405,3 +2454,57 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+function setupActionSchedule(callback) {
+    $(document).on('click', '.nexter_date_picker', function (e) {
+        document.querySelector('.nexter_input_date').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input', callback);
+}
+
+function setupActionSnooze(callback) {
+    $(document).on('click', '.nexter_date_picker_snooze', function (e) {
+        document.querySelector('.nexter_input_date_snooze').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper_snooze', function (e) {
+        e.preventDefault();
+        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date_snooze', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker_snooze').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date_snooze', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input_snooze').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input_snooze', callback);
+}
