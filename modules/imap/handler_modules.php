@@ -1187,9 +1187,9 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $terms = $this->session->get('search_terms', false);
-            $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
-            $fld = $this->session->get('search_fld', 'TEXT');
+            $terms = validate_search_terms($this->request->get['search_terms']);
+            $since = isset($this->request->get['search_since']) ? process_since_argument($this->request->get['search_since'], true): DEFAULT_SEARCH_SINCE;
+            $fld = isset($this->request->get['search_fld']) ? validate_search_fld($this->request->get['search_fld']): DEFAULT_SEARCH_FLD;
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($since);
             $folder = bin2hex('INBOX');
