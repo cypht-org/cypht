@@ -26,6 +26,8 @@ customize the program without hacking the code.
 Installation instructions
 * All Cypht latest and master versions: [https://cypht.org/install](https://cypht.org/install)
 
+Monthly community meetings: [https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings](https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings)
+
 Security details: [https://cypht.org/security](https://cypht.org/security)
 
 Module info: [https://cypht.org/modules](https://cypht.org/modules)
