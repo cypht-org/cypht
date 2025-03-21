@@ -33,7 +33,11 @@ class Hm_Handler_process_change_password extends Hm_Handler_Module {
         if ($this->session->change_pass($user, $form['new_pass1'])) {
             Hm_Msgs::add("Password changed");
             $user_config->load($user, $form['old_pass']);
-            $user_config->save($user, $form['new_pass1']);
+            try {
+                $user_config->save($user, $form['new_pass1']);
+            } catch (Exception $e) {
+                Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+            }
             return;
         }
         Hm_Msgs::add("An error Occurred", "danger");

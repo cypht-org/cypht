@@ -779,9 +779,13 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                     $pass = false;
                 }
                 if ($user && $path && $pass) {
-                    $this->user_config->save($user, $pass);
-                    $this->session->destroy($this->request);
-                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                    try {
+                        $this->user_config->save($user, $pass);
+                        $this->session->destroy($this->request);
+                        Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                    } catch (Exception $e) {
+                        Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+                    }
                 }
             }
             else {

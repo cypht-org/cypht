@@ -244,9 +244,13 @@ class Hm_Dispatch {
         if (!$this->session->loaded) {
             return;
         }
-        if ($this->module_exec->user_config->save_on_login) {
-            $this->module_exec->user_config->save($this->request->post['username'], $this->request->post['password']);
-        }
+        try {
+            if ($this->module_exec->user_config->save_on_login) {
+                $this->module_exec->user_config->save($this->request->post['username'], $this->request->post['password']);
+            }
+        } catch (Exception $e) {
+            Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+        } 
     }
 
     /**
