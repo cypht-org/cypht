@@ -1861,6 +1861,9 @@ if (!class_exists('Hm_IMAP')) {
                     case 'ARCHIVE':
                         $command = "UID STORE $uid_string +FLAGS (\Archive)\r\n";
                         break;
+                    case 'JUNK':
+                        $command = "UID STORE $uid_string +FLAGS (\Junk)\r\n";
+                        break;
                     case 'FLAG':
                         $command = "UID STORE $uid_string +FLAGS (\Flagged)\r\n";
                         break;
