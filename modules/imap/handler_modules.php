@@ -1082,12 +1082,12 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     /**
-     * Read, unread, delete, flag, or unflag a set of message uids
+     * Read, unread, delete, flag, unflag, archive, or mark as junk a set of message uids
      */
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive'))) {
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk'))) {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
@@ -1095,71 +1095,18 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $status = array();
                 foreach ($ids as $server => $folders) {
                     $specials = get_special_folders($this, $server);
-                    $trash_folder = false;
-                    $archive_folder = false;
                     $mailbox = Hm_IMAP_List::get_connected_mailbox($server, $this->cache);
                     if ($mailbox && $mailbox->authed()) {
                         $server_details = $this->user_config->get('imap_servers')[$server];
-                        if ($form['action_type'] == 'delete') {
-                            if (array_key_exists('trash', $specials)) {
-                                if ($specials['trash']) {
-                                    $trash_folder = $specials['trash'];
-                                } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('No trash folder configured for %s', $server_details['name']), 'warning');
-                                }
-                            }
-                        }
-                        if ($form['action_type'] == 'archive') {
-                            if(array_key_exists('archive', $specials)) {
-                                if($specials['archive']) {
-                                    $archive_folder = $specials['archive'];
-                                } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('No archive folder configured for %s', $server_details['name']), 'warning');
-                                }
-                            }
-                        }
 
                         foreach ($folders as $folder => $uids) {
                             $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
-
-                            if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    foreach ($uids as $uid) {
-                                        $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
-                                    }
-                                }
-                            }
-                            elseif ($mailbox->is_imap() && $form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
-                                /* path according to original option setting */
-                                if ($this->user_config->get('original_folder_setting', false)) {
-                                    $archive_folder .= '/' . hex2bin($folder);
-                                    $dest_path_exists = count($mailbox->get_folder_status($archive_folder));
-                                    if (!$dest_path_exists) {
-                                        $mailbox->create_folder($archive_folder);
-                                    }
-                                }
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $archive_folder)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    foreach ($uids as $uid) {
-                                        $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
-                                    }
-                                }
-                            }
-                            else {
-                                if (! $mailbox->message_action(hex2bin($folder), mb_strtoupper($form['action_type']), $uids)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    $msgs += count($uids);
-                                    if ($form['action_type'] == 'delete') {
-                                        $mailbox->message_action(hex2bin($folder), 'EXPUNGE', $uids);
-                                    }
-                                }
+                            $action_result = $this->perform_action($mailbox, $form['action_type'], $uids, $folder, $specials, $server_details);
+                            if ($action_result['error']) {
+                                $errs++;
+                            } else {
+                                $msgs += count($uids);
+                                $moved = array_merge($moved, $action_result['moved']);
                             }
                         }
                     }
@@ -1173,6 +1120,84 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
+    }
+
+    /**
+     * Perform a specified action on a set of messages in a mailbox.
+     *
+     * This function processes messages based on the provided action type (e.g., 'move', 'delete'),
+     * moving them to a special folder if necessary, or performing an operation like expunging deleted messages.
+     * It handles creating folders, moving messages to a special folder, and managing message status accordingly.
+     *
+     * @param object $mailbox The mailbox object used to perform actions.
+     * @param string $action_type The type of action to perform (e.g., 'move', 'delete').
+     * @param array $uids The unique identifiers (UIDs) of the messages to act upon.
+     * @param string $folder The folder where the messages currently reside.
+     * @param array $specials Special folder information for handling specific actions.
+     * @param array $server_details Details of the server, including its unique ID and settings.
+     * 
+     * @return array Returns an associative array with:
+     *   - 'error' => bool Indicates if an error occurred during the operation.
+     *   - 'moved' => array List of moved message identifiers in a specific format.
+     */
+    private function perform_action($mailbox, $action_type, $uids, $folder, $specials, $server_details) {
+        $error = false;
+        $moved = array();
+        $folder_name = hex2bin($folder);
+        $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
+
+        if ($special_folder && $special_folder != $folder_name) {
+            if ($this->user_config->get('original_folder_setting', false)) {
+                $special_folder .= '/' . $folder_name;
+                if (!count($mailbox->get_folder_status($special_folder))) {
+                    $mailbox->create_folder($special_folder);
+                }
+            }
+            if (!$mailbox->message_action($folder_name, 'MOVE', $uids, $special_folder)['status']) {
+                $error = true;
+            } else {
+                foreach ($uids as $uid) {
+                    $moved[] = sprintf("imap_%s_%s_%s", $server_details['id'], $uid, $folder);
+                }
+            }
+        } else {
+            if (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
+                $error = true;
+            } else {
+                if ($action_type == 'delete') {
+                    $mailbox->message_action($folder_name, 'EXPUNGE', $uids);
+                }
+            }
+        }
+        return ['error' => $error, 'moved' => $moved];
+    }
+
+    /**
+     * Retrieves the special folder associated with a specific action type.
+     *
+     * This function checks the given action type (e.g., 'delete', 'archive', 'junk') and looks for a corresponding
+     * special folder from the provided special folders list. If the folder is not found for the action, it logs an
+     * error message, unless the action type is one of 'read', 'unread', 'flag', or 'unflag'.
+     *
+     * @param string $action_type The action type that determines which special folder to retrieve (e.g., 'delete', 'archive').
+     * @param array $specials An associative array of special folder names, like 'trash', 'archive', and 'junk'.
+     * @param array $server_details Details of the server, including its name.
+     * 
+     * @return string|false Returns the special folder name if found, or false if no corresponding folder is configured.
+     */
+    private function get_special_folder($action_type, $specials, $server_details) {
+        $folder = false;
+        if ($action_type == 'delete' && array_key_exists('trash', $specials)) {
+            $folder = $specials['trash'];
+        } elseif ($action_type == 'archive' && array_key_exists('archive', $specials)) {
+            $folder = $specials['archive'];
+        } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
+            $folder = $specials['junk'];
+        }
+        if (!$folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
+            Hm_Msgs::add(sprintf('ERRNo %s folder configured for %s', $action_type, $server_details['name']));
+        }
+        return $folder;
     }
 }
 
