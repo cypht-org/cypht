@@ -535,8 +535,13 @@ if (!hm_exists('get_blocked_senders')){
 
 if (!hm_exists('initialize_sieve_client_factory')) {
     function initialize_sieve_client_factory($site_config, $user_config, $imapServer) {
-        $factory = get_sieve_client_factory($site_config);
-        return $factory->init($user_config, $imapServer, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
+        try {
+            $factory = get_sieve_client_factory($site_config);
+            return $factory->init($user_config, $imapServer, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
+        } catch (Exception $e) {
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+            return null;
+        }
     }
 }
 
