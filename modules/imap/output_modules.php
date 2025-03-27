@@ -1464,11 +1464,11 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                                 <label class="" for="ews_server">'.$this->trans('Server Address').'</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input required type="text" id="ews_email" name="ews_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
+                                <input required type="text" id="ews_email" name="ews_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'" autocomplete="username">
                                 <label class="" for="ews_email">'.$this->trans('Email or Username').'</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" id="ews_password" name="ews_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                <input type="password" id="ews_password" name="ews_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'" autocomplete="new-password">
                                 <label class="" for="ews_password">'.$this->trans('Password').'</label>
                             </div>
                             <div class="form-check">
