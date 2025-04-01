@@ -32,7 +32,11 @@ class Hm_Handler_process_recover_settings_form extends Hm_Handler_login {
             foreach ($settings as $name => $val) {
                 $this->user_config->set($name, $val);
             }
-            $this->user_config->save($user, $form['new_password_recover']);
+            try {
+                $this->user_config->save($user, $form['new_password_recover']);
+            } catch (Exception $e) {
+                Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+            }
             Hm_Msgs::add('Settings recovered');
             $this->session->set('load_recover_options', false);
             $this->session->set('old_settings_str', '');

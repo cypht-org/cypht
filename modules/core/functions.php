@@ -368,17 +368,22 @@ function save_user_settings($handler, $form, $logout) {
         $pass = false;
     }
     if ($user && $path && $pass) {
-        $handler->user_config->save($user, $pass);
-        $handler->session->set('changed_settings', array());
-        if ($logout) {
-            $handler->session->destroy($handler->request);
-            Hm_Msgs::add('Saved user data on logout', 'info');
-            Hm_Msgs::add('Session destroyed on logout', 'info');
-        }
-        else {
-            Hm_Msgs::add('Settings saved');
+        try {
+            $handler->user_config->save($user, $pass);
+            $handler->session->set('changed_settings', array());
+            if ($logout) {
+                $handler->session->destroy($handler->request);
+                Hm_Msgs::add('Saved user data on logout', 'info');
+                Hm_Msgs::add('Session destroyed on logout', 'info');
+            }
+            else {
+                Hm_Msgs::add('Settings saved', 'info');
+            }
+        } catch (Exception $e) {
+            Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
         }
     }
+    
 }}
 
 /**
