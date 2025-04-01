@@ -13,6 +13,23 @@
 class Hm_IMAP_Cache extends Hm_IMAP_Parser {
 
     /**
+     * Store the imap command used to fetch a sorted message list in absence of
+     * the SORT imap extension. This needs to be removed from cache in some cases.
+     */
+    public function set_fetch_command($newval){
+        $newval = str_replace(array("\r", "\n"), array(''), preg_replace("/^A\d+ /", '', $newval));
+        $this->cache_data['INTERNAL_CYPHT_USE']['SORT_BY_FETCH'] = $newval;
+    }
+    public function get_fetch_command(){
+        if (isset($this->cache_data['INTERNAL_CYPHT_USE'])){
+            if (isset($this->cache_data['INTERNAL_CYPHT_USE']['SORT_BY_FETCH'])){
+                return $this->cache_data['INTERNAL_CYPHT_USE']['SORT_BY_FETCH'];
+            }
+        }
+        return false;
+    }
+
+    /**
      * update the cache untagged QRESYNC FETCH responses
      * @param array $data low level parsed IMAP response segment
      * @return int 1 if the cache was updated
@@ -272,6 +289,12 @@ class Hm_IMAP_Cache extends Hm_IMAP_Parser {
                             if (!preg_match("/^UID FETCH/", $command)) {
                                 unset($this->cache_data[$type][$command]);
                                 $this->debug[] = 'Partial cache flush: '.$command;
+                            }
+                            if ($this->get_fetch_command()) {
+                                if (mb_strstr($command, $this->get_fetch_command())){
+                                    unset($this->cache_data[$type][$command]);
+                                    $this->debug[] = 'Partial cache flush: '.$command;
+                                }
                             }
                         }
                     }

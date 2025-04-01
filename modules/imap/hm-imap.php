@@ -1653,6 +1653,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command = $command1.$command2;
             $cache_command = $command.(string)$reverse;
+            $this->set_fetch_command($cache_command);
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
                 return $cache;
