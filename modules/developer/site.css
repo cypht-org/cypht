@@ -1,6 +1,13 @@
-.hmod_val, .omod_val, .hmod, .omod { color: #666; display: none; padding: 4px; padding-left: 60px; }
-.config_map_page { color: #666; font-size: 110%; cursor: pointer; padding-top: 20px; padding-left: 40px; }
-.config_map { margin-left: 40px; min-width: 400px; }
-.config_map th {border-bottom: solid 1px #eee; padding-left: 20px;  display: none; padding-top: 10px; color: #666; font-size: 90%; text-align: left; }
-.config_map th { padding-left: 60px; }
-.config_map img { width: 16px; height: 16px; opacity: .6 }
+.hmod_val, .omod_val, .hmod, .omod { color: #666; display: none; padding: 4px; padding-left: 40px; }
+.config_map_page { color: #666; font-size: 110%; cursor: pointer; padding-top: 15px; padding-left: 30px; }
+.config_map { word-wrap: break-word; margin-left: 30px; min-width: 400px; max-width: 90vw; table-layout: fixed; }
+.config_map th { border-bottom: solid 1px #eee; padding-left: 20px; display: none; padding-top: 8px; color: #666; font-size: 90%; text-align: left; }
+.config_map th { padding-left: 40px;}
+.config_map img { width: 16px; height: 16px; opacity: 0.6; }
+@media (max-width: 768px) {
+    .config_map { max-width: 100%; margin-left: 10px; }
+    .config_map_page { font-size: 100%; padding-left: 20px; padding-top: 10px; }
+    .hmod, .omod, .hmod_val, .omod_val { padding-left: 20px; font-size: 90%; }
+    .config_map th { font-size: 85%; padding-left: 20px; }}
+@media (max-width: 480px) { .config_map_page { font-size: 95%; padding-left: 15px; padding-top: 8px; }
+    .hmod, .omod, .hmod_val, .omod_val { font-size: 85%; padding-left: 15px; }}
