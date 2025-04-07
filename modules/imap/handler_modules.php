@@ -1917,13 +1917,13 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 
                 $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
+                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
                 if ($mailbox) {
                     if ($mailbox->authed()) {
-                        Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
+                        Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $imap_details['user']));
                     }
                     else {
-                        Hm_Msgs::add(sprintf("Failed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']), "danger");
+                        Hm_Msgs::add(sprintf("Failed to authenticate to the %s server : %s", $mailbox->server_type(), $imap_details['user']), "danger");
                     }
                 }
                 else {

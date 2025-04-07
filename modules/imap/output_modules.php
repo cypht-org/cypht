@@ -840,7 +840,10 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
         $res = '';
         $capabilities = $this->get('sieve_server_capabilities', array());
         if ($capabilities) {
-            $res .= '<span class="sieve_extensions">'.implode(', ', $capabilities).'</span>';
+            foreach ($capabilities as $key => $val) {
+                $capabilities[$key] = $key . ': ' . (is_array($val) ? implode(', ', $val) : $val);
+            }
+            $res .= '<span class="sieve_extensions">' . implode(', ', $capabilities) . '</span>';
         }
         $this->out('sieve_detail_display', $res);
         $res = '';

@@ -261,7 +261,7 @@ class Hm_Mailbox {
      */
     public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=50, $keyword=false, $trusted_senders=[], $include_preview = false) {
         if (! $this->select_folder($folder)) {
-            return;
+            return [0, []];
         }
         if ($this->is_imap()) {
             $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview);
