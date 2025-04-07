@@ -141,7 +141,8 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 if (!is_dir($file_dir)) {
                     mkdir($file_dir);
                 }
-                $name = $msg_header['Subject'] . '.eml';
+                $basename = str_replace(',', '', $msg_header['Subject']);
+                $name = $basename. '.eml';
                 $file_path = $file_dir . $name;
                 $attached_files[$this->request->get['uid']][] = array(
                     'name' => $name,
@@ -149,7 +150,7 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                     'size' => strlen($content),
                     'tmp_name' => $file_path,
                     'filename' => $file_path,
-                    'basename' => $msg_header['Subject']
+                    'basename' => $basename
                 );
                 $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
                 file_put_contents($file_path, $content);
