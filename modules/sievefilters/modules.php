@@ -1373,31 +1373,32 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
 }
 class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
     public function process() {
-        list($success, $form) = $this->process_form(array('imap_server_id'));
-        if (!$success) {
-            return;
-        }
-
-        Hm_IMAP_List::init($this->user_config, $this->session);
-        $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
-        
-        $factory = get_sieve_client_factory($this->config);
-        try {
-            $client = $factory->init($this->user_config, $imap_account);
-
-            $blocked_senders = [];
-            $current_script = $client->getScript('blocked_senders');
-            if ($current_script != '') {
-                $blocked_list = prepare_sieve_script ($current_script);
-                foreach ($blocked_list as $blocked_sender) {
-                    $blocked_senders[] = $blocked_sender;
-                }
+        if($this->module_is_supported('sievefilters')  && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)){
+            list($success, $form) = $this->process_form(array('imap_server_id'));
+            if (!$success) {
+                return;
             }
-            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
-                        
-        } catch (Exception $e) {
-            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
-            return;
+    
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
+            $factory = get_sieve_client_factory($this->config);
+            try {
+                $client = $factory->init($this->user_config, $imap_account);
+    
+                $blocked_senders = [];
+                $current_script = $client->getScript('blocked_senders');
+                if ($current_script != '') {
+                    $blocked_list = prepare_sieve_script ($current_script);
+                    foreach ($blocked_list as $blocked_sender) {
+                        $blocked_senders[] = $blocked_sender;
+                    }
+                }
+                $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
+                            
+            } catch (Exception $e) {
+                Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+                return;
+            }
         }
     }
 }
