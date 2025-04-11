@@ -426,7 +426,7 @@ return array(
     'Added SMTP server!' => '请添加 SMTP 服务器',
     'Added repository' => '添加存储库',
     'Added server!' => '请添加服务器！',
-    'Are you sure?' => '确定吗?',
+    'Are you sure you want to delete this server?' => '确定吗?',
     'Could not find that repository/owner combination at github.com' => '无法在 Github 查找到用户名的相关仓库',
     'Disable prompts when deleting' => '删除前无需确认',
     'Enable keyboard shortcuts' => '启用键盘快捷键',

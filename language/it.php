@@ -408,7 +408,7 @@ return array(
     'Added SMTP server!' => 'Server SMTP aggiunto!',
     'Added repository' => 'Repository aggiunto',
     'Added server!' => 'Server aggiunto!',
-    'Are you sure?' => 'Sei sicuro?',
+    'Are you sure you want to delete this server?' => 'Sei sicuro?',
     'Could not find that repository/owner combination at github.com' => 'Impossibile trovare quella combinazione repository/proprietario su github.com',
     'Disable prompts when deleting' => 'Disabilita le richieste durante l\'eliminazione',
     'Enable keyboard shortcuts' => 'Abilita scorciatoie da tastiera',
