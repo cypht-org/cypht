@@ -412,7 +412,7 @@ return array(
     'Added SMTP server!' => 'Lisasin SMTP serveri!',
     'Added repository' => 'Lisasin repositooriumi',
     'Added server!' => 'Lisasin serveri!',
-    'Are you sure?' => 'Kas oled kindel?',
+    'Are you sure you want to delete this server?' => 'Kas oled kindel?',
     'Could not find that repository/owner combination at github.com' => 'Ei leidnud github.com saidist seda repositooriumi/omaniku kombinatsiooni',
     'Disable prompts when deleting' => 'Kustutamisel ära küsi mult üle kas soovin kustutada',
     'Enable keyboard shortcuts' => 'Kasuta kiirklahve',
