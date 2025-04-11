@@ -411,7 +411,7 @@ return array(
     'Added SMTP server!' => 'SMTP server əlavə edilmişdir!',
     'Added repository' => 'Anbar əlavə edilmişdir',
     'Added server!' => 'Server əlavə edilmişdir',
-    'Are you sure?' => 'Siz əminsiniz?',
+    'Are you sure you wanto to delete this server? ' => 'Siz əminsiniz?',
     'Could not find that repository/owner combination at github.com' => 'Github.com-da kombinasiya anbar/sahib tapılmamışdır',
     'Disable prompts when deleting' => 'Silinmə vaxtı sorğunu kəsmək',
     'Enable keyboard shortcuts' => 'Qaynar klavişləri qoşmaq',
