@@ -122,6 +122,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                     }, $msgText);
                 }
 
+                $msgText = sanitize_email_html($msgText);
                 $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
@@ -1471,6 +1472,71 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
         $res = '<tr class="general_setting"><td><label for="move_messages_in_screen_email">'.
             $this->trans('Move all messages in Screen Email folder if dislike email').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></td></tr>';
 
+        return $res;
+    }
+}
+
+
+class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "";
+        if (array_key_exists('active_preview_message', $settings) && $settings['active_preview_message']) {
+            if ($settings['active_preview_message']) {
+                $checked = "checked";
+            }
+        }
+        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $ceo_use_detect_ceo_fraud = "";
+        $ceo_use_trusted_contact = "checked";
+        $ceo_suspicious_terms = "wire transfer, urgent, account details, payment instruction";
+        $ceo_rate_limit = "100";
+        if (array_key_exists('ceo_use_detect_ceo_fraud', $settings)) {
+            if ($settings['ceo_use_detect_ceo_fraud']) {
+                $ceo_use_detect_ceo_fraud = "checked";
+            } else {
+                $ceo_use_detect_ceo_fraud = "";
+            }
+        }
+
+        if (array_key_exists('ceo_use_trusted_contact', $settings)) {
+            if ($settings['ceo_use_trusted_contact']) {
+                $ceo_use_trusted_contact = "checked";
+            } else {
+                $ceo_use_trusted_contact = "";
+            }
+        }
+
+        if (array_key_exists('ceo_suspicious_terms', $settings) && $settings['ceo_suspicious_terms']) {
+            if ($settings['ceo_suspicious_terms']) {
+                $ceo_suspicious_terms = $settings['ceo_suspicious_terms'];
+            }
+        }
+        if (array_key_exists('ceo_rate_limit', $settings) && $settings['ceo_rate_limit']) {
+            if ($settings['ceo_rate_limit']) {
+                $ceo_rate_limit = $settings['ceo_rate_limit'];
+            }
+        }
+
+        $res = '<tr class="general_setting"><td><label for="ceo_use_detect_ceo_fraud">'.
+            $this->trans('CEO fraud: Use Detect CEO Fraud').
+            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></td></tr>';
+        $res .= '<tr class="general_setting"><td><label for="ceo_use_trusted_contact">'.
+            $this->trans('CEO fraud: Use Trusted Contacts as Valid emails ').
+            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_trusted_contact" name="ceo_use_trusted_contact" '. $ceo_use_trusted_contact .' ></td></tr>';
+        $res .= '<tr class="general_setting"><td><label for="ceo_suspicious_terms">'.
+            $this->trans('CEO fraud: Suspicious Phrases or Requests(separate by ",")').
+            '</label></td><td><textarea class="form-control form-control-sm w-auto" role="switch" id="ceo_suspicious_terms" name="ceo_suspicious_terms">'. $ceo_suspicious_terms .'</textarea></td></tr>';
+        $res .= '<tr class="general_setting"><td><label for="ceo_rate_limit">'.
+            $this->trans('CEO fraud: Rate-Limit or Monitor Unusual Requests').
+            '</label></td><td><input class="form-control form-control-sm w-auto" type="number" min="0" role="switch" id="ceo_rate_limit" name="ceo_rate_limit" value="'. $ceo_rate_limit .'" ></td></tr>';
         return $res;
     }
 }
