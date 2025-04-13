@@ -87,7 +87,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
                     $path = sprintf('?page=message_list&list_path=%s&screen_emails=1', $this->html_safe($this->get('list_path')));
                     $custom .= '<a title="'.sprintf($this->trans('Screen %s first emails'), $this->get('first_time_screen_emails')).
                     '" href="'. $path .'"><i class="bi bi-hand-thumbs-up-fill"></i></a>';
-                }                
+                }
             }
             $this->out('custom_list_controls', $custom);
         }
@@ -122,6 +122,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                     }, $msgText);
                 }
 
+                $msgText = sanitize_email_html($msgText);
                 $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
