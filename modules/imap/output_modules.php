@@ -126,6 +126,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                     }
                 }
 
+                $msgText = sanitize_email_html($msgText);
                 $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
@@ -1677,7 +1678,7 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
                 $ceo_rate_limit = $settings['ceo_rate_limit'];
             }
         }
-        
+
         $res = '<tr class="general_setting"><td><label for="ceo_use_detect_ceo_fraud">'.
             $this->trans('CEO fraud: Use Detect CEO Fraud').
             '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></td></tr>';
