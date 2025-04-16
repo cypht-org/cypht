@@ -76,6 +76,17 @@ function format_msg_text($str, $output_mod, $links=true) {
 }}
 
 /**
+ * Strip DNS prefetch tags from HTML
+ * @subpackage core/functions
+ * @param string $html HTML content
+ * @return string
+ */
+if (!hm_exists('strip_dns_prefetch_tags')) {
+function strip_dns_prefetch_tags($html) {
+    return preg_replace('/<link\s+[^>]*rel=["\']dns-prefetch["\'][^>]*>/i', '', $html);
+}}
+
+/**
  * Format reply text
  * @subpackage core/functions
  * @param string $txt message text
@@ -119,7 +130,7 @@ function reply_to_address($headers, $type) {
         return $msg_to;
     }
     foreach (array('reply-to', 'from', 'sender', 'return-path') as $fld) {
-        if (array_key_exists($fld, $headers)) { 
+        if (array_key_exists($fld, $headers)) {
             list($parsed, $msg_to) = format_reply_address($headers[$fld], $parsed);
             if ($msg_to) {
                 break;
@@ -485,7 +496,7 @@ function addr_split($str, $seps = array(',', ';')) {
         elseif (!$capture && in_array($str[$i], array_keys($capture_chars))) {
             $capture = $str[$i];
         }
-        
+
         if (!$capture && in_array($str[$i], $seps)) {
             $words[] = trim($word);
             $word = '';
