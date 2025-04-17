@@ -141,6 +141,13 @@ class Hm_Mailbox {
         }
         if ($this->is_imap()) {
             $old_folder = prep_folder_name($this->connection, $folder, true);
+            if (! $parent) {
+                $parents = explode(".", $old_folder);
+                $parents = array_slice($parents, 0, -1);
+                if (count($parents))  {
+                    $new_name =  implode(".", $parents) .".". $new_name;
+                }
+            }
             $new_folder = prep_folder_name($this->connection, $new_name, false, $parent);
             return $this->connection->rename_mailbox($old_folder, $new_folder);
         } else {
