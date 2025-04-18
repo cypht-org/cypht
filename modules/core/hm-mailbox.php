@@ -24,6 +24,7 @@ class Hm_Mailbox {
     protected $user_config;
     protected $session;
     protected $config;
+    protected $list_sub_folders = [];
 
     public function __construct($server_id, $user_config, $session, $config) {
         $this->server_id = $server_id;
@@ -164,11 +165,33 @@ class Hm_Mailbox {
             return;
         }
         if ($this->is_imap()) {
-            $del_folder = prep_folder_name($this->connection, $folder, true);
-            return $this->connection->delete_mailbox($del_folder);
+            $parent_folder = prep_folder_name($this->connection, $folder, true);
+            $this->list_sub_folders[] = $parent_folder;
+            $this->get_recursive_subfolders($parent_folder);
+            $this->list_sub_folders = array_reverse($this->list_sub_folders);
+            foreach ($this->list_sub_folders as $key => $del_folder) {
+                $delete_state = $this->connection->delete_mailbox($del_folder);
+                if ($delete_state) {
+                    unset($this->list_sub_folders[$key]);
+                }
+            }
+            if (empty($this->list_sub_folders)) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             $del_folder = decode_folder_str($folder);
             return $this->connection->delete_folder($del_folder);
+        }
+    }
+
+    public function get_recursive_subfolders($parentFolder) {
+        $infoFolder = $this->get_subfolders($parentFolder);
+        if ($infoFolder) {
+            $folder = key($infoFolder);
+            $this->list_sub_folders[] = $folder;
+            $this->get_recursive_subfolders($folder);
         }
     }
 
