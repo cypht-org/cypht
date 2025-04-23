@@ -1,6 +1,6 @@
 <?php
 
-use Services\Core\Commands\Hm_BaseCommand;
+use Services\Core\Commands\BaseCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -8,7 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * TestCommand is a mock command for testing BaseCommand functionalities.
  */
-class Hm_TestCommand extends Hm_BaseCommand
+class Hm_TestCommand extends BaseCommand
 {
     /**
      * The name of the command (e.g., "test:command").

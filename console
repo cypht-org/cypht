@@ -6,7 +6,7 @@
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-list($containerBuilder, $config) = require __DIR__ . '/services/Hm_bootstrap.php';
+list($containerBuilder, $config) = require __DIR__ . '/services/Hbootstrap.php';
 
 $application = new Application('Cypht Console', '1.0');
 
