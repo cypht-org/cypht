@@ -102,6 +102,7 @@ function applyMessagePageHandlers(routeParams) {
     
     switch (path) {
         case 'imap':
+        case 'trac':
             return applyImapMessageContentPageHandlers(routeParams);
         case 'feed':
             return applyFeedMessageContentPageHandlers(routeParams);
