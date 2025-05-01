@@ -308,6 +308,17 @@ class Hm_Mailbox {
         }
     }
 
+    public function get_message_parts_content($folder, $uid_part_map, $structures_map = null) {
+        if (! $this->select_folder($folder)) {
+            return [];
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_message_parts_content($uid_part_map, $structures_map);
+        } else {
+            return [];
+        }
+    }
+
     public function get_structured_message($folder, $msg_id, $part, $text_only) {
         if (! $this->select_folder($folder)) {
             return;
@@ -564,6 +575,17 @@ class Hm_Mailbox {
             return $this->connection->get_message_list($msg_ids);
         } else {
             return $this->connection->get_message_list($msg_ids);
+        }
+    }
+
+    public function get_message_structures($folder, $uids) {
+        if (! $this->select_folder($folder)) {
+            return [];
+        }
+        if ($this->is_imap()) {
+            return $this->connection->get_message_structures($uids);
+        } else {
+            return [];
         }
     }
 

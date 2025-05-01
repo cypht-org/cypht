@@ -157,6 +157,15 @@ add_output('ajax_imap_message_content', 'filter_message_headers', true);
 add_output('ajax_imap_message_content', 'filter_message_body', true);
 add_output('ajax_imap_message_content', 'filter_message_struct', true);
 
+/* ajax message reactions */
+setup_base_ajax_page('ajax_imap_message_reactions', 'core');
+add_handler('ajax_imap_message_reactions', 'load_imap_servers_from_config', true);
+add_handler('ajax_imap_message_reactions', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_message_reactions', 'imap_message_reactions', true);
+add_handler('ajax_imap_message_reactions', 'save_imap_cache', true);
+add_handler('ajax_imap_message_reactions', 'save_imap_servers', true);
+add_handler('ajax_imap_message_reactions', 'close_session_early', true, 'core');
+
 /* ajax sent callback data */
 setup_base_ajax_page('ajax_imap_folder_data', 'core');
 add_handler('ajax_imap_folder_data', 'message_list_type', true, 'core');
@@ -333,6 +342,7 @@ return array(
         'ajax_imap_search',
         'ajax_unread_count',
         'ajax_imap_message_content',
+        'ajax_imap_message_reactions',
         'ajax_imap_save_folder_state',
         'ajax_imap_message_action',
         'ajax_imap_delete_message',
@@ -372,6 +382,7 @@ return array(
         'ajax_imap_folders_permissions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'move_responses' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
         'offsets' => array(FILTER_DEFAULT, false),
+        'reactions' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_get' => array(

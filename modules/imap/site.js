@@ -636,6 +636,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                 $('.msg_text').append(res.msg_headers);
                 $('.msg_text').append(res.msg_text);
                 $('.msg_text').append(res.msg_parts);
+                setup_message_reactions(uid, detail);
                 document.title = $('.header_subject th').text();
                 imap_message_view_finished(uid, detail, listParent);
             }
@@ -644,6 +645,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
                     $(this).attr("href", $(this).data("href"));
                     $(this).removeClass('disabled_link');
                 });
+                setup_message_reactions(uid, detail);
             }
             if (!res.show_pagination_links) {
                 $('.prev, .next').hide();
@@ -680,6 +682,166 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
         );
     }
     return false;
+};
+
+// Save reactions to local storage
+var save_message_reactions = function(uid, reactions) {
+    const key = get_message_reactions_storage_key(uid);
+    Hm_Utils.save_to_local_storage(key, JSON.stringify(reactions));
+};
+
+var get_local_message_reactions = function(uid, path) {
+    if (!uid) {
+        uid = getMessageUidParam();
+    }
+    if (!path) {
+        path = getListPathParam();
+    }
+    return Hm_Utils.get_from_local_storage(get_message_reactions_storage_key(uid));
+};
+
+function get_message_reactions_storage_key(uid) {
+    return uid + '_reactions_' + getListPathParam();
+}
+
+var fetch_message_reactions_and_update = function(uid, detail) {
+    Hm_Ajax.request(
+        [
+            { name: 'hm_ajax_hook', value: 'ajax_imap_message_reactions' },
+            { name: 'imap_msg_uid', value: uid },
+            { name: 'imap_server_id', value: detail.server_id },
+            { name: 'folder', value: detail.folder }
+        ],
+        function(res) {
+            var can_react = true;
+            if (res.reactions && res.reactions.can_react === '0') {
+                can_react = false;
+            }
+            render_message_reactions(uid, detail, res.reactions, can_react);
+            if (res.reactions) {
+                save_message_reactions(uid, res.reactions);
+            }
+        },
+        [],
+        true
+    );
+};
+
+var render_message_reactions = function(uid, detail, reactions, can_react) {
+    var container = $('.msg_text .message-reactions');
+    if (!container.length) {
+        if ($('.msg_text_inner').length) {
+            $('.msg_text_inner').after('<div class="message-reactions"></div>');
+        } else {
+            $('.msg_text').append('<div class="message-reactions"></div>');
+        }
+        container = $('.msg_text .message-reactions');
+    }
+
+    container.empty();
+
+    var reactionList = $('<div class="reactions-list"></div>');
+    if (reactions && reactions.reactions) {
+        Object.keys(reactions.reactions).forEach(function(emoji) {
+            var reaction = reactions.reactions[emoji];
+            var count = reaction.count || '0';
+            var tooltip = '';
+            if (reaction.users && typeof reaction.users === 'object') {
+                var users = Object.values(reaction.users);
+                tooltip = hm_trans('Reacted by: ') + users.join(', ');
+            }
+            var item = $('<div class="reaction-item"></div>')
+                .attr('data-emoji', emoji)
+                .attr('title', tooltip)
+                .append($('<span class="reaction-emoji"></span>').text(emoji))
+                .append($('<span class="reaction-count"></span>').text(count));
+            reactionList.append(item);
+        });
+    }
+    container.append(reactionList);
+
+    var addBtnContainer = $('<div class="add-reaction"></div>');
+    var addBtn = $('<button class="btn btn-sm btn-outline-secondary add-reaction-btn"></button>')
+        .append('<i class="bi bi-emoji-smile"></i> ' + hm_trans('Add reaction'))
+        .prop('disabled', !can_react)
+        .on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!$(this).prop('disabled')) {
+                toggle_emoji_picker(this, uid, detail);
+            }
+        });
+    addBtnContainer.append(addBtn);
+    container.append(addBtnContainer);
+};
+
+var setup_message_reactions = function(uid, detail) {
+    render_message_reactions(uid, detail, null, true);
+
+    var cached = get_local_message_reactions(uid);
+    var cachedData = null;
+    var canReact = true;
+    if (cached) {
+        cachedData = JSON.parse(cached);
+        if (cachedData && cachedData.can_react === '0') {
+            canReact = false;
+        }
+        render_message_reactions(uid, detail, cachedData, canReact);
+    }
+
+    fetch_message_reactions_and_update(uid, detail);
+};
+
+var toggle_emoji_picker = function(button, uid, detail) {
+    var pickerId = 'emoji-picker-container';
+    var existing = $('#' + pickerId);
+    if (existing.length) {
+        const picker = existing.find('em-emoji-picker')[0];
+        if (picker) {
+            picker.remove();
+        }
+        existing.remove();
+        return;
+    }
+
+    var $pickerContainer = $('<div id="' + pickerId + '"></div>');
+    $pickerContainer.css({
+        position: 'absolute',
+        zIndex: 1050
+    });
+    $('body').append($pickerContainer);
+
+    var offset = $(button).offset();
+    $pickerContainer.css({
+        bottom: $(window).height() - offset.top + 5,
+        left: offset.left
+    });
+
+    const picker = new EmojiMart.Picker({
+        onEmojiSelect: (emoji) => {
+            send_reaction(emoji, uid, detail);
+            picker.remove();
+            $pickerContainer.remove();
+        },
+        onClickOutside: () => {
+            const picker = $pickerContainer.find('em-emoji-picker')[0];
+            if (picker) {
+                picker.remove();
+            }
+            $pickerContainer.remove();
+        },
+        locale: window.hm_current_lang,
+        theme: window.hm_theme_mode || 'light'
+    });
+
+    $pickerContainer.append(picker);
+
+    $pickerContainer.on('remove', function() {
+        const picker = $(this).find('em-emoji-picker')[0];
+        if (picker) {
+            picker.remove();
+        }
+    });
 };
 
 var imap_mark_as_read = function(uid, detail) {

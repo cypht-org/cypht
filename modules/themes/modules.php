@@ -25,8 +25,14 @@ class Hm_Handler_load_theme  extends Hm_Handler_Module
         if ($theme == 'hn') {
             $this->user_config->set('list_style', 'news_style');
         }
+
+        // Determine theme mode
+        $dark_themes = ['cyborg', 'darkly', 'slate', 'solar', 'superhero', 'vapor'];
+        $theme_mode = in_array($theme, $dark_themes) ? 'dark' : 'light';
+
         $this->out('themes', $themes);
         $this->out('theme', $theme);
+        $this->out('theme_mode', $theme_mode);
     }
 }
 
@@ -65,7 +71,15 @@ class Hm_Output_theme_css extends Hm_Output_Module
     {
         if ($this->get('theme') && in_array($this->get('theme'), array_keys($this->get('themes', array())), true)) {
             $theme_name = $this->html_safe($this->get('theme'));
-            return '<link href="' . ASSETS_THEMES_ROOT . 'modules/themes/assets/' . $theme_name . '/css/' . $theme_name . '.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+            $theme_mode = $this->get('theme_mode', 'light');
+
+            $css = '<link href="' . ASSETS_THEMES_ROOT . 'modules/themes/assets/' . $theme_name . '/css/' . $theme_name . '.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+
+            // Add emoji picker theme CSS based on dark/light mode
+            if ($theme_mode === 'dark') {
+                $css .= '<link href="' . ASSETS_THEMES_ROOT . 'modules/themes/assets/reactions-dark.css?v=' . CACHE_ID . '" media="all" rel="stylesheet" type="text/css" />';
+            }
+            return $css;
         }
     }
 }
