@@ -289,4 +289,27 @@ function bindFoldersEventHandlers() {
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
     $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
     $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
+    // $(function() {
+    //     load_folders_based_on_profiles()
+    // });
 }
+
+
+var load_folders_based_on_profiles = () => {
+    // window.addEventListener('DOMContentLoaded', () => {
+    //     const select = document.getElementById('imap_server_folder');
+    //     if (select) {
+    //         const form = $('#imap_server_folder').closest('form')
+    //         if(form) {
+    //             const autoSubmit = form.data('autoSubmit');
+    //             console.log(autoSubmit)
+    //             if (autoSubmit && autoSubmit === "1") {
+    //                 alert('hello');
+    //                 form.submit();
+    //             }
+    //         }
+    //     }
+    // });
+}
+
+// load_folders_based_on_profiles()
