@@ -408,7 +408,7 @@ return array(
     'Added SMTP server!' => false,
     'Added repository' => false,
     'Added server!' => false,
-    'Are you sure?' => false,
+    'Are you sure you want to delete this server?' => false,
     'Could not find that repository/owner combination at github.com' => false,
     'Disable prompts when deleting' => false,
     'Enable keyboard shortcuts' => false,

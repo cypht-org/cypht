@@ -408,7 +408,7 @@ return array(
     'Added SMTP server!' => 'SMTP kiszolgáló hozzáadva!',
     'Added repository' => 'Tároló hozzáadva',
     'Added server!' => 'Kiszolgáló hozzáadva!',
-    'Are you sure?' => 'Biztos benne?',
+    'Are you sure you want to delete this server?' => 'Biztos benne?',
     'Could not find that repository/owner combination at github.com' => 'Nem található az a tároló/tulajdonos a github.com-on',
     'Disable prompts when deleting' => 'Kérdések letiltása törléskor',
     'Enable keyboard shortcuts' => 'Gyorsbillentyűk engedélyezése',

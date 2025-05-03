@@ -151,7 +151,7 @@ class Hm_EWS {
             } else {
                 $result = $this->api->getFolderByDisplayName($folder, Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
                 if (! $result) {
-                    throw new Exception('Folder not found.');
+                    throw new Exception('Folder '. $folder .' not found.');
                 }
             }
             return [

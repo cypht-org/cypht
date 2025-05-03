@@ -635,7 +635,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };';
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure you want to delete this server? ').'"); };';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
@@ -1318,7 +1318,9 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg"></a>';
+        $theme = $this->get('theme');
+        $logo = $theme === 'darkly' ? 'modules/core/assets/images/logo.svg' : 'modules/core/assets/images/logo_dark.svg' ;
+        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
         $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
