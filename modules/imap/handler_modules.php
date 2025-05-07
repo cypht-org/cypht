@@ -1463,7 +1463,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'type' => 'jmap',
                     'port' => false,
                     'tls' => false));
-                Hm_Msgs::add('Added server!');
+                Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
