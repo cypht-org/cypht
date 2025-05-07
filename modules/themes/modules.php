@@ -92,7 +92,7 @@ class Hm_Output_theme_setting extends Hm_Output_Module
             if ($name == $current) {
                 $res .= 'selected="selected" ';
                 if ($name != 'default') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="' . $this->html_safe($name) . '">' . $this->trans($label) . '</option>';
