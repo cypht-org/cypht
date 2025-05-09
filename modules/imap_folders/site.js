@@ -9,6 +9,7 @@ var folder_page_folder_list = function (container, title, link_class, target, id
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
+    var child_link_target =  folder_location.find('a.'+link_class).data('target')
     $('.' + link_class, folder_location).on("click", function () { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
     $('a', folder_location).not('.' + link_class).not('.close').off('click');
     $('a', folder_location).not('.' + link_class).not('.close').on("click", function () { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
@@ -19,6 +20,7 @@ var folder_page_folder_list = function (container, title, link_class, target, id
         $('#' + id_dest).val('');
         return false;
     });
+    expand_folders_page_list(child_link_target, container, link_class, target, id_dest, subscription);
     return false;
 };
 
