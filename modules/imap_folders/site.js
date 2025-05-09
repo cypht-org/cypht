@@ -19,6 +19,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
         $('#'+id_dest).val('');
         return false;
     });
+    expand_folders_page_list(child_link_target, container, link_class, target, id_dest, subscription, original_icon_clone, link);
     return false;
 };
 
@@ -46,6 +47,15 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                         $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
                         if (lsub) {
                             $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
+                        }
+                    }
+                    if(original_icon != null) {
+                        // 5. Restore the icon by removing the spinner element
+                        const spinner_element = document.getElementById('imap-spinner');
+                        if (spinner_element && spinner_element.parentNode === parent_icon_link) {
+                            if(parent_icon_link != null) {
+                                parent_icon_link.replaceChild(original_icon, spinner_element);
+                            }
                         }
                     }
                 }
