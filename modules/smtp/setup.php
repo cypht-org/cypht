@@ -119,6 +119,14 @@ add_handler('ajax_re_schedule_message_sending', 're_schedule_message_sending', t
 
 add_output('message_list', 'scheduled_send_msg_control', true, 'smtp', 'imap_custom_controls', 'after');
 
+/* ajax message reactions */
+setup_base_ajax_page('ajax_send_message_reaction', 'core');
+add_handler('ajax_send_message_reaction', 'login', false, 'core');
+add_handler('ajax_send_message_reaction', 'load_user_data', true, 'core');
+add_handler('ajax_send_message_reaction', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_send_message_reaction', 'compose_profile_data', true, 'profiles', 'load_imap_servers_from_config', 'after');
+add_handler('ajax_send_message_reaction', 'send_message_reaction', true, 'smtp', 'compose_profile_data', 'after');
+
 return array(
     'allowed_pages' => array(
         'ajax_clear_attachment_chunks',
@@ -130,7 +138,8 @@ return array(
         'ajax_get_test_chunk',
         'ajax_upload_chunk',
         'ajax_send_scheduled_messages',
-        'ajax_re_schedule_message_sending'
+        'ajax_re_schedule_message_sending',
+        'ajax_send_message_reaction',
     ),
     'allowed_get' => array(
         'imap_draft' => FILTER_VALIDATE_INT,
@@ -212,5 +221,6 @@ return array(
         'schedule' => FILTER_DEFAULT,
         'schedule_date' => FILTER_DEFAULT,
         'scheduled_msg_ids' => FILTER_DEFAULT,
+        'reaction' => FILTER_DEFAULT,
     )
 );

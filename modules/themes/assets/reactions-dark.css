@@ -1,0 +1,15 @@
+.message-reactions {
+  border-top: 1px solid #444 !important;
+}
+
+.reaction-item {
+  background: #4f4f4f69 !important;
+}
+
+.reaction-item:hover {
+  background: #4f4f4f9a !important;
+}
+
+.reaction-count {
+  color: #adb5bd !important;
+}

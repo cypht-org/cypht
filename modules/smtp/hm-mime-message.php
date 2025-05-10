@@ -280,3 +280,105 @@ class Hm_MIME_Msg {
         return str_replace('.', '=2E', quoted_printable_encode($string));
     }
 }
+
+/**
+ * Build a MIME message for Email Reactions
+ * @subpackage smtp/lib
+ */
+class Hm_Reaction_MIME_Msg {
+    private $headers = array('X-Mailer' => 'Cypht', 'MIME-Version' => '1.0');
+    private $boundary = '';
+    private $body = '';
+
+    /* build reaction mime message data */
+    function __construct($from_address, $from_name, $to_address, $subject, $reaction_content, $emoji_char, $original_message_data) {
+        $this->boundary = str_replace(array('=', '/', '+'), '', Hm_Crypt::unique_id(48));
+
+        $formatted_to = $this->format_address_field($to_address);
+        $formatted_from = $from_address;
+        if ($from_name) {
+            $formatted_from = '"' . mb_encode_mimeheader(str_replace('"', '', $from_name), 'UTF-8', 'Q') . '" <' . $from_address . '>';
+        }
+
+        $fallback_text = 'Reacted with ' . $emoji_char;
+        $fallback_html = '<p>' . htmlspecialchars($fallback_text, ENT_QUOTES, 'UTF-8') . '</p>';
+        $encoded_reaction_json = $this->qp_encode($reaction_content);
+        $encoded_fallback_text = $this->qp_encode($fallback_text);
+        $encoded_fallback_html = $this->qp_encode($fallback_html);
+
+        $encoded_subject = mb_encode_mimeheader($subject, 'UTF-8', 'B');
+
+        $in_reply_to_header = '';
+        $references_header = '';
+        if (!empty($original_message_data['message_id'])) {
+            $in_reply_to_header = '<' . $original_message_data['message_id'] . '>';
+            $references_header = $in_reply_to_header;
+            if (!empty($original_message_data['references'])) {
+                $ref_parts = preg_split('/\s+/', trim($original_message_data['references']));
+                $ref_parts[] = $in_reply_to_header;
+                $references_header = implode(' ', array_unique($ref_parts));
+            }
+        }
+
+        $this->headers['Date'] = date('r');
+        $this->headers['Message-Id'] = '<' . md5(uniqid(rand(), 1)) . '@' . php_uname('n') . '>';
+        $this->headers['Subject'] = $encoded_subject;
+        $this->headers['From'] = $formatted_from;
+        $this->headers['To'] = $formatted_to;
+        if ($in_reply_to_header) {
+            $this->headers['In-Reply-To'] = $in_reply_to_header;
+            $this->headers['References'] = $references_header;
+        }
+        $this->headers['Content-Type'] = 'multipart/alternative; boundary="' . $this->boundary . '"';
+
+        $this->body = $this->build_mime_body_parts($encoded_fallback_text, $encoded_reaction_json, $encoded_fallback_html);
+    }
+
+    /* output mime message */
+    function get_mime_msg() {
+        $header_string = '';
+        foreach ($this->headers as $name => $value) {
+            if (!trim($value)) {
+                continue;
+            }
+            $header_string .= sprintf("%s: %s\r\n", $name, $value);
+        }
+        return $header_string . "\r\n" . $this->body;
+    }
+
+    /* get recipient addresses */
+    function get_recipient_addresses() {
+        return Hm_MIME_Msg::find_addresses($this->headers['To']);
+    }
+
+    /* build multipart body */
+    private function build_mime_body_parts($fallback_text, $reaction_json, $fallback_html) {
+        $body = '--' . $this->boundary . "\r\n";
+        $body .= "Content-Type: text/plain; charset=utf-8\r\n";
+        $body .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $body .= $fallback_text . "\r\n\r\n";
+
+        $body .= '--' . $this->boundary . "\r\n";
+        $body .= "Content-Type: text/vnd.google.email-reaction+json; charset=utf-8\r\n";
+        $body .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $body .= $reaction_json . "\r\n\r\n";
+
+        $body .= '--' . $this->boundary . "\r\n";
+        $body .= "Content-Type: text/html; charset=utf-8\r\n";
+        $body .= "Content-Transfer-Encoding: quoted-printable\r\n\r\n";
+        $body .= $fallback_html . "\r\n\r\n";
+
+        $body .= '--' . $this->boundary . "--\r\n";
+        return $body;
+    }
+
+    /* encode quoted-printable */
+    private function qp_encode($string) {
+        return str_replace('.', '=2E', quoted_printable_encode($string));
+    }
+
+    /* format email address field */
+    private function format_address_field($address_string) {
+        return $address_string;
+    }
+}

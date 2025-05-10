@@ -2498,3 +2498,19 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
         $this->out('formatted_message_list', $messageList);
     }
 }
+
+/**
+ * Output emoji picker theme data
+ * @subpackage core/output
+ */
+class Hm_Output_theme_mode extends Hm_Output_Module {
+    /**
+     * Add emoji picker theme data to the page as a JS variable
+     */
+    protected function output() {
+        $theme_mode = $this->get('theme_mode', 'light');
+        return '<script type="text/javascript">
+            var hm_theme_mode = "' . $theme_mode . '";
+        </script>';
+    }
+}
