@@ -715,7 +715,7 @@ class Hm_Output_start_page_setting extends Hm_Output_Module {
             if ($start_page == $val) {
                 $res .= 'selected="selected" ';
                 if ($start_page != DEFAULT_START_PAGE) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -752,7 +752,7 @@ class Hm_Output_default_sort_order_setting extends Hm_Output_Module {
             if ($default_sort_order == $val) {
                 $res .= 'selected="selected" ';
                 if ($default_sort_order != 'arrival') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -789,7 +789,7 @@ class Hm_Output_list_style_setting extends Hm_Output_Module {
             if ($list_style == $val) {
                 $res .= 'selected="selected" ';
                 if ($list_style != DEFAULT_LIST_STYLE) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$val.'">'.$this->trans($label).'</option>';
@@ -807,7 +807,7 @@ class Hm_Output_mailto_handler_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('mailto_handler', $settings) && $settings['mailto_handler']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -826,7 +826,7 @@ class Hm_Output_no_folder_icon_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('no_folder_icons', $settings) && $settings['no_folder_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -851,7 +851,7 @@ class Hm_Output_no_password_setting extends Hm_Output_Module {
             $checked = '';
         }
         if(isset($settings['no_password_save']) && $settings['no_password_save'] !== DEFAULT_NO_PASSWORD_SAVE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="no_password_save">'.$this->trans('Don\'t save account passwords between logins').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="no_password_save" name="no_password_save" data-default-value="'.(DEFAULT_NO_PASSWORD_SAVE ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
@@ -865,7 +865,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
         $reset = '';
-        $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         if (array_key_exists('disable_delete_prompt', $settings) && $settings['disable_delete_prompt']) {
             $checked = ' checked="checked"';
         }
@@ -873,7 +873,7 @@ class Hm_Output_delete_prompt_setting extends Hm_Output_Module {
             $checked = '';
         }
         if(isset($settings['disable_delete_prompt']) && $settings['disable_delete_prompt'] !== DEFAULT_DISABLE_DELETE_PROMPT) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="disable_delete_prompt">'.$this->trans('Disable prompts when deleting').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="disable_delete_prompt" name="disable_delete_prompt" data-default-value="'.(DEFAULT_DISABLE_DELETE_PROMPT ? 'true' : 'false') . '" />'.$reset.'</td></tr>';
@@ -892,7 +892,7 @@ class Hm_Output_delete_attachment_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="allow_delete_attachment">'.$this->trans('Allow delete attachment').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' value="1" id="allow_delete_attachment" name="allow_delete_attachment" data-default-value="false" />'.$reset.'</td></tr>';
@@ -1000,7 +1000,7 @@ class Hm_Output_unread_source_max_setting extends Hm_Output_Module {
             $sources = $settings['unread_per_source'];
         }
         if ($sources != DEFAULT_UNREAD_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="unread_setting"><td><label for="unread_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1044,7 +1044,7 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
             $sources = $settings['flagged_per_source'];
         }
         if ($sources != DEFAULT_FLAGGED_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="flagged_setting"><td><label for="flagged_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1091,7 +1091,7 @@ class Hm_Output_all_email_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_email_per_source'];
         }
         if ($sources != DEFAULT_ALL_EMAIL_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="email_setting"><td><label for="all_email_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1115,7 +1115,7 @@ class Hm_Output_all_source_max_setting extends Hm_Output_Module {
             $sources = $settings['all_per_source'];
         }
         if ($sources != DEFAULT_ALL_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="all_setting"><td><label for="all_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1191,7 +1191,7 @@ class Hm_Output_language_setting extends Hm_Output_Module {
             if ($id == $mylang) {
                 $res .= 'selected="selected" ';
                 if ($id != 'en') {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
                 }
             }
             $res .= 'value="'.$id.'">'.$lang.'</option>';
@@ -1226,7 +1226,7 @@ class Hm_Output_timezone_setting extends Hm_Output_Module {
             if ($zone == $myzone) {
                 $res .= 'selected="selected" ';
                 if ($zone != $this->get('default_timezone','UTC')) {
-                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_timezone"></i></span>';
+                    $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_timezone"></i></span>';
                 }
             }
             $res .= 'value="'.$zone.'">'.$zone.'</option>';
@@ -1247,7 +1247,7 @@ class Hm_Output_msg_list_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('show_list_icons', $settings) && $settings['show_list_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="show_list_icons">'.
             $this->trans('Show icons in message lists').'</label></td>'.
@@ -2048,7 +2048,7 @@ class Hm_Output_junk_source_max_setting extends Hm_Output_Module {
             $sources = $settings['junk_per_source'];
         }
         if ($sources != DEFAULT_JUNK_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="junk_setting"><td><label for="junk_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2107,7 +2107,7 @@ class Hm_Output_trash_source_max_setting extends Hm_Output_Module {
             $sources = $settings['trash_per_source'];
         }
         if ($sources != DEFAULT_TRASH_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="trash_setting"><td><label for="trash_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2164,7 +2164,7 @@ class Hm_Output_snoozed_source_max_setting extends Hm_Output_Module {
             $sources = $settings['snoozed_per_source'];
         }
         if ($sources != DEFAULT_SNOOZED_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="snoozed_setting"><td><label for="snoozed_per_source">'.
             $this->trans('Max messages per source for Snoozed').'</label></td>' .
@@ -2221,7 +2221,7 @@ class Hm_Output_drafts_source_max_setting extends Hm_Output_Module {
             $sources = $settings['drafts_per_source'];
         }
         if ($sources != DEFAULT_DRAFT_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="drafts_setting"><td><label for="drafts_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -2260,7 +2260,7 @@ class Hm_Output_warn_for_unsaved_changes_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('warn_for_unsaved_changes', $settings) && $settings['warn_for_unsaved_changes']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="warn_for_unsaved_changes">'.
             $this->trans('Warn for unsaved changes').'</label></td>'.

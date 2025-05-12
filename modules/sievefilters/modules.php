@@ -1287,7 +1287,7 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
         }
         
         if($settings['enable_sieve_filter'] != DEFAULT_ENABLE_SIEVE_FILTER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }else {
             $reset = '';
         }
