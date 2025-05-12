@@ -1050,7 +1050,7 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
@@ -1071,7 +1071,7 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['pagination_links'] !== DEFAULT_PAGINATION_LINKS) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
             $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
@@ -1092,7 +1092,7 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         if (!array_key_exists('auto_advance_email', $settings) || (array_key_exists('auto_advance_email', $settings) && $settings['auto_advance_email'])) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
             $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
@@ -1128,7 +1128,7 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
             $per_page = $settings['imap_per_page'];
         }
         if ($per_page != DEFAULT_IMAP_PER_PAGE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
             $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
@@ -1149,7 +1149,7 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
             $max_google_contacts_number = $settings['max_google_contacts_number'];
         }
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
             $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
@@ -1168,7 +1168,7 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('msg_part_icons', $settings) && $settings['msg_part_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
@@ -1189,7 +1189,7 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['text_only'] !== DEFAULT_TEXT_ONLY) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
@@ -1210,7 +1210,7 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
             $sources = $settings['sent_per_source'];
         }
         if ($sources != DEFAULT_SENT_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1229,7 +1229,7 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
@@ -1249,7 +1249,7 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['review_sent_email'] !== DEFAULT_REVIEW_SENT_EMAIL) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
@@ -1575,7 +1575,7 @@ class Hm_Output_first_time_screen_emails_per_page_setting extends Hm_Output_Modu
             $per_page = $settings['first_time_screen_emails'];
         }
         if ($per_page != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="first_time_screen_emails">'.
             $this->trans('First-time screen senders').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.

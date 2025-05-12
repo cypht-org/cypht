@@ -824,7 +824,7 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('only_subscribed_folders', $settings) && $settings['only_subscribed_folders']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.

@@ -467,7 +467,7 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
         if ($val == $since) {
             $res .= ' selected="selected"';
             if ($val != $original_default_value) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
             }
 
         }
