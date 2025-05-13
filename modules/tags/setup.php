@@ -49,14 +49,14 @@ return array(
     'allowed_output' => array(
     ),
     'allowed_post' => array(
-        'tag_name' => FILTER_DEFAULT,
-        'tag_id' => FILTER_DEFAULT,
-        'parent_tag' => FILTER_DEFAULT,
-        'tag_delete' => FILTER_DEFAULT,
+        'tag_name' => FILTER_UNSAFE_RAW,
+        'tag_id' => FILTER_UNSAFE_RAW,
+        'parent_tag' => FILTER_UNSAFE_RAW,
+        'tag_delete' => FILTER_UNSAFE_RAW,
         'tag_per_source' => FILTER_VALIDATE_INT,
-        'tag_since' => FILTER_DEFAULT,
+        'tag_since' => FILTER_UNSAFE_RAW,
     ),
     'allowed_get' => array(
-        'tag_id' => FILTER_DEFAULT,
+        'tag_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );

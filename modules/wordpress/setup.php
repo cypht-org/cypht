@@ -54,11 +54,11 @@ return array(
         'ajax_wp_notice_display',
     ),
     'allowed_post' => array(
-        'wp_disconnect' => FILTER_DEFAULT,
+        'wp_disconnect' => FILTER_UNSAFE_RAW,
         'unread_exclude_wordpress' => FILTER_VALIDATE_INT,
-        'wp_uid' => FILTER_DEFAULT,
+        'wp_uid' => FILTER_UNSAFE_RAW,
         'wordpress_limit' => FILTER_VALIDATE_INT,
-        'wordpress_since' => FILTER_DEFAULT,
+        'wordpress_since' => FILTER_UNSAFE_RAW,
     ),
     'allowed_output' => array(
         'wp_notice_text' => array(FILTER_UNSAFE_RAW, false),
