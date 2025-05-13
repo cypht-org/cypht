@@ -32,4 +32,4 @@ rm -r /var/www
 ln -s $(pwd)/site /var/www
 
 # Start services
-/usr/bin/supervisord -c /etc/supervisord.conf
+exec /usr/bin/supervisord -c /etc/supervisord.conf

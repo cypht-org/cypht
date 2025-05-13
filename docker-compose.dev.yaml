@@ -13,6 +13,7 @@ services:
       - MYSQL_DATABASE=cypht
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
+    stop_grace_period: 30s
   cypht:
     build:
       context: .
@@ -42,3 +43,4 @@ services:
       - USER_CONFIG_TYPE=DB
     extra_hosts:
       host.docker.internal: host-gateway  # for xdebug
+    stop_grace_period: 30s
