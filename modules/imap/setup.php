@@ -375,14 +375,14 @@ return array(
     ),
 
     'allowed_get' => array(
-        'imap_server_id' => FILTER_DEFAULT,
+        'imap_server_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_download_message' => FILTER_VALIDATE_BOOLEAN,
         'imap_remove_attachment' => FILTER_VALIDATE_BOOLEAN,
         'imap_show_message'  => FILTER_VALIDATE_BOOLEAN,
-        'imap_msg_part' => FILTER_DEFAULT,
-        'imap_msg_uid' => FILTER_DEFAULT,
-        'imap_folder' => FILTER_DEFAULT,
-        'offsets' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
+        'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'imap_msg_uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'imap_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'offsets' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
     ),
 
     'allowed_post' => array(

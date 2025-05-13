@@ -30,8 +30,8 @@ return array(
         'delete_id' => FILTER_DEFAULT
     ),
     'allowed_get' => array(
-        'date' => FILTER_DEFAULT,
-        'view' => FILTER_DEFAULT,
-        'action' => FILTER_DEFAULT,
+        'date' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'view' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
 );

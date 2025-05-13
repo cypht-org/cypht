@@ -61,10 +61,10 @@ return array(
         'ajax_nux_add_service',
     ),
     'allowed_get' => array(
-        'code' => FILTER_DEFAULT,
-        'state' => FILTER_DEFAULT,
-        'error' => FILTER_DEFAULT,
-        'security_token' => FILTER_DEFAULT
+        'code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'state' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'error' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'security_token' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),

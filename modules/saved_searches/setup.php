@@ -58,7 +58,7 @@ return array(
         'ajax_update_save_search_label',
     ),
     'allowed_get' => array(
-        'search_name' => FILTER_DEFAULT
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_post' => array(
         'search_name' => FILTER_DEFAULT,

@@ -70,6 +70,6 @@ return array(
         'tag_since' => FILTER_DEFAULT,
     ),
     'allowed_get' => array(
-        'tag_id' => FILTER_DEFAULT,
+        'tag_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );
