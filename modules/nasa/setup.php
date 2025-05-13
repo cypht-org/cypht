@@ -33,7 +33,7 @@ return array(
         'ajax_nasa_disconnect',
     ),
     'allowed_post' => array(
-        'api_key' => FILTER_DEFAULT,
+        'api_key' => FILTER_UNSAFE_RAW,
         'nasa_disconnect' => FILTER_VALIDATE_BOOLEAN,
     ),
     'allowed_get' => array(

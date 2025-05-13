@@ -61,15 +61,15 @@ return array(
         'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_post' => array(
-        'search_name' => FILTER_DEFAULT,
-        'search_terms' => FILTER_DEFAULT,
-        'search_fld' => FILTER_DEFAULT,
-        'search_since' => FILTER_DEFAULT,
-        'search_terms_label' => FILTER_DEFAULT,
-        'old_search_terms_label' => FILTER_DEFAULT
+        'search_name' => FILTER_UNSAFE_RAW,
+        'search_terms' => FILTER_UNSAFE_RAW,
+        'search_fld' => FILTER_UNSAFE_RAW,
+        'search_since' => FILTER_UNSAFE_RAW,
+        'search_terms_label' => FILTER_UNSAFE_RAW,
+        'old_search_terms_label' => FILTER_UNSAFE_RAW
     ),
     'allowed_output' => array(
         'saved_search_result' => array(FILTER_VALIDATE_INT, false),
-        'new_saved_search_label' => array(FILTER_DEFAULT, false),
+        'new_saved_search_label' => array(FILTER_UNSAFE_RAW, false),
     ),
 );
