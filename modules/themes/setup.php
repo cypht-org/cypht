@@ -28,6 +28,6 @@ add_output('settings', 'theme_setting', true, 'feeds', 'language_setting', 'afte
 
 return array(
     'allowed_post' => array(
-        'theme_setting' => FILTER_DEFAULT
+        'theme_setting' => FILTER_UNSAFE_RAW
     )
 );
