@@ -13,8 +13,8 @@ add_handler('process_api_login', 'api_login_step_two', false, 'api_login', 'proc
 return array(
     'allowed_pages' => array('process_api_login'),
     'allowed_post' => array(
-        'hm_session' => FILTER_DEFAULT,
-        'hm_id' => FILTER_DEFAULT,
-        'api_login_key' => FILTER_DEFAULT
+        'hm_session' => FILTER_UNSAFE_RAW,
+        'hm_id' => FILTER_UNSAFE_RAW,
+        'api_login_key' => FILTER_UNSAFE_RAW
     )
 );

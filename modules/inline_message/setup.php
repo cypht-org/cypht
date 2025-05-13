@@ -24,6 +24,6 @@ return array(
     ),
     'allowed_post' => array(
         'inline_message' => FILTER_VALIDATE_INT,
-        'inline_message_style' => FILTER_DEFAULT
+        'inline_message_style' => FILTER_UNSAFE_RAW
     )
 );
