@@ -1405,6 +1405,33 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
     }
 }
 
+class Hm_Handler_check_sieve_configuration extends Hm_Handler_Module {
+    public function process() {
+        if($this->module_is_supported('sievefilters')  && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)){
+            Hm_IMAP_List::init($this->user_config, $this->session);
+            $servers = Hm_IMAP_List::dump();
+            $has_uncomplete_sieve_conf = (bool) array_filter($servers, fn($item) => $item['type'] !== 'ews' && empty($item['sieve_config_host']));
+            if($has_uncomplete_sieve_conf) {
+                $this->out('sieve_alert_message', 'Sieve is enabled but not fully configured on some servers. Please review and save the server configuration to complete setup.');
+            }
+        }
+    }
+}
+
+class Hm_Output_display_sieve_misconfig_alert extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $res = '';
+        $sieve_alert_message = $this->get('sieve_alert_message');
+        if(!empty($sieve_alert_message)) {
+            $res = '<div class="mt-3"><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>'.$this->trans('Alert sieve!').'</strong> '. $sieve_alert_message .'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>';
+        }
+        return $res;
+    }
+}
+
 
 class Hm_Output_list_block_sieve_output extends Hm_Output_Module {
     public function output() {
