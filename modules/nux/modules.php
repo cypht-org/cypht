@@ -579,7 +579,12 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
         $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
         $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
-        $res .= '</div><ul class="mt-4">';
+        $res .= '</div>';
+        $sieve_alert_message = $this->get('sieve_alert_message');
+        if(!empty($sieve_alert_message)) {
+            $res .= '<div class="mt-3"><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>'.$this->trans('Alert sieve!').'</strong> '. $sieve_alert_message .'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>';
+        }
+        $res .= '<ul class="mt-4">';
 
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
