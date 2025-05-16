@@ -284,6 +284,23 @@ if (!hm_exists('get_sieve_client_factory')) {
     }
 }
 
+if (!hm_exists('parse_sieve_config_host')) {
+function parse_sieve_config_host($imap_account) {
+    $host = $imap_account['sieve_config_host'];
+    $url = parse_url($host);
+    if ($url === false) {
+        return $host;
+    }
+    $host = $url['host'] ?? $url['path'];
+    $port = $url['port'] ?? '4190';
+    if (isset($url['scheme'])) {
+        $tls = $url['scheme'] == 'tls';
+    } else {
+        $tls = $imap_account['tls'] ?? true;
+    }
+    return [$host, $port, $tls];
+}}
+
 if (!hm_exists('prepare_sieve_script ')) {
     function prepare_sieve_script ($script, $index = 1, $action = "decode")
     {
@@ -554,6 +571,7 @@ if (!hm_exists('get_sieve_host_from_services')) {
                 return [
                     'host' => $service['sieve']['host'],
                     'port' => $service['sieve']['port'] ?? 4190,
+                    'tls' => $service['sieve']['tls'] ?? true,
                 ];
             }
         }

@@ -211,10 +211,9 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
                         $imap_account = $imap_servers[$form['imap_server_id']];
                         $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
                         if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
+                            $factory = get_sieve_client_factory($this->site_config);
                             try {
-                                $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                                $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
+                                $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
                                 $script_names = array_filter(
                                     $linked_mailboxes,
                                     function ($value) use($old_folder) {
@@ -835,14 +834,12 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
     function get_sieve_linked_mailbox ($imap_account, $module) {
-        if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+        if (! ($module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER))) {
             return;
         }
-        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
-        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
+        $factory = get_sieve_client_factory($site_config);
         try {
-            $tls = isset($imap_account['sieve_tls']) ? $imap_account['sieve_tls'] : false;
-            $client->connect($imap_account['user'], $imap_account['pass'], $tls, "", "PLAIN");
+            $client = $factory->init($module->user_config, $imap_account, $module->module_is_supported('nux'));
             $scripts = $client->listScripts();
             $folders = [];
             foreach ($scripts as $s) {

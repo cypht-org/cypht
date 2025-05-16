@@ -1526,20 +1526,6 @@ if (!hm_exists('forward_dropdown')) {
     }
 }
 
-/**
- * @subpackage imap/functions
- */
-if (!hm_exists('parse_sieve_config_host')) {
-function parse_sieve_config_host($host) {
-    $url = parse_url($host);
-    if ($url === false) {
-        return $host;
-    }
-    $host = $url['host'] ?? $url['path'];
-    $port = $url['port'] ?? '4190';
-    return [$host, $port];
-}}
-
 if (!hm_exists('connect_to_imap_server')) {
     function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(

@@ -1905,10 +1905,9 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
             if ($success && $imap_details) {
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    $factory = get_sieve_client_factory($this->site_config);
                     try {
-                        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_details['sieve_config_host']);
-                        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($imap_details['user'], $imap_details['pass'], $imap_details['sieve_tls'], "", "PLAIN");
+                        $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
                     } catch (Exception $e) {
                         Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
                         return;
