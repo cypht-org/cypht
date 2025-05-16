@@ -113,6 +113,8 @@ add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_ou
 add_handler('settings', 'process_enable_sieve_filter_setting', true, 'sievefilters', 'save_user_settings', 'before');
 add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'start_general_settings', 'after');
 
+add_handler('home', 'check_sieve_configuration', true, 'nux','load_imap_servers_from_config', 'after');
+
 /**
  * toggle fliter
  */

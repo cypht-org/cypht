@@ -839,7 +839,7 @@ class Hm_Output_unread_feeds_included extends Hm_Output_Module {
         $settings = $this->get('user_settings');
         if (array_key_exists('unread_exclude_feeds', $settings) && $settings['unread_exclude_feeds']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -902,7 +902,7 @@ class Hm_Output_feed_limit_setting extends Hm_Output_Module {
             $limit = $settings['feed_limit'];
         }
         if ($limit != DEFAULT_FEED_LIMIT) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="feeds_setting"><td><label for="feed_limit">'.$this->trans('Max feed items to display').'</label></td>'.
             '<td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="feed_limit" name="feed_limit" size="2" value="'.$this->html_safe($limit).'" data-default-value="'.DEFAULT_FEED_LIMIT.'" />'.$reset.'</td></tr>';
