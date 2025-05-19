@@ -28,16 +28,16 @@ return array(
         'profiles'
     ),
     'allowed_post' => array(
-        'profile_name' => FILTER_DEFAULT,
-        'profile_id' => FILTER_DEFAULT,
-        'profile_replyto' => FILTER_DEFAULT,
-        'profile_smtp' => FILTER_DEFAULT,
-        'profile_imap' => FILTER_DEFAULT,
+        'profile_name' => FILTER_UNSAFE_RAW,
+        'profile_id' => FILTER_UNSAFE_RAW,
+        'profile_replyto' => FILTER_UNSAFE_RAW,
+        'profile_smtp' => FILTER_UNSAFE_RAW,
+        'profile_imap' => FILTER_UNSAFE_RAW,
         'profile_default' => FILTER_VALIDATE_INT,
-        'profile_address' => FILTER_DEFAULT,
+        'profile_address' => FILTER_UNSAFE_RAW,
         'profile_sig' => FILTER_UNSAFE_RAW,
         'profile_rmk' => FILTER_UNSAFE_RAW,
-        'profile_delete' => FILTER_DEFAULT
+        'profile_delete' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
         'profile_id' => FILTER_UNSAFE_RAW,

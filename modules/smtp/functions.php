@@ -86,7 +86,7 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
                 $profile = $profiles[0];
             }
             $smtpMailbox = Hm_SMTP_List::connect($profile['smtp_id'], false);
-            if (! $smtpMailbox->authed()) {
+            if (! $smtpMailbox || ! $smtpMailbox->authed()) {
                 Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
                 return;
             }

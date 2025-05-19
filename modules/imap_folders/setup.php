@@ -102,17 +102,17 @@ return array(
     ),
     'allowed_output' => array(
         'imap_folders_success' => array(FILTER_VALIDATE_INT, false),
-        'imap_special_name' => array(FILTER_DEFAULT, false),
-        'imap_folder_subscription' => array(FILTER_DEFAULT, false),
+        'imap_special_name' => array(FILTER_UNSAFE_RAW, false),
+        'imap_folder_subscription' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'parent' => FILTER_DEFAULT,
-        'new_folder' => FILTER_DEFAULT,
-        'special_folder_type' => FILTER_DEFAULT,
-        'imap_service_name' => FILTER_DEFAULT,
+        'parent' => FILTER_UNSAFE_RAW,
+        'new_folder' => FILTER_UNSAFE_RAW,
+        'special_folder_type' => FILTER_UNSAFE_RAW,
+        'imap_service_name' => FILTER_UNSAFE_RAW,
         'subscription_state' => FILTER_VALIDATE_BOOLEAN,
-        'folder' => FILTER_DEFAULT,
+        'folder' => FILTER_UNSAFE_RAW,
         'only_subscribed_folders' => FILTER_VALIDATE_BOOLEAN,
     )
 );

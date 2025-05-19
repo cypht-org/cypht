@@ -106,14 +106,14 @@ if (!hm_exists('credentials_form')) {
         $res .= '<div class="form-floating mb-3">';
         $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="' . $mod->trans('E-Mail Password') . '">';
         $res .= '<label for="nux_password">' . $mod->trans('E-mail Password') . '</label></div>';
-
+        $res .= '<div class="d-flex flex-column flex-md-row gap-3 mt-3">';
         // Connect Button
-        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary me-3" value="' . $mod->trans('Connect') . '">';
+        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary w-100 w-md-auto" value="' . $mod->trans('Connect') . '">';
 
         // Reset Link
-        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';
+        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary w-100 w-md-auto">Reset</a>';
 
-        $res .= '</div></div>';
+        $res .= '</div></div></div>';
 
         return $res;
     }

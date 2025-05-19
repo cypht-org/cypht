@@ -18,7 +18,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         $res = '<li class="menu_search mb-2"><form method="get">';
         $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' . 
+            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' .
             '<i class="bi bi-search"></i>' .
             '</a>';
         }
@@ -635,7 +635,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };';
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure you wanto to delete this server?').'"); };';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
@@ -1686,9 +1686,9 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '</thead>';
         $share_folder_modal .= '<tbody></tbody>';
         $share_folder_modal .= '</table>';
-        
+
         $share_folder_modal .= '</div>';
-        
+
         $share_folder_modal .= '<div class="col-lg-4 col-md-12">';
         $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
         $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';
@@ -2351,12 +2351,12 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
                                             <span id="srv_setup_stepper_profile_name-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
+                                            <input required type="text" id="srv_setup_stepper_email" name="srv_setup_stepper_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'" autocomplete="username">
                                             <label class="" for="srv_setup_stepper_email">'.$this->trans('Email or Username').'</label>
                                             <span id="srv_setup_stepper_email-error" class="invalid-feedback"></span>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                            <input required type="password" id="srv_setup_stepper_password" name="srv_setup_stepper_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'" autocomplete="new-password">
                                             <label class="" for="srv_setup_stepper_password">'.$this->trans('Password').'</label>
                                             <span id="srv_setup_stepper_password-error" class="invalid-feedback"></span>
                                         </div>
@@ -2465,22 +2465,23 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
 
     protected function output()
     {
-        $res = '<tr><td data-target=".privacy_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
-            '<i class="bi bi-shield fs-5 me-2"></i>'.
-            $this->trans('Privacy').'</td></tr>';
-        $userSettings = $this->get('user_settings', array());
-        foreach (self::$settings as $key => $setting) {
-            $value = $userSettings[$key] ?? '';
-            ['type' => $type, 'label' => $label, 'description' => $description] = $setting;
-            $res .= "<tr class='privacy_setting'>" .
-            "<td><label for='$key'>$label</label></td>" .
-            "<td>
-                <input type='$type' id='$key' name='$key' value='$value' class='form-control' />
-                <div class='setting_description'>$description</div>
-            </td>" .
-            "</tr>";
-        }
-        return $res;
+        return getSettingsSectionOutput('privacy', $this->trans('Privacy'), 'shield', self::$settings, $this->get('user_settings', array()));
+    }
+}
+
+class Hm_Output_engine_settings extends Hm_Output_Module {
+    static $settings = [
+        'enable_child_processes' => [
+            'type' => 'checkbox',
+            'label' => 'Enable child processes',
+            'description' => 'Enable child processes for long running tasks to improve performance.',
+            'default' => true
+        ],
+    ];
+
+    protected function output()
+    {
+        return getSettingsSectionOutput('engine', $this->trans('Engine'), 'heart-pulse-fill', self::$settings, $this->get('user_settings', array()));
     }
 }
 

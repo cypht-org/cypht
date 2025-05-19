@@ -734,7 +734,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 
                     if ($ceo_use_detect_ceo_fraud && hex2bin($form['folder']) == 'INBOX') {
                         if ($this->isCeoFraud($msg['to'], $msg['subject'], $msg['preview_msg'])) {
-                            
+
                             $folder = "Suspicious emails";
                             if (!count($mailbox->get_mailbox_status($folder))) {
                                 $mailbox->create_folder($folder);
@@ -750,7 +750,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                             $total--;
                         }
                     }
-                    
+
                     if ($msg) {
                         if (! $include_preview && isset($msg['preview_msg'])) {
                             $msg['preview_msg'] = "";
@@ -770,18 +770,18 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
-    public function isCeoFraud($email, $subject, $msg) {          
+    public function isCeoFraud($email, $subject, $msg) {
         // 1. Check Suspicious Terms or Requests
         $suspiciousTerms = explode(",", $this->user_config->get("ceo_suspicious_terms_setting"));
         if ($this->detectSuspiciousTerms($msg, $suspiciousTerms) || $this->detectSuspiciousTerms($subject, $suspiciousTerms)) {
-           
+
             // 2. check ceo_rate_limit
             $amounts = $this->extractAmountFromEmail($msg);
             $amountLimit = $this->user_config->get("ceo_amount_limit_setting");
             $isUpperAmount = array_reduce($amounts, function ($carry, $value) use ($amountLimit) {
                 return $carry || $value > $amountLimit;
             }, false);
-            
+
             if ($isUpperAmount) {
                 if ($this->user_config->get("ceo_use_trusted_contact_setting")) {
                     $contacts = $this->get('contact_store');
@@ -815,16 +815,16 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     }
     private function extractAmountFromEmail($emailBody) {
         $pattern = '/\b\d+(?:,\d+)?\.?\d*\s*(?:USD|dollars?|US\$?|EUR|euros?|€|JPY|yen|¥|GBP|pounds?|£|CAD|CAD\$|AUD|AUD\$)/i';
-    
+
         preg_match_all($pattern, $emailBody, $matches);
-    
+
         if ($matches) {
-            return array_map(function($value) { 
-                return floatval(preg_replace('/[^0-9]/', '', $value)); 
+            return array_map(function($value) {
+                return floatval(preg_replace('/[^0-9]/', '', $value));
             }, $matches[0]);
         }
     }
-    
+
 }
 
 /**
@@ -1082,12 +1082,12 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
  */
 class Hm_Handler_imap_message_action extends Hm_Handler_Module {
     /**
-     * Read, unread, delete, flag, or unflag a set of message uids
+     * Read, unread, delete, flag, unflag, archive, or mark as junk a set of message uids
      */
     public function process() {
         list($success, $form) = $this->process_form(array('action_type', 'message_ids'));
         if ($success) {
-            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive'))) {
+            if (in_array($form['action_type'], array('delete', 'read', 'unread', 'flag', 'unflag', 'archive', 'junk'))) {
                 $ids = process_imap_message_ids($form['message_ids']);
                 $errs = 0;
                 $msgs = 0;
@@ -1095,71 +1095,18 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 $status = array();
                 foreach ($ids as $server => $folders) {
                     $specials = get_special_folders($this, $server);
-                    $trash_folder = false;
-                    $archive_folder = false;
                     $mailbox = Hm_IMAP_List::get_connected_mailbox($server, $this->cache);
                     if ($mailbox && $mailbox->authed()) {
                         $server_details = $this->user_config->get('imap_servers')[$server];
-                        if ($form['action_type'] == 'delete') {
-                            if (array_key_exists('trash', $specials)) {
-                                if ($specials['trash']) {
-                                    $trash_folder = $specials['trash'];
-                                } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('No trash folder configured for %s', $server_details['name']), 'warning');
-                                }
-                            }
-                        }
-                        if ($form['action_type'] == 'archive') {
-                            if(array_key_exists('archive', $specials)) {
-                                if($specials['archive']) {
-                                    $archive_folder = $specials['archive'];
-                                } elseif ($mailbox->is_imap()) {
-                                    Hm_Msgs::add(sprintf('No archive folder configured for %s', $server_details['name']), 'warning');
-                                }
-                            }
-                        }
 
                         foreach ($folders as $folder => $uids) {
                             $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
-
-                            if ($mailbox->is_imap() && $form['action_type'] == 'delete' && $trash_folder && $trash_folder != hex2bin($folder)) {
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $trash_folder)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    foreach ($uids as $uid) {
-                                        $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
-                                    }
-                                }
-                            }
-                            elseif ($mailbox->is_imap() && $form['action_type'] == 'archive' && $archive_folder && $archive_folder != hex2bin($folder)) {
-                                /* path according to original option setting */
-                                if ($this->user_config->get('original_folder_setting', false)) {
-                                    $archive_folder .= '/' . hex2bin($folder);
-                                    $dest_path_exists = count($mailbox->get_folder_status($archive_folder));
-                                    if (!$dest_path_exists) {
-                                        $mailbox->create_folder($archive_folder);
-                                    }
-                                }
-                                if (! $mailbox->message_action(hex2bin($folder), 'MOVE', $uids, $archive_folder)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    foreach ($uids as $uid) {
-                                        $moved[] = sprintf("imap_%s_%s_%s", $server, $uid, $folder);
-                                    }
-                                }
-                            }
-                            else {
-                                if (! $mailbox->message_action(hex2bin($folder), mb_strtoupper($form['action_type']), $uids)['status']) {
-                                    $errs++;
-                                }
-                                else {
-                                    $msgs += count($uids);
-                                    if ($form['action_type'] == 'delete') {
-                                        $mailbox->message_action(hex2bin($folder), 'EXPUNGE', $uids);
-                                    }
-                                }
+                            $action_result = $this->perform_action($mailbox, $form['action_type'], $uids, $folder, $specials, $server_details);
+                            if ($action_result['error']) {
+                                $errs++;
+                            } else {
+                                $msgs += count($uids);
+                                $moved = array_merge($moved, $action_result['moved']);
                             }
                         }
                     }
@@ -1174,6 +1121,84 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             }
         }
     }
+
+    /**
+     * Perform a specified action on a set of messages in a mailbox.
+     *
+     * This function processes messages based on the provided action type (e.g., 'move', 'delete'),
+     * moving them to a special folder if necessary, or performing an operation like expunging deleted messages.
+     * It handles creating folders, moving messages to a special folder, and managing message status accordingly.
+     *
+     * @param object $mailbox The mailbox object used to perform actions.
+     * @param string $action_type The type of action to perform (e.g., 'move', 'delete').
+     * @param array $uids The unique identifiers (UIDs) of the messages to act upon.
+     * @param string $folder The folder where the messages currently reside.
+     * @param array $specials Special folder information for handling specific actions.
+     * @param array $server_details Details of the server, including its unique ID and settings.
+     *
+     * @return array Returns an associative array with:
+     *   - 'error' => bool Indicates if an error occurred during the operation.
+     *   - 'moved' => array List of moved message identifiers in a specific format.
+     */
+    private function perform_action($mailbox, $action_type, $uids, $folder, $specials, $server_details) {
+        $error = false;
+        $moved = array();
+        $folder_name = hex2bin($folder);
+        $special_folder = $this->get_special_folder($action_type, $specials, $server_details);
+
+        if ($special_folder && $special_folder != $folder_name) {
+            if ($this->user_config->get('original_folder_setting', false)) {
+                $special_folder .= '/' . $folder_name;
+                if (!count($mailbox->get_folder_status($special_folder))) {
+                    $mailbox->create_folder($special_folder);
+                }
+            }
+            if (!$mailbox->message_action($folder_name, 'MOVE', $uids, $special_folder)['status']) {
+                $error = true;
+            } else {
+                foreach ($uids as $uid) {
+                    $moved[] = sprintf("imap_%s_%s_%s", $server_details['id'], $uid, $folder);
+                }
+            }
+        } else {
+            if (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
+                $error = true;
+            } else {
+                if ($action_type == 'delete') {
+                    $mailbox->message_action($folder_name, 'EXPUNGE', $uids);
+                }
+            }
+        }
+        return ['error' => $error, 'moved' => $moved];
+    }
+
+    /**
+     * Retrieves the special folder associated with a specific action type.
+     *
+     * This function checks the given action type (e.g., 'delete', 'archive', 'junk') and looks for a corresponding
+     * special folder from the provided special folders list. If the folder is not found for the action, it logs an
+     * error message, unless the action type is one of 'read', 'unread', 'flag', or 'unflag'.
+     *
+     * @param string $action_type The action type that determines which special folder to retrieve (e.g., 'delete', 'archive').
+     * @param array $specials An associative array of special folder names, like 'trash', 'archive', and 'junk'.
+     * @param array $server_details Details of the server, including its name.
+     *
+     * @return string|false Returns the special folder name if found, or false if no corresponding folder is configured.
+     */
+    private function get_special_folder($action_type, $specials, $server_details) {
+        $folder = false;
+        if ($action_type == 'delete' && array_key_exists('trash', $specials)) {
+            $folder = $specials['trash'];
+        } elseif ($action_type == 'archive' && array_key_exists('archive', $specials)) {
+            $folder = $specials['archive'];
+        } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
+            $folder = $specials['junk'];
+        }
+        if (!$folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
+            Hm_Msgs::add(sprintf('ERRNo %s folder configured for %s', $action_type, $server_details['name']));
+        }
+        return $folder;
+    }
 }
 
 /**
@@ -1187,9 +1212,9 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
-            $terms = $this->session->get('search_terms', false);
-            $since = $this->session->get('search_since', DEFAULT_SEARCH_SINCE);
-            $fld = $this->session->get('search_fld', 'TEXT');
+            $terms = validate_search_terms($this->request->get['search_terms']);
+            $since = isset($this->request->get['search_since']) ? process_since_argument($this->request->get['search_since'], true): DEFAULT_SEARCH_SINCE;
+            $fld = isset($this->request->get['search_fld']) ? validate_search_fld($this->request->get['search_fld']): DEFAULT_SEARCH_FLD;
             $ids = explode(',', $form['imap_server_ids']);
             $date = process_since_argument($since);
             $folder = bin2hex('INBOX');
@@ -1248,7 +1273,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         $offset = 0;
         $list_page = 1;
         $maxPerSource = round($limit / count($data_sources));
-        
+
         if (isset($this->request->get['list_page'])) {
             $list_page = (int) $this->request->get['list_page'];
             if ($list_page && $list_page > 1) {
@@ -1348,7 +1373,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
             $offsets = explode(',', $offsets);
         }
         $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
-        
+
         $result = getCombinedMessagesLists($data_sources, [
             'cache' => $this->cache,
             'session' => $this->session,
@@ -1438,7 +1463,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'type' => 'jmap',
                     'port' => false,
                     'tls' => false));
-                Hm_Msgs::add('Added server!');
+                Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
@@ -1668,12 +1693,12 @@ class Hm_Handler_load_imap_folders_permissions extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id','imap_folder_uid','imap_folder'));
-        
+
         if ($success && !empty($form['imap_server_id']) && !empty($form['imap_folder'])  && !empty($form['imap_folder_uid'])) {
             Hm_IMAP_List::init($this->user_config, $this->session);
             $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            
+
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
             $permissions = $imap->get_acl($form['imap_folder']);
             $this->out('imap_folders_permissions', $permissions);
@@ -1691,13 +1716,13 @@ class Hm_Handler_set_acl_to_imap_folders extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions','action'));
-        
+
         if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions']) && !empty($form['action'])) {
 
             Hm_IMAP_List::init($this->user_config, $this->session);
             $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            
+
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
             if($form['action'] === 'add') {
                 $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
@@ -1778,6 +1803,10 @@ class Hm_Handler_imap_oauth2_token_check extends Hm_Handler_Module {
         }
         if (array_key_exists('imap_server_id', $this->request->post)) {
             $active[] = $this->request->post['imap_server_id'];
+        }
+        if (count($active)===0) {
+            $data_sources = imap_data_sources();
+            $active = array_map(function($ds) { return $ds['id']; }, $data_sources);
         }
         $updated = 0;
         foreach ($active as $server_id) {
@@ -1874,12 +1903,11 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
-            if ($success && $imap_details) {         
+            if ($success && $imap_details) {
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    $factory = get_sieve_client_factory($this->site_config);
                     try {
-                        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_details['sieve_config_host']);
-                        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                        $client->connect($imap_details['user'], $imap_details['pass'], $imap_details['sieve_tls'], "", "PLAIN");
+                        $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
                     } catch (Exception $e) {
                         Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
                         return;
@@ -1888,13 +1916,13 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
 
                 $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $form['imap_user'], $form['imap_pass']);
+                $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
                 if ($mailbox) {
                     if ($mailbox->authed()) {
-                        Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $form['imap_user']));
+                        Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $mailbox->server_type(), $imap_details['user']));
                     }
                     else {
-                        Hm_Msgs::add(sprintf("Failed to authenticate to the %s server : %s", $mailbox->server_type(), $form['imap_user']), "danger");
+                        Hm_Msgs::add(sprintf("Failed to authenticate to the %s server : %s", $mailbox->server_type(), $imap_details['user']), "danger");
                     }
                 }
                 else {
@@ -2023,9 +2051,15 @@ class Hm_Handler_imap_hide extends Hm_Handler_Module {
         if (isset($this->request->post['hide_imap_server'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
-                Hm_IMAP_List::toggle_hidden($form['imap_server_id'], (bool) $this->request->post['hide_imap_server']);
-                Hm_Msgs::add('Hidden status updated');
-                $this->session->record_unsaved(sprintf('%s server hidden status updated', imap_server_type($form['imap_server_id'])));
+                $action = (bool) $this->request->post['hide_imap_server'];
+                $server_type = imap_server_type($form['imap_server_id']);
+                Hm_IMAP_List::toggle_hidden($form['imap_server_id'], $action);
+                if ($action) {
+                    Hm_Msgs::add(sprintf('%s server has been hidden', $server_type));
+                } else {
+                    Hm_Msgs::add(sprintf('%s server is now visible', $server_type));
+                }
+                $this->session->record_unsaved(sprintf('%s server visibility updated', $server_type));
             }
         }
     }
@@ -2193,7 +2227,7 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         function process_ceo_use_trusted_contact_callback($val) { return $val; }
         function process_ceo_suspicious_terms_callback($val) { return $val; }
         function process_ceo_amount_limit_callback($val) { return $val; }
-        
+
         process_site_setting('ceo_use_detect_ceo_fraud', $this, 'process_ceo_use_detect_ceo_fraud_callback');
         process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
         process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');

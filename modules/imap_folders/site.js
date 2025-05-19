@@ -68,11 +68,22 @@ var set_folders_page_value = function(id, container, target, id_dest) {
     }
     $('.'+target).html(link);
     $('#'+id_dest).val(id);
+    if (id_dest === 'delete_source') {
+        const folder = document.querySelector(`.${id}`);
+        if (folder) {
+            const numberChildren = folder.getAttribute('data-number-children');
+            $('#children_number').val(numberChildren);
+        } else {
+            $('#children_number').val(0);
+        }
+        
+    }
     list.hide();
 
 };
 
 var folder_page_delete = function() {
+    var children_number = parseInt($('#children_number').val());
     var val = $('#delete_source').val();
     var id = $('#imap_server_folder').val();
     if (!id.length) {
@@ -83,21 +94,36 @@ var folder_page_delete = function() {
         Hm_Notices.show($('#delete_folder_error').val(), 'danger');
         return;
     }
-    if (!confirm($('#delete_folder_confirm').val())) {
-        return;
+
+    let message = "";
+    if (children_number) {
+        message = `<p>${hm_trans('This folder contains '+ children_number +' sub-folders.')}</p>`;
     }
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
-        {'name': 'imap_server_id', value: id},
-        {'name': 'folder', 'value': val}],
-        function(res) {
-            if (res.imap_folders_success) {
-                $('#delete_source').val('');
-                $('.selected_delete').html('');
-                Hm_Folders.reload_folders(true);
+
+    const modal = new Hm_Modal({
+        modalId: 'emptySubjectBodyModal',
+        title: hm_trans("Deletion confirmation"),
+        btnSize: 'sm'
+    });
+
+    modal.addFooterBtn(hm_trans('Delete anyway'), 'btn-warning', handleDeleteFolder);
+    modal.setContent(message + $('#delete_folder_confirm').val());
+    modal.open();
+    function handleDeleteFolder() {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
+            {'name': 'imap_server_id', value: id},
+            {'name': 'folder', 'value': val}],
+            function(res) {
+                if (res.imap_folders_success) {
+                    $('#delete_source').val('');
+                    $('.selected_delete').html('');
+                    Hm_Folders.reload_folders(true);
+                }
             }
-        }
-    );
+        );
+        modal.hide();
+    };
 };
 
 var folder_page_rename = function() {

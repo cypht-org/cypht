@@ -7,7 +7,7 @@ trait Hm_Repository {
     protected static $session;
     protected static $entities;
 
-    protected static function initRepo($name, $user_config, $session, &$entities, callable $init = null) {
+    protected static function initRepo($name, $user_config, $session, &$entities, ? callable $init = null) {
         self::$name = $name;
         self::$user_config = $user_config;
         self::$session = $session;

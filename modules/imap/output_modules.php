@@ -126,6 +126,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                     }
                 }
 
+                $msgText = sanitize_email_html($msgText);
                 $txt .= format_msg_html($msgText, $allowed);
             }
             elseif (isset($struct['type']) && mb_strtolower($struct['type']) == 'image') {
@@ -840,7 +841,10 @@ class Hm_Output_filter_imap_status_data extends Hm_Output_Module {
         $res = '';
         $capabilities = $this->get('sieve_server_capabilities', array());
         if ($capabilities) {
-            $res .= '<span class="sieve_extensions">'.implode(', ', $capabilities).'</span>';
+            foreach ($capabilities as $key => $val) {
+                $capabilities[$key] = $key . ': ' . (is_array($val) ? implode(', ', $val) : $val);
+            }
+            $res .= '<span class="sieve_extensions">' . implode(', ', $capabilities) . '</span>';
         }
         $this->out('sieve_detail_display', $res);
         $res = '';
@@ -1464,11 +1468,11 @@ class Hm_Output_server_config_ews extends Hm_Output_Module {
                                 <label class="" for="ews_server">'.$this->trans('Server Address').'</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input required type="text" id="ews_email" name="ews_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'">
+                                <input required type="text" id="ews_email" name="ews_email" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Email or Username').'" autocomplete="username">
                                 <label class="" for="ews_email">'.$this->trans('Email or Username').'</label>
                             </div>
                             <div class="form-floating mb-3">
-                                <input type="password" id="ews_password" name="ews_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'">
+                                <input type="password" id="ews_password" name="ews_password" class="txt_fld form-control warn_on_paste" value="" placeholder="'.$this->trans('Password').'" autocomplete="new-password">
                                 <label class="" for="ews_password">'.$this->trans('Password').'</label>
                             </div>
                             <div class="form-check">
@@ -1674,7 +1678,7 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
                 $ceo_rate_limit = $settings['ceo_rate_limit'];
             }
         }
-        
+
         $res = '<tr class="general_setting"><td><label for="ceo_use_detect_ceo_fraud">'.
             $this->trans('CEO fraud: Use Detect CEO Fraud').
             '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></td></tr>';

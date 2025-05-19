@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5bffec86ce0fc86baf335beabefe4dba",
+    "content-hash": "df2bb49f8876382e3b6dbf6b18f0be67",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -783,16 +783,16 @@
         },
         {
             "name": "henrique-borba/php-sieve-manager",
-            "version": "v1.0.8",
+            "version": "v1.0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/php-sieve-manager.git",
-                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4"
+                "reference": "845e59954c5418db50f3c6a134eb587660331f6e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4",
-                "reference": "1b2819ca294bfa943fd90c7d922c5cef5f8cd8e4",
+                "url": "https://api.github.com/repos/cypht-org/php-sieve-manager/zipball/845e59954c5418db50f3c6a134eb587660331f6e",
+                "reference": "845e59954c5418db50f3c6a134eb587660331f6e",
                 "shasum": ""
             },
             "require": {
@@ -848,20 +848,20 @@
                 "source": "https://github.com/cypht-org/php-sieve-manager",
                 "wiki": "https://github.com/cypht-org/php-sieve-manager/wiki"
             },
-            "time": "2024-08-29T06:33:14+00:00"
+            "time": "2025-03-25T17:14:17+00:00"
         },
         {
             "name": "league/commonmark",
-            "version": "2.6.0",
+            "version": "2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/commonmark.git",
-                "reference": "d150f911e0079e90ae3c106734c93137c184f932"
+                "reference": "6fbb36d44824ed4091adbcf4c7d4a3923cdb3405"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/d150f911e0079e90ae3c106734c93137c184f932",
-                "reference": "d150f911e0079e90ae3c106734c93137c184f932",
+                "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/6fbb36d44824ed4091adbcf4c7d4a3923cdb3405",
+                "reference": "6fbb36d44824ed4091adbcf4c7d4a3923cdb3405",
                 "shasum": ""
             },
             "require": {
@@ -898,7 +898,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.7-dev"
+                    "dev-main": "2.8-dev"
                 }
             },
             "autoload": {
@@ -955,7 +955,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-07T15:34:16+00:00"
+            "time": "2025-05-05T12:20:28+00:00"
         },
         {
             "name": "league/config",

@@ -67,7 +67,10 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         }
 
         if (($profile = Hm_Profiles::get($form['profile_id']))) {
-            if (array_key_exists('autocreate', $profile)) {
+
+            $server = Hm_SMTP_List::get($profile['smtp_id'], false);
+
+            if (array_key_exists('autocreate', $profile) && $server) {
                 Hm_Msgs::add('Automatically created profile cannot be deleted', 'warning');
                 return;
             }

@@ -427,7 +427,7 @@ class Hm_Alert {
 
         const messageElement = document.createElement('div');
         messageElement.className = 'flex-grow-1 pe-4';
-        messageElement.textContent = message;
+        messageElement.innerHTML = message;
 
         alert.appendChild(iconContainer);
         alert.appendChild(messageElement);

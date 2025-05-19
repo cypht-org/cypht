@@ -8,6 +8,8 @@ use ZBateson\MailMimeParser\Message;
 use function React\Async\await;
 use function React\Async\parallel;
 
+require_once APP_PATH . 'modules/imap/helpers.php';
+
 /**
  * IMAP modules
  * @package modules
@@ -133,7 +135,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
 
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
-        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
+        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($folder['number_of_children']).'">';
         if ($folder['children']) {
             $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
         }
@@ -1524,20 +1526,6 @@ if (!hm_exists('forward_dropdown')) {
     }
 }
 
-/**
- * @subpackage imap/functions
- */
-if (!hm_exists('parse_sieve_config_host')) {
-function parse_sieve_config_host($host) {
-    $url = parse_url($host);
-    if ($url === false) {
-        return $host;
-    }
-    $host = $url['host'] ?? $url['path'];
-    $port = $url['port'] ?? '4190';
-    return [$host, $port];
-}}
-
 if (!hm_exists('connect_to_imap_server')) {
     function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(
@@ -1631,41 +1619,82 @@ function getCombinedMessagesLists($sources, $context, $search) {
         'defaultOffset' => 0,
         'listPage' => 1
     ];
-    $search = array_merge($defaultSearch, $search);    
+    $search = array_merge($defaultSearch, $search);
     
-    $promises = array_map(function ($dataSource, $index) use ($context, $search) {
-        return function () use ($dataSource, $context, $search, $index) {
-            return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
-                $process = new Process('php ' . __DIR__ . '/workers/messages_list.php');
-                $process->start(Loop::get());
-                $process->stdin->write(json_encode([
-                    'index' => $index,
-                    'search' => $search,
-                    'dataSource' => $dataSource,
-                    'cache' => serialize($context['cache']),
-                    'session' => serialize($context['session']),
-                    'config' => serialize($context['config'])
-                ]));
-                $process->stdin->end();
+    if ($context['config']->get('enable_child_processes_setting', true)) {
+        $promises = array_map(function ($dataSource, $index) use ($context, $search) {
+            return function () use ($dataSource, $context, $search, $index) {
+                return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
+                    $cmd = 'php ' . __DIR__ . '/workers/messages_list.php';
+                    if (APP_PATH) {
+                        $cmd .= ' -p ' . APP_PATH;
+                    }
+                    if (env('WORKER_CUSTOM_IMPORTS')) {
+                        $cmd .= ' -i ' . env('WORKER_CUSTOM_IMPORTS');
+                    }
+                    if (CACHE_ID) {
+                        $cmd .= ' -c ' . CACHE_ID;
+                    }
+                    if (SITE_ID) {
+                        $cmd .= ' -s ' . SITE_ID;
+                    }
+                    $process = new Process($cmd);
+                    $process->start(Loop::get());
+                    $process->stdin->write(json_encode([
+                        'index' => $index,
+                        'search' => $search,
+                        'dataSource' => $dataSource,
+                        'cache' => serialize($context['cache']),
+                        'session' => serialize($context['session']),
+                        'config' => serialize($context['config'])
+                    ]));
+                    $process->stdin->end();
 
-                $process->stdout->on('data', function ($output) use ($resolve) {
-                    $resolve(json_decode($output, true));
-                });
+                    $process->stdout->on('data', function ($output) use ($resolve, $reject) {
+                        $data = json_decode($output, true);
+                        if (isset($data['error'])) {
+                            $reject(new \Exception($data['error']));
+                        } else {
+                            $resolve($data);
+                        }
+                    });
 
-                $process->on('exit', function ($exitCode) use ($reject) {
-                    $reject(new \Exception('Worker exited with code ' . $exitCode));
-                });
-        });
-    };
-    }, $sources, array_keys($sources));
+                    $process->stderr->on('data', function ($errorOutput) {
+                        Hm_Functions::error_log('Worker error output: ' . $errorOutput);
+                    });
 
-    $promise = parallel($promises);
-    
-    try {
-        $results = await($promise);
-    } catch (\Exception $e) {
-        Hm_Msgs::add($e->getMessage(), 'error');
-        return ['lists' => [], 'total' => 0, 'status' => []];
+                    $process->on('exit', function ($exitCode, $signal) use ($reject) {
+                        if ($exitCode != 0) {
+                            error_log(sprintf(' worker exited with abornaml exit code' . $exitCode ));
+                            $reject(new \Exception($signal . ' Error code: ' . $exitCode));
+                    }});
+            });
+        };
+        }, $sources, array_keys($sources));
+
+        $promise = parallel($promises);
+        
+        try {
+            $results = await($promise);
+        } catch (\Exception $e) {
+            Hm_Msgs::add($e->getMessage(), 'error');
+            return ['lists' => [], 'total' => 0, 'status' => []];
+        }
+    } else {
+        $cache = $context['cache'];
+        $listPage = $search['listPage'];
+        $offsets = $search['offsets'];
+        $search['offset'] = $search['defaultOffset'];
+        $results = [];
+        foreach ($sources as $index => $dataSource) {
+            if ($offsets && $listPage > 1) {
+                if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
+                    $search['offest'] = (int) $offsets[$index] * ($listPage - 1);
+                }
+            }
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
+            $results[] = getMessagesList($mailbox, $dataSource, $search);
+        }
     }
 
     $totalMessages = 0;

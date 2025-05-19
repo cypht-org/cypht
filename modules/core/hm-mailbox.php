@@ -47,6 +47,9 @@ class Hm_Mailbox {
     }
 
     public function connect() {
+        if (! $this->connection) {
+            return false;
+        }
         return $this->connection->connect($this->config);
     }
 
@@ -138,6 +141,13 @@ class Hm_Mailbox {
         }
         if ($this->is_imap()) {
             $old_folder = prep_folder_name($this->connection, $folder, true);
+            if (! $parent) {
+                $parents = explode(".", $old_folder);
+                $parents = array_slice($parents, 0, -1);
+                if (count($parents))  {
+                    $new_name =  implode(".", $parents) .".". $new_name;
+                }
+            }
             $new_folder = prep_folder_name($this->connection, $new_name, false, $parent);
             return $this->connection->rename_mailbox($old_folder, $new_folder);
         } else {
@@ -258,7 +268,7 @@ class Hm_Mailbox {
      */
     public function get_messages($folder, $sort, $reverse, $flag_filter, $offset=0, $limit=50, $keyword=false, $trusted_senders=[], $include_preview = false) {
         if (! $this->select_folder($folder)) {
-            return;
+            return [0, []];
         }
         if ($this->is_imap()) {
             $messages = $this->connection->get_mailbox_page($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview);

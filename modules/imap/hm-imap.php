@@ -6,6 +6,8 @@
  * @subpackage imap
  */
 
+use ZBateson\MailMimeParser\MailMimeParser;
+
 require_once('hm-imap-base.php');
 require_once('hm-imap-parser.php');
 require_once('hm-imap-cache.php');
@@ -180,6 +182,8 @@ if (!class_exists('Hm_IMAP')) {
         public $folder_state = false;
         private $scramAuthenticator;
         private $namespace_count = 0;
+
+        protected $list_sub_folders = [];
         /**
          * constructor
          */
@@ -972,7 +976,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
             if ($include_content_body) {
-                $command .= " BODY.PEEK[0.1]";
+                $command .= " BODY.PEEK[TEXT]<0.500>";
             }
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
@@ -1012,9 +1016,11 @@ if (!class_exists('Hm_IMAP')) {
                     $x_profile_id = '';
                     $x_delivery = '';
                     $count = count($vals);
+                    $header_founded = false;
+                    $body_founded = false;
                     for ($i=0;$i<$count;$i++) {
-                        if ($vals[$i] == 'BODY[HEADER.FIELDS') {
-                                
+                        if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
+                            $header_founded = true;
                             $i++;
                             while(isset($vals[$i]) && in_array(mb_strtoupper($vals[$i]), $junk)) {
                                 $i++;
@@ -1032,7 +1038,8 @@ if (!class_exists('Hm_IMAP')) {
                                 }
                             }
                         }
-                        elseif ($vals[$i] == 'BODY[0.1') {
+                        elseif ($vals[$i] == 'BODY[TEXT' && !$body_founded) {
+                            $body_founded = true;
                             $content = '';
                             $i++;
                             $i++;
@@ -1041,7 +1048,18 @@ if (!class_exists('Hm_IMAP')) {
                                 $i++;
                             }
                             $i++;
+                            if (! empty($content)) {
+                                if (substr($content, 0, 3) == "<0>") {
+                                    $content = substr($content, 3);
+                                }
+                                $parser = new MailMimeParser();
+                                $str_parser = $parser->parse($content, false);
+                                $content = $str_parser->getTextContent();
+                            }
                             $flds['body'] = $content;
+                            if (!$header_founded) {
+                                $i = 0;
+                            }
                         }
                         elseif (isset($tags[mb_strtoupper($vals[$i])])) {
                             if (isset($vals[($i + 1)])) {
@@ -1060,7 +1078,6 @@ if (!class_exists('Hm_IMAP')) {
                             }
                         }
                     }
-
                     if ($uid) {
                         $cset = '';
                         if (mb_stristr($content_type, 'charset=')) {
@@ -1638,6 +1655,7 @@ if (!class_exists('Hm_IMAP')) {
             }
             $command = $command1.$command2;
             $cache_command = $command.(string)$reverse;
+            $this->set_fetch_command($cache_command);
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
                 return $cache;
@@ -1737,16 +1755,31 @@ if (!class_exists('Hm_IMAP')) {
                 $this->debug[] = 'Delete mailbox not permitted in read only mode';
                 return false;
             }
-            $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($mailbox))."\"\r\n";
-            $this->send_command($command);
-            $result = $this->get_response(false);
-            $status = $this->check_response($result, false);
-            if ($status) {
-                return true;
+            $this->list_sub_folders[] = $mailbox;
+            $this->get_recursive_subfolders($mailbox, true);
+            $this->list_sub_folders = array_reverse($this->list_sub_folders);
+            foreach ($this->list_sub_folders as $key => $del_folder) {
+                $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($del_folder))."\"\r\n";
+                $this->send_command($command);
+                $result = $this->get_response(false);
+                $status = $this->check_response($result, false);
+                if ($status) {
+                    unset($this->list_sub_folders[$key]);
+                } else {
+                    $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
+                    return false;
+                }
             }
-            else {
-                $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
-                return false;
+            return true;
+        }
+
+        public function get_recursive_subfolders($parentFolder, $is_delete_action) {
+            $infoFolder = $this->get_folder_list_by_level($parentFolder, false, false, $is_delete_action);
+            if ($infoFolder) {
+                foreach (array_keys($infoFolder) as $folder) {
+                    $this->list_sub_folders[] = $folder;
+                    $this->get_recursive_subfolders($folder, $is_delete_action);
+                }
             }
         }
 
@@ -1845,6 +1878,9 @@ if (!class_exists('Hm_IMAP')) {
                         break;
                     case 'ARCHIVE':
                         $command = "UID STORE $uid_string +FLAGS (\Archive)\r\n";
+                        break;
+                    case 'JUNK':
+                        $command = "UID STORE $uid_string +FLAGS (\Junk)\r\n";
                         break;
                     case 'FLAG':
                         $command = "UID STORE $uid_string +FLAGS (\Flagged)\r\n";
@@ -2480,7 +2516,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $level mailbox name or empty string for the top level
          * @return array list of matching folders
          */
-        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false) {
+        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false, $is_delete_action = false) {
             $result = array();
             $folders = array();
             if ($this->server_support_children_capability()) {
@@ -2502,6 +2538,9 @@ if (!class_exists('Hm_IMAP')) {
                 );
                 if ($with_input) {
                     $result[$name]['special'] = $folder['special'];
+                }
+                if ($folder['can_have_kids'] && !$is_delete_action) {
+                    $result[$name]['number_of_children'] = count($this->get_folder_list_by_level($folder['name'], false, false, $is_delete_action));
                 }
             }
             if ($only_subscribed || $with_input) {

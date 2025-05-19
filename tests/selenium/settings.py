@@ -3,11 +3,12 @@
 from base import WebTest, USER, PASS
 from selenium.webdriver.common.by import By
 from runner import test_runner
-from selenium.webdriver.support.ui import Select
-
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
 
 class SettingsHelpers(WebTest):
-
     def is_unchecked(self, name):
         selected = self.by_name(name).is_selected()
         print(f"The selected status of checkbox '{name}' is:", selected)
@@ -24,10 +25,17 @@ class SettingsHelpers(WebTest):
 
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        alert_message = self.by_class('sys_messages')
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
         self.safari_workaround()
-        assert self.by_class('sys_messages').text == 'Settings updated'
+        WebDriverWait(self.driver, 20).until(EC.staleness_of(alert_message))
+        ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
+        _ = WebDriverWait(self.driver, 10, ignored_exceptions=ignored_exceptions).until(
+            EC.presence_of_element_located((By.CLASS_NAME, 'sys_messages'))
+        )
+        alert_message = self.by_class('sys_messages')
+        assert alert_message.text.strip() == 'Settings updated'
 
     def settings_section(self, section):
         if not self.by_class('settings').is_displayed():
@@ -79,7 +87,6 @@ class SettingsHelpers(WebTest):
 
 
 class SettingsTests(SettingsHelpers):
-
     def __init__(self):
         WebTest.__init__(self)
         self.login(USER, PASS)

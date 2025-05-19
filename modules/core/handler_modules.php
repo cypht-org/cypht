@@ -779,9 +779,13 @@ class Hm_Handler_logout extends Hm_Handler_Module {
                     $pass = false;
                 }
                 if ($user && $path && $pass) {
-                    $this->user_config->save($user, $pass);
-                    $this->session->destroy($this->request);
-                    Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                    try {
+                        $this->user_config->save($user, $pass);
+                        $this->session->destroy($this->request);
+                        Hm_Msgs::add('Saved user data on logout, Session destroyed on logout', 'info');
+                    } catch (Exception $e) {
+                        Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
+                    }
                 }
             }
             else {
@@ -1119,20 +1123,6 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                 $this->out('just_saved_credentials', true);
                 return;
             } else {
-                /*
-                 *  Connect to SMTP server if user wants to send emails
-                 */
-                if($isSender){
-                    if (!$this->module_is_supported('smtp')) {
-                        Hm_Msgs::add("SMTP module is not enabled", "danger");
-                        return;
-                    }
-                    $this->smtp_server_id = connect_to_smtp_server($smtpAddress, $profileName, $smtpPort, $email, $password, $smtpTls, 'smtp', $smtpServerId);
-                    if(!isset($this->smtp_server_id)){
-                        Hm_Msgs::add("Could not save SMTP server", "warning");
-                        return;
-                    }
-                }
 
                 /*
                  *  Connect to IMAP server if user wants to receive emails
@@ -1168,21 +1158,12 @@ class Hm_Handler_quick_servers_setup extends Hm_Handler_Module {
                     };
                 }
 
-                if($isSender && $isReceiver && $createProfile && isset($this->imap_server_id) && isset($this->smtp_server_id) && ! ($smtpServerId || $imapServerId)) {
-                    if (!$this->module_is_supported('profiles')) {
-                        Hm_Msgs::add("Profiles module is not enabled", "danger");
-                        return;
-                    }
-
-                    add_profile($profileName, $profileSignature, $profileReplyTo, $profileIsDefault, $email, $onlyJmap? $jmapAddress: $imapAddress, $email, $this->smtp_server_id, $this->imap_server_id, $this);
-                }
-
                 if ($this->module_is_supported('imap_folders')) {
                     $this->out('imap_server_id', $this->imap_server_id);
                     $this->out('imap_service_name', $provider);
                 }
                 $this->out('just_saved_credentials', true);
-                Hm_Msgs::add("Server saved");
+                Hm_Msgs::add("Server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
             }
 
             if ($createProfile && $this->smtp_server_id && ($this->imap_server_id || $this->jmap_server_id)) {
@@ -1203,6 +1184,16 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
         $settings = Hm_Output_privacy_settings::$settings;
         foreach ($settings as $key => $setting) {
             process_site_setting($key, $this, 'privacy_setting_callback');
+        }
+    }
+}
+
+class Hm_Handler_engine_settings extends Hm_Handler_Module {
+    
+    public function process() {
+        $settings = Hm_Output_engine_settings::$settings;
+        foreach ($settings as $key => $setting) {
+            process_site_setting($key, $this, 'engineSettingCallback', isset($setting['default']) ? $setting['default'] : null, $setting['type'] === 'checkbox');
         }
     }
 }

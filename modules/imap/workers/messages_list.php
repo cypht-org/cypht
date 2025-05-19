@@ -4,15 +4,32 @@ if (mb_strtolower(php_sapi_name()) !== 'cli') {
     die("Must be run from the command line\n");
 }
 
-const APP_PATH = '';
+$options = getopt('p:i:c:s:', ['app_path:', 'imports:', 'cache_id:', 'site_id:']);
 
-require 'lib/framework.php';
+$appPath = $options['app_path'] ?? $options['p'] ?? '';
+$imports = $options['imports'] ?? $options['i'] ?? '';
+$cacheId = $options['cache_id'] ?? $options['c'] ?? '';
+$siteId = $options['site_id'] ?? $options['s'] ?? '';
 
-require 'modules/core/message_functions.php';
-require 'modules/core/message_list_functions.php';
+define('APP_PATH', $appPath);
+define('CACHE_ID', $cacheId);
+define('SITE_ID', $siteId);
 
-require 'modules/imap/hm-imap.php';
-require 'modules/core/hm-mailbox.php';
+require $appPath . 'lib/framework.php';
+
+require $appPath . 'modules/core/message_functions.php';
+require $appPath . 'modules/core/message_list_functions.php';
+
+require $appPath . 'modules/imap/hm-imap.php';
+require $appPath . 'modules/core/hm-mailbox.php';
+require $appPath . 'modules/imap/helpers.php';
+
+if ($imports) {
+    $imports = explode(',', $imports);
+    foreach ($imports as $import) {
+        require $import;
+    }
+}
 
 $input = trim(fgets(STDIN));
 $data = json_decode($input, true);
@@ -21,6 +38,7 @@ $index = $data['index'];
 $search = $data['search'];
 $dataSource = $data['dataSource'];
 $cache = unserialize($data['cache']);
+$cache->reconnect();
 $session = unserialize($data['session']);
 $user_config = unserialize($data['config']);
 
@@ -42,43 +60,18 @@ if ($offsets && $listPage > 1) {
 Hm_IMAP_List::init($user_config, $session);
 $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
 if ($mailbox && $mailbox->authed()) {
-    $connection = $mailbox->get_connection();
-    $folder = $dataSource['folder'];
-    $mailbox->select_folder(hex2bin($folder));
-    $state = $connection->get_mailbox_status(hex2bin($folder));
-
-    if ($mailbox->is_imap()) {
-        if ($connection->is_supported('SORT')) {
-            $sortedUids = $connection->get_message_sort_order($sort, $reverse, $filter);
-        } else {
-            $sortedUids = $connection->sort_by_fetch($sort, $reverse, $filter);
-        }
-
-        $uids = $mailbox->search(hex2bin($folder), $filter, $sortedUids, $searchTerms);
-    } else {
-        // EWS
-        $uids = $connection->search($folder, $sort, $reverse, $filter, 0, $limit, $searchTerms);
-    }
-
-    $total = count($uids);
-    $uids = array_slice($uids, $offset, $limit);
-
-    $headers = $mailbox->get_message_list(hex2bin($folder), $uids);
-    $messages = [];
-    foreach ($uids as $uid) {
-        if (isset($headers[$uid])) {
-            $messages[] = $headers[$uid];
-        }
-    }
+    $search['offset'] = $offset;
+    $result = getMessagesList($mailbox, $dataSource, $search);
 
     echo json_encode([
-        'uids' => $uids,
-        'status' => $state,
-        'messages' => $messages,
-        'total' => $total,
-        'dataSource' => $dataSource,
-        'folder' => $folder
+        'uids' => $result['uids'],
+        'status' => $result['status'],
+        'messages' => $result['messages'],
+        'total' => $result['total'],
+        'dataSource' => $result['dataSource'],
+        'folder' => $result['folder']
     ]);
 } else {
+    echo json_encode(['error' => 'Failed to establish connection to the mailbox.']);
     exit;
 }

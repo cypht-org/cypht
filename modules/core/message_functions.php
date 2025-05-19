@@ -46,6 +46,19 @@ function format_msg_html($str, $images=false) {
 }}
 
 /**
+ * Sanitize HTML for email
+ * @subpackage core/functions
+ * @param string $html content to sanitize
+ * @return string
+ */
+if (!hm_exists('sanitize_email_html')) {
+function sanitize_email_html($html) {
+    $html = preg_replace('/<([^>]+)style\s*=\s*["\'][^"\']*background-image\s*:\s*url\((["\']?)https?:\/\/.*?\2\)[^"\']*["\']/i', '<$1', $html);
+
+    return $html;
+}}
+
+/**
  * Convert HTML to plain text
  * @param string $html content to convert
  * @return string

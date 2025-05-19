@@ -407,6 +407,7 @@ function message_controls($output_mod) {
                     '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
                     '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
                     '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>'.
+                    '<li><a class="dropdown-item msg_junk core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="junk">'.$output_mod->trans('Junk').'</a></li>'.
                 '</ul>'.
             '</div>'.
             '<a class="msg_read core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
@@ -414,7 +415,8 @@ function message_controls($output_mod) {
             '<a class="msg_flag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
             '<a class="msg_unflag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
             '<a class="msg_delete core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-            '<a class="msg_archive core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>';
+            '<a class="msg_archive core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>'. 
+            '<a class="msg_junk core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="junk">'.$output_mod->trans('Junk').'</a>';
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');

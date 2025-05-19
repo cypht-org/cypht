@@ -122,7 +122,8 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'pass' => $result['access_token'],
                         'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
                         'refresh_token' => $result['refresh_token'],
-                        'auth' => 'xoauth2'
+			'auth' => 'xoauth2',
+			'type' => $details['type']
                     ));
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
@@ -134,11 +135,12 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'user' => $details['email'],
                             'pass' => $result['access_token'],
                             'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
-                            'refresh_token' => $result['refresh_token']
+			    'refresh_token' => $result['refresh_token'],
+			    'type' => 'smtp'
                         ));
                         $this->session->record_unsaved('SMTP server added');
                     }
-                    Hm_Msgs::add('E-mail account successfully added');
+                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                     Hm_IMAP_List::clean_up();
                     $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
@@ -182,6 +184,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     'tls' => $details['tls'],
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
+		    'type' => $details['type']
                 );
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
@@ -200,7 +203,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                             'port' => $details['smtp']['port'],
                             'tls' => $details['smtp']['tls'],
                             'user' => $form['nux_email'],
-                            'pass' => $form['nux_pass']
+			    'pass' => $form['nux_pass'],
+			    'type' => 'smtp'
                         ));
                         if (can_save_last_added_server('Hm_SMTP_List', $form['nux_email'])) {
                             $this->session->record_unsaved('SMTP server added');
@@ -210,7 +214,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    Hm_Msgs::add('E-mail account successfully added');
+                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
@@ -386,6 +390,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $server['username'],
                             $server['password'],
                             $server['smtp']['tls'],
+			    $server['type'],
                             false
                         );
                         if (! $smtp_server_id) {
@@ -426,7 +431,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                 Hm_Msgs::add("$error", 'danger');
             }
             foreach ($successes as $success) {
-                Hm_Msgs::add("Server $success imported successfully");
+                Hm_Msgs::add("Server $success imported successfully, To preserve these settings after logout, please go to <a href='/?save'>/?save</a>.");
             }
         }
     }
