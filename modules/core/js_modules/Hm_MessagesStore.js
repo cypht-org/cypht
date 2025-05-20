@@ -17,7 +17,7 @@ class Hm_MessagesStore {
 
     constructor(path, page = 1, filter = '', rows = {}, abortController = new AbortController()) {
         this.path = path;
-        this.list = path + '_' + (filter ? filter + '_': '') + page;
+        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_': '') + page;
         this.rows = rows;
         this.count = 0;
         this.flagAsReadOnOpen = true;
