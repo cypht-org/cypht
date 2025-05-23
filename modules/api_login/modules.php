@@ -1,5 +1,6 @@
 <?php
 
+require_once APP_PATH.'modules/core/handler_modules.php';
 /**
  * @package modules
  * @subpackage api_login

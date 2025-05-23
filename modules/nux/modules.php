@@ -567,7 +567,23 @@ class Hm_Output_nux_help extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
-class Hm_Output_welcome_dialog extends Hm_Output_Module {
+class Hm_Output_start_welcome_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
+        $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
+        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
+class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('single_server_mode')) {
             return '';
@@ -576,10 +592,8 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
         $tz = $this->get('tzone');
         $protos = array('imap', 'jmap', 'ews', 'smtp', 'feeds', 'profiles');
 
-        $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
-        $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
-        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
-        $res .= '</div><ul class="mt-4">';
+        
+        $res = '<ul class="mt-4">';
 
         foreach ($protos as $proto) {
             $proto_dsp = $proto;

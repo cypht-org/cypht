@@ -30,7 +30,7 @@ class Hm_Output_tag_per_source_setting extends Hm_Output_Module {
             $sources = $settings['tag_per_source'];
         }
         if ($sources != DEFAULT_TAGS_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="tag_setting"><td><label for="tag_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
