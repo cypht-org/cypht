@@ -34,15 +34,18 @@ class FolderListTests(WebTest):
 
     def expand_section(self):
         self.by_css('[data-bs-target=".settings"]').click()
-        list_item = self.by_class('menu_home')
+        list_item = self.by_class('menu_dev')
         list_item.click()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
-        assert self.by_class('content_title').text == 'Home'
+        assert self.by_class('content_title').text == 'Developer Documentation'
 
     def collapse_section(self):
+        self.by_css('[data-bs-target=".settings"]').click()
         section = self.by_css('.settings.folders.collapse')
         expanded_class = section.get_attribute('class')
+        print("collapse_section")
+        print(expanded_class)
         assert 'show' in expanded_class
         self.load()
         section = self.by_css('.settings.folders.collapse')
