@@ -577,12 +577,6 @@ function sieveFiltersPageHandler() {
         current_account = $(this).attr('account');
         edit_script_modal.open();
     });
-    $('.edit_filter').on('click', function (e) {
-        e.preventDefault();
-        let script_name = $(this).parent().parent().children().next().html();
-        edit_filter_modal.setTitle(script_name);
-        edit_filter_modal.open();
-    });
 
     /**
      * Delete action Button
@@ -997,6 +991,8 @@ function sieveFiltersPageHandler() {
                         }
                     }
                 });
+                edit_filter_modal.setTitle(current_editing_filter_name);
+                edit_filter_modal.open();
             }
         );
     });
