@@ -1453,7 +1453,7 @@ class Hm_Output_settings_menu_start extends Hm_Output_Module {
     protected function output() {
         $res = '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">'.$this->trans('Settings').
             '<i class="bi bi-chevron-down"></i></div>'.
-            '<ul class="collapse settings folders">';
+            '<ul id="settings-menu-start" class="collapse settings folders">';
         if ($this->format == 'HTML5') {
             return $res;
         }

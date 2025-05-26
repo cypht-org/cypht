@@ -894,10 +894,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_settings_menu_start() {
         $test = new Output_Test('settings_menu_start', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
+        $this->assertEquals(array('<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul id="settings-menu-start" class="collapse settings folders">'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul class="collapse settings folders">'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="src_name d-flex justify-content-between pe-2" data-bs-toggle="collapse" role="button" data-bs-target=".settings">Settings<i class="bi bi-chevron-down"></i></div><ul id="settings-menu-start" class="collapse settings folders">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
