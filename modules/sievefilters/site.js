@@ -1003,7 +1003,7 @@ function get_list_block_sieve() {
     sessionStorage.removeItem('list_blocked');
     let detail = Hm_Utils.parse_folder_path(hm_list_path());
     let list_blocked_senders = [];
-    if (getPageNameParam() == 'message_list') {
+    if (getPageNameParam() == 'message_list' && detail !== false) {
         Hm_Ajax.request(
             [
                 { name: 'hm_ajax_hook', value: 'ajax_list_block_sieve' },
