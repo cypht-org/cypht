@@ -185,7 +185,7 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('An error occurred creating the folder', 'danger');
+                    Hm_Msgs::add('Failed to create folder '.$form['folder'].'. It might already exist. Please check and try again.', 'danger');
                 }
             }
         }
@@ -319,6 +319,17 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             $this->out('folder_server', $this->request->get['imap_server_id']);
             $this->out('page', $this->request->get['page']);
+            $this->out('trigger_default_submit', false);
+        }else {
+            // as requested, if there no selected server we should select on by default based on profiles
+            require_once APP_PATH.'modules/profiles/hm-profiles.php';
+            Hm_Profiles::init($this);
+            $defaultProfile = Hm_Profiles::getDefault();
+            $server = Hm_IMAP_List::getBy($defaultProfile['server'],'server', true);
+            if (!is_null($server) && !empty($server['id'])) {
+                $this->out('folder_server', $server['id']);
+                $this->out('trigger_default_submit', true);
+            }
         }
     }
 }
@@ -375,7 +386,8 @@ class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Modu
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', '');
-        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get">';
+        $data_auto_submit = !empty($this->get('trigger_default_submit')) ? ' data-auto-submit="1"' : 'data-auto-submit="0"';
+        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get"'.$data_auto_submit.'>';
         $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
@@ -409,7 +421,7 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">';
             $res .= '<div data-target=".delete_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                        <a href="#" class="pe-auto">'.$this->trans('Delete a Folder').'</a>
+                        <a href="#" class="pe-auto"><i class="bi bi-folder-x fs-5 me-2"></i>'.$this->trans('Delete a Folder').'</a>
                     </div>';
             $res .= '<div class="delete_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-1 px-0">
                         <div class="folder_row">
@@ -439,7 +451,7 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">
                         <div data-target=".rename_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                            <a href="#" class="pe-auto">'.$this->trans('Rename a Folder').'</a>
+                            <a href="#" class="pe-auto"><i class="bi bi-folder-check fs-5 me-2"></i>'.$this->trans('Rename a Folder').'</a>
                         </div>
                         <div class="rename_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
                             <div class="folder_row">
@@ -493,7 +505,7 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".sent_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Sent Folder').':<span id="sent_val">'.$folder_name.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-send-check-fill fs-5 me-2"></i>'.$this->trans('Sent Folder').':<span id="sent_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog sent_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -539,7 +551,7 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".archive_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Archive Folder').':<span id="archive_val">'.$folder_name.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-archive fs-5 me-2"></i>'.$this->trans('Archive Folder').':<span id="archive_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog archive_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -585,7 +597,7 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".draft_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Draft Folder').':<span id="draft_val">'.$folder_name.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-pencil-square fs-5 me-2"></i>'.$this->trans('Draft Folder').':<span id="draft_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog draft_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -631,7 +643,7 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".trash_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Trash Folder').':<span id="trash_val">'.$folder_name.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-trash3 fs-5 me-2"></i>'.$this->trans('Trash Folder').':<span id="trash_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
         $res .= '<div class="folder_dialog trash_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
@@ -674,7 +686,7 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
                 </div>';
 
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
@@ -748,7 +760,7 @@ class Hm_Output_folders_create_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">
                         <div data-target=".create_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                            <a href="#" class="pe-auto">'.$this->trans('Create a New Folder').'</a>
+                            <a href="#" class="pe-auto"><i class="bi bi-folder-plus fs-5 me-2"></i>'.$this->trans('Create a New Folder').'</a>
                         </div>
                         <div class="create_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
                             <div class="form-floating mb-3">
@@ -824,7 +836,7 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('only_subscribed_folders', $settings) && $settings['only_subscribed_folders']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.
