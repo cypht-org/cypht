@@ -1377,11 +1377,14 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
             $res .= '<i class="bi bi-pencil-square menu-icon"></i>';
         }
         $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
-        $res .= '<li class="menu_snoozed"><a class="unread_link" href="?page=message_list&amp;list_path=snoozed">';
-        if (!$this->get('hide_folder_icons')) {
-            $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('enable_snooze', $settings) && $settings['enable_snooze']) {
+            $res .= '<li class="menu_snoozed"><a class="unread_link" href="?page=message_list&amp;list_path=snoozed">';
+            if (!$this->get('hide_folder_icons')) {
+                $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
+            }
+            $res .= '<span class="nav-label">'.$this->trans('Snoozed').'</span></a></li>';
         }
-        $res .= '<span class="nav-label">'.$this->trans('Snoozed').'</span></a></li>';
 
         if ($this->format == 'HTML5') {
             return $res;

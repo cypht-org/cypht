@@ -996,6 +996,9 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
      * Use IMAP to snooze the selected message uid
      */
     public function process() {
+        if (!$this->user_config->get('enable_snooze', DEFAULT_ENABLE_SNOOZE)) {
+            return;
+        }
         list($success, $form) = $this->process_form(array('imap_snooze_ids', 'imap_snooze_until'));
         if (!$success) {
             return;
@@ -1043,6 +1046,9 @@ class Hm_Handler_imap_unsnooze_message extends Hm_Handler_Module {
      * This should use cron
      */
     public function process() {
+        if (!$this->user_config->get('enable_snooze', DEFAULT_ENABLE_SNOOZE)) {
+            return;
+        }
         $servers = Hm_IMAP_List::dump();
         foreach (array_keys($servers) as $server_id) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
