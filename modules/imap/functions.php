@@ -1708,7 +1708,7 @@ function getCombinedMessagesLists($sources, $context, $search) {
             $msg['server_name'] = $result['dataSource']['name'];
             $msg['folder'] = $result['folder'];
             return $msg;
-        }, $result['messages']);
+        }, is_array($result['messages']) ? $result['messages'] : []);
     }
 
     return ['lists' => $messagesLists, 'total' => $totalMessages, 'status' => $status];
