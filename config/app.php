@@ -1076,6 +1076,13 @@ return [
 
     /*
     |
+    | Enable snooze functionality for messages
+    | Defaults to false
+    */
+    'default_setting_enable_snooze' => env('DEFAULT_SETTING_ENABLE_SNOOZE', false),
+
+    /*
+    |
     | Per source time limit for tags page
     | Defaults to 1 week
     */
