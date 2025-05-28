@@ -974,7 +974,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
@@ -988,8 +988,8 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1002,6 +1002,7 @@ if (!class_exists('Hm_IMAP')) {
                     $references = '';
                     $date = '';
                     $message_id = '';
+                    $in_reply_to = '';
                     $x_priority = 0;
                     $content_type = '';
                     $to = '';
@@ -1089,7 +1090,7 @@ if (!class_exists('Hm_IMAP')) {
                                          'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
-                                         'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
+                                         'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
                                          'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
                         $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 

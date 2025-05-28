@@ -208,10 +208,16 @@ function human_readable_interval($date_str) {
  * @return array
  */
 if (!hm_exists('message_list_row')) {
-function message_list_row($values, $id, $style, $output_mod, $row_class='') {
+function message_list_row($values, $id, $style, $output_mod, $row_class='', $msgId = '', $inReplyTo = '') {
     $res = '<tr class="'.$output_mod->html_safe($id);
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
+    }
+    if (!empty($msgId)) {
+        $res .= '" data-msg-id="'.$output_mod->html_safe($msgId);
+    }
+    if (!empty($inReplyTo)) {
+        $res .= '" data-in-reply-to="'.$output_mod->html_safe($inReplyTo);
     }
     $data_uid = "";
     if ($uids = explode("_", $id)) {

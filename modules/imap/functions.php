@@ -321,6 +321,16 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         //    $url = '?page=compose&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&uid='.$msg['uid'].'&imap_draft=1';
         //}
 
+        $msgId = $msg['message_id'] ?? '';
+        $inReplyTo = $msg['in_reply_to'] ?? '';
+
+        if ($msgId) {
+            $msgId = str_replace(['<', '>'], '', trim($msgId));
+        }
+        if ($inReplyTo) {
+            $inReplyTo = str_replace(['<', '>'], '', trim($inReplyTo));
+        }
+
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
                     array('checkbox_callback', $id),
@@ -334,7 +344,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 $id,
                 $style,
                 $output_module,
-                $row_class
+                $row_class,
+                $msgId,
+                $inReplyTo
             );
         }
         else {
@@ -350,7 +362,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 $id,
                 $style,
                 $output_module,
-                $row_class
+                $row_class,
+                $msgId,
+                $inReplyTo
             );
         }
     }
