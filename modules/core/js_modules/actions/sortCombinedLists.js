@@ -4,11 +4,12 @@ async function sortCombinedLists(sortValue) {
     
     history.pushState(history.state, null, url.toString());
     location.next = url.search;
-    const messagesStore = new Hm_MessagesStore(getListPathParam(), getParam('page'), `${getParam('keyword')}_${getParam('filter')}`);
+    const messagesStore = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, sortValue);
     try {
-        await messagesStore.load(true);
         Hm_Utils.tbody().attr('id', messagesStore.list);
-        display_imap_mailbox(messagesStore.rows, messagesStore.list, messagesStore);
+        await messagesStore.load(true, false, false, store => {
+            display_imap_mailbox(store.rows, store.list, store);
+        });
     } catch (error) {
         Hm_Notices.show('Failed to load messages', 'danger');
     }
