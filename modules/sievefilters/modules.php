@@ -1380,6 +1380,10 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
 
         Hm_IMAP_List::init($this->user_config, $this->session);
         $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
+
+        if (empty($imap_account['sieve_config_host'])) {
+            return;
+        }
         
         $factory = get_sieve_client_factory($this->config);
         try {
