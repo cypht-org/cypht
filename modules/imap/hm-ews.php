@@ -140,7 +140,15 @@ class Hm_EWS {
         }
     }
 
-    public function get_folder_status($folder) {
+    public function get_folder_name_quick($folder) {
+        if ($this->is_distinguished_folder($folder)) {
+            return $folder;
+        } else {
+            return false;
+        }
+    }
+
+    public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {
                 $folder = new Type\DistinguishedFolderIdType($folder);
@@ -151,7 +159,7 @@ class Hm_EWS {
             } else {
                 $result = $this->api->getFolderByDisplayName($folder, Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
                 if (! $result) {
-                    throw new Exception('Folder not found.');
+                    throw new Exception('Folder not found: ' . $folder);
                 }
             }
             return [
@@ -167,7 +175,9 @@ class Hm_EWS {
             // since this is used for missing folders check, we skip error reporting
             return [];
         } catch (\Exception $e) {
-            Hm_Msgs::add($e->getMessage(), 'danger');
+            if ($report_error) {
+                Hm_Msgs::add($e->getMessage(), 'danger');
+            }
             return [];
         }
     }
@@ -946,10 +956,17 @@ class Hm_EWS {
         return $flags;
     }
 
-    protected function is_distinguished_folder($folder) {
+    protected function is_distinguished_folder(&$folder) {
         $oClass = new ReflectionClass(new Enumeration\DistinguishedFolderIdNameType());
         $constants = $oClass->getConstants();
-        return in_array($folder, $constants);
+        if (in_array($folder, $constants)) {
+            return true;
+        }
+        if (isset($constants[$folder])) {
+            $folder = $constants[$folder];
+            return true;
+        }
+        return false;
     }
 
     protected function archive_items($itemIds) {

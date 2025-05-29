@@ -20,10 +20,10 @@ async function nextPage() {
 
     const nextPage = parseInt(currentPage) + 1;
 
-    const store = new Hm_MessagesStore(getListPathParam(), currentPage, `${getParam('keyword')}_${getParam('filter')}`);
+    const store = new Hm_MessagesStore(getListPathParam(), currentPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     store.load(false, false, true);
 
-    await changePage(nextPage, this, store.offsets);
+    await changePage(nextPage, this);
 }
 
 async function previousPage() {
@@ -31,41 +31,34 @@ async function previousPage() {
 
     const previousPage = parseInt(currentPage) - 1;
 
-    let offsets = '';
     if (previousPage > 1) {
-        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1, `${getParam('keyword')}_${getParam('filter')}`);
+        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
         store.load(false, false, true);
-        offsets = store.offsets;
     }
 
-    await changePage(previousPage, this, offsets);
+    await changePage(previousPage, this);
 
     if (previousPage > 1) {
         $(this).prop('disabled', false);
     }
 }
 
-async function changePage(toPage, button, offsets) {
+async function changePage(toPage, button) {
     $(button).prop('disabled', true);
     $(button).addClass('active');
 
     const url = new URL(window.location.href);
     url.searchParams.set('list_page', toPage);
 
-    if (offsets) {
-        url.searchParams.set('offsets', offsets);
-    } else {
-        url.searchParams.delete('offsets');
-    }
-
     history.pushState(history.state, "", url.toString());
     window.location.next = url.search;
 
-    const messagesStore = new Hm_MessagesStore(getListPathParam(), toPage, `${getParam('keyword')}_${getParam('filter')}`);
+    const messagesStore = new Hm_MessagesStore(getListPathParam(), toPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     try {
-        await messagesStore.load();
         Hm_Utils.tbody().attr('id', messagesStore.list);
-        display_imap_mailbox(messagesStore.rows, messagesStore.list, messagesStore);
+        await messagesStore.load(false, false, false, store => {
+            display_imap_mailbox(store.rows, store.list, store);
+        });
         $(".pagination .current").text(toPage);
     } catch (error) {
         Hm_Notices.show("Failed to fetch content", "danger");

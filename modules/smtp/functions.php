@@ -138,7 +138,7 @@ function reschedule_message_sending($handler, $mailbox, $msg_id, $folder, $new_d
     $msg = rtrim($msg)."\r\n";
 
     $schedule_folder = 'Scheduled';
-    if (!count($mailbox->get_folder_status($schedule_folder))) {
+    if ($mailbox->folder_exists($schedule_folder)) {
         return;
     }
     $res = false;

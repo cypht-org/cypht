@@ -301,7 +301,7 @@ function parse_sieve_config_host($imap_account) {
     return [$host, $port, $tls];
 }}
 
-if (!hm_exists('prepare_sieve_script ')) {
+if (!hm_exists('prepare_sieve_script')) {
     function prepare_sieve_script ($script, $index = 1, $action = "decode")
     {
         $blocked_list = [];

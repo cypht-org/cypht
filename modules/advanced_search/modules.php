@@ -144,7 +144,7 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         if (in_array('deleted', $flags, true)) {
             $exclude_deleted = false;
         }
-        $msgs = $mailbox->search($this->folder, $flags, false, $params, array(), $exclude_deleted);
+        $msgs = $mailbox->search($this->folder, $flags, $params, null, null, $exclude_deleted);
         if (!$msgs) {
             return $msg_list;
         }

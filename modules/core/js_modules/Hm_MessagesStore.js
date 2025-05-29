@@ -15,16 +15,17 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, filter = '', rows = {}, abortController = new AbortController()) {
+    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = {}, abortController = new AbortController()) {
         this.path = path;
         this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_': '') + page;
+        this.sortFld = sortFld;
         this.rows = rows;
+        this.sources = {};
         this.count = 0;
         this.flagAsReadOnOpen = true;
         this.abortController = abortController;
         this.pages = 0;
         this.page = page;
-        this.offsets = '';
         this.newMessages = [];
     }
 
@@ -33,21 +34,27 @@ class Hm_MessagesStore {
      * @returns {Boolean}
      */
     hasLocalData() {
-        return this.#retrieveFromLocalStorage() !== false;
+        return this.retrieveFromLocalStorage() !== false;
     }
 
     /**
+     * Loads message list from store or reload/initially fetch from configuration.
+     * The target ajax request(s) are based on the configuration coming from the URL path params.
+     * This method is designed to work with single-source paths like imap folders, github or feed pages
+     * as well as combined source paths like All email, unread, sent, trash, etc.
+     * When it works on multiple data-sources, you can pass messagesReadyCB to refresh the UI element, so
+     * user doesn't have to wait for all sources to be loaded to see something on screen.
      * 
      * @returns {Promise<this>}
      */
-    async load(reload = false, hideLoadingState = false, doNotFetch = false) {
-        const storedMessages = this.#retrieveFromLocalStorage();
+    async load(reload = false, hideLoadingState = false, doNotFetch = false, messagesReadyCB = null) {
+        const storedMessages = this.retrieveFromLocalStorage();
         if (storedMessages) {
             this.rows = storedMessages.rows;
+            this.sources = storedMessages.sources || {};
             this.pages = parseInt(storedMessages.pages);
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
-            this.offsets = storedMessages.offsets;
             if (!reload) {
                 return this;
             }
@@ -57,18 +64,58 @@ class Hm_MessagesStore {
             return this;
         }
 
-        const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, offsets } = await this.#fetch(hideLoadingState);
+        this.fetch(hideLoadingState).forEach(async (req) => {
+            const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
+            // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
+            this.count = folder_status && Object.values(folder_status)[0]?.messages;
+            this.pages = parseInt(pages);
+            this.newMessages = this.getNewMessages(updatedMessages);
 
-        this.newMessages = this.#getNewMessages(updatedMessages);
-        this.count = folder_status && Object.values(folder_status)[0]?.messages;
-        this.pages = parseInt(pages);
-        this.rows = updatedMessages;
-        this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
-        this.offsets = offsets;
+            if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
+            }
 
-        this.#saveToLocalStorage();
+            if (this.sources[sourceId]) {
+                this.rows = Object.fromEntries(
+                    Object.entries(this.rows).filter(([key]) => !this.sources[sourceId].includes(key))
+                );
+            }
+            this.sources[sourceId] = Object.keys(updatedMessages);
+            this.rows = Object.assign({}, this.rows, updatedMessages);
+
+            this.sort();
+            this.saveToLocalStorage();
+
+            if (messagesReadyCB) {
+                messagesReadyCB(this);
+            }
+        }, this);
 
         return this;
+    }
+
+    sort() {
+        let rows = Object.entries(this.rows);
+        let sortFld = this.sortFld;
+        let sorted = rows.sort((a, b) => {
+            let aval, bval;
+            const sortField = sortFld.replace('-', '');
+            if (['arrival', 'date'].includes(sortField)) {
+                aval = new Date($(`input.${sortField}`, $('td.dates', $(a[1][0]))).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', $(b[1][0]))).val());
+                if (sortFld.startsWith('-')) {
+                    return aval - bval;
+                }
+                return bval - aval;
+            }
+            aval = $(`td.${sortField}`, $(a[1][0])).text().replace(/^\s+/g, '');
+            bval = $(`td.${sortField}`, $(b[1][0])).text().replace(/^\s+/g, '');
+            if (sortFld.startsWith('-')) {
+                return bval.toUpperCase().localeCompare(aval.toUpperCase());
+            }
+            return aval.toUpperCase().localeCompare(bval.toUpperCase());
+        });
+        this.rows = Object.fromEntries(sorted);
     }
 
     /**
@@ -90,7 +137,7 @@ class Hm_MessagesStore {
             objectRows[row[0]]['0'] = htmlRow[0].outerHTML;
             
             this.rows = objectRows;
-            this.#saveToLocalStorage();
+            this.saveToLocalStorage();
 
             return wasUnseen;
         }
@@ -138,7 +185,7 @@ class Hm_MessagesStore {
         if (row) {
             const newRows = rows.filter((_, i) => i !== row.index);
             this.rows = Object.fromEntries(newRows);
-            this.#saveToLocalStorage();
+            this.saveToLocalStorage();
         }
         
     }
@@ -150,12 +197,12 @@ class Hm_MessagesStore {
             const objectRows = Object.fromEntries(rows);
             objectRows[row[0]]['0'] = html;
             this.rows = objectRows;
-            this.#saveToLocalStorage();
+            this.saveToLocalStorage();
         }
     }
 
-    #getNewMessages(fetchedRows) {
-        const actualRows = this.hasLocalData() ? Object.values(this.rows): [];
+    getNewMessages(fetchedRows) {
+        const actualRows = this.rows;
         const fetchedRowsValues = Object.values(fetchedRows);
 
         const newMessages = [];
@@ -175,76 +222,70 @@ class Hm_MessagesStore {
         return newMessages;
     }
 
-    #fetch(hideLoadingState = false) {
-        return new Promise((resolve, reject) => {
-            Hm_Ajax.request(
-              this.#getRequestConfig(),
-              (response) => {
-                resolve(response);
-              },
-              [],
-              hideLoadingState,
-              undefined,
-              reject,
-              this.abortController?.signal
-            );
+    fetch(hideLoadingState = false) {
+        let store = this;
+        return this.getRequestConfigs().map((config) => {
+            return new Promise((resolve, reject) => {
+                Hm_Ajax.request(
+                    config,
+                    (response) => {
+                        response.sourceId = store.hashObject(config);
+                        resolve(response);
+                    },
+                    [],
+                    hideLoadingState,
+                    undefined,
+                    reject,
+                    this.abortController?.signal
+                );
+            });
         });
     }
 
-    #getRequestConfig() {
-        let hook;
-        const config = [];
+    getRequestConfigs() {
+        const config = [{ name: "list_page", value: this.page }];
+        const configs = [];
         if (this.path.startsWith('imap')) {
-            hook = "ajax_imap_folder_display";
-
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
+            config.push({ name: "hm_ajax_hook", value: 'ajax_imap_folder_display' });
             config.push({ name: "imap_server_id", value: detail.server_id });
             config.push({ name: "folder", value: detail.folder });
-
+            configs.push(config);
         } else if (this.path.startsWith('feeds')) {
-            hook = "ajax_feed_combined";
             const serverId = this.path.split('_')[1];
             if (serverId) {
                 config.push({ name: "feed_server_ids", value: serverId });
             }
+            config.push({ name: "hm_ajax_hook", value: 'ajax_feed_combined' });
+            configs.push(config);
         } else if (this.path.startsWith('github')) {
-            hook = "ajax_github_data";
+            config.push({ name: "hm_ajax_hook", value: 'ajax_github_data' });
             config.push({ name: "github_repo", value: this.path.split('_')[1] });
+            configs.push(config);
         } else {
-            switch (this.path) {
-                case 'unread':
-                case 'flagged':
-                    hook = "ajax_imap_filter_by_type";
-                    config.push({ name: "filter_type", value: this.path });
-                    break;
-                case 'combined_inbox':
-                    hook = "ajax_combined_message_list";
-                    break;
-                case 'email':
-                    hook = "ajax_imap_combined_inbox";
-                    break;
-                case 'tag':
-                    hook = "ajax_imap_tag_data";
-                    folder = getParam('tag_id');
-                    break;
-                default:
-                    hook = "ajax_imap_folder_data";
-                    break;
+            if (this.path == 'tag') {
+                config.push({ name: "hm_ajax_hook", value: 'ajax_imap_tag_data' });
+                config.push({ name: "folder", value: getParam('tag_id') });
+                configs.push(config);
+            } else {
+                hm_data_sources().forEach((ds) => {
+                    const cfg = config.slice();
+                    cfg.push({ name: "hm_ajax_hook", value: 'ajax_imap_message_list' });
+                    cfg.push({ name: "imap_server_ids", value: ds.id });
+                    cfg.push({ name: "imap_folder_ids", value: ds.folder });
+                    configs.push(cfg);
+                });
             }
         }
-        
-        config.push({ name: "hm_ajax_hook", value: hook });
-        config.push({ name: "list_page", value: this.page });
-
-        return config;
+        return configs;
     }
 
-    #saveToLocalStorage() {
-        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ rows: this.rows, pages: this.pages, count: this.count, offsets: this.offsets }));
+    saveToLocalStorage() {
+        Hm_Utils.save_to_local_storage(this.list, JSON.stringify({ rows: this.rows, sources: this.sources, pages: this.pages, count: this.count }));
         Hm_Utils.save_to_local_storage('flagAsReadOnOpen', this.flagAsReadOnOpen);
     }
 
-    #retrieveFromLocalStorage() {
+    retrieveFromLocalStorage() {
         const stored = Hm_Utils.get_from_local_storage(this.list);
         const flagAsReadOnOpen = Hm_Utils.get_from_local_storage('flagAsReadOnOpen');
         if (stored) {
@@ -270,6 +311,17 @@ class Hm_MessagesStore {
             return { index, value: row };
         }
         return false;
+    }
+
+    hashObject(obj) {
+        const str = JSON.stringify(obj);
+        let hash = 0, i, chr;
+        for (i = 0; i < str.length; i++) {
+        chr = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32-bit int
+        }
+        return `id_${Math.abs(hash)}`;
     }
 }
 

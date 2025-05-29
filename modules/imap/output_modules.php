@@ -919,7 +919,7 @@ class Hm_Output_filter_by_type extends Hm_Output_Module {
 }
 
 /**
- * Format message headers for the Sent, Junk, Draft, Trash E-mail page
+ * Format message headers for the All, Combined Inbox, Sent, Junk, Draft, Unread, Trash E-mail pages
  * @subpackage imap/output
  */
 class Hm_Output_filter_data extends Hm_Output_Module {
@@ -927,44 +927,8 @@ class Hm_Output_filter_data extends Hm_Output_Module {
      * Build ajax response for the All E-mail message list
      */
     protected function output() {
-        if ($this->get('imap_'.$this->get('list_path').'_data')) {
-            prepare_imap_message_list($this->get('imap_'.$this->get('list_path').'_data'), $this, $this->get('list_path'));
-        }
-        else {
-            $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format message headers for the All E-mail page
- * @subpackage imap/output
- */
-class Hm_Output_filter_all_email extends Hm_Output_Module {
-    /**
-     * Build ajax response for the All E-mail message list
-     */
-    protected function output() {
-        if ($this->get('imap_combined_inbox_data')) {
-            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'email');
-        }
-        else {
-            $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format message headers for the Everthing page
- * @subpackage imap/output
- */
-class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
-    /**
-     * Build ajax response for the Everthing message list
-     */
-    protected function output() {
-        if ($this->get('imap_combined_inbox_data')) {
-            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
+        if ($this->get('imap_message_list_data')) {
+            prepare_imap_message_list($this->get('imap_message_list_data'), $this, $this->get('list_path'));
         }
         else {
             $this->out('formatted_message_list', array());

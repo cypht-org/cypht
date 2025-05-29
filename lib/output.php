@@ -55,7 +55,7 @@ class Hm_Output_HTTP extends Hm_Output {
      */
     protected function output_content($content, $headers = []) {
         $this->output_headers($headers);
-        ob_end_clean();
+        ob_end_flush();
         echo $content;
     }
 }

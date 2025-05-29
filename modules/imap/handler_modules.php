@@ -546,12 +546,8 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     else {
                         $folder = hex2bin($parts[2]);
                     }
-                    $mailbox = Hm_IMAP_List::get_connected_mailbox($details['id'], $this->cache);
-                    if ($mailbox && $mailbox->authed()) {
-                        $label = $mailbox->get_folder_name($folder);
-                    } else {
-                        $label = $folder;
-                    }
+                    $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
+                    $label = $mailbox->get_folder_name($folder);
                     $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
@@ -559,7 +555,7 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     $this->out('mailbox_list_title', $title);
                 }
 
-                if ($this->module_is_supported("contacts") && $folder == 'INBOX') {
+                if ($this->module_is_supported("contacts") && strtoupper($folder) == 'INBOX') {
                     $this->out('folder', $folder);
                     $this->out('screen_emails', isset($this->request->get['screen_emails']));
                     $this->out('first_time_screen_emails', $this->user_config->get('first_time_screen_emails_setting', DEFAULT_PER_SOURCE));
@@ -1234,7 +1230,7 @@ class Hm_Handler_imap_search extends Hm_Handler_Module {
  * Get message headers for the Everthing page
  * @subpackage imap/handler
  */
-class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
+class Hm_Handler_imap_message_list extends Hm_Handler_Module {
     /**
      * Returns list of message data for the Everthing page
      */
@@ -1242,14 +1238,14 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         $defaultGetParams = [
             'list_page' => 1,
             'sort' => 'arrival',
-            'offsets' => ''
         ];
         $this->request->get = array_merge($defaultGetParams, $this->request->get);
 
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
+        list($success, $form) = $this->process_form(array('imap_server_ids', 'imap_folder_ids'));
 
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
+            $folders = explode(',', $form['imap_folder_ids']);
         } else {
             $userCustomSources = $this->session->get('custom_imap_sources', user:true);
             if (! $userCustomSources) {
@@ -1257,149 +1253,76 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
             }
             $data_sources = imap_data_sources($userCustomSources);
             $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
-        }
-
-        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'email') {
-            $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
-        }
-        else {
-            $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
-            $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+            $folders = array_map(function($ds) { return $ds['folder']; }, $data_sources);
         }
 
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
-        $filter = 'ALL';
-        $offset = 0;
-        $list_page = 1;
-        $maxPerSource = round($limit / count($data_sources));
-
-        if (isset($this->request->get['list_page'])) {
-            $list_page = (int) $this->request->get['list_page'];
-            if ($list_page && $list_page > 1) {
-                $offset = ($list_page - 1)*$maxPerSource;
-            }
-            else {
-                $list_page = 1;
-            }
+        switch ($this->get('list_path')) {
+            case 'email':
+                $filter = 'ALL';
+                $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_email_since_setting', DEFAULT_SINCE));
+                break;
+            case 'combined_inbox':
+                $filter = 'ALL';
+                $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
+                $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                break;
+            case 'flagged':
+                $filter = 'FLAGGED';
+            case 'unread':
+                $filter = 'UNSEEN';
+            default:
+                if (empty($filter)) {
+                    $filter = 'ALL';
+                }
+                if ($this->get('list_path')) {
+                    $limit = $this->user_config->get($this->get('list_path').'_per_source_setting', DEFAULT_PER_SOURCE);
+                    $date = process_since_argument($this->user_config->get($this->get('list_path').'_since_setting', DEFAULT_SINCE));
+                } else {
+                    $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
+                    $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
+                }
         }
+
         if ($this->get('list_filter')) {
             $filter = mb_strtoupper($this->get('list_filter'));
         }
 
-        $offsets = $this->request->get['offsets'] ?? '';
-        if ($offsets) {
-            $offsets = explode(',', $offsets);
+        $terms = [[search_since_based_on_setting($this->user_config), $date]];
+
+        $messages = [];
+        $status = [];
+        foreach ($ids as $key => $id) {
+            $details = Hm_IMAP_List::dump($id);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
+            $uids = $mailbox->search(hex2bin($folders[$key]), $filter, $terms, $sort, $reverse);
+
+            $total = count($uids);
+            $uids = array_slice($uids, 0, $limit);
+
+            $headers = $mailbox->get_message_list(hex2bin($folders[$key]), $uids);
+            foreach ($uids as $uid) {
+                if (isset($headers[$uid])) {
+                    $msg = $headers[$uid];
+                } elseif (isset($headers[bin2hex($uid)])) {
+                    $msg = $headers[bin2hex($uid)];
+                } else {
+                    continue;
+                }
+                $msg['server_id'] = $id;
+                $msg['server_name'] = $details['name'];
+                $msg['folder'] = $folders[$key];
+                $messages[] = $msg;
+            }
+
+            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_status(hex2bin($folders[$key]));
         }
 
-        $result = getCombinedMessagesLists($data_sources, [
-            'cache' => $this->cache,
-            'session' => $this->session,
-            'config' => $this->user_config,
-        ], [
-            'terms' => [[search_since_based_on_setting($this->user_config), $date]],
-            'listPage' => $list_page,
-            'limit' => $limit,
-            'offsets' => $offsets,
-            'defaultOffset' => $offset,
-            'filter' => $filter,
-            'sort' => $sort,
-            'reverse' => $reverse
-        ]);
-
-        $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
-
-        $maxPages = ceil($result['total'] / $limit);
-        $this->out('pages', $maxPages);
-        $this->out('folder_status', $result['status']);
-        $this->out('imap_combined_inbox_data', $messagesList);
+        $this->out('folder_status', $status);
+        $this->out('imap_message_list_data', $messages);
         $this->out('imap_server_ids', implode(',', $ids));
-        $this->out('offsets', implode(',', $list['offsets']));
-    }
-}
-
-/**
- * Get message headers for the Flagged page
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
-    /**
-     * Fetch flagged messages from an IMAP server
-     */
-    public function process() {
-        $defaultGetParams = [
-            'list_page' => 1,
-            'sort' => 'arrival',
-            'offsets' => '',
-            'keyword' => ''
-        ];
-        $this->request->get = array_merge($defaultGetParams, $this->request->get);
-
-        $data_sources = imap_data_sources();
-        $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
-
-        $filter_type = $this->request->post['filter_type'];
-
-        if ($filter_type === 'flagged') {
-            $filter = 'FLAGGED';
-            $date = process_since_argument($this->user_config->get('flagged_since_setting', DEFAULT_FLAGGED_SINCE));
-            $limit = $this->user_config->get('flagged_per_source_setting', DEFAULT_FLAGGED_PER_SOURCE);
-        } else if ($filter_type === 'unread') {
-            $filter = 'UNSEEN';
-            $date = process_since_argument($this->user_config->get('unread_since_setting', DEFAULT_UNREAD_SINCE));
-            $limit = $this->user_config->get('unread_per_source_setting', DEFAULT_PER_SOURCE);
-        } else {
-            return;
-        }
-
-        list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
-        $list_page = (int) $this->request->get['list_page'];
-        $offsets = $this->request->get['offsets'];
-        $keyword = $this->request->get['keyword'];
-
-        $maxPerSource = round($limit / count($data_sources));
-        $offset = 0;
-
-        if ($list_page && $list_page > 1) {
-            $offset = ($list_page - 1)*$maxPerSource;
-        }
-
-        $searchTerms = [];
-        if ($keyword) {
-            $searchTerms[] = ['TEXT', $keyword];
-        }
-        if ($offsets) {
-            $offsets = explode(',', $offsets);
-        }
-        $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
-
-        $result = getCombinedMessagesLists($data_sources, [
-            'cache' => $this->cache,
-            'session' => $this->session,
-            'config' => $this->user_config,
-        ], [
-            'terms' => $searchTerms,
-            'listPage' => $list_page,
-            'limit' => $limit,
-            'offsets' => $offsets,
-            'defaultOffset' => $offset,
-            'filter' => $filter,
-            'sort' => $sort,
-            'reverse' => $reverse
-        ]);
-
-        $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
-
-        $maxPages = ceil($result['total'] / $limit);
-        $this->out('pages', $maxPages);
-        $this->out('folder_status', $result['status']);
-        $this->out('imap_filter_by_type_data', $messagesList);
-        $this->out('type', $filter_type);
-        $this->out('imap_server_ids', implode(',', $ids));
-        $this->out('offsets', implode(',', $list['offsets']));
     }
 }
 
@@ -2111,83 +2034,6 @@ class Hm_Handler_process_review_sent_email_setting extends Hm_Handler_Module {
             return $val;
         }
         process_site_setting('review_sent_email', $this, 'review_sent_email_callback', DEFAULT_REVIEW_SENT_EMAIL, true);
-    }
-}
-
-/**
- * Get message headers for the Sent page
- * @subpackage imap/handler
- */
-class Hm_Handler_imap_folder_data extends Hm_Handler_Module {
-    /**
-     * Returns list of message data for the sent page
-     */
-    public function process() {
-        $defaultParams = [
-            'list_page' => 1,
-            'keyword' => '',
-            'offsets' => '',
-            'sort' => 'arrival'
-        ];
-        $this->request->get = array_merge($defaultParams, $this->request->get);
-        $path = $this->request->get['list_path'];
-        $keyword = $this->request->get['keyword'];
-        $list_page = (int) $this->request->get['list_page'];
-        $offsets = $this->request->get['offsets'];
-
-        list($success, $form) = $this->process_form(array('imap_server_ids'));
-        if ($success) {
-            $ids = explode(',', $form['imap_server_ids']);
-        } else {
-            $data_sources = imap_sources($this, $path);
-            $ids = array_map(function($ds) { return $ds['id']; }, $data_sources);
-        }
-
-        $limit = $this->user_config->get($path.'_per_source_setting', DEFAULT_PER_SOURCE);
-        $date = process_since_argument($this->user_config->get($path.'_since_setting', DEFAULT_SINCE));
-        list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
-
-        $maxPerSource = round($limit / count($data_sources));
-        $offset = 0;
-
-        if ($list_page && $list_page > 1) {
-            $offset = ($list_page - 1)*$maxPerSource;
-        }
-
-        $searchTerms = [];
-
-        if ($keyword) {
-            $searchTerms[] = ['TEXT', $keyword];
-        }
-        if ($offsets) {
-            $offsets = explode(',', $offsets);
-        }
-        $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
-
-        $result = getCombinedMessagesLists($data_sources, [
-            'cache' => $this->cache,
-            'session' => $this->session,
-            'config' => $this->user_config,
-        ], [
-            'listPage' => $list_page,
-            'limit' => $limit,
-            'offsets' => $offsets,
-            'defaultOffset' => $offset,
-            'terms' => $searchTerms,
-            'sort' => $sort,
-            'reverse' => $reverse,
-            'filter' => 'ALL'
-        ]);
-
-        $list = flattenMessagesLists($result['lists'], $maxPerSource);
-        $messagesList = sortCombinedMessages($list['messages'], $this->request->get['sort'] ?? 'arrival');
-
-        $maxPages = ceil($result['total'] / $limit);
-        $this->out('pages', $maxPages);
-        $this->out('folder_status', $result['status']);
-        $this->out('imap_'.$path.'_data', $messagesList);
-        $this->out('imap_server_ids', implode(',', $ids));
-        $this->out('offsets', implode(',', $list['offsets']));
     }
 }
 

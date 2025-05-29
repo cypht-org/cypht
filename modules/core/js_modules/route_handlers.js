@@ -67,10 +67,10 @@ function applyInfoPageHandlers() {
     }
 }
 
-function applyMessaleListPageHandlers(routeParams) {
+function applyMessageListPageHandlers(routeParams) {
     sortHandlerForMessageListAndSearchPage();
     Hm_Message_List.set_row_events();
-    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`);
+    const messagesStore = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`, routeParams.sort);
     Hm_Utils.tbody().attr('id', messagesStore.list);
 
     $('.core_msg_control').on("click", function(e) {
@@ -88,7 +88,9 @@ function applyMessaleListPageHandlers(routeParams) {
         return applyGithubMessageListPageHandler(routeParams);
     }
     
-
+    if (routeParams.sort) {
+        $('.combined_sort').val(routeParams.sort);
+    }
     $('.combined_sort').on("change", function() {
         sortCombinedLists($(this).val());
     });
