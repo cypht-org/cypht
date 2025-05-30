@@ -30,7 +30,6 @@ class Hm_QueueWorker
         while ($item = $this->queue->pop())
         {
             try {
-                // exit(var_dump($this->queue));
                 $this->queue->process($item);
             } catch (\Exception $e) {
                 $item->failed();

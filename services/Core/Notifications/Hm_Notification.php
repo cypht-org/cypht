@@ -2,9 +2,11 @@
 
 namespace Services\Core\Notifications;
 
+use Psr\Log\LoggerInterface;
 use Services\Traits\Hm_Dispatchable;
 use Services\Core\Queue\Hm_Queueable;
 use Services\Contracts\Notifications\Hm_Dispatcher;
+use Services\Core\Hm_Container;
 
 /**
  * Notification class
@@ -21,6 +23,10 @@ class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
      */
     public string $content = '';
 
+
+    private ?LoggerInterface $logger = null;
+
+
     /**
      * Constructor.
      * 
@@ -30,6 +36,7 @@ class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
     {
         $this->content = $content;
         $this->driver = env('QUEUE_DRIVER');
+        
     }
     /**
      * Notifcations can be sent through multiple channels.
@@ -43,9 +50,10 @@ class Hm_Notification extends Hm_Queueable implements Hm_Dispatcher
 
     public function handle(): void
     {
-        dump("Processing ".self::class);
-
+        $logger = Hm_Container::getContainer()->get(LoggerInterface::class);
+        $logger->info('Processing notification: '.self::class);
         $this->sendNow();
+        $logger->info('Processing notification: '.self::class.' Termined');
     }
     public function failed(): void
     {
