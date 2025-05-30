@@ -1,7 +1,11 @@
 <?php
 
+use Monolog\Logger;
 use Services\Hm_Kernel;
+use Psr\Log\LoggerInterface;
 use Services\Core\Hm_Container;
+use Services\Providers\CyphtServiceProvider;
+use Services\Providers\LoggerServiceProvider;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -42,6 +46,9 @@ if (!$config->get('disable_ini_settings')) {
     require APP_PATH.'lib/ini_set.php';
 }
 
+// require_once Hm_IMAP_List
+require_once APP_PATH . 'modules/imap/hm-imap.php';
+
 ErrorHandler::register();
 
 $containerBuilder = Hm_Container::setContainer(new ContainerBuilder());
@@ -60,6 +67,13 @@ Hm_Container::bind();
 // Prepare Kernel instance parameters
 $queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider');
 $queueServiceProvider->register($config, $session);
+
+//Register logger to display info in terminal
+$loggerProvider = new LoggerServiceProvider();
+$loggerProvider->register($containerBuilder);
+
+//register cypht(we need imap class in the service)
+(new CyphtServiceProvider())->register($containerBuilder);
 
 // Create a new Kernel instance
 $kernel = (new Hm_Kernel($containerBuilder->get('scheduler')))->schedule();
