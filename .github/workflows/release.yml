@@ -30,7 +30,7 @@ jobs:
         run: php scripts/config_gen.php
 
       - name: Create tarball
-        run: cd .. && tar --exclude .github --exclude .git --exclude .gitignore --exclude .travis --exclude .travis.yml --exclude .coveralls.yml --exclude .env.example -pczf cypht.tar.gz cypht
+        run: tar czf ../cypht.tar.gz --exclude .git --exclude .gitignore --exclude .travis --exclude .travis.yml --exclude .github --exclude .coveralls.yml --exclude .env.example ./* ./.*
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
