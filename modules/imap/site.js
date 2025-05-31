@@ -416,6 +416,11 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
         if (messages.pages) {
             showPagination(messages.pages);
         }
+
+        messages.newMessages.forEach((newMessage) => {
+            const row = $(newMessage);
+            triggerNewMessageEvent(row.data('uid'), row[0]);
+        });
     });
 
     if (path === 'unread') {

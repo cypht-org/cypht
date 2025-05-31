@@ -25,6 +25,7 @@ class Hm_MessagesStore {
         this.pages = 0;
         this.page = page;
         this.offsets = '';
+        this.newMessages = [];
     }
 
     /**
@@ -58,6 +59,7 @@ class Hm_MessagesStore {
 
         const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, offsets } = await this.#fetch(hideLoadingState);
 
+        this.newMessages = this.#getNewMessages(updatedMessages);
         this.count = folder_status && Object.values(folder_status)[0]?.messages;
         this.pages = parseInt(pages);
         this.rows = updatedMessages;
@@ -150,6 +152,27 @@ class Hm_MessagesStore {
             this.rows = objectRows;
             this.#saveToLocalStorage();
         }
+    }
+
+    #getNewMessages(fetchedRows) {
+        const actualRows = this.hasLocalData() ? Object.values(this.rows): [];
+        const fetchedRowsValues = Object.values(fetchedRows);
+
+        const newMessages = [];
+
+        fetchedRowsValues.forEach(fetchedRow => {
+            const isNew = !actualRows.some(actualRow => {
+                return $(actualRow['0']).data('uid') === $(fetchedRow['0']).data('uid');
+            });
+            if (isNew) {
+                const row = $(fetchedRow['0']);
+                if (row.hasClass('unseen')) {
+                    newMessages.push(fetchedRow['0']);
+                }
+            }
+        });
+
+        return newMessages;
     }
 
     #fetch(hideLoadingState = false) {
