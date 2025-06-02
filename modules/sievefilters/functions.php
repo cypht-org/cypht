@@ -301,14 +301,14 @@ function parse_sieve_config_host($imap_account) {
     return [$host, $port, $tls];
 }}
 
-if (!hm_exists('prepare_sieve_script ')) {
+if (!hm_exists('prepare_sieve_script')) {
     function prepare_sieve_script ($script, $index = 1, $action = "decode")
     {
         $blocked_list = [];
         if ($script != '') {
             $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[$index]);
             if ($action == "decode") {
-                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)));
+                $blocked_list = json_decode(str_replace("*", "", base64_decode($base64_obj)), true);
             } else {
                 $blocked_list = json_encode(base64_decode($base64_obj));
             }
