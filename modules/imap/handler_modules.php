@@ -565,10 +565,6 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     $this->out('first_time_screen_emails', $this->user_config->get('first_time_screen_emails_setting', DEFAULT_PER_SOURCE));
                     $this->out('move_messages_in_screen_email', $this->user_config->get('move_messages_in_screen_email_setting', DEFAULT_PER_SOURCE));
                 }
-            } elseif ($path == 'sent') {
-                $this->out('mailbox_list_title', array('Sent'));
-                $this->out('per_source_limit', $this->user_config->get('sent_per_source_setting', DEFAULT_SENT_PER_SOURCE));
-                $this->out('message_list_since', $this->user_config->get('sent_since_setting', DEFAULT_SENT_SINCE));
             }
             if (array_key_exists('sort', $this->request->get)) {
                 if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
