@@ -62,6 +62,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_TRASH_PER_SOURCE);
         $mailbox_list_title = array('Trash');
     }
+    elseif ($path == 'sent') {
+        $list_path = 'sent';
+        $message_list_since = $handler->user_config->get('sent_since_setting', DEFAULT_SENT_SINCE);
+        $per_source_limit = $handler->user_config->get('sent_per_source_setting', DEFAULT_SENT_PER_SOURCE);
+        $mailbox_list_title = array('Sent');
+    }
     elseif ($path == 'drafts') {
         $list_path = 'drafts';
         $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_DRAFT_SINCE);
