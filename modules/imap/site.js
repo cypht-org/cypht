@@ -772,7 +772,7 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
-    $('#unread_message').on("click", function() { return inline_imap_unread_message(msg_uid, detail);});
+    $('#unread_message').on("click", function() { return imap_unread_message(msg_uid, detail);});
     $('#block_sender').on("click", function(e) {
         e.preventDefault();
         var scope = $('[name=scope]').val();

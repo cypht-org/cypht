@@ -175,7 +175,7 @@ class Hm_EWS {
             // since this is used for missing folders check, we skip error reporting
             return [];
         } catch (\Exception $e) {
-            if ($report_error) {
+            if ($report_error && $e->getMessage()) {
                 Hm_Msgs::add($e->getMessage(), 'danger');
             }
             return [];
@@ -485,7 +485,7 @@ class Hm_EWS {
             $messages = [$messages];
         }
         $itemIds = array_map(function($msg) {
-            return $msg->get('itemId')->get('id');
+            return bin2hex($msg->get('itemId')->get('id'));
         }, $messages);
         return [$result->get('totalItemsInView'), $itemIds];
     }
@@ -517,7 +517,7 @@ class Hm_EWS {
             ),
             'ItemIds' => [
                 'ItemId' => array_map(function($id) {
-                    return ['Id' => $id];
+                    return ['Id' => hex2bin($id)];
                 }, $itemIds),
             ],
         );

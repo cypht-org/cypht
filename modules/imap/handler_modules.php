@@ -272,7 +272,6 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             if (count($other_server_ids) > 0) {
                 $action = imap_move_different_server($other_server_ids, $form['imap_move_action'], $dest_path, $this->cache);
                 $moved = array_merge($moved, $action['moved']);
-
             }
             if (count($moved) > 0) {
                 $this->out('move_responses', $action['responses']);
@@ -1270,9 +1269,8 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));
                 break;
             case 'flagged':
-                $filter = 'FLAGGED';
             case 'unread':
-                $filter = 'UNSEEN';
+                $filter = mb_strtoupper($this->get('list_path'));
             default:
                 if (empty($filter)) {
                     $filter = 'ALL';
