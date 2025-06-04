@@ -50,9 +50,11 @@ class SendTest(WebTest):
         assert message_found, f"Unexpected system message: {sys_messages}"
 
     def view_message_list(self):
+        self.load()
         list_item = self.by_class('menu_unread')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_for_navigation_to_complete()
+        self.wait_with_folder_list()
         assert self.by_class('mailbox_list_title').text == 'Unread'
         # self.wait_on_class('unseen', 10)
         # try:
