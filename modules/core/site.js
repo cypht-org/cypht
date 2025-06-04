@@ -1562,6 +1562,14 @@ var Hm_Utils = {
         return false;
     },
 
+    remove_from_local_storage: function(key) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
+        if (Storage !== void(0)) {
+            sessionStorage.removeItem(key);
+        }
+    },
+
     clean_selector: function(str) {
         return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },

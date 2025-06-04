@@ -103,14 +103,14 @@ var ews_edit_action = function(event) {
 };
 
 var set_message_content = function(path, msg_uid) {
-    if (!path) {
-        path = getListPathParam();
-    }
     if (!msg_uid) {
         msg_uid = getMessageUidParam();
     }
-    var key = msg_uid+'_'+path;
-    Hm_Utils.save_to_local_storage(key, $('.msg_text').html());
+    if (!path) {
+        path = getListPathParam();
+    }
+    Hm_Utils.remove_from_local_storage(getMessageStorageKey(msg_uid));
+    preFetchMessageContent(false, msg_uid, path);
 };
 
 var imap_delete_message = function(state, supplied_uid, supplied_detail) {
@@ -660,9 +660,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
         if (!msg_part) {
             const msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
-                onSuccess(JSON.parse(msgContent));
+                onSuccess(msgContent);
                 if (callback) {
-                    callback(JSON.parse(msgContent))
+                    callback(msgContent)
                 }
                 return;
             }
@@ -820,8 +820,16 @@ var get_local_message_content = function(msg_uid, path) {
     if (!msg_uid) {
         msg_uid = getMessageUidParam();
     }
-
-    return Hm_Utils.get_from_local_storage(getMessageStorageKey(msg_uid));
+    let msg_content = Hm_Utils.get_from_local_storage(getMessageStorageKey(msg_uid));
+    if (msg_content) {
+        try {
+            msg_content = JSON.parse(msg_content);
+        } catch (e) {
+            // ignore invalid cached values - might be old html or unrecognized json
+            msg_content = '';
+        }
+    }
+    return msg_content;
 };
 
 var imap_setup_message_view_page = function(uid, details, list_path, listParent, callback) {
@@ -834,7 +842,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, listParent,
         get_message_content(false, uid, list_path, listParent, details, callback);
     }
     else {
-        const msgResponse = JSON.parse(msg_content);
+        const msgResponse = msg_content;
         $('.msg_text').append(msgResponse.msg_headers)
                         .append(msgResponse.msg_text)
                         .append(msgResponse.msg_parts);
