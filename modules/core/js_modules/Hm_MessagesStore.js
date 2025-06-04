@@ -56,6 +56,9 @@ class Hm_MessagesStore {
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
             if (!reload) {
+                if (messagesReadyCB) {
+                    messagesReadyCB(this);
+                }
                 return this;
             }
         }

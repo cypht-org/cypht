@@ -394,18 +394,18 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
                     const row = link.closest('tr');
                     messages.updateRow(rowUid, row.prop('outerHTML'));
                 });
-                const tableRow = Hm_Utils.tbody(messages.list).find(`tr[data-uid="${rowUid}"]`);
+                const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
                 if (!tableRow.length) {
-                    if (Hm_Utils.rows(messages.list).length >= index) {
-                        Hm_Utils.rows(messages.list).eq(index).after(row);
+                    if (Hm_Utils.rows().length >= index) {
+                        Hm_Utils.rows().eq(index).after(row);
                     } else {
-                        Hm_Utils.tbody(messages.list).append(row);
+                        Hm_Utils.tbody().append(row);
                     }
                 } else if (tableRow.attr('class') !== $(row).attr('class')) {
                     tableRow.replaceWith(row);
                 }
             }
-            Hm_Utils.rows(messages.list).each(function() {
+            Hm_Utils.rows().each(function() {
                 if (!messages.getRowByUid($(this).data('uid'))) {
                     $(this).remove();
                 }
@@ -491,19 +491,18 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
         });
         Hm_Utils.tbody().attr('id', messages.list);
     } catch (error) {
+        console.log(error);
         // Show error message. TODO: No message utility yet, implement it later.
     }
 });
 
 var display_imap_mailbox = function(rows, id, store) {
     Hm_Message_List.toggle_msg_controls();
-    if (rows) {
-        Hm_Message_List.update(rows, id, store);
-        Hm_Message_List.check_empty_list();
-        $('input[type=checkbox]').on("click", function(e) {
-            Hm_Message_List.toggle_msg_controls();
-        });
-    }
+    Hm_Message_List.update(rows, id, store);
+    Hm_Message_List.check_empty_list();
+    $('input[type=checkbox]').on("click", function(e) {
+        Hm_Message_List.toggle_msg_controls();
+    });
 };
 
 function preFetchMessageContent(msgPart, uid, path) {

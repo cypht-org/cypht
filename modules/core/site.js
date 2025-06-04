@@ -574,10 +574,10 @@ function Message_List() {
     };
 
     this.update = function(msgs, id, store) {
-        Hm_Utils.tbody(id).html('');
+        Hm_Utils.tbody().html('');
         for (const index in msgs) {
             const row = msgs[index][0];
-            Hm_Utils.tbody(id).append(row).find('a').each(function() {
+            Hm_Utils.tbody().append(row).find('a').each(function() {
                 const link = $(this);
                 const filterParams = ["keyword", "filter"];
                 const url = new URL(link.attr('href'), location.href);
@@ -1610,14 +1610,11 @@ var Hm_Utils = {
         }
     },
 
-    rows: function(id) {
-        return this.tbody(id).find('tr').not('.inline_msg');
+    rows: function() {
+        return this.tbody().find('tr').not('.inline_msg');
     },
 
-    tbody: function(id) {
-        if (id) {
-            return $('#'+id);
-        }
+    tbody: function() {
         return $('.message_table_body');
     },
 

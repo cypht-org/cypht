@@ -23,7 +23,7 @@ class Hm_IMAP_List {
 
     use Hm_Server_List;
 
-    public static $use_cache = true;
+    public static $use_cache = false;
     protected static $user_config;
     protected static $session;
 
