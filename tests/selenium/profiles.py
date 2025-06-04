@@ -13,6 +13,8 @@ class ProfileTest(SettingsHelpers):
 
     def load_profile_page(self):
         self.load()
+        self.wait()
+        self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
         WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
         list_item = self.by_class('menu_profiles')
