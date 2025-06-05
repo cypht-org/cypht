@@ -4,6 +4,7 @@ from creds import RECIP
 from runner import test_runner
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
+import time
 
 class SendTest(WebTest):
 
@@ -32,6 +33,7 @@ class SendTest(WebTest):
         if send_button.get_attribute('disabled'):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
         self.driver.execute_script("arguments[0].scrollIntoView()", send_button)
+        time.sleep(1)
         send_button.click()
         self.wait_with_folder_list()
         self.wait_on_class('sys_messages')
