@@ -31,6 +31,7 @@ class SendTest(WebTest):
         send_button = self.by_class('smtp_send_placeholder')
         if send_button.get_attribute('disabled'):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
+        self.driver.execute_script("arguments[0].scrollIntoView()", send_button)
         send_button.click()
         self.wait_with_folder_list()
         self.wait_on_class('sys_messages')
