@@ -167,6 +167,7 @@ class WebTest:
 
     def click_when_clickable(self, el):
         print(" - waiting for element to be clickable")
+        self.driver.execute_script("arguments[0].scrollIntoView()", el)
         WebDriverWait(self.driver, 10).until(
             exp_cond.element_to_be_clickable(el)
         ).click()
