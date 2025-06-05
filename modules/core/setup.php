@@ -68,7 +68,6 @@ add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
-add_handler('settings', 'engine_settings', true, 'core', 'date', 'after');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
 add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
@@ -109,7 +108,6 @@ add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
 add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
-add_output('settings', 'engine_settings', 'true', 'core', 'privacy_settings', 'after');
 
 /* message list page */
 setup_base_page('message_list');
@@ -360,6 +358,5 @@ return array(
         'srv_setup_stepper_imap_hide_from_c_page' => FILTER_VALIDATE_BOOLEAN,
         'images_whitelist' => FILTER_UNSAFE_RAW,
         'update' => FILTER_VALIDATE_BOOLEAN,
-        'enable_child_processes' => FILTER_VALIDATE_BOOLEAN,
     )
 );
