@@ -175,7 +175,7 @@ class Hm_MessagesStore {
             const index = this.rows.indexOf(row);
             const previousRow = this.rows[index - 1];
             if (previousRow) {
-                return previousRow[1];
+                return previousRow;
             }
         }
         return false;
