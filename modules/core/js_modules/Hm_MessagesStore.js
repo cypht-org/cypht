@@ -15,9 +15,9 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = {}, abortController = new AbortController()) {
+    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = [], abortController = new AbortController()) {
         this.path = path;
-        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_': '') + page;
+        this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page;
         this.sortFld = sortFld;
         this.rows = rows;
         this.sources = {};
@@ -56,6 +56,7 @@ class Hm_MessagesStore {
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
             if (!reload) {
+                this.sort();
                 if (messagesReadyCB) {
                     messagesReadyCB(this);
                 }
@@ -79,12 +80,14 @@ class Hm_MessagesStore {
             }
 
             if (this.sources[sourceId]) {
-                this.rows = Object.fromEntries(
-                    Object.entries(this.rows).filter(([key]) => !this.sources[sourceId].includes(key))
-                );
+                this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
             }
             this.sources[sourceId] = Object.keys(updatedMessages);
-            this.rows = Object.assign({}, this.rows, updatedMessages);
+            for (const id in updatedMessages) {
+                if (this.rows.indexOf(updatedMessages[id]) === -1) {
+                    this.rows.push(updatedMessages[id]);
+                }
+            }
 
             this.sort();
             this.saveToLocalStorage();
@@ -98,27 +101,25 @@ class Hm_MessagesStore {
     }
 
     sort() {
-        let rows = Object.entries(this.rows);
         let sortFld = this.sortFld;
-        let sorted = rows.sort((a, b) => {
+        this.rows = this.rows.sort((a, b) => {
             let aval, bval;
             const sortField = sortFld.replace('-', '');
             if (['arrival', 'date'].includes(sortField)) {
-                aval = new Date($(`input.${sortField}`, $('td.dates', $(a[1][0]))).val());
-                bval = new Date($(`input.${sortField}`, $('td.dates', $(b[1][0]))).val());
+                aval = new Date($(`input.${sortField}`, $('td.dates', $(a[0]))).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', $(b[0]))).val());
                 if (sortFld.startsWith('-')) {
                     return aval - bval;
                 }
                 return bval - aval;
             }
-            aval = $(`td.${sortField}`, $(a[1][0])).text().replace(/^\s+/g, '');
-            bval = $(`td.${sortField}`, $(b[1][0])).text().replace(/^\s+/g, '');
+            aval = $(`td.${sortField}`, $(a[0])).text().replace(/^\s+/g, '');
+            bval = $(`td.${sortField}`, $(b[0])).text().replace(/^\s+/g, '');
             if (sortFld.startsWith('-')) {
                 return bval.toUpperCase().localeCompare(aval.toUpperCase());
             }
             return aval.toUpperCase().localeCompare(bval.toUpperCase());
         });
-        this.rows = Object.fromEntries(sorted);
     }
 
     /**
@@ -127,19 +128,17 @@ class Hm_MessagesStore {
      * @returns {Boolean} true if the message was marked as read, false otherwise
      */
     markRowAsRead(uid) {
-        const rows = Object.entries(this.rows);
-        const row = this.getRowByUid(uid)?.value;
+        const row = this.getRowByUid(uid);
         
         if (row) {
-            const htmlRow = $(row[1]['0']);
+            const htmlRow = $(row['0']);
             const wasUnseen = htmlRow.find('.unseen').length > 0 || htmlRow.hasClass('unseen');
 
             htmlRow.removeClass('unseen');
             htmlRow.find('.unseen').removeClass('unseen');
-            const objectRows = Object.fromEntries(rows);
-            objectRows[row[0]]['0'] = htmlRow[0].outerHTML;
+
+            row['0'] = htmlRow[0].outerHTML;
             
-            this.rows = objectRows;
             this.saveToLocalStorage();
 
             return wasUnseen;
@@ -153,13 +152,13 @@ class Hm_MessagesStore {
      * @returns {RowObject|false} the next row entry if found, false otherwise
      */
     getNextRowForMessage(uid) {
-        const rows = Object.entries(this.rows);
-        const row = this.getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid);
         
-        if (row !== false) {
-            const nextRow = rows[row + 1];
+        if (row) {
+            const index = this.rows.indexOf(row);
+            const nextRow = this.rows[index + 1];
             if (nextRow) {
-                return nextRow[1];
+                return nextRow;
             }
         }
         return false;
@@ -171,10 +170,10 @@ class Hm_MessagesStore {
      * @returns {RowObject|false} the previous row entry if found, false otherwise
      */
     getPreviousRowForMessage(uid) {
-        const rows = Object.entries(this.rows);
-        const row = this.getRowByUid(uid)?.index;
+        const row = this.getRowByUid(uid);
         if (row) {
-            const previousRow = rows[row - 1];
+            const index = this.rows.indexOf(row);
+            const previousRow = this.rows[index - 1];
             if (previousRow) {
                 return previousRow[1];
             }
@@ -183,23 +182,18 @@ class Hm_MessagesStore {
     }
     
     removeRow(uid) {
-        const rows = Object.entries(this.rows);
         const row = this.getRowByUid(uid);
         if (row) {
-            const newRows = rows.filter((_, i) => i !== row.index);
-            this.rows = Object.fromEntries(newRows);
+            this.rows = this.rows.filter(r => r !== row);
             this.saveToLocalStorage();
         }
         
     }
     
     updateRow(uid, html) {
-        const rows = Object.entries(this.rows);
-        const row = this.getRowByUid(uid)?.value;
+        const row = this.getRowByUid(uid);
         if (row) {
-            const objectRows = Object.fromEntries(rows);
-            objectRows[row[0]]['0'] = html;
-            this.rows = objectRows;
+            row['0'] = html;
             this.saveToLocalStorage();
         }
     }
@@ -306,12 +300,10 @@ class Hm_MessagesStore {
      * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
     getRowByUid(uid) {
-        const rows = Object.entries(this.rows);
-        const row = rows.find(([key, value]) => $(value['0']).attr('data-uid') == uid);
+        const row = this.rows.find(row => $(row['0']).attr('data-uid') == uid);
         
         if (row) {
-            const index = rows.indexOf(row);
-            return { index, value: row };
+            return row;
         }
         return false;
     }

@@ -244,20 +244,6 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Notices.show(msg.text, msg.type);
                 });
             }
-            if (res.folder_status) {
-                for (const name in res.folder_status) {
-                    if (name === getListPathParam()) {
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
-                        messages.load().then(() => {
-                            if (messages.count != res.folder_status[name].messages) {
-                                messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.list, messages);
-                                })
-                            }
-                        });
-                    }
-                }
-            }
             if (this.callback) {
                 this.callback(res);
             }
@@ -575,9 +561,12 @@ function Message_List() {
 
     this.update = function(msgs, id, store) {
         Hm_Utils.tbody().html('');
-        for (const index in msgs) {
-            const row = msgs[index][0];
-            Hm_Utils.tbody().append(row).find('a').each(function() {
+        let msgArray = msgs;
+        if (! Array.isArray(msgArray)) {
+            msgArray = Object.entries(msgArray);
+        }
+        for (let row of msgArray) {
+            Hm_Utils.tbody().append(row[0]).find('a').each(function() {
                 const link = $(this);
                 const filterParams = ["keyword", "filter"];
                 const url = new URL(link.attr('href'), location.href);

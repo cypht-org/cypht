@@ -376,12 +376,11 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 }
 
 async function select_imap_folder(path, page = 1,reload, processInTheBackground = false, abortController = null) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), {}, abortController);
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], abortController);
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground) {
-            const rows = Object.values(messages.rows);
-            for (const index in rows) {
-                const row = $(rows[index]?.[0]);            
+            for (let row of messages.rows) {
+                row = $(row['0']);
                 const rowUid = row.data('uid');
                 row.find('a').each(function() {
                     const link = $(this);
@@ -396,6 +395,7 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
                 });
                 const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
                 if (!tableRow.length) {
+                    const index = messages.rows.indexOf(row);
                     if (Hm_Utils.rows().length >= index) {
                         Hm_Utils.rows().eq(index).after(row);
                     } else {
@@ -413,9 +413,8 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
         } else {
             display_imap_mailbox(messages.rows, messages.list, messages);
         }
-        if (messages.pages) {
-            showPagination(messages.pages);
-        }
+
+        showPagination(messages.pages);
 
         messages.newMessages.forEach((newMessage) => {
             const row = $(newMessage);
@@ -485,11 +484,8 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
         const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
         await messages.load(!messages.hasLocalData(), false, false, () => {
             display_imap_mailbox(messages.rows, messages.list, messages);
-            if (messages.pages) {
-                showPagination(messages.pages);
-            }
+            showPagination(messages.pages);
         });
-        Hm_Utils.tbody().attr('id', messages.list);
     } catch (error) {
         console.log(error);
         // Show error message. TODO: No message utility yet, implement it later.
