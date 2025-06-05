@@ -967,7 +967,7 @@ if (!class_exists('Hm_IMAP')) {
         public function get_message_list($uids, $raw=false, $include_content_body = false) {
             if (is_array($uids)) {
                 sort($uids);
-                $sorted_string = implode(',', $uids);
+                $sorted_string = implode(',', array_filter($uids));
             }
             else {
                 $sorted_string = $uids;
