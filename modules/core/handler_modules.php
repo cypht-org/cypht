@@ -1187,13 +1187,3 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
         }
     }
 }
-
-class Hm_Handler_engine_settings extends Hm_Handler_Module {
-    
-    public function process() {
-        $settings = Hm_Output_engine_settings::$settings;
-        foreach ($settings as $key => $setting) {
-            process_site_setting($key, $this, 'engineSettingCallback', isset($setting['default']) ? $setting['default'] : null, $setting['type'] === 'checkbox');
-        }
-    }
-}

@@ -8,7 +8,7 @@ const modulesRoutes = [
     },
     {
         page: 'message_list',
-        handler: 'applyMessaleListPageHandlers'
+        handler: 'applyMessageListPageHandlers'
     },
     {
         page: 'message',

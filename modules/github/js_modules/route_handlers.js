@@ -31,9 +31,9 @@ function applyGithubMessageListPageHandler(routeParams) {
     if (routeParams.list_path === 'github_all') {
         const dataSources = hm_data_sources().map((source) => source.id);
         dataSources.forEach((id) => {
-            const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+            const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
             messages.load().then(store => {
-                for (const row of Object.values(store.rows)) {
+                for (const row of store.rows) {
                     Hm_Utils.tbody().append(row['0']);
                 }
             })
@@ -58,11 +58,10 @@ function applyGithubMessageListPageHandler(routeParams) {
 
 function refreshAll(dataSources, background = false, abortController) {
     dataSources.forEach((id) => {
-        const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, {}, abortController);
+        const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], abortController);
         messages.load(true, background).then(store => {
-            const rows = Object.values(store.rows);
-            for (const index in rows) {
-                const row = rows[index]?.[0];
+            for (let row of store.rows) {
+                row = row['0'];
                 if (!row) {
                     continue;
                 }

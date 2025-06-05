@@ -103,14 +103,14 @@ var ews_edit_action = function(event) {
 };
 
 var set_message_content = function(path, msg_uid) {
-    if (!path) {
-        path = getListPathParam();
-    }
     if (!msg_uid) {
         msg_uid = getMessageUidParam();
     }
-    var key = msg_uid+'_'+path;
-    Hm_Utils.save_to_local_storage(key, $('.msg_text').html());
+    if (!path) {
+        path = getListPathParam();
+    }
+    Hm_Utils.remove_from_local_storage(getMessageStorageKey(msg_uid));
+    preFetchMessageContent(false, msg_uid, path);
 };
 
 var imap_delete_message = function(state, supplied_uid, supplied_detail) {
@@ -134,7 +134,7 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
             function(res) {
                 if (!res.imap_delete_error) {
                     const listPath = getParam('list_parent') || getListPathParam();
-                    const store = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+                    const store = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                     store.load();
                     store.removeRow(uid);
                     if (Hm_Utils.get_from_global('msg_uid', false)) {
@@ -376,12 +376,11 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 }
 
 async function select_imap_folder(path, page = 1,reload, processInTheBackground = false, abortController = null) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, null, abortController);
-    await messages.load(reload, processInTheBackground).then(() => {
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], abortController);
+    await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground) {
-            const rows = Object.values(messages.rows);            
-            for (const index in rows) {
-                const row = $(rows[index]?.[0]);            
+            for (let row of messages.rows) {
+                row = $(row['0']);
                 const rowUid = row.data('uid');
                 row.find('a').each(function() {
                     const link = $(this);
@@ -394,18 +393,19 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
                     const row = link.closest('tr');
                     messages.updateRow(rowUid, row.prop('outerHTML'));
                 });
-                const tableRow = Hm_Utils.tbody(messages.list).find(`tr[data-uid="${rowUid}"]`);
+                const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
                 if (!tableRow.length) {
-                    if (Hm_Utils.rows(messages.list).length >= index) {
-                        Hm_Utils.rows(messages.list).eq(index).after(row);
+                    const index = messages.rows.indexOf(row);
+                    if (Hm_Utils.rows().length >= index) {
+                        Hm_Utils.rows().eq(index).after(row);
                     } else {
-                        Hm_Utils.tbody(messages.list).append(row);
+                        Hm_Utils.tbody().append(row);
                     }
                 } else if (tableRow.attr('class') !== $(row).attr('class')) {
                     tableRow.replaceWith(row);
                 }
             }
-            Hm_Utils.rows(messages.list).each(function() {
+            Hm_Utils.rows().each(function() {
                 if (!messages.getRowByUid($(this).data('uid'))) {
                     $(this).remove();
                 }
@@ -413,9 +413,8 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
         } else {
             display_imap_mailbox(messages.rows, messages.list, messages);
         }
-        if (messages.pages) {
-            showPagination(messages.pages);
-        }
+
+        showPagination(messages.pages);
 
         messages.newMessages.forEach((newMessage) => {
             const row = $(newMessage);
@@ -455,7 +454,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         $('#imap_filter_form').trigger('submit');
     });
 
-    const hadLocalData = new Hm_MessagesStore(listPath, listPage, `${getParam('keyword')}_${getParam('filter')}`).hasLocalData();
+    const hadLocalData = new Hm_MessagesStore(listPath, listPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort')).hasLocalData();
     await select_imap_folder(listPath, listPage);
 
     handleMessagesDragAndDrop();
@@ -482,27 +481,24 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
     history.pushState(history.state, "", url.toString());
     location.next = url.search;
     try {        
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
-        await messages.load(!messages.hasLocalData());
-        Hm_Utils.tbody().attr('id', messages.list);
-        display_imap_mailbox(messages.rows, messages.list, messages);
-        if (messages.pages) {
+        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+        await messages.load(!messages.hasLocalData(), false, false, () => {
+            display_imap_mailbox(messages.rows, messages.list, messages);
             showPagination(messages.pages);
-        }
+        });
     } catch (error) {
+        console.log(error);
         // Show error message. TODO: No message utility yet, implement it later.
     }
 });
 
 var display_imap_mailbox = function(rows, id, store) {
     Hm_Message_List.toggle_msg_controls();
-    if (rows) {
-        Hm_Message_List.update(rows, id, store);
-        Hm_Message_List.check_empty_list();
-        $('input[type=checkbox]').on("click", function(e) {
-            Hm_Message_List.toggle_msg_controls();
-        });
-    }
+    Hm_Message_List.update(rows, id, store);
+    Hm_Message_List.check_empty_list();
+    $('input[type=checkbox]').on("click", function(e) {
+        Hm_Message_List.toggle_msg_controls();
+    });
 };
 
 function preFetchMessageContent(msgPart, uid, path) {
@@ -531,7 +527,7 @@ async function markPrefetchedMessagesAsRead(uid) {
     const detail = Hm_Utils.parse_folder_path(listPath, 'imap');
     const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;    
 
-    const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+    const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     await messages.load(false, true);
     if (!messages.flagAsReadOnOpen) {
         return;
@@ -659,9 +655,9 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
         if (!msg_part) {
             const msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
-                onSuccess(JSON.parse(msgContent));
+                onSuccess(msgContent);
                 if (callback) {
-                    callback(JSON.parse(msgContent))
+                    callback(msgContent)
                 }
                 return;
             }
@@ -771,7 +767,7 @@ var imap_message_view_finished = function(msg_uid, detail, listParent, skip_link
     $('#move_message').on("click", function(e) { return imap_move_copy(e, 'move', 'message');});
     $('#copy_message').on("click", function(e) { return imap_move_copy(e, 'copy', 'message');});
     $('#archive_message').on("click", function(e) { return imap_archive_message();});
-    $('#unread_message').on("click", function() { return inline_imap_unread_message(msg_uid, detail);});
+    $('#unread_message').on("click", function() { return imap_unread_message(msg_uid, detail);});
     $('#block_sender').on("click", function(e) {
         e.preventDefault();
         var scope = $('[name=scope]').val();
@@ -819,8 +815,16 @@ var get_local_message_content = function(msg_uid, path) {
     if (!msg_uid) {
         msg_uid = getMessageUidParam();
     }
-
-    return Hm_Utils.get_from_local_storage(getMessageStorageKey(msg_uid));
+    let msg_content = Hm_Utils.get_from_local_storage(getMessageStorageKey(msg_uid));
+    if (msg_content) {
+        try {
+            msg_content = JSON.parse(msg_content);
+        } catch (e) {
+            // ignore invalid cached values - might be old html or unrecognized json
+            msg_content = '';
+        }
+    }
+    return msg_content;
 };
 
 var imap_setup_message_view_page = function(uid, details, list_path, listParent, callback) {
@@ -833,7 +837,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, listParent,
         get_message_content(false, uid, list_path, listParent, details, callback);
     }
     else {
-        const msgResponse = JSON.parse(msg_content);
+        const msgResponse = msg_content;
         $('.msg_text').append(msgResponse.msg_headers)
                         .append(msgResponse.msg_text)
                         .append(msgResponse.msg_parts);
@@ -983,7 +987,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
             {'name': 'imap_move_action', 'value': action}],
             async function(res) {
                 var index;
-                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+                const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                 await store.load(false, true, true);
                 const moveResponses = Object.values(res['move_responses']);
                 moveResponses.forEach((response) => {
@@ -1178,7 +1182,7 @@ var imap_setup_snooze = function() {
                 const snoozedMessages = Object.values(res['snoozed_messages']);
                 if (snoozedMessages.length) {
                     const path = getParam("list_parent") || getListPathParam();
-                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+                    const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                     await store.load(false, true, true);
                     
                     snoozedMessages.forEach((msg) => {

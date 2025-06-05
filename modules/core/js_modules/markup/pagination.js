@@ -26,8 +26,10 @@ function showPagination (totalPages) {
     if ($('.message_list .pagination').length) {
         $('.message_list .pagination').remove();
     }
-    $(paginationMarkup(totalPages)).insertBefore('.message_table');
-    handlePagination();
-    refreshNextButton(getParam('list_page') || 1);
-    refreshPreviousButton(getParam('list_page') || 1);
+    if (totalPages > 1) {
+        $(paginationMarkup(totalPages)).insertBefore('.message_table');
+        handlePagination();
+        refreshNextButton(getParam('list_page') || 1);
+        refreshPreviousButton(getParam('list_page') || 1);
+    }
 }

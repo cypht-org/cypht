@@ -23,7 +23,7 @@ class Hm_IMAP_List {
 
     use Hm_Server_List;
 
-    public static $use_cache = true;
+    public static $use_cache = false;
     protected static $user_config;
     protected static $session;
 
@@ -71,6 +71,11 @@ class Hm_IMAP_List {
             $cache = false;
         }
         return self::connect($id, $cache);
+    }
+
+    public static function get_mailbox_without_connection($config) {
+        $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
+        return new Hm_Mailbox($id, self::$user_config, self::$session, $config);
     }
 }
 
@@ -962,7 +967,7 @@ if (!class_exists('Hm_IMAP')) {
         public function get_message_list($uids, $raw=false, $include_content_body = false) {
             if (is_array($uids)) {
                 sort($uids);
-                $sorted_string = implode(',', $uids);
+                $sorted_string = implode(',', array_filter($uids));
             }
             else {
                 $sorted_string = $uids;
@@ -2303,27 +2308,55 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
-         * use the SORT extension to get a sorted UID list
+         * use the SORT extension to get a sorted UID list and also perform term search if available
          * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
          * @param bool $reverse flag to reverse the sort order
          * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
          * @return array list of IMAP message UIDs
          */
-        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $esort=array()) {
+        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
             if (!$this->is_clean($sort, 'keyword') || !$this->is_clean($filter, 'keyword') || !$this->is_supported('SORT')) {
-                return false;
+                return [];
             }
-            $esort_enabled = false;
-            $esort_res = array();
-            $command = 'UID SORT ';
-            if (!empty($esort) && $this->is_supported('ESORT')) {
-                $valid = array_filter($esort, function($v) { return in_array($v, array('MIN', 'MAX', 'COUNT', 'ALL')); });
-                if (!empty($valid)) {
-                    $esort_enabled = true;
-                    $command .= 'RETURN ('.implode(' ', $valid).') ';
+            if (!empty($terms)) {
+                foreach ($terms as $vals) {
+                    if (!$this->is_clean($vals[0], 'search_str') || !$this->is_clean($vals[1], 'search_str')) {
+                        return [];
+                    }
                 }
             }
-            $command .= '('.$sort.') US-ASCII '.$filter."\r\n";
+            if ($this->search_charset) {
+                $charset = mb_strtoupper($this->search_charset).' ';
+            }
+            else {
+                $charset = 'US-ASCII ';
+            }
+            if (!empty($terms)) {
+                $flds = array();
+                foreach ($terms as $vals) {
+                    if (mb_substr($vals[1], 0, 4) == 'NOT ') {
+                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', mb_substr($vals[1], 4)).'"';
+                    }
+                    else {
+                        $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
+                    }
+                }
+                $fld = ' '.implode(' ', $flds);
+            }
+            else {
+                $fld = '';
+            }
+            if ($exclude_deleted) {
+                $fld .= ' NOT DELETED';
+            }
+            if ($only_auto_bcc) {
+               $fld .= ' HEADER X-Auto-Bcc cypht';
+            }
+            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
+               $fld .= ' NOT HEADER X-Auto-Bcc cypht';
+            }
+            $command = 'UID SORT ';
+            $command .= '('.$sort.') '.$charset.$filter.' '.$fld."\r\n";
             $cache_command = $command.(string)$reverse;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -2340,9 +2373,6 @@ if (!class_exists('Hm_IMAP')) {
             $status = $this->check_response($res, true);
             $uids = array();
             foreach ($res as $vals) {
-                if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'ESEARCH') {
-                    $esort_res = $this->parse_esearch_response($vals);
-                }
                 if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'SORT') {
                     array_shift($vals);
                     array_shift($vals);
@@ -2356,9 +2386,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($reverse) {
                 $uids = array_reverse($uids);
-            }
-            if ($esort_enabled) {
-                $uids = $esort_res;
             }
             if ($status) {
                 return $this->cache_return_val($uids, $cache_command);

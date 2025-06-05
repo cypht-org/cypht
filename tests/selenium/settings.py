@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
+import time
 
 class SettingsHelpers(WebTest):
     def is_unchecked(self, name):
@@ -18,13 +19,20 @@ class SettingsHelpers(WebTest):
         assert self.by_name(name).is_selected() == True
 
     def toggle(self, name):
-        self.by_name(name).click()
+        elem = self.by_name(name)
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def close_section(self, section):
-        self.by_css('[data-target=".'+section+'"]').click()
+        elem = self.by_css('[data-target=".'+section+'"]')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
         alert_message = self.by_class('sys_messages')
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
@@ -47,7 +55,10 @@ class SettingsHelpers(WebTest):
         if not self.element_exists('content_title') or self.by_class('content_title').text != 'Site Settings':
             self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
-            self.by_css('[data-target=".'+section+'"]').click()
+            elem = self.by_css('[data-target=".'+section+'"]')
+            self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+            time.sleep(1)
+            elem.click()
 
     def checkbox_test(self, section, name, checked, mod=False):
         if mod and not self.mod_active(mod):

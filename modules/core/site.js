@@ -244,20 +244,6 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Notices.show(msg.text, msg.type);
                 });
             }
-            if (res.folder_status) {
-                for (const name in res.folder_status) {
-                    if (name === getListPathParam()) {
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
-                        messages.load().then(() => {
-                            if (messages.count != res.folder_status[name].messages) {
-                                messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.list, messages);
-                                })
-                            }
-                        });
-                    }
-                }
-            }
             if (this.callback) {
                 this.callback(res);
             }
@@ -574,10 +560,13 @@ function Message_List() {
     };
 
     this.update = function(msgs, id, store) {
-        Hm_Utils.tbody(id).html('');
-        for (const index in msgs) {
-            const row = msgs[index][0];
-            Hm_Utils.tbody(id).append(row).find('a').each(function() {
+        Hm_Utils.tbody().html('');
+        let msgArray = msgs;
+        if (! Array.isArray(msgArray)) {
+            msgArray = Object.entries(msgArray);
+        }
+        for (let row of msgArray) {
+            Hm_Utils.tbody().append(row[0]).find('a').each(function() {
                 const link = $(this);
                 const filterParams = ["keyword", "filter"];
                 const url = new URL(link.attr('href'), location.href);
@@ -730,10 +719,11 @@ function Message_List() {
         var index;
         for (index in selected) {
             const uid = selected[index].split('_')[2];
-            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
-            store.load();
-            store.removeRow(uid);
-            
+            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+            store.load().then(store => {
+                store.removeRow(uid);
+            });
+
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
@@ -923,19 +913,19 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(msgUid, lisPath = getListPathParam()) {
+    this.prev_next_links = function(msgUid, listPath = getListPathParam()) {
         let prevUrl;
         let nextUrl;
                 
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(lisPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+        const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
         messages.load(false, true);
         const next = messages.getNextRowForMessage(msgUid);
         const prev = messages.getPreviousRowForMessage(msgUid);
         if (prev) {
             const prevSubject = $(prev['0']).find('.subject a');
             prevUrl = new URL(prevSubject.prop('href'));
-            prevUrl.searchParams.set('list_parent', lisPath);
+            prevUrl.searchParams.set('list_parent', listPath);
             const subject = prevSubject.text();
             const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
             $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
@@ -943,7 +933,7 @@ function Message_List() {
         if (next) {
             const nextSubject = $(next['0']).find('.subject a');
             nextUrl = new URL(nextSubject.prop('href'));
-            nextUrl.searchParams.set('list_parent', lisPath);
+            nextUrl.searchParams.set('list_parent', listPath);
             const subject = nextSubject.text();
             
             const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
@@ -1561,6 +1551,14 @@ var Hm_Utils = {
         return false;
     },
 
+    remove_from_local_storage: function(key) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
+        if (Storage !== void(0)) {
+            sessionStorage.removeItem(key);
+        }
+    },
+
     clean_selector: function(str) {
         return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },
@@ -1601,14 +1599,11 @@ var Hm_Utils = {
         }
     },
 
-    rows: function(id) {
-        return this.tbody(id).find('tr').not('.inline_msg');
+    rows: function() {
+        return this.tbody().find('tr').not('.inline_msg');
     },
 
-    tbody: function(id) {
-        if (id) {
-            return $('#'+id);
-        }
+    tbody: function() {
         return $('.message_table_body');
     },
 

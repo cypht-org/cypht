@@ -2469,22 +2469,6 @@ class Hm_Output_privacy_settings extends Hm_Output_Module {
     }
 }
 
-class Hm_Output_engine_settings extends Hm_Output_Module {
-    static $settings = [
-        'enable_child_processes' => [
-            'type' => 'checkbox',
-            'label' => 'Enable child processes',
-            'description' => 'Enable child processes for long running tasks to improve performance.',
-            'default' => true
-        ],
-    ];
-
-    protected function output()
-    {
-        return getSettingsSectionOutput('engine', $this->trans('Engine'), 'heart-pulse-fill', self::$settings, $this->get('user_settings', array()));
-    }
-}
-
 class Hm_output_combined_message_list extends Hm_Output_Module {
     protected function output() {
         $messageList = [];

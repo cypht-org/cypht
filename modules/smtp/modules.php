@@ -1579,6 +1579,9 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
             if ($mailbox->connect()) {
                 $folder = 'Scheduled';
+                if (! $mailbox->folder_exists($folder)) {
+                    continue;
+                }
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
                     $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
@@ -2054,7 +2057,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     
     if (!empty($atts['schedule'])) {
         $folder ='Scheduled';
-        if (!count($mailbox->get_folder_status($folder))) {
+        if (!$mailbox->folder_exists($folder)) {
             $mailbox->create_folder($folder);
         }
         $atts['schedule'] = get_scheduled_date($atts['schedule']);

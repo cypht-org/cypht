@@ -83,7 +83,7 @@ class Hm_Output_tag_since_setting extends Hm_Output_Module {
             $since = $settings['tag_since'];
         }
         return '<tr class="tag_setting"><td><label for="tag_since">'.
-            $this->trans('Show junk messages since').'</label></td>'.
+            $this->trans('Show tagged messages since').'</label></td>'.
             '<td>'.message_since_dropdown($since, 'tag_since', $this, DEFAULT_TAGS_SINCE).'</td></tr>';
     }
 }
