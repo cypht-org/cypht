@@ -265,11 +265,20 @@ class Hm_MessagesStore {
                 config.push({ name: "folder", value: getParam('tag_id') });
                 configs.push(config);
             } else {
-                hm_data_sources().forEach((ds) => {
+                let sources = hm_data_sources();
+                if (this.path != 'combined_inbox') {
+                    sources = sources.filter(s => s.type != 'feeds');
+                }
+                sources.forEach((ds) => {
                     const cfg = config.slice();
-                    cfg.push({ name: "hm_ajax_hook", value: 'ajax_imap_message_list' });
-                    cfg.push({ name: "imap_server_ids", value: ds.id });
-                    cfg.push({ name: "imap_folder_ids", value: ds.folder });
+                    if (ds.type == 'feeds') {
+                        cfg.push({ name: "hm_ajax_hook", value: 'ajax_feed_combined' });
+                        cfg.push({ name: "feed_server_ids", value: ds.id });
+                    } else {
+                        cfg.push({ name: "hm_ajax_hook", value: 'ajax_imap_message_list' });
+                        cfg.push({ name: "imap_server_ids", value: ds.id });
+                        cfg.push({ name: "imap_folder_ids", value: ds.folder });
+                    }
                     configs.push(cfg);
                 });
             }
