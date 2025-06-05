@@ -25,7 +25,10 @@ class SettingsHelpers(WebTest):
         elem.click()
 
     def close_section(self, section):
-        self.by_css('[data-target=".'+section+'"]').click()
+        elem = self.by_css('[data-target=".'+section+'"]')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
