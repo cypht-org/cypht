@@ -459,7 +459,7 @@ class Hm_EWS {
                 // noop
         }
         if ($qs && empty($request['Restriction'])) {
-            $request['QueryString'] = implode(' ', $qs);
+            $request['QueryString'] = implode(' AND ', $qs);
         } elseif ($keyword && ! empty($request['Restriction'])) {
             $restriction = ['And' => $request['Restriction']];
             $restriction['And']['Or'] = [

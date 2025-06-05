@@ -577,7 +577,7 @@ class Hm_Mailbox {
                 }
             } else {
                 // just search with default sort order
-                $uids = $this->connection->search($target, false, $terms, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
             }
             return $uids;
         } else {
