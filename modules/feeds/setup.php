@@ -98,10 +98,6 @@ add_handler('ajax_feed_status', 'date', true, 'core');
 add_handler('ajax_feed_status', 'http_headers', true, 'core');
 add_output('ajax_feed_status', 'filter_feed_status_data', true);
 
-
-add_handler('ajax_combined_message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
-add_handler('ajax_combined_message_list', 'feed_list_content', true, 'feeds');
-
 return array(
 
     'allowed_pages' => array(

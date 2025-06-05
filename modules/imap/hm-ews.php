@@ -323,8 +323,9 @@ class Hm_EWS {
      * filtering by extended properties as answered or unanswered emails.
      */
     public function search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
-        if ($this->is_distinguished_folder(strtolower($folder))) {
-            $folder = new Type\DistinguishedFolderIdType(strtolower($folder));
+        $lower_folder = strtolower($folder);
+        if ($this->is_distinguished_folder($lower_folder)) {
+            $folder = new Type\DistinguishedFolderIdType($lower_folder);
         } else {
             $folder = new Type\FolderIdType($folder);
         }

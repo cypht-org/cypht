@@ -1,12 +1,15 @@
 function performSearch(routeParams) {
     if (routeParams.search_terms) {
-        const serverIds = hm_data_sources().map((source) => source.id);
-        const ids = [...new Set(serverIds)];
-        ids.forEach((id) => {
-            Hm_Ajax.request([
-                {name: 'hm_ajax_hook', value: 'ajax_imap_search'},
-                {name: 'imap_server_ids', value: id},
-            ],
+        hm_data_sources().forEach((source) => {
+            const config = [];
+            if (source.type == 'feeds') {
+                config.push({name: 'hm_ajax_hook', value: 'ajax_feed_combined'});
+                config.push({name: 'feed_server_ids', value: source.id});
+            } else {
+                config.push({name: 'hm_ajax_hook', value: 'ajax_imap_search'});
+                config.push({name: 'imap_server_ids', value: source.id});
+            }
+            Hm_Ajax.request(config,
                 function (response) {                
                     if (response.formatted_message_list) {
                         Object.values(response.formatted_message_list).forEach((message) => {
