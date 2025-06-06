@@ -422,7 +422,16 @@ class Hm_Handler_process_snoozed_since_setting extends Hm_Handler_Module {
         process_site_setting('snoozed_since', $this, 'since_setting_callback', DEFAULT_SNOOZED_SINCE);
     }
 }
-
+class Hm_Handler_process_enable_snooze_setting extends Hm_Handler_Module {
+    /**
+     * Process the enable/disable snooze setting
+     */
+    public function process() {
+        process_site_setting('enable_snooze', $this, function ($val) {
+            return filter_var($val, FILTER_VALIDATE_BOOLEAN);
+        }, DEFAULT_ENABLE_SNOOZE, true);
+    }
+}
 /**
  * Process "since" setting for the Everything page in the settings page
  * @subpackage core/handler
