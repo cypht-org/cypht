@@ -87,6 +87,7 @@ class Hm_Environment {
         define('DEFAULT_INLINE_MESSAGE_STYLE', $config->get('default_setting_inline_message_style', 'right'));
         define('DEFAULT_ENABLE_KEYBOARD_SHORTCUTS', $config->get('default_setting_enable_keyboard_shortcuts', false));
         define('DEFAULT_ENABLE_SIEVE_FILTER', $config->get('default_setting_enable_sieve_filter', false));
+        define('DEFAULT_DEBUG_LOG', $config->get('debug_log', false));
     }
 
     /**
