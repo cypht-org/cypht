@@ -438,6 +438,17 @@ abstract class Hm_Handler_Module {
         return in_array(mb_strtolower($name), $this->config->get_modules(true), true);
     }
 
+   /**
+     * Checks if a config setting is disabled and signals whether to skip further execution.
+     *
+     * @param string $setting_key  The configuration key to check.
+     * @param mixed  $default      The default value to use if the key is not set.
+     * @return bool  True if the feature is disabled and should be skipped.
+     */
+    public function should_skip_execution($setting_key, $default = false) {
+        return !$this->user_config->get($setting_key, $default);
+    }
+
     public function save_hm_msgs() {
         $msgs = Hm_Msgs::getRaw();
         if (!empty($msgs)) {
