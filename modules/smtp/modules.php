@@ -886,7 +886,7 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_compose_delivery_receipt', $settings) && $settings['enable_compose_delivery_receipt']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -943,7 +943,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
             if(!$settings['enable_attachment_reminder']) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
             }
             else {
                 $reset='';
@@ -1371,7 +1371,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if ($selected != 0) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
@@ -1392,7 +1392,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;
