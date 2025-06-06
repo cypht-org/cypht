@@ -122,9 +122,9 @@ function message_list_meta($input, $output_mod) {
     $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('sources@%d each'), $limit);
 
-    return '<div class="list_meta fs-6">'.
+    return '<div class="list_meta d-flex align-items-center fs-6">'.
         $date.
-        '<b> -</b>'.
+        '<b>-</b>'.
         '<span class="src_count"></span> '.$max.
         '<b>-</b>'.
         '<span class="total"></span> '.$output_mod->trans('total').'</div>';
