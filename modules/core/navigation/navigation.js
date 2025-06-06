@@ -112,6 +112,10 @@ function extractCustomScripts($el) {
         for (const el of $el) {
             if ($(el).is('script')) {
                 candidates.push(el);
+            } else {
+                for (const s of $(el).find('script')) {
+                    candidates.push(s);
+                }
             }
         }
     }
