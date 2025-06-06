@@ -1270,7 +1270,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 break;
             case 'flagged':
             case 'unread':
-                $filter = mb_strtoupper($this->get('list_path'));
+                $filter = $this->get('list_path') == 'unread' ? 'UNSEEN' : mb_strtoupper($this->get('list_path'));
             default:
                 if (empty($filter)) {
                     $filter = 'ALL';
