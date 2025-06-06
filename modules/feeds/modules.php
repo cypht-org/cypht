@@ -731,6 +731,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                 if (!$show_icons) {
                     $icon = false;
                 }
+                $sorting_date = $item['dc:date'] ?? $item['pubdate'] ?? '';
                 $row_style .= ' '.str_replace(' ', '_', $item['server_name']);
                 if ($style == 'news') {
                     $res[$id] = message_list_row(array(
@@ -740,6 +741,7 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                             array('safe_output_callback', 'source', $item['server_name']),
                             array('safe_output_callback', 'from'.$nofrom, $from),
                             array('date_callback', $date, $timestamp),
+                            array('dates_holders_callback', $sorting_date, $sorting_date),
                         ),
                         $id,
                         $style,
@@ -754,7 +756,8 @@ class Hm_Output_filter_feed_list_data extends Hm_Output_Module {
                             array('safe_output_callback', 'from'.$nofrom, $from),
                             array('subject_callback', strip_tags($item['title']), $url, $flags),
                             array('date_callback', $date, $timestamp),
-                            array('icon_callback', $flags)
+                            array('icon_callback', $flags),
+                            array('dates_holders_callback', $sorting_date, $sorting_date),
                         ),
                         $id,
                         $style,
