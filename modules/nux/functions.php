@@ -106,7 +106,7 @@ if (!hm_exists('credentials_form')) {
         $res .= '<div class="form-floating mb-3">';
         $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="' . $mod->trans('E-Mail Password') . '">';
         $res .= '<label for="nux_password">' . $mod->trans('E-mail Password') . '</label></div>';
-        $res .= '<div class="d-flex flex-column flex-md-row gap-3 mt-3">';
+        $res .= '<div class="d-flex flex-md-row gap-3 mt-3">';
         // Connect Button
         $res .= '<input type="button" class="nux_submit px-5 btn btn-primary w-100 w-md-auto" value="' . $mod->trans('Connect') . '">';
 

@@ -407,7 +407,7 @@ return array(
     'Added SMTP server!' => false,
     'Added repository' => false,
     'Added server!' => false,
-    'Are you sure?' => 'Sunteți sigur(ă)?',
+    'Are you sure you want to delete this server?' => 'Sunteți sigur(ă)?',
     'Could not find that repository/owner combination at github.com' => false,
     'Disable prompts when deleting' => 'Invalidează promptul la ștergere',
     'Enable keyboard shortcuts' => false,
