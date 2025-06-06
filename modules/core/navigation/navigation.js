@@ -9,7 +9,7 @@ function trackLocationSearchChanges() {
 window.addEventListener('popstate', function(event) {
     if (event.state) {
         $('#cypht-main').replaceWith(event.state.main);
-        loadCustomScripts(event.state.head);
+        loadCustomScripts(event.state.scripts);
     }
 
     window.location.next = window.location.search;
@@ -29,7 +29,7 @@ window.addEventListener('popstate', function(event) {
 
 window.addEventListener('load', function() {
     const unMountCallback = renderPage(window.location.href);
-    history.replaceState({ main: $('#cypht-main').prop('outerHTML'), head: $('head').prop('outerHTML') }, "");
+    history.replaceState({ main: $('#cypht-main').prop('outerHTML'), scripts: extractCustomScripts($(document)) }, "");
 
     if (unMountCallback) {
         unMountSubscribers[window.location.search] = unMountCallback;
@@ -74,8 +74,8 @@ async function navigate(url, loaderMessage) {
         document.title = title.replace(/<[^>]*>/g, '');
         
         // load custom javascript
-        const head = html.match(/<head[^>]*>((.|[\n\r])*)<\/head>/i)[0];
-        loadCustomScripts(head);
+        const scripts = extractCustomScripts($(html));
+        loadCustomScripts(scripts);
 
         window.location.next = url;
 
@@ -83,7 +83,7 @@ async function navigate(url, loaderMessage) {
 
         const unMountCallback = renderPage(url);
 
-        history.pushState({ main: cyphtMain, head }, "", url);
+        history.pushState({ main: cyphtMain, scripts }, "", url);
         
         if (unMountCallback) {
             unMountSubscribers[url] = unMountCallback;
@@ -101,11 +101,33 @@ async function navigate(url, loaderMessage) {
     }
 }
 
-function loadCustomScripts(head) {
-    const newHead = $('<div>').append(head);
-    $(document.head).find('script#data-store').replaceWith(newHead.find('script#data-store'));
-    $(document.head).find('script#search-data').replaceWith(newHead.find('script#search-data'));
-    $(document.head).find('script#inline-msg-state').replaceWith(newHead.find('script#inline-msg-state'));
+function extractCustomScripts($el) {
+    const scripts = [];
+    let candidates = [];
+    if ($el.length == 1) {
+        for (const el of $el.find('script')) {
+            candidates.push(el);
+        }
+    } else {
+        for (const el of $el) {
+            if ($(el).is('script')) {
+                candidates.push(el);
+            }
+        }
+    }
+    for (const script of candidates) {
+        if (['data-store', 'search-data', 'inline-msg-state'].indexOf($(script).attr('id')) >= 0) {
+            scripts.push($(script).prop('outerHTML'));
+        }
+    }
+    return scripts;
+}
+
+function loadCustomScripts(scripts) {
+    for (const script of scripts) {
+        const id = $(script).attr('id');
+        $('script#' + id).replaceWith(script);
+    }
 }
 
 function renderPage(href) {
