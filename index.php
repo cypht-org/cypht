@@ -40,6 +40,7 @@ $environment->load();
 
 /* get configuration */
 $config = new Hm_Site_Config_File();
+
 /* set default TZ */
 date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 /* set the default since and per_source values */
@@ -52,6 +53,10 @@ if (!$config->get('disable_ini_settings')) {
 
 /* process the request */
 new Hm_Dispatch($config);
+
+if (is_null($config)) {
+    $config = new Hm_Site_Config_File();
+}
 
 /* log some debug stats about the page */
 if (DEBUG_MODE or $config->get('debug_log')) {
