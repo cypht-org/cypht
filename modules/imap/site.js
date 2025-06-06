@@ -430,10 +430,12 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
 };
 
 var setup_imap_folder_page = async function(listPath, listPage = 1) {
+    const store = new Hm_MessagesStore(listPath, listPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     $('.remove_source').on("click", remove_imap_combined_source);
     $('.add_source').on("click", add_imap_combined_source);
     $('.refresh_link').on("click", function(e) {
         e.preventDefault();
+        store.removeFromLocalStorage();
         if ($('.imap_keyword').val()) {
             $('#imap_filter_form').trigger('submit');
         }
@@ -454,7 +456,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         $('#imap_filter_form').trigger('submit');
     });
 
-    const hadLocalData = new Hm_MessagesStore(listPath, listPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort')).hasLocalData();
+    const hadLocalData = store.hasLocalData();
     await select_imap_folder(listPath, listPage);
 
     handleMessagesDragAndDrop();

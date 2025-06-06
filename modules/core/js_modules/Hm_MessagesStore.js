@@ -300,6 +300,10 @@ class Hm_MessagesStore {
         return false;
     }
 
+    removeFromLocalStorage() {
+        Hm_Utils.remove_from_local_storage(this.list);
+    }
+
     /**
      * @typedef {Object} RowOutput
      * @property {Number} index - The index of the row
