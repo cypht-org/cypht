@@ -1318,7 +1318,9 @@ class Hm_Output_main_menu_start extends Hm_Output_Module {
                 $this->trans('Running in debug mode. See https://cypht.org/install.html Section 6 for more detail.').
                 '" class="debug_title">'.$this->trans('Debug').'</span>';
         }
-        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT. 'modules/core/assets/images/logo_dark.svg"></a>';
+        $theme = $this->get('theme');
+        $logo = $theme === 'darkly' ? 'modules/core/assets/images/logo.svg' : 'modules/core/assets/images/logo_dark.svg' ;
+        $res .= '<a href="?page=home" class="menu_home"><img class="app-logo" src="'.WEB_ROOT.$logo.'"></a>';
         $res .= '<div class="main"><ul class="folders">';
         if ($this->format == 'HTML5') {
             return $res;
