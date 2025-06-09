@@ -408,7 +408,7 @@ return array(
     'Added SMTP server!' => '已新增 SMTP 伺服器！',
     'Added repository' => '已新增儲存庫',
     'Added server!' => '已新增伺服器！',
-    'Are you sure?' => '您確定嗎？',
+    'Are you sure you want to delete this server?' => '您確定嗎？',
     'Could not find that repository/owner combination at github.com' => '在 github.com 上找不到該儲存庫/擁有者的組合',
     'Disable prompts when deleting' => '刪除時停用提示',
     'Enable keyboard shortcuts' => '啟用鍵盤快捷鍵',
