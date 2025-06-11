@@ -36,6 +36,7 @@ docker-php-ext-install \
     pdo_pgsql \
     pdo_mysql \
     mysqli \
+    pgsql \
     soap
 docker-php-ext-configure zip
 docker-php-ext-install zip
