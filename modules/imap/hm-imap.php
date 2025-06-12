@@ -75,7 +75,7 @@ class Hm_IMAP_List {
 
     public static function get_mailbox_without_connection($config) {
         $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
-        return new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        return new Hm_Mailbox($config['id'], self::$user_config, self::$session, $config);
     }
 }
 
