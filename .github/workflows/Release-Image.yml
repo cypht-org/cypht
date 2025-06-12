@@ -1,4 +1,4 @@
-name: Build Daily Image
+name: Build Release Image
 
 on:
   release:
@@ -37,7 +37,9 @@ jobs:
           platforms: linux/amd64
           file: ./docker/Dockerfile
           push: true
-          tags: cypht/cypht:${{ steps.tags.outputs.tags }}
+          tags: |
+            cypht/cypht:${{ steps.tags.outputs.tags }}
+            cypht/cypht:latest
           debug: false
 
       - name: Log out from Docker Hub
