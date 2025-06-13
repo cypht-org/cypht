@@ -1288,8 +1288,15 @@ $(function() {
         }
     }
     setTimeout(prefetch_imap_folders, 2);
-});
 
+    $('#report_spam_message').on("click", function(e) { return imap_report_spam_message(); });
+    $(document).on('click', '.msg_report_spam', function(e) { 
+        e.preventDefault();
+        var uid = getMessageUidParam();
+        var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        return imap_report_spam_message(false, uid, detail); 
+    });
+});
 
 var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     var uid = getMessageUidParam();
@@ -1327,6 +1334,62 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                 }
             }
         );
+    }
+    return false;
+};
+
+var imap_report_spam_message = function(state, supplied_uid, supplied_detail) {
+    console.log('Report Spam clicked - Starting process');
+    var uid = getMessageUidParam();
+    var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+    console.log('Message details:', {uid: uid, detail: detail});
+    
+    if (supplied_uid) {
+        uid = supplied_uid;
+    }
+    if (supplied_detail) {
+        detail = supplied_detail;
+    }
+    if (detail && uid) {
+        console.log('Making AJAX request to report spam with params:', {
+            hook: 'ajax_imap_report_spam',
+            uid: uid,
+            server_id: detail.server_id,
+            folder: detail.folder
+        });
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder}],
+            function(res) {
+                console.log('Report spam AJAX response:', res);
+                if (!res.imap_report_spam_error) {
+                    if (Hm_Utils.get_from_global('msg_uid', false)) {
+                        console.log('Message UID in global, returning');
+                        return;
+                    }
+                    var nlink = $('.nlink');
+                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
+                        console.log('Auto-advance enabled, redirecting to next message');
+                        Hm_Utils.redirect(nlink.attr('href'));
+                    }
+                    else {
+                        console.log('Redirecting to message list');
+                        if (!hm_list_parent()) {
+                            Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
+                        }
+                        else {
+                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
+                        }
+                    }
+                } else {
+                    console.error('Error in report spam response:', res.imap_report_spam_error);
+                }
+            }
+        );
+    } else {
+        console.error('Missing required details:', {detail: detail, uid: uid});
     }
     return false;
 };

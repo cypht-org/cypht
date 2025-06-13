@@ -2164,3 +2164,88 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
     }
 }
+
+/**
+ * Report a message as spam
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
+    /**
+     * Use IMAP to move the selected message to the junk folder
+     */
+    public function process() {
+        Hm_Debug::add('Report Spam handler starting');
+        list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
+        Hm_Debug::add('Form processing result:', array('success' => $success, 'form' => $form));
+
+        if (!$success) {
+            Hm_Debug::add('Form processing failed');
+            return;
+        }
+
+        $junk_folder = false;
+        $form_folder = hex2bin($form['folder']);
+        $errors = 0;
+        $status = null;
+
+        $specials = get_special_folders($this, $form['imap_server_id']);
+        Hm_Debug::add('Special folders:', $specials);
+        
+        if (array_key_exists('junk', $specials) && $specials['junk']) {
+            $junk_folder = $specials['junk'];
+            Hm_Debug::add('Found junk folder:', $junk_folder);
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        Hm_Debug::add('Mailbox connection:', array(
+            'connected' => ($mailbox !== false),
+            'authed' => ($mailbox && $mailbox->authed()),
+            'is_imap' => ($mailbox && $mailbox->is_imap())
+        ));
+
+        if ($mailbox && !$mailbox->is_imap() && empty($junk_folder)) {
+            Hm_Debug::add('Using EWS JUNK action');
+            // EWS supports moving to junk folder directly
+            $status = $mailbox->message_action($form_folder, 'JUNK', array($form['imap_msg_uid']))['status'];
+            Hm_Debug::add('EWS JUNK action result:', $status);
+        } else {
+            if (!$junk_folder) {
+                Hm_Debug::add('No junk folder configured');
+                Hm_Msgs::add('No junk folder configured for this IMAP server', 'warning');
+                $errors++;
+            }
+
+            if (!$errors && $mailbox && $mailbox->authed()) {
+                $junk_exists = count($mailbox->get_folder_status($junk_folder));
+                Hm_Debug::add('Junk folder status:', array(
+                    'folder' => $junk_folder,
+                    'exists' => $junk_exists
+                ));
+                
+                if (!$junk_exists) {
+                    Hm_Debug::add('Junk folder does not exist');
+                    Hm_Msgs::add('Configured junk folder for this IMAP server does not exist', 'warning');
+                    $errors++;
+                }
+
+                /* try to move the message */
+                if (!$errors) {
+                    Hm_Debug::add('Attempting to move message to junk folder');
+                    $status = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $junk_folder)['status'];
+                    Hm_Debug::add('Move action result:', $status);
+                }
+            }
+        }
+
+        if ($status) {
+            Hm_Debug::add('Message successfully reported as spam');
+            Hm_Msgs::add("Message reported as spam");
+        } else {
+            Hm_Debug::add('Failed to report message as spam');
+            Hm_Msgs::add('An error occurred reporting the message as spam', 'danger');
+        }
+
+        $this->out('imap_report_spam_error', !$status);
+        $this->save_hm_msgs();
+    }
+}
