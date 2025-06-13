@@ -1,5 +1,27 @@
 'use strict';
 
+// Add helper function for delayed logging
+function delayedLog(message, data = null, delay = 1000) {
+    setTimeout(() => {
+        if (data) {
+            console.log(message, data);
+        } else {
+            console.log(message);
+        }
+    }, delay);
+}
+
+// Add helper function for displaying messages
+function showMessage(message, type = 'info') {
+    if (typeof Hm_Msgs !== 'undefined') {
+        Hm_Msgs.add(message, type);
+    } else if (typeof hm_msgs !== 'undefined' && typeof hm_msgs.add === 'function') {
+        hm_msgs.add(message, type);
+    } else {
+        console.log(`[${type.toUpperCase()}] ${message}`);
+    }
+}
+
 var imap_delete_action = function(event) {
     if (!hm_delete_prompt()) {
         return false;
@@ -1289,12 +1311,86 @@ $(function() {
     }
     setTimeout(prefetch_imap_folders, 2);
 
-    $('#report_spam_message').on("click", function(e) { return imap_report_spam_message(); });
+    // Add spam report modal to the page
+    if (!$('#spamReportModal').length) {
+        $('body').append(`
+            <div class="modal fade" id="spamReportModal" tabindex="-1" aria-labelledby="spamReportModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="spamReportModalLabel">Report Spam</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="spamReportReason" class="form-label">Reason for reporting as spam:</label>
+                                <textarea class="form-control" id="spamReportReason" rows="3">This message appears to be unsolicited commercial email or contains suspicious content.</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-danger" id="confirmSpamReport">Report as Spam</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `);
+    }
+
     $(document).on('click', '.msg_report_spam', function(e) { 
         e.preventDefault();
-        var uid = getMessageUidParam();
-        var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-        return imap_report_spam_message(false, uid, detail); 
+        var uid, detail;
+        
+        // Check if we're in message list view
+        var selected = $('input[type=checkbox]:checked', $('.message_table')).closest('tr');
+        if (selected.length > 0) {
+            // We're in message list view
+            uid = selected.data('uid');
+            detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        } else {
+            // We're in message view
+            uid = getMessageUidParam();
+            detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        }
+        
+        if (!uid) {
+            delayedLog('Missing UID', null, 0);
+            showMessage('Could not determine message ID', 'error');
+            return false;
+        }
+        
+        // Store the message details for the modal
+        $('#spamReportModal').data('uid', uid).data('detail', detail);
+        
+        // Show the modal
+        var modal = new bootstrap.Modal(document.getElementById('spamReportModal'));
+        modal.show();
+        
+        return false;
+    });
+
+    // Handle the confirm button click
+    $(document).on('click', '#confirmSpamReport', function() {
+        var modal = $('#spamReportModal');
+        var uid = modal.data('uid');
+        var detail = modal.data('detail');
+        var reason = $('#spamReportReason').val().trim();
+        
+        if (!reason) {
+            showMessage('Please provide a reason for reporting this message as spam', 'warning');
+            return;
+        }
+
+        if (!uid) {
+            showMessage('Could not determine message ID', 'error');
+            return;
+        }
+
+        // Hide the modal
+        bootstrap.Modal.getInstance(document.getElementById('spamReportModal')).hide();
+        
+        // Call the report spam function with the reason
+        return imap_report_spam_message(false, uid, detail, reason);
     });
 });
 
@@ -1338,44 +1434,49 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
-var imap_report_spam_message = function(state, supplied_uid, supplied_detail) {
-    console.log('Report Spam clicked - Starting process');
-    var uid = getMessageUidParam();
-    var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-    console.log('Message details:', {uid: uid, detail: detail});
+var imap_report_spam_message = function(state, supplied_uid, supplied_detail, reason) {
+    delayedLog('Report Spam clicked - Starting process');
+    var uid = supplied_uid || getMessageUidParam();
+    var detail = supplied_detail || Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+    delayedLog('Message details:', {uid: uid, detail: detail, reason: reason});
     
-    if (supplied_uid) {
-        uid = supplied_uid;
+    if (!uid) {
+        delayedLog('Missing UID', null, 0);
+        showMessage('Could not determine message ID', 'error');
+        return false;
     }
-    if (supplied_detail) {
-        detail = supplied_detail;
-    }
+    
     if (detail && uid) {
-        console.log('Making AJAX request to report spam with params:', {
-            hook: 'ajax_imap_report_spam',
-            uid: uid,
-            server_id: detail.server_id,
-            folder: detail.folder
-        });
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
+        // Construct form data
+        var form_data = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
             {'name': 'imap_msg_uid', 'value': uid},
             {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'folder', 'value': detail.folder}],
+            {'name': 'folder', 'value': detail.folder}
+        ];
+
+        // Always include spam_reason, even if empty
+        form_data.push({'name': 'spam_reason', 'value': reason || 'No reason provided'});
+
+        delayedLog('Making AJAX request to report spam with form data:', form_data);
+
+        Hm_Ajax.request(
+            form_data,
             function(res) {
-                console.log('Report spam AJAX response:', res);
+                delayedLog('Report spam AJAX response:', res);
                 if (!res.imap_report_spam_error) {
+                    showMessage('Message reported as spam and moved to junk folder', 'success');
                     if (Hm_Utils.get_from_global('msg_uid', false)) {
-                        console.log('Message UID in global, returning');
+                        delayedLog('Message UID in global, returning');
                         return;
                     }
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                        console.log('Auto-advance enabled, redirecting to next message');
+                        delayedLog('Auto-advance enabled, redirecting to next message');
                         Hm_Utils.redirect(nlink.attr('href'));
                     }
                     else {
-                        console.log('Redirecting to message list');
+                        delayedLog('Redirecting to message list');
                         if (!hm_list_parent()) {
                             Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
                         }
@@ -1384,12 +1485,20 @@ var imap_report_spam_message = function(state, supplied_uid, supplied_detail) {
                         }
                     }
                 } else {
-                    console.error('Error in report spam response:', res.imap_report_spam_error);
+                    delayedLog('Error in report spam response:', res.imap_report_spam_error);
+                    var errorMsg = 'Failed to report message as spam';
+                    if (res.router_user_msgs && res.router_user_msgs.text) {
+                        errorMsg += ': ' + res.router_user_msgs.text;
+                    }
+                    showMessage(errorMsg, 'error');
                 }
-            }
+            },
+            true, // Show loading icon
+            true  // Handle errors
         );
     } else {
-        console.error('Missing required details:', {detail: detail, uid: uid});
+        delayedLog('Missing required details:', {detail: detail, uid: uid}, 0);
+        showMessage('Could not process spam report: Missing required details', 'error');
     }
     return false;
 };
