@@ -16,6 +16,7 @@ class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', DEFAULT_NO_FOLDER_ICONS));
+        $this->out('user_settings', $this->user_config->dump());
     }
 }
 

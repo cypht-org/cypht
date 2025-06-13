@@ -615,6 +615,8 @@ class Hm_Output_js_data extends Hm_Output_Module {
      * Uses function wrappers to make the data immutable from JS
      */
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.
@@ -650,6 +652,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             '    return key;'.
             '};';
         $res .= 'window.hm_default_timezone = "'.$this->get('default_timezone','UTC').'";';
+        $res .= 'window.hm_default_setting_enable_snooze = ' . ($enable_snooze ? 'true' : 'false') . ';' . PHP_EOL;
         $res .= 'var hm_module_is_supported = function(module) {'.
             '    return '.json_encode($this->get('enabled_modules', array())).'.indexOf(module) !== -1;'.
             '};';
@@ -1378,7 +1381,7 @@ class Hm_Output_main_menu_content extends Hm_Output_Module {
         }
         $res .= '<span class="nav-label">'.$this->trans('Drafts').'</span></a></li>';
         $settings = $this->get('user_settings', array());
-        if (array_key_exists('enable_snooze', $settings) && $settings['enable_snooze']) {
+        if (array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
             $res .= '<li class="menu_snoozed"><a class="unread_link" href="?page=message_list&amp;list_path=snoozed">';
             if (!$this->get('hide_folder_icons')) {
                 $res .= '<i class="bi bi-clock-fill menu-icon"></i>';
