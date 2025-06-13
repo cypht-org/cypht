@@ -217,6 +217,14 @@ add_handler('ajax_imap_archive_message', 'imap_oauth2_token_check', true);
 add_handler('ajax_imap_archive_message', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_archive_message', 'imap_archive_message',  true);
 
+/* report spam message callback */
+setup_base_ajax_page('ajax_imap_report_spam', 'core');
+add_handler('ajax_imap_report_spam', 'message_list_type', true, 'core');
+add_handler('ajax_imap_report_spam', 'imap_message_list_type', true);
+add_handler('ajax_imap_report_spam', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_report_spam', 'imap_oauth2_token_check', true);
+add_handler('ajax_imap_report_spam', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_report_spam', 'imap_report_spam',  true);
 
 /* ajax message action callback */
 add_handler('ajax_message_action', 'load_imap_servers_from_config',  true, 'imap', 'load_user_data', 'after');
@@ -300,6 +308,7 @@ return array(
         'ajax_imap_message_action',
         'ajax_imap_delete_message',
         'ajax_imap_archive_message',
+        'ajax_imap_report_spam',
         'ajax_imap_flag_message',
         'ajax_imap_update_combined_source',
         'ajax_imap_mark_as_read',
