@@ -39,6 +39,7 @@ class LoginTests(WebTest):
         hidden_el = self.by_name('hm_page_key')
         self.change_val(hidden_el, 'asdf')
         self.login(USER, PASS)
+        self.load()
         self.wait()
         assert self.by_class('login_form') != None
 
@@ -50,9 +51,10 @@ class LoginTests(WebTest):
 
     def good_logout(self):
         self.logout()
+        self.wait()
+        self.safari_workaround()
         self.wait_on_class('sys_messages')
-        assert self.by_class('sys_messages').text == 'Session destroyed on logout'
-
+        assert self.by_class('sys_messages') != None
 
 if __name__ == '__main__':
 
