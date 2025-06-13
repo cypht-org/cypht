@@ -154,7 +154,7 @@ var folder_page_rename = function() {
     }
     if (notices.length) {
         notices.forEach((msg) => {
-            Hm_Notices.show(msg, danger);
+            Hm_Notices.show(msg, 'danger');
         });
         return;
     }
