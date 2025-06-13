@@ -34,6 +34,7 @@ class FolderListTests(WebTest):
 
     def expand_section(self):
         self.load()
+        self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
         folder_list = self.by_class('folder_list')
         list_item = folder_list.find_element(By.CLASS_NAME, 'menu_save')

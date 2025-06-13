@@ -104,6 +104,7 @@ class PageTests(WebTest):
         assert self.by_class('content_title').text == 'Home'
 
     def servers_page(self):
+        self.wait_on_class('menu_servers')
         list_item = self.by_class('menu_servers')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
@@ -142,6 +143,7 @@ class PageTests(WebTest):
             return
         if self.auth_type != 'DB':
             return
+        self.wait_on_class('menu_change_password')
         list_item = self.by_class('menu_change_password')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()

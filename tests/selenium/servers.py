@@ -16,6 +16,7 @@ class ServersTest(WebTest):
         return self.by_css('[data-target=".{0}_section"]'.format(name)).click()
 
     def load_servers_page(self):
+        self.load()
         self.wait()
         self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
