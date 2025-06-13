@@ -29,9 +29,9 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_get_message_list_meta() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('', message_list_meta(array(), $mod));
-        $this->assertEquals('<div class="list_meta fs-6">last 7 days<b> :</b><span class="src_count"></span> 20 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'message_list_since' => '-1 week'), $mod));
-        $this->assertEquals('<div class="list_meta fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5), $mod));
-        $this->assertEquals('<div class="list_meta fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5, 'message_list_since' => '-1 week'), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 20 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'message_list_since' => '-1 week'), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5, 'message_list_since' => '-1 week'), $mod));
     }
     /**
      * @preserveGlobalState disabled

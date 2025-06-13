@@ -16,11 +16,13 @@ class ServersTest(WebTest):
         return self.by_css('[data-target=".{0}_section"]'.format(name)).click()
 
     def load_servers_page(self):
+        self.wait()
         self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
         self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_servers')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Servers'

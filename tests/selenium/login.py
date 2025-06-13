@@ -3,6 +3,10 @@
 from base import WebTest, USER, PASS
 from runner import test_runner
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
 class LoginTests(WebTest):
 
     def bad_login_values(self):
@@ -46,10 +50,8 @@ class LoginTests(WebTest):
 
     def good_logout(self):
         self.logout()
-        self.wait()
         self.wait_on_class('sys_messages')
         assert self.by_class('sys_messages').text == 'Session destroyed on logout'
-
 
 
 if __name__ == '__main__':
