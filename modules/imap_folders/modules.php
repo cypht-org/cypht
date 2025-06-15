@@ -185,7 +185,7 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('An error occurred creating the folder', 'danger');
+                    Hm_Msgs::add('Failed to create folder '.$form['folder'].'. It might already exist. Please check and try again.', 'danger');
                 }
             }
         }
@@ -319,6 +319,18 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             $this->out('folder_server', $this->request->get['imap_server_id']);
             $this->out('page', $this->request->get['page']);
+            $this->out('trigger_default_submit', false);
+        }else {
+            // as requested, if there no selected server we should select on by default based on profiles
+            if($this->module_is_supported('profiles')) {
+                Hm_Profiles::init($this);
+                $defaultProfile = Hm_Profiles::getDefault();
+                $server = Hm_IMAP_List::getBy($defaultProfile['server'],'server', true);
+                if (!is_null($server) && !empty($server['id'])) {
+                    $this->out('folder_server', $server['id']);
+                    $this->out('trigger_default_submit', true);
+                }
+            }
         }
     }
 }
@@ -375,7 +387,8 @@ class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Modu
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', '');
-        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get">';
+        $data_auto_submit = !empty($this->get('trigger_default_submit')) ? ' data-auto-submit="1"' : 'data-auto-submit="0"';
+        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get"'.$data_auto_submit.'>';
         $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
