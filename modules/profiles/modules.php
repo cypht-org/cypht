@@ -159,6 +159,26 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
 /**
  * @subpackage profile/handler
+ * If no 'imap_server_id' is provided, we select a default server based on the user profile.
+ * This handler works in conjunction with imap_folders/Hm_Handler_folders_server_id,
+ * which handles the case where 'imap_server_id' is explicitly provided.
+ */
+class Hm_Handler_load_default_server_from_profiles extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('imap_server_id', $this->request->get)) {
+            Hm_Profiles::init($this);
+            $defaultProfile = Hm_Profiles::getDefault();
+            $server = Hm_IMAP_List::getBy($defaultProfile['server'],'server', true);
+            if (!is_null($server) && !empty($server['id'])) {
+                $this->out('folder_server', $server['id']);
+                $this->out('trigger_default_submit', true);
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
  */
 class Hm_Handler_profile_data extends Hm_Handler_Module {
     public function process() {

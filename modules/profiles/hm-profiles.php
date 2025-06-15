@@ -56,6 +56,15 @@ class Hm_Profiles {
         return true;
     }
 
+    public static function getDefault() {
+        foreach (self::$data as $vals) {
+            if ($vals['default'] && $vals['default'] = true) {
+                return $vals;
+            }
+        }
+        return null;
+    }
+
     public static function createDefault($hmod) {
         if (! $hmod->module_is_supported('imap') || ! $hmod->module_is_supported('smtp')) {
             return;
