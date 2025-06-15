@@ -61,6 +61,8 @@ class Hm_Handler_process_edit_shortcut extends Hm_Handler_Module {
             $this->session->set('user_data', $user_data);
             $this->session->record_unsaved('Shortcut updated');
             Hm_Msgs::add('Shortcut updated');
+            $this->save_hm_msgs();
+            Hm_Dispatch::page_redirect('?page=shortcuts');
         }
     }
 }

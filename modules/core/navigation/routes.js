@@ -77,6 +77,10 @@ const modulesRoutes = [
     {
         page: 'sieve_filters',
         handler: 'applySieveFiltersPageHandler'
+    },
+    {
+        page: 'shortcuts',
+        handler: 'applyShortcutsPageHandlers'
     }
 ]
 
