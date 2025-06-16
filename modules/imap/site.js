@@ -612,34 +612,53 @@ var prefetch_imap_folders = function() {
 };
 
 var expand_imap_folders = function(element) {
+    console.log('expand_imap_folders called with element:', element);
+    console.log('Element HTML:', element.prop('outerHTML'));
+    console.log('Element data attributes:', element.data());
     var path = element.data('target');
+    console.log('Path from data-target:', path);
+    if (!path) {
+        console.error('No path found in data-target attribute');
+        return false;
+    }
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
+    console.log('Detail object:', detail);
+    if (!detail || !detail.server_id) {
+        console.error('Invalid folder path or missing server_id:', detail);
+        return false;
+    }
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.email_folders'));
+    console.log('List items found:', list.length);
     if ($('li', list).length === 0) {
-        $('.expand_link', list).html('<i class="bi bi-file-minus-fill">');
+        console.log('Making AJAX request to expand folder');
+        $('.expand_link', list).html('<i class="bi bi-file-minus-fill"></i>');
         if (detail) {
-            element.addClass('disabled_link');
             Hm_Ajax.request(
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
                 {'name': 'folder', 'value': detail.folder}],
-                function (res) {
-                    element.removeClass('disabled_link');
-                    expand_imap_mailbox(res);
+                function(res) {
+                    console.log('AJAX response received:', res);
+                    if (res.imap_expanded_folder_path) {
+                        expand_imap_mailbox(res);
+                    } else {
+                        console.error('Invalid response from server:', res);
+                        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill"></i>');
+                    }
                 },
                 [],
                 false,
-                Hm_Folders.save_folder_list,
                 function() {
-                    element.removeClass('disabled_link');
+                    console.error('AJAX request failed');
+                    $('.expand_link', list).html('<i class="bi bi-plus-circle-fill"></i>');
                 }
             );
         }
     }
     else {
-        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill">');
+        console.log('Folder is already expanded, collapsing');
+        $('.expand_link', list).html('<i class="bi bi-plus-circle-fill"></i>');
         $('ul', list).remove();
-        Hm_Folders.save_folder_list();
     }
     return false;
 };
@@ -1334,13 +1353,27 @@ $(function() {
             showMessage('Could not determine message ID', 'error');
             return false;
         }
+
+        if (!detail || !detail.server_id || !detail.folder) {
+            delayedLog('Invalid folder details:', detail);
+            showMessage('Could not determine message location', 'error');
+            return false;
+        }
         
         // Store the message details for the modal
-        $('#spamReportModal').data('uid', uid).data('detail', detail);
+        var modal = $('#spamReportModal');
+        var modalData = {
+            type: 'imap',
+            server_id: detail.server_id,
+            folder: detail.folder,
+            uid: uid
+        };
+        modal.attr('data-uid', uid);
+        modal.attr('data-detail', JSON.stringify(modalData));
         
         // Show the modal
-        var modal = new bootstrap.Modal(document.getElementById('spamReportModal'));
-        modal.show();
+        var modalInstance = new bootstrap.Modal(modal[0]);
+        modalInstance.show();
         
         return false;
     });
@@ -1348,8 +1381,7 @@ $(function() {
     // Handle the confirm button click
     $(document).on('click', '#confirmSpamReport', function() {
         var modal = $('#spamReportModal');
-        var uid = modal.data('uid');
-        var detail = modal.data('detail');
+        var detail = JSON.parse(modal.attr('data-detail') || '{}');
         var reason = $('#spamReportReason').val().trim();
         
         if (!reason) {
@@ -1357,16 +1389,62 @@ $(function() {
             return;
         }
 
-        if (!uid) {
-            showMessage('Could not determine message ID', 'error');
+        if (!detail || !detail.uid || !detail.server_id || !detail.folder) {
+            showMessage('Could not determine message details', 'error');
             return;
         }
 
         // Hide the modal
-        bootstrap.Modal.getInstance(document.getElementById('spamReportModal')).hide();
+        bootstrap.Modal.getInstance(modal[0]).hide();
         
         // Call the report spam function with the reason
-        return imap_report_spam_message(false, uid, detail, reason);
+        imap_report_spam_message(false, detail.uid, {
+            server_id: detail.server_id,
+            folder: detail.folder
+        }, reason);
+    });
+
+    $('.screen-email-like').on("click", function() {
+        var list_blocked_senders = (sessionStorage.getItem('list_blocked') !== null) ? JSON.parse(sessionStorage.getItem('list_blocked')) : [];
+        var list_email = [];
+        var list_msg_uid = [];
+        var email_existing_in_blocked_senders = [];
+        $('input[type=checkbox]').each(function() {
+            if (this.checked && this.id.search('imap') != -1) {
+                let email = $('.'+ this.id +' .from').attr("data-title")
+                if (email = email.trim()) {
+                    list_email.push(email);
+                    if (list_blocked_senders.length > 0) {
+                        list_blocked_senders.forEach((sender, index) => {
+                            if (sender === email) {
+                                email_existing_in_blocked_senders.push(email);
+                                list_msg_uid.push($(this).parent().parent().attr("data-uid"));
+                                delete list_blocked_senders[index];
+                            }
+                        });
+                    }
+                }
+            }
+        });
+
+        if (email_existing_in_blocked_senders) {
+            var list_html = "<ol>";
+            email_existing_in_blocked_senders.forEach(sender => {
+                sender = sender.trim();
+                list_html += `<li>${sender}</li>`
+            });
+            list_html += "</ol>";
+            Hm_Notices.show('The following senders are already in your blocked list: ' + list_html, 'warning');
+        }
+        if (list_email) {
+            add_email_in_contact_trusted(list_email);
+        }
+        if (list_msg_uid) {
+            list_msg_uid.forEach(function(msg_uid) {
+                block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(getListPathParam()), 'sender', 'blocked');
+            });
+        }
+        return false;
     });
 });
 
@@ -1421,62 +1499,60 @@ var imap_report_spam_message = function(state, supplied_uid, supplied_detail, re
         return false;
     }
     
-    if (detail && uid) {
-        // Construct form data
-        var form_data = [
-            {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
-            {'name': 'imap_msg_uid', 'value': uid},
-            {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'folder', 'value': detail.folder}
-        ];
+    if (!detail || !detail.server_id || !detail.folder) {
+        delayedLog('Invalid folder details:', detail);
+        showMessage('Could not determine message location', 'error');
+        return false;
+    }
+    
+    // Construct form data
+    var form_data = [
+        {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
+        {'name': 'imap_msg_uid', 'value': uid},
+        {'name': 'imap_server_id', 'value': detail.server_id},
+        {'name': 'folder', 'value': detail.folder},
+        {'name': 'spam_reason', 'value': reason || 'No reason provided'}
+    ];
 
-        // Always include spam_reason, even if empty
-        form_data.push({'name': 'spam_reason', 'value': reason || 'No reason provided'});
+    delayedLog('Making AJAX request to report spam with form data:', form_data);
 
-        delayedLog('Making AJAX request to report spam with form data:', form_data);
-
-        Hm_Ajax.request(
-            form_data,
-            function(res) {
-                delayedLog('Report spam AJAX response:', res);
-                if (!res.imap_report_spam_error) {
-                    showMessage('Message reported as spam and moved to junk folder', 'success');
-                    if (Hm_Utils.get_from_global('msg_uid', false)) {
-                        delayedLog('Message UID in global, returning');
-                        return;
-                    }
-                    var nlink = $('.nlink');
-                    if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                        delayedLog('Auto-advance enabled, redirecting to next message');
-                        Hm_Utils.redirect(nlink.attr('href'));
+    Hm_Ajax.request(
+        form_data,
+        function(res) {
+            delayedLog('Report spam AJAX response:', res);
+            if (!res.imap_report_spam_error) {
+                showMessage('Message reported as spam and moved to junk folder', 'success');
+                if (Hm_Utils.get_from_global('msg_uid', false)) {
+                    delayedLog('Message UID in global, returning');
+                    return;
+                }
+                var nlink = $('.nlink');
+                if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
+                    delayedLog('Auto-advance enabled, redirecting to next message');
+                    Hm_Utils.redirect(nlink.attr('href'));
+                }
+                else {
+                    delayedLog('Redirecting to message list');
+                    if (!hm_list_parent()) {
+                        Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
                     }
                     else {
-                        delayedLog('Redirecting to message list');
-                        if (!hm_list_parent()) {
-                            Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
-                        }
-                        else {
-                            Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
-                        }
+                        Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                     }
-                } else {
-                    delayedLog('Error in report spam response:', res.imap_report_spam_error);
-                    var errorMsg = 'Failed to report message as spam';
-                    if (res.router_user_msgs && res.router_user_msgs.text) {
-                        errorMsg += ': ' + res.router_user_msgs.text;
-                    }
-                    showMessage(errorMsg, 'error');
                 }
-            },
-            true, // Show loading icon
-            true  // Handle errors
-        );
-    } else {
-        delayedLog('Missing required details:', {detail: detail, uid: uid}, 0);
-        showMessage('Could not process spam report: Missing required details', 'error');
-    }
-    return false;
-};
+            } else {
+                delayedLog('Error in report spam response:', res.imap_report_spam_error);
+                var errorMsg = 'Failed to report message as spam';
+                if (res.router_user_msgs && res.router_user_msgs.text) {
+                    errorMsg += ': ' + res.router_user_msgs.text;
+                }
+                showMessage(errorMsg, 'error');
+            }
+        },
+        true, // Show loading icon
+        true  // Handle errors
+    );
+}
 
 var imap_show_add_contact_popup = function() {
     var popup = document.getElementById("contact_popup");
@@ -1570,156 +1646,18 @@ $('.screen-email-like').on("click", function() {
         var list_html = "<ol>";
         email_existing_in_blocked_senders.forEach(sender => {
             sender = sender.trim();
-            list_html += `<li>${sender}</li>`;
+            list_html += `<li>${sender}</li>`
         });
         list_html += "</ol>";
-        const modal = new Hm_Modal({
-            modalId: 'emptySubjectBodyModal',
-            title: 'Warning',
-            btnSize: 'sm'
-        });
-
-        var modalContentHeadline = "Adress mail exist in your Block list";
-        modal.addFooterBtn(hm_trans('Add Emails to Trust contact'), 'btn-warning', handleAddEmail);
-        modal.setContent(modalContentHeadline + list_html + `<p>${hm_trans('If you add these, all will be unblocked.<br>Are you sure you want to add this in your Trust contact?')}</p>`);
-        modal.open();
-        function handleAddEmail() {
-            list_msg_uid.forEach(function(msg_uid) {
-                block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(hm_list_path()), 'sender', 'unblocked');
-            });
-            modal.hide();
-            add_email_in_contact_trusted(list_email);
-        };
-    } else {
+        Hm_Notices.show('The following senders are already in your blocked list: ' + list_html, 'warning');
+    }
+    if (list_email) {
         add_email_in_contact_trusted(list_email);
     }
-    return false;
-});
-
-$(document).on('click', '[data-bs-dismiss="modal"]', function() {
-    $('#shareFolderModal').modal('hide');
-});
-
-$(document).on('click', 'a.dropdown-item.share', function(e) {
-    e.preventDefault();
-    const listItem = e.target.closest('li');
-    if(listItem) {
-        listItem.getAttribute('data-id');
-        const uid = listItem.getAttribute('data-id');
-        const folder_uid = listItem.getAttribute('data-folder-uid');
-        const folder = listItem.getAttribute('data-folder');
-        $('#server_id').val(uid);
-        $('#folder_uid').val(folder_uid);
-        $('#folder').val(folder);
-        const currentLabel = $('#shareFolderModalLabel').text();
-        $('#shareFolderModalLabel').text(`${currentLabel} - ${folder} Folder`);
-
-        $('#shareFolderModalLabel').val(`Share ${folder} Folder`);
-        $('#shareFolderModal table tbody').empty();
-        $('#loadingSpinner').show();
-        Hm_Ajax.request(
-            [
-              { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
-              { name: 'imap_server_id', value: uid },
-              { name: 'imap_folder_uid', value: folder_uid },
-              { name: 'imap_folder', value: folder },
-            ],
-            function (res) {
-                $('#loadingSpinner').hide();
-                if (res.ajax_imap_folders_permissions) {
-                    const permissions = res.ajax_imap_folders_permissions;
-                    //then populate the modal with the data
-                    populate_permissions_table(permissions);
-                    $('#permissionTable').show();
-                }
-            }
-        );
-        $('#shareFolderModal').modal('show');
-    }
-});
-
-var populate_permissions_table = function(permissions) {
-    $('#shareFolderModal table tbody').empty();
-    for (const [email, permissionList] of Object.entries(permissions)) {
-        const translatedPermissions = permissionList.split(',').map(permission => {
-            return hm_trans(permission.trim()); // Translate each permission
+    if (list_msg_uid) {
+        list_msg_uid.forEach(function(msg_uid) {
+            block_unblock_sender(msg_uid, Hm_Utils.parse_folder_path(getListPathParam()), 'sender', 'blocked');
         });
-        const permissionsString = translatedPermissions.join(', ');
-        const row = `
-            <tr>
-                <td>${email}</td>
-                <td>${permissionsString}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary edit-permission" data-email="${email}" data-permissions="${permissionList}">Edit</button>
-                </td>
-            </tr>
-        `;
-        $('#shareFolderModal table tbody').append(row);
     }
-}
-
-$(document).on('click', '.edit-permission', function(e) {
-    e.preventDefault();
-
-    const email = $(this).data('email');
-    const permissions = $(this).data('permissions');
-
-    $('#email').val(email);
-    $('#identifierUser').prop('checked', true);
-
-
-    // Uncheck all permissions initially
-    $('#accessRead').prop('checked', false);
-    $('#accessWrite').prop('checked', false);
-    $('#accessDelete').prop('checked', false);
-    $('#accessOther').prop('checked', false);
-
-    // Map the permissions string to checkboxes
-    if (permissions.includes('Read')) $('#accessRead').prop('checked', true);
-    if (permissions.includes('Write')) $('#accessWrite').prop('checked', true);
-    if (permissions.includes('Delete')) $('#accessDelete').prop('checked', true);
-    if (permissions.includes('Administer') || permissions.includes('Other')) $('#accessOther').prop('checked', true);
-
-    // Show the form for editing
-    $('#shareFolderModal').modal('show');
-});
-
-$(document).on('submit', '#shareForm', function(e) {
-    e.preventDefault();
-    const server_id = $('#server_id').val();
-    const folder = $('#folder').val();
-
-    let identifier = '';
-    if ($('#identifierUser').is(':checked')) {
-        identifier = $('#email').val();
-    } else if ($('#identifierAll').is(':checked')) {
-        identifier = 'all';
-    } else if ($('#identifierGuests').is(':checked')) {
-        identifier = 'guests';
-    }
-
-    let permissions = '';
-    if ($('#accessRead').is(':checked')) permissions += 'r';
-    if ($('#accessWrite').is(':checked')) permissions += 'w';
-    if ($('#accessDelete').is(':checked')) permissions += 'd';
-    if ($('#accessOther').is(':checked')) permissions += 'a';
-    // If no permissions are selected, call DELETEACL elser call SETACL
-    const action = permissions === '' ? 'remove' : 'add';
-    Hm_Ajax.request(
-        [
-          { name: 'hm_ajax_hook', value: 'ajax_share_folders' },
-          { name: 'imap_server_id', value: server_id },
-          { name: 'identifier', value: identifier },
-          { name: 'imap_folder', value: folder },
-          { name: 'action', value: action },
-          { name: 'permissions', value: permissions },
-        ],
-        function (res) {
-            if(res.ajax_imap_folders_permissions) {
-                console.log("ajax_imap_folders_permissions",res.ajax_imap_folders_permissions);
-                const permissions = res.ajax_imap_folders_permissions;
-                populate_permissions_table(permissions);
-            }
-        }
-    );
+    return false;
 });
