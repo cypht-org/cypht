@@ -2179,13 +2179,9 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
-    /**
-     * Use IMAP to move the selected message to the junk folder
-     */
     public function process() {
         try {
             delayed_debug_log('Report Spam handler starting');
-            // Remove spam_reason from required fields
             list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
             delayed_debug_log('Form processing result:', array('success' => $success, 'form' => $form));
 
@@ -2207,7 +2203,6 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             $form_folder = hex2bin($form['folder']);
             $errors = 0;
             $status = null;
-            // Get spam_reason from form if it exists, otherwise use default
             $spam_reason = isset($form['spam_reason']) && !empty($form['spam_reason']) ? 
                 $form['spam_reason'] : 'No reason provided';
 
@@ -2252,6 +2247,36 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             }
 
             if (!$errors) {
+                // Get message headers for spam reporting
+                $headers = $mailbox->get_message_headers($form_folder, $form['imap_msg_uid']);
+                $message_data = array(
+                    'uid' => $form['imap_msg_uid'],
+                    'folder' => $form_folder,
+                    'from' => isset($headers['From']) ? $headers['From'] : '',
+                    'subject' => isset($headers['Subject']) ? $headers['Subject'] : '',
+                    'headers' => $headers
+                );
+
+                // Report to enabled spam services
+                $report_results = array();
+                $enabled_services = get_enabled_spam_services();
+                foreach ($enabled_services as $service_name => $service_config) {
+                    delayed_debug_log("Processing spam report for service: $service_name");
+                    $reporter = Hm_Spam_Reporter_Factory::create($service_name, $mailbox, $message_data);
+                    if ($reporter) {
+                        $result = $reporter->report($spam_reason);
+                        $report_results[$service_name] = $result;
+                        delayed_debug_log("Report result for $service_name:", $result);
+                        
+                        if ($result['success']) {
+                            Hm_Msgs::add($result['message']);
+                        } else {
+                            Hm_Msgs::add($result['error'], 'warning');
+                        }
+                    }
+                }
+
+                // Move message to junk folder
                 delayed_debug_log('Attempting to move message to junk folder', array(
                     'from_folder' => $form_folder,
                     'to_folder' => $junk_folder,

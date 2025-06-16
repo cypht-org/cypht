@@ -270,6 +270,18 @@ class Hm_MessagesStore {
                 Hm_Ajax.request(
                     config,
                     (response) => {
+                        if (response === false) {
+                            // Create a proper response object for failed requests
+                            response = {
+                                formatted_message_list: {},
+                                pages: 0,
+                                folder_status: {},
+                                sourceId: store.hashObject(config)
+                            };
+                        } else {
+                            response.sourceId = store.hashObject(config);
+                        }
+                        resolve(response);
                         if (response) {
                             response.sourceId = store.hashObject(initialConfig); // Do not use this config object because the request appends a "hm_page_key" entry, which would change the hash
                             resolve(response);

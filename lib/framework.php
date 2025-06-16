@@ -248,6 +248,96 @@ if (!class_exists('Hm_Functions')) {
         public static function stream_socket_enable_crypto($socket, $type) {
             return stream_socket_enable_crypto($socket, true, $type);
         }
+
+        /**
+         * Send an email using PHP's mail function
+         * @param string $to Recipient email address
+         * @param array $headers Email headers
+         * @param string $body Email body
+         * @return boolean True if email was sent successfully
+         */
+        public static function send_email($to, $headers, $body) {
+            try {
+                // Convert headers array to string format
+                $header_string = '';
+                foreach ($headers as $key => $value) {
+                    $header_string .= "$key: $value\r\n";
+                }
+                $header_string .= "MIME-Version: 1.0\r\n";
+
+                // Send the email
+                $result = mail($to, $headers['Subject'], $body, $header_string);
+                
+                if (!$result) {
+                    Hm_Debug::add('Failed to send spam report email: ' . error_get_last()['message']);
+                    return false;
+                }
+                
+                return true;
+            } catch (Exception $e) {
+                Hm_Debug::add('Exception sending spam report email: ' . $e->getMessage());
+                return false;
+            }
+        }
+
+        /**
+         * Make an HTTP request using cURL
+         * @param string $url Target URL
+         * @param string $method HTTP method (GET, POST, etc.)
+         * @param array $data Request data
+         * @param array $headers Request headers
+         * @return string|false Response body or false on failure
+         */
+        public static function http_request($url, $method = 'GET', $data = array(), $headers = array()) {
+            try {
+                $ch = curl_init();
+                
+                // Set cURL options
+                curl_setopt($ch, CURLOPT_URL, $url);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+                // Set method and data
+                if ($method === 'POST') {
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    if (!empty($data)) {
+                        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+                    }
+                } elseif ($method !== 'GET') {
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                }
+
+                // Set headers
+                if (!empty($headers)) {
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                }
+
+                // Execute request
+                $response = curl_exec($ch);
+                $error = curl_error($ch);
+                $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                
+                curl_close($ch);
+
+                if ($error) {
+                    Hm_Debug::add('cURL error in spam report request: ' . $error);
+                    return false;
+                }
+
+                if ($http_code < 200 || $http_code >= 300) {
+                    Hm_Debug::add('HTTP error in spam report request: ' . $http_code);
+                    return false;
+                }
+
+                return $response;
+            } catch (Exception $e) {
+                Hm_Debug::add('Exception in spam report request: ' . $e->getMessage());
+                return false;
+            }
+        }
     }
 }
 
