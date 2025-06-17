@@ -70,11 +70,18 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
     $msg_headers = $imapMailbox->get_message_headers($folder, $msg_id);    
     $mailbox_details = $imapMailbox->get_config();  
     try {
-        if (empty($msg_headers['X-Schedule'])) {
+        if (! isset($msg_headers['X-Schedule'])) {
             return false;
+        } else {
+            if (empty($msg_headers['X-Schedule'])) {
+                return false;
+            }
         }
 
         if (new DateTime($msg_headers['X-Schedule']) <= new DateTime() || $send_now) {
+            if (! isset($msg_headers['X-Profile-ID'])) {
+                return false;
+            }
             $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
             if (!$profile) {
                 $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
