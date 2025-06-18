@@ -82,9 +82,49 @@ setup_user() {
 	sudo useradd -m -p '$1$BMvnSsOY$DXbm292ZTfTwuEwUpu/Lo/' testuser
 	sudo mkdir -p /home/testuser/mail/.imap/INBOX
 	sudo chown -R testuser:testuser /home/testuser
+    sudo chmod 700 /home/testuser/mail/.imap
 	sudo usermod -aG mail testuser
 	sudo usermod -aG postdrop testuser
+
+    sudo systemctl restart dovecot
+
 	STATUS_DONE
+}
+# test dovecot user authentication
+test_user_setup() {
+    STATUS_TITLE "Test MailUser After Setup"
+
+    # Create system user with password
+    # sudo useradd -m -p "$(openssl passwd -1 testuser)" testuser
+
+    # Setup mail directory and permissions
+    # sudo mkdir -p /home/testuser/mail/.imap/INBOX
+    # sudo chown -R testuser:testuser /home/testuser
+    # sudo chmod 700 /home/testuser/mail/.imap
+    # sudo usermod -aG mail testuser
+    # sudo usermod -aG postdrop testuser
+
+    # Restart Dovecot to pick up the new user
+    # sudo systemctl restart dovecot
+
+    # Test authentication with doveadm
+    echo "🔐 Testing Dovecot authentication for 'testuser@localhost'..."
+    sudo doveadm auth test testuser testuser
+
+    # Try SMTP login manually via STARTTLS
+    echo -e "EHLO localhost\r\nAUTH PLAIN $(printf '\0testuser@localhost\0testuser' | base64)\r\nQUIT\r\n" | \
+      openssl s_client -connect localhost:25 -starttls smtp -crlf
+
+    # Try IMAP login manually (plaintext)
+    echo -e "a login testuser@localhost testuser\r\na logout\r\n" | \
+      openssl s_client -connect localhost:143 -crlf
+
+    # Check if Postfix auth socket exists
+    echo "🔐 Checking Postfix auth socket..."
+    sudo ls -l /var/spool/postfix/private/auth
+    sudo test -S /var/spool/postfix/private/auth && echo "Socket exists"
+
+    STATUS_DONE
 }
 
 # config Dovecot
@@ -189,6 +229,7 @@ setup_ui_tests() {
     setup_user
     setup_dovecot
     setup_postfix
+    test_user_setup
     setup_site
 }
 
