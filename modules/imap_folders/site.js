@@ -9,7 +9,25 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
-    $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
+
+    // 1. Get the <a> element
+    const link = document.querySelector('.'+link_class);
+    // 2. Save the <i> element
+    const original_icon = link.querySelector('i');
+    const original_icon_clone = original_icon.cloneNode(true);
+    // 3. Create the spinner
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner-border text-info spinner-border-sm';
+    spinner.setAttribute('role', 'status');
+    spinner.setAttribute('id', 'imap-spinner');
+    spinner.innerHTML = '<span class="sr-only"></span>';
+    // 4. Replace the icon with the spinner
+    if (original_icon.parentNode === link) {
+        link.replaceChild(spinner, original_icon);
+    }
+ 
+    var child_link_target =  folder_location.find('a.'+link_class).data('target')
+    $('.' + link_class, folder_location).on("click", function () { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
     $('a', folder_location).not('.'+link_class).not('.close').off('click');
     $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
     $('.close', folder_location).on("click", function() {
@@ -23,7 +41,7 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     return false;
 };
 
-var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub) {
+var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub, original_icon = null, parent_icon_link = null) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.'+container));
     if ($('li', list).length === 0) {

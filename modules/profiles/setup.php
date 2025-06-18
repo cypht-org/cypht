@@ -14,6 +14,8 @@ add_handler('profiles', 'process_profile_update', true, 'profiles', 'process_pro
 add_output('profiles', 'profile_edit_form', true, 'profiles', 'content_section_start', 'after');
 add_output('profiles', 'profile_content', true, 'profiles', 'profile_edit_form', 'after');
 
+add_handler('folders', 'load_default_server_from_profiles', true, 'profiles', 'folders_server_id', 'before');
+
 add_output('ajax_hm_folders', 'profile_page_link', true, 'profiles', 'settings_menu_end', 'before');
 add_output('compose', 'compose_signature_button', true, 'profiles', 'compose_form_end', 'before');
 add_output('compose', 'compose_signature_values', true, 'profiles', 'compose_form_start', 'before');
