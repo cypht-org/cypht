@@ -866,13 +866,8 @@ class Hm_Output_filter_imap_folders extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        $settings = $this->get('user_settings', array());
-        $enable_snooze = array_key_exists('enable_snooze', $settings) && $settings['enable_snooze'];
         if ($this->get('imap_folders')) {
             foreach ($this->get('imap_folders', array()) as $id => $folder) {
-                if (!$enable_snooze && mb_strtolower($folder) === 'snoozed') {
-                    continue;
-                }
                 $res .= '<li class="imap_'.$id.'_"><a href="#" class="imap_folder_link" data-target="imap_'.$id.'_">';
                 if (!$this->get('hide_folder_icons')) {
                     $res .= '<i class="bi bi-folder fs-5 me-2"></i>';
