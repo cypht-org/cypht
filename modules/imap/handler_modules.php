@@ -8,6 +8,15 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
+// Add helper function for delayed logging
+function delayed_debug_log($message, $data = null, $delay = 1) {
+    if ($data) {
+        Hm_Debug::add($message . ': ' . json_encode($data));
+    } else {
+        Hm_Debug::add($message);
+    }
+    sleep($delay);
+}
 
 /**
  * Check for attachments when forwarding a message
@@ -2081,5 +2090,137 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
         process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');
         process_site_setting('ceo_rate_limit', $this, 'process_ceo_amount_limit_callback');
+    }
+}
+
+/**
+ * Report a message as spam
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
+    public function process() {
+        try {
+            delayed_debug_log('Report Spam handler starting');
+            list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
+            delayed_debug_log('Form processing result:', array('success' => $success, 'form' => $form));
+
+            if (!$success) {
+                delayed_debug_log('Form processing failed - missing required fields');
+                Hm_Msgs::add('Failed to process spam report: Missing required fields', 'error');
+                $this->out('imap_report_spam_error', true);
+                return;
+            }
+
+            if (!isset($form['imap_msg_uid']) || !isset($form['imap_server_id']) || !isset($form['folder'])) {
+                delayed_debug_log('Missing required form fields:', $form);
+                Hm_Msgs::add('Failed to process spam report: Invalid request data', 'error');
+                $this->out('imap_report_spam_error', true);
+                return;
+            }
+
+            $junk_folder = false;
+            $form_folder = hex2bin($form['folder']);
+            $errors = 0;
+            $status = null;
+            $spam_reason = isset($form['spam_reason']) && !empty($form['spam_reason']) ? 
+                $form['spam_reason'] : 'No reason provided';
+
+            // Log the spam report
+            $log_entry = sprintf(
+                "Spam Report - Time: %s, Server: %s, Folder: %s, UID: %s, Reason: %s",
+                date('Y-m-d H:i:s'),
+                $form['imap_server_id'],
+                $form_folder,
+                $form['imap_msg_uid'],
+                $spam_reason
+            );
+            delayed_debug_log('Spam report log:', $log_entry);
+
+            $specials = get_special_folders($this, $form['imap_server_id']);
+            delayed_debug_log('Special folders:', $specials);
+            
+            if (array_key_exists('junk', $specials) && $specials['junk']) {
+                $junk_folder = $specials['junk'];
+                delayed_debug_log('Found junk folder:', $junk_folder);
+            } else {
+                delayed_debug_log('No junk folder configured');
+                Hm_Msgs::add('No junk folder configured for this IMAP server', 'warning');
+                $errors++;
+            }
+
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            delayed_debug_log('Mailbox connection:', array(
+                'connected' => ($mailbox !== false),
+                'authed' => ($mailbox && $mailbox->authed()),
+                'is_imap' => ($mailbox && $mailbox->is_imap())
+            ));
+
+            if (!$mailbox) {
+                delayed_debug_log('Failed to connect to mailbox');
+                Hm_Msgs::add('Failed to connect to mailbox', 'error');
+                $errors++;
+            } elseif (!$mailbox->authed()) {
+                delayed_debug_log('Not authenticated to mailbox');
+                Hm_Msgs::add('Not authenticated to mailbox', 'error');
+                $errors++;
+            }
+
+            if (!$errors) {
+                // Get message headers for spam reporting
+                $headers = $mailbox->get_message_headers($form_folder, $form['imap_msg_uid']);
+                $message_data = array(
+                    'uid' => $form['imap_msg_uid'],
+                    'folder' => $form_folder,
+                    'from' => isset($headers['From']) ? $headers['From'] : '',
+                    'subject' => isset($headers['Subject']) ? $headers['Subject'] : '',
+                    'headers' => $headers
+                );
+
+                // Report to enabled spam services
+                $report_results = array();
+                $enabled_services = get_enabled_spam_services();
+                foreach ($enabled_services as $service_name => $service_config) {
+                    delayed_debug_log("Processing spam report for service: $service_name");
+                    $reporter = Hm_Spam_Reporter_Factory::create($service_name, $mailbox, $message_data);
+                    if ($reporter) {
+                        $result = $reporter->report($spam_reason);
+                        $report_results[$service_name] = $result;
+                        delayed_debug_log("Report result for $service_name:", $result);
+                        
+                        if ($result['success']) {
+                            Hm_Msgs::add($result['message']);
+                        } else {
+                            Hm_Msgs::add($result['error'], 'warning');
+                        }
+                    }
+                }
+
+                // Move message to junk folder
+                delayed_debug_log('Attempting to move message to junk folder', array(
+                    'from_folder' => $form_folder,
+                    'to_folder' => $junk_folder,
+                    'uid' => $form['imap_msg_uid']
+                ));
+                $result = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $junk_folder);
+                $status = $result['status'];
+                delayed_debug_log('Move action result:', array('status' => $status, 'result' => $result));
+            }
+
+            if ($status) {
+                delayed_debug_log('Message successfully reported as spam');
+                Hm_Msgs::add("Message reported as spam and moved to junk folder");
+            } else {
+                delayed_debug_log('Failed to report message as spam');
+                Hm_Msgs::add('An error occurred reporting the message as spam', 'danger');
+            }
+
+            $this->out('imap_report_spam_error', !$status);
+            $this->save_hm_msgs();
+        } catch (Exception $e) {
+            delayed_debug_log('Exception in spam report handler: ' . $e->getMessage());
+            Hm_Msgs::add('An unexpected error occurred while reporting spam', 'error');
+            $this->out('imap_report_spam_error', true);
+            $this->save_hm_msgs();
+        }
     }
 }
