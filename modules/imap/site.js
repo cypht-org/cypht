@@ -382,17 +382,6 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
             for (let row of messages.rows) {
                 row = $(row['0']);
                 const rowUid = row.data('uid');
-                row.find('a').each(function() {
-                    const link = $(this);
-                    const filterParams = ["keyword", "filter"];
-                    const url = new URL(link.attr('href'), location.href);
-                    filterParams.forEach(param => {
-                        url.searchParams.set(param, getParam(param));
-                    });
-                    link.attr('href', url.toString());
-                    const row = link.closest('tr');
-                    messages.updateRow(rowUid, row.prop('outerHTML'));
-                });
                 const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
                 if (!tableRow.length) {
                     const index = messages.rows.indexOf(row);

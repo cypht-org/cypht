@@ -566,17 +566,7 @@ function Message_List() {
             msgArray = Object.entries(msgArray);
         }
         for (let row of msgArray) {
-            Hm_Utils.tbody().append(row[0]).find('a').each(function() {
-                const link = $(this);
-                const filterParams = ["keyword", "filter"];
-                const url = new URL(link.attr('href'), location.href);
-                filterParams.forEach(param => {
-                    url.searchParams.set(param, getParam(param));
-                });
-                link.attr('href', url.toString());
-                const row = link.closest('tr');
-                store.updateRow(row.data('uid'), row.prop('outerHTML'));
-            });
+            Hm_Utils.tbody().append(row[0]);
         }
     };
 
