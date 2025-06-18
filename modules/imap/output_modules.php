@@ -1238,6 +1238,27 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option to enable/disable snooze functionality
+ * @subpackage imap/output
+ */
+class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = '';
+        $reset = '';
+        if (array_key_exists('enable_snooze', $settings) && $settings['enable_snooze']) {
+            $checked = ' checked="checked"';
+        }
+        if ($settings['enable_snooze'] !== DEFAULT_ENABLE_SNOOZE) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
+            $this->trans('Enable Snooze functionality').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * @subpackage imap/output
  */
 class Hm_Output_review_sent_email extends Hm_Output_Module {
@@ -1263,6 +1284,13 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
  */
 class Hm_Output_snooze_msg_control extends Hm_Output_Module {
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_snooze = array_key_exists('enable_snooze', $settings) && $settings['enable_snooze'];
+
+        if (!$enable_snooze) {
+            return;
+        }
+        
         $parts = explode('_', $this->get('list_path'));
         $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
         $res = snooze_dropdown($this, $unsnooze);

@@ -326,6 +326,7 @@ return array(
         'junk_since' => FILTER_UNSAFE_RAW,
         'snoozed_per_source' => FILTER_VALIDATE_INT,
         'snoozed_since' => FILTER_UNSAFE_RAW,
+        'enable_snooze' => FILTER_VALIDATE_BOOLEAN,
         'trash_per_source' => FILTER_VALIDATE_INT,
         'trash_since' => FILTER_UNSAFE_RAW,
         'drafts_per_source' => FILTER_UNSAFE_RAW,

@@ -16,6 +16,7 @@ class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', DEFAULT_NO_FOLDER_ICONS));
+        $this->out('user_settings', $this->user_config->dump());
     }
 }
 
@@ -420,6 +421,20 @@ class Hm_Handler_process_snoozed_since_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('snoozed_since', $this, 'since_setting_callback', DEFAULT_SNOOZED_SINCE);
+    }
+}
+
+/**
+ * Process the enable/disable snooze setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_enable_snooze_setting extends Hm_Handler_Module {
+    /**
+     * Process the enable/disable snooze setting
+     */
+    public function process() {
+        function enable_snooze_setting_callback($val) { return $val; }
+        process_site_setting('enable_snooze', $this, 'enable_snooze_setting_callback', DEFAULT_ENABLE_SNOOZE, true);
     }
 }
 
