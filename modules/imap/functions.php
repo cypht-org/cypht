@@ -1,13 +1,5 @@
 <?php
 
-use React\ChildProcess\Process;
-use React\EventLoop\Loop;
-use React\Promise\Promise;
-use ZBateson\MailMimeParser\Message;
-
-use function React\Async\await;
-use function React\Async\parallel;
-
 /**
  * IMAP modules
  * @package modules

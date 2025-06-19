@@ -346,6 +346,7 @@ return array(
         'imap_msg_part' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_msg_uid' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'imap_folder' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
 
     'allowed_post' => array(
@@ -426,5 +427,6 @@ return array(
         'ceo_rate_limit' => FILTER_VALIDATE_INT,
         'filter_type' => FILTER_UNSAFE_RAW,
         'list_page' => FILTER_UNSAFE_RAW,
+        'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     )
 );

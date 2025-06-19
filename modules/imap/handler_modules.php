@@ -561,10 +561,11 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     $this->out('move_messages_in_screen_email', $this->user_config->get('move_messages_in_screen_email_setting', DEFAULT_PER_SOURCE));
                 }
             }
-            if (array_key_exists('sort', $this->request->get)) {
-                if (in_array($this->request->get['sort'], array('arrival', 'from', 'subject',
+            if (array_key_exists('sort', $this->request->get) || array_key_exists('sort', $this->request->post)) {
+                $sort = $this->request->get['sort'] ?? $this->request->post['sort'] ?? '';
+                if (in_array($sort, array('arrival', 'from', 'subject',
                     'date', 'to', '-arrival', '-from', '-subject', '-date', '-to'), true)) {
-                    $this->out('list_sort', $this->request->get['sort']);
+                    $this->out('list_sort', $sort);
                 }
             } elseif ($default_sort_order = $this->user_config->get('default_sort_order_setting', false)) {
                 $this->out('list_sort', $default_sort_order);

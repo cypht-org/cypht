@@ -240,7 +240,7 @@ class Hm_MessagesStore {
     }
 
     getRequestConfigs() {
-        const config = [{ name: "list_page", value: this.page }];
+        const config = [{ name: "list_page", value: this.page }, { name: "sort", value: this.sortFld }];
         const configs = [];
         if (this.path.startsWith('imap')) {
             const detail = Hm_Utils.parse_folder_path(this.path, 'imap');
