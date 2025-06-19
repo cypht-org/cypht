@@ -73,6 +73,7 @@ RUN if [ "$WITH_DEBUG" = "true" ]; then \
 
 RUN composer install
 
+COPY assets/ assets/
 COPY config/ config/
 COPY language/ language/
 COPY lib/ lib/
