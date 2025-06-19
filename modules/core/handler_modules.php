@@ -16,7 +16,6 @@ class Hm_Handler_check_folder_icon_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('hide_folder_icons', $this->user_config->get('no_folder_icons_setting', DEFAULT_NO_FOLDER_ICONS));
-        $this->out('user_settings', $this->user_config->dump());
     }
 }
 
@@ -739,6 +738,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE));
+        $this->out('user_settings', $this->user_config->dump(), false);
         if (!mb_strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
             if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {

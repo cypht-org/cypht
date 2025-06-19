@@ -273,9 +273,14 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
      * Modules populate this table to run a status check from the info page
      */
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_sieve = $settings['enable_sieve_filter_setting'] ?? DEFAULT_ENABLE_SIEVE_FILTER;
         $res = '<div class="content_title px-3">'.$this->trans('Status').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
-                $this->trans('Status').'</th><th class="text-secondary fw-light">'.
-                $this->trans('Sieve server capabilities').'</th></tr></thead><tbody>';
+                $this->trans('Status').'</th>';
+        if ($enable_sieve) {
+            $res .= '<th class="text-secondary fw-light">'.$this->trans('Sieve server capabilities').'</th>';
+        }
+        $res .= '</tr></thead><tbody>';
         return $res;
     }
 }

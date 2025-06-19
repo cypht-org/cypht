@@ -233,22 +233,18 @@ var imap_flag_message = function(state, supplied_uid, supplied_detail) {
 };
 
 var imap_status_update = function() {
-    const dataSources = hm_data_sources() ?? [];
-    
-    if (dataSources.length) {
-        dataSources.forEach((source) => {
-            Hm_Ajax.request(
-                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
-                {'name': 'imap_server_ids', 'value': source.id}],
-                (res) => {
-                    const id = res.imap_status_server_id;
-                    $('.imap_status_'+id).html(res.imap_status_display);
-                    $('.imap_detail_'+id).html(res.sieve_detail_display);
-                    $('.imap_capabilities_'+id).html(res.imap_extensions_display);
-                }
-            );
-        })
-    }
+    $('.imap_status').each(function(i, el) {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
+            {'name': 'imap_server_ids', 'value': $(el).data('id')}],
+            (res) => {
+                const id = res.imap_status_server_id;
+                $('.imap_status_'+id).html(res.imap_status_display);
+                $('.imap_detail_'+id).html(res.sieve_detail_display);
+                $('.imap_capabilities_'+id).html(res.imap_extensions_display);
+            }
+        );
+    });
     return false;
 };
 

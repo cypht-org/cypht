@@ -731,10 +731,15 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
      * Build the HTML for the status rows. Will be populated by an ajax call per server
      */
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_sieve = $settings['enable_sieve_filter_setting'] ?? DEFAULT_ENABLE_SIEVE_FILTER;
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
-                '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
+            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].' imap_status" data-id="'.$vals['id'].'"></td>';
+            if ($enable_sieve) {
+                $res .= '<td class="imap_detail_'.$vals['id'].'"></td>';
+            }
+            $res .= '</tr>';
         }
         return $res;
     }

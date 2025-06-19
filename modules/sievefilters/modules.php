@@ -54,8 +54,6 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
-        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
-
         $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
     }
 }
@@ -65,8 +63,6 @@ class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module {
     public function process() {
-        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
-
         $server = $this->user_config->get('imap_servers')[$this->request->post['imap_server_id']];
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
         if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
@@ -1295,8 +1291,6 @@ class Hm_Output_check_filter_status extends Hm_Output_Module {
  */
 class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
     public function process() {
-        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
-
         function sieve_enabled_callback($val) { return $val; }
         process_site_setting('enable_sieve_filter', $this, 'sieve_enabled_callback', DEFAULT_ENABLE_SIEVE_FILTER, true);
     }
