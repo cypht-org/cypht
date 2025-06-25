@@ -70,7 +70,7 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
     $msg_headers = $imapMailbox->get_message_headers($folder, $msg_id);    
     $mailbox_details = $imapMailbox->get_config();  
     try {
-        if (empty($msg_headers['X-Schedule'])) {
+        if (empty($msg_headers['X-Schedule']) || empty($msg_headers['X-Profile-ID'])) {
             return false;
         }
 
