@@ -1051,6 +1051,35 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
 }
 
 /**
+ * Add SERVER tp queue
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_add_server_to_queue extends Hm_Handler_Module {
+    /**
+     * Use IMAP to tag the selected message uid
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id'));
+        if (!$success) {
+            return;
+        }
+        $imap_server = Hm_IMAP_List::get($form['imap_server_id'], false);
+
+        try {
+            [$container] = require_once APP_PATH.'services/Hm_bootstrap.php';
+    
+            $imapConManagerService = $container->get(Services\ImapConnectionManager::class);
+            $imapConManagerService->add($imap_server);
+            exit(var_dump($imapConManagerService->getAll()));
+    
+            Hm_Msgs::add('Server added to queue');
+        } catch (\Exception $e) {
+            Hm_Msgs::add('ERRCould not access addd server: '.$e->getMessage());
+        }
+    }
+}
+
+/**
  * Unsnooze messages
  * @subpackage imap/handler
  */

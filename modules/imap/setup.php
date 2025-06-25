@@ -272,6 +272,20 @@ add_handler('ajax_imap_snooze', 'close_session_early',  true, 'core');
 add_handler('ajax_imap_snooze', 'save_imap_cache',  true);
 add_handler('ajax_imap_snooze', 'imap_snooze_message',  true, 'core');
 
+/* add label email */
+setup_base_ajax_page('ajax_imap_tag', 'core');
+add_handler('ajax_imap_tag', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_tag', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_tag', 'save_imap_cache',  true);
+add_handler('ajax_imap_tag', 'imap_add_tag_message',  true, 'core');
+
+/* add label email */
+setup_base_ajax_page('ajax_imap_queue', 'core');
+add_handler('ajax_imap_queue', 'load_imap_servers_from_config',  true);
+add_handler('ajax_imap_queue', 'close_session_early',  true, 'core');
+add_handler('ajax_imap_queue', 'save_imap_cache',  true);
+add_handler('ajax_imap_queue', 'imap_add_server_to_queue',  true, 'core');
+
 /* unsnooze emails in snoozed folders */
 setup_base_ajax_page('ajax_imap_unsnooze', 'core');
 add_handler('ajax_imap_unsnooze', 'load_imap_servers_from_config',  true);
@@ -290,6 +304,7 @@ add_handler('ajax_share_folders', 'set_acl_to_imap_folders',  true);
 return array(
     'allowed_pages' => array(
         'ajax_imap_debug',
+        'ajax_imap_queue',
         'ajax_imap_status',
         'ajax_imap_message_list',
         'ajax_imap_folder_expand',

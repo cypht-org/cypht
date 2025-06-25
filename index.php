@@ -1,4 +1,5 @@
 <?php
+use Symfony\Component\ErrorHandler\ErrorHandler;
 
 /**
  * GIT VERSION: 10813
@@ -34,7 +35,7 @@ ob_start();
 
 require VENDOR_PATH.'autoload.php';
 /* get includes */
-require APP_PATH.'lib/framework.php';
+require_once APP_PATH.'lib/framework.php';
 $environment = Hm_Environment::getInstance();
 $environment->load();
 
@@ -61,4 +62,6 @@ if (empty($config)) {
 if (DEBUG_MODE or $config->get('debug_log')) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show();
+    ErrorHandler::register();
+
 }

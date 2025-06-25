@@ -1,81 +1,15 @@
 <?php
 
-use Monolog\Logger;
-use Services\Hm_Kernel;
-use Psr\Log\LoggerInterface;
 use Services\Core\Hm_Container;
-use Services\Providers\CyphtServiceProvider;
-use Services\Providers\LoggerServiceProvider;
-use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Services\ImapConnectionManager;
 
-define('APP_PATH', dirname(__DIR__).'/');
-define('VENDOR_PATH', APP_PATH.'vendor/');
-define('CONFIG_PATH', APP_PATH.'config/');
-define('WEB_ROOT', '');
-define('ASSETS_THEMES_ROOT', '');
-define('DEBUG_MODE', true);
-define('CACHE_ID', '');
-define('SITE_ID', '');
-define('JS_HASH', '');
-define('CSS_HASH', '');
+$containerBuilder = Hm_Container::getContainer();
 
-/* show all warnings in debug mode */
-if (DEBUG_MODE) {
-    error_reporting(E_ALL);
+if (!$containerBuilder->hasDefinition(ImapConnectionManager::class)) {
+    //register cypht(we need imap class in the service)
+    $containerBuilder
+        ->register(ImapConnectionManager::class, ImapConnectionManager::class)
+        ->addArgument([]);
 }
 
-/* don't let anything output content until we are ready */
-ob_start();
-
-require VENDOR_PATH.'autoload.php';
-/* get includes */
-require APP_PATH.'lib/framework.php';
-$environment = Hm_Environment::getInstance();
-$environment->load();
-
-/* get configuration */
-$config = new Hm_Site_Config_File();
-/* set default TZ */
-date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
-/* set the default since and per_source values */
-$environment->define_default_constants($config);
-
-/* setup ini settings */
-if (!$config->get('disable_ini_settings')) {
-    require APP_PATH.'lib/ini_set.php';
-}
-
-// require_once Hm_IMAP_List
-require_once APP_PATH . 'modules/imap/hm-imap.php';
-
-ErrorHandler::register();
-
-$containerBuilder = Hm_Container::setContainer(new ContainerBuilder());
-
-// Register Hm_Site_Config_File
-$containerBuilder->set('config', $config);
-
-/* setup a session handler, but don't actually start a session yet */
-$session_config = new Hm_Session_Setup($config);
-$session = $session_config->setup_session();
-// list($session, $request) = session_init();
-$containerBuilder->set('session', $session);
-
-Hm_Container::bind();
-
-// Prepare Kernel instance parameters
-$queueServiceProvider = $containerBuilder->get('scheduler.ServiceProvider');
-$queueServiceProvider->register($config, $session);
-
-//Register logger to display info in terminal
-$loggerProvider = new LoggerServiceProvider();
-$loggerProvider->register($containerBuilder);
-
-//register cypht(we need imap class in the service)
-(new CyphtServiceProvider())->register($containerBuilder);
-
-// Create a new Kernel instance
-$kernel = (new Hm_Kernel($containerBuilder->get('scheduler')))->schedule();
-
-return [$containerBuilder, $config];
+return [$containerBuilder];
