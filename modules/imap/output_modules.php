@@ -490,7 +490,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $this->html_safe($vals['name']), $this->html_safe($vals['server']), $this->html_safe($vals['port']),
                 $vals['tls'] ? 'TLS' : '' );
 
-            $res .= '</div> <div class="col-xl-7 col-lg-7 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4 mb-2 ">';
+            $res .= '</div> <div class="col-xl-6 col-lg-6 col-md-9"> <div class="row"> <div class="col-md-6 col-lg-4 mb-2 ">';
 
             // IMAP Username
             $res .= '<div class="form-floating">';
@@ -511,7 +511,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input '.$disabled.' id="imap_sieve_host_'.$server_id.'" class="form-control credentials imap_sieve_host_input" type="text" name="imap_sieve_host" value="'.$default_value.'" placeholder="Sieve Host">';
                 $res .= '<label for="imap_sieve_host_'.$server_id.'">'.$this->trans('Sieve Host').'</label></div>';
             }
-            $res .= '</div></div></div><div class="col-xl-3 col-lg-4 col-md-6 d-flex justify-content-start align-items-center">';
+            $res .= '</div></div></div><div class="col-xl-3 col-lg-5 col-md-6 d-flex justify-content-start align-items-center">';
 
             // Buttons
             $disabled = isset($vals['default']) ? ' disabled': '';
@@ -527,6 +527,7 @@ class Hm_Output_display_configured_imap_servers extends Hm_Output_Module {
                 $res .= '<input type="submit" value="'.$this->trans('Test').'" class="test_imap_connect btn btn-outline-primary btn-sm me-2 mt-3" />';
                 $res .= '<input type="submit" value="'.$this->trans('Delete').'" class="imap_delete btn btn-outline-danger btn-sm me-2 mt-3"'.$disabled.' />';
                 $res .= '<input type="submit" value="'.$this->trans('Forget').'" class="forget_imap_connection btn btn-outline-warning btn-sm me-2 mt-3"'.$disabled.' />';
+                $res .= '<input type="submit" value="'.$this->trans('Queue').'" class="queue_imap_connection btn btn-outline-secondary btn-sm me-2 mt-3"'.$disabled.' />';
             }
 
             // Hide/Unhide Buttons

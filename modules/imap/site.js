@@ -79,6 +79,23 @@ var imap_forget_action = function(event) {
     );
 };
 
+var imap_queue_action = function(event) {
+    event.preventDefault();
+    Hm_Notices.hide(true);
+    var form = $(this).closest('.imap_connect');
+    var serializedForm = form.serializeArray();
+    serializedForm.find(item => item.name === "hm_ajax_hook").value = "ajax_imap_queue";
+    console.log("serializedForm", serializedForm)
+
+    // var btnContainer = $(this).parent();
+    Hm_Ajax.request(
+        serializedForm,
+        function(res) {
+            console.log("RES", res)
+        }
+    );
+};
+
 var imap_save_action = function(event) {
     event.preventDefault();
     Hm_Notices.hide(true);
@@ -120,6 +137,7 @@ var imapServersPageHandler = function() {
     $('.hide_imap_connection').on('click', imap_hide);
     $('.unhide_imap_connection').on('click', imap_unhide);
     $('.forget_imap_connection').on('click', imap_forget_action);
+    $('.queue_imap_connection').on('click', imap_queue_action);
     $('.test_imap_connect').on('click', imap_test_action);
 
     var dsp = Hm_Utils.get_from_local_storage('.imap_section');

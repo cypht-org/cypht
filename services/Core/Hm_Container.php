@@ -14,7 +14,7 @@ use Services\Providers\{Hm_CommandServiceProvider, Hm_EventServiceProvider, Hm_S
  */
 class Hm_Container
 {
-    private static $container = null;
+    private static ?ContainerBuilder $container = null;
 
     // Prevent direct instantiation and cloning
     private function __construct() {}
@@ -26,12 +26,9 @@ class Hm_Container
      * @param ContainerBuilder $containerBuilder
      * @return ContainerBuilder
      */
-    public static function setContainer(ContainerBuilder $containerBuilder): ContainerBuilder
+    public static function setContainer(ContainerBuilder $container): ContainerBuilder
     {
-        if (self::$container === null) {
-            self::$container = $containerBuilder;
-        }
-
+        self::$container = $container;
         return self::$container;
     }
 
@@ -45,11 +42,11 @@ class Hm_Container
         $config = self::$container->get('config');
 
         if ($config->get('queue_enabled')) {
-            
+
             if ($config->get('queue_driver') === 'database') {
                 // Register Hm_DB
                 self::$container->set('db.connection', Hm_DB::connect(self::$container->get('config')));
-        
+
                 self::$container->register('db', Hm_DB::class)->setPublic(true);
             } else if ($config->get('queue_driver') === 'redis') {
                 // Register Hm_Redis
@@ -89,6 +86,15 @@ class Hm_Container
      */
     public static function getContainer(): ContainerBuilder
     {
+        if (self::$container === null) {
+            self::$container = new ContainerBuilder();
+        }
+
         return self::$container;
+    }
+
+    public static function hasContainer(): bool
+    {
+        return self::$container !== null;
     }
 }

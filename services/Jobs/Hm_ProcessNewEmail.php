@@ -7,7 +7,9 @@ use Services\Traits\Hm_Serializes;
 use Services\Traits\Hm_Dispatchable;
 use Services\Traits\Hm_InteractsWithQueue;
 use Services\Contracts\Queue\Hm_ShouldQueue;
+use Services\Core\Hm_Container;
 use Services\Events\Hm_NewEmailProcessedEvent;
+use Services\ImapConnectionManager;
 
 class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
 {
@@ -17,7 +19,7 @@ class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
     /**
      * The queue driver
      */
-    public string $driver = 'redis';
+    public string $driver = 'database';
 
     public function __construct(string $email)
     {
@@ -26,14 +28,20 @@ class Hm_ProcessNewEmail extends Hm_BaseJob implements Hm_ShouldQueue
 
     public function handle(): void
     {
+                print("start {$this->email} \n");
+
         //fetch new email
-        // $imap = Hm_Container::getContainer()->get('imap');//Hm_Imap::class
+        $servers = Hm_Container::getContainer()->get(ImapConnectionManager::class);//Hm_Imap::class
+        // dump($servers);
+                dump($servers);die();
+
         // $newMessages = $imap->search('UNSEEN'); 
         //then process it
+        print("Counting \n");
+        // $count = count($servers->getAll());
+        // print("get server:s {$count}\n");
 
-        dump("Processing ".self::class);
-
-        Hm_NewEmailProcessedEvent::dispatch($this->email);
+        // Hm_NewEmailProcessedEvent::dispatch($this->email);
         
     }
 

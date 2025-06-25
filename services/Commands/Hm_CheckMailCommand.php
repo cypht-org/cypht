@@ -37,8 +37,8 @@ class Hm_CheckMailCommand extends Hm_BaseCommand
 
         // $notification = new Hm_NewMailNotification($message);
         // $notification->sendNow();
-        Hm_NewMailNotification::dispatch($message);
-        // Hm_ProcessNewEmail::dispatch(email: 'muhngesteven@gmail.com');
+        // Hm_NewMailNotification::dispatch($message);
+        Hm_ProcessNewEmail::dispatch(email: 'muhngesteven@gmail.com');
         return Command::SUCCESS;
     }
 }
