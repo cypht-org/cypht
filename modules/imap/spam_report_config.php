@@ -66,6 +66,19 @@ function get_spam_report_services() {
 }
 
 /**
+ * Get auto-block configuration for spam reporting
+ * @return array Auto-block configuration
+ */
+function get_auto_block_spam_config() {
+    return array(
+        'enabled' => true,  // Whether auto-blocking is enabled
+        'action' => 'move_to_junk',  // Default action: move_to_junk, discard, reject
+        'scope' => 'sender',  // Default scope: sender, domain
+        'junk_folder' => 'Junk'  // Default junk folder name
+    );
+}
+
+/**
  * Helper function to get enabled spam reporting services
  * @return array List of enabled services
  */
@@ -101,4 +114,31 @@ function get_spam_service_config($service_name) {
 function is_spam_service_enabled($service_name) {
     $config = get_spam_service_config($service_name);
     return $config && $config['enabled'];
+}
+
+/**
+ * Helper function to check if auto-blocking is enabled
+ * @param object $user_config User configuration object
+ * @return boolean True if auto-blocking is enabled
+ */
+function is_auto_block_spam_enabled($user_config) {
+    return $user_config->get('auto_block_spam_sender', true);
+}
+
+/**
+ * Helper function to get auto-block action
+ * @param object $user_config User configuration object
+ * @return string Auto-block action
+ */
+function get_auto_block_spam_action($user_config) {
+    return $user_config->get('auto_block_spam_action', 'move_to_junk');
+}
+
+/**
+ * Helper function to get auto-block scope
+ * @param object $user_config User configuration object
+ * @return string Auto-block scope
+ */
+function get_auto_block_spam_scope($user_config) {
+    return $user_config->get('auto_block_spam_scope', 'sender');
 } 
