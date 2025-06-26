@@ -1699,3 +1699,58 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
         return $res;
     }
 }
+
+/**
+ * Auto-block spam settings UI
+ * @subpackage imap/output
+ */
+class Hm_Output_auto_block_spam_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = array_key_exists('auto_block_spam_sender', $settings) ? $settings['auto_block_spam_sender'] : true;
+        $action = array_key_exists('auto_block_spam_action', $settings) ? $settings['auto_block_spam_action'] : 'move_to_junk';
+        $scope = array_key_exists('auto_block_spam_scope', $settings) ? $settings['auto_block_spam_scope'] : 'sender';
+        
+        $res = '<tr class="general_setting"><td colspan="2">';
+        $res .= '<div class="auto_block_spam_setting mb-3">';
+        $res .= '<div class="subtitle">' . $this->trans('Auto-Block Spam Sender Settings') . '</div>';
+        
+        // Enable/Disable toggle
+        $res .= '<div class="form-check mb-3">';
+        $res .= '<input type="checkbox" id="auto_block_spam_sender" name="auto_block_spam_sender" class="form-check-input" value="1"' . ($enabled ? ' checked' : '') . '>';
+        $res .= '<label for="auto_block_spam_sender" class="form-check-label">' . $this->trans('Automatically block sender when reporting spam') . '</label>';
+        $res .= '</div>';
+        
+        // Action selection
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="auto_block_spam_action" class="form-label">' . $this->trans('Action for blocked senders') . '</label>';
+        $res .= '<select class="form-select" id="auto_block_spam_action" name="auto_block_spam_action">';
+        $res .= '<option value="move_to_junk"' . ($action == 'move_to_junk' ? ' selected' : '') . '>' . $this->trans('Move to Junk Folder') . '</option>';
+        $res .= '<option value="discard"' . ($action == 'discard' ? ' selected' : '') . '>' . $this->trans('Discard Messages') . '</option>';
+        $res .= '<option value="reject"' . ($action == 'reject' ? ' selected' : '') . '>' . $this->trans('Reject with Bounce') . '</option>';
+        $res .= '</select>';
+        $res .= '<div class="form-text">' . $this->trans('What happens to future messages from blocked senders') . '</div>';
+        $res .= '</div>';
+        
+        // Scope selection
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="auto_block_spam_scope" class="form-label">' . $this->trans('Blocking scope') . '</label>';
+        $res .= '<select class="form-select" id="auto_block_spam_scope" name="auto_block_spam_scope">';
+        $res .= '<option value="sender"' . ($scope == 'sender' ? ' selected' : '') . '>' . $this->trans('Block specific sender only') . '</option>';
+        $res .= '<option value="domain"' . ($scope == 'domain' ? ' selected' : '') . '>' . $this->trans('Block entire domain') . '</option>';
+        $res .= '</select>';
+        $res .= '<div class="form-text">' . $this->trans('Whether to block just the sender or the entire domain') . '</div>';
+        $res .= '</div>';
+        
+        // Information note
+        $res .= '<div class="alert alert-info">';
+        $res .= '<i class="bi bi-info-circle"></i> ';
+        $res .= $this->trans('Auto-blocking requires Sieve filters to be enabled on your IMAP server. Future messages from blocked senders will be automatically filtered based on your chosen action.');
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</td></tr>';
+        
+        return $res;
+    }
+}

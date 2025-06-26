@@ -1887,6 +1887,16 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
             if ($success && $imap_details) {
+                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    $factory = get_sieve_client_factory($this->config);
+                    try {
+                        $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
+                    } catch (Exception $e) {
+                        Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
+                        return;
+                    }
+                }
+
                 $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
                 $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
@@ -2285,6 +2295,50 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                 $result = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $junk_folder);
                 $status = $result['status'];
                 delayed_debug_log('Move action result:', array('status' => $status, 'result' => $result));
+
+                // Auto-block sender after successful spam report
+                if ($status) {
+                    delayed_debug_log('Message moved successfully, attempting auto-block sender');
+                    
+                    // Check if Sieve filters are enabled for this server
+                    $imap_servers = $this->user_config->get('imap_servers', array());
+                    $imap_account = null;
+                    foreach ($imap_servers as $idx => $mailbox_config) {
+                        if ($idx == $form['imap_server_id']) {
+                            $imap_account = $mailbox_config;
+                            break;
+                        }
+                    }
+
+                    if ($imap_account && isset($imap_account['sieve_config_host'])) {
+                        delayed_debug_log('Sieve filters enabled, proceeding with auto-block');
+                        
+                        // Perform auto-block
+                        $auto_block_result = auto_block_spam_sender(
+                            $this->user_config,
+                            $this->config,
+                            $form['imap_server_id'],
+                            $message_data,
+                            $spam_reason
+                        );
+
+                        delayed_debug_log('Auto-block result:', $auto_block_result);
+
+                        if ($auto_block_result['success']) {
+                            Hm_Msgs::add($auto_block_result['message'], 'success');
+                            delayed_debug_log('Auto-block successful', array(
+                                'sender' => $auto_block_result['sender'],
+                                'action' => $auto_block_result['action'],
+                                'scope' => $auto_block_result['scope']
+                            ));
+                        } else {
+                            Hm_Msgs::add('Auto-block failed: ' . $auto_block_result['error'], 'warning');
+                            delayed_debug_log('Auto-block failed', array('error' => $auto_block_result['error']));
+                        }
+                    } else {
+                        delayed_debug_log('Sieve filters not enabled for this server, skipping auto-block');
+                    }
+                }
             }
 
             if ($status) {
@@ -2303,5 +2357,21 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
             $this->out('imap_report_spam_error', true);
             $this->save_hm_msgs();
         }
+    }
+}
+
+/**
+ * Process auto-block spam settings
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_auto_block_spam_setting extends Hm_Handler_Module {
+    public function process() {
+        function auto_block_spam_enabled_callback($val) { return $val; }
+        function auto_block_spam_action_callback($val) { return $val; }
+        function auto_block_spam_scope_callback($val) { return $val; }
+        
+        process_site_setting('auto_block_spam_sender', $this, 'auto_block_spam_enabled_callback', true, true);
+        process_site_setting('auto_block_spam_action', $this, 'auto_block_spam_action_callback', 'move_to_junk', true);
+        process_site_setting('auto_block_spam_scope', $this, 'auto_block_spam_scope_callback', 'sender', true);
     }
 }
