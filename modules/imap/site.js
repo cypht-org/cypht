@@ -1356,73 +1356,48 @@ $(function() {
         `);
     }
 
-    $(document).on('click', '.msg_report_spam', function(e) { 
+    $(document).off('click', '.msg_report_spam').on('click', '.msg_report_spam', function(e) {
         e.preventDefault();
-        var uid, detail;
-        
-        // Check if we're in message list view
-        var selected = $('input[type=checkbox]:checked', $('.message_table')).closest('tr');
-        if (selected.length > 0) {
-            // We're in message list view
-            uid = selected.data('uid');
-            detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        var selectedRows = $('input[type=checkbox]:checked', $('.message_table')).closest('tr');
+        var uids = [];
+        if (selectedRows.length > 0) {
+            selectedRows.each(function() {
+                var uid = $(this).data('uid');
+                if (uid) uids.push(uid);
+            });
         } else {
-            // We're in message view
-            uid = getMessageUidParam();
-            detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+            var uid = getMessageUidParam();
+            if (uid) uids.push(uid);
         }
-        
-        if (!uid) {
-            delayedLog('Missing UID', null, 0);
-            showMessage('Could not determine message ID', 'error');
-            return false;
-        }
-
-        if (!detail || !detail.server_id || !detail.folder) {
-            delayedLog('Invalid folder details:', detail);
-            showMessage('Could not determine message location', 'error');
-            return false;
-        }
-        
-        // Store the message details for the modal
+        var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
         var modal = $('#spamReportModal');
         var modalData = {
             type: 'imap',
             server_id: detail.server_id,
             folder: detail.folder,
-            uid: uid
+            uids: uids
         };
-        modal.attr('data-uid', uid);
+        modal.attr('data-uids', JSON.stringify(uids));
         modal.attr('data-detail', JSON.stringify(modalData));
-        
-        // Show the modal
         var modalInstance = new bootstrap.Modal(modal[0]);
         modalInstance.show();
-        
-        return false;
     });
 
-    // Handle the confirm button click
-    $(document).on('click', '#confirmSpamReport', function() {
+    $(document).off('click', '#confirmSpamReport').on('click', '#confirmSpamReport', function() {
         var modal = $('#spamReportModal');
         var detail = JSON.parse(modal.attr('data-detail') || '{}');
         var reason = $('#spamReportReason').val().trim();
-        
+        var uids = detail.uids || [];
         if (!reason) {
             showMessage('Please provide a reason for reporting this message as spam', 'warning');
             return;
         }
-
-        if (!detail || !detail.uid || !detail.server_id || !detail.folder) {
+        if (!detail || !detail.server_id || !detail.folder || !uids.length) {
             showMessage('Could not determine message details', 'error');
             return;
         }
-
-        // Hide the modal
         bootstrap.Modal.getInstance(modal[0]).hide();
-        
-        // Call the report spam function with the reason
-        imap_report_spam_message(false, detail.uid, {
+        imap_report_spam_message(false, uids, {
             server_id: detail.server_id,
             folder: detail.folder
         }, reason);
@@ -1470,6 +1445,8 @@ $(function() {
         }
         return false;
     });
+
+    $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 });
 
 var imap_archive_message = function(state, supplied_uid, supplied_detail) {
@@ -1512,72 +1489,57 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
     return false;
 };
 
-var imap_report_spam_message = function(state, supplied_uid, supplied_detail, reason) {
+var imap_report_spam_message = function(state, supplied_uids, supplied_detail, reason) {
     delayedLog('Report Spam clicked - Starting process');
-    var uid = supplied_uid || getMessageUidParam();
+    var uids = Array.isArray(supplied_uids) ? supplied_uids : [supplied_uids];
     var detail = supplied_detail || Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
-    delayedLog('Message details:', {uid: uid, detail: detail, reason: reason});
-    
-    if (!uid) {
-        delayedLog('Missing UID', null, 0);
-        showMessage('Could not determine message ID', 'error');
+    delayedLog('Message details:', {uids: uids, detail: detail, reason: reason});
+    if (!uids.length) {
+        delayedLog('Missing UIDs', null, 0);
+        showMessage('Could not determine message IDs', 'error');
         return false;
     }
-    
     if (!detail || !detail.server_id || !detail.folder) {
         delayedLog('Invalid folder details:', detail);
         showMessage('Could not determine message location', 'error');
         return false;
     }
-    
-    // Construct form data
     var form_data = [
         {'name': 'hm_ajax_hook', 'value': 'ajax_imap_report_spam'},
-        {'name': 'imap_msg_uid', 'value': uid},
+        {'name': 'imap_msg_uids', 'value': uids.join(',')},
         {'name': 'imap_server_id', 'value': detail.server_id},
         {'name': 'folder', 'value': detail.folder},
         {'name': 'spam_reason', 'value': reason || 'No reason provided'}
     ];
-
-    delayedLog('Making AJAX request to report spam with form data:', form_data);
-
+    delayedLog('Spam report form_data:', form_data);
     Hm_Ajax.request(
         form_data,
         function(res) {
             delayedLog('Report spam AJAX response:', res);
-            if (!res.imap_report_spam_error) {
-                showMessage('Message reported as spam and moved to junk folder', 'success');
-                if (Hm_Utils.get_from_global('msg_uid', false)) {
-                    delayedLog('Message UID in global, returning');
-                    return;
+            if (res.rate_limit_error) {
+                var resetTime = res.rate_limit_reset || 0;
+                var remainingTime = Math.max(0, resetTime - Math.floor(Date.now() / 1000));
+                var minutes = Math.floor(remainingTime / 60);
+                var seconds = remainingTime % 60;
+                var timeMessage = '';
+                if (minutes > 0) {
+                    timeMessage = minutes + ' minute' + (minutes > 1 ? 's' : '') + ' and ' + seconds + ' second' + (seconds > 1 ? 's' : '');
+                } else {
+                    timeMessage = seconds + ' second' + (seconds > 1 ? 's' : '');
                 }
-                var nlink = $('.nlink');
-                if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
-                    delayedLog('Auto-advance enabled, redirecting to next message');
-                    Hm_Utils.redirect(nlink.attr('href'));
-                }
-                else {
-                    delayedLog('Redirecting to message list');
-                    if (!hm_list_parent()) {
-                        Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
-                    }
-                    else {
-                        Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
-                    }
-                }
-            } else {
-                delayedLog('Error in report spam response:', res.imap_report_spam_error);
-                var errorMsg = 'Failed to report message as spam';
-                if (res.router_user_msgs && res.router_user_msgs.text) {
-                    errorMsg += ': ' + res.router_user_msgs.text;
-                }
-                showMessage(errorMsg, 'error');
+                showMessage('Rate limit exceeded. Please wait ' + timeMessage + ' before trying again.', 'warning');
+                return;
             }
-        },
-        true, // Show loading icon
-        true  // Handle errors
+            if (!res.imap_report_spam_error) {
+                if (!hm_list_parent()) {
+                    Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
+                } else {
+                    Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
+                }
+            }
+        }
     );
-}
+};
 
 var imap_show_add_contact_popup = function() {
     var popup = document.getElementById("contact_popup");

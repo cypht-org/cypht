@@ -52,7 +52,8 @@ add_handler('settings', 'process_first_time_screen_emails_per_page_setting', tru
 add_handler('settings', 'process_setting_move_messages_in_screen_email', true, 'imap', 'process_first_time_screen_emails_per_page_setting', 'after');
 add_handler('settings', 'process_setting_active_preview_message', true, 'imap', 'process_setting_move_messages_in_screen_email', 'after');
 add_handler('settings', 'process_setting_ceo_detection_fraud', true, 'imap', 'process_setting_move_messages_in_screen_email', 'after');
-add_handler('settings', 'process_auto_block_spam_setting', true, 'imap', 'process_setting_ceo_detection_fraud', 'after');
+add_handler('settings', 'process_auto_block_spam_setting', true, 'imap', 'save_user_data', 'before');
+add_handler('settings', 'process_rate_limit_settings', true, 'imap', 'save_user_data', 'before');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -73,7 +74,8 @@ add_output('settings', 'first_time_screen_emails_per_page_setting', true, 'imap'
 add_output('settings', 'setting_move_messages_in_screen_email', true, 'imap', 'first_time_screen_emails_per_page_setting', 'after');
 add_output('settings', 'setting_active_preview_message', true, 'imap', 'setting_move_messages_in_screen_email', 'after');
 add_output('settings', 'setting_ceo_detection_fraud', true, 'imap', 'default_sort_order_setting', 'after');
-add_output('settings', 'auto_block_spam_setting', true, 'imap', 'setting_ceo_detection_fraud', 'after');
+add_output('settings', 'auto_block_spam_setting', true, 'imap', 'end_settings_form', 'before');
+add_output('settings', 'rate_limit_settings', true, 'imap', 'end_settings_form', 'before');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');
@@ -393,6 +395,7 @@ return array(
         'force_update' => FILTER_VALIDATE_BOOLEAN,
         'imap_folder_state' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_UNSAFE_RAW,
+        'imap_msg_uids' => FILTER_UNSAFE_RAW,
         'imap_msg_part' => FILTER_UNSAFE_RAW,
         'imap_prefetch' => FILTER_VALIDATE_BOOLEAN,
         'hide_imap_server' => FILTER_VALIDATE_BOOLEAN,
@@ -441,5 +444,11 @@ return array(
         'list_page' => FILTER_UNSAFE_RAW,
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'count_children' => FILTER_VALIDATE_BOOL,
+        'rate_limit_enabled' => FILTER_VALIDATE_BOOLEAN,
+        'rate_limit_window_size' => FILTER_VALIDATE_INT,
+        'rate_limit_max_requests' => FILTER_VALIDATE_INT,
+        'rate_limit_burst_limit' => FILTER_VALIDATE_INT,
+        'rate_limit_burst_window' => FILTER_VALIDATE_INT,
+        'spam_reason' => FILTER_UNSAFE_RAW,
     )
 );
