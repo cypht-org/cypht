@@ -84,7 +84,33 @@ setup_user() {
 	sudo chown -R testuser:testuser /home/testuser
 	sudo usermod -aG mail testuser
 	sudo usermod -aG postdrop testuser
+
 	STATUS_DONE
+}
+# test dovecot user authentication
+test_user_setup() {
+    STATUS_TITLE "Test MailUser After Setup"
+
+    # Create user without password first
+    sudo useradd -m test
+
+    # Set plaintext password correctly
+    echo "test:test" | sudo chpasswd
+
+    # Setup mail directory and permissions
+    sudo mkdir -p /home/test/mail/.imap/INBOX
+    sudo chown -R test:test /home/test
+    sudo usermod -aG mail test
+    sudo usermod -aG postdrop test
+
+    # Restart Dovecot
+    sudo systemctl restart dovecot
+
+    # Test authentication
+    echo "🔐 Testing Dovecot authentication..."
+    sudo doveadm auth test test test
+
+    STATUS_DONE
 }
 
 # config Dovecot
@@ -152,6 +178,7 @@ setup_ui_tests() {
     setup_cypht
     bootstrap_unit_tests
     setup_user
+    test_user_setup
     setup_dovecot
     setup_postfix
     setup_site
