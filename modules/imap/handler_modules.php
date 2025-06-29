@@ -2094,170 +2094,129 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
+    use Hm_Rate_Limiter_Trait;
     public function process() {
         try {
             delayed_debug_log('Report Spam handler starting');
-            list($success, $form) = $this->process_form(array('imap_msg_uid', 'imap_server_id', 'folder'));
-            delayed_debug_log('Form processing result:', array('success' => $success, 'form' => $form));
-
-            if (!$success) {
-                delayed_debug_log('Form processing failed - missing required fields');
-                Hm_Msgs::add('Failed to process spam report: Missing required fields', 'error');
+            list($success, $form) = $this->process_form(array('imap_msg_uids', 'imap_server_id', 'folder', 'spam_reason'));
+            delayed_debug_log('Form data:', $form);
+            if (!$this->check_rate_limit('ajax_imap_report_spam')) {
+                delayed_debug_log('Rate limit exceeded for spam report');
+                return;
+            }
+            if (!$success || !isset($form['imap_msg_uids'])) {
+                delayed_debug_log('imap_msg_uids missing in form data');
+                Hm_Msgs::add('Failed to process spam report: Missing message UIDs', 'error');
                 $this->out('imap_report_spam_error', true);
                 return;
             }
-
-            if (!isset($form['imap_msg_uid']) || !isset($form['imap_server_id']) || !isset($form['folder'])) {
-                delayed_debug_log('Missing required form fields:', $form);
+            $uids = explode(',', $form['imap_msg_uids']);
+            $uids = array_filter($uids, function($uid) { return !empty(trim($uid)); });
+            delayed_debug_log('Processed UIDs:', $uids);
+            if (!isset($form['imap_server_id']) || !isset($form['folder']) || empty($uids)) {
+                delayed_debug_log('Missing required form fields or empty UIDs', $form);
                 Hm_Msgs::add('Failed to process spam report: Invalid request data', 'error');
                 $this->out('imap_report_spam_error', true);
                 return;
             }
-
             $junk_folder = false;
             $form_folder = hex2bin($form['folder']);
             $errors = 0;
             $status = null;
-            $spam_reason = isset($form['spam_reason']) && !empty($form['spam_reason']) ? 
-                $form['spam_reason'] : 'No reason provided';
-
-            // Log the spam report
-            $log_entry = sprintf(
-                "Spam Report - Time: %s, Server: %s, Folder: %s, UID: %s, Reason: %s",
-                date('Y-m-d H:i:s'),
-                $form['imap_server_id'],
-                $form_folder,
-                $form['imap_msg_uid'],
-                $spam_reason
-            );
-            delayed_debug_log('Spam report log:', $log_entry);
-
+            $spam_reason = isset($form['spam_reason']) && !empty($form['spam_reason']) ? $form['spam_reason'] : 'No reason provided';
             $specials = get_special_folders($this, $form['imap_server_id']);
-            delayed_debug_log('Special folders:', $specials);
-            
             if (array_key_exists('junk', $specials) && $specials['junk']) {
                 $junk_folder = $specials['junk'];
-                delayed_debug_log('Found junk folder:', $junk_folder);
             } else {
-                delayed_debug_log('No junk folder configured');
                 Hm_Msgs::add('No junk folder configured for this IMAP server', 'warning');
                 $errors++;
             }
-
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
-            delayed_debug_log('Mailbox connection:', array(
-                'connected' => ($mailbox !== false),
-                'authed' => ($mailbox && $mailbox->authed()),
-                'is_imap' => ($mailbox && $mailbox->is_imap())
-            ));
-
             if (!$mailbox) {
-                delayed_debug_log('Failed to connect to mailbox');
                 Hm_Msgs::add('Failed to connect to mailbox', 'error');
                 $errors++;
             } elseif (!$mailbox->authed()) {
-                delayed_debug_log('Not authenticated to mailbox');
                 Hm_Msgs::add('Not authenticated to mailbox', 'error');
                 $errors++;
             }
-
+            $bulk_results = array();
             if (!$errors) {
-                // Get message headers for spam reporting
-                $headers = $mailbox->get_message_headers($form_folder, $form['imap_msg_uid']);
-                $message_data = array(
-                    'uid' => $form['imap_msg_uid'],
-                    'folder' => $form_folder,
-                    'from' => isset($headers['From']) ? $headers['From'] : '',
-                    'subject' => isset($headers['Subject']) ? $headers['Subject'] : '',
-                    'headers' => $headers
-                );
-
-                // Report to enabled spam services
-                $report_results = array();
-                $enabled_services = get_enabled_spam_services();
-                foreach ($enabled_services as $service_name => $service_config) {
-                    delayed_debug_log("Processing spam report for service: $service_name");
-                    $reporter = Hm_Spam_Reporter_Factory::create($service_name, $mailbox, $message_data);
-                    if ($reporter) {
-                        $result = $reporter->report($spam_reason);
-                        $report_results[$service_name] = $result;
-                        delayed_debug_log("Report result for $service_name:", $result);
-                        
-                        if ($result['success']) {
-                            Hm_Msgs::add($result['message']);
-                        } else {
-                            Hm_Msgs::add($result['error'], 'warning');
+                foreach ($uids as $uid) {
+                    $result = array('uid' => $uid, 'success' => false, 'error' => '');
+                    $headers = $mailbox->get_message_headers($form_folder, $uid);
+                    $message_data = array(
+                        'uid' => $uid,
+                        'folder' => $form_folder,
+                        'from' => isset($headers['From']) ? $headers['From'] : '',
+                        'subject' => isset($headers['Subject']) ? $headers['Subject'] : '',
+                        'headers' => $headers
+                    );
+                    $enabled_services = get_enabled_spam_services();
+                    foreach ($enabled_services as $service_name => $service_config) {
+                        $reporter = Hm_Spam_Reporter_Factory::create($service_name, $mailbox, $message_data);
+                        if ($reporter) {
+                            $service_result = $reporter->report($spam_reason);
+                            if (!$service_result['success']) {
+                                $result['error'] .= $service_result['error'] . '; ';
+                            }
                         }
                     }
-                }
-
-                // Move message to junk folder
-                delayed_debug_log('Attempting to move message to junk folder', array(
-                    'from_folder' => $form_folder,
-                    'to_folder' => $junk_folder,
-                    'uid' => $form['imap_msg_uid']
-                ));
-                $result = $mailbox->message_action($form_folder, 'MOVE', array($form['imap_msg_uid']), $junk_folder);
-                $status = $result['status'];
-                delayed_debug_log('Move action result:', array('status' => $status, 'result' => $result));
-
-                // Auto-block sender after successful spam report
-                if ($status) {
-                    delayed_debug_log('Message moved successfully, attempting auto-block sender');
-                    
-                    // Check if Sieve filters are enabled for this server
-                    $imap_servers = $this->user_config->get('imap_servers', array());
-                    $imap_account = null;
-                    foreach ($imap_servers as $idx => $mailbox_config) {
-                        if ($idx == $form['imap_server_id']) {
-                            $imap_account = $mailbox_config;
-                            break;
+                    $move_result = $mailbox->message_action($form_folder, 'MOVE', array($uid), $junk_folder);
+                    if ($move_result['status']) {
+                        $result['success'] = true;
+                        $imap_servers = $this->user_config->get('imap_servers', array());
+                        $imap_account = null;
+                        foreach ($imap_servers as $idx => $mailbox_config) {
+                            if ($idx == $form['imap_server_id']) {
+                                $imap_account = $mailbox_config;
+                                break;
+                            }
                         }
-                    }
-
-                    if ($imap_account && isset($imap_account['sieve_config_host'])) {
-                        delayed_debug_log('Sieve filters enabled, proceeding with auto-block');
-                        
-                        // Perform auto-block
-                        $auto_block_result = auto_block_spam_sender(
-                            $this->user_config,
-                            $this->config,
-                            $form['imap_server_id'],
-                            $message_data,
-                            $spam_reason
-                        );
-
-                        delayed_debug_log('Auto-block result:', $auto_block_result);
-
-                        if ($auto_block_result['success']) {
-                            Hm_Msgs::add($auto_block_result['message'], 'success');
-                            delayed_debug_log('Auto-block successful', array(
-                                'sender' => $auto_block_result['sender'],
-                                'action' => $auto_block_result['action'],
-                                'scope' => $auto_block_result['scope']
-                            ));
-                        } else {
-                            Hm_Msgs::add('Auto-block failed: ' . $auto_block_result['error'], 'warning');
-                            delayed_debug_log('Auto-block failed', array('error' => $auto_block_result['error']));
+                        if ($imap_account && isset($imap_account['sieve_config_host'])) {
+                            $auto_block_result = auto_block_spam_sender(
+                                $this->user_config,
+                                $this->config,
+                                $form['imap_server_id'],
+                                $message_data,
+                                $spam_reason
+                            );
+                            if (!$auto_block_result['success']) {
+                                $result['error'] .= 'Auto-block failed: ' . $auto_block_result['error'] . '; ';
+                            }
                         }
                     } else {
-                        delayed_debug_log('Sieve filters not enabled for this server, skipping auto-block');
+                        $result['error'] .= 'Move to junk failed; ';
                     }
+                    $bulk_results[] = $result;
                 }
             }
-
-            if ($status) {
-                delayed_debug_log('Message successfully reported as spam');
-                Hm_Msgs::add("Message reported as spam and moved to junk folder");
+            if (count($uids) === 1) {
+                $status = isset($bulk_results[0]['success']) ? $bulk_results[0]['success'] : false;
+                $this->out('imap_report_spam_error', !$status);
+                if ($status) {
+                    Hm_Msgs::add('Message reported as spam and moved to junk folder', 'success');
+                } else {
+                    Hm_Msgs::add('Failed to report message as spam', 'danger');
+                }
             } else {
-                delayed_debug_log('Failed to report message as spam');
-                Hm_Msgs::add('An error occurred reporting the message as spam', 'danger');
+                $this->out('imap_report_spam_error', false);
+                $this->out('bulk_spam_report_results', $bulk_results);
+                $success_count = 0;
+                foreach ($bulk_results as $result) {
+                    if ($result['success']) {
+                        $success_count++;
+                    }
+                }
+                if ($success_count === count($bulk_results)) {
+                    Hm_Msgs::add('All messages reported as spam and moved to junk folder', 'success');
+                } elseif ($success_count > 0) {
+                    Hm_Msgs::add("$success_count of " . count($bulk_results) . " messages reported as spam", 'warning');
+                } else {
+                    Hm_Msgs::add('Failed to report messages as spam', 'danger');
+                }
             }
-
-            $this->out('imap_report_spam_error', !$status);
             $this->save_hm_msgs();
         } catch (Exception $e) {
-            delayed_debug_log('Exception in spam report handler: ' . $e->getMessage());
             Hm_Msgs::add('An unexpected error occurred while reporting spam', 'error');
             $this->out('imap_report_spam_error', true);
             $this->save_hm_msgs();
@@ -2278,5 +2237,25 @@ class Hm_Handler_process_auto_block_spam_setting extends Hm_Handler_Module {
         process_site_setting('auto_block_spam_sender', $this, 'auto_block_spam_enabled_callback', true, true);
         process_site_setting('auto_block_spam_action', $this, 'auto_block_spam_action_callback', 'move_to_junk', true);
         process_site_setting('auto_block_spam_scope', $this, 'auto_block_spam_scope_callback', 'sender', true);
+    }
+}
+
+/**
+ * Process rate limiting settings
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_rate_limit_settings extends Hm_Handler_Module {
+    public function process() {
+        function rate_limit_enabled_callback($val) { return $val; }
+        function rate_limit_window_size_callback($val) { return max(60, min(86400, intval($val))); } // 1 minute to 24 hours
+        function rate_limit_max_requests_callback($val) { return max(1, min(10000, intval($val))); } // 1 to 10000 requests
+        function rate_limit_burst_limit_callback($val) { return max(1, min(1000, intval($val))); } // 1 to 1000 burst requests
+        function rate_limit_burst_window_callback($val) { return max(10, min(3600, intval($val))); } // 10 seconds to 1 hour
+        
+        process_site_setting('rate_limit_enabled', $this, 'rate_limit_enabled_callback', true, true);
+        process_site_setting('rate_limit_window_size', $this, 'rate_limit_window_size_callback', 3600, true);
+        process_site_setting('rate_limit_max_requests', $this, 'rate_limit_max_requests_callback', 100, true);
+        process_site_setting('rate_limit_burst_limit', $this, 'rate_limit_burst_limit_callback', 10, true);
+        process_site_setting('rate_limit_burst_window', $this, 'rate_limit_burst_window_callback', 60, true);
     }
 }

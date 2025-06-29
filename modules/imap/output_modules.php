@@ -1714,3 +1714,67 @@ class Hm_Output_auto_block_spam_setting extends Hm_Output_Module {
         return $res;
     }
 }
+
+/**
+ * Rate limiting settings UI
+ * @subpackage imap/output
+ */
+class Hm_Output_rate_limit_settings extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enabled = array_key_exists('rate_limit_enabled', $settings) ? $settings['rate_limit_enabled'] : true;
+        $window_size = array_key_exists('rate_limit_window_size', $settings) ? $settings['rate_limit_window_size'] : 3600;
+        $max_requests = array_key_exists('rate_limit_max_requests', $settings) ? $settings['rate_limit_max_requests'] : 100;
+        $burst_limit = array_key_exists('rate_limit_burst_limit', $settings) ? $settings['rate_limit_burst_limit'] : 10;
+        $burst_window = array_key_exists('rate_limit_burst_window', $settings) ? $settings['rate_limit_burst_window'] : 60;
+        
+        $res = '<tr class="general_setting"><td colspan="2">';
+        $res .= '<div class="rate_limit_settings mb-3">';
+        $res .= '<div class="subtitle">' . $this->trans('Rate Limiting Settings') . '</div>';
+        
+        // Enable/Disable toggle
+        $res .= '<div class="form-check mb-3">';
+        $res .= '<input type="checkbox" id="rate_limit_enabled" name="rate_limit_enabled" class="form-check-input" value="1"' . ($enabled ? ' checked' : '') . '>';
+        $res .= '<label for="rate_limit_enabled" class="form-check-label">' . $this->trans('Enable rate limiting for API endpoints') . '</label>';
+        $res .= '</div>';
+        
+        // Window size
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="rate_limit_window_size" class="form-label">' . $this->trans('Rate limit window (seconds)') . '</label>';
+        $res .= '<input type="number" class="form-control" id="rate_limit_window_size" name="rate_limit_window_size" value="' . $window_size . '" min="60" max="86400">';
+        $res .= '<div class="form-text">' . $this->trans('Time window for rate limiting (60 seconds to 24 hours)') . '</div>';
+        $res .= '</div>';
+        
+        // Max requests
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="rate_limit_max_requests" class="form-label">' . $this->trans('Maximum requests per window') . '</label>';
+        $res .= '<input type="number" class="form-control" id="rate_limit_max_requests" name="rate_limit_max_requests" value="' . $max_requests . '" min="1" max="10000">';
+        $res .= '<div class="form-text">' . $this->trans('Maximum number of requests allowed per time window') . '</div>';
+        $res .= '</div>';
+        
+        // Burst limit
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="rate_limit_burst_limit" class="form-label">' . $this->trans('Burst limit') . '</label>';
+        $res .= '<input type="number" class="form-control" id="rate_limit_burst_limit" name="rate_limit_burst_limit" value="' . $burst_limit . '" min="1" max="1000">';
+        $res .= '<div class="form-text">' . $this->trans('Maximum requests allowed in burst window') . '</div>';
+        $res .= '</div>';
+        
+        // Burst window
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="rate_limit_burst_window" class="form-label">' . $this->trans('Burst window (seconds)') . '</label>';
+        $res .= '<input type="number" class="form-control" id="rate_limit_burst_window" name="rate_limit_burst_window" value="' . $burst_window . '" min="10" max="3600">';
+        $res .= '<div class="form-text">' . $this->trans('Time window for burst limiting (10 seconds to 1 hour)') . '</div>';
+        $res .= '</div>';
+        
+        // Information note
+        $res .= '<div class="alert alert-info">';
+        $res .= '<i class="bi bi-info-circle"></i> ';
+        $res .= $this->trans('Rate limiting helps prevent abuse of API endpoints. When limits are exceeded, users will be temporarily blocked from making requests. Spam reporting has stricter limits to prevent abuse.');
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</td></tr>';
+        
+        return $res;
+    }
+}
