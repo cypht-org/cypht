@@ -139,14 +139,14 @@ Nux_Quick_Services::add('zoho', array(
 ));
 
 Nux_Quick_Services::add('fastmail', array(
-    'server' => 'mail.messagingengine.com',
+    'server' => 'imap.fastmail.com',
     'type' => 'imap',
     'tls' => true,
     'port' => 993,
     'name' => 'Fastmail',
     'auth' => 'login',
     'smtp' => array(
-        'server' => 'mail.messagingengine.com',
+        'server' => 'smtp.fastmail.com',
         'port' => 465,
         'tls' => true
     )
