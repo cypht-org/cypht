@@ -226,7 +226,17 @@ class Hm_MessagesStore {
                 Hm_Ajax.request(
                     config,
                     (response) => {
-                        response.sourceId = store.hashObject(config);
+                        if (response === false) {
+                            // Create a proper response object for failed requests
+                            response = {
+                                formatted_message_list: {},
+                                pages: 0,
+                                folder_status: {},
+                                sourceId: store.hashObject(config)
+                            };
+                        } else {
+                            response.sourceId = store.hashObject(config);
+                        }
                         resolve(response);
                     },
                     [],
