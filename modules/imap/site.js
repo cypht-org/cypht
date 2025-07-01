@@ -901,12 +901,14 @@ var unselect_non_imap_messages = function() {
 };
 
 var imap_move_copy = function(e, action, context) {
+    e.preventDefault()
     var move_to;
     if (!e.target || e.target.classList.contains('imap_move')) {
         move_to = $('.msg_controls .move_to_location');
     }
     else {
-        move_to = $('.msg_text .move_to_location');
+        var li = e.target.closest('li');
+        move_to = li.querySelector('.move_to_location');
     }
     unselect_non_imap_messages();
     var label;
@@ -923,7 +925,7 @@ var imap_move_copy = function(e, action, context) {
         label = $('.move_to_string2').val();
     }
     folders.prepend('<div class="move_to_title">'+label+'<a class="close_move_to close" href="#" aria-label="Close"><span aria-hidden="true">&times;</span></a></div>');
-    move_to.html(folders.html());
+    $(move_to).html(folders.html());
     $('.imap_move_folder_link', move_to).on("click", function() { return expand_imap_move_to_folders($(this).data('target'), context); });
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').off('click');
     $('a', move_to).not('.imap_move_folder_link').not('.close_move_to').on("click", function() { imap_perform_move_copy($(this).data('id'), context); return false; });
@@ -933,7 +935,7 @@ var imap_move_copy = function(e, action, context) {
         $('.move_to_location').hide();
         return false;
     });
-    move_to.show();
+    $(move_to).show();
     return false;
 };
 
