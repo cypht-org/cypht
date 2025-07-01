@@ -320,7 +320,17 @@ function subject_callback($vals, $style, $output_mod) {
     }
     $subject = $output_mod->html_safe($vals[0]);
     if (isset($vals[4]) && $vals[4]) {
-        $preview_msg = $output_mod->html_safe($vals[4]);
+        $lines = explode("\n", $vals[4]);
+        $clean = array_filter(array_map('trim', $lines), function ($line) {
+            return $line !== ''
+                && stripos($line, 'boundary=') === false
+                && !preg_match('/^-{2,}==/', $line)
+                && stripos($line, 'content-type:') !== 0
+                && stripos($line, 'charset=') === false
+                && stripos($line, 'content-transfer-encoding:') !== 0;
+        });
+        $clean_text = implode("\n", $clean);
+        $preview_msg = $output_mod->html_safe($clean_text);
     }
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
