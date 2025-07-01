@@ -320,9 +320,26 @@ function subject_callback($vals, $style, $output_mod) {
     }
     $subject = $output_mod->html_safe($vals[0]);
     if (isset($vals[4]) && $vals[4]) {
-        $preview_msg = $output_mod->html_safe($vals[4]);
+        $lines = explode("\n", $vals[4]);
+        $clean = [];
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (
+                $line === '' ||
+                stripos($line, 'boundary=') !== false ||
+                preg_match('/^-{2,}==/', $line) ||
+                stripos($line, 'content-type:') === 0 ||
+                stripos($line, 'charset=') !== false ||
+                stripos($line, 'content-transfer-encoding:') === 0
+            ) {
+                continue;
+            }
+            $clean[] = $line;
+        }
+        $clean_text = implode("\n", $clean);
+        $preview_msg = $output_mod->html_safe($clean_text);
     }
-    
+
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
     if ($style == 'news') {
         if ($output_mod->get('is_mobile')) {
