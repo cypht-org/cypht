@@ -457,14 +457,16 @@ class Hm_Alert {
         
         this.container.appendChild(alert);
 
-        setTimeout(() => {
-            alert.style.opacity = '0';
-            alert.style.transform = 'translateY(-20px)';
+        if (dismissible) {
             setTimeout(() => {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }, 500);
-        }, dismissTime * 1000);
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 500);
+            }, dismissTime * 1000);
+        }
     }
 
     #getIcon(type) {
