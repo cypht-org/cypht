@@ -619,20 +619,18 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             window.scrollTo(0,0);
         }
         const onSuccess = function(res) {
-            if (!noupdate) {
-                $('.msg_text').html('');
-                $('.msg_text').append(res.msg_headers);
-                $('.msg_text').append(res.msg_text);
-                $('.msg_text').append(res.msg_parts);
-                document.title = $('.header_subject th').text();
-                imap_message_view_finished(uid, detail, listParent);
+            $('.msg_text').html('');
+            $('.msg_text').append(res.msg_headers);
+            $('.msg_text').append(res.msg_text);
+            $('.msg_text').append(res.msg_parts);
+
+            document.title = $('.header_subject th').text();
+            imap_message_view_finished(uid, detail, listParent);
+            if (res.deleted) {
+                Hm_Notices.show('This message has been moved or deleted', 'warning', false);
+                $('.header_links').addClass('disabled_link');
             }
-            else {
-                $('.reply_link, .reply_all_link, .forward_link').each(function() {
-                    $(this).attr("href", $(this).data("href"));
-                    $(this).removeClass('disabled_link');
-                });
-            }
+
             if (!res.show_pagination_links) {
                 $('.prev, .next').hide();
             }
@@ -640,13 +638,15 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
         };
         
         if (!msg_part) {
-            const msgContent = get_local_message_content(uid, list_path);
+            var msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
                 onSuccess(msgContent);
                 if (callback) {
                     callback(msgContent)
                 }
-                return;
+                if (msgContent.deleted) {
+                    return;
+                }
             }
         }
 
@@ -657,7 +657,14 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             {'name': 'imap_server_id', 'value': detail.server_id},
             {'name': 'folder', 'value': detail.folder}],
             function(res) {
-                onSuccess(res);
+                if (res.msg_text === '<div class="msg_text_inner"></div>' && noupdate) {
+                    msgContent.deleted = true;
+                    Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(msgContent));
+                    res = msgContent;
+                }
+                if (!noupdate) {
+                    onSuccess(res);
+                }
                 if (!noupdate && !msg_part) {
                     Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
                 }
@@ -820,27 +827,8 @@ var imap_setup_message_view_page = function(uid, details, list_path, listParent,
     }
     
     const msg_content = get_local_message_content(uid, list_path);
-    if (!msg_content) {
-        get_message_content(false, uid, list_path, listParent, details, callback);
-    }
-    else {
-        const msgResponse = msg_content;
-        $('.msg_text').append(msgResponse.msg_headers)
-                        .append(msgResponse.msg_text)
-                        .append(msgResponse.msg_parts);
-        document.title = $('.header_subject th').text();
-        if ($('.header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
-            $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
-            $('.close_inline_msg').on("click", function() { msg_inline_close(); });
-        }
-
-        $('.reply_link, .reply_all_link, .forward_link').each(function() {
-            $(this).data("href", $(this).attr("href")).removeAttr("href");
-            $(this).addClass('disabled_link');
-        });
-        imap_message_view_finished(uid, details, listParent);
-        get_message_content(false, uid, list_path, listParent, details, callback, true);
-    }
+    const noupdate = Boolean(msg_content);
+    get_message_content(false, uid, list_path, listParent, details, callback, noupdate);
 };
 
 var display_reply_content = function(res) {
