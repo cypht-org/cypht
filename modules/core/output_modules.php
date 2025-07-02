@@ -637,7 +637,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure you want to delete this server? ').'"); };';
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('This action cannot be undone. Are you sure you want to delete this?').'"); };';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
