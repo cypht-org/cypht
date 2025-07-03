@@ -777,3 +777,4 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
     }
     return $res;
 }
+
