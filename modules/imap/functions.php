@@ -1612,6 +1612,7 @@ if (!hm_exists('connect_to_imap_server')) {
 if (!hm_exists('save_sent_msg')) {
 function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_id, $show_errors = true) {
     $specials = get_special_folders($handler, $imap_id);
+    $sent_folder = false;
     if (array_key_exists('sent', $specials) && $specials['sent']) {
         $sent_folder = $specials['sent'];
     }
@@ -1634,5 +1635,5 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
     }
-    return $uid;
+    return [$uid, $sent_folder];
 }}
