@@ -59,6 +59,11 @@ async function navigate(url, loaderMessage) {
             throw new Error("Request failed with status: " + response.status);
         }
 
+        if (response.redirected && response.url) {
+            window.location.href = response.url;
+            return;
+        }
+
         const html = await response.text();
         const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
         const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
