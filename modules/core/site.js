@@ -244,6 +244,12 @@ var Hm_Ajax_Request = function() { return {
                     Hm_Notices.show(msg.text, msg.type);
                 });
             }
+            if (res.folder_status) {
+                for (var name in res.folder_status) {
+                    Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
+                    Hm_Folders.update_unread_counts();
+                }
+            }
             if (this.callback) {
                 this.callback(res);
             }
