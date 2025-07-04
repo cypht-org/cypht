@@ -1283,7 +1283,7 @@ class Hm_Output_add_smtp_server_dialog extends Hm_Output_Module {
         if ($this->get('single_server_mode')) {
             return '';
         }
-        $count = count($this->get('smtp_servers', array()));
+        $count = count(array_filter($this->get('smtp_servers', array()), fn($s) => ($s['type'] ?? null) !== 'ews'));
         $count = sprintf($this->trans('%d configured'), $count);
         $name = '';
         $address = '';
