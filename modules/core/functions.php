@@ -777,3 +777,16 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
     }
     return $res;
 }
+
+/**
+ * @subpackage imap/functions
+ */
+if (!hm_exists('extract_email_adress')) {
+    function extract_email_adress($str)
+    {
+        if (preg_match("/^(.*?) <(.*?)>$/", $str, $matches)) {
+            return $matches[2];
+        }
+        return null;
+    }
+}

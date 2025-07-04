@@ -464,8 +464,10 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 $imap_account = $mailbox;
             }
         }
+        $array_email_sender = [];
+        $email_sender = null;
 
-        if (isset($this->request->post['imap_msg_uid'])) {
+        if (isset($this->request->post['imap_msg_uid']) && !empty($this->request->post['imap_msg_uid'])) {
             $form['imap_msg_uid'] = $this->request->post['imap_msg_uid'];
             $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->post['imap_server_id'], $this->cache);
             if (! $mailbox || ! $mailbox->authed()) {
@@ -478,6 +480,10 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $email_sender = $email_sender[0][0];
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
+            if ($this->request->post['is_screened']) {
+                $array_email_sender = explode(",", $email_sender);
+                $email_sender = null;
+            }
         } else {
             Hm_Msgs::add('Sender not found', 'warning');
             return;
@@ -509,12 +515,18 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $unblock_sender = false;
             if ($current_script != '') {
                 $blocked_list = prepare_sieve_script ($current_script);
-                foreach ($blocked_list as $blocked_sender) {
-                    if ($blocked_sender != $email_sender) {
-                        $blocked_senders[] = $blocked_sender;
-                        continue;
+                if ($email_sender) {
+                    foreach ($blocked_list as $blocked_sender) {
+                        if ($blocked_sender != $email_sender) {
+                            $blocked_senders[] = $blocked_sender;
+                            continue;
+                        }
+                        $unblock_sender = true;
                     }
-                    $unblock_sender = true;
+                } else {
+                    if ($array_email_sender) {
+                        $blocked_senders = array_diff($array_email_sender, $blocked_list);
+                    }
                 }
                 $blocked_list_actions = prepare_sieve_script ($current_script, 2);
             }
