@@ -396,8 +396,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
-            if ($this->get('sieve_filters_enabled') && !$is_draft) {
+            $settings = $this->get('user_settings', array());
+            if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
+            }
+            if ($this->get('sieve_filters_enabled') && !$is_draft) {
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
@@ -1290,7 +1293,7 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
 class Hm_Output_snooze_msg_control extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
-        $enable_snooze = array_key_exists('enable_snooze', $settings) && $settings['enable_snooze'];
+        $enable_snooze = array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting'];
 
         if (!$enable_snooze) {
             return;

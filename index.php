@@ -54,7 +54,7 @@ if (!$config->get('disable_ini_settings')) {
 /* process the request */
 new Hm_Dispatch($config);
 
-if (is_null($config)) {
+if (empty($config)) {
     $config = new Hm_Site_Config_File();
 }
 
