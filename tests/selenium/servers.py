@@ -34,9 +34,9 @@ class ServersTest(WebTest):
         name = self.by_name('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
-        email.send_keys('test@localhost')
+        email.send_keys('testuser@localhost')
         pwd = self.by_name('srv_setup_stepper_password')
-        pwd.send_keys('test')
+        pwd.send_keys('testuser')
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
@@ -56,7 +56,7 @@ class ServersTest(WebTest):
         imap_port.clear()
         imap_port.send_keys(143)
         reply_to = self.by_name('srv_setup_stepper_profile_reply_to')
-        reply_to.send_keys('test@localhost')
+        reply_to.send_keys('testuser@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
         elem = self.by_id('step_config_action_finish')
@@ -67,6 +67,7 @@ class ServersTest(WebTest):
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
         sys_message_text = element.text
         sys_message_texts = sys_message_text.split('\n')
+        print(f"MESSAGES FOUND: '{sys_message_texts}'")
         assert any("Authentication failed" in text for text in sys_message_texts)
 
 if __name__ == '__main__':
