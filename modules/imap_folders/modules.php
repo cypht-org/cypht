@@ -386,7 +386,7 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
         if (empty($server_id)) {
             $res .= 'selected="selected" ';
         }
-        $res .= 'value="">'.$this->trans('Select an IMAP server').'</option>';
+        $res .= 'value="">'.$this->trans('Select a Mail Account').'</option>';
         foreach ($this->get('imap_servers', array()) as $id => $server) {
             $res .= '<option ';
             if ($server_id == $id) {
@@ -395,8 +395,8 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($id).'">';
             $res .= $this->html_safe($server['name']);
         }
-        $res .= '</select><label for="imap_server_folder">'.$this->trans('IMAP Server').'</label></div></form></div></div>';
-        $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select an IMAP server first').'" />';
+        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></form></div></div>';
+        $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select a mail account first').'" />';
         $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_confirm" value="'.$this->trans('Are you sure you want to delete this folder, and all the messages in it?').'" />';
