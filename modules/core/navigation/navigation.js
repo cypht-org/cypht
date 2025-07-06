@@ -53,6 +53,7 @@ async function navigate(url, loaderMessage) {
     try {
         const response = await fetch(url, {
             method: 'GET',
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -60,18 +61,34 @@ async function navigate(url, loaderMessage) {
         }
 
         const html = await response.text();
-        const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
-        const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
-
-        let cyphtMain;
-        if ($(main).attr('id') === 'cypht-main') {
-            $('main#cypht-main').replaceWith(main);
-            cyphtMain = main;
-        } else {
-            $('main#cypht-main').replaceWith($(main).find('#cypht-main'));
-            cyphtMain = $(main).find('#cypht-main').prop('outerHTML');
+        if (!html || typeof html !== 'string') {
+            throw new Error("Empty or invalid response body.");
         }
-        document.title = title.replace(/<[^>]*>/g, '');
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const main = doc.querySelector('main');
+        const title = doc.querySelector('title');
+
+        if (!main || !title) {
+            throw new Error("main or title not found in parsed HTML");
+        }
+
+        let $mainEl = $(main);
+        let cyphtMain;
+        if ($mainEl.attr('id') === 'cypht-main') {
+            $('main#cypht-main').replaceWith($mainEl);
+            cyphtMain = $mainEl.prop('outerHTML');
+        } else {
+            const innerMain = $mainEl.find('#cypht-main');
+            if (innerMain.length === 0) {
+                throw new Error("Element with id='cypht-main' not found in new main.");
+            }
+            $('main#cypht-main').replaceWith(innerMain);
+            cyphtMain = innerMain.prop('outerHTML');
+        }
+        document.title = title.textContent.trim();
         
         // load custom javascript
         const scripts = extractCustomScripts($(html));
