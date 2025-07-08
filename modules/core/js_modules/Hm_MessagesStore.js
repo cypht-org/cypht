@@ -268,7 +268,7 @@ class Hm_MessagesStore {
                 configs.push(config);
             } else {
                 let sources = hm_data_sources();
-                if (this.path != 'combined_inbox') {
+                if (this.path != 'combined_inbox' && this.path != 'search') {
                     sources = sources.filter(s => s.type != 'feeds');
                 }
                 sources.forEach((ds) => {
