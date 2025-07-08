@@ -82,7 +82,6 @@ add_handler('compose', 'imap_unflag_on_send', true, 'imap', 'imap_save_sent', 'a
 add_output('compose', 'imap_unflag_on_send_controls', true, 'imap', 'compose_form_end', 'before');
 
 /* search page data */
-add_handler('search', 'load_imap_servers_for_search',  true, 'imap', 'message_list_type', 'after');
 add_handler('search', 'imap_message_list_type', true, 'imap', 'message_list_type', 'after');
 
 /* message list pages */

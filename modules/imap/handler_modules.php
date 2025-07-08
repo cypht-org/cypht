@@ -1570,22 +1570,6 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
 }
 
 /**
- * Load IMAP servers for the search page
- * @subpackage imap/handler
- */
-class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
-    /**
-     * Output IMAP server array used on the search page
-     */
-    public function process() {
-        foreach(imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
-            $this->append('data_sources', $vals);
-        }
-    }
-}
-
-
-/**
  * Load IMAP servers for message list pages
  * @subpackage imap/handler
  */
