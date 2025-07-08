@@ -188,5 +188,6 @@ return array(
         'reject_message' => FILTER_UNSAFE_RAW,
         'change_behavior' => FILTER_VALIDATE_BOOL,
         'gen_script' => FILTER_VALIDATE_BOOL,
+        'is_screened' => FILTER_VALIDATE_BOOL,
     )
 );
