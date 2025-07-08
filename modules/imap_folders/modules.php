@@ -206,41 +206,6 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
                 if ($form['folder'] && $form['new_folder'] && $mailbox->rename_folder($form['folder'], $form['new_folder'], $parent)) {
-                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER) && $mailbox->is_imap()) {
-                        $imap_servers = $this->user_config->get('imap_servers');
-                        $imap_account = $imap_servers[$form['imap_server_id']];
-                        $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
-                        if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            $factory = get_sieve_client_factory($this->site_config);
-                            try {
-                                $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
-                                $script_names = array_filter(
-                                    $linked_mailboxes,
-                                    function ($value) use($old_folder) {
-                                        return $value == $old_folder;
-                                    }
-                                );
-                                $script_names = array_keys($script_names);
-                                foreach ($script_names as $script_name) {
-                                    $script_parsed = $client->getScript($script_name);
-                                    $script_parsed = str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $script_parsed);
-
-                                    $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
-                                    $new_actions = base64_encode(str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $old_actions));
-                                    $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
-                                    $client->removeScripts($script_name);
-                                    $client->putScript(
-                                        $script_name,
-                                        $script_parsed
-                                    );
-                                }
-                                $client->close();
-                                Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well', 'info');
-                            } catch (Exception $e) {
-                                Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
-                            }
-                        }
-                    }
                     Hm_Msgs::add('Folder renamed');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
@@ -262,12 +227,8 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
         if ($success) {
             $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
             if ($mailbox && $mailbox->authed()) {
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER) && $mailbox->is_imap()) {
-                    $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
-                    if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
-                        Hm_Msgs::add('This folder can\'t be deleted because it is used in a filter.', 'warning');
-                        return;
-                    }
+                if ($this->get('sieve_can_delete_folder') === false) {
+                    return;
                 }
                 if ($form['folder'] && $mailbox->delete_folder($form['folder'])) {
                     Hm_Msgs::add('Folder deleted');
@@ -833,44 +794,5 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" class="form-check-input" />'.$reset.'</td></tr>';
-    }
-}
-
-if (!hm_exists('get_sieve_linked_mailbox')) {
-    function get_sieve_linked_mailbox ($imap_account, $module) {
-        if (! ($module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER))) {
-            return;
-        }
-        $factory = get_sieve_client_factory($site_config);
-        try {
-            $client = $factory->init($module->user_config, $imap_account, $module->module_is_supported('nux'));
-            $scripts = $client->listScripts();
-            $folders = [];
-            foreach ($scripts as $s) {
-                $script = $client->getScript($s);
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
-                $obj = json_decode(base64_decode($base64_obj))[0];
-                if ($obj && in_array($obj->action, ['copy', 'move'])) {
-                    $folders[$s] = $obj->value;
-                }
-            }
-            $client->close();
-            return $folders;
-        } catch (Exception $e) {
-            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
-            return;
-        }
-    }
-}
-
-if (!hm_exists('is_mailbox_linked_with_filters')) {
-    function is_mailbox_linked_with_filters ($mailbox, $imap_server_id, $module) {
-        $imap_servers = $module->user_config->get('imap_servers');
-        $imap_account = $imap_servers[$imap_server_id];
-        if (isset($imap_account['sieve_config_host'])) {
-            $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $module);
-            return in_array($mailbox, $linked_mailboxes);
-        }
-        return false;
     }
 }

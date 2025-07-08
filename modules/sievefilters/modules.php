@@ -1357,6 +1357,25 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Check the connection to a SIEVE server
+ * @subpackage sieve/handler
+ */
+class Hm_Handler_sieve_connect extends Hm_Handler_Module {
+    public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        if ($imap_details = $this->get('imap_connect_details')) {
+            $factory = get_sieve_client_factory($this->site_config);
+            try {
+                $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
+            } catch (Exception $e) {
+                Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
+            }
+        }
+    }
+}
+
 
 class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
     public function process() {
@@ -1484,6 +1503,80 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         if (isset($accounts[$form['imap_server_id']])) {
             $this->out('mailbox', $accounts[$form['imap_server_id']]);
             $this->session->close_early();
+        }
+    }
+}
+
+class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
+
+        if (!$success) {
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
+            $imap_servers = $this->user_config->get('imap_servers');
+            $imap_account = $imap_servers[$form['imap_server_id']];
+            $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
+            if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
+                $factory = get_sieve_client_factory($this->site_config);
+                try {
+                    $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
+                    $script_names = array_filter(
+                        $linked_mailboxes,
+                        function ($value) use ($form) {
+                            return $value == $form['folder'];
+                        }
+                    );
+                    $script_names = array_keys($script_names);
+                    foreach ($script_names as $script_name) {
+                        $script_parsed = $client->getScript($script_name);
+                        $script_parsed = str_replace('"'.$form['folder'].'"', '"'.$form['new_folder'].'"', $script_parsed);
+
+                        $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
+                        $new_actions = base64_encode(str_replace('"'.$form['folder'].'"', '"'.$form['folder'].'"', $old_actions));
+                        $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
+                        $client->removeScripts($script_name);
+                        $client->putScript(
+                            $script_name,
+                            $script_parsed
+                        );
+                    }
+                    $client->close();
+                    Hm_Msgs::add('Sieve filters using the folder were also updated to use the new folder name.', 'info');
+                } catch (Exception $e) {
+                    Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
+                }
+            }
+        }
+    }
+}
+
+class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+
+        if (! $success) {
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
+            $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
+            if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
+                $this->out('sieve_can_delete_folder', false);
+                Hm_Msgs::add('This folder can\'t be deleted because it is used in a Sieve filter.', 'warning');
+            }
         }
     }
 }

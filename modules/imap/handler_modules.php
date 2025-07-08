@@ -1833,16 +1833,6 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
             if ($success && $imap_details) {
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                    $factory = get_sieve_client_factory($this->site_config);
-                    try {
-                        $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
-                    } catch (Exception $e) {
-                        Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
-                        return;
-                    }
-                }
-
                 $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
                 $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
@@ -1858,6 +1848,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     Hm_Msgs::add('Username and password are required', 'warning');
                     $this->out('old_form', $form);
                 }
+                $this->out('imap_connect_details', $imap_details);
             }
         }
     }

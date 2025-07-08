@@ -578,3 +578,39 @@ if (!hm_exists('get_sieve_host_from_services')) {
         return null;
     }
 }
+
+if (!hm_exists('get_sieve_linked_mailbox')) {
+    function get_sieve_linked_mailbox ($imap_account, $module) {
+        $factory = get_sieve_client_factory($site_config);
+        try {
+            $client = $factory->init($module->user_config, $imap_account, $module->module_is_supported('nux'));
+            $scripts = $client->listScripts();
+            $folders = [];
+            foreach ($scripts as $s) {
+                $script = $client->getScript($s);
+                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
+                $obj = json_decode(base64_decode($base64_obj))[0];
+                if ($obj && in_array($obj->action, ['copy', 'move'])) {
+                    $folders[$s] = $obj->value;
+                }
+            }
+            $client->close();
+            return $folders;
+        } catch (Exception $e) {
+            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+            return;
+        }
+    }
+}
+
+if (!hm_exists('is_mailbox_linked_with_filters')) {
+    function is_mailbox_linked_with_filters ($mailbox, $imap_server_id, $module) {
+        $imap_servers = $module->user_config->get('imap_servers');
+        $imap_account = $imap_servers[$imap_server_id];
+        if (isset($imap_account['sieve_config_host'])) {
+            $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $module);
+            return in_array($mailbox, $linked_mailboxes);
+        }
+        return false;
+    }
+}

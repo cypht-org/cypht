@@ -226,8 +226,10 @@ class Hm_MessagesStore {
                 Hm_Ajax.request(
                     config,
                     (response) => {
-                        response.sourceId = store.hashObject(config);
-                        resolve(response);
+                        if (response) {
+                            response.sourceId = store.hashObject(config);
+                            resolve(response);
+                        }
                     },
                     [],
                     hideLoadingState,

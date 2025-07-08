@@ -2,17 +2,20 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-handler_source('sieve_filters');
+handler_source('sievefilters');
 output_source('sievefilters');
 
 add_module_to_all_pages('handler', 'sieve_filters_enabled', true, 'sievefilters', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
-add_handler('ajax_hm_folders', 'sieve_filters_enabled', true, 'core', 'load_user_data', 'after');
-
-add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_status', 'before');
-
 setup_base_page('sieve_filters', 'core');
 setup_base_page('block_list', 'core');
+
+// addons and hooks in other modules
+add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
+add_handler('ajax_hm_folders', 'sieve_filters_enabled', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_rename', 'sieve_remame_folder', true, 'imap_folders', 'process_folder_rename', 'after');
+add_handler('ajax_imap_folders_delete', 'sieve_can_delete_folder', true, 'imap_folders', 'process_folder_delete', 'before');
+add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_status', 'before');
+add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'after');
 
 // sieve filter
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
@@ -176,6 +179,7 @@ return array(
         'imap_msg_uid' => FILTER_VALIDATE_INT,
         'imap_server_id' => FILTER_UNSAFE_RAW,
         'folder' => FILTER_UNSAFE_RAW,
+        'new_folder' => FILTER_UNSAFE_RAW,
         'sender' => FILTER_UNSAFE_RAW,
         'selected_behaviour' => FILTER_UNSAFE_RAW,
         'enable_sieve_filter' => FILTER_VALIDATE_INT,
