@@ -134,7 +134,11 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
             function(res) {
                 if (!res.imap_delete_error) {
                     const listPath = getParam('list_parent') || getListPathParam();
-                    const store = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+                    let filter = `${getParam('keyword')}_${getParam('filter')}`;
+                    if (getParam('search_terms')) {
+                        filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
+                    }
+                    const store = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), filter, getParam('sort'));
                     store.load();
                     store.removeRow(uid);
                     if (Hm_Utils.get_from_global('msg_uid', false)) {
@@ -145,8 +149,9 @@ var imap_delete_message = function(state, supplied_uid, supplied_detail) {
                     var nlink = $('.nlink');
                     if (nlink.length && Hm_Utils.get_from_global('auto_advance_email_enabled')) {
                         Hm_Utils.redirect(nlink.attr('href'));
-                    }
-                    else {
+                    } else if (listPath == 'search') {
+                        Hm_Utils.redirect("?page=search&list_path="+listPath);
+                    } else {
                         Hm_Utils.redirect("?page=message_list&list_path="+listPath);
                     }
                 }
@@ -182,8 +187,9 @@ var imap_unread_message = function(supplied_uid, supplied_detail) {
                     else {
                         if (!hm_list_parent()) {
                             Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
-                        }
-                        else {
+                        } else if (hm_list_parent() == 'search') {
+                            Hm_Utils.redirect("?page=search&list_path="+hm_list_parent());
+                        } else {
                             Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                         }
                     }
@@ -1283,8 +1289,9 @@ var imap_archive_message = function(state, supplied_uid, supplied_detail) {
                     else {
                         if (!hm_list_parent()) {
                             Hm_Utils.redirect("?page=message_list&list_path="+getListPathParam());
-                        }
-                        else {
+                        } else if (hm_list_parent() == 'search') {
+                            Hm_Utils.redirect("?page=search&list_path="+hm_list_parent());
+                        } else {
                             Hm_Utils.redirect("?page=message_list&list_path="+hm_list_parent());
                         }
                     }

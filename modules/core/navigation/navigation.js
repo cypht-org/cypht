@@ -40,12 +40,38 @@ window.addEventListener('load', function() {
 $(document).on('click', 'a', function(event) {
     if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
         event.preventDefault();
-        const currentPage = new URL(window.location.href).searchParams.toString();
-        if (currentPage !== $(this).attr('href').split('?')[1]) {
-            navigate($(this).attr('href'));
+        const currentUrl = new URL(window.location.href);
+        const currentPage = currentUrl.searchParams.toString();
+        const target = new URLSearchParams($(this).attr('href').split('?')[1]);
+        if (currentPage !== target.toString()) {
+            navigate(autoAppendParamsForNavigation($(this).attr('href')));
         }
     }
 });
+
+function autoAppendParamsForNavigation(href)
+{
+    const currentUrl = new URL(window.location.href);
+    const currentPage = currentUrl.searchParams.toString();
+    const target = new URLSearchParams(href.split('?')[1]);
+    if (currentPage !== target.toString()) {
+        if ((target.get('page') == 'message' && target.get('list_parent') == 'search') || target.get('page') == 'search') {
+            if ($('.search_form form').length > 0) {
+                for (let field of $('.search_form form').serializeArray()) {
+                    if (field.name != 'page') {
+                        target.set(field.name, field.value);
+                    }
+                }
+            } else {
+                for (let field of ['list_page', 'search_terms', 'search_fld', 'search_since', 'sort']) {
+                    target.set(field, currentUrl.searchParams.get(field));
+                }
+            }
+            return href.split('?')[0] + '?' + target.toString();
+        }
+    }
+    return href;
+}
 
 async function navigate(url, loaderMessage) {
     showRoutingToast(loaderMessage);

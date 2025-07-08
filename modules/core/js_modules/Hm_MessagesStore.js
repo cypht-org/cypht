@@ -277,7 +277,7 @@ class Hm_MessagesStore {
                         cfg.push({ name: "hm_ajax_hook", value: 'ajax_feed_combined' });
                         cfg.push({ name: "feed_server_ids", value: ds.id });
                     } else {
-                        cfg.push({ name: "hm_ajax_hook", value: 'ajax_imap_message_list' });
+                        cfg.push({ name: "hm_ajax_hook", value: this.path == 'search' ? 'ajax_imap_search' : 'ajax_imap_message_list' });
                         cfg.push({ name: "imap_server_ids", value: ds.id });
                         cfg.push({ name: "imap_folder_ids", value: ds.folder });
                     }

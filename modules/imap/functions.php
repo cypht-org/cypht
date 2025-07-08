@@ -219,6 +219,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     $list_page = $output_module->get('list_page', 0);
     $list_sort = $output_module->get('list_sort', $output_module->get('default_sort_order'));
     $list_filter = $output_module->get('list_filter');
+    $list_keyword = $output_module->get('list_keyword');
     foreach($msg_list as $msg) {
         $row_class = 'email';
         $icon = 'env_open';
@@ -304,6 +305,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         if ($list_filter) {
             $url .= '&filter='.$output_module->html_safe($list_filter);
+        }
+        if ($list_keyword) {
+            $url .= '&keyword='.$output_module->html_safe($list_keyword);
         }
         if (!$show_icons) {
             $icon = false;

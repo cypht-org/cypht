@@ -147,8 +147,8 @@ function combined_sort_dialog($mod) {
 
     $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {
-        $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
-        $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
+        $res .= '<option value="'.$name.'"'.($mod->get('sort') == $name || $mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'"'.($mod->get('sort') == '-'.$name || $mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
     }
     $res .= '</select>';
     return $res;

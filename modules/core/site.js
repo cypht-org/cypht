@@ -909,34 +909,40 @@ function Message_List() {
         }
     };
 
-    this.prev_next_links = function(msgUid, listPath = getListPathParam()) {
+    this.prev_next_links = function(msgUid, listPath = getListPathParam(), cb = null) {
         let prevUrl;
         let nextUrl;
                 
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
-        messages.load(false, true);
-        const next = messages.getNextRowForMessage(msgUid);
-        const prev = messages.getPreviousRowForMessage(msgUid);
-        if (prev) {
-            const prevSubject = $(prev['0']).find('.subject a');
-            prevUrl = new URL(prevSubject.prop('href'));
-            prevUrl.searchParams.set('list_parent', listPath);
-            const subject = prevSubject.text();
-            const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
-            $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
+        let filter = `${getParam('keyword')}_${getParam('filter')}`;
+        if (getParam('search_terms')) {
+            filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
         }
-        if (next) {
-            const nextSubject = $(next['0']).find('.subject a');
-            nextUrl = new URL(nextSubject.prop('href'));
-            nextUrl.searchParams.set('list_parent', listPath);
-            const subject = nextSubject.text();
-            
-            const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
-            $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
-        }
-
-        return [prevUrl?.href, nextUrl?.href];
+        const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), filter, getParam('sort'));
+        messages.load(false, true, false, function() {
+            $('tr.prev, tr.next').remove();
+            const next = messages.getNextRowForMessage(msgUid);
+            const prev = messages.getPreviousRowForMessage(msgUid);
+            if (prev) {
+                const prevSubject = $(prev['0']).find('.subject a');
+                prevUrl = new URL(prevSubject.prop('href'));
+                prevUrl.searchParams.set('list_parent', listPath);
+                const subject = prevSubject.text();
+                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+                $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
+            }
+            if (next) {
+                const nextSubject = $(next['0']).find('.subject a');
+                nextUrl = new URL(nextSubject.prop('href'));
+                nextUrl.searchParams.set('list_parent', listPath);
+                const subject = nextSubject.text();
+                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+                $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
+            }
+            if (cb) {
+                cb([prevUrl?.href, nextUrl?.href]);
+            }
+        });
     };
 
     this.check_empty_list = function() {
@@ -1624,7 +1630,7 @@ var Hm_Utils = {
         if (! path) {
             path = window.location.href;
         }
-        window.location.href = path;
+        window.location.href = autoAppendParamsForNavigation(path);
     },
 
     is_valid_email: function (val) {
