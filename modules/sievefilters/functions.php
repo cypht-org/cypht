@@ -536,9 +536,14 @@ if (!hm_exists('get_blocked_senders')){
                 $ret .= '<a href="#" mailbox_id="'.$mailbox_id.'" data-action="'.$action.'" data-reject-message="'.$reject_message.'" title="'.$module->trans('Change Behavior').'" class="block_sender_link toggle-behavior-dropdown" aria-labelledby="dropdownMenuBlockSender'.$k.'" data-bs-toggle="dropdown" aria-expanded="false"> <i class="bi bi-pencil-fill ms-3"></i></a>';
                 $ret .= block_filter_dropdown($module, $mailbox_id, false, 'edit_blocked_behavior', 'Edit', $k);
 
-                $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'"></i>';
+                $ret .= '</td><td><i class="bi bi-'.$icon_svg.' unblock_button" mailbox_id="'.$mailbox_id.'" data-title="unblock Sender '.$sender.'"></i>';
                 if (!mb_strstr($sender, '*')) {
-                    $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'"></i>';
+                    $sender_party = explode('@', $sender);
+                    $domain_name = "";
+                    if(isset($sender_party[1])) {
+                        $domain_name = $sender_party[1];
+                    }
+                    $ret .= ' <i class="bi bi-'.$icon_block_domain_svg.' block_domain_button" mailbox_id="'.$mailbox_id.'" data-title="block domain '.$domain_name.'"></i>';
                 }
                 $ret .= '</td></tr>';
             }
