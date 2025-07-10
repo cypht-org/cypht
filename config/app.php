@@ -781,6 +781,8 @@ return [
     //     */
     //     'developer',
 
+        'debug_log' => env('DEBUG_LOG', false),
+
     //     /*
     //     | -------
     //     | Github
@@ -1073,6 +1075,13 @@ return [
     | Defaults 20
     */
     'default_setting_snoozed_per_source' => env('DEFAULT_SETTING_SNOOZED_PER_SOURCE', 20),
+
+    /*
+    |
+    | Enable snooze functionality for messages
+    | Defaults to false
+    */
+    'default_setting_enable_snooze' => env('DEFAULT_SETTING_ENABLE_SNOOZE', false),
 
     /*
     |

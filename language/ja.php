@@ -408,7 +408,7 @@ return array(
     'Added SMTP server!' => false,
     'Added repository' => false,
     'Added server!' => false,
-    'Are you sure?' => 'よろしいですか？',
+    'Are you sure you want to delete this server?' => 'よろしいですか？',
     'Could not find that repository/owner combination at github.com' => false,
     'Disable prompts when deleting' => '削除前の確認を無くす',
     'Enable keyboard shortcuts' => 'キーボードショートカットを有効にする',

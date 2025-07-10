@@ -20,9 +20,10 @@ function applyImapMessageContentPageHandlers(routeParams) {
     imap_setup_message_view_page(routeParams.uid, null, routeParams.list_path, routeParams.list_parent, () => {
         imap_setup_tags();
         imap_setup_snooze();
+        window.dispatchEvent(new CustomEvent('message-loaded'));
     });
 
-    const messages = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`);
+    const messages = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`, getParam('sort'));
     messages.load(false);
     const next = messages.getNextRowForMessage(routeParams.uid);
     const prev = messages.getPreviousRowForMessage(routeParams.uid);

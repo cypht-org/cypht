@@ -77,7 +77,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
             if ($this->get('folder')) {
                 if ($this->get('screen_emails')) {
-                    $custom .= '<a title="Disike" href="#" class="screen-email-unlike"><i class="bi bi-hand-thumbs-down-fill"></i></a><a title="Like" href="#" class="screen-email-like"></i><i class="bi bi-hand-thumbs-up-fill"></i></a>';
+                    $custom .= '<span title="Disike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"></i><i class="bi bi-hand-thumbs-up-fill"></i></span>';
                     if ($this->get('move_messages_in_screen_email')) {
                         $custom .= '<input type="hidden" value="1" id="move_messages_in_screen_email"/>';
                     } else {
@@ -361,33 +361,33 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
-            $txt .= '<div class="msg_move_to">'.
-                '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
-                '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
+            $txt .= '<ul class="msg_move_to">'.
+                '<li><a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a></li>'.
+                '<li><a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a></li>';
             if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
-                $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                $txt .= ' | <li><a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a></li>';
                 if ($size > 1) {
-                    $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                    $txt .= ' | <li><a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a></li>';
                 }
                 else {
-                    $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
+                    $txt .= ' | <li><a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a></li>';
                 }
                 $txt .= ' | ' . forward_dropdown($this, $reply_args);
             }
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <li><a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
+                $txt .= '<li><a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
             }
             else {
-                $txt .= ' | <a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <li><a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
+                $txt .= '<li><a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
             }
 
-            $txt .= ' | <a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a>';
-            $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
-            $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
-            $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
-            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            $txt .= ' | <li><a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a></li>';
+            $txt .= ' | <li><a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a></li>';
+            $txt .= ' | <li><a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location"></div></li>';
+            $txt .= ' | <li><a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location"></div></li>';
+            $txt .= ' | <li><a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a></li>';
             if($this->get('tags')){
                 $txt .= ' | '. tags_dropdown($this, $headers);
             }
@@ -396,8 +396,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
-            if ($this->get('sieve_filters_enabled') && !$is_draft) {
+            $settings = $this->get('user_settings', array());
+            if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
+            }
+            if ($this->get('sieve_filters_enabled') && !$is_draft) {
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
@@ -410,19 +413,19 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
                     if(!in_array($sender, $existing_emails)){
-                        $txt .= ' | <div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                        $txt .= ' | <li><div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a></li>';
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= ' | <li><span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span></li>';
                 }
             }
-            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
+            $txt .= ' | <li><a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a></li>';
 
             if ($is_draft) {
-                $txt .= ' | <a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
+                $txt .= ' | <li><a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a></li>';
             }
-            $txt .= '<div class="move_to_location"></div></div>';
+            $txt .= '</ul><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
@@ -731,10 +734,15 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
      * Build the HTML for the status rows. Will be populated by an ajax call per server
      */
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_sieve = $settings['enable_sieve_filter_setting'] ?? DEFAULT_ENABLE_SIEVE_FILTER;
         $res = '';
         foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].'"></td>'.
-                '<td class="imap_detail_'.$vals['id'].'"></td></tr>';
+            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].' imap_status" data-id="'.$vals['id'].'"></td>';
+            if ($enable_sieve) {
+                $res .= '<td class="imap_detail_'.$vals['id'].'"></td>';
+            }
+            $res .= '</tr>';
         }
         return $res;
     }
@@ -919,7 +927,7 @@ class Hm_Output_filter_by_type extends Hm_Output_Module {
 }
 
 /**
- * Format message headers for the Sent, Junk, Draft, Trash E-mail page
+ * Format message headers for the All, Combined Inbox, Sent, Junk, Draft, Unread, Trash E-mail pages
  * @subpackage imap/output
  */
 class Hm_Output_filter_data extends Hm_Output_Module {
@@ -927,44 +935,8 @@ class Hm_Output_filter_data extends Hm_Output_Module {
      * Build ajax response for the All E-mail message list
      */
     protected function output() {
-        if ($this->get('imap_'.$this->get('list_path').'_data')) {
-            prepare_imap_message_list($this->get('imap_'.$this->get('list_path').'_data'), $this, $this->get('list_path'));
-        }
-        else {
-            $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format message headers for the All E-mail page
- * @subpackage imap/output
- */
-class Hm_Output_filter_all_email extends Hm_Output_Module {
-    /**
-     * Build ajax response for the All E-mail message list
-     */
-    protected function output() {
-        if ($this->get('imap_combined_inbox_data')) {
-            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'email');
-        }
-        else {
-            $this->out('formatted_message_list', array());
-        }
-    }
-}
-
-/**
- * Format message headers for the Everthing page
- * @subpackage imap/output
- */
-class Hm_Output_filter_combined_inbox extends Hm_Output_Module {
-    /**
-     * Build ajax response for the Everthing message list
-     */
-    protected function output() {
-        if ($this->get('imap_combined_inbox_data')) {
-            prepare_imap_message_list($this->get('imap_combined_inbox_data'), $this, 'combined_inbox');
+        if ($this->get('imap_message_list_data')) {
+            prepare_imap_message_list($this->get('imap_message_list_data'), $this, $this->get('list_path'));
         }
         else {
             $this->out('formatted_message_list', array());
@@ -991,6 +963,9 @@ class Hm_Output_filter_folder_page extends Hm_Output_Module {
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());
+            $this->out('pages', 0);
+        } else {
+            $this->out('pages', 0);
         }
         $this->out('do_not_flag_as_read_on_open', $this->get('do_not_flag_as_read_on_open', false));
     }
@@ -1083,7 +1058,7 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         if (array_key_exists('simple_msg_parts', $settings) && $settings['simple_msg_parts']) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
             $this->trans('Show simple message part structure when reading a message').'</label></td>'.
@@ -1104,7 +1079,7 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['pagination_links'] !== DEFAULT_PAGINATION_LINKS) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
             $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
@@ -1125,7 +1100,7 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         if (!array_key_exists('auto_advance_email', $settings) || (array_key_exists('auto_advance_email', $settings) && $settings['auto_advance_email'])) {
             $checked = ' checked="checked"';
         } else {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
             $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
@@ -1161,7 +1136,7 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
             $per_page = $settings['imap_per_page'];
         }
         if ($per_page != DEFAULT_IMAP_PER_PAGE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="imap_per_page">'.
             $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
@@ -1182,7 +1157,7 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
             $max_google_contacts_number = $settings['max_google_contacts_number'];
         }
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
             $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
@@ -1201,7 +1176,7 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
         $reset = '';
         if (array_key_exists('msg_part_icons', $settings) && $settings['msg_part_icons']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
             $this->trans('Show message part icons when reading a message').'</label></td>'.
@@ -1222,7 +1197,7 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['text_only'] !== DEFAULT_TEXT_ONLY) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
             $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
@@ -1243,7 +1218,7 @@ class Hm_Output_sent_source_max_setting extends Hm_Output_Module {
             $sources = $settings['sent_per_source'];
         }
         if ($sources != DEFAULT_SENT_PER_SOURCE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="sent_setting"><td><label for="sent_per_source">'.
             $this->trans('Max messages per source').'</label></td>'.
@@ -1262,11 +1237,32 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('original_folder', $settings) && $settings['original_folder']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
             $this->trans('Archive to the original folder').'</label></td>'.
             '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+    }
+}
+
+/**
+ * Option to enable/disable snooze functionality
+ * @subpackage imap/output
+ */
+class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = '';
+        $reset = '';
+        if (array_key_exists('enable_snooze', $settings) && $settings['enable_snooze']) {
+            $checked = ' checked="checked"';
+        }
+        if ($settings['enable_snooze'] !== DEFAULT_ENABLE_SNOOZE) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+        }
+        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
+            $this->trans('Enable Snooze functionality').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
     }
 }
 
@@ -1282,7 +1278,7 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
             $checked = ' checked="checked"';
         }
         if($settings['review_sent_email'] !== DEFAULT_REVIEW_SENT_EMAIL) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
             $this->trans('Review sent message').'</label></td>'.
@@ -1296,6 +1292,13 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
  */
 class Hm_Output_snooze_msg_control extends Hm_Output_Module {
     protected function output() {
+        $settings = $this->get('user_settings', array());
+        $enable_snooze = array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting'];
+
+        if (!$enable_snooze) {
+            return;
+        }
+        
         $parts = explode('_', $this->get('list_path'));
         $unsnooze = $parts[0] == 'imap' && hex2bin($parts[2]) == 'Snoozed';
         $res = snooze_dropdown($this, $unsnooze);
@@ -1608,7 +1611,7 @@ class Hm_Output_first_time_screen_emails_per_page_setting extends Hm_Output_Modu
             $per_page = $settings['first_time_screen_emails'];
         }
         if ($per_page != 20) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_input"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="first_time_screen_emails">'.
             $this->trans('First-time screen senders').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.

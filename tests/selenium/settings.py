@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import StaleElementReferenceException
+import time
 
 class SettingsHelpers(WebTest):
     def is_unchecked(self, name):
@@ -18,13 +19,20 @@ class SettingsHelpers(WebTest):
         assert self.by_name(name).is_selected() == True
 
     def toggle(self, name):
-        self.by_name(name).click()
+        elem = self.by_name(name)
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def close_section(self, section):
-        self.by_css('[data-target=".'+section+'"]').click()
+        elem = self.by_css('[data-target=".'+section+'"]')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        time.sleep(1)
+        elem.click()
 
     def save_settings(self):
         self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(1)
         alert_message = self.by_class('sys_messages')
         self.by_name('save_settings').click()
         self.wait_with_folder_list()
@@ -47,7 +55,10 @@ class SettingsHelpers(WebTest):
         if not self.element_exists('content_title') or self.by_class('content_title').text != 'Site Settings':
             self.wait_for_navigation_to_complete()
         if not self.by_class(section).is_displayed():
-            self.by_css('[data-target=".'+section+'"]').click()
+            elem = self.by_css('[data-target=".'+section+'"]')
+            self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+            time.sleep(1)
+            elem.click()
 
     def checkbox_test(self, section, name, checked, mod=False):
         if mod and not self.mod_active(mod):
@@ -80,8 +91,11 @@ class SettingsHelpers(WebTest):
         if mod and not self.mod_active(mod):
             return
         self.settings_section(section)
-        assert self.by_name(name).get_attribute('value') == current
-        Select(self.by_name(name)).select_by_value(new)
+        dropdown = self.by_name(name)
+        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", dropdown)
+        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(dropdown))
+        assert dropdown.get_attribute('value') == current
+        Select(dropdown).select_by_value(new)
         self.save_settings()
         assert self.by_name(name).get_attribute('value') == new
 
@@ -224,12 +238,12 @@ if __name__ == '__main__':
 
         # general options
         'load_settings_page',
-        'list_style_test',
-        'start_page_test',
-        'tz_test',
-        'theme_test',
-        'imap_per_page_test',
         'mail_format_test',
+        'theme_test',
+        'list_style_test',
+        'tz_test',
+        'start_page_test',
+        'imap_per_page_test',
         'auto_bcc_test',
         'keyboard_shortcuts_test',
         'inline_message_test',

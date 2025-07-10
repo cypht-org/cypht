@@ -778,20 +778,3 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
     return $res;
 }
 
-function engineSettingCallback($val, $key, $mod) {
-    $setting = Hm_Output_engine_settings::$settings[$key];
-    $key .= '_setting';
-    $user_setting = $mod->user_config->get($key);
-    $update = $mod->request->post['update'];
-
-    if ($update) {
-        $val = implode($setting['separator'], array_filter(array_merge(explode($setting['separator'], $user_setting), [$val])));
-        $mod->user_config->set($key, $val);
-
-        $user_data = $mod->session->get('user_data', array());
-        $user_data[$key] = $val;
-        $mod->session->set('user_data', $user_data);
-        $mod->session->record_unsaved('Engine settings updated');
-    }
-    return $val;
-}

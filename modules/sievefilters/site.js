@@ -577,12 +577,6 @@ function sieveFiltersPageHandler() {
         current_account = $(this).attr('account');
         edit_script_modal.open();
     });
-    $('.edit_filter').on('click', function (e) {
-        e.preventDefault();
-        let script_name = $(this).parent().parent().children().next().html();
-        edit_filter_modal.setTitle(script_name);
-        edit_filter_modal.open();
-    });
 
     /**
      * Delete action Button
@@ -997,6 +991,8 @@ function sieveFiltersPageHandler() {
                         }
                     }
                 });
+                edit_filter_modal.setTitle(current_editing_filter_name);
+                edit_filter_modal.open();
             }
         );
     });
@@ -1007,7 +1003,7 @@ function get_list_block_sieve() {
     sessionStorage.removeItem('list_blocked');
     let detail = Hm_Utils.parse_folder_path(hm_list_path());
     let list_blocked_senders = [];
-    if (getPageNameParam() == 'message_list') {
+    if (getPageNameParam() == 'message_list' && detail) {
         Hm_Ajax.request(
             [
                 { name: 'hm_ajax_hook', value: 'ajax_list_block_sieve' },

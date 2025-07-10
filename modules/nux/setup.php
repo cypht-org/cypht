@@ -44,8 +44,9 @@ add_handler('home', 'process_oauth2_authorization', true, 'nux', 'message_list_t
 add_handler('home', 'nux_homepage_data', true, 'nux', 'process_oauth2_authorization', 'after');
 add_handler('home', 'nux_dev_news', true, 'nux', 'nux_homepage_data', 'after');
 
-add_output('home', 'welcome_dialog', true, 'nux', 'home_password_dialogs', 'after');
-add_output('home', 'nux_help', true, 'nux', 'welcome_dialog', 'after');
+add_output('home', 'start_welcome_dialog', true, 'nux', 'home_password_dialogs', 'after');
+add_output('home', 'end_welcome_dialog', true, 'nux', 'start_welcome_dialog', 'after');
+add_output('home', 'nux_help', true, 'nux', 'end_welcome_dialog', 'after');
 add_output('home', 'nux_dev_news', true, 'nux', 'nux_help', 'after');
 
 add_output('message_list', 'nux_message_list_notice', true, 'nux', 'message_list_start', 'before');
@@ -61,26 +62,26 @@ return array(
         'ajax_nux_add_service',
     ),
     'allowed_get' => array(
-        'code' => FILTER_DEFAULT,
-        'state' => FILTER_DEFAULT,
-        'error' => FILTER_DEFAULT,
-        'security_token' => FILTER_DEFAULT
+        'code' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'state' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'error' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'security_token' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
     ),
     'allowed_output' => array(
         'nux_service_step_two' => array(FILTER_UNSAFE_RAW, false),
         'service_details' => array(FILTER_UNSAFE_RAW, false),
         'nux_account_added' => array(FILTER_VALIDATE_BOOLEAN, false),
-        'nux_server_id' => array(FILTER_DEFAULT, false),
-        'nux_service_name' => array(FILTER_DEFAULT, false),
+        'nux_server_id' => array(FILTER_UNSAFE_RAW, false),
+        'nux_service_name' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_post' => array(
-        'nux_service' => FILTER_DEFAULT,
-        'nux_email' => FILTER_DEFAULT,
-        'nux_name' => FILTER_DEFAULT,
+        'nux_service' => FILTER_UNSAFE_RAW,
+        'nux_email' => FILTER_UNSAFE_RAW,
+        'nux_name' => FILTER_UNSAFE_RAW,
         'nux_pass' => FILTER_UNSAFE_RAW,
-        'nux_account_name' => FILTER_DEFAULT,
-        'nux_all_inkl_login' => FILTER_DEFAULT,
-        'accounts_source' => FILTER_DEFAULT,
-        'accounts_sample' => FILTER_DEFAULT,
+        'nux_account_name' => FILTER_UNSAFE_RAW,
+        'nux_all_inkl_login' => FILTER_UNSAFE_RAW,
+        'accounts_source' => FILTER_UNSAFE_RAW,
+        'accounts_sample' => FILTER_UNSAFE_RAW,
     )
 );

@@ -230,6 +230,8 @@ class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', 'arrival'));
+        $this->out('sort', $this->request->get['sort'] ?? null);
+        $this->out('list_sort', $this->request->get['list_sort'] ?? null);
     }
 }
 
@@ -420,6 +422,20 @@ class Hm_Handler_process_snoozed_since_setting extends Hm_Handler_Module {
      */
     public function process() {
         process_site_setting('snoozed_since', $this, 'since_setting_callback', DEFAULT_SNOOZED_SINCE);
+    }
+}
+
+/**
+ * Process the enable/disable snooze setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_enable_snooze_setting extends Hm_Handler_Module {
+    /**
+     * Process the enable/disable snooze setting
+     */
+    public function process() {
+        function enable_snooze_setting_callback($val) { return $val; }
+        process_site_setting('enable_snooze', $this, 'enable_snooze_setting_callback', DEFAULT_ENABLE_SNOOZE, true);
     }
 }
 
@@ -724,6 +740,7 @@ class Hm_Handler_load_user_data extends Hm_Handler_Module {
         $this->out('mailto_handler', $this->user_config->get('mailto_handler_setting', false));
         $this->out('warn_for_unsaved_changes', $this->user_config->get('warn_for_unsaved_changes_setting', false));
         $this->out('no_password_save', $this->user_config->get('no_password_save_setting', DEFAULT_NO_PASSWORD_SAVE));
+        $this->out('user_settings', $this->user_config->dump(), false);
         if (!mb_strstr($this->request->server['REQUEST_URI'], 'page=') && $this->page == 'home') {
             $start_page = $this->user_config->get('start_page_setting', false);
             if ($start_page && $start_page != 'none' && in_array($start_page, start_page_opts(), true)) {
@@ -1184,16 +1201,6 @@ class Hm_Handler_privacy_settings extends Hm_Handler_Module {
         $settings = Hm_Output_privacy_settings::$settings;
         foreach ($settings as $key => $setting) {
             process_site_setting($key, $this, 'privacy_setting_callback');
-        }
-    }
-}
-
-class Hm_Handler_engine_settings extends Hm_Handler_Module {
-    
-    public function process() {
-        $settings = Hm_Output_engine_settings::$settings;
-        foreach ($settings as $key => $setting) {
-            process_site_setting($key, $this, 'engineSettingCallback', isset($setting['default']) ? $setting['default'] : null, $setting['type'] === 'checkbox');
         }
     }
 }

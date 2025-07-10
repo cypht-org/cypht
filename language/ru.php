@@ -409,7 +409,7 @@ return array(
     'Added SMTP server!' => 'Добавлен SMTP сервер!',
     'Added repository' => 'Добавлен репозиторий',
     'Added server!' => 'Добавлен сервер',
-    'Are you sure?' => 'Вы уверены?',
+    'Are you sure you want to delete this server?' => 'Вы уверены?',
     'Could not find that repository/owner combination at github.com' => 'Не найдена комбинация репозиторий/владелец на github.com',
     'Disable prompts when deleting' => 'Отключить запрос при удалении',
     'Enable keyboard shortcuts' => 'Включить горячии клавиши',

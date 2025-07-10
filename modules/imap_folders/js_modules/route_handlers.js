@@ -5,6 +5,13 @@ function applyFoldersPageHandlers() {
     $('.settings_subtitle').on("click", function() { return Hm_Utils.toggle_page_section($(this).data('target')); });
     
     bindFoldersEventHandlers();
+    $(function() {
+        const form = $('#form_folder_imap');
+        const autoSubmit = form.data('auto-submit');
+        if (autoSubmit && autoSubmit === 1) {
+            form.submit();
+        }
+    })
 }
 
 function applyFoldersSubscriptionPageHandlers() {

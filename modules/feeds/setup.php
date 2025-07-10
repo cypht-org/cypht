@@ -98,10 +98,6 @@ add_handler('ajax_feed_status', 'date', true, 'core');
 add_handler('ajax_feed_status', 'http_headers', true, 'core');
 add_output('ajax_feed_status', 'filter_feed_status_data', true);
 
-
-add_handler('ajax_combined_message_list', 'load_feeds_from_config', true, 'feeds', 'load_user_data', 'after');
-add_handler('ajax_combined_message_list', 'feed_list_content', true, 'feeds');
-
 return array(
 
     'allowed_pages' => array(
@@ -113,28 +109,28 @@ return array(
         'ajax_feed_status'
     ),
     'allowed_output' => array(
-        'feed_connect_status' => array(FILTER_DEFAULT, false),
-        'feed_connect_time' => array(FILTER_DEFAULT, false),
+        'feed_connect_status' => array(FILTER_UNSAFE_RAW, false),
+        'feed_connect_time' => array(FILTER_UNSAFE_RAW, false),
         'feed_detail_display' => array(FILTER_UNSAFE_RAW, false),
         'feed_status_display' => array(FILTER_UNSAFE_RAW, false),
         'feed_status_server_id' => array(FILTER_VALIDATE_INT, false),
-        'feed_server_ids' => array(FILTER_DEFAULT, false),
+        'feed_server_ids' => array(FILTER_UNSAFE_RAW, false),
         'feed_msg_headers' => array(FILTER_UNSAFE_RAW, false),
         'feed_msg_text' => array(FILTER_UNSAFE_RAW, false),
     ),
     'allowed_post' => array(
-        'feed_id' => FILTER_DEFAULT,
+        'feed_id' => FILTER_UNSAFE_RAW,
         'delete_feed' => FILTER_VALIDATE_INT,
         'feed_connect' => FILTER_VALIDATE_INT,
-        'feed_server_ids' => FILTER_DEFAULT,
-        'submit_feed' => FILTER_DEFAULT,
-        'new_feed_name' => FILTER_DEFAULT,
+        'feed_server_ids' => FILTER_UNSAFE_RAW,
+        'submit_feed' => FILTER_UNSAFE_RAW,
+        'new_feed_name' => FILTER_UNSAFE_RAW,
         'feed_delete' => FILTER_VALIDATE_INT,
-        'new_feed_address' => FILTER_DEFAULT,
+        'new_feed_address' => FILTER_UNSAFE_RAW,
         'unread_exclude_feeds' => FILTER_VALIDATE_INT,
-        'feed_list_path' => FILTER_DEFAULT,
-        'feed_uid' => FILTER_DEFAULT,
-        'feed_since' => FILTER_DEFAULT,
+        'feed_list_path' => FILTER_UNSAFE_RAW,
+        'feed_uid' => FILTER_UNSAFE_RAW,
+        'feed_since' => FILTER_UNSAFE_RAW,
         'feed_limit' => FILTER_VALIDATE_INT,
         'feed_search' => FILTER_VALIDATE_INT,
     )

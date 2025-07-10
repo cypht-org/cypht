@@ -216,6 +216,27 @@ trait Hm_Server_List {
     }
 
     /**
+     * Return server details matching $match in column $column.
+     *
+     * @param mixed  $match        Value to match.
+     * @param string $column       Column name to match against.
+     * @param bool   $returnFirst  If true, return only the first matching server.
+     * @return array|null          Array of matches, or a single server array, or null if no match.
+     */
+    public static function getBy($match, $column = 'id', $returnFirst = false) {
+        $results = [];
+        foreach (self::$server_list as $server) {
+            if (isset($server[$column]) && $server[$column] === $match) {
+                if ($returnFirst) {
+                    return $server;
+                }
+                $results[] = $server;
+            }
+        }
+        return $returnFirst ? null : $results;
+    }
+
+    /**
      * @param int $id server id to fetch
      * @param bool $full true to return passwords for server connections. CAREFUL!
      * @return array

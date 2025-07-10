@@ -62,6 +62,12 @@ function get_message_list_settings($path, $handler) {
         $per_source_limit = $handler->user_config->get('trash_per_source_setting', DEFAULT_TRASH_PER_SOURCE);
         $mailbox_list_title = array('Trash');
     }
+    elseif ($path == 'sent') {
+        $list_path = 'sent';
+        $message_list_since = $handler->user_config->get('sent_since_setting', DEFAULT_SENT_SINCE);
+        $per_source_limit = $handler->user_config->get('sent_per_source_setting', DEFAULT_SENT_PER_SOURCE);
+        $mailbox_list_title = array('Sent');
+    }
     elseif ($path == 'drafts') {
         $list_path = 'drafts';
         $message_list_since = $handler->user_config->get('drafts_since_setting', DEFAULT_DRAFT_SINCE);
@@ -114,14 +120,13 @@ function message_list_meta($input, $output_mod) {
         $since = DEFAULT_SINCE;
     }
     $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
-    $max = sprintf($output_mod->trans('sources@%d each'), $limit);
+    $max = sprintf($output_mod->trans('%d items per source'), $limit);
 
     return '<div class="list_meta d-flex align-items-center fs-6">'.
         $date.
-        '<b>-</b>'.
+        '<b> :</b>'.
         '<span class="src_count"></span> '.$max.
-        '<b>-</b>'.
-        '<span class="total"></span> '.$output_mod->trans('total').'</div>';
+        '</div>';
 }}
 
 /**
@@ -142,8 +147,8 @@ function combined_sort_dialog($mod) {
 
     $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {
-        $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
-        $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
+        $res .= '<option value="'.$name.'"'.($mod->get('sort') == $name || $mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'"'.($mod->get('sort') == '-'.$name || $mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
     }
     $res .= '</select>';
     return $res;
@@ -208,10 +213,16 @@ function human_readable_interval($date_str) {
  * @return array
  */
 if (!hm_exists('message_list_row')) {
-function message_list_row($values, $id, $style, $output_mod, $row_class='') {
+function message_list_row($values, $id, $style, $output_mod, $row_class='', $msgId = '', $inReplyTo = '') {
     $res = '<tr class="'.$output_mod->html_safe($id);
     if ($row_class) {
         $res .= ' '.$output_mod->html_safe($row_class);
+    }
+    if (!empty($msgId)) {
+        $res .= '" data-msg-id="'.$output_mod->html_safe($msgId);
+    }
+    if (!empty($inReplyTo)) {
+        $res .= '" data-in-reply-to="'.$output_mod->html_safe($inReplyTo);
     }
     $data_uid = "";
     if ($uids = explode("_", $id)) {
@@ -309,7 +320,17 @@ function subject_callback($vals, $style, $output_mod) {
     }
     $subject = $output_mod->html_safe($vals[0]);
     if (isset($vals[4]) && $vals[4]) {
-        $preview_msg = $output_mod->html_safe($vals[4]);
+        $lines = explode("\n", $vals[4]);
+        $clean = array_filter(array_map('trim', $lines), function ($line) {
+            return $line !== ''
+                && stripos($line, 'boundary=') === false
+                && !preg_match('/^-{2,}==/', $line)
+                && stripos($line, 'content-type:') !== 0
+                && stripos($line, 'charset=') === false
+                && stripos($line, 'content-transfer-encoding:') !== 0;
+        });
+        $clean_text = implode("\n", $clean);
+        $preview_msg = $output_mod->html_safe($clean_text);
     }
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
@@ -455,7 +476,7 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
         if ($val == $since) {
             $res .= ' selected="selected"';
             if ($val != $original_default_value) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
             }
 
         }

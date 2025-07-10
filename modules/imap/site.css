@@ -313,19 +313,46 @@
 }
 .msg_move_to .move_to_location {
   font-size: 100%;
-  left: auto;
   right: 0px;
-  top: 33px;
+  top: 40px;
   font-variant: normal;
 }
 .msg_move_to {
   width: auto !important;
   position: relative;
-  display: inline-block;
+  display: flex;
+  gap: 4px;
+  list-style: none;
+  flex-wrap: wrap;
 }
 .move_to_location .expand_link {
   float: left !important;
   width: auto !important;
+}
+.msg_move_to li {
+  display: flex;
+  position: relative;
+}
+.move_to_location {
+  display: none;
+  position: absolute;
+  left: -5%;
+  top: 40px;
+  right: 100%;
+  background-color: white;
+  border: 0.4px solid #8080807a;
+  border-radius: 4px;
+  z-index: 50;
+  min-width: 300px;
+  max-width: 400px;
+  min-height: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow: 0px 5px 10px #8080804a;
+}
+.move_to_location .folders li {
+  display: flex;
+  flex-direction: column;
 }
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
@@ -545,6 +572,13 @@
 .inner_list li[class^="imap_"]:hover .action-link {
     opacity: 1;
 }
+.inner_list li {
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2px;
+  align-items: center;
+}
+
 #loadingSpinner {
     position: absolute;
     left: 33.5%;

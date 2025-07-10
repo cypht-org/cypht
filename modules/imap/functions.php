@@ -1,15 +1,5 @@
 <?php
 
-use React\ChildProcess\Process;
-use React\EventLoop\Loop;
-use React\Promise\Promise;
-use ZBateson\MailMimeParser\Message;
-
-use function React\Async\await;
-use function React\Async\parallel;
-
-require_once APP_PATH . 'modules/imap/helpers.php';
-
 /**
  * IMAP modules
  * @package modules
@@ -68,8 +58,10 @@ function imap_data_sources($custom=array()) {
         if (!array_key_exists('user', $vals)) {
             continue;
         }
+        $mailbox = Hm_IMAP_List::get_mailbox_without_connection($vals);
+        $folder = $mailbox->get_folder_name('INBOX');
         $sieve = ! empty($vals['sieve_config_host']);
-        $sources[] = array('folder' => bin2hex('INBOX'), 'folder_name' => 'INBOX', 'type' => $vals['type'] ?? 'imap', 'name' => $vals['name'], 'id' => $index,  'sieve' => $sieve);
+        $sources[] = array('folder' => bin2hex($folder), 'folder_name' => $folder, 'type' => $vals['type'] ?? 'imap', 'name' => $vals['name'], 'id' => $index,  'sieve' => $sieve);
     }
     foreach ($custom as $path => $type) {
         $parts = explode('_', $path, 3);
@@ -227,6 +219,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     $list_page = $output_module->get('list_page', 0);
     $list_sort = $output_module->get('list_sort', $output_module->get('default_sort_order'));
     $list_filter = $output_module->get('list_filter');
+    $list_keyword = $output_module->get('list_keyword');
     foreach($msg_list as $msg) {
         $row_class = 'email';
         $icon = 'env_open';
@@ -300,7 +293,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         $source = $msg['server_name'];
         $row_class .= ' '.str_replace(' ', '_', $source);
         $row_class .= ' '.implode(' ', $flags);
-        if ($msg['folder'] && hex2bin($msg['folder']) != 'INBOX') {
+        if ($msg['folder'] && strtolower(hex2bin($msg['folder'])) != 'inbox') {
             $source .= '-'.preg_replace("/^INBOX.{1}/", '', hex2bin($msg['folder']));
         }
         $url = '?page=message&uid='.$msg['uid'].'&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&list_parent='.$parent_value;
@@ -313,6 +306,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($list_filter) {
             $url .= '&filter='.$output_module->html_safe($list_filter);
         }
+        if ($list_keyword) {
+            $url .= '&keyword='.$output_module->html_safe($list_keyword);
+        }
         if (!$show_icons) {
             $icon = false;
         }
@@ -320,6 +316,16 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         //if (in_array('draft', $flags)) {
         //    $url = '?page=compose&list_path='.sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']).'&uid='.$msg['uid'].'&imap_draft=1';
         //}
+
+        $msgId = $msg['message_id'] ?? '';
+        $inReplyTo = $msg['in_reply_to'] ?? '';
+
+        if ($msgId) {
+            $msgId = str_replace(['<', '>'], '', trim($msgId));
+        }
+        if ($inReplyTo) {
+            $inReplyTo = str_replace(['<', '>'], '', trim($inReplyTo));
+        }
 
         if ($style == 'news') {
             $res[$id] = message_list_row(array(
@@ -334,7 +340,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 $id,
                 $style,
                 $output_module,
-                $row_class
+                $row_class,
+                $msgId,
+                $inReplyTo
             );
         }
         else {
@@ -350,7 +358,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                 $id,
                 $style,
                 $output_module,
-                $row_class
+                $row_class,
+                $msgId,
+                $inReplyTo
             );
         }
     }
@@ -783,10 +793,10 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     }
                 }
                 if ($sent) {
-                    $msgs = $mailbox->search($folder, $search_type, false, $terms, array(), true, false, true);
+                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, false, true);
                 }
                 else {
-                    $msgs = $mailbox->search($folder, $search_type, false, $terms);
+                    $msgs = $mailbox->search($folder, $search_type, $terms);
                 }
             }
             else {
@@ -908,7 +918,7 @@ function imap_move_same_server($ids, $action, $hm_cache, $dest_path, $screen_ema
                 foreach ($msgs as $msg) {
                     $moved[]  = sprintf('imap_%s_%s_%s', $server_id, $msg, $folder);
                     $email = current(array_column(process_address_fld($mailbox->get_message_headers(hex2bin($folder), $msg)['From']), "email"));
-                    $uids = $mailbox->search(hex2bin($folder), 'ALL', false, array(array('FROM', $email)));
+                    $uids = $mailbox->search(hex2bin($folder), 'ALL', array(array('FROM', $email)));
                     foreach ($uids as $uid) {
                         $result = $mailbox->message_action(hex2bin($folder), mb_strtoupper($action), $uid, hex2bin($dest_path[2]));
                         if ($result['status']) {
@@ -1526,20 +1536,6 @@ if (!hm_exists('forward_dropdown')) {
     }
 }
 
-/**
- * @subpackage imap/functions
- */
-if (!hm_exists('parse_sieve_config_host')) {
-function parse_sieve_config_host($host) {
-    $url = parse_url($host);
-    if ($url === false) {
-        return $host;
-    }
-    $host = $url['host'] ?? $url['path'];
-    $port = $url['port'] ?? '4190';
-    return [$host, $port];
-}}
-
 if (!hm_exists('connect_to_imap_server')) {
     function connect_to_imap_server($address, $name, $port, $user, $pass, $tls, $imap_sieve_host, $enableSieve, $type, $context, $hidden = false, $server_id = false, $sieve_tls = false, $show_errors = true) {
         $imap_list = array(
@@ -1617,160 +1613,10 @@ if (!hm_exists('connect_to_imap_server')) {
     }
 }
 
-/**
- * @param array $sources
- * @param array $context
- * @param array $search
- */
-function getCombinedMessagesLists($sources, $context, $search) {
-    $defaultSearch = [
-        'filter' => 'ALL',
-        'sort' => 'ARRIVAL',
-        'reverse' => true,
-        'terms' => [],
-        'limit' => 10,
-        'offsets' => [],
-        'defaultOffset' => 0,
-        'listPage' => 1
-    ];
-    $search = array_merge($defaultSearch, $search);
-    
-    if ($context['config']->get('enable_child_processes_setting', true)) {
-        $promises = array_map(function ($dataSource, $index) use ($context, $search) {
-            return function () use ($dataSource, $context, $search, $index) {
-                return new Promise(function ($resolve, $reject) use ($dataSource, $context, $search, $index) {
-                    $cmd = 'php ' . __DIR__ . '/workers/messages_list.php';
-                    if (APP_PATH) {
-                        $cmd .= ' -p ' . APP_PATH;
-                    }
-                    if (env('WORKER_CUSTOM_IMPORTS')) {
-                        $cmd .= ' -i ' . env('WORKER_CUSTOM_IMPORTS');
-                    }
-                    if (CACHE_ID) {
-                        $cmd .= ' -c ' . CACHE_ID;
-                    }
-                    if (SITE_ID) {
-                        $cmd .= ' -s ' . SITE_ID;
-                    }
-                    $process = new Process($cmd);
-                    $process->start(Loop::get());
-                    $process->stdin->write(json_encode([
-                        'index' => $index,
-                        'search' => $search,
-                        'dataSource' => $dataSource,
-                        'cache' => serialize($context['cache']),
-                        'session' => serialize($context['session']),
-                        'config' => serialize($context['config'])
-                    ]));
-                    $process->stdin->end();
-
-                    $process->stdout->on('data', function ($output) use ($resolve, $reject) {
-                        $data = json_decode($output, true);
-                        if (isset($data['error'])) {
-                            $reject(new \Exception($data['error']));
-                        } else {
-                            $resolve($data);
-                        }
-                    });
-
-                    $process->stderr->on('data', function ($errorOutput) {
-                        Hm_Functions::error_log('Worker error output: ' . $errorOutput);
-                    });
-
-                    $process->on('exit', function ($exitCode, $signal) use ($reject) {
-                        if ($exitCode != 0) {
-                            error_log(sprintf(' worker exited with abornaml exit code' . $exitCode ));
-                            $reject(new \Exception($signal . ' Error code: ' . $exitCode));
-                    }});
-            });
-        };
-        }, $sources, array_keys($sources));
-
-        $promise = parallel($promises);
-        
-        try {
-            $results = await($promise);
-        } catch (\Exception $e) {
-            Hm_Msgs::add($e->getMessage(), 'error');
-            return ['lists' => [], 'total' => 0, 'status' => []];
-        }
-    } else {
-        $cache = $context['cache'];
-        $listPage = $search['listPage'];
-        $offsets = $search['offsets'];
-        $search['offset'] = $search['defaultOffset'];
-        $results = [];
-        foreach ($sources as $index => $dataSource) {
-            if ($offsets && $listPage > 1) {
-                if (isset($offsets[$index]) && (int) $offsets[$index] > 0) {
-                    $search['offest'] = (int) $offsets[$index] * ($listPage - 1);
-                }
-            }
-            $mailbox = Hm_IMAP_List::get_connected_mailbox($dataSource['id'], $cache);
-            $results[] = getMessagesList($mailbox, $dataSource, $search);
-        }
-    }
-
-    $totalMessages = 0;
-    $messagesLists = [];
-    $status = [];
-    foreach ($results as $result) {
-        $totalMessages += $result['total'];
-        $status['imap_'.$result['dataSource']['id'].'_'.$result['folder']] = $result['status'];
-        $messagesLists[] = array_map(function($msg) use ($result) {
-            $msg['server_id'] = $result['dataSource']['id'];
-            $msg['server_name'] = $result['dataSource']['name'];
-            $msg['folder'] = $result['folder'];
-            return $msg;
-        }, $result['messages']);
-    }
-
-    return ['lists' => $messagesLists, 'total' => $totalMessages, 'status' => $status];
-}
-
-function flattenMessagesLists($messagesLists, $listSize) {
-    $endList = [];
-    $sizesTaken = [];
-
-    $max = $listSize * count($messagesLists);
-
-    while (count($endList) < $listSize * count($messagesLists) && count(array_filter($messagesLists, fn ($list) => count($list) > 0)) > 0) {
-        foreach ($messagesLists as $index => $list) {
-            if (count($list) > 0) {
-                $part = array_slice($list, 0, $listSize);
-                $endList = array_merge($endList, $part);
-                $messagesLists[$index] = array_slice($list, $listSize);
-                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] + count($part) : count($part);
-                $totalTakens = array_sum(array_values($sizesTaken));
-                if ($totalTakens > $max) {
-                    $sizesTaken[$index] = $sizesTaken[$index] - ($totalTakens - $max);
-                }
-            } else {
-                $sizesTaken[$index] = isset($sizesTaken[$index]) ? $sizesTaken[$index] : 0;
-            }
-        }
-    }
-
-    $endList = array_slice($endList, 0, $max);
-
-    return ['messages' => $endList, 'offsets' => $sizesTaken];
-}
-
-function sortCombinedMessages($list, $sort) {
-    usort($list, function($a, $b) use ($sort) {
-        $sortField = str_replace(['arrival', '-'], ['internal_date', ''], $sort);
-        if (strpos($sort, '-') === 0) {
-            return strtotime($a[$sortField]) - strtotime($b[$sortField]);
-        }
-        return strtotime($b[$sortField]) - strtotime($a[$sortField]);
-    });
-
-    return $list;
-}
-
 if (!hm_exists('save_sent_msg')) {
 function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_id, $show_errors = true) {
     $specials = get_special_folders($handler, $imap_id);
+    $sent_folder = false;
     if (array_key_exists('sent', $specials) && $specials['sent']) {
         $sent_folder = $specials['sent'];
     }
@@ -1793,5 +1639,5 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
     }
-    return $uid;
+    return [$uid, $sent_folder];
 }}

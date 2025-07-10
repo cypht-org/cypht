@@ -1115,7 +1115,7 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_compose_delivery_receipt', $settings) && $settings['enable_compose_delivery_receipt']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -1172,7 +1172,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
             if(!$settings['enable_attachment_reminder']) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
             }
             else {
                 $reset='';
@@ -1422,7 +1422,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>';
                 if($this->get('enable_compose_delivery_receipt_setting')) {
-                    $res .= '<div class="form-check mb-3"><input value="0" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
@@ -1600,7 +1600,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if ($selected != 0) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
@@ -1621,7 +1621,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;
@@ -1808,6 +1808,9 @@ class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
             $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
             if ($mailbox->connect()) {
                 $folder = 'Scheduled';
+                if (! $mailbox->folder_exists($folder)) {
+                    continue;
+                }
                 $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
                 foreach ($ret[1] as $msg) {
                     $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
@@ -2283,7 +2286,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     
     if (!empty($atts['schedule'])) {
         $folder ='Scheduled';
-        if (!count($mailbox->get_folder_status($folder))) {
+        if (!$mailbox->folder_exists($folder)) {
             $mailbox->create_folder($folder);
         }
         $atts['schedule'] = get_scheduled_date($atts['schedule']);

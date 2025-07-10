@@ -61,6 +61,8 @@ class Hm_Handler_process_edit_shortcut extends Hm_Handler_Module {
             $this->session->set('user_data', $user_data);
             $this->session->record_unsaved('Shortcut updated');
             Hm_Msgs::add('Shortcut updated');
+            $this->save_hm_msgs();
+            Hm_Dispatch::page_redirect('?page=shortcuts');
         }
     }
 }
@@ -254,7 +256,7 @@ function shortcut_defaults($user_config=false) {
     $res = array(
         array('label' => 'Unfocus all input elements', 'group' => 'general', 'page' => '*', 'control_chars' => array(), 'char' => 27, 'action' => 'Keyboard_Shortcuts.unfocus', 'target' => 'false'),
         array('label' => 'Jump to the "Everything" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 69, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=combined_inbox'),
-        array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 85, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
+        array('label' => 'Jump to the "Unread" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 75, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=unread'),
         array('label' => 'Jump to the "Flagged" page', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 70, 'action' => 'ks_redirect', 'target' => '?page=message_list&list_path=flagged'),
         array('label' => 'Jump to History', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 72, 'action' => 'ks_redirect', 'target' => '?page=history'),
         array('label' => 'Jump to Contacts', 'group' => 'general', 'page' => '*', 'control_chars' => array('control', 'shift'), 'char' => 67, 'action' => 'ks_redirect', 'target' => '?page=contacts'),

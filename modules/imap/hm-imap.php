@@ -23,7 +23,7 @@ class Hm_IMAP_List {
 
     use Hm_Server_List;
 
-    public static $use_cache = true;
+    public static $use_cache = false;
     protected static $user_config;
     protected static $session;
 
@@ -71,6 +71,11 @@ class Hm_IMAP_List {
             $cache = false;
         }
         return self::connect($id, $cache);
+    }
+
+    public static function get_mailbox_without_connection($config) {
+        $config['type'] = array_key_exists('type', $config) ? $config['type'] : 'imap';
+        return new Hm_Mailbox($config['id'], self::$user_config, self::$session, $config);
     }
 }
 
@@ -962,7 +967,7 @@ if (!class_exists('Hm_IMAP')) {
         public function get_message_list($uids, $raw=false, $include_content_body = false) {
             if (is_array($uids)) {
                 sort($uids);
-                $sorted_string = implode(',', $uids);
+                $sorted_string = implode(',', array_filter($uids));
             }
             else {
                 $sorted_string = $uids;
@@ -974,7 +979,7 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
@@ -988,8 +993,8 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1002,6 +1007,7 @@ if (!class_exists('Hm_IMAP')) {
                     $references = '';
                     $date = '';
                     $message_id = '';
+                    $in_reply_to = '';
                     $x_priority = 0;
                     $content_type = '';
                     $to = '';
@@ -1089,7 +1095,7 @@ if (!class_exists('Hm_IMAP')) {
                                          'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
-                                         'references' => $references, 'message_id' => $message_id, 'x_auto_bcc' => $x_auto_bcc,
+                                         'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
                                          'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
                         $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
@@ -2472,27 +2478,55 @@ if (!class_exists('Hm_IMAP')) {
         }
 
         /**
-         * use the SORT extension to get a sorted UID list
+         * use the SORT extension to get a sorted UID list and also perform term search if available
          * @param string $sort sort order. can be one of ARRIVAL, DATE, CC, TO, SUBJECT, FROM, or SIZE
          * @param bool $reverse flag to reverse the sort order
          * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
          * @return array list of IMAP message UIDs
          */
-        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $esort=array()) {
+        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
             if (!$this->is_clean($sort, 'keyword') || !$this->is_clean($filter, 'keyword') || !$this->is_supported('SORT')) {
-                return false;
+                return [];
             }
-            $esort_enabled = false;
-            $esort_res = array();
-            $command = 'UID SORT ';
-            if (!empty($esort) && $this->is_supported('ESORT')) {
-                $valid = array_filter($esort, function($v) { return in_array($v, array('MIN', 'MAX', 'COUNT', 'ALL')); });
-                if (!empty($valid)) {
-                    $esort_enabled = true;
-                    $command .= 'RETURN ('.implode(' ', $valid).') ';
+            if (!empty($terms)) {
+                foreach ($terms as $vals) {
+                    if (!$this->is_clean($vals[0], 'search_str') || !$this->is_clean($vals[1], 'search_str')) {
+                        return [];
+                    }
                 }
             }
-            $command .= '('.$sort.') US-ASCII '.$filter."\r\n";
+            if ($this->search_charset) {
+                $charset = mb_strtoupper($this->search_charset).' ';
+            }
+            else {
+                $charset = 'US-ASCII ';
+            }
+            if (!empty($terms)) {
+                $flds = array();
+                foreach ($terms as $vals) {
+                    if (mb_substr($vals[1], 0, 4) == 'NOT ') {
+                        $flds[] = 'NOT '.$vals[0].' "'.str_replace('"', '\"', mb_substr($vals[1], 4)).'"';
+                    }
+                    else {
+                        $flds[] = $vals[0].' "'.str_replace('"', '\"', $vals[1]).'"';
+                    }
+                }
+                $fld = ' '.implode(' ', $flds);
+            }
+            else {
+                $fld = '';
+            }
+            if ($exclude_deleted) {
+                $fld .= ' NOT DELETED';
+            }
+            if ($only_auto_bcc) {
+               $fld .= ' HEADER X-Auto-Bcc cypht';
+            }
+            if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
+               $fld .= ' NOT HEADER X-Auto-Bcc cypht';
+            }
+            $command = 'UID SORT ';
+            $command .= '('.$sort.') '.$charset.$filter.' '.$fld."\r\n";
             $cache_command = $command.(string)$reverse;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {
@@ -2509,9 +2543,6 @@ if (!class_exists('Hm_IMAP')) {
             $status = $this->check_response($res, true);
             $uids = array();
             foreach ($res as $vals) {
-                if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'ESEARCH') {
-                    $esort_res = $this->parse_esearch_response($vals);
-                }
                 if ($vals[0] == '*' && mb_strtoupper($vals[1]) == 'SORT') {
                     array_shift($vals);
                     array_shift($vals);
@@ -2525,9 +2556,6 @@ if (!class_exists('Hm_IMAP')) {
             }
             if ($reverse) {
                 $uids = array_reverse($uids);
-            }
-            if ($esort_enabled) {
-                $uids = $esort_res;
             }
             if ($status) {
                 return $this->cache_return_val($uids, $cache_command);

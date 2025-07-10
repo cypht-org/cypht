@@ -46,7 +46,7 @@ class Hm_EWS {
             $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::INBOX);
             $this->authed = true;
             return true;
-        } catch (Exception\UnauthorizedException $e) {
+        } catch (Exception\UnauthorizedException | \SoapFault $e) {
             return false;
         }
     }
@@ -140,7 +140,15 @@ class Hm_EWS {
         }
     }
 
-    public function get_folder_status($folder) {
+    public function get_folder_name_quick($folder) {
+        if ($this->is_distinguished_folder($folder)) {
+            return $folder;
+        } else {
+            return false;
+        }
+    }
+
+    public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {
                 $folder = new Type\DistinguishedFolderIdType($folder);
@@ -151,7 +159,7 @@ class Hm_EWS {
             } else {
                 $result = $this->api->getFolderByDisplayName($folder, Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
                 if (! $result) {
-                    throw new Exception('Folder not found.');
+                    throw new Exception('Folder not found: ' . $folder);
                 }
             }
             return [
@@ -167,7 +175,9 @@ class Hm_EWS {
             // since this is used for missing folders check, we skip error reporting
             return [];
         } catch (\Exception $e) {
-            Hm_Msgs::add($e->getMessage(), 'danger');
+            if ($report_error && $e->getMessage()) {
+                Hm_Msgs::add($e->getMessage(), 'danger');
+            }
             return [];
         }
     }
@@ -313,8 +323,9 @@ class Hm_EWS {
      * filtering by extended properties as answered or unanswered emails.
      */
     public function search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
-        if ($this->is_distinguished_folder(strtolower($folder))) {
-            $folder = new Type\DistinguishedFolderIdType(strtolower($folder));
+        $lower_folder = strtolower($folder);
+        if ($this->is_distinguished_folder($lower_folder)) {
+            $folder = new Type\DistinguishedFolderIdType($lower_folder);
         } else {
             $folder = new Type\FolderIdType($folder);
         }
@@ -449,7 +460,7 @@ class Hm_EWS {
                 // noop
         }
         if ($qs && empty($request['Restriction'])) {
-            $request['QueryString'] = implode(' ', $qs);
+            $request['QueryString'] = implode(' AND ', $qs);
         } elseif ($keyword && ! empty($request['Restriction'])) {
             $restriction = ['And' => $request['Restriction']];
             $restriction['And']['Or'] = [
@@ -475,7 +486,7 @@ class Hm_EWS {
             $messages = [$messages];
         }
         $itemIds = array_map(function($msg) {
-            return $msg->get('itemId')->get('id');
+            return bin2hex($msg->get('itemId')->get('id'));
         }, $messages);
         return [$result->get('totalItemsInView'), $itemIds];
     }
@@ -507,7 +518,7 @@ class Hm_EWS {
             ),
             'ItemIds' => [
                 'ItemId' => array_map(function($id) {
-                    return ['Id' => $id];
+                    return ['Id' => hex2bin($id)];
                 }, $itemIds),
             ],
         );
@@ -946,10 +957,17 @@ class Hm_EWS {
         return $flags;
     }
 
-    protected function is_distinguished_folder($folder) {
+    protected function is_distinguished_folder(&$folder) {
         $oClass = new ReflectionClass(new Enumeration\DistinguishedFolderIdNameType());
         $constants = $oClass->getConstants();
-        return in_array($folder, $constants);
+        if (in_array($folder, $constants)) {
+            return true;
+        }
+        if (isset($constants[$folder])) {
+            $folder = $constants[$folder];
+            return true;
+        }
+        return false;
     }
 
     protected function archive_items($itemIds) {

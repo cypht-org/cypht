@@ -415,7 +415,7 @@ return array(
     'Added SMTP server!' => 'Server SMTP ditambahkan!',
     'Added repository' => 'Repositori ditambahkan!',
     'Added server!' => 'Server ditambahkan!',
-    'Are you sure?' => "Apakah Anda yakin?",
+    'Are you sure you want to delete this server?' => "Apakah Anda yakin?",
     'Could not find that repository/owner combination at github.com' => 'Tidak dapat menemukan kombinasi repositori/pemilik itu di github.com',
     'Disable prompts when deleting' => 'Nonaktifkan prompt saat menghapus',
     'Enable keyboard shortcuts' => 'Aktifkan pintasan papan ketik',

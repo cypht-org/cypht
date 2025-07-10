@@ -16,11 +16,14 @@ class ServersTest(WebTest):
         return self.by_css('[data-target=".{0}_section"]'.format(name)).click()
 
     def load_servers_page(self):
+        self.load()
+        self.wait()
         self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
         self.wait_for_settings_to_expand()
         list_item = self.by_class('menu_servers')
         self.click_when_clickable(list_item.find_element(By.TAG_NAME, 'a'))
+        self.wait()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Servers'
@@ -56,7 +59,10 @@ class ServersTest(WebTest):
         reply_to.send_keys('test@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
-        self.by_id('step_config_action_finish').click()
+        elem = self.by_id('step_config_action_finish')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        sleep(1)
+        elem.click()
         wait = WebDriverWait(self.driver, 30)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
         sys_message_text = element.text

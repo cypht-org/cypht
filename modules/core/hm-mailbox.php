@@ -99,14 +99,22 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_folder_status($folder) {
+    public function folder_exists($folder) {
+        $res = $this->get_folder_status($folder, false);
+        if (empty($res)) {
+            return false;
+        }
+        return true;
+    }
+
+    public function get_folder_status($folder, $report_error = true) {
         if (! $this->authed()) {
             return;
         }
         if ($this->is_imap()) {
             return $this->connection->get_mailbox_status($folder);
         } else {
-            return $this->connection->get_folder_status($folder);
+            return $this->connection->get_folder_status($folder, $report_error);
         }
     }
 
@@ -114,8 +122,16 @@ class Hm_Mailbox {
         if ($this->is_imap()) {
             return $folder;
         } else {
-            $result = $this->connection->get_folder_status($folder);
-            return $result['name'];
+            $result = $this->connection->get_folder_name_quick($folder);
+            if ($result) {
+                return $result;
+            } else {
+                if (! $this->connection->authed()) {
+                    $this->connect();
+                }
+                $result = $this->connection->get_folder_status($folder);
+                return $result['name'];
+            }
         }
     }
 
@@ -554,15 +570,30 @@ class Hm_Mailbox {
         }
     }
 
-    public function search($folder, $target='ALL', $uids=false, $terms=array(), $esearch=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+    public function search($folder, $target='ALL', $terms=array(), $sort=null, $reverse=null, $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
         if (! $this->select_folder($folder)) {
-            return;
+            return [];
         }
         if ($this->is_imap()) {
-            return $this->connection->search($target, $uids, $terms, $esearch, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+            if ($sort) {
+                if ($this->connection->is_supported('SORT')) {
+                    // use fast sort extension and search simultanously
+                    $uids = $this->connection->get_message_sort_order($sort, $reverse, $target, $terms, $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                } else {
+                    // search first and then sort only the found ones by fetch
+                    $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+                    if ($uids) {
+                        $uids = $this->connection->sort_by_fetch($sort, $reverse, $target, implode(',', $uids));
+                    }
+                }
+            } else {
+                // just search with default sort order
+                $uids = $this->connection->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+            }
+            return $uids;
         } else {
             // deleted flag, auto-bcc feature - not supported by EWS
-            list($total, $itemIds) = $this->connection->search($folder, false, false, $target, 0, 9999, $terms, []);
+            list($total, $itemIds) = $this->connection->search($folder, $sort, $reverse, $target, 0, 9999, $terms, []);
             return $itemIds;
         }
     }

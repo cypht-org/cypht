@@ -444,7 +444,7 @@ return array(
     "Added SMTP server!"=>"سرور SMTP اضافه شد!",
     "Added repository"=>"مخزن اضافه شده است",
     "Added server!"=>"سرور اضافه شد!",
-    "Are you sure?"=>"مطمئنی؟",
+    "Are you sure you want to delete this server?"=>"مطمئنی؟",
     "Could not find that repository/owner combination at github.com"=>"آن ترکیب مخزن / مالک در github.com یافت نشد",
     "Disable prompts when deleting"=>"هنگام حذف ، درخواستها را غیرفعال کنید",
     "Enable keyboard shortcuts"=>"میانبرهای صفحه کلید را فعال کنید",

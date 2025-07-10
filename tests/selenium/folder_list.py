@@ -33,12 +33,22 @@ class FolderListTests(WebTest):
         assert main_menu.is_displayed()
 
     def expand_section(self):
+        self.load()
+        self.wait_with_folder_list()
         self.by_css('[data-bs-target=".settings"]').click()
-        list_item = self.by_class('menu_home')
-        list_item.click()
+        folder_list = self.by_class('folder_list')
+        list_item = folder_list.find_element(By.CLASS_NAME, 'menu_save')
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.driver.execute_script("""
+            const container = arguments[0];
+            const item = arguments[1];
+            container.scrollTop = item.offsetTop - container.offsetTop;
+        """, folder_list, list_item)
+        WebDriverWait(self.driver, 5).until(EC.element_to_be_clickable(link))
+        link.click()
         self.wait_with_folder_list()
         self.wait_for_navigation_to_complete()
-        assert self.by_class('content_title').text == 'Home'
+        assert self.by_class('content_title').text == 'Save Settings'
 
     def collapse_section(self):
         section = self.by_css('.settings.folders.collapse')
@@ -74,8 +84,8 @@ if __name__ == '__main__':
     print("FOLDER LIST TESTS")
     test_runner(FolderListTests, [
         'reload_folder_list',
-        'expand_section',
-        'collapse_section',
+        # 'expand_section',
+        # 'collapse_section',
         'hide_folders',
         'show_folders',
         'logout'

@@ -20,6 +20,8 @@ require_once APP_PATH.'modules/sievefilters/functions.php';
  */
 class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
@@ -96,6 +98,8 @@ class Hm_Output_sieve_edit_filter extends Hm_Output_Module {
  */
 class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
@@ -129,6 +133,8 @@ class Hm_Output_sieve_edit_output extends Hm_Output_Module {
  */
 class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
@@ -166,6 +172,8 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         foreach ($this->user_config->get('imap_servers') as $mailbox) {
             if ($mailbox['name'] == $this->request->post['imap_account']) {
                 $imap_account = $mailbox;
@@ -203,6 +211,8 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         $imap_account = null;
         foreach ($this->user_config->get('imap_servers') as $idx => $mailbox) {
             if ($idx == $this->request->post['imap_server_id']) {
@@ -281,6 +291,8 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_get_mailboxes_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_account'));
         if (!$success) {
             return;
@@ -318,6 +330,8 @@ class Hm_Output_sieve_get_mailboxes_output extends Hm_Output_Module {
 */
 class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_server_id', 'sender'));
 
         if (!$success) {
@@ -438,6 +452,8 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_server_id', 'block_action', 'scope'));
         if (!$success) {
             return;
@@ -448,8 +464,10 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 $imap_account = $mailbox;
             }
         }
+        $array_email_sender = [];
+        $email_sender = null;
 
-        if (isset($this->request->post['imap_msg_uid'])) {
+        if (isset($this->request->post['imap_msg_uid']) && !empty($this->request->post['imap_msg_uid'])) {
             $form['imap_msg_uid'] = $this->request->post['imap_msg_uid'];
             $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->post['imap_server_id'], $this->cache);
             if (! $mailbox || ! $mailbox->authed()) {
@@ -462,6 +480,10 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $email_sender = $email_sender[0][0];
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
+            if ($this->request->post['is_screened']) {
+                $array_email_sender = explode(",", $email_sender);
+                $email_sender = null;
+            }
         } else {
             Hm_Msgs::add('Sender not found', 'warning');
             return;
@@ -493,12 +515,18 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $unblock_sender = false;
             if ($current_script != '') {
                 $blocked_list = prepare_sieve_script ($current_script);
-                foreach ($blocked_list as $blocked_sender) {
-                    if ($blocked_sender != $email_sender) {
-                        $blocked_senders[] = $blocked_sender;
-                        continue;
+                if ($email_sender) {
+                    foreach ($blocked_list as $blocked_sender) {
+                        if ($blocked_sender != $email_sender) {
+                            $blocked_senders[] = $blocked_sender;
+                            continue;
+                        }
+                        $unblock_sender = true;
                     }
-                    $unblock_sender = true;
+                } else {
+                    if ($array_email_sender) {
+                        $blocked_senders = array_diff($array_email_sender, $blocked_list);
+                    }
                 }
                 $blocked_list_actions = prepare_sieve_script ($current_script, 2);
             }
@@ -612,6 +640,8 @@ class Hm_Output_sieve_save_filter_output extends Hm_Output_Module {
  */
 class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         $priority =  $this->request->post['sieve_filter_priority'];
         if ($this->request->post['sieve_filter_priority'] == '') {
             $priority = 0;
@@ -1001,6 +1031,8 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         $priority =  $this->request->post['sieve_script_priority'];
         if ($this->request->post['sieve_script_priority'] == '') {
             $priority = 0;
@@ -1036,6 +1068,8 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
  */
 class Hm_Handler_sieve_block_change_behaviour_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         $imap_server_id = $this->request->post['imap_server_id'];
         if (!$this->user_config->get('sieve_block_default_behaviour')) {
             $this->user_config->set('sieve_block_default_behaviour', []);
@@ -1148,6 +1182,8 @@ class Hm_Handler_load_behaviour extends Hm_Handler_Module
 {
     public function process()
     {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         if ($this->user_config->get('sieve_block_default_behaviour')) {
             $this->out('sieve_block_default_behaviour', $this->user_config->get('sieve_block_default_behaviour'));
         } else {
@@ -1278,17 +1314,17 @@ class Hm_Handler_process_enable_sieve_filter_setting extends Hm_Handler_Module {
 class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
-        // exit(var_dump($settings['enable_sieve_filter']));
         if ((array_key_exists('enable_sieve_filter', $settings) && $settings['enable_sieve_filter']) || DEFAULT_ENABLE_SIEVE_FILTER) {
             $checked = ' checked="checked"';
-            $reset = '';
         }
         else {
             $checked = '';
         }
         
         if($settings['enable_sieve_filter'] != DEFAULT_ENABLE_SIEVE_FILTER) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
+        }else {
+            $reset = '';
         }
         return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
             $this->trans('Enable sieve filter').'</label></td>'.
@@ -1308,6 +1344,8 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
      * Output used on the info page to display the server status
      */
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_server_ids'));
         if ($success) {
             $ids = explode(',', $form['imap_server_ids']);
@@ -1331,9 +1369,30 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
     }
 }
 
+/**
+ * Check the connection to a SIEVE server
+ * @subpackage sieve/handler
+ */
+class Hm_Handler_sieve_connect extends Hm_Handler_Module {
+    public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        if ($imap_details = $this->get('imap_connect_details')) {
+            $factory = get_sieve_client_factory($this->site_config);
+            try {
+                $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
+            } catch (Exception $e) {
+                Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
+            }
+        }
+    }
+}
+
 
 class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_account', 'script_state', 'sieve_script_name'));
         if (!$success) {
             $this->out('success', false);
@@ -1373,6 +1432,8 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
 }
 class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
     public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_server_id'));
         if (!$success) {
             return;
@@ -1380,6 +1441,10 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
 
         Hm_IMAP_List::init($this->user_config, $this->session);
         $imap_account = Hm_IMAP_List::get($form['imap_server_id'], true);
+
+        if (empty($imap_account['sieve_config_host'])) {
+            return;
+        }
         
         $factory = get_sieve_client_factory($this->config);
         try {
@@ -1393,12 +1458,37 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
                     $blocked_senders[] = $blocked_sender;
                 }
             }
-            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
-                        
         } catch (Exception $e) {
-            Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
+            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
             return;
         }
+    }
+}
+
+class Hm_Handler_check_sieve_configuration extends Hm_Handler_Module {
+    public function process() {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        Hm_IMAP_List::init($this->user_config, $this->session);
+        $servers = Hm_IMAP_List::dump();
+        $has_uncomplete_sieve_conf = (bool) array_filter($servers, fn($item) => $item['type'] !== 'ews' && empty($item['sieve_config_host']));
+        if($has_uncomplete_sieve_conf) {
+            $this->out('sieve_alert_message', 'Sieve is enabled but not fully configured on some servers. Please review and save the server configuration to complete setup.');
+        }
+    }
+}
+
+class Hm_Output_display_sieve_misconfig_alert extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $res = '';
+        $sieve_alert_message = $this->get('sieve_alert_message');
+        if(!empty($sieve_alert_message)) {
+            $res = '<div class="mt-3"><div class="alert alert-warning alert-dismissible fade show" role="alert"><strong>'.$this->trans('Alert sieve!').'</strong> '. $sieve_alert_message .'<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div></div>';
+        }
+        return $res;
     }
 }
 
@@ -1414,6 +1504,8 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
 {
     public function process()
     {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
         list($success, $form) = $this->process_form(array('imap_server_id'));
 
         if (!$success) {
@@ -1423,6 +1515,80 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         if (isset($accounts[$form['imap_server_id']])) {
             $this->out('mailbox', $accounts[$form['imap_server_id']]);
             $this->session->close_early();
+        }
+    }
+}
+
+class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
+
+        if (!$success) {
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
+            $imap_servers = $this->user_config->get('imap_servers');
+            $imap_account = $imap_servers[$form['imap_server_id']];
+            $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
+            if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
+                $factory = get_sieve_client_factory($this->site_config);
+                try {
+                    $client = $factory->init($this->user_config, $imap_account, $this->module_is_supported('nux'));
+                    $script_names = array_filter(
+                        $linked_mailboxes,
+                        function ($value) use ($form) {
+                            return $value == $form['folder'];
+                        }
+                    );
+                    $script_names = array_keys($script_names);
+                    foreach ($script_names as $script_name) {
+                        $script_parsed = $client->getScript($script_name);
+                        $script_parsed = str_replace('"'.$form['folder'].'"', '"'.$form['new_folder'].'"', $script_parsed);
+
+                        $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
+                        $new_actions = base64_encode(str_replace('"'.$form['folder'].'"', '"'.$form['folder'].'"', $old_actions));
+                        $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
+                        $client->removeScripts($script_name);
+                        $client->putScript(
+                            $script_name,
+                            $script_parsed
+                        );
+                    }
+                    $client->close();
+                    Hm_Msgs::add('Sieve filters using the folder were also updated to use the new folder name.', 'info');
+                } catch (Exception $e) {
+                    Hm_Msgs::add("Failed to rename folder in sieve scripts", "warning");
+                }
+            }
+        }
+    }
+}
+
+class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if ($this->should_skip_execution('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) return;
+
+        list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
+
+        if (! $success) {
+            return;
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
+            $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
+            if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
+                $this->out('sieve_can_delete_folder', false);
+                Hm_Msgs::add('This folder can\'t be deleted because it is used in a Sieve filter.', 'warning');
+            }
         }
     }
 }

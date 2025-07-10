@@ -36,6 +36,7 @@ docker-php-ext-install \
     pdo_pgsql \
     pdo_mysql \
     mysqli \
+    pgsql \
     soap
 docker-php-ext-configure zip
 docker-php-ext-install zip
@@ -72,6 +73,7 @@ RUN if [ "$WITH_DEBUG" = "true" ]; then \
 
 RUN composer install
 
+COPY assets/ assets/
 COPY config/ config/
 COPY language/ language/
 COPY lib/ lib/

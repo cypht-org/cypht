@@ -13,5 +13,5 @@ return array(
     'allowed_cookie' => array(),
     'allowed_server' => array(),
     'allowed_get' => array(),
-    'allowed_post' => array('email_provider' => FILTER_DEFAULT)
+    'allowed_post' => array('email_provider' => FILTER_UNSAFE_RAW)
 );

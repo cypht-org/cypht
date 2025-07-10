@@ -76,7 +76,7 @@ function handleMessagesDragAndDrop() {
                 {'name': 'imap_move_page', 'value': page},
                 {'name': 'imap_move_action', 'value': 'move'}],
                 async (res) =>{
-                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`);
+                    const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                     await store.load(false, true, true);
                     const moveResponses = Object.values(res['move_responses']);
                     moveResponses.forEach((response) => {

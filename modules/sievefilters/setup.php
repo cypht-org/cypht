@@ -2,17 +2,20 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-handler_source('sieve_filters');
+handler_source('sievefilters');
 output_source('sievefilters');
 
 add_module_to_all_pages('handler', 'sieve_filters_enabled', true, 'sievefilters', 'load_imap_servers_from_config', 'after');
-add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
-add_handler('ajax_hm_folders', 'sieve_filters_enabled', true, 'core', 'load_user_data', 'after');
-
-add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_status', 'before');
-
 setup_base_page('sieve_filters', 'core');
 setup_base_page('block_list', 'core');
+
+// addons and hooks in other modules
+add_handler('ajax_imap_message_content', 'sieve_filters_enabled_message_content', true, 'sievefilters', 'imap_message_content', 'after');
+add_handler('ajax_hm_folders', 'sieve_filters_enabled', true, 'core', 'load_user_data', 'after');
+add_handler('ajax_imap_folders_rename', 'sieve_remame_folder', true, 'imap_folders', 'process_folder_rename', 'after');
+add_handler('ajax_imap_folders_delete', 'sieve_can_delete_folder', true, 'imap_folders', 'process_folder_delete', 'before');
+add_handler('ajax_imap_status', 'sieve_status', true, 'sievefilters', 'imap_status', 'before');
+add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'after');
 
 // sieve filter
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
@@ -113,6 +116,9 @@ add_output('ajax_sieve_block_change_behaviour', 'sieve_block_change_behaviour_ou
 add_handler('settings', 'process_enable_sieve_filter_setting', true, 'sievefilters', 'save_user_settings', 'before');
 add_output('settings', 'enable_sieve_filter_setting', true, 'sievefilters', 'start_general_settings', 'after');
 
+add_handler('home', 'check_sieve_configuration', true, 'nux','load_imap_servers_from_config', 'after');
+add_output('home', 'display_sieve_misconfig_alert', true, 'nux', 'start_welcome_dialog', 'after');
+
 /**
  * toggle fliter
  */
@@ -158,28 +164,30 @@ return array(
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
-        'script_state' => FILTER_DEFAULT,
-        'imap_account' => FILTER_DEFAULT,
-        'sieve_script_name' => FILTER_DEFAULT,
+        'script_state' => FILTER_UNSAFE_RAW,
+        'imap_account' => FILTER_UNSAFE_RAW,
+        'sieve_script_name' => FILTER_UNSAFE_RAW,
         'sieve_script_priority' => FILTER_VALIDATE_INT,
-        'sieve_filter_name' => FILTER_DEFAULT,
+        'sieve_filter_name' => FILTER_UNSAFE_RAW,
         'sieve_filter_priority' => FILTER_VALIDATE_INT,
         'script' => FILTER_UNSAFE_RAW,
-        'current_editing_script' => FILTER_DEFAULT,
-        'current_editing_filter_name' => FILTER_DEFAULT,
+        'current_editing_script' => FILTER_UNSAFE_RAW,
+        'current_editing_filter_name' => FILTER_UNSAFE_RAW,
         'conditions_json' => FILTER_UNSAFE_RAW,
         'actions_json' => FILTER_UNSAFE_RAW,
-        'filter_test_type' => FILTER_DEFAULT,
+        'filter_test_type' => FILTER_UNSAFE_RAW,
         'imap_msg_uid' => FILTER_VALIDATE_INT,
-        'imap_server_id' => FILTER_DEFAULT,
-        'folder' => FILTER_DEFAULT,
+        'imap_server_id' => FILTER_UNSAFE_RAW,
+        'folder' => FILTER_UNSAFE_RAW,
+        'new_folder' => FILTER_UNSAFE_RAW,
         'sender' => FILTER_UNSAFE_RAW,
-        'selected_behaviour' => FILTER_DEFAULT,
+        'selected_behaviour' => FILTER_UNSAFE_RAW,
         'enable_sieve_filter' => FILTER_VALIDATE_INT,
-        'scope' => FILTER_DEFAULT,
-        'block_action' => FILTER_DEFAULT,
-        'reject_message' => FILTER_DEFAULT,
+        'scope' => FILTER_UNSAFE_RAW,
+        'block_action' => FILTER_UNSAFE_RAW,
+        'reject_message' => FILTER_UNSAFE_RAW,
         'change_behavior' => FILTER_VALIDATE_BOOL,
         'gen_script' => FILTER_VALIDATE_BOOL,
+        'is_screened' => FILTER_VALIDATE_BOOL,
     )
 );

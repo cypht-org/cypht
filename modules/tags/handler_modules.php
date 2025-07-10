@@ -33,7 +33,6 @@ class Hm_Handler_add_tag_to_message extends Hm_Handler_Module {
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
             $folder = hex2bin($folder);
-            $msg_id = hex2bin($msg_id);
             $tagged = Hm_Tags::addMessage($form['tag_id'], $imap_server_id, $folder, $msg_id);
             if ($tagged) {
                 $taged_messages++;
