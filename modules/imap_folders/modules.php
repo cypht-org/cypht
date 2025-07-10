@@ -422,6 +422,7 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
                                 <a href="#" class="close">'.$this->trans('Cancel').'</a>
                             </li>
                         </ul>
+                        <input type="hidden" value="" id="children_number" />
                         <input type="hidden" value="" id="delete_source" />
                         <input type="button" id="delete_folder" class="btn btn-danger" value="'.$this->trans('Delete').'">
                      </div></div>';

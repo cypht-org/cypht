@@ -182,6 +182,8 @@ if (!class_exists('Hm_IMAP')) {
         public $folder_state = false;
         private $scramAuthenticator;
         private $namespace_count = 0;
+
+        protected $list_sub_folders = [];
         /**
          * constructor
          */
@@ -1923,16 +1925,31 @@ if (!class_exists('Hm_IMAP')) {
                 $this->debug[] = 'Delete mailbox not permitted in read only mode';
                 return false;
             }
-            $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($mailbox))."\"\r\n";
-            $this->send_command($command);
-            $result = $this->get_response(false);
-            $status = $this->check_response($result, false);
-            if ($status) {
-                return true;
+            $this->list_sub_folders[] = $mailbox;
+            $this->get_recursive_subfolders($mailbox, true);
+            $this->list_sub_folders = array_reverse($this->list_sub_folders);
+            foreach ($this->list_sub_folders as $key => $del_folder) {
+                $command = 'DELETE "'.str_replace('"', '\"', $this->utf7_encode($del_folder))."\"\r\n";
+                $this->send_command($command);
+                $result = $this->get_response(false);
+                $status = $this->check_response($result, false);
+                if ($status) {
+                    unset($this->list_sub_folders[$key]);
+                } else {
+                    $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
+                    return false;
+                }
             }
-            else {
-                $this->debug[] = str_replace('A'.$this->command_count, '', $result[0]);
-                return false;
+            return true;
+        }
+
+        public function get_recursive_subfolders($parentFolder, $is_delete_action) {
+            $infoFolder = $this->get_folder_list_by_level($parentFolder, false, false, $is_delete_action);
+            if ($infoFolder) {
+                foreach (array_keys($infoFolder) as $folder) {
+                    $this->list_sub_folders[] = $folder;
+                    $this->get_recursive_subfolders($folder, $is_delete_action);
+                }
             }
         }
 
@@ -2669,7 +2686,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $level mailbox name or empty string for the top level
          * @return array list of matching folders
          */
-        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false) {
+        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false, $is_delete_action = false) {
             $result = array();
             $folders = array();
             if ($this->server_support_children_capability()) {
@@ -2691,6 +2708,9 @@ if (!class_exists('Hm_IMAP')) {
                 );
                 if ($with_input) {
                     $result[$name]['special'] = $folder['special'];
+                }
+                if ($folder['can_have_kids'] && !$is_delete_action) {
+                    $result[$name]['number_of_children'] = count($this->get_folder_list_by_level($folder['name'], false, false, $is_delete_action));
                 }
             }
             if ($only_subscribed || $with_input) {

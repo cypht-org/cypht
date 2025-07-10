@@ -734,7 +734,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
 
                     if ($ceo_use_detect_ceo_fraud && hex2bin($form['folder']) == 'INBOX') {
                         if ($this->isCeoFraud($msg['to'], $msg['subject'], $msg['preview_msg'])) {
-                            
+
                             $folder = "Suspicious emails";
                             if (!count($mailbox->get_mailbox_status($folder))) {
                                 $mailbox->create_folder($folder);
@@ -750,7 +750,7 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
                             $total--;
                         }
                     }
-                    
+
                     if ($msg) {
                         if (! $include_preview && isset($msg['preview_msg'])) {
                             $msg['preview_msg'] = "";
@@ -770,18 +770,18 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
             $this->out('do_not_flag_as_read_on_open', $this->user_config->get('unread_on_open_setting', false));
         }
     }
-    public function isCeoFraud($email, $subject, $msg) {          
+    public function isCeoFraud($email, $subject, $msg) {
         // 1. Check Suspicious Terms or Requests
         $suspiciousTerms = explode(",", $this->user_config->get("ceo_suspicious_terms_setting"));
         if ($this->detectSuspiciousTerms($msg, $suspiciousTerms) || $this->detectSuspiciousTerms($subject, $suspiciousTerms)) {
-           
+
             // 2. check ceo_rate_limit
             $amounts = $this->extractAmountFromEmail($msg);
             $amountLimit = $this->user_config->get("ceo_amount_limit_setting");
             $isUpperAmount = array_reduce($amounts, function ($carry, $value) use ($amountLimit) {
                 return $carry || $value > $amountLimit;
             }, false);
-            
+
             if ($isUpperAmount) {
                 if ($this->user_config->get("ceo_use_trusted_contact_setting")) {
                     $contacts = $this->get('contact_store');
@@ -815,16 +815,16 @@ class Hm_Handler_imap_folder_page extends Hm_Handler_Module {
     }
     private function extractAmountFromEmail($emailBody) {
         $pattern = '/\b\d+(?:,\d+)?\.?\d*\s*(?:USD|dollars?|US\$?|EUR|euros?|€|JPY|yen|¥|GBP|pounds?|£|CAD|CAD\$|AUD|AUD\$)/i';
-    
+
         preg_match_all($pattern, $emailBody, $matches);
-    
+
         if ($matches) {
-            return array_map(function($value) { 
-                return floatval(preg_replace('/[^0-9]/', '', $value)); 
+            return array_map(function($value) {
+                return floatval(preg_replace('/[^0-9]/', '', $value));
             }, $matches[0]);
         }
     }
-    
+
 }
 
 /**
@@ -1135,7 +1135,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
      * @param string $folder The folder where the messages currently reside.
      * @param array $specials Special folder information for handling specific actions.
      * @param array $server_details Details of the server, including its unique ID and settings.
-     * 
+     *
      * @return array Returns an associative array with:
      *   - 'error' => bool Indicates if an error occurred during the operation.
      *   - 'moved' => array List of moved message identifiers in a specific format.
@@ -1182,7 +1182,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
      * @param string $action_type The action type that determines which special folder to retrieve (e.g., 'delete', 'archive').
      * @param array $specials An associative array of special folder names, like 'trash', 'archive', and 'junk'.
      * @param array $server_details Details of the server, including its name.
-     * 
+     *
      * @return string|false Returns the special folder name if found, or false if no corresponding folder is configured.
      */
     private function get_special_folder($action_type, $specials, $server_details) {
@@ -1273,7 +1273,7 @@ class Hm_Handler_imap_combined_inbox extends Hm_Handler_Module {
         $offset = 0;
         $list_page = 1;
         $maxPerSource = round($limit / count($data_sources));
-        
+
         if (isset($this->request->get['list_page'])) {
             $list_page = (int) $this->request->get['list_page'];
             if ($list_page && $list_page > 1) {
@@ -1373,7 +1373,7 @@ class Hm_Handler_imap_filter_by_type extends Hm_Handler_Module {
             $offsets = explode(',', $offsets);
         }
         $searchTerms[] = [search_since_based_on_setting($this->user_config), $date];
-        
+
         $result = getCombinedMessagesLists($data_sources, [
             'cache' => $this->cache,
             'session' => $this->session,
@@ -1463,7 +1463,7 @@ class Hm_Handler_process_add_jmap_server extends Hm_Handler_Module {
                     'type' => 'jmap',
                     'port' => false,
                     'tls' => false));
-                Hm_Msgs::add('Added server!');
+                Hm_Msgs::add("Added server!. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                 $this->session->record_unsaved('JMAP server added');
             }
             else {
@@ -1693,12 +1693,12 @@ class Hm_Handler_load_imap_folders_permissions extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id','imap_folder_uid','imap_folder'));
-        
+
         if ($success && !empty($form['imap_server_id']) && !empty($form['imap_folder'])  && !empty($form['imap_folder_uid'])) {
             Hm_IMAP_List::init($this->user_config, $this->session);
             $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            
+
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
             $permissions = $imap->get_acl($form['imap_folder']);
             $this->out('imap_folders_permissions', $permissions);
@@ -1716,13 +1716,13 @@ class Hm_Handler_set_acl_to_imap_folders extends Hm_Handler_Module {
      */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id','imap_folder','identifier','permissions','action'));
-        
+
         if ($success && !empty($form['imap_server_id']) && !empty($form['identifier'])  && !empty($form['permissions']) && !empty($form['action'])) {
 
             Hm_IMAP_List::init($this->user_config, $this->session);
             $server = Hm_IMAP_List::dump($form['imap_server_id'], true);
             $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            
+
             $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache, $server['user'], $server['pass']);
             if($form['action'] === 'add') {
                 $response = $imap->set_acl($form['imap_folder'], $form['identifier'], $form['permissions']);
@@ -1903,7 +1903,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
         if (isset($this->request->post['imap_connect'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
-            if ($success && $imap_details) {         
+            if ($success && $imap_details) {
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     try {
                         list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_details['sieve_config_host']);
@@ -2325,9 +2325,15 @@ class Hm_Handler_imap_hide extends Hm_Handler_Module {
         if (isset($this->request->post['hide_imap_server'])) {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             if ($success) {
-                Hm_IMAP_List::toggle_hidden($form['imap_server_id'], (bool) $this->request->post['hide_imap_server']);
-                Hm_Msgs::add('Hidden status updated');
-                $this->session->record_unsaved(sprintf('%s server hidden status updated', imap_server_type($form['imap_server_id'])));
+                $action = (bool) $this->request->post['hide_imap_server'];
+                $server_type = imap_server_type($form['imap_server_id']);
+                Hm_IMAP_List::toggle_hidden($form['imap_server_id'], $action);
+                if ($action) {
+                    Hm_Msgs::add(sprintf('%s server has been hidden', $server_type));
+                } else {
+                    Hm_Msgs::add(sprintf('%s server is now visible', $server_type));
+                }
+                $this->session->record_unsaved(sprintf('%s server visibility updated', $server_type));
             }
         }
     }
@@ -2495,7 +2501,7 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
         function process_ceo_use_trusted_contact_callback($val) { return $val; }
         function process_ceo_suspicious_terms_callback($val) { return $val; }
         function process_ceo_amount_limit_callback($val) { return $val; }
-        
+
         process_site_setting('ceo_use_detect_ceo_fraud', $this, 'process_ceo_use_detect_ceo_fraud_callback');
         process_site_setting('ceo_use_trusted_contact', $this, 'process_ceo_use_trusted_contact_callback');
         process_site_setting('ceo_suspicious_terms', $this, 'process_ceo_suspicious_terms_callback');

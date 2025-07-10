@@ -135,7 +135,7 @@ function format_imap_folder_section($folders, $id, $output_mod, $with_input = fa
 
     foreach ($folders as $folder_name => $folder) {
         $folder_name = bin2hex($folder_name);
-        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'">';
+        $results .= '<li class="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'" data-number-children="'.$output_mod->html_safe($folder['number_of_children']).'">';
         if ($folder['children']) {
             $results .= '<a href="#" class="imap_folder_link expand_link d-inline-flex" data-target="imap_'.$id.'_'.$output_mod->html_safe($folder_name).'"><i class="bi bi-plus-circle-fill"></i></a>';
         }

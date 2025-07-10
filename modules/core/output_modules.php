@@ -18,7 +18,7 @@ class Hm_Output_search_from_folder_list extends Hm_Output_Module {
         $res = '<li class="menu_search mb-2"><form method="get">';
         $res .= '<div class="input-group">';
         if (!$this->get('hide_folder_icons')) {
-            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' . 
+            $res .= '<a href="?page=search" class="input-group-text" id="basic-addon1">' .
             '<i class="bi bi-search"></i>' .
             '</a>';
         }
@@ -635,7 +635,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
             format_data_sources($this->get('data_sources', array()), $this);
 
         if (!$this->get('disable_delete_prompt', DEFAULT_DISABLE_DELETE_PROMPT)) {
-            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure?').'"); };';
+            $res .= 'var hm_delete_prompt = function() { return confirm("'.$this->trans('Are you sure you wanto to delete this server?').'"); };';
         }
         else {
             $res .= 'var hm_delete_prompt = function() { return true; };';
@@ -1686,9 +1686,9 @@ class Hm_Output_modals extends Hm_Output_Module {
         $share_folder_modal .= '</thead>';
         $share_folder_modal .= '<tbody></tbody>';
         $share_folder_modal .= '</table>';
-        
+
         $share_folder_modal .= '</div>';
-        
+
         $share_folder_modal .= '<div class="col-lg-4 col-md-12">';
         $share_folder_modal .= '<form id="shareForm" action="" method="POST">';
         $share_folder_modal .= '<input type="hidden" name="server_id" id="server_id" value="">';

@@ -1,6 +1,6 @@
 attrs==23.1.0
 certifi==2024.7.4
-h11==0.14.0
+h11==0.16.0
 idna==3.7
 outcome==1.2.0
 PySocks==1.7.1
