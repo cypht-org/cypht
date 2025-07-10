@@ -1389,7 +1389,6 @@ if (!class_exists('Hm_IMAP')) {
                         $content = '';
                         $part_found = false;
                         foreach ($vals as $i => $val) {
-                            error_log($val);
                             if (mb_strtoupper($val) == 'UID' && isset($vals[$i+1])) {
                                 $uid = $vals[$i+1];
                             }
