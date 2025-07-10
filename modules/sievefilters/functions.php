@@ -401,7 +401,7 @@ if (!hm_exists('block_filter')) {
         elseif ($default_behaviour == 'Move') {
             $filter->addRequirement('fileinto');
             $custom_condition->addAction(
-                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['Blocked'])
+                new \PhpSieveManager\Filters\Actions\FileIntoFilterAction(['mailbox' => 'Blocked'])
             );
         }
 
@@ -502,7 +502,7 @@ if (!hm_exists('get_blocked_senders')){
                     return '';
                 }
                 $base64_obj = str_replace("# ", "", $script_split[1]);
-                $blocked_list = json_decode(base64_decode($base64_obj));
+                $blocked_list = json_decode(base64_decode($base64_obj), true);
                 if (!$blocked_list) {
                     return '';
                 }

@@ -1369,7 +1369,16 @@ $(function() {
             var uid = getMessageUidParam();
             if (uid) uids.push(uid);
         }
+        // Use getListPathParam() to get the current URL parameter instead of cached data
         var detail = Hm_Utils.parse_folder_path(getListPathParam(), 'imap');
+        
+        // Debug logging to see what values are being used
+        console.log('Spam Report Debug:');
+        console.log('Current URL:', window.location.href);
+        console.log('getListPathParam():', getListPathParam());
+        console.log('hm_list_path():', hm_list_path());
+        console.log('Parsed detail:', detail);
+        
         var modal = $('#spamReportModal');
         var modalData = {
             type: 'imap',

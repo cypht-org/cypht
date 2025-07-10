@@ -16,3 +16,4 @@ require_once APP_PATH.'modules/imap/hm-jmap.php';
 require_once APP_PATH.'modules/imap/spam_report_config.php';
 require_once APP_PATH.'modules/imap/spam_report_services.php';
 require_once APP_PATH.'modules/imap/spam_report_utils.php';
+require_once APP_PATH.'modules/imap/spam_service_manager.php';

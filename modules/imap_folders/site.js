@@ -1,10 +1,14 @@
 'use strict';
 
 var folder_page_folder_list = function(container, title, link_class, target, id_dest, subscription = false) {
+    console.log('folder_page_folder_list called with:', {container, title, link_class, target, id_dest, subscription});
     var id = $('#imap_server_folder').val();
+    console.log('Selected server ID:', id);
     var folder_location = $('.'+container);
+    console.log('Folder location found:', folder_location.length);
     $('li', folder_location).not('.'+title).remove();
     var folders = $('.folder_list .imap_'+id+'_').clone(false);
+    console.log('Folders found:', folders.length);
     folders.find('.manage_folders_li').remove();
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
@@ -321,15 +325,80 @@ var folder_page_create = function() {
 };
 
 function bindFoldersEventHandlers() {
-    $('.select_parent_folder').on("click", function() { return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); });
-    $('.select_rename_folder').on("click", function() { return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); });
-    $('.select_delete_folder').on("click", function() { return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); });
-    $('.select_trash_folder').on("click", function() { return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); });
-    $('.select_sent_folder').on("click", function() { return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); });
-    $('.select_archive_folder').on("click", function() { return folder_page_folder_list('archive_folder_select', 'archive_title', 'imap_archive_folder_link', 'selected_archive', 'archive_source'); });
-    $('.select_draft_folder').on("click", function() { return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); });
-    $('.select_junk_folder').on("click", function() { return folder_page_folder_list('junk_folder_select', 'junk_title', 'imap_junk_folder_link', 'selected_junk', 'junk_source'); });
-    $('.select_rename_parent_folder').on("click", function() { return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); });
+    console.log('bindFoldersEventHandlers called');
+    
+    // Remove any existing handlers first to prevent duplicates
+    $('.select_parent_folder').off('click');
+    $('.select_rename_folder').off('click');
+    $('.select_delete_folder').off('click');
+    $('.select_trash_folder').off('click');
+    $('.select_sent_folder').off('click');
+    $('.select_archive_folder').off('click');
+    $('.select_draft_folder').off('click');
+    $('.select_junk_folder').off('click');
+    $('.select_rename_parent_folder').off('click');
+    
+    $('.select_parent_folder').on("click", function(e) { 
+        console.log('select_parent_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('parent_folder_select', 'parent_title', 'imap_parent_folder_link', 'selected_parent', 'create_parent'); 
+    });
+    $('.select_rename_folder').on("click", function(e) { 
+        console.log('select_rename_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('rename_folder_select', 'rename_title', 'imap_rename_folder_link', 'selected_rename', 'rename_source'); 
+    });
+    $('.select_delete_folder').on("click", function(e) { 
+        console.log('select_delete_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('delete_folder_select', 'delete_title', 'imap_delete_folder_link', 'selected_delete', 'delete_source'); 
+    });
+    $('.select_trash_folder').on("click", function(e) { 
+        console.log('select_trash_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('trash_folder_select', 'trash_title', 'imap_trash_folder_link', 'selected_trash', 'trash_source'); 
+    });
+    $('.select_sent_folder').on("click", function(e) { 
+        console.log('select_sent_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('sent_folder_select', 'sent_title', 'imap_sent_folder_link', 'selected_sent', 'sent_source'); 
+    });
+    $('.select_archive_folder').on("click", function(e) { 
+        console.log('select_archive_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('archive_folder_select', 'archive_title', 'imap_archive_folder_link', 'selected_archive', 'archive_source'); 
+    });
+    $('.select_draft_folder').on("click", function(e) { 
+        console.log('select_draft_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('draft_folder_select', 'draft_title', 'imap_draft_folder_link', 'selected_draft', 'draft_source'); 
+    });
+    $('.select_junk_folder').on("click", function(e) { 
+        console.log('select_junk_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('junk_folder_select', 'junk_title', 'imap_junk_folder_link', 'selected_junk', 'junk_source'); 
+    });
+    $('.select_rename_parent_folder').on("click", function(e) { 
+        console.log('select_rename_parent_folder clicked');
+        e.preventDefault();
+        return folder_page_folder_list('rename_parent_folder_select', 'rename_parent_title', 'imap_rename_parent_folder_link', 'selected_rename_parent', 'rename_parent_source'); 
+    });
+    
+    // Remove existing handlers for buttons
+    $('#create_folder').off('click');
+    $('#delete_folder').off('click');
+    $('#rename_folder').off('click');
+    $('#set_trash_folder').off('click');
+    $('#set_sent_folder').off('click');
+    $('#set_archive_folder').off('click');
+    $('#set_draft_folder').off('click');
+    $('#set_junk_folder').off('click');
+    $('#clear_trash_folder').off('click');
+    $('#clear_sent_folder').off('click');
+    $('#clear_archive_folder').off('click');
+    $('#clear_draft_folder').off('click');
+    $('#clear_junk_folder').off('click');
+    
     $('#create_folder').on("click", function() { folder_page_create(); return false; });
     $('#delete_folder').on("click", function() { folder_page_delete(); return false; });
     $('#rename_folder').on("click", function() { folder_page_rename(); return false; });
@@ -344,4 +413,7 @@ function bindFoldersEventHandlers() {
     $('#clear_sent_folder').on("click", function() { clear_special_folder('sent'); return false; });
     $('#clear_archive_folder').on("click", function() { clear_special_folder('archive'); return false; });
     $('#clear_draft_folder').on("click", function() { clear_special_folder("draft"); return false; });
+    $('#clear_junk_folder').on("click", function() { clear_special_folder("junk"); return false; });
+    
+    console.log('bindFoldersEventHandlers completed');
 }

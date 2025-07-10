@@ -75,7 +75,7 @@ function send_scheduled_message($handler, $imapMailbox, $folder, $msg_id, $send_
         }
 
         if (new DateTime($msg_headers['X-Schedule']) <= new DateTime() || $send_now) {
-            $profile = Hm_Profiles::get($msg_headers['X-Profile-ID']);
+            $profile = Hm_Profiles::get(isset($msg_headers['X-Profile-ID']) ? $msg_headers['X-Profile-ID'] : null);
             if (!$profile) {
                 $profiles = Hm_Profiles::search('server', $mailbox_details['server']);
 

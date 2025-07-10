@@ -99,6 +99,7 @@ class Hm_Handler_process_enable_shortcut_setting extends Hm_Handler_Module {
 class Hm_Output_enable_shortcut_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings');
+        $reset = '';
         if (array_key_exists('enable_keyboard_shortcuts', $settings) && $settings['enable_keyboard_shortcuts']) {
             $checked = ' checked="checked"';
             if($settings['enable_keyboard_shortcuts'] !== DEFAULT_ENABLE_KEYBOARD_SHORTCUTS) {

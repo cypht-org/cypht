@@ -74,7 +74,7 @@ class Hm_Handler_add_folder_manage_link extends Hm_Handler_Module {
 class Hm_Handler_process_clear_special_folder extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('special_folder_type', 'imap_server_id'));
-        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive'), true)) {
+        if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive', 'junk'), true)) {
             return;
         }
         $specials = $this->user_config->get('special_imap_folders', array());

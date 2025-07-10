@@ -2512,3 +2512,18 @@ class Hm_output_combined_message_list extends Hm_Output_Module {
         $this->out('formatted_message_list', $messageList);
     }
 }
+
+/**
+ * Starts the Spam Reporting section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_spam_reporting_settings extends Hm_Output_Module {
+    /**
+     * Settings in this section control the spam reporting features
+     */
+    protected function output() {
+        return '<tr><td data-target=".spam_reporting_setting" colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2">'.
+            '<i class="bi bi-shield-exclamation fs-5 me-2"></i>'.
+            $this->trans('Spam Reporting').'</td></tr>';
+    }
+}

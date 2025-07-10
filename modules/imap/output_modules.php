@@ -608,7 +608,7 @@ class Hm_Output_add_jmap_server_dialog extends Hm_Output_Module {
             <div data-target=".jmap_section" class="server_section border-bottom cursor-pointer px-1 py-3 pe-auto">
                 <a href="#" class="pe-auto">
                     <i class="bi bi-envelope-fill me-3"></i>
-                    <b>'.$this->trans('JMAP Servers').'</b>
+                    <b>' . $this->trans('JMAP Servers').'</b>
                 </a>
                 <div class="server_count">'.$count.'</div>
             </div>
@@ -1707,11 +1707,11 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
 class Hm_Output_auto_block_spam_setting extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
-        $enabled = array_key_exists('auto_block_spam_sender', $settings) ? $settings['auto_block_spam_sender'] : true;
-        $action = array_key_exists('auto_block_spam_action', $settings) ? $settings['auto_block_spam_action'] : 'move_to_junk';
-        $scope = array_key_exists('auto_block_spam_scope', $settings) ? $settings['auto_block_spam_scope'] : 'sender';
+        $enabled = array_key_exists('auto_block_spam_sender_setting', $settings) ? $settings['auto_block_spam_sender_setting'] : true;
+        $action = array_key_exists('auto_block_spam_action_setting', $settings) ? $settings['auto_block_spam_action_setting'] : 'move_to_junk';
+        $scope = array_key_exists('auto_block_spam_scope_setting', $settings) ? $settings['auto_block_spam_scope_setting'] : 'sender';
         
-        $res = '<tr class="general_setting"><td colspan="2">';
+        $res = '<tr class="spam_reporting_setting"><td colspan="2">';
         $res .= '<div class="auto_block_spam_setting mb-3">';
         $res .= '<div class="subtitle">' . $this->trans('Auto-Block Spam Sender Settings') . '</div>';
         
@@ -1762,13 +1762,13 @@ class Hm_Output_auto_block_spam_setting extends Hm_Output_Module {
 class Hm_Output_rate_limit_settings extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
-        $enabled = array_key_exists('rate_limit_enabled', $settings) ? $settings['rate_limit_enabled'] : true;
-        $window_size = array_key_exists('rate_limit_window_size', $settings) ? $settings['rate_limit_window_size'] : 3600;
-        $max_requests = array_key_exists('rate_limit_max_requests', $settings) ? $settings['rate_limit_max_requests'] : 100;
-        $burst_limit = array_key_exists('rate_limit_burst_limit', $settings) ? $settings['rate_limit_burst_limit'] : 10;
-        $burst_window = array_key_exists('rate_limit_burst_window', $settings) ? $settings['rate_limit_burst_window'] : 60;
+        $enabled = array_key_exists('rate_limit_enabled_setting', $settings) ? $settings['rate_limit_enabled_setting'] : true;
+        $window_size = array_key_exists('rate_limit_window_size_setting', $settings) ? $settings['rate_limit_window_size_setting'] : 3600;
+        $max_requests = array_key_exists('rate_limit_max_requests_setting', $settings) ? $settings['rate_limit_max_requests_setting'] : 100;
+        $burst_limit = array_key_exists('rate_limit_burst_limit_setting', $settings) ? $settings['rate_limit_burst_limit_setting'] : 10;
+        $burst_window = array_key_exists('rate_limit_burst_window_setting', $settings) ? $settings['rate_limit_burst_window_setting'] : 60;
         
-        $res = '<tr class="general_setting"><td colspan="2">';
+        $res = '<tr class="spam_reporting_setting"><td colspan="2">';
         $res .= '<div class="rate_limit_settings mb-3">';
         $res .= '<div class="subtitle">' . $this->trans('Rate Limiting Settings') . '</div>';
         
@@ -1814,6 +1814,884 @@ class Hm_Output_rate_limit_settings extends Hm_Output_Module {
         
         $res .= '</div>';
         $res .= '</td></tr>';
+        
+        return $res;
+    }
+}
+
+/**
+ * Centralized Spam Reporting Settings UI
+ * @subpackage imap/output
+ */
+class Hm_Output_spam_reporting_settings extends Hm_Output_Module {
+    protected function output() {
+        $res = '';
+        // Section: Auto-block spam sender
+        $auto_block = new Hm_Output_auto_block_spam_setting($this->output, $this->protected);
+        $res .= $auto_block->output();
+        // Section: Rate limiting
+        $rate_limit = new Hm_Output_rate_limit_settings($this->output, $this->protected);
+        $res .= $rate_limit->output();
+        // Section: External spam services checkboxes
+        $services = new Hm_Output_spam_services_setting($this->output, $this->protected);
+        $res .= $services->output();
+        // Add more spam report settings here as needed
+        return $res;
+    }
+}
+
+/**
+ * Output checkboxes for enabling/disabling external spam services
+ * @subpackage imap/output
+ */
+class Hm_Output_spam_services_setting extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $services = [
+            'enable_spamcop' => $this->trans('Enable SpamCop'),
+            'enable_abuseipdb' => $this->trans('Enable AbuseIPDB'),
+            'enable_stopforumspam' => $this->trans('Enable StopForumSpam'),
+            'enable_cleantalk' => $this->trans('Enable CleanTalk'),
+        ];
+        $defaults = [
+            'enable_spamcop' => true,
+            'enable_abuseipdb' => false,
+            'enable_stopforumspam' => false,
+            'enable_cleantalk' => false,
+        ];
+        $res = '<tr class="spam_reporting_setting"><td colspan="2" class="settings_subtitle p-2">'.$this->trans('External Spam Reporting Services').'</td></tr>';
+        foreach ($services as $key => $label) {
+            $checked = '';
+            if (array_key_exists($key.'_setting', $settings)) {
+                if ($settings[$key.'_setting']) $checked = ' checked="checked"';
+            } else if ($defaults[$key]) {
+                $checked = ' checked="checked"';
+            }
+            $res .= '<tr class="spam_reporting_setting"><td><label class="form-check-label" for="'.$key.'">'.$label.'</label></td>';
+            $res .= '<td>';
+            $res .= '<input class="form-check-input" type="checkbox"'.$checked.' value="1" id="'.$key.'" name="'.$key.'" data-default-value="'.($defaults[$key] ? 'true' : 'false').'"/>';
+            // Add Edit button for each service (disabled for now)
+            $service_id = str_replace('enable_', '', $key);
+            $res .= '<button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="editService(\''.$service_id.'\')" disabled>';
+            $res .= '<i class="bi bi-pencil"></i> '.$this->trans('Edit');
+            $res .= '</button>';
+            $res .= '</td></tr>';
+        }
+        return $res;
+    }
+}
+
+/**
+ * Output spam service management interface
+ * @subpackage imap/output
+ */
+class Hm_Output_spam_service_management extends Hm_Output_Module {
+    protected function output() {
+        $services = $this->get('spam_services', array());
+        $service_types = $this->get('spam_service_types', array());
+        $template_variables = $this->get('spam_template_variables', array());
+        
+        // Debug output
+        $debug_info = '<!-- DEBUG: Services count: ' . count($services) . ' -->';
+        $debug_info .= '<!-- DEBUG: Service types count: ' . count($service_types) . ' -->';
+        $debug_info .= '<!-- DEBUG: Service types keys: ' . json_encode(array_keys($service_types)) . ' -->';
+        $debug_info .= '<!-- DEBUG: Template variables count: ' . count($template_variables) . ' -->';
+        
+        // Check if service types have fields
+        foreach ($service_types as $type => $config) {
+            $debug_info .= '<!-- DEBUG: Type ' . $type . ' has fields: ' . (isset($config['fields']) ? 'yes' : 'no') . ' -->';
+            if (isset($config['fields'])) {
+                $debug_info .= '<!-- DEBUG: Type ' . $type . ' fields count: ' . count($config['fields']) . ' -->';
+            }
+        }
+        
+        $res = $debug_info;
+        
+        // Add section header
+        $res .= '<tr class="spam_reporting_setting"><td colspan="2" class="settings_subtitle p-2">'.$this->trans('External Spam Reporting Services Management').'</td></tr>';
+        
+        // Service management content
+        $res .= '<tr class="spam_reporting_setting"><td colspan="2">';
+        $res .= '<div class="spam-service-management">';
+        
+        // Add new service button (disabled for now)
+        $res .= '<div class="mb-3">';
+        $res .= '<button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addServiceModal" disabled>';
+        $res .= '<i class="bi bi-plus-circle me-1"></i>'.$this->trans('Add New Service');
+        $res .= '</button>';
+        $res .= '</div>';
+        
+        // Services table
+        if (!empty($services)) {
+            $res .= '<div class="table-responsive">';
+            $res .= '<table class="table table-sm table-striped">';
+            $res .= '<thead><tr>';
+            $res .= '<th>'.$this->trans('Service Name').'</th>';
+            $res .= '<th>'.$this->trans('Type').'</th>';
+            $res .= '<th>'.$this->trans('Status').'</th>';
+            $res .= '<th>'.$this->trans('Actions').'</th>';
+            $res .= '</tr></thead><tbody>';
+            
+            foreach ($services as $service_id => $service) {
+                $type_name = isset($service_types[$service['type']]) ? $service_types[$service['type']]['name'] : ucfirst($service['type']);
+                $status_icon = $service['enabled'] ? '<i class="bi bi-check-circle-fill text-success"></i>' : '<i class="bi bi-x-circle-fill text-danger"></i>';
+                $status_text = $service['enabled'] ? $this->trans('Enabled') : $this->trans('Disabled');
+                
+                $res .= '<tr>';
+                $res .= '<td>'.$this->html_safe($service['name']).'</td>';
+                $res .= '<td>'.$this->html_safe($type_name).'</td>';
+                $res .= '<td>'.$status_icon.' '.$status_text.'</td>';
+                $res .= '<td>';
+                $res .= '<button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editService(\''.$service_id.'\')">';
+                $res .= '<i class="bi bi-pencil"></i>';
+                $res .= '</button>';
+                $res .= '<button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteService(\''.$service_id.'\')">';
+                $res .= '<i class="bi bi-trash"></i>';
+                $res .= '</button>';
+                $res .= '</td>';
+                $res .= '</tr>';
+            }
+            
+            $res .= '</tbody></table>';
+            $res .= '</div>';
+        } else {
+            $res .= '<div class="alert alert-info">'.$this->trans('No services configured. Add your first service using the button above.').'</div>';
+        }
+        
+        $res .= '</div>';
+        $res .= '</td></tr>';
+        
+        return $res;
+    }
+}
+
+/**
+ * Output spam service modals
+ * @subpackage imap/output
+ */
+class Hm_Output_spam_service_modals extends Hm_Output_Module {
+    protected function output() {
+        $service_types = $this->get('spam_service_types', array());
+        $template_variables = $this->get('spam_template_variables', array());
+        
+        $res = $this->generateAddServiceModal($service_types, $template_variables);
+        $res .= $this->generateEditServiceModal($service_types, $template_variables);
+        
+        return $res;
+    }
+    
+    private function generateAddServiceModal($service_types, $template_variables) {
+        // Fallback service types if not loaded
+        if (empty($service_types)) {
+            $service_types = array(
+                'email' => array(
+                    'name' => 'Email Service',
+                    'description' => 'Send spam reports via email',
+                    'fields' => array(
+                        'endpoint' => array('type' => 'email', 'label' => 'Email Address', 'required' => true)
+                    )
+                ),
+                'api' => array(
+                    'name' => 'API Service',
+                    'description' => 'Send spam reports via REST API',
+                    'fields' => array(
+                        'endpoint' => array('type' => 'url', 'label' => 'API Endpoint', 'required' => true),
+                        'method' => array('type' => 'select', 'label' => 'HTTP Method', 'required' => true, 'options' => array('POST', 'GET', 'PUT')),
+                        'auth_type' => array('type' => 'select', 'label' => 'Authentication', 'required' => false, 'options' => array('none', 'header', 'bearer', 'basic')),
+                        'auth_header' => array('type' => 'text', 'label' => 'Auth Header Name', 'required' => false),
+                        'auth_value' => array('type' => 'password', 'label' => 'Auth Value', 'required' => false),
+                        'payload_template' => array('type' => 'json', 'label' => 'Payload Template', 'required' => true)
+                    )
+                ),
+                'custom' => array(
+                    'name' => 'Custom Service',
+                    'description' => 'Custom integration with custom fields',
+                    'fields' => array(
+                        'custom_fields' => array('type' => 'json', 'label' => 'Custom Configuration', 'required' => true)
+                    )
+                )
+            );
+        }
+        
+        $res = '<div class="modal fade" id="addServiceModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog modal-lg">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Add New Spam Service').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST" id="addServiceForm">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<div class="modal-body">';
+        
+        // Basic fields
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('Service Name').' *</label>';
+        $res .= '<input type="text" class="form-control" name="service_name" required />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('Service Type').' *</label>';
+        $res .= '<select class="form-select" name="service_type" id="serviceType" required>';
+        $res .= '<option value="">'.$this->trans('Select Type').'</option>';
+        foreach ($service_types as $type => $config) {
+            $res .= '<option value="'.$type.'">'.$config['name'].'</option>';
+        }
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="serviceEnabled" checked />';
+        $res .= '<label class="form-check-label" for="serviceEnabled">'.$this->trans('Enable this service').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Type-specific fields (will be shown/hidden via JavaScript)
+        $res .= $this->generateTypeSpecificFields($service_types, $template_variables, 'add');
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="add_spam_service">'.$this->trans('Add Service').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
+        
+        return $res;
+    }
+    
+    private function generateEditServiceModal($service_types, $template_variables) {
+        // Fallback service types if not loaded
+        if (empty($service_types)) {
+            $service_types = array(
+                'email' => array('name' => 'Email Service'),
+                'api' => array('name' => 'API Service'),
+                'custom' => array('name' => 'Custom Service')
+            );
+        }
+        
+        $res = '<div class="modal fade" id="editServiceModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog modal-lg">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Edit Spam Service').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST" id="editServiceForm">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="service_id" id="editServiceId" />';
+        $res .= '<div class="modal-body">';
+        
+        // Basic fields
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('Service Name').' *</label>';
+        $res .= '<input type="text" class="form-control" name="service_name" id="editServiceName" required />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('Service Type').' *</label>';
+        $res .= '<select class="form-select" name="service_type" id="editServiceType" required>';
+        $res .= '<option value="">'.$this->trans('Select Type').'</option>';
+        foreach ($service_types as $type => $config) {
+            $res .= '<option value="'.$type.'">'.$config['name'].'</option>';
+        }
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="editServiceEnabled" />';
+        $res .= '<label class="form-check-label" for="editServiceEnabled">'.$this->trans('Enable this service').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Type-specific fields (will be populated via JavaScript)
+        $res .= $this->generateTypeSpecificFields($service_types, $template_variables, 'edit');
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="edit_spam_service">'.$this->trans('Update Service').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
+        
+        return $res;
+    }
+    
+    private function generateTypeSpecificFields($service_types, $template_variables, $prefix) {
+        // Debug output
+        $debug_info = '<!-- DEBUG: generateTypeSpecificFields called with prefix: ' . $prefix . ' -->';
+        $debug_info .= '<!-- DEBUG: service_types count: ' . count($service_types) . ' -->';
+        $debug_info .= '<!-- DEBUG: service_types keys: ' . json_encode(array_keys($service_types)) . ' -->';
+        
+        // Ensure we have proper service types with fields
+        if (empty($service_types)) {
+            $debug_info .= '<!-- DEBUG: Using fallback service types -->';
+            $service_types = array(
+                'email' => array(
+                    'name' => 'Email Service',
+                    'description' => 'Send spam reports via email',
+                    'fields' => array(
+                        'endpoint' => array('type' => 'email', 'label' => 'Email Address', 'required' => true)
+                    )
+                ),
+                'api' => array(
+                    'name' => 'API Service',
+                    'description' => 'Send spam reports via REST API',
+                    'fields' => array(
+                        'endpoint' => array('type' => 'url', 'label' => 'API Endpoint', 'required' => true),
+                        'method' => array('type' => 'select', 'label' => 'HTTP Method', 'required' => true, 'options' => array('POST', 'GET', 'PUT')),
+                        'auth_type' => array('type' => 'select', 'label' => 'Authentication', 'required' => false, 'options' => array('none', 'header', 'bearer', 'basic')),
+                        'auth_header' => array('type' => 'text', 'label' => 'Auth Header Name', 'required' => false),
+                        'auth_value' => array('type' => 'password', 'label' => 'Auth Value', 'required' => false),
+                        'payload_template' => array('type' => 'json', 'label' => 'Payload Template', 'required' => true)
+                    )
+                ),
+                'custom' => array(
+                    'name' => 'Custom Service',
+                    'description' => 'Custom integration with custom fields',
+                    'fields' => array(
+                        'custom_fields' => array('type' => 'json', 'label' => 'Custom Configuration', 'required' => true)
+                    )
+                )
+            );
+        }
+        
+        $res = $debug_info;
+        $res .= '<div id="'.$prefix.'TypeFields">';
+        
+        foreach ($service_types as $type => $config) {
+            $res .= '<!-- DEBUG: Processing type: ' . $type . ' -->';
+            $res .= '<!-- DEBUG: Config keys: ' . json_encode(array_keys($config)) . ' -->';
+            
+            $res .= '<div class="type-fields" data-type="'.$type.'" style="display: none;">';
+            $res .= '<h6 class="mt-3 mb-2">'.$config['name'].' Configuration</h6>';
+            $res .= '<p class="text-muted small">'.$config['description'].'</p>';
+            
+            // Check if fields exist
+            if (!isset($config['fields']) || !is_array($config['fields'])) {
+                $res .= '<!-- DEBUG: No fields found for type: ' . $type . ' -->';
+                $res .= '<div class="alert alert-warning">No configuration fields available for this service type.</div>';
+            } else {
+                $res .= '<!-- DEBUG: Fields count for ' . $type . ': ' . count($config['fields']) . ' -->';
+                
+                foreach ($config['fields'] as $field_name => $field_config) {
+                    $field_id = $prefix.'_'.$type.'_'.$field_name;
+                    $field_name_full = $type.'_'.$field_name;
+                    
+                    $res .= '<div class="mb-3">';
+                    $res .= '<label class="form-label">'.$field_config['label'];
+                    if ($field_config['required']) {
+                        $res .= ' *';
+                    }
+                    $res .= '</label>';
+                    
+                    switch ($field_config['type']) {
+                        case 'text':
+                        case 'email':
+                        case 'url':
+                        case 'number':
+                            $res .= '<input type="'.$field_config['type'].'" class="form-control" name="'.$field_name_full.'" id="'.$field_id.'"';
+                            if ($field_config['required']) {
+                                $res .= ' required';
+                            }
+                            $res .= ' />';
+                            break;
+                            
+                        case 'textarea':
+                            $res .= '<textarea class="form-control" name="'.$field_name_full.'" id="'.$field_id.'" rows="3"';
+                            if ($field_config['required']) {
+                                $res .= ' required';
+                            }
+                            $res .= '></textarea>';
+                            break;
+                            
+                        case 'select':
+                            $res .= '<select class="form-select" name="'.$field_name_full.'" id="'.$field_id.'"';
+                            if ($field_config['required']) {
+                                $res .= ' required';
+                            }
+                            $res .= '>';
+                            $res .= '<option value="">'.$this->trans('Select').'</option>';
+                            foreach ($field_config['options'] as $option) {
+                                $res .= '<option value="'.$option.'">'.$option.'</option>';
+                            }
+                            $res .= '</select>';
+                            break;
+                            
+                        case 'checkbox':
+                            $res .= '<div class="form-check">';
+                            $res .= '<input class="form-check-input" type="checkbox" name="'.$field_name_full.'" id="'.$field_id.'" />';
+                            $res .= '<label class="form-check-label" for="'.$field_id.'">'.$field_config['label'].'</label>';
+                            $res .= '</div>';
+                            break;
+                            
+                        case 'json':
+                            $res .= '<textarea class="form-control" name="'.$field_name_full.'" id="'.$field_id.'" rows="5"';
+                            if ($field_config['required']) {
+                                $res .= ' required';
+                            }
+                            $res .= ' placeholder=\'{"key": "value"}\'></textarea>';
+                            break;
+                    }
+                    
+                    $res .= '</div>';
+                }
+            }
+            
+            // Template variables help
+            if (in_array($type, array('email', 'api'))) {
+                $res .= '<div class="alert alert-info small">';
+                $res .= '<strong>'.$this->trans('Available Template Variables:').'</strong><br>';
+                foreach ($template_variables as $var => $desc) {
+                    $res .= '<code>'.$var.'</code> - '.$desc.'<br>';
+                }
+                $res .= '</div>';
+            }
+            
+            $res .= '</div>';
+        }
+        
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * Output JavaScript for spam service management
+ * @subpackage imap/output
+ */
+class Hm_Output_spam_service_management_js extends Hm_Output_Module {
+    protected function output() {
+        $services = $this->get('spam_services', array());
+        $services_json = json_encode($services);
+        
+        $res = '<script type="text/javascript">';
+        $res .= 'var spamServices = '.$services_json.';';
+        $res .= '
+        // Show/hide type-specific fields based on service type selection
+        function showTypeFields(type, prefix) {
+            // Hide all type fields
+            document.querySelectorAll("#" + prefix + "TypeFields .type-fields").forEach(function(field) {
+                field.style.display = "none";
+            });
+            
+            // Show fields for selected type
+            var typeField = document.querySelector("#" + prefix + "TypeFields .type-fields[data-type=\'" + type + "\']");
+            if (typeField) {
+                typeField.style.display = "block";
+            }
+        }
+        
+        // Initialize type field visibility
+        document.addEventListener("DOMContentLoaded", function() {
+            // Add service modal
+            var serviceType = document.getElementById("serviceType");
+            if (serviceType) {
+                serviceType.addEventListener("change", function() {
+                    showTypeFields(this.value, "add");
+                });
+            }
+            
+            // Edit service modal
+            var editServiceType = document.getElementById("editServiceType");
+            if (editServiceType) {
+                editServiceType.addEventListener("change", function() {
+                    showTypeFields(this.value, "edit");
+                });
+            }
+        });
+        
+        // Edit service function
+        function editService(serviceId) {
+            // Check if it\'s a predefined service
+            if (["spamcop", "abuseipdb", "stopforumspam", "cleantalk"].includes(serviceId)) {
+                // Show predefined service modal
+                var modal = new bootstrap.Modal(document.getElementById(serviceId + "Modal"));
+                modal.show();
+                return;
+            }
+            
+            // Handle custom services (existing logic)
+            var service = spamServices[serviceId];
+            if (!service) {
+                alert("Service not found");
+                return;
+            }
+            
+            // Populate edit form
+            document.getElementById("editServiceId").value = serviceId;
+            document.getElementById("editServiceName").value = service.name;
+            document.getElementById("editServiceType").value = service.type;
+            document.getElementById("editServiceEnabled").checked = service.enabled;
+            
+            // Show type-specific fields
+            showTypeFields(service.type, "edit");
+            
+            // Populate type-specific fields
+            populateTypeFields(service, "edit");
+            
+            // Show modal
+            var modal = new bootstrap.Modal(document.getElementById("editServiceModal"));
+            modal.show();
+        }
+        
+        // Populate type-specific fields
+        function populateTypeFields(service, prefix) {
+            var type = service.type;
+            
+            // Clear all fields first
+            document.querySelectorAll("#" + prefix + "TypeFields input, #" + prefix + "TypeFields select, #" + prefix + "TypeFields textarea").forEach(function(field) {
+                if (field.type === "checkbox") {
+                    field.checked = false;
+                } else {
+                    field.value = "";
+                }
+            });
+            
+            // Populate fields based on service type
+            switch (type) {
+                case "email":
+                    if (service.endpoint) document.getElementById(prefix + "_email_endpoint").value = service.endpoint;
+                    break;
+                    
+                case "api":
+                    if (service.endpoint) document.getElementById(prefix + "_api_endpoint").value = service.endpoint;
+                    if (service.method) document.getElementById(prefix + "_api_method").value = service.method;
+                    if (service.auth_type) document.getElementById(prefix + "_api_auth_type").value = service.auth_type;
+                    if (service.auth_header) document.getElementById(prefix + "_api_auth_header").value = service.auth_header;
+                    if (service.auth_value) document.getElementById(prefix + "_api_auth_value").value = service.auth_value;
+                    if (service.payload_template) document.getElementById(prefix + "_api_payload_template").value = service.payload_template;
+                    if (service.response_code) document.getElementById(prefix + "_api_response_code").value = service.response_code;
+                    if (service.timeout) document.getElementById(prefix + "_api_timeout").value = service.timeout;
+                    break;
+                    
+                case "custom":
+                    if (service.custom_fields) document.getElementById(prefix + "_custom_custom_fields").value = JSON.stringify(service.custom_fields, null, 2);
+                    break;
+            }
+        }
+        
+        // Delete service function
+        function deleteService(serviceId) {
+            if (confirm("Are you sure you want to delete this service?")) {
+                var form = document.createElement("form");
+                form.method = "POST";
+                form.innerHTML = \'<input type="hidden" name="hm_page_key" value="\' + document.querySelector("input[name=hm_page_key]").value + \'" />\' +
+                               \'<input type="hidden" name="service_id" value="\' + serviceId + \'" />\' +
+                               \'<input type="hidden" name="delete_spam_service" value="1" />\';
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        ';
+        $res .= '</script>';
+        
+        return $res;
+    }
+}
+
+/**
+ * Output predefined service edit modals
+ * @subpackage imap/output
+ */
+class Hm_Output_predefined_service_modals extends Hm_Output_Module {
+    protected function output() {
+        $manager = new Hm_Spam_Service_Manager($this->get('user_config'));
+        $services = $manager->getServices();
+        
+        $res = $this->generateSpamCopModal($services);
+        $res .= $this->generateAbuseIPDBModal($services);
+        $res .= $this->generateStopForumSpamModal($services);
+        $res .= $this->generateCleanTalkModal($services);
+        
+        return $res;
+    }
+    
+    private function generateSpamCopModal($services) {
+        $service = isset($services['spamcop']) ? $services['spamcop'] : array();
+        $endpoint = isset($service['endpoint']) ? $service['endpoint'] : 'submit.u4GqXFse5hLoqP34@spam.spamcop.net';
+        $enabled = isset($service['enabled']) ? $service['enabled'] : true;
+        
+        $res = '<div class="modal fade" id="spamcopModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Edit SpamCop Configuration').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="service_id" value="spamcop" />';
+        $res .= '<div class="modal-body">';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Email Address').' *</label>';
+        $res .= '<input type="email" class="form-control" name="email_endpoint" value="'.$this->html_safe($endpoint).'" required />';
+        $res .= '<div class="form-text">'.$this->trans('SpamCop submission email address').'</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="spamcopEnabled"'.($enabled ? ' checked' : '').' />';
+        $res .= '<label class="form-check-label" for="spamcopEnabled">'.$this->trans('Enable SpamCop').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="update_predefined_service">'.$this->trans('Update').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
+        
+        return $res;
+    }
+    
+    private function generateAbuseIPDBModal($services) {
+        $service = isset($services['abuseipdb']) ? $services['abuseipdb'] : array();
+        $endpoint = isset($service['endpoint']) ? $service['endpoint'] : 'https://api.abuseipdb.com/api/v2/report';
+        $method = isset($service['method']) ? $service['method'] : 'POST';
+        $auth_type = isset($service['auth_type']) ? $service['auth_type'] : 'header';
+        $auth_header = isset($service['auth_header']) ? $service['auth_header'] : 'Key';
+        $auth_value = isset($service['auth_value']) ? $service['auth_value'] : '';
+        $payload_template = isset($service['payload_template']) ? $service['payload_template'] : '{"ip": "{{ ip }}", "categories": [3], "comment": "{{ reason }}"}';
+        $enabled = isset($service['enabled']) ? $service['enabled'] : false;
+        
+        $res = '<div class="modal fade" id="abuseipdbModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog modal-lg">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Edit AbuseIPDB Configuration').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="service_id" value="abuseipdb" />';
+        $res .= '<div class="modal-body">';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('API Endpoint').' *</label>';
+        $res .= '<input type="url" class="form-control" name="api_endpoint" value="'.$this->html_safe($endpoint).'" required />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('HTTP Method').' *</label>';
+        $res .= '<select class="form-select" name="api_method" required>';
+        $res .= '<option value="POST"'.($method == 'POST' ? ' selected' : '').'>POST</option>';
+        $res .= '<option value="GET"'.($method == 'GET' ? ' selected' : '').'>GET</option>';
+        $res .= '<option value="PUT"'.($method == 'PUT' ? ' selected' : '').'>PUT</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Type').'</label>';
+        $res .= '<select class="form-select" name="api_auth_type">';
+        $res .= '<option value="none"'.($auth_type == 'none' ? ' selected' : '').'>None</option>';
+        $res .= '<option value="header"'.($auth_type == 'header' ? ' selected' : '').'>Header</option>';
+        $res .= '<option value="bearer"'.($auth_type == 'bearer' ? ' selected' : '').'>Bearer</option>';
+        $res .= '<option value="basic"'.($auth_type == 'basic' ? ' selected' : '').'>Basic</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Header').'</label>';
+        $res .= '<input type="text" class="form-control" name="api_auth_header" value="'.$this->html_safe($auth_header).'" />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('API Key').'</label>';
+        $res .= '<input type="password" class="form-control" name="api_auth_value" value="'.$this->html_safe($auth_value).'" placeholder="Enter your API key" />';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Payload Template').' *</label>';
+        $res .= '<textarea class="form-control" name="api_payload_template" rows="3" required>'.$this->html_safe($payload_template).'</textarea>';
+        $res .= '<div class="form-text">'.$this->trans('JSON template for the API request').'</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="abuseipdbEnabled"'.($enabled ? ' checked' : '').' />';
+        $res .= '<label class="form-check-label" for="abuseipdbEnabled">'.$this->trans('Enable AbuseIPDB').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="update_predefined_service">'.$this->trans('Update').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
+        
+        return $res;
+    }
+    
+    private function generateStopForumSpamModal($services) {
+        $service = isset($services['stopforumspam']) ? $services['stopforumspam'] : array();
+        $endpoint = isset($service['endpoint']) ? $service['endpoint'] : 'https://www.stopforumspam.com/add';
+        $method = isset($service['method']) ? $service['method'] : 'POST';
+        $auth_type = isset($service['auth_type']) ? $service['auth_type'] : 'header';
+        $auth_header = isset($service['auth_header']) ? $service['auth_header'] : 'api_key';
+        $auth_value = isset($service['auth_value']) ? $service['auth_value'] : '';
+        $payload_template = isset($service['payload_template']) ? $service['payload_template'] : '{"email": "{{ email }}", "ip": "{{ ip }}", "evidence": "{{ reason }}"}';
+        $enabled = isset($service['enabled']) ? $service['enabled'] : false;
+        
+        $res = '<div class="modal fade" id="stopforumspamModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog modal-lg">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Edit StopForumSpam Configuration').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="service_id" value="stopforumspam" />';
+        $res .= '<div class="modal-body">';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('API Endpoint').' *</label>';
+        $res .= '<input type="url" class="form-control" name="api_endpoint" value="'.$this->html_safe($endpoint).'" required />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('HTTP Method').' *</label>';
+        $res .= '<select class="form-select" name="api_method" required>';
+        $res .= '<option value="POST"'.($method == 'POST' ? ' selected' : '').'>POST</option>';
+        $res .= '<option value="GET"'.($method == 'GET' ? ' selected' : '').'>GET</option>';
+        $res .= '<option value="PUT"'.($method == 'PUT' ? ' selected' : '').'>PUT</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Type').'</label>';
+        $res .= '<select class="form-select" name="api_auth_type">';
+        $res .= '<option value="none"'.($auth_type == 'none' ? ' selected' : '').'>None</option>';
+        $res .= '<option value="header"'.($auth_type == 'header' ? ' selected' : '').'>Header</option>';
+        $res .= '<option value="bearer"'.($auth_type == 'bearer' ? ' selected' : '').'>Bearer</option>';
+        $res .= '<option value="basic"'.($auth_type == 'basic' ? ' selected' : '').'>Basic</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Header').'</label>';
+        $res .= '<input type="text" class="form-control" name="api_auth_header" value="'.$this->html_safe($auth_header).'" />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('API Key').'</label>';
+        $res .= '<input type="password" class="form-control" name="api_auth_value" value="'.$this->html_safe($auth_value).'" placeholder="Enter your API key" />';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Payload Template').' *</label>';
+        $res .= '<textarea class="form-control" name="api_payload_template" rows="3" required>'.$this->html_safe($payload_template).'</textarea>';
+        $res .= '<div class="form-text">'.$this->trans('JSON template for the API request').'</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="stopforumspamEnabled"'.($enabled ? ' checked' : '').' />';
+        $res .= '<label class="form-check-label" for="stopforumspamEnabled">'.$this->trans('Enable StopForumSpam').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="update_predefined_service">'.$this->trans('Update').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
+        
+        return $res;
+    }
+    
+    private function generateCleanTalkModal($services) {
+        $service = isset($services['cleantalk']) ? $services['cleantalk'] : array();
+        $endpoint = isset($service['endpoint']) ? $service['endpoint'] : 'https://moderate.cleantalk.org/api2.0';
+        $method = isset($service['method']) ? $service['method'] : 'POST';
+        $auth_type = isset($service['auth_type']) ? $service['auth_type'] : 'header';
+        $auth_header = isset($service['auth_header']) ? $service['auth_header'] : 'auth_key';
+        $auth_value = isset($service['auth_value']) ? $service['auth_value'] : '';
+        $payload_template = isset($service['payload_template']) ? $service['payload_template'] : '{"auth_key": "{{ auth_value }}", "method_name": "spam_check", "message": "{{ body }}", "sender_email": "{{ email }}", "sender_ip": "{{ ip }}"}';
+        $enabled = isset($service['enabled']) ? $service['enabled'] : false;
+        
+        $res = '<div class="modal fade" id="cleantalkModal" tabindex="-1">';
+        $res .= '<div class="modal-dialog modal-lg">';
+        $res .= '<div class="modal-content">';
+        $res .= '<div class="modal-header">';
+        $res .= '<h5 class="modal-title">'.$this->trans('Edit CleanTalk Configuration').'</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal"></button>';
+        $res .= '</div>';
+        $res .= '<form method="POST">';
+        $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />';
+        $res .= '<input type="hidden" name="service_id" value="cleantalk" />';
+        $res .= '<div class="modal-body">';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('API Endpoint').' *</label>';
+        $res .= '<input type="url" class="form-control" name="api_endpoint" value="'.$this->html_safe($endpoint).'" required />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6">';
+        $res .= '<label class="form-label">'.$this->trans('HTTP Method').' *</label>';
+        $res .= '<select class="form-select" name="api_method" required>';
+        $res .= '<option value="POST"'.($method == 'POST' ? ' selected' : '').'>POST</option>';
+        $res .= '<option value="GET"'.($method == 'GET' ? ' selected' : '').'>GET</option>';
+        $res .= '<option value="PUT"'.($method == 'PUT' ? ' selected' : '').'>PUT</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="row mb-3">';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Type').'</label>';
+        $res .= '<select class="form-select" name="api_auth_type">';
+        $res .= '<option value="none"'.($auth_type == 'none' ? ' selected' : '').'>None</option>';
+        $res .= '<option value="header"'.($auth_type == 'header' ? ' selected' : '').'>Header</option>';
+        $res .= '<option value="bearer"'.($auth_type == 'bearer' ? ' selected' : '').'>Bearer</option>';
+        $res .= '<option value="basic"'.($auth_type == 'basic' ? ' selected' : '').'>Basic</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('Auth Header').'</label>';
+        $res .= '<input type="text" class="form-control" name="api_auth_header" value="'.$this->html_safe($auth_header).'" />';
+        $res .= '</div>';
+        $res .= '<div class="col-md-4">';
+        $res .= '<label class="form-label">'.$this->trans('API Key').'</label>';
+        $res .= '<input type="password" class="form-control" name="api_auth_value" value="'.$this->html_safe($auth_value).'" placeholder="Enter your API key" />';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<label class="form-label">'.$this->trans('Payload Template').' *</label>';
+        $res .= '<textarea class="form-control" name="api_payload_template" rows="3" required>'.$this->html_safe($payload_template).'</textarea>';
+        $res .= '<div class="form-text">'.$this->trans('JSON template for the API request').'</div>';
+        $res .= '</div>';
+        
+        $res .= '<div class="mb-3">';
+        $res .= '<div class="form-check">';
+        $res .= '<input class="form-check-input" type="checkbox" name="service_enabled" id="cleantalkEnabled"'.($enabled ? ' checked' : '').' />';
+        $res .= '<label class="form-check-label" for="cleantalkEnabled">'.$this->trans('Enable CleanTalk').'</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '<div class="modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">'.$this->trans('Cancel').'</button>';
+        $res .= '<button type="submit" class="btn btn-primary" name="update_predefined_service">'.$this->trans('Update').'</button>';
+        $res .= '</div>';
+        $res .= '</form>';
+        $res .= '</div></div></div>';
         
         return $res;
     }

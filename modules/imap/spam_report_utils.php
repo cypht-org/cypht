@@ -66,7 +66,20 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
         ));
 
         // Initialize Sieve client
+        delayed_debug_log('Auto-block: About to get Sieve client factory', array(
+            'site_config_class' => get_class($site_config),
+            'sieve_factory_function_exists' => function_exists('get_sieve_client_factory'),
+            'sieve_factory_class_exists' => class_exists('Hm_Sieve_Client_Factory')
+        ));
+        
         $factory = get_sieve_client_factory($site_config);
+        delayed_debug_log('Auto-block: Sieve factory created', array(
+            'factory_class' => get_class($factory),
+            'imap_account_keys' => array_keys($imap_account),
+            'php_sieve_manager_client_exists' => class_exists('PhpSieveManager\ManageSieve\Client'),
+            'php_sieve_manager_filter_factory_exists' => class_exists('PhpSieveManager\Filters\FilterFactory')
+        ));
+        
         $client = $factory->init($user_config, $imap_account, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
         
         if (!$client) {
@@ -90,7 +103,24 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
             $blocked_list = prepare_sieve_script($current_script);
             $blocked_list_actions = prepare_sieve_script($current_script, 2);
             
-            if ($blocked_list) {
+            delayed_debug_log('Auto-block: Blocked list data types', array(
+                'blocked_list_type' => gettype($blocked_list),
+                'blocked_list_actions_type' => gettype($blocked_list_actions),
+                'blocked_list_is_array' => is_array($blocked_list),
+                'blocked_list_actions_is_array' => is_array($blocked_list_actions)
+            ));
+            
+            // Ensure blocked_list_actions is always an array
+            if (!is_array($blocked_list_actions)) {
+                $blocked_list_actions = array();
+            }
+            
+            // Ensure blocked_list is always an array
+            if (!is_array($blocked_list)) {
+                $blocked_list = array();
+            }
+            
+            if ($blocked_list && is_array($blocked_list)) {
                 foreach ($blocked_list as $blocked_sender) {
                     if ($blocked_sender != $sender_email) {
                         $blocked_senders[] = $blocked_sender;
@@ -109,6 +139,10 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
         // Map action to Sieve action
         $sieve_action = map_auto_block_action_to_sieve($action, $user_config, $imap_server_id);
         
+        if (!is_array($blocked_senders)) {
+            $blocked_senders = array();
+        }
+        
         foreach ($blocked_senders as $blocked_sender) {
             if ($blocked_sender == $sender_email) {
                 $actions = block_filter(
@@ -119,15 +153,16 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
                     $blocked_sender,
                     'Auto-blocked after spam report: ' . $spam_reason
                 );
-            } elseif (array_key_exists($blocked_sender, $blocked_list_actions)) {
+            } elseif (is_array($blocked_list_actions) && array_key_exists($blocked_sender, $blocked_list_actions)) {
                 $reject_message = '';
-                if ($blocked_list_actions[$blocked_sender]['action'] == 'reject_with_message') {
-                    $reject_message = $blocked_list_actions[$blocked_sender]['reject_message'];
+                if (isset($blocked_list_actions[$blocked_sender]['action']) && $blocked_list_actions[$blocked_sender]['action'] == 'reject_with_message') {
+                    $reject_message = isset($blocked_list_actions[$blocked_sender]['reject_message']) ? $blocked_list_actions[$blocked_sender]['reject_message'] : '';
                 }
+                $action_type = isset($blocked_list_actions[$blocked_sender]['action']) ? $blocked_list_actions[$blocked_sender]['action'] : 'default';
                 $actions = block_filter(
                     $filter,
                     $user_config,
-                    $blocked_list_actions[$blocked_sender]['action'],
+                    $action_type,
                     $imap_server_id,
                     $blocked_sender,
                     $reject_message
@@ -141,7 +176,9 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
                     $blocked_sender
                 );
             }
-            $blocked_list_actions[$blocked_sender] = $actions;
+            if (is_array($blocked_list_actions)) {
+                $blocked_list_actions[$blocked_sender] = $actions;
+            }
         }
 
         // Generate and save Sieve script
@@ -150,7 +187,7 @@ function auto_block_spam_sender($user_config, $site_config, $imap_server_id, $me
 
         $header_obj = "# CYPHT CONFIG HEADER - DON'T REMOVE";
         $header_obj .= "\n# " . base64_encode(json_encode($blocked_senders));
-        $header_obj .= "\n# " . base64_encode(json_encode($blocked_list_actions));
+        $header_obj .= "\n# " . base64_encode(json_encode(is_array($blocked_list_actions) ? $blocked_list_actions : array()));
         $script_parsed = $header_obj . "\n\n" . $script_parsed;
 
         $client->putScript('blocked_senders', $script_parsed);
@@ -237,4 +274,91 @@ function map_auto_block_action_to_sieve($action, $user_config, $imap_server_id) 
 function get_domain($email) {
     $parts = explode('@', $email);
     return isset($parts[1]) ? $parts[1] : '';
+}
+
+/**
+ * Get list of blocked senders for a specific IMAP server
+ * @param object $user_config User configuration object
+ * @param string $imap_server_id IMAP server ID
+ * @return array List of blocked sender emails
+ */
+function get_blocked_senders_list($user_config, $imap_server_id) {
+    try {
+        // Include necessary files
+        require_once APP_PATH . 'modules/sievefilters/functions.php';
+        require_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
+        
+        // Get IMAP server configuration
+        $imap_servers = $user_config->get('imap_servers', array());
+        $imap_account = null;
+        foreach ($imap_servers as $idx => $mailbox) {
+            if ($idx == $imap_server_id) {
+                $imap_account = $mailbox;
+                break;
+            }
+        }
+        
+        if (!$imap_account || !isset($imap_account['sieve_config_host'])) {
+            delayed_debug_log('get_blocked_senders_list: No Sieve configuration', array(
+                'server_id' => $imap_server_id,
+                'has_account' => !empty($imap_account),
+                'has_sieve_host' => isset($imap_account['sieve_config_host'])
+            ));
+            return array();
+        }
+        
+        // Initialize Sieve client
+        $config = new Hm_Site_Config_File();
+        $factory = get_sieve_client_factory($config);
+        $client = $factory->init($user_config, $imap_account, false);
+        
+        if (!$client) {
+            delayed_debug_log('get_blocked_senders_list: Failed to initialize Sieve client', array(
+                'server_id' => $imap_server_id
+            ));
+            return array();
+        }
+        
+        // Get blocked senders from Sieve script
+        $scripts = $client->listScripts();
+        if (array_search('blocked_senders', $scripts, true) === false) {
+            delayed_debug_log('get_blocked_senders_list: No blocked_senders script found', array(
+                'server_id' => $imap_server_id,
+                'available_scripts' => $scripts
+            ));
+            return array();
+        }
+        
+        $current_script = $client->getScript('blocked_senders');
+        if (empty($current_script)) {
+            delayed_debug_log('get_blocked_senders_list: Empty blocked_senders script', array(
+                'server_id' => $imap_server_id
+            ));
+            return array();
+        }
+        
+        $blocked_list = prepare_sieve_script($current_script);
+        if (!is_array($blocked_list)) {
+            delayed_debug_log('get_blocked_senders_list: Failed to parse blocked list', array(
+                'server_id' => $imap_server_id,
+                'blocked_list_type' => gettype($blocked_list)
+            ));
+            return array();
+        }
+        
+        delayed_debug_log('get_blocked_senders_list: Successfully retrieved blocked senders', array(
+            'server_id' => $imap_server_id,
+            'blocked_senders_count' => count($blocked_list),
+            'blocked_senders' => $blocked_list
+        ));
+        
+        return $blocked_list;
+        
+    } catch (Exception $e) {
+        delayed_debug_log('get_blocked_senders_list: Exception occurred', array(
+            'server_id' => $imap_server_id,
+            'error' => $e->getMessage()
+        ));
+        return array();
+    }
 } 

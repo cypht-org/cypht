@@ -57,6 +57,11 @@ new Hm_Dispatch($config);
 if (empty($config)) {
     $config = new Hm_Site_Config_File();
 }
+/* log some debug stats about the page */
+if (DEBUG_MODE or $config->get('debug_log')) {
+    Hm_Debug::load_page_stats();
+    Hm_Debug::show();
+}
 
 /* log some debug stats about the page */
 if (DEBUG_MODE or $config->get('debug_log')) {

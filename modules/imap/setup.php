@@ -54,6 +54,15 @@ add_handler('settings', 'process_setting_active_preview_message', true, 'imap', 
 add_handler('settings', 'process_setting_ceo_detection_fraud', true, 'imap', 'process_setting_move_messages_in_screen_email', 'after');
 add_handler('settings', 'process_auto_block_spam_setting', true, 'imap', 'save_user_data', 'before');
 add_handler('settings', 'process_rate_limit_settings', true, 'imap', 'save_user_data', 'before');
+add_handler('settings', 'process_spam_services_setting', true, 'imap', 'save_user_data', 'before');
+// add_handler('settings', 'load_spam_services', true, 'imap', 'spam_reporting_settings', 'before');
+// add_handler('settings', 'add_spam_service', true, 'imap', 'save_user_data', 'before');
+// add_handler('settings', 'edit_spam_service', true, 'imap', 'save_user_data', 'before');
+// add_handler('settings', 'delete_spam_service', true, 'imap', 'save_user_data', 'before');
+// add_handler('settings', 'toggle_spam_service', true, 'imap', 'save_user_data', 'before');
+add_handler('settings', 'update_predefined_service', true, 'imap', 'save_user_data', 'before');
+// add_output('settings', 'spam_service_management', true, 'imap', 'spam_reporting_settings', 'after');
+add_output('settings', 'predefined_service_modals', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'imap_server_ids', true, 'imap', 'page_js', 'before');
 add_output('settings', 'start_sent_settings', true, 'imap', 'end_settings_form', 'before');
 add_output('settings', 'sent_since_setting', true, 'imap', 'start_sent_settings', 'after');
@@ -74,8 +83,8 @@ add_output('settings', 'first_time_screen_emails_per_page_setting', true, 'imap'
 add_output('settings', 'setting_move_messages_in_screen_email', true, 'imap', 'first_time_screen_emails_per_page_setting', 'after');
 add_output('settings', 'setting_active_preview_message', true, 'imap', 'setting_move_messages_in_screen_email', 'after');
 add_output('settings', 'setting_ceo_detection_fraud', true, 'imap', 'default_sort_order_setting', 'after');
-add_output('settings', 'auto_block_spam_setting', true, 'imap', 'end_settings_form', 'before');
-add_output('settings', 'rate_limit_settings', true, 'imap', 'end_settings_form', 'before');
+add_output('settings', 'start_spam_reporting_settings', true, 'core', 'start_trash_settings', 'before');
+add_output('settings', 'spam_reporting_settings', true, 'imap', 'start_spam_reporting_settings', 'after');
 
 /* compose page data */
 add_output('compose', 'imap_server_ids', true, 'imap', 'page_js', 'before');

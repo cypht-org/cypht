@@ -1,0 +1,95 @@
+SUCCESS: LOGGED IN
+    [17] => DANGER: Report Spam handler starting
+    [18] => DANGER: Form processing result:: {"success":true,"form":{"imap_msg_uid":"59","imap_server_id":"684b1017a7861","folder":"494e424f58"}}
+    [19] => DANGER: Spam report log:: "Spam Report - Time: 2025-06-16 23:32:11, Server: 684b1017a7861, Folder: INBOX, UID: 59, Reason: No reason provided"
+    [20] => DANGER: Special folders:: {"sent":"Sent","draft":"Drafts","trash":"Trash","archive":"Archive","junk":"Junk"}
+    [21] => DANGER: Found junk folder:: "Junk"
+    [22] => DANGER: Mailbox connection:: {"connected":true,"authed":true,"is_imap":true}
+    [23] => DANGER: Processing spam report for service: spamcop
+    [24] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"59"}
+    [25] => DANGER: SpamCop: Message content retrieved: {"content_length":3277}
+    [26] => DANGER: SpamCop: Prepared headers: {"From":"joseph@lab23.evoludata.com","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Test Email 19","Content-Type":"message\/rfc822"}
+    [27] => DANGER: SpamCop: Attempting to send email
+    [28] => DANGER: SpamCop: Email sent successfully
+    [29] => DANGER: Report result for spamcop:: {"success":true,"service":"SpamCop","message":"Report sent to SpamCop"}
+    [30] => DANGER: Attempting to move message to junk folder: {"from_folder":"INBOX","to_folder":"Junk","uid":"59"}
+    [31] => DANGER: Move action result:: {"status":true,"result":{"status":true,"responses":[{"oldUid":"59","newUid":"268"}]}}
+    [32] => DANGER: Message successfully reported as spam
+    [33] => 
+
+    [17] => DANGER: Report Spam handler starting
+    [18] => DANGER: Form processing result:: {"success":true,"form":{"imap_msg_uid":"76","imap_server_id":"684b1017a7861","folder":"494e424f58"}}
+    [19] => DANGER: Spam report log:: "Spam Report - Time: 2025-06-26 19:25:50, Server: 684b1017a7861, Folder: INBOX, UID: 76, Reason: No reason provided"
+    [20] => DANGER: Special folders:: {"sent":"Sent","draft":"Drafts","trash":"Trash","archive":"Archive","junk":"Junk"}
+    [21] => DANGER: Found junk folder:: "Junk"
+    [22] => DANGER: Mailbox connection:: {"connected":true,"authed":true,"is_imap":true}
+    [23] => DANGER: Processing spam report for service: spamcop
+    [24] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"76"}
+    [25] => DANGER: SpamCop: Message content retrieved: {"content_length":6012}
+    [26] => DANGER: SpamCop: Prepared headers: {"From":"Joskal Joskal <joskaljoskal@gmail.com>","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Draft test","Content-Type":"message\/rfc822"}
+    [27] => DANGER: SpamCop: Attempting to send email
+    [28] => DANGER: SpamCop: Email sent successfully
+    [29] => DANGER: Report result for spamcop:: {"success":true,"service":"SpamCop","message":"Report sent to SpamCop"}
+    [30] => DANGER: Attempting to move message to junk folder: {"from_folder":"INBOX","to_folder":"Junk","uid":"76"}
+    [31] => DANGER: Move action result:: {"status":true,"result":{"status":true,"responses":[{"oldUid":"76","newUid":"269"}]}}
+    [32] => DANGER: Message moved successfully, attempting auto-block sender
+    [33] => DANGER: Sieve filters not enabled for this server, skipping auto-block
+    [34] => DANGER: Message successfully reported as spam
+    [35] =>
+
+    DANGER: Form processing result:: {"success":true,"form":{"imap_msg_uid":"131","imap_server_id":"684b1017a7861","folder":"494e424f58"}}
+    [21] => DANGER: Spam report log:: "Spam Report - Time: 2025-06-27 20:31:22, Server: 684b1017a7861, Folder: INBOX, UID: 131, Reason: No reason provided"
+    [22] => DANGER: Special folders:: {"sent":"Sent","draft":"Drafts","trash":"Trash","archive":"Archive","junk":"Junk"}
+    [23] => DANGER: Found junk folder:: "Junk"
+    [24] => DANGER: Mailbox connection:: {"connected":true,"authed":true,"is_imap":true}
+    [25] => DANGER: Processing spam report for service: spamcop
+    [26] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"131"}
+    [27] => DANGER: SpamCop: Message content retrieved: {"content_length":6293}
+    [28] => DANGER: SpamCop: Prepared headers: {"From":"lwanzo.khausi@gmail.com","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Test Email from user2@example.com","Content-Type":"message\/rfc822"}
+    [29] => DANGER: SpamCop: Attempting to send email
+    [30] => DANGER: SpamCop: Email sent successfully
+    [31] => DANGER: Report result for spamcop:: {"success":true,"service":"SpamCop","message":"Report sent to SpamCop"}
+    [32] => DANGER: Attempting to move message to junk folder: {"from_folder":"INBOX","to_folder":"Junk","uid":"131"}
+    [33] => DANGER: Move action result:: {"status":true,"result":{"status":true,"responses":[{"oldUid":"131","newUid":"286"}]}}
+    [34] => DANGER: Message moved successfully, attempting auto-block sender
+    [35] => DANGER: Sieve filters not enabled for this server, skipping auto-block
+    [36] => DANGER: Message successfully reported as spam
+    [37] => 
+
+    DANGER: Form processing result:: {"success":true,"form":{"imap_msg_uid":"128","imap_server_id":"684b1017a7861","folder":"494e424f58"}}
+    [21] => DANGER: Spam report log:: "Spam Report - Time: 2025-06-27 20:32:26, Server: 684b1017a7861, Folder: INBOX, UID: 128, Reason: No reason provided"
+    [22] => DANGER: Special folders:: {"sent":"Sent","draft":"Drafts","trash":"Trash","archive":"Archive","junk":"Junk"}
+    [23] => DANGER: Found junk folder:: "Junk"
+    [24] => DANGER: Mailbox connection:: {"connected":true,"authed":true,"is_imap":true}
+    [25] => DANGER: Processing spam report for service: spamcop
+    [26] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"128"}
+    [27] => DANGER: SpamCop: Message content retrieved: {"content_length":6279}
+    [28] => DANGER: SpamCop: Prepared headers: {"From":"lwanzo.khausi@gmail.com","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Test Email from user1@example.com","Content-Type":"message\/rfc822"}
+    [29] => DANGER: SpamCop: Attempting to send email
+    [30] => DANGER: SpamCop: Email sent successfully
+    [31] => DANGER: Report result for spamcop:: {"success":true,"service":"SpamCop","message":"Report sent to SpamCop"}
+    [32] => DANGER: Attempting to move message to junk folder: {"from_folder":"INBOX","to_folder":"Junk","uid":"128"}
+    [33] => DANGER: Move action result:: {"status":true,"result":{"status":true,"responses":[{"oldUid":"128","newUid":"287"}]}}
+    [34] => DANGER: Message moved successfully, attempting auto-block sender
+    [35] => DANGER: Sieve filters not enabled for this server, skipping auto-block
+    [36] => DANGER: Message successfully reported as spam
+    [37] =>
+
+    DANGER: Processed UIDs:: ["151"]
+    [22] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"151"}
+    [23] => DANGER: SpamCop: Message content retrieved: {"content_length":6315}
+    [24] => DANGER: SpamCop: Prepared headers: {"From":"lwanzo.khausi@gmail.com","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Test Email from test@unknownsender.xyz","Content-Type":"message\/rfc822"}
+    [25] => DANGER: SpamCop: Attempting to send email
+    [26] => DANGER: SpamCop: Email sent successfully
+    [27] =>
+
+    DANGER: Report Spam handler starting
+    [18] => DANGER: Form data:: {"imap_msg_uids":"148","imap_server_id":"684b1017a7861","folder":"494e424f58","spam_reason":"This message appears to be unsolicited commercial email or contains suspicious content."}
+    [19] => INFO: CACHE: saving "rate_limit_burst:ajax_imap_report_spam:test@notrewiki.com" using noop
+    [20] => INFO: CACHE: saving "rate_limit_main:ajax_imap_report_spam:test@notrewiki.com" using noop
+    [21] => DANGER: Processed UIDs:: ["148"]
+    [22] => DANGER: SpamCop: Getting message content: {"folder":"INBOX","uid":"148"}
+    [23] => DANGER: SpamCop: Message content retrieved: {"content_length":6301}
+    [24] => DANGER: SpamCop: Prepared headers: {"From":"lwanzo.khausi@gmail.com","To":"submit.u4GqXFse5hLoqP34@spam.spamcop.net","Subject":"Spam Report: Test Email from test@unknownsender.xyz","Content-Type":"message\/rfc822"}
+    [25] => DANGER: SpamCop: Attempting to send email
+    [26] => DANGER: SpamCop: Email sent successfully

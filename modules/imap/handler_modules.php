@@ -18,6 +18,9 @@ function delayed_debug_log($message, $data = null, $delay = 1) {
     sleep($delay);
 }
 
+// Include spam report utilities for debugging functions
+require_once APP_PATH . 'modules/imap/spam_report_utils.php';
+
 /**
  * Check for attachments when forwarding a message
  * @subpackage imap/handler
@@ -1384,6 +1387,49 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 } else {
                     continue;
                 }
+                
+                // Debug: Check if message is from a blocked sender
+                if (isset($msg['from']) && !empty($msg['from'])) {
+                    $sender_email = extract_sender_email_from_headers(array('From' => $msg['from']));
+                    if ($sender_email) {
+                        delayed_debug_log('Message received from sender', array(
+                            'sender' => $sender_email,
+                            'subject' => isset($msg['subject']) ? $msg['subject'] : 'No subject',
+                            'uid' => $uid,
+                            'folder' => $folders[$key],
+                            'server_id' => $id,
+                            'server_name' => $details['name']
+                        ));
+                        
+                        // Check if this sender is in the blocked list
+                        if (is_auto_block_spam_enabled($this->user_config)) {
+                            $blocked_senders = get_blocked_senders_list($this->user_config, $id);
+                            if (in_array($sender_email, $blocked_senders)) {
+                                delayed_debug_log('BLOCKED SENDER DETECTED - Message should be filtered', array(
+                                    'sender' => $sender_email,
+                                    'subject' => isset($msg['subject']) ? $msg['subject'] : 'No subject',
+                                    'uid' => $uid,
+                                    'folder' => $folders[$key],
+                                    'server_id' => $id,
+                                    'blocked_senders_count' => count($blocked_senders),
+                                    'blocked_senders_sample' => array_slice($blocked_senders, 0, 5)
+                                ));
+                            } else {
+                                delayed_debug_log('Sender not in blocked list', array(
+                                    'sender' => $sender_email,
+                                    'blocked_senders_count' => count($blocked_senders),
+                                    'blocked_senders_sample' => array_slice($blocked_senders, 0, 5)
+                                ));
+                            }
+                        } else {
+                            delayed_debug_log('Auto-blocking is disabled', array(
+                                'sender' => $sender_email,
+                                'auto_block_enabled' => false
+                            ));
+                        }
+                    }
+                }
+                
                 $msg['server_id'] = $id;
                 $msg['server_name'] = $details['name'];
                 $msg['folder'] = $folders[$key];
@@ -1853,6 +1899,8 @@ class Hm_Handler_add_imap_servers_to_page_data extends Hm_Handler_Module {
         if (!empty($servers)) {
             $this->out('imap_servers', $servers);
         }
+        // Output user_config for output modules that need it
+        $this->out('user_config', $this->user_config);
     }
 }
 
@@ -1888,6 +1936,14 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
             if ($success && $imap_details) {
                 if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
+                    // Ensure sieve functions are loaded
+                    if (!function_exists('get_sieve_client_factory')) {
+                        require_once APP_PATH.'modules/sievefilters/functions.php';
+                    }
+                    if (!class_exists('Hm_Sieve_Client_Factory')) {
+                        require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+                    }
+                    
                     $factory = get_sieve_client_factory($this->config);
                     try {
                         $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
@@ -2191,8 +2247,56 @@ class Hm_Handler_process_setting_ceo_detection_fraud extends Hm_Handler_Module {
 class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
     use Hm_Rate_Limiter_Trait;
     public function process() {
+        // Include Composer autoloader for PhpSieveManager
+        if (file_exists(VENDOR_PATH . 'autoload.php')) {
+            require_once VENDOR_PATH . 'autoload.php';
+        }
+        
+        // Include Sieve functions for auto-blocking
+        if (!function_exists('get_sieve_client_factory')) {
+            require_once APP_PATH.'modules/sievefilters/functions.php';
+        }
+        
+        // Include Sieve client factory class
+        if (!class_exists('Hm_Sieve_Client_Factory')) {
+            require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+        }
+        
+        // Include spam reporting configuration
+        if (!function_exists('is_auto_block_spam_enabled')) {
+            require_once APP_PATH.'modules/imap/spam_report_config.php';
+        }
+        
+        // Include spam reporting utilities
+        if (!function_exists('auto_block_spam_sender')) {
+            require_once APP_PATH.'modules/imap/spam_report_utils.php';
+        }
+        
+        // Include spam reporting services
+        if (!class_exists('Hm_Spam_Reporter_Factory')) {
+            require_once APP_PATH.'modules/imap/spam_report_services.php';
+        }
+        
+        // Debug: Log what we've loaded
+        delayed_debug_log('Spam report handler: Dependencies loaded', array(
+            'sieve_functions_loaded' => function_exists('get_sieve_client_factory'),
+            'sieve_factory_class_loaded' => class_exists('Hm_Sieve_Client_Factory'),
+            'spam_config_loaded' => function_exists('is_auto_block_spam_enabled'),
+            'spam_utils_loaded' => function_exists('auto_block_spam_sender'),
+            'spam_services_loaded' => class_exists('Hm_Spam_Reporter_Factory'),
+            'php_sieve_manager_client_exists' => class_exists('PhpSieveManager\ManageSieve\Client'),
+            'php_sieve_manager_filter_factory_exists' => class_exists('PhpSieveManager\Filters\FilterFactory'),
+            'composer_autoloader_exists' => file_exists(VENDOR_PATH . 'autoload.php')
+        ));
         try {
             delayed_debug_log('Report Spam handler starting');
+            
+            // Debug: Check if IMAP_List is initialized
+            delayed_debug_log('Auto-block debug: IMAP_List initialization check', array(
+                'imap_list_initialized' => class_exists('Hm_IMAP_List'),
+                'user_config_loaded' => !empty($this->user_config),
+                'session_loaded' => !empty($this->session)
+            ));
             list($success, $form) = $this->process_form(array('imap_msg_uids', 'imap_server_id', 'folder', 'spam_reason'));
             delayed_debug_log('Form data:', $form);
             if (!$this->check_rate_limit('ajax_imap_report_spam')) {
@@ -2259,15 +2363,55 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                     $move_result = $mailbox->message_action($form_folder, 'MOVE', array($uid), $junk_folder);
                     if ($move_result['status']) {
                         $result['success'] = true;
-                        $imap_servers = $this->user_config->get('imap_servers', array());
-                        $imap_account = null;
-                        foreach ($imap_servers as $idx => $mailbox_config) {
-                            if ($idx == $form['imap_server_id']) {
-                                $imap_account = $mailbox_config;
-                                break;
-                            }
+                        // Debug: Check user configuration first
+                        $user_imap_servers = $this->user_config->get('imap_servers', array());
+                        delayed_debug_log('Auto-block debug: User IMAP servers', array(
+                            'user_imap_servers_keys' => array_keys($user_imap_servers),
+                            'user_imap_servers_data' => $user_imap_servers
+                        ));
+                        
+                        // Debug: Check if the specific server exists in user config
+                        if (isset($user_imap_servers[$form['imap_server_id']])) {
+                            $user_server_config = $user_imap_servers[$form['imap_server_id']];
+                            delayed_debug_log('Auto-block debug: User server config found', array(
+                                'server_id' => $form['imap_server_id'],
+                                'user_server_keys' => array_keys($user_server_config),
+                                'user_server_data' => $user_server_config,
+                                'has_sieve_in_user_config' => isset($user_server_config['sieve_config_host'])
+                            ));
+                        } else {
+                            delayed_debug_log('Auto-block debug: Server not found in user config', array(
+                                'server_id' => $form['imap_server_id'],
+                                'available_server_ids' => array_keys($user_imap_servers)
+                            ));
                         }
+                        
+                        // Debug: Check Hm_IMAP_List state
+                        delayed_debug_log('Auto-block debug: Hm_IMAP_List state', array(
+                            'all_servers' => Hm_IMAP_List::dump(),
+                            'specific_server' => Hm_IMAP_List::dump($form['imap_server_id'], true)
+                        ));
+                        
+                        // Debug: Check if IMAP_List is initialized properly
+                        delayed_debug_log('Auto-block debug: IMAP_List initialization', array(
+                            'imap_list_class_exists' => class_exists('Hm_IMAP_List'),
+                            'imap_list_initialized' => method_exists('Hm_IMAP_List', 'dump'),
+                            'user_config_imap_servers_count' => count($user_imap_servers),
+                            'imap_list_dump_count' => count(Hm_IMAP_List::dump())
+                        ));
+                        
+                        // Use Hm_IMAP_List::dump() to get the proper IMAP server configuration
+                        $imap_account = Hm_IMAP_List::dump($form['imap_server_id'], true);
+                        delayed_debug_log('Auto-block check: IMAP account found', array(
+                            'has_account' => !empty($imap_account),
+                            'has_sieve_host' => isset($imap_account['sieve_config_host']),
+                            'sieve_host' => isset($imap_account['sieve_config_host']) ? $imap_account['sieve_config_host'] : 'not set',
+                            'imap_account_keys' => array_keys($imap_account),
+                            'imap_account_data' => $imap_account
+                        ));
+                        
                         if ($imap_account && isset($imap_account['sieve_config_host'])) {
+                            delayed_debug_log('Auto-block: Starting auto-block process');
                             $auto_block_result = auto_block_spam_sender(
                                 $this->user_config,
                                 $this->config,
@@ -2277,7 +2421,16 @@ class Hm_Handler_imap_report_spam extends Hm_Handler_Module {
                             );
                             if (!$auto_block_result['success']) {
                                 $result['error'] .= 'Auto-block failed: ' . $auto_block_result['error'] . '; ';
+                                delayed_debug_log('Auto-block: Failed', array('error' => $auto_block_result['error']));
+                            } else {
+                                delayed_debug_log('Auto-block: Success', array('result' => $auto_block_result));
                             }
+                        } else {
+                            delayed_debug_log('Auto-block: Skipped - missing sieve_config_host in IMAP server configuration', array(
+                                'server_id' => $form['imap_server_id'],
+                                'server_name' => $imap_account['name'],
+                                'available_keys' => array_keys($imap_account)
+                            ));
                         }
                     } else {
                         $result['error'] .= 'Move to junk failed; ';
@@ -2352,5 +2505,420 @@ class Hm_Handler_process_rate_limit_settings extends Hm_Handler_Module {
         process_site_setting('rate_limit_max_requests', $this, 'rate_limit_max_requests_callback', 100, true);
         process_site_setting('rate_limit_burst_limit', $this, 'rate_limit_burst_limit_callback', 10, true);
         process_site_setting('rate_limit_burst_window', $this, 'rate_limit_burst_window_callback', 60, true);
+    }
+}
+
+/**
+ * Process external spam service enable/disable settings
+ * @subpackage imap/handler
+ */
+class Hm_Handler_process_spam_services_setting extends Hm_Handler_Module {
+    public function process() {
+        function enable_spamcop_callback($val) { return (bool)$val; }
+        function enable_abuseipdb_callback($val) { return (bool)$val; }
+        function enable_stopforumspam_callback($val) { return (bool)$val; }
+        function enable_cleantalk_callback($val) { return (bool)$val; }
+        process_site_setting('enable_spamcop', $this, 'enable_spamcop_callback', true, true);
+        process_site_setting('enable_abuseipdb', $this, 'enable_abuseipdb_callback', false, true);
+        process_site_setting('enable_stopforumspam', $this, 'enable_stopforumspam_callback', false, true);
+        process_site_setting('enable_cleantalk', $this, 'enable_cleantalk_callback', false, true);
+    }
+}
+
+/**
+ * Load spam services for management
+ * @subpackage imap/handler
+ */
+class Hm_Handler_load_spam_services extends Hm_Handler_Module {
+    public function process() {
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        $services = $manager->getServices();
+        $service_types = $manager->getServiceTypes();
+        $template_variables = $manager->getTemplateVariables();
+        
+        // Debug output
+        Hm_Debug::add('Spam services loaded: ' . count($services));
+        Hm_Debug::add('Service types loaded: ' . count($service_types));
+        Hm_Debug::add('Service type keys: ' . implode(', ', array_keys($service_types)));
+        
+        $this->out('spam_services', $services);
+        $this->out('spam_service_types', $service_types);
+        $this->out('spam_template_variables', $template_variables);
+    }
+}
+
+/**
+ * Add new spam service
+ * @subpackage imap/handler
+ */
+class Hm_Handler_add_spam_service extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('add_spam_service', $this->request->post)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('service_name', 'service_type', 'service_enabled'));
+        if (!$success) {
+            Hm_Msgs::add('Failed to process service data', 'error');
+            return;
+        }
+
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        
+        // Build service configuration based on type
+        $service_config = array(
+            'name' => $form['service_name'],
+            'type' => $form['service_type'],
+            'enabled' => isset($form['service_enabled']) ? true : false
+        );
+
+        // Add type-specific fields
+        switch ($form['service_type']) {
+            case 'email':
+                if (isset($form['email_endpoint'])) {
+                    $service_config['endpoint'] = $form['email_endpoint'];
+                }
+                if (isset($form['email_subject_template'])) {
+                    $service_config['subject_template'] = $form['email_subject_template'];
+                }
+                if (isset($form['email_body_template'])) {
+                    $service_config['body_template'] = $form['email_body_template'];
+                }
+                $service_config['require_headers'] = isset($form['email_require_headers']) ? true : false;
+                $service_config['require_body'] = isset($form['email_require_body']) ? true : false;
+                break;
+
+            case 'api':
+                if (isset($form['api_endpoint'])) {
+                    $service_config['endpoint'] = $form['api_endpoint'];
+                }
+                if (isset($form['api_method'])) {
+                    $service_config['method'] = $form['api_method'];
+                }
+                if (isset($form['api_auth_type'])) {
+                    $service_config['auth_type'] = $form['api_auth_type'];
+                }
+                if (isset($form['api_auth_header'])) {
+                    $service_config['auth_header'] = $form['api_auth_header'];
+                }
+                if (isset($form['api_auth_value'])) {
+                    $service_config['auth_value'] = $form['api_auth_value'];
+                }
+                if (isset($form['api_payload_template'])) {
+                    $service_config['payload_template'] = $form['api_payload_template'];
+                }
+                if (isset($form['api_response_code'])) {
+                    $service_config['response_code'] = intval($form['api_response_code']);
+                }
+                if (isset($form['api_timeout'])) {
+                    $service_config['timeout'] = intval($form['api_timeout']);
+                }
+                break;
+
+            case 'dns':
+                if (isset($form['dns_query_format'])) {
+                    $service_config['query_format'] = $form['dns_query_format'];
+                }
+                if (isset($form['dns_response_type'])) {
+                    $service_config['response_type'] = $form['dns_response_type'];
+                }
+                if (isset($form['dns_timeout'])) {
+                    $service_config['timeout'] = intval($form['dns_timeout']);
+                }
+                break;
+
+            case 'custom':
+                if (isset($form['custom_fields'])) {
+                    $service_config['custom_fields'] = $form['custom_fields'];
+                }
+                break;
+        }
+
+        $service_id = $manager->addService($service_config);
+        if ($service_id) {
+            Hm_Msgs::add('Service added successfully', 'success');
+            $this->out('spam_service_added', $service_id);
+        } else {
+            Hm_Msgs::add('Failed to add service: Invalid configuration', 'error');
+        }
+    }
+}
+
+/**
+ * Edit existing spam service
+ * @subpackage imap/handler
+ */
+class Hm_Handler_edit_spam_service extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('edit_spam_service', $this->request->post)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('service_id', 'service_name', 'service_type', 'service_enabled'));
+        if (!$success) {
+            Hm_Msgs::add('Failed to process service data', 'error');
+            return;
+        }
+
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        
+        // Build service configuration (same as add, but with service_id)
+        $service_config = array(
+            'name' => $form['service_name'],
+            'type' => $form['service_type'],
+            'enabled' => isset($form['service_enabled']) ? true : false
+        );
+
+        // Add type-specific fields (same logic as add)
+        switch ($form['service_type']) {
+            case 'email':
+                if (isset($form['email_endpoint'])) {
+                    $service_config['endpoint'] = $form['email_endpoint'];
+                }
+                if (isset($form['email_subject_template'])) {
+                    $service_config['subject_template'] = $form['email_subject_template'];
+                }
+                if (isset($form['email_body_template'])) {
+                    $service_config['body_template'] = $form['email_body_template'];
+                }
+                $service_config['require_headers'] = isset($form['email_require_headers']) ? true : false;
+                $service_config['require_body'] = isset($form['email_require_body']) ? true : false;
+                break;
+
+            case 'api':
+                if (isset($form['api_endpoint'])) {
+                    $service_config['endpoint'] = $form['api_endpoint'];
+                }
+                if (isset($form['api_method'])) {
+                    $service_config['method'] = $form['api_method'];
+                }
+                if (isset($form['api_auth_type'])) {
+                    $service_config['auth_type'] = $form['api_auth_type'];
+                }
+                if (isset($form['api_auth_header'])) {
+                    $service_config['auth_header'] = $form['api_auth_header'];
+                }
+                if (isset($form['api_auth_value'])) {
+                    $service_config['auth_value'] = $form['api_auth_value'];
+                }
+                if (isset($form['api_payload_template'])) {
+                    $service_config['payload_template'] = $form['api_payload_template'];
+                }
+                if (isset($form['api_response_code'])) {
+                    $service_config['response_code'] = intval($form['api_response_code']);
+                }
+                if (isset($form['api_timeout'])) {
+                    $service_config['timeout'] = intval($form['api_timeout']);
+                }
+                break;
+
+            case 'dns':
+                if (isset($form['dns_query_format'])) {
+                    $service_config['query_format'] = $form['dns_query_format'];
+                }
+                if (isset($form['dns_response_type'])) {
+                    $service_config['response_type'] = $form['dns_response_type'];
+                }
+                if (isset($form['dns_timeout'])) {
+                    $service_config['timeout'] = intval($form['dns_timeout']);
+                }
+                break;
+
+            case 'custom':
+                if (isset($form['custom_fields'])) {
+                    $service_config['custom_fields'] = $form['custom_fields'];
+                }
+                break;
+        }
+
+        $success = $manager->updateService($form['service_id'], $service_config);
+        if ($success) {
+            Hm_Msgs::add('Service updated successfully', 'success');
+        } else {
+            Hm_Msgs::add('Failed to update service: Invalid configuration', 'error');
+        }
+    }
+}
+
+/**
+ * Delete spam service
+ * @subpackage imap/handler
+ */
+class Hm_Handler_delete_spam_service extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('delete_spam_service', $this->request->post)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('service_id'));
+        if (!$success) {
+            Hm_Msgs::add('Failed to process delete request', 'error');
+            return;
+        }
+
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        $success = $manager->deleteService($form['service_id']);
+        
+        if ($success) {
+            Hm_Msgs::add('Service deleted successfully', 'success');
+        } else {
+            Hm_Msgs::add('Failed to delete service', 'error');
+        }
+    }
+}
+
+/**
+ * Toggle spam service enabled/disabled
+ * @subpackage imap/handler
+ */
+class Hm_Handler_toggle_spam_service extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('toggle_spam_service', $this->request->post)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('service_id', 'enabled'));
+        if (!$success) {
+            Hm_Msgs::add('Failed to process toggle request', 'error');
+            return;
+        }
+
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        $success = $manager->setServiceEnabled($form['service_id'], $form['enabled'] === 'true');
+        
+        if ($success) {
+            $status = $form['enabled'] === 'true' ? 'enabled' : 'disabled';
+            Hm_Msgs::add('Service ' . $status . ' successfully', 'success');
+        } else {
+            Hm_Msgs::add('Failed to update service status', 'error');
+        }
+    }
+}
+
+/**
+ * Update predefined spam service
+ * @subpackage imap/handler
+ */
+class Hm_Handler_update_predefined_service extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('update_predefined_service', $this->request->post)) {
+            return;
+        }
+
+        list($success, $form) = $this->process_form(array('service_id'));
+        if (!$success) {
+            Hm_Msgs::add('Failed to process service data', 'error');
+            return;
+        }
+
+        $service_id = $form['service_id'];
+        $manager = new Hm_Spam_Service_Manager($this->user_config);
+        
+        // Build service configuration based on service type
+        switch ($service_id) {
+            case 'spamcop':
+                $service_config = array(
+                    'name' => 'SpamCop',
+                    'type' => 'email',
+                    'enabled' => isset($this->request->post['service_enabled']) ? true : false
+                );
+                
+                if (isset($this->request->post['email_endpoint'])) {
+                    $service_config['endpoint'] = $this->request->post['email_endpoint'];
+                }
+                break;
+                
+            case 'abuseipdb':
+                $service_config = array(
+                    'name' => 'AbuseIPDB',
+                    'type' => 'api',
+                    'enabled' => isset($this->request->post['service_enabled']) ? true : false
+                );
+                
+                if (isset($this->request->post['api_endpoint'])) {
+                    $service_config['endpoint'] = $this->request->post['api_endpoint'];
+                }
+                if (isset($this->request->post['api_method'])) {
+                    $service_config['method'] = $this->request->post['api_method'];
+                }
+                if (isset($this->request->post['api_auth_type'])) {
+                    $service_config['auth_type'] = $this->request->post['api_auth_type'];
+                }
+                if (isset($this->request->post['api_auth_header'])) {
+                    $service_config['auth_header'] = $this->request->post['api_auth_header'];
+                }
+                if (isset($this->request->post['api_auth_value'])) {
+                    $service_config['auth_value'] = $this->request->post['api_auth_value'];
+                }
+                if (isset($this->request->post['api_payload_template'])) {
+                    $service_config['payload_template'] = $this->request->post['api_payload_template'];
+                }
+                break;
+                
+            case 'stopforumspam':
+                $service_config = array(
+                    'name' => 'StopForumSpam',
+                    'type' => 'api',
+                    'enabled' => isset($this->request->post['service_enabled']) ? true : false
+                );
+                
+                if (isset($this->request->post['api_endpoint'])) {
+                    $service_config['endpoint'] = $this->request->post['api_endpoint'];
+                }
+                if (isset($this->request->post['api_method'])) {
+                    $service_config['method'] = $this->request->post['api_method'];
+                }
+                if (isset($this->request->post['api_auth_type'])) {
+                    $service_config['auth_type'] = $this->request->post['api_auth_type'];
+                }
+                if (isset($this->request->post['api_auth_header'])) {
+                    $service_config['auth_header'] = $this->request->post['api_auth_header'];
+                }
+                if (isset($this->request->post['api_auth_value'])) {
+                    $service_config['auth_value'] = $this->request->post['api_auth_value'];
+                }
+                if (isset($this->request->post['api_payload_template'])) {
+                    $service_config['payload_template'] = $this->request->post['api_payload_template'];
+                }
+                break;
+                
+            case 'cleantalk':
+                $service_config = array(
+                    'name' => 'CleanTalk',
+                    'type' => 'api',
+                    'enabled' => isset($this->request->post['service_enabled']) ? true : false
+                );
+                
+                if (isset($this->request->post['api_endpoint'])) {
+                    $service_config['endpoint'] = $this->request->post['api_endpoint'];
+                }
+                if (isset($this->request->post['api_method'])) {
+                    $service_config['method'] = $this->request->post['api_method'];
+                }
+                if (isset($this->request->post['api_auth_type'])) {
+                    $service_config['auth_type'] = $this->request->post['api_auth_type'];
+                }
+                if (isset($this->request->post['api_auth_header'])) {
+                    $service_config['auth_header'] = $this->request->post['api_auth_header'];
+                }
+                if (isset($this->request->post['api_auth_value'])) {
+                    $service_config['auth_value'] = $this->request->post['api_auth_value'];
+                }
+                if (isset($this->request->post['api_payload_template'])) {
+                    $service_config['payload_template'] = $this->request->post['api_payload_template'];
+                }
+                break;
+                
+            default:
+                Hm_Msgs::add('Unknown service type', 'error');
+                return;
+        }
+
+        $success = $manager->updateService($service_id, $service_config);
+        if ($success) {
+            Hm_Msgs::add('Service updated successfully', 'success');
+        } else {
+            Hm_Msgs::add('Failed to update service: Invalid configuration', 'error');
+        }
     }
 }

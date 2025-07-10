@@ -45,3 +45,8 @@ Docker: [https://hub.docker.com/r/cypht/cypht](https://hub.docker.com/r/cypht/cy
 LinkedIn group: [https://www.linkedin.com/groups/13804559/](https://www.linkedin.com/groups/13804559/)
 
 An interview with the project's founder: https://github.com/cypht-org/cypht/wiki/AMA-Jason-Munro
+
+---
+
+**New in this version:**
+- All spam reporting, rate limiting, and auto-block settings are now managed in a single **Spam Reporting** section under **Site Settings** in the web interface. This makes it easier for administrators to configure and manage all spam-related options in one place.

@@ -1848,7 +1848,7 @@ var fillImapData = function(details) {
         $('#srv_setup_stepper_imap_sieve_host').val(details.sieve_config_host);
         $("#srv_setup_stepper_enable_sieve").trigger("click", false);
         $('#srv_setup_stepper_imap_sieve_mode_tls')
-                            .prop('checked', details.tls)
+                            .prop('checked', details.sieve_tls !== false)
                             .trigger('change');
     }
 

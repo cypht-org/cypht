@@ -1,5 +1,12 @@
 # Rate Limiting in Cypht
 
+## Important: Centralized Spam Reporting Settings
+
+All spam reporting, rate limiting, and auto-block settings are now managed in a single **Spam Reporting** section under **Site Settings** in the web interface. Previous per-module settings have been removed for clarity and ease of use.
+
+- To configure spam reporting, rate limits, or auto-block options, go to **Site Settings → Spam Reporting** in the admin UI.
+- All related options are now grouped together for easier management.
+
 ## Overview
 
 Cypht now includes a comprehensive endpoint-specific rate limiting system to prevent abuse of API endpoints. This feature helps protect against spam, brute force attacks, and excessive resource consumption.
