@@ -585,3 +585,35 @@
     top: 50%;
     transform: translate(-50%, -50%);
 }
+
+/* Message reactions */
+.message-reactions {
+  margin-top: 15px;
+  padding: 10px;
+  border-top: 1px solid #eee;
+}
+.reactions-list {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.reaction-item {
+  display: inline-flex;
+  align-items: center;
+  background: #f0f2f5;
+  border-radius: 16px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.reaction-item:hover {
+  background: #e4e6eb;
+}
+.reaction-emoji {
+  font-size: 16px;
+  margin-right: 4px;
+}
+.reaction-count {
+  font-size: 12px;
+  color: #606770;
+}

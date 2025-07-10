@@ -1118,6 +1118,58 @@ if (!class_exists('Hm_IMAP')) {
             }
         }
 
+
+        /**
+         * Get message structures for multiple UIDs in a single request
+         * @param mixed $uids An array of UIDs or a valid IMAP sequence set as a string
+         * @return array Associative array with UIDs as keys and message structures as values
+         */
+        public function get_message_structures($uids) {
+            if (is_array($uids)) {
+                sort($uids);
+                $uid_string = implode(',', $uids);
+            } else {
+                $uid_string = $uids;
+            }
+
+            if (!$this->is_clean($uid_string, 'uid_list')) {
+                return array();
+            }
+
+            $command = 'UID FETCH ' . $uid_string . ' BODYSTRUCTURE' . "\r\n";
+            $cache_command = $command;
+            $cache = $this->check_cache($cache_command);
+            if ($cache !== false) {
+                return $cache;
+            }
+
+            $this->send_command($command);
+            $result = $this->get_response(false, true);
+            $status = $this->check_response($result, true);
+            $structures = array();
+
+            if ($status) {
+                foreach ($result as $vals) {
+                    if ($vals[0] == '*' && isset($vals[2]) && mb_strtoupper($vals[2]) == 'FETCH') {
+                        $uid = false;
+                        for ($i = 0; $i < count($vals); $i++) {
+                            if (mb_strtoupper($vals[$i]) == 'UID' && isset($vals[$i + 1])) {
+                                $uid = $vals[$i + 1];
+                                break;
+                            }
+                        }
+                        if ($uid) {
+                            $single_result = array($vals);
+                            $struct = $this->parse_bodystructure_response($single_result);
+                            $structures[$uid] = $struct;
+                        }
+                    }
+                }
+                return $this->cache_return_val($structures, $cache_command);
+            }
+            return $structures;
+        }
+
         /**
          * get the IMAP BODYSTRUCTURE of a message
          * @param int $uid IMAP UID of the message
@@ -1282,25 +1334,143 @@ if (!class_exists('Hm_IMAP')) {
                     $struct = $part_struct[$message_part];
                 }
             }
-            if (is_array($struct)) {
-                if (isset($struct['encoding']) && $struct['encoding']) {
-                    if (mb_strtolower($struct['encoding']) == 'quoted-printable') {
-                        $res = quoted_printable_decode($res);
-                    }
-                    elseif (mb_strtolower($struct['encoding']) == 'base64') {
-                        $res = base64_decode($res);
-                    }
-                }
-                if (isset($struct['attributes']['charset']) && $struct['attributes']['charset']) {
-                    if ($struct['attributes']['charset'] != 'us-ascii') {
-                        $res = mb_convert_encoding($res, 'UTF-8', $struct['attributes']['charset']);
-                    }
-                }
-            }
+            $res = $this->decode_message_part_content($res, $struct);
             if ($status) {
                 return $this->cache_return_val($res, $cache_command);
             }
             return $res;
+        }
+
+        /**
+         * Get content for multiple message parts in a single request
+         * @param array $uid_part_map associative array where keys are UIDs and values are message part numbers
+         * @param array|null $structures_map Optional pre-fetched structures mapping UID => structure
+         * @return array associative array with content for each UID/part pair
+         */
+        public function get_message_parts_content($uid_part_map, $structures_map = null) {
+            if (empty($uid_part_map)) {
+                return array();
+            }
+
+            // If no structures_map provided, fetch all at once
+            if ($structures_map === null) {
+                $all_uids = array_keys($uid_part_map);
+                $structures_map = $this->get_message_structures($all_uids);
+            }
+
+            // Group UIDs by part
+            $part_uid_map = array();
+            foreach ($uid_part_map as $uid => $part) {
+                $part = preg_replace("/^0\.{1}/", '', $part);
+                if (!$this->is_clean($part, 'msg_part')) {
+                    continue;
+                }
+                $part_uid_map[$part][] = $uid;
+            }
+
+            $contents = array();
+            foreach ($part_uid_map as $part => $uids) {
+                $uid_string = implode(',', $uids);
+                $command = "UID FETCH $uid_string BODY.PEEK[$part]\r\n";
+                $cache_command = $command;
+                $cache = $this->check_cache($cache_command);
+                if ($cache !== false) {
+                    foreach ($uids as $uid) {
+                        if (isset($cache[$uid])) {
+                            $contents[$uid] = $cache[$uid];
+                        }
+                    }
+                    continue;
+                }
+
+                $this->send_command($command);
+                $result = $this->get_response(false, true);
+                $status = $this->check_response($result, true);
+
+                if ($status) {
+                    $fetched_contents_for_cache = array();
+                    foreach ($result as $vals) {
+                        if ($vals[0] != '*' || !isset($vals[2]) || mb_strtoupper($vals[2]) != 'FETCH') {
+                            continue;
+                        }
+                        $uid = false;
+                        $content = '';
+                        $part_found = false;
+                        foreach ($vals as $i => $val) {
+                            if (mb_strtoupper($val) == 'UID' && isset($vals[$i+1])) {
+                                $uid = $vals[$i+1];
+                            }
+                            if (mb_stristr($val, 'BODY[') !== false) {
+                                $part_found = true;
+                            } elseif ($part_found && $val != ']') {
+                                if ($val == 'NIL') {
+                                    $content = '';
+                                } else {
+                                    $content_part = trim(preg_replace("/\s*\)$/", '', $val));
+                                    while (isset($vals[$i+1]) && $vals[$i+1] != ')') {
+                                        $i++;
+                                        $content_part .= $vals[$i];
+                                    }
+                                    $content = $content_part;
+                                }
+                                $part_found = false;
+                            }
+                        }
+
+                        if ($uid && isset($uid_part_map[$uid])) {
+                            // Use pre-fetched structure
+                            $full_struct = isset($structures_map[$uid]) ? $structures_map[$uid] : null;
+
+                            if ($full_struct) {
+                                if (!is_object($this->struct_object) || !($this->struct_object instanceof Hm_IMAP_Struct)) {
+                                    $this->struct_object = new Hm_IMAP_Struct($full_struct, $this);
+                                }
+                                $part_struct = $this->search_bodystructure($full_struct, array('imap_part_number' => $part));
+                                if (!empty($part_struct) && isset($part_struct[$part])) {
+                                    $struct = $part_struct[$part];
+                                    $content = $this->decode_message_part_content($content, $struct);
+                                }
+                            }
+                            $contents[$uid] = $content;
+                            $fetched_contents_for_cache[$uid] = $content;
+                        }
+                    }
+                    if (!empty($fetched_contents_for_cache)) {
+                        $this->cache_return_val($fetched_contents_for_cache, $cache_command);
+                    }
+                }
+            }
+            return $contents;
+        }
+
+        /**
+         * Decodes the content of a message part based on its encoding and charset.
+         * message content is returned in a readable format.
+         * @param string $content The raw message part content.
+         * @param array $struct The structure array for the message part.
+         * @return string The decoded and charset-converted content.
+         */
+        private function decode_message_part_content($content, $struct) {
+            if (is_array($struct)) {
+                if (isset($struct['encoding']) && $struct['encoding']) {
+                    $encoding = mb_strtolower($struct['encoding']);
+                    if ($encoding == 'quoted-printable') {
+                        $content = quoted_printable_decode($content);
+                    } elseif ($encoding == 'base64') {
+                        $content = base64_decode($content);
+                    }
+                }
+                if (isset($struct['attributes']['charset']) && $struct['attributes']['charset']) {
+                    $charset = $struct['attributes']['charset'];
+                    if (!in_array(strtoupper($charset), array('UTF-8', 'US-ASCII'))) {
+                        $converted_content = @mb_convert_encoding($content, 'UTF-8', $charset);
+                        if ($converted_content !== false) {
+                            $content = $converted_content;
+                        }
+                    }
+                }
+            }
+            return $content;
         }
 
         /**

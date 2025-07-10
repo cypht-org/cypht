@@ -690,31 +690,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
-        /* smtp server details */
-        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
-        if (!$smtp_details) {
-            Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
-            repopulate_compose_form($draft, $this);
-            return;
-        }
-
         /* profile details */
         $profiles = $this->get('compose_profiles', array());
         list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $this);
 
-        /* xoauth2 check */
-        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $smtp_id);
-
         /* adjust from and reply to addresses */
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
-
-        /* try to connect */
-        $mailbox = Hm_SMTP_List::connect($smtp_id, false);
-        if (! $mailbox || ! $mailbox->authed()) {
-            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
-            repopulate_compose_form($draft, $this);
-            return;
-        }
 
         /* build message */
         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to, $delivery_receipt);
@@ -732,9 +713,16 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
+        $err_msg = send_smtp_message(
+            $this,
+            $form['compose_smtp_id'],
+            $from,
+            $recipients,
+            $mime->get_mime_msg(),
+            $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt'])
+        );
+
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -792,6 +780,247 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         if ($form['draft_id'] > 0) {
             delete_uploaded_files($this->session, 0);
         }
+    }
+}
+
+/**
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_send_message_reaction extends Hm_Handler_Module {
+    public function process() {
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            Hm_Msgs::add('Required modules (IMAP or Profiles) are not enabled for reactions.', 'danger');
+            return false;
+        }
+        list($success, $form) = $this->process_form(array('imap_msg_uid', 'folder', 'reaction', 'imap_server_id'));
+
+        if (!$success) {
+            Hm_Msgs::add('Missing required information for reaction.', 'warning');
+            return false;
+        }
+
+        $imap_server_details = $this->get_imap_server_details($form['imap_server_id']);
+        if (!$imap_server_details) {
+            return false;
+        }
+
+        $original_message_data = $this->get_original_message_details(
+            $form['imap_server_id'],
+            $form['folder'],
+            $form['imap_msg_uid']
+        );
+
+        $delivered_to = $original_message_data['delivered_to'];
+
+        if (empty($delivered_to)) {
+            Hm_Msgs::add('You cannot react to your own sent message.', 'warning');
+            return false;
+        }
+
+        list($to_address, $cc_address) = reply_to_address($original_message_data['headers'], 'reply_all');
+        $subject = reply_to_subject($original_message_data['headers'], 'reply_all');
+
+        list($selected_smtp_id, $from_address, $from_name) = $this->find_smtp_server_for_reaction($imap_server_details, $delivered_to);
+        if (!$selected_smtp_id || !$this->validate_smtp_info($selected_smtp_id, $from_address)) {
+            return false;
+        }
+
+        $emoji_char = $form['reaction'];
+        $reaction_data = $this->prepare_reaction_data($emoji_char);
+        if (!$reaction_data) {
+            return false;
+        }
+
+        $reaction_mime = new Hm_Reaction_MIME_Msg(
+            $from_address,
+            $from_name,
+            $to_address,
+            $subject,
+            $reaction_data,
+            $emoji_char,
+            $original_message_data
+        );
+        $full_mime_message = $reaction_mime->get_mime_msg();
+
+        $recipients = $reaction_mime->get_recipient_addresses();
+
+        $err_msg = send_smtp_message(
+            $this,
+            $selected_smtp_id,
+            $from_address,
+            $recipients,
+            $full_mime_message
+        );
+
+        if ($err_msg === false) {
+            Hm_Msgs::add('Reaction sent successfully!', 'success');
+            $this->out('success', true);
+        } else {
+            $this->out('success', false);
+        }
+    }
+
+    /**
+     * Get IMAP server details
+     */
+    private function get_imap_server_details($imap_server_id) {
+        $imap_server_details = Hm_IMAP_List::dump()[$imap_server_id] ?? null;
+        if (!$imap_server_details) {
+            Hm_Msgs::add('Could not load IMAP server details for reaction.', 'warning');
+            return null;
+        }
+        return $imap_server_details;
+    }
+
+    /**
+     * Find appropriate SMTP server for sending the reaction
+     */
+    private function find_smtp_server_for_reaction($imap_server_details, $delivered_to) {
+        Hm_SMTP_List::init($this->user_config, $this->session);
+
+        $selected_smtp_id = $from_address = $from_name = null;
+        $all_profiles = $this->get('profiles', array());
+
+        foreach ($all_profiles as $profile) {
+            if (isset($profile['server'], $profile['user']) &&
+                $profile['server'] === $imap_server_details['server'] &&
+                $profile['user'] === $imap_server_details['user'] &&
+                !empty($profile['smtp_id'])) {
+
+                $selected_smtp_id = $profile['smtp_id'];
+                $from_address = !empty($profile['address']) ? $profile['address'] : $profile['replyto'];
+                $from_name = $profile['name'];
+                break;
+            }
+        }
+
+        if (!$selected_smtp_id) {
+            list($selected_smtp_id, $from_address, $from_name) = $this->find_fallback_smtp_server($imap_server_details, $delivered_to);
+        }
+
+        return array($selected_smtp_id, $from_address, $from_name);
+    }
+
+    /**
+     * Find SMTP server using fallback methods
+     *
+     * @param array $imap_server_details Details of the IMAP server
+     * @param string $delivered_to The email address the original message was delivered to
+     * 
+     * @return array [smtp_id, from_address, from_name] or [null, null, null]
+     */
+    private function find_fallback_smtp_server($imap_server_details, $delivered_to) {
+        $smtp_servers = Hm_SMTP_List::dump();
+        $imap_user_email = $imap_server_details['user'];
+        $potential_from_address = null;
+
+        // Use delivered_to if username lacks domain, otherwise use outbound_address_check
+        if (strpos($imap_user_email, '@') === false && $delivered_to && filter_var($delivered_to, FILTER_VALIDATE_EMAIL)) {
+            $potential_from_address = $delivered_to;
+        } else {
+            list($potential_from_address, $_) = outbound_address_check($this, $imap_user_email, '');
+        }
+
+        // First pass: Match SMTP username with IMAP username
+        foreach ($smtp_servers as $smtp_id => $smtp_server) {
+            if (isset($smtp_server['user']) && $smtp_server['user'] === $imap_user_email) {
+                if (!$potential_from_address) {
+                    list($potential_from_address, $_) = outbound_address_check($this, $smtp_server['user'], '');
+                }
+                $server_name = $smtp_server['name'] ?? '';
+                return array(
+                    $smtp_id,
+                    $potential_from_address,
+                    $server_name
+                );
+            }
+        }
+
+        // Second pass: Find the default SMTP server
+        foreach ($smtp_servers as $smtp_id => $smtp_server) {
+            if (isset($smtp_server['default']) && $smtp_server['default']) {
+                $default_smtp_user = $smtp_server['user'] ?? null;
+                list($from_address, $_) = outbound_address_check($this, $default_smtp_user, '');
+                $server_name = $smtp_server['name'] ?? '';
+                return array(
+                    $smtp_id,
+                    $from_address,
+                    $server_name
+                );
+            }
+        }
+
+        return array(null, null, null);
+    }
+
+    /**
+     * Validate selected SMTP server and email address
+     */
+    private function validate_smtp_info($smtp_id, $from_address) {
+        if (!$smtp_id) {
+            Hm_Msgs::add('Could not determine SMTP server to send reaction.', 'danger');
+            return false;
+        }
+
+        if (!$from_address) {
+            $smtp_details = Hm_SMTP_List::dump($smtp_id);
+            $from_address = $smtp_details['user'] ?? null;
+            list($from_address, $_) = outbound_address_check($this, $from_address, '');
+        }
+
+        if (!filter_var($from_address, FILTER_VALIDATE_EMAIL)) {
+            Hm_Msgs::add('Could not determine a valid sender address for the reaction.', 'danger');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get original message details from IMAP server
+     */
+    private function get_original_message_details($imap_server_id, $folder_hex, $msg_uid) {
+        $original_message_id = null;
+        $delivered_to = null;
+        $references_header = null;
+
+        $imap_mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+        if ($imap_mailbox && $imap_mailbox->authed()) {
+            $original_headers = $imap_mailbox->get_message_headers(hex2bin($folder_hex), $msg_uid);
+            $lc_original_headers = lc_headers($original_headers);
+            if (!empty($lc_original_headers['message-id'])) {
+                $original_message_id = trim($lc_original_headers['message-id'], '<>');
+                $references_header = $lc_original_headers['references'] ?? '';
+                $delivered_to = $lc_original_headers['delivered-to'] ?? '';
+            }
+        } else {
+            Hm_Msgs::add('Could not connect to IMAP server to fetch original message details.', 'warning');
+        }
+
+        return array(
+            'message_id' => $original_message_id,
+            'delivered_to' => $delivered_to,
+            'references' => $references_header,
+            'headers' => $original_headers ?? array()
+        );
+    }
+
+    /**
+     * Prepare JSON data for the reaction
+     */
+    private function prepare_reaction_data($reaction_emoji) {
+        $reaction_data = array(
+            'emoji' => $reaction_emoji,
+            'version' => 1
+        );
+
+        $reaction_content = json_encode($reaction_data, JSON_UNESCAPED_UNICODE);
+        if ($reaction_content === false) {
+            Hm_Msgs::add('Failed to encode reaction data.', 'danger');
+            return false;
+        }
+
+        return $reaction_content;
     }
 }
 

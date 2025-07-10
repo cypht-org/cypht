@@ -1941,6 +1941,279 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
 }
 
 /**
+ * Handle email message reactions (emoji responses)
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_message_reactions extends Hm_Handler_Module {
+    /**
+     * Fetch reactions for the supplied message
+     */
+    public function process() {
+        list($success, $form) = $this->process_form(array('imap_server_id', 'imap_msg_uid', 'folder'));
+
+        if ($success) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                // Set read-only since we're just fetching reactions
+                $mailbox->set_read_only(true);
+
+                // Get original message headers to get Message-ID
+                $msg_headers = $mailbox->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
+                $msg_headers = lc_headers($msg_headers);
+                if (!isset($msg_headers['message-id'])) {
+                    return;
+                }
+
+                $message_id = $msg_headers['message-id'];
+                $delivered_to = isset($msg_headers['delivered-to']) ? $msg_headers['delivered-to'] : null;
+
+                // Search for reaction messages referencing this Message-ID
+                $reactions = $this->get_message_reactions($mailbox, $message_id, $delivered_to);
+
+                // Output the reactions data
+                $this->out('reactions', $reactions);
+            }
+        }
+    }
+
+    /**
+     * Extract reactions data from messages referencing the original message
+     *
+     * @param object $mailbox IMAP mailbox connection
+     * @param string $message_id Message-ID to search for reactions
+     * @param string $delivered_to The email address the original message was delivered to
+     * 
+     * @return array Reactions data structure
+     */
+    private function get_message_reactions($mailbox, $message_id, $delivered_to) {
+        $reactions = array(
+            'reactions' => array(),
+            'can_react' => '1',
+            'user_reactions' => array()
+        );
+
+        // Search for messages with "In-Reply-To" header that contains the Message-ID
+        $terms = array(
+            array('HEADER In-Reply-To', $message_id)
+        );
+
+        // Search folders and store UIDs grouped by folder
+        $folders = $mailbox->get_folders();
+
+        $reactions_by_folder = array();
+        foreach ($folders as $folder_details) {
+            $current_folder_name = $folder_details['name'];
+
+            $uids_in_folder = $mailbox->search($current_folder_name, 'ALL', terms: $terms);
+            if (!is_array($uids_in_folder) || empty($uids_in_folder)) {
+                continue;
+            }
+            $reactions_by_folder[$current_folder_name] = $uids_in_folder;
+        }
+
+        if (empty($reactions_by_folder)) {
+            return $reactions;
+        }
+
+        // Process potential reactions folder by folder
+        $user_reactions_count = 0;
+        // Use Message-ID of the reaction message to track processed ones
+        $processed_reaction_message_ids = array();
+
+        foreach ($reactions_by_folder as $folder => $uids) {
+            $headers_list = $mailbox->get_message_list($folder, $uids, true);
+            if (empty($headers_list)) {
+                continue;
+            }
+
+            $potential_reaction_uids = array();
+            foreach ($headers_list as $uid => $headers) {
+                $lc_headers = lc_headers($headers);
+
+                if (!isset($lc_headers['message_id']) || !isset($lc_headers['from'])) {
+                    continue;
+                }
+
+                $reaction_message_id = $lc_headers['message_id'];
+
+                // Skip if we've already processed this message ID
+                if (isset($processed_reaction_message_ids[$reaction_message_id])) {
+                    continue;
+                }
+
+                $processed_reaction_message_ids[$reaction_message_id] = true;
+                $potential_reaction_uids[$uid] = $lc_headers;
+            }
+
+            if (empty($potential_reaction_uids)) {
+                continue;
+            }
+
+            // Get message structures for potential reaction messages
+            $structures = $mailbox->get_message_structures($folder, array_keys($potential_reaction_uids));
+            if (empty($structures)) {
+                continue;
+            }
+
+            // Find reaction JSON parts
+            $uid_part_map = array();
+            foreach ($structures as $uid => $struct) {
+                $reaction_part = $this->find_reaction_json_part($struct);
+                if ($reaction_part) {
+                    $uid_part_map[$uid] = $reaction_part;
+                }
+            }
+
+            if (empty($uid_part_map)) {
+                continue;
+            }
+
+            // Get content of reaction parts in one batch
+            $contents = $mailbox->get_message_parts_content($folder, $uid_part_map, $structures);
+
+            if (empty($contents)) {
+                continue;
+            }
+
+            // Process each reaction
+            foreach ($contents as $uid => $content) {
+                $reaction_data = $this->parse_reaction_json($content);
+                if (!$reaction_data) {
+                    continue;
+                }
+
+                $emoji = $reaction_data['emoji'];
+                $headers = $potential_reaction_uids[$uid];
+                $from_header = $headers['from'];
+                $sender_info = $this->parse_from_header($from_header);
+
+                if (!$sender_info) {
+                    continue;
+                }
+
+                // Check if sender is the current user
+                $is_current_user = ($delivered_to && strtolower($sender_info['email']) === strtolower($delivered_to));
+
+                if ($is_current_user) {
+                    $display_user = 'You';
+                    $user_reactions_count++;
+                    if (!in_array($emoji, $reactions['user_reactions'])) {
+                        $reactions['user_reactions'][] = $emoji;
+                    }
+                } else {
+                    $display_user = !empty($sender_info['name']) ? $sender_info['name'] : $sender_info['email'];
+                }
+
+                $display_user_with_email = !empty($sender_info['name']) ?
+                    $display_user . ' (' . $sender_info['email'] . ')' :
+                    $sender_info['email'];
+
+                if (!isset($reactions['reactions'][$emoji])) {
+                    $reactions['reactions'][$emoji] = array(
+                        'users' => array(),
+                        'count' => 0
+                    );
+                }
+
+                // Avoid adding duplicate users for the same emoji
+                if (!in_array($display_user_with_email, $reactions['reactions'][$emoji]['users'])) {
+                    $reactions['reactions'][$emoji]['users'][] = $display_user_with_email;
+                    $reactions['reactions'][$emoji]['count']++;
+                }
+            }
+        }
+
+        // Limit maximum number of reactions (Gmail uses 20 per message)
+        if ($user_reactions_count >= 20) {
+            $reactions['can_react'] = '0';
+        }
+
+        return $reactions;
+    }
+
+    /**
+     * Find the message part containing reaction JSON
+     *
+     * @param array $struct Message structure array
+     * 
+     * @return string|false Part ID if found, otherwise false
+     */
+    private function find_reaction_json_part($struct) {
+        foreach ($struct as $id => $part) {
+            if (isset($part['type']) && $part['type'] === 'multipart' && isset($part['subs'])) {
+                foreach ($part['subs'] as $sub_id => $sub_part) {
+                    if (isset($sub_part['type']) && $sub_part['type'] === 'text' &&
+                        isset($sub_part['subtype']) && strtolower($sub_part['subtype']) === 'vnd.google.email-reaction+json') {
+                        return $sub_id;
+                    }
+
+                    if (isset($sub_part['content_type']) &&
+                        strtolower($sub_part['content_type']) === 'text/vnd.google.email-reaction+json') {
+                        return $sub_id;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Parse JSON reaction data from message content
+     * 
+     * @param string $content Message content
+     * 
+     * @return array|false Parsed reaction data or false if invalid
+     */
+    private function parse_reaction_json($content) {
+        $content = quoted_printable_decode($content);
+
+        $json = json_decode($content, true);
+
+        if (!$json || !isset($json['version']) || !isset($json['emoji'])) {
+            return false;
+        }
+
+        if ($json['version'] !== 1) {
+            return false;
+        }
+
+        if (empty($json['emoji'])) {
+            return false;
+        }
+
+        return $json;
+    }
+
+    /**
+     * Parse the From header to extract name and email
+     * 
+     * @param string $from_header From header value
+     * 
+     * @return array|false Array with name and email, or false if parsing failed
+     */
+    private function parse_from_header($from_header) {
+        // Try to extract email from "Name <email@example.com>" format
+        if (preg_match('/^(.*?)\s*<([^>]+)>/', $from_header, $matches)) {
+            return array(
+                'name' => trim($matches[1], ' "\''),
+                'email' => $matches[2]
+            );
+        }
+
+        // If no angle brackets, just use the whole string as email
+        else if (filter_var($from_header, FILTER_VALIDATE_EMAIL)) {
+            return array(
+                'name' => '',
+                'email' => $from_header
+            );
+        }
+
+        return false;
+    }
+}
+
+/**
  * Get message source from an IMAP server
  */
 class Hm_Handler_imap_message_source extends Hm_Handler_Module {

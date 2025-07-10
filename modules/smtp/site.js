@@ -377,6 +377,61 @@ var force_send_message = function() {
     }
 }
 
+var send_reaction = function(emojiData, uid, detail) {
+    var selectedEmoji = emojiData.native;
+
+    // Get cached reactions
+    var cachedReactionsJson = get_local_message_reactions(uid);
+    var userHasReactedWithThisEmoji = false;
+    var canReactOverall = true;
+
+    if (cachedReactionsJson) {
+        var cachedReactionsData = JSON.parse(cachedReactionsJson);
+
+        if (cachedReactionsData && cachedReactionsData.can_react === '0') {
+            canReactOverall = false;
+        }
+
+        if (cachedReactionsData && cachedReactionsData.user_reactions) {
+            // Check if user_reactions is an array or an object
+            if (Array.isArray(cachedReactionsData.user_reactions)) {
+                userHasReactedWithThisEmoji = cachedReactionsData.user_reactions.indexOf(selectedEmoji) !== -1;
+            } else if (typeof cachedReactionsData.user_reactions === 'object') {
+                // Handle the case where user_reactions is an object
+                userHasReactedWithThisEmoji = Object.values(cachedReactionsData.user_reactions).indexOf(selectedEmoji) !== -1;
+            }
+        }
+    }
+
+    if (userHasReactedWithThisEmoji) {
+        Hm_Notices.show(hm_trans('You have already reacted with this emoji.'), 'info');
+        return;
+    }
+
+    if (!canReactOverall) {
+        Hm_Notices.show(hm_trans('You have reached the maximum number of reactions for this message.'), 'warning');
+        return;
+    }
+
+    Hm_Notices.show(hm_trans('Sending reaction... ') + selectedEmoji, 'info');
+
+    Hm_Ajax.request(
+        [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_send_message_reaction'},
+            {'name': 'imap_msg_uid', 'value': uid},
+            {'name': 'imap_server_id', 'value': detail.server_id},
+            {'name': 'folder', 'value': detail.folder},
+            {'name': 'reaction', 'value': selectedEmoji}
+        ],
+        function(res) {
+            if (res) {
+                // Fetch updated reactions after successful send
+                fetch_message_reactions_and_update(uid, detail);
+            }
+        }
+    );
+};
+
 function smtpSettingsPageHandler() {
     $('#clear_chunks_button').on('click', function(e) {
         e.preventDefault();
