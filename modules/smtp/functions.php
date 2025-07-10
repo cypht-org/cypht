@@ -149,3 +149,30 @@ function reschedule_message_sending($handler, $mailbox, $msg_id, $folder, $new_d
     }
     return $res; 
 }}
+
+if (!hm_exists('send_smtp_message')) {
+function send_smtp_message($handler_mod, $smtp_id, $from_address, $recipients, $mime_message, $delivery_receipt = false) {
+    $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
+    if (!$smtp_details) {
+        Hm_Msgs::add('Could not load selected SMTP server details.', 'danger');
+        return 'Could not load selected SMTP server details.';
+    }
+
+    // Refresh OAuth2 token if needed
+    smtp_refresh_oauth2_token_on_send($smtp_details, $handler_mod, $smtp_id);
+
+    $smtp_mailbox = Hm_SMTP_List::connect($smtp_id, false);
+    if (!$smtp_mailbox || !$smtp_mailbox->authed()) {
+        Hm_Msgs::add("Failed to authenticate to the SMTP server.", "danger");
+        return "Failed to authenticate to the SMTP server.";
+    }
+
+    $err_msg = $smtp_mailbox->send_message($from_address, $recipients, $mime_message, $delivery_receipt);
+
+    if (!$err_msg) {
+        return false; // Indicates success
+    } else {
+        Hm_Msgs::add('Failed to send email: ' . $err_msg, 'danger');
+        return $err_msg;
+    }
+}}

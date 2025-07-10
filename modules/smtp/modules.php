@@ -690,31 +690,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
-        /* smtp server details */
-        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
-        if (!$smtp_details) {
-            Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
-            repopulate_compose_form($draft, $this);
-            return;
-        }
-
         /* profile details */
         $profiles = $this->get('compose_profiles', array());
         list($imap_server, $from_name, $reply_to, $from) = get_outbound_msg_profile_detail($form, $profiles, $smtp_details, $this);
 
-        /* xoauth2 check */
-        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $smtp_id);
-
         /* adjust from and reply to addresses */
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
-
-        /* try to connect */
-        $mailbox = Hm_SMTP_List::connect($smtp_id, false);
-        if (! $mailbox || ! $mailbox->authed()) {
-            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
-            repopulate_compose_form($draft, $this);
-            return;
-        }
 
         /* build message */
         $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to, $delivery_receipt);
@@ -732,9 +713,16 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         }
 
         /* send the message */
-        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
+        $err_msg = send_smtp_message(
+            $this,
+            $form['compose_smtp_id'],
+            $from,
+            $recipients,
+            $mime->get_mime_msg(),
+            $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt'])
+        );
+
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -856,14 +844,20 @@ class Hm_Handler_send_message_reaction extends Hm_Handler_Module {
 
         $recipients = $reaction_mime->get_recipient_addresses();
 
-        $result = $this->send_reaction_message(
+        $err_msg = send_smtp_message(
+            $this,
             $selected_smtp_id,
             $from_address,
             $recipients,
             $full_mime_message
         );
 
-        $this->out('success', $result);
+        if ($err_msg === false) {
+            Hm_Msgs::add('Reaction sent successfully!', 'success');
+            $this->out('success', true);
+        } else {
+            $this->out('success', false);
+        }
     }
 
     /**
@@ -1027,35 +1021,6 @@ class Hm_Handler_send_message_reaction extends Hm_Handler_Module {
         }
 
         return $reaction_content;
-    }
-
-    /**
-     * Send the reaction message via SMTP
-     */
-    private function send_reaction_message($smtp_id, $from_address, $recipients, $mime_message) {
-        $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
-        if (!$smtp_details) {
-            Hm_Msgs::add('Could not load selected SMTP server details.', 'danger');
-            return false;
-        }
-
-        smtp_refresh_oauth2_token_on_send($smtp_details, $this, $smtp_id);
-
-        $smtp_mailbox = Hm_SMTP_List::connect($smtp_id, false);
-        if (!$smtp_mailbox || !$smtp_mailbox->authed()) {
-            Hm_Msgs::add("Failed to authenticate to the SMTP server for sending reaction.", "danger");
-            return false;
-        }
-
-        $err_msg = $smtp_mailbox->send_message($from_address, $recipients, $mime_message);
-
-        if (!$err_msg) {
-            Hm_Msgs::add('Reaction sent successfully!', 'success');
-            return true;
-        } else {
-            Hm_Msgs::add('Failed to send reaction email.', 'danger');
-            return false;
-        }
     }
 }
 
