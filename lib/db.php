@@ -60,6 +60,10 @@ class Hm_DB {
         );
     }
 
+    static public function getConfig() {
+        return self::$config;
+    }
+
     /**
      * Build a DSN to connect to the db with
      * @return string
@@ -88,6 +92,7 @@ class Hm_DB {
      * @return boolean|integer|array
      */
     static public function execute($dbh, $sql, $args, $type = false, $all = false) {
+        
         if (!$dbh) {
             return false;
         }

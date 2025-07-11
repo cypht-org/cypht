@@ -240,8 +240,9 @@ class Hm_Redis {
     /**
      * @return boolean
      */
-    private function connect() {
+    public function connect() {
         $this->cache_con = Hm_Functions::redis();
+        
         try {
             if ($this->socket) {
                 $con = $this->cache_con->connect($this->socket);
@@ -300,6 +301,21 @@ class Hm_Redis {
             return false;
         }
         return $this->cache_con->close();
+    }
+
+    /**
+     * Get the Redis connection
+     * @return Redis|null
+     */
+    public function getInstance() {
+        return $this->cache_con;
+    }
+    /**
+     * Get the Redis connection
+     * @return Redis|null
+     */
+    static public function getConnection() {
+        return self::$cache_con;
     }
 }
 

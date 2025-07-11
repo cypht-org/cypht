@@ -19,6 +19,11 @@
     ],
     "homepage": "https://cypht.org",
     "license": "LGPL-2.1",
+    "autoload": {
+        "psr-4": {
+            "Services\\": "services/"
+        }
+    },
     "authors": [
         {
             "name": "Jason Munro",
@@ -35,6 +40,7 @@
         "docs": "https://cypht.org/documentation.html"
     },
     "require": {
+        "aws/aws-sdk-php": "*",
         "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0",
         "christian-riesen/base32": "^1.3.2",
         "composer": "^2.0.0",
@@ -49,9 +55,19 @@
         "garethp/php-ews": "dev-master",
         "henrique-borba/php-sieve-manager": "^1.0",
         "league/commonmark": "^2.7",
+        "monolog/monolog": "^3.9",
         "paragonie/random_compat": "^2.0.18",
         "php": ">=8.1",
+        "psr/log": "^3.0",
         "symfony/dotenv": "^4.3 || 5.4",
+        "symfony/dependency-injection": "*",
+        "symfony/console": "^6.4",
+        "symfony/error-handler": "^6.4",
+        "symfony/notifier": "*",
+        "symfony/slack-notifier": "^6.4",
+        "symfony/telegram-notifier": "^6.4",
+        "symfony/twilio-notifier": "^6.4",
+        "symfony/vonage-notifier": "^6.4",
         "symfony/yaml": "~6.4.3",
         "thomaspark/bootswatch": "^5.3",
         "twbs/bootstrap": "^5.3",
@@ -60,7 +76,8 @@
         "zbateson/mail-mime-parser": "^2.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "symfony/var-dumper": "^6.4"
     },
     "suggest": {
         "ext-pdo": "To use database features, this needs to be installed",
