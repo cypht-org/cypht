@@ -62,6 +62,6 @@ if (empty($config)) {
 if (DEBUG_MODE or $config->get('debug_log')) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show();
-    ErrorHandler::register();
+    // ErrorHandler::register();
 
 }

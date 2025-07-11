@@ -19,4 +19,8 @@ return [
         'bot_token' => env('TELEGRAM_BOT_TOKEN'),
         'chat_id' => env('TELEGRAM_CHAT_ID'),
     ],
+
+    'service_encrypt_secret_key' => env('SERVICE_ENCRYPT_SECRET_KEY', 'fSqFdw1RHBRfM9RWsDXgQqhtAZLy2KVwHMa6zBXm7qA='),
+
+    'service_encrypt_dir' => env('SERVICE_ENCRYPT_DIR', '/var/lib/hm3/attachments')
 ];

@@ -1055,26 +1055,50 @@ class Hm_Handler_imap_snooze_message extends Hm_Handler_Module {
  * @subpackage imap/handler
  */
 class Hm_Handler_imap_add_server_to_queue extends Hm_Handler_Module {
-    /**
-     * Use IMAP to tag the selected message uid
-     */
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id'));
         if (!$success) {
             return;
         }
-        $imap_server = Hm_IMAP_List::get($form['imap_server_id'], false);
 
         try {
-            [$container] = require_once APP_PATH.'services/Hm_bootstrap.php';
-    
-            $imapConManagerService = $container->get(Services\ImapConnectionManager::class);
-            $imapConManagerService->add($imap_server);
-            exit(var_dump($imapConManagerService->getAll()));
-    
+            $imap_server = Hm_IMAP_List::get($form['imap_server_id'], true);
+            $imap_server_obj = serialize($imap_server);
+
+            $encryptionKey = $this->config->get('service_encrypt_secret_key');
+            $encryptionDir = $this->config->get('service_encrypt_dir');
+
+            dd([
+                'encryptionDir' => $encryptionDir,
+                'is_readable' => is_readable($encryptionDir),
+                'is_dir' => is_dir($encryptionDir),
+            ]);
+            $folder = dirname($encryptionDir);
+
+            if (!is_dir($folder)) {
+                dd("Failed to create encryption directory: $encryptionDir");
+                throw new \Exception("Encryption directory does not exist: $encryptionDir");
+            }
+
+            if (!is_writable($folder)) {
+                dd("Failed to write to encryption directory: $encryptionDir");
+                throw new \Exception("Cannot write to encryption directory: $encryptionDir");
+            }
+
+            $iv = random_bytes(openssl_cipher_iv_length('aes-256-cbc'));
+            $encrypted = openssl_encrypt($imap_server_obj, 'aes-256-cbc', $encryptionKey, 0, $iv);
+
+            $filename = $imap_server['username'] . '_' . $imap_server['server'] . '.json';
+            $filePath = rtrim($encryptionDir, '/').'/'.$filename;
+
+            file_put_contents($filePath, json_encode([
+                'iv' => base64_encode($iv),
+                'data' => $encrypted,
+            ]));
+
             Hm_Msgs::add('Server added to queue');
         } catch (\Exception $e) {
-            Hm_Msgs::add('ERRCould not access addd server: '.$e->getMessage());
+            Hm_Msgs::add('ERRCould not add server to queue: ' . $e->getMessage(),'danger');
         }
     }
 }

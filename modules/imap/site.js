@@ -78,7 +78,7 @@ var imap_forget_action = function(event) {
 
 var imap_queue_action = function(event) {
     event.preventDefault();
-    Hm_Notices.hide(true);
+    // Hm_Notices.hide(true);
     var form = $(this).closest('.imap_connect');
     var serializedForm = form.serializeArray();
     serializedForm.find(item => item.name === "hm_ajax_hook").value = "ajax_imap_queue";
