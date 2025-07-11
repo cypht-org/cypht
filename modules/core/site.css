@@ -977,13 +977,7 @@ div.unseen,
   width: 100%;
 }
 .mobile .content_title {
-  z-index: 100;
-  top: 0px;
-  position: fixed;
-  padding-left: 4rem !important;
-  margin-bottom: 5px;
-  left: 0px;
-  right: 0px;
+  padding-top: 0;
   display: flex;
   max-height: 35rem;
   align-items: center;
@@ -1114,12 +1108,16 @@ div.unseen,
 }
 .mobile .search_content .content_title {
   max-height: 500px;
+  flex: 0 0 auto;
 }
 .mobile .search_form select {
   width: calc(50% - 0.5rem);
 }
 .mobile .search_content {
-  padding-top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
 }
 .mobile .unsaved_reminder {
   display: none;
@@ -1410,11 +1408,16 @@ div.unseen,
 
 .mobile .menu-toggle {
   position: fixed;
-  right: unset;
-  left: 20px;
+  right: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
-  text-align: right;
-  top: 15px;
+  text-align: left;
+  top: 0;
+  padding: 15px 0 15px 20px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .mobile nav .menu-toggle {
@@ -1422,6 +1425,46 @@ div.unseen,
   left: unset;
   text-align: left;
   top: 20px;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  position: absolute;
+  z-index: 1001;
+  color: var(--bs-primary);
+}
+
+.mobile .nav-header {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  padding: 0;
+  border-bottom: 1px solid var(--bs-secondary-bg);
+}
+
+.mobile .nav-header a {
+  margin: auto;
+}
+
+.mobile .nav-header .app-logo {
+  display: block;
+  height: 2rem;
+  width: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.mobile .nav-header .close-toggle {
+  position: static;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  width: fit-content;
+  margin-left: 0;
+  padding: 15px 20px;
+}
+
+.mobile .app-logo{
+  display: none;
 }
 
 body {
@@ -1509,10 +1552,19 @@ a[disabled] {
   color: var(--bs-white);
 }
 
-.mobile .search_content .message_table {
+/* .mobile .search_content .message_table {
   margin-top: 10rem;
+} */
+
+.mobile .search_content .p-3 {
+  flex: 1 1 auto;
+  overflow: auto;
 }
 
 .search_content .refresh_link {
   display: none;
 }
+
+/* .mobile .menu_home {
+  display: none;
+} */
