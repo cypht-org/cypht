@@ -480,7 +480,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $email_sender = $email_sender[0][0];
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
-            if ($this->request->post['is_screened']) {
+            if (isset($this->request->post['is_screened'])) {
                 $array_email_sender = explode(",", $email_sender);
                 $email_sender = null;
             }
