@@ -1607,9 +1607,13 @@ class Hm_Output_folder_list_content_end extends Hm_Output_Module {
         }
         $res .= '<span class="nav-label">' . $this->trans('Reload') . '</span>';
         $res .= '</a>';
+        
+        // Add menu-toggle for desktop only (not mobile)
+        $res .= '<div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>';
+        
         /** Sidebar footer end */
 
-        $res .= '<div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>';
+
         if ($this->format == 'HTML5') {
             return $res;
         }
