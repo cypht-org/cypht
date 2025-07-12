@@ -240,6 +240,23 @@ var imap_flag_message = function(state, supplied_uid, supplied_detail) {
 
 var imap_status_update = function() {
     $('.imap_status').each(function(i, el) {
+        const serverId = $(el).data('id');
+        $('.imap_detail_' + serverId).html(`
+            <div class="d-flex align-items-center">
+                <div class="spinner-border text-primary me-2" role="status" style="width: 1rem; height: 1rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span>Loading sieve capabilities...</span>
+            </div>
+        `);
+        $('.imap_capabilities_' + serverId).html(`
+            <div class="d-flex align-items-center">
+                <div class="spinner-border text-primary me-2" role="status" style="width: 1rem; height: 1rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <span>Loading server capabilities...</span>
+            </div>
+        `);
         Hm_Ajax.request(
             [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_status'},
             {'name': 'imap_server_ids', 'value': $(el).data('id')}],

@@ -737,13 +737,15 @@ class Hm_Output_display_imap_status extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         $enable_sieve = $settings['enable_sieve_filter_setting'] ?? DEFAULT_ENABLE_SIEVE_FILTER;
         $res = '';
-        foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].' imap_status" data-id="'.$vals['id'].'"></td>';
-            if ($enable_sieve) {
-                $res .= '<td class="imap_detail_'.$vals['id'].'"></td>';
+        if(!$this->get('is_mobile')) {
+            foreach ($this->get('imap_servers', array()) as $index => $vals) {
+                $res .= '<tr><td>'.(strtoupper($vals['type'] ?? 'IMAP')).'</td><td>'.$vals['name'].'</td><td class="imap_status_'.$vals['id'].' imap_status" data-id="'.$vals['id'].'"></td>';
+                if ($enable_sieve) {
+                    $res .= '<td class="imap_detail_'.$vals['id'].'"></td>';
+                }
+                $res .= '</tr>';
             }
-            $res .= '</tr>';
-        }
+        }   
         return $res;
     }
 }
@@ -758,9 +760,11 @@ class Hm_Output_display_imap_capability extends Hm_Output_Module {
      */
     protected function output() {
         $res = '';
-        foreach ($this->get('imap_servers', array()) as $index => $vals) {
-            $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
-                '<td class="imap_capabilities_'.$vals['id'].'"></td></tr>';
+        if(!$this->get('is_mobile')) {
+            foreach ($this->get('imap_servers', array()) as $index => $vals) {
+                $res .= '<tr><td>IMAP</td><td>'.$vals['name'].'</td>'.
+                    '<td class="imap_capabilities_'.$vals['id'].'"></td></tr>';
+            }
         }
         return $res;
     }
