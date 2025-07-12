@@ -1,6 +1,27 @@
 .hmod_val, .omod_val, .hmod, .omod { color: #666; display: none; padding: 4px; padding-left: 60px; }
 .config_map_page { color: #666; font-size: 110%; cursor: pointer; padding-top: 20px; padding-left: 40px; }
-.config_map { margin-left: 40px; min-width: 400px; }
+.config_map { margin-left: 25px; min-width: 400px; }
 .config_map th {border-bottom: solid 1px #eee; padding-left: 20px;  display: none; padding-top: 10px; color: #666; font-size: 90%; text-align: left; }
 .config_map th { padding-left: 60px; }
 .config_map img { width: 16px; height: 16px; opacity: .6 }
+
+
+.server_status_parent_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-left: 1.6rem;
+}
+
+.server_status_parent_list li {
+    list-style: none;
+    gap: 4px;
+}
+
+.server_status_parent_list .server_status_label {
+    opacity: .6;
+}
+
+@media screen and (max-width: 768px) {
+    .server_info table tr { display: flex; flex-direction: column;}
+}

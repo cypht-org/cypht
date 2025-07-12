@@ -275,26 +275,58 @@ class Hm_Output_server_status_start extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
         $enable_sieve = $settings['enable_sieve_filter_setting'] ?? DEFAULT_ENABLE_SIEVE_FILTER;
-        $res = '<div class="content_title px-3">'.$this->trans('Status').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
-                $this->trans('Status').'</th>';
-        if ($enable_sieve) {
-            $res .= '<th class="text-secondary fw-light">'.$this->trans('Sieve server capabilities').'</th>';
+        $res = '<div class="content_title_info px-4">'.$this->trans('Status & Sieve Capabilities').'</div><div class="server_status_info p-3">';
+        if (!$this->get('is_mobile')) {
+            $res .= '<table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
+                    $this->trans('Status').'</th>';
+            if ($enable_sieve) {
+                $res .= '<th class="text-secondary fw-light">'.$this->trans('Sieve server capabilities').'</th>';
+            }
+            $res .= '</tr></thead><tbody>';
+        }else {
+            $imap_servers = $this->get('imap_servers', array());
+            // Helper function to render label/value pairs
+            $row = function($label, $value) {
+                return '<li><div class="server_status_label">'.$label.'</div><div>'.$value.'</div></li>';
+            };
+            $last_key = end(array_keys($imap_servers));
+            foreach($imap_servers as $index => $imap_server) {
+                $res .= "<ul class='server_status_parent_list'>";
+                $res .= $row($this->trans('Type'), strtoupper($imap_server['type'] ?? 'IMAP'));
+                $res .= $row($this->trans('Name'), $imap_server['name']);
+                $res .= $row(
+                    $this->trans('Status'),
+                    '<div class="imap_status_'.$imap_server['id'].' imap_status" data-id="'.$imap_server['id'].'"></div>'
+                );
+                if ($enable_sieve) {
+                    $res .= $row(
+                        $this->trans('Sieve server capabilities'),
+                        '<div class="imap_detail_'.$imap_server['id'].'"></div>'
+                    );
+                }
+                $res .= "</ul>";
+                if ($index !== $last_key) {
+                    $res .= '<hr class="my-4 border-top border-secondary opacity-50">';
+                }
+            }
         }
-        $res .= '</tr></thead><tbody>';
         return $res;
     }
 }
 
+
 /**
  * Close the status table used on the info page
- * @subpackage developer/output
- */
+ * @subpackage developer/output */
 class Hm_Output_server_status_end extends Hm_Output_Module {
     /**
      * Close the table opened in Hm_Output_server_status_start
      */
     protected function output() {
-        return '</tbody></table></div></div>';
+        if (!$this->get('is_mobile')) {
+            return '</tbody></table></div></div>';
+        }
+        return '</div>';
     }
 }
 
@@ -307,8 +339,33 @@ class Hm_Output_server_capabilities_start extends Hm_Output_Module {
      * Modules populate this table to run a status check from the info page
      */
     protected function output() {
-        $res = '<div class="content_title px-3">'.$this->trans('Capabilities').'</div><div class="p-3"><table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
+        $res = '<div class="content_title_info px-4">'.$this->trans('Capabilities').'</div><div class="p-3">';
+        if(!$this->get('is_mobile')) {
+            $res .= '<table class="table table-borderless"><thead><tr><th class="text-secondary fw-light">'.$this->trans('Type').'</th><th class="text-secondary fw-light">'.$this->trans('Name').'</th><th class="text-secondary fw-light">'.
                 $this->trans('Server capabilities').'</th></tr></thead><tbody>';
+        }else {
+            $imap_servers = $this->get('imap_servers', array());
+
+            // Helper function to render label/value pairs
+            $row = function($label, $value) {
+                return '<li><div class="server_status_label">'.$label.'</div><div>'.$value.'</div></li>';
+            };
+            $last_key = end(array_keys($imap_servers));
+            foreach($imap_servers as $imap_server) {
+                $res .= "<ul class='server_status_parent_list'>";
+                $res .= $row($this->trans('Type'), strtoupper($imap_server['type'] ?? 'IMAP'));
+                $res .= $row($this->trans('Name'), $imap_server['name']);
+                
+                $res .= $row(
+                    $this->trans('Server capabilities'),
+                    '<div class="imap_capabilities_'.$imap_server['id'].'"></div>'
+                );
+                $res .= "</ul>";
+                if ($imap_server['id'] !== $last_key) {
+                    $res .= '<hr class="my-4 border-top border-secondary opacity-50">';
+                }
+            }
+        }
         return $res;
     }
 }
@@ -322,6 +379,9 @@ class Hm_Output_server_capabilities_end extends Hm_Output_Module {
      * Close the table opened in Hm_Output_server_capabilities_start
      */
     protected function output() {
-        return '</tbody></table></div></div>';
+        if(!$this->get('is_mobile')) {
+            return '</tbody></table></div></div>';
+        }
+        return '</div>';
     }
 }
