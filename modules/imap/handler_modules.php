@@ -250,6 +250,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
             $screen = false;
             $parts = explode("_", $this->request->get['list_path']);
             $imap_server_id = $parts[1] ?? '';
+            $emails_to_block = [];
             if ($form['imap_move_action'] == "screen_mail") {
                 $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
                 if ($mailbox && $mailbox->authed()) {
@@ -260,6 +261,19 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                         $mailbox->create_folder($screen_folder);
                     }
                     $form['imap_move_to'] = $parts[0] ."_". $parts[1] ."_".bin2hex($screen_folder);
+                    $imap_move_ids = explode(",", $form['imap_move_ids']);
+
+                    foreach ($imap_move_ids as $imap_msg_id) {
+                        $array_imap_msg_id = explode("_", $imap_msg_id);
+                        if (isset($array_imap_msg_id[2])) {
+                            $msg_header = $mailbox->get_message_headers(hex2bin($array_imap_msg_id[3]), $array_imap_msg_id[2]);
+                            $email_sender = process_address_fld($msg_header['From'])[0]['email'] ?? null;
+                            if ($email_sender) {
+                                $emails_to_block[] = $email_sender;
+                            }
+                        }
+                    }
+                    $emails_to_block = array_unique($emails_to_block);
                 }
             }
 
@@ -304,6 +318,7 @@ class Hm_Handler_imap_process_move extends Hm_Handler_Module {
                 Hm_Msgs::add('Unable to move/copy selected messages', 'danger');
             }
             $this->out('move_count', $moved);
+            $this->out('emails_to_block', implode(",", $emails_to_block));
         }
     }
 }
@@ -328,10 +343,9 @@ class Hm_Handler_imap_save_sent extends Hm_Handler_Module {
         $msg = str_replace("\n", "\r\n", $msg);
         $msg = rtrim($msg)."\r\n";
         $imap_details = Hm_IMAP_List::dump($imap_id);
-        $sent_folder = false;
         $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
-            $uid = save_sent_msg($this, $imap_id, $mailbox, $imap_details, $msg, $mime->get_headers()['Message-Id']);
+            list($uid, $sent_folder) = save_sent_msg($this, $imap_id, $mailbox, $imap_details, $msg, $mime->get_headers()['Message-Id']);
             if ($uid) {
                 $this->out('sent_msg_uid', $uid);
                 $this->out('sent_imap_id', $imap_id);
@@ -1571,22 +1585,6 @@ class Hm_Handler_save_imap_servers extends Hm_Handler_Module {
 }
 
 /**
- * Load IMAP servers for the search page
- * @subpackage imap/handler
- */
-class Hm_Handler_load_imap_servers_for_search extends Hm_Handler_Module {
-    /**
-     * Output IMAP server array used on the search page
-     */
-    public function process() {
-        foreach(imap_data_sources($this->user_config->get('custom_imap_sources', array())) as $vals) {
-            $this->append('data_sources', $vals);
-        }
-    }
-}
-
-
-/**
  * Load IMAP servers for message list pages
  * @subpackage imap/handler
  */
@@ -1834,16 +1832,6 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
             list($success, $form) = $this->process_form(array('imap_server_id'));
             $imap_details = Hm_IMAP_List::dump($form['imap_server_id'], true);
             if ($success && $imap_details) {
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                    $factory = get_sieve_client_factory($this->site_config);
-                    try {
-                        $client = $factory->init($this->user_config, $imap_details, $this->module_is_supported('nux'));
-                    } catch (Exception $e) {
-                        Hm_Msgs::add("Failed to authenticate to the Sieve host", "danger");
-                        return;
-                    }
-                }
-
                 $mailbox = false;
                 $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
                 $mailbox = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
@@ -1859,6 +1847,7 @@ class Hm_Handler_imap_connect extends Hm_Handler_Module {
                     Hm_Msgs::add('Username and password are required', 'warning');
                     $this->out('old_form', $form);
                 }
+                $this->out('imap_connect_details', $imap_details);
             }
         }
     }

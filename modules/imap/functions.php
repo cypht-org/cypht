@@ -219,6 +219,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
     $list_page = $output_module->get('list_page', 0);
     $list_sort = $output_module->get('list_sort', $output_module->get('default_sort_order'));
     $list_filter = $output_module->get('list_filter');
+    $list_keyword = $output_module->get('list_keyword');
     foreach($msg_list as $msg) {
         $row_class = 'email';
         $icon = 'env_open';
@@ -304,6 +305,9 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         }
         if ($list_filter) {
             $url .= '&filter='.$output_module->html_safe($list_filter);
+        }
+        if ($list_keyword) {
+            $url .= '&keyword='.$output_module->html_safe($list_keyword);
         }
         if (!$show_icons) {
             $icon = false;
@@ -1612,6 +1616,7 @@ if (!hm_exists('connect_to_imap_server')) {
 if (!hm_exists('save_sent_msg')) {
 function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_id, $show_errors = true) {
     $specials = get_special_folders($handler, $imap_id);
+    $sent_folder = false;
     if (array_key_exists('sent', $specials) && $specials['sent']) {
         $sent_folder = $specials['sent'];
     }
@@ -1634,5 +1639,5 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
             Hm_Msgs::add('ERRAn error occurred saving the sent message');
         }
     }
-    return $uid;
+    return [$uid, $sent_folder];
 }}

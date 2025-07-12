@@ -1781,16 +1781,23 @@ class Hm_Output_message_start extends Hm_Output_Module {
             else {
                 $list_name = $this->trans(ucwords(str_replace('_', ' ', $this->get('list_parent', ''))));
             }
+            $additional = '';
             if ($this->get('list_parent') == 'advanced_search') {
                 $page = 'advanced_search';
             }
             elseif ($this->get('list_parent') == 'search') {
                 $page = 'search';
+                foreach (['list_page', 'list_sort', 'search_terms', 'search_fld', 'search_since'] as $field) {
+                    if ($value = $this->get($field)) {
+                        $field = $field == 'list_sort' ? 'sort' : $field;
+                        $additional .= "&amp;$field=" . $this->html_safe($value);
+                    }
+                }
             }
             else {
                 $page = 'message_list';
             }
-            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).'">'.$list_name.'</a>';
+            $title = '<a href="?page='.$page.'&amp;list_path='.$this->html_safe($this->get('list_parent')).$additional.'">'.$list_name.'</a>';
             if (count($this->get('mailbox_list_title', array())) > 0) {
                 $mb_title = array_map( function($v) { return $this->trans($v); }, $this->get('mailbox_list_title', array()));
                 if (($key = array_search($list_name, $mb_title)) !== false) {

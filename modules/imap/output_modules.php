@@ -77,7 +77,7 @@ class Hm_Output_imap_custom_controls extends Hm_Output_Module {
             }
             if ($this->get('folder')) {
                 if ($this->get('screen_emails')) {
-                    $custom .= '<a title="Disike" href="#" class="screen-email-unlike"><i class="bi bi-hand-thumbs-down-fill"></i></a><a title="Like" href="#" class="screen-email-like"></i><i class="bi bi-hand-thumbs-up-fill"></i></a>';
+                    $custom .= '<span title="Disike" class="screen-email-unlike cursor-pointer"><i class="bi bi-hand-thumbs-down-fill"></i></span><span title="Like" class="screen-email-like cursor-pointer"></i><i class="bi bi-hand-thumbs-up-fill"></i></span>';
                     if ($this->get('move_messages_in_screen_email')) {
                         $custom .= '<input type="hidden" value="1" id="move_messages_in_screen_email"/>';
                     } else {
@@ -361,33 +361,33 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
             $txt .= '<tr><th colspan="2" class="header_links">';
-            $txt .= '<div class="msg_move_to">'.
-                '<a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a>'.
-                '<a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a>';
+            $txt .= '<ul class="msg_move_to">'.
+                '<li><a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a></li>'.
+                '<li><a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a></li>';
             if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
-                $txt .= ' | <a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                $txt .= ' | <li><a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a></li>';
                 if ($size > 1) {
-                    $txt .= ' | <a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                    $txt .= ' | <li><a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a></li>';
                 }
                 else {
-                    $txt .= ' | <a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a>';
+                    $txt .= ' | <li><a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a></li>';
                 }
                 $txt .= ' | ' . forward_dropdown($this, $reply_args);
             }
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <li><a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
+                $txt .= '<li><a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
             }
             else {
-                $txt .= ' | <a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= ' | <li><a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
+                $txt .= '<li><a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
             }
 
-            $txt .= ' | <a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a>';
-            $txt .= ' | <a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
-            $txt .= ' | <a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
-            $txt .= ' | <a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a>';
-            $txt .= ' | <a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            $txt .= ' | <li><a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a></li>';
+            $txt .= ' | <li><a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a></li>';
+            $txt .= ' | <li><a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location"></div></li>';
+            $txt .= ' | <li><a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location"></div></li>';
+            $txt .= ' | <li><a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a></li>';
             if($this->get('tags')){
                 $txt .= ' | '. tags_dropdown($this, $headers);
             }
@@ -397,7 +397,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
             $settings = $this->get('user_settings', array());
-            if(array_key_exists('enable_snooze', $settings) && $settings['enable_snooze']) {
+            if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
             }
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
@@ -413,19 +413,19 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
                     if(!in_array($sender, $existing_emails)){
-                        $txt .= ' | <div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
+                        $txt .= ' | <li><div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a></li>';
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= ' | <span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= ' | <li><span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span></li>';
                 }
             }
-            $txt .= ' | <a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
+            $txt .= ' | <li><a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a></li>';
 
             if ($is_draft) {
-                $txt .= ' | <a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
+                $txt .= ' | <li><a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a></li>';
             }
-            $txt .= '<div class="move_to_location"></div></div>';
+            $txt .= '</ul><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';

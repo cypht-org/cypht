@@ -230,6 +230,8 @@ class Hm_Handler_default_sort_order_setting extends Hm_Handler_Module {
      */
     public function process() {
         $this->out('default_sort_order', $this->user_config->get('default_sort_order_setting', 'arrival'));
+        $this->out('sort', $this->request->get['sort'] ?? null);
+        $this->out('list_sort', $this->request->get['list_sort'] ?? null);
     }
 }
 

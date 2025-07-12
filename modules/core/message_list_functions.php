@@ -147,8 +147,8 @@ function combined_sort_dialog($mod) {
 
     $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
     foreach ($sorts as $name => $val) {
-        $res .= '<option value="'.$name.'">'.$val.' &darr;</option>';
-        $res .= '<option value="-'.$name.'">'.$val.' &uarr;</option>';
+        $res .= '<option value="'.$name.'"'.($mod->get('sort') == $name || $mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'"'.($mod->get('sort') == '-'.$name || $mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
     }
     $res .= '</select>';
     return $res;
@@ -320,7 +320,17 @@ function subject_callback($vals, $style, $output_mod) {
     }
     $subject = $output_mod->html_safe($vals[0]);
     if (isset($vals[4]) && $vals[4]) {
-        $preview_msg = $output_mod->html_safe($vals[4]);
+        $lines = explode("\n", $vals[4]);
+        $clean = array_filter(array_map('trim', $lines), function ($line) {
+            return $line !== ''
+                && stripos($line, 'boundary=') === false
+                && !preg_match('/^-{2,}==/', $line)
+                && stripos($line, 'content-type:') !== 0
+                && stripos($line, 'charset=') === false
+                && stripos($line, 'content-transfer-encoding:') !== 0;
+        });
+        $clean_text = implode("\n", $clean);
+        $preview_msg = $output_mod->html_safe($clean_text);
     }
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);

@@ -46,7 +46,7 @@ class Hm_EWS {
             $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::INBOX);
             $this->authed = true;
             return true;
-        } catch (Exception\UnauthorizedException $e) {
+        } catch (Exception\UnauthorizedException | \SoapFault $e) {
             return false;
         }
     }
