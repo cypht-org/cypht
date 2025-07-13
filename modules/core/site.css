@@ -54,9 +54,11 @@ main {
 a {
   color: var(--bs-link-color);
   text-decoration: none;
+  transition: color 0.2s ease-in-out;
 }
 a:hover {
   color: var(--bs-link-hover-color);
+  text-decoration: underline;
 }
 .folder_cell {
   position: relative;
@@ -289,9 +291,11 @@ td {
   color: #333;
   text-decoration: none;
   border: none !important;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
 }
 .logout:hover {
   background-color: #eee;
+  color: var(--bs-link-hover-color);
 }
 .logout {
   cursor: pointer;
@@ -386,6 +390,13 @@ button {
   color: rgba(var(--bs-body-color-rgb), 0.7);
   text-decoration: none;
   line-height: 1.25em;
+  transition: color 0.2s ease-in-out;
+}
+.folders a:hover,
+.unread_link:hover,
+.all_tags:hover {
+  color: var(--bs-link-hover-color);
+  text-decoration: underline;
 }
 .settings_subtitle {
   color: var(--bs-link-color) !important;
@@ -551,6 +562,11 @@ button {
 .page_links a {
   text-decoration: none;
   color: #111;
+  transition: color 0.2s ease-in-out;
+}
+.page_links a:hover {
+  color: var(--bs-link-hover-color);
+  text-decoration: underline;
 }
 .page_links a img {
   opacity: 0.6;
@@ -1535,6 +1551,11 @@ nav.collapsed .sidebar-footer a {
 
 .logout_link {
   color: rgba(var(--bs-body-color-rgb), 0.7);
+  transition: color 0.2s ease-in-out;
+}
+.logout_link:hover {
+  color: var(--bs-link-hover-color);
+  text-decoration: underline;
 }
 
 a[disabled] {
@@ -1568,3 +1589,472 @@ a[disabled] {
 /* .mobile .menu_home {
   display: none;
 } */
+
+/* Flexbox-based message headers - replaces table structure */
+.msg_headers_flex {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background-color: #fff;
+  border-bottom: solid 1px #ddd;
+  color: #777;
+  padding: 0px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.header-item {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  padding: 3px;
+  padding-top: 5px;
+  border-bottom: none;
+}
+
+.header-item:last-child {
+  border-bottom: none;
+}
+
+.header-subject {
+  flex-direction: column;
+  gap: 0;
+  padding: 3px;
+  padding-top: 10px;
+}
+
+.header-subject .header-content {
+  font-size: 1.3em;
+  font-weight: normal;
+  color: #333;
+  padding: 0;
+  padding-left: 35px;
+  padding-right: 13px;
+}
+
+.header-label {
+  font-weight: normal;
+  color: #777;
+  min-width: 80px;
+  flex-shrink: 0;
+  padding: 3px;
+  padding-top: 5px;
+  padding-left: 35px;
+  padding-right: 13px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.header-value {
+  flex: 1;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 3px;
+  padding-top: 5px;
+  padding-right: 13px;
+}
+
+.header-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 3px;
+  padding-top: 10px;
+  padding-left: 35px;
+  padding-right: 13px;
+}
+
+.action-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  margin-bottom: 10px;
+}
+
+.message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.3rem;
+}
+
+.action-links a,
+.message-actions a {
+  margin-right: 5px;
+  text-decoration: none;
+  color: #777;
+  transition: color 0.2s ease-in-out;
+}
+.action-links a:hover,
+.message-actions a:hover {
+  color: var(--bs-link-hover-color);
+  text-decoration: underline;
+}
+
+.action-links a:after,
+.message-actions a:after {
+  color: #777;
+}
+
+.action-links a:last-child:after,
+.message-actions a:last-child:after {
+  content: "";
+}
+
+.long_header {
+  display: none;
+}
+
+.long_header[style*="display: block"],
+.long_header[style*="display: flex"],
+.long_header[style*="display: grid"] {
+  display: grid !important;
+  grid-template-columns: 1fr 4fr;
+  gap: 0;
+  align-items: start;
+}
+
+/* .small_header {
+  display: block;
+} */
+
+.all_headers {
+  display: inline-block;
+}
+
+.small_headers {
+  display: none;
+}
+
+/* Contact info styling */
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.contact-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.contact-label {
+  font-weight: bold;
+  min-width: 60px;
+}
+
+.contact-value {
+  flex: 1;
+}
+
+.header-item.header-list .header-value {
+  display: flex;
+  flex-direction: row;
+  column-gap: 0.3rem;
+}
+
+.header-item.header-list .header-value div {
+  display: flex;
+  column-gap: 0.3rem;
+}
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  a {
+    white-space: normal !important;
+  }
+  .msg_headers_flex {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+  
+  .header-item {
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0;
+    border: none;
+    margin-bottom: -0.5rem;
+  }
+  
+  .header-item:last-child {
+    border-bottom: none;
+  }
+
+  .header-item.header-date {
+    padding: 0;
+    margin-top: -0.3rem;
+  }
+
+  .header-item.header-to,
+  .header-item.header-cc,
+  .header-item.header-flags,
+  .header-item.header-list {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .header-item.header-date .header-label,
+  .header-item.header-from .header-label  {
+    display: none;
+  }
+
+  .header-item.header-date .header-value {
+    font-size: 0.6rem;
+  }
+
+  .header-item.header-to .header-label,
+  .header-item.header-cc .header-label,
+  .header-item.header-flags .header-label,
+  .header-item.header-list .header-label {
+    margin: 0;
+  }
+
+  .header-label {
+    min-width: auto;
+    font-size: 0.77rem;
+    color: #888;
+    padding: 0;
+    margin-bottom: 0.25rem;
+  }
+  
+  .header-value {
+    font-size: 0.77rem;
+    padding: 0;
+  }
+  
+  .header-subject .header-content {
+    font-size: 0.8rem;
+    padding: 0;
+    font-weight: 600;
+    word-break: auto-phrase;
+  }
+  
+  .header-actions {
+    padding: 0;
+    margin-top: 1rem;
+  }
+  
+  .action-links,
+  .message-actions {
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .action-links a,
+  .message-actions a {
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    background-color: #f8f9fa;
+    text-decoration: none;
+    color: #495057;
+    font-size: 0.6rem;
+    margin-right: 0;
+  }
+  
+  .action-links a:after,
+  .message-actions a:after {
+    content: "";
+  }
+  
+  .action-links a:hover,
+  .message-actions a:hover {
+    background-color: #e9ecef;
+  }
+
+  .action-links button,
+  .message-actions button {
+    font-size: 0.6rem;
+    padding: 0.4rem 0.2rem;
+}
+
+  /* List header specific mobile styling */
+  .header-item.header-list .header-value {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .header-item.header-list .header-value > div {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+  }
+
+  .header-item.header-list .header-value p {
+    margin: 0;
+    font-size: 0.77rem;
+  }
+
+  .header-item.header-list .header-value a {
+    font-size: 0.77rem;
+    color: #495057;
+    text-decoration: none;
+    background-color: #edf3fa;
+    /* border: 1px solid #dee2e6; */
+    border-radius: 0.25rem;
+    /* padding: 0.25rem 0.5rem; */
+    /* margin: 0.125rem; */
+    /* Use more compact padding and margin for a sleeker look */
+    padding: 0 0.07rem; 
+    display: inline-block;
+    transition: all 0.15s ease-in-out;
+  }
+
+  .header-item.header-list .header-value a:hover {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+    text-decoration: none;
+  }
+
+  .header-item.header-list .header-value a:active {
+    background-color: #5a6268;
+    border-color: #545b62;
+  }
+
+  .long_header {
+    display: none;
+  }
+
+  .small_header {
+    display: block;
+  }
+
+  .all_headers {
+    display: inline-block;
+  }
+
+  .small_headers {
+    display: none;
+  }
+}
+
+/* Tablet responsive design */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .header-item {
+    gap: 0.75rem;
+  }
+  
+  .header-label {
+    min-width: 70px;
+  }
+}
+
+/* Desktop design - maintain original table appearance */
+@media (min-width: 1025px) {
+  .msg_headers_flex {
+    padding: 0px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+  }
+  
+  .header-item {
+    gap: 0;
+  }
+  
+  .header-label {
+    min-width: 80px;
+  }
+}
+
+/* Override old table styles for new flexbox headers */
+.msg_headers_flex {
+  max-width: 100%;
+  border-bottom: solid 1px #ddd;
+  color: #777;
+  padding: 0px;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+/* Ensure old table styles don't interfere */
+.msg_headers table {
+  display: none;
+}
+
+/* Mobile flexbox header improvements */
+.mobile .msg_headers_flex {
+  padding: 0.75rem;
+  gap: 0.5rem;
+}
+
+.mobile .header-item:last-child {
+  border-bottom: none;
+}
+
+.mobile .header-item .header-date {
+  display: none;
+}
+
+/* .mobile .header-subject .header-content {
+  font-size: 0.8rem;
+  padding: 0;
+  font-weight: 500;
+} */
+
+.mobile .header-actions {
+  padding: 0;
+  margin-top: 1rem;
+}
+
+/* .mobile .action-links,
+.mobile .message-actions {
+  flex-direction: column;
+  gap: 0.5rem;
+} */
+
+/* .mobile .action-links a,
+.mobile .message-actions a {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #f8f9fa;
+  text-decoration: none;
+  color: #495057;
+  font-size: 0.875rem;
+  margin-right: 0;
+}
+
+.mobile .action-links a:after,
+.mobile .message-actions a:after {
+  content: "";
+}
+
+.mobile .action-links a:hover,
+.mobile .message-actions a:hover {
+  background-color: #e9ecef;
+} */
+
+/* Additional mobile responsive improvements */
+.mobile .msg_text {
+  padding: 0 10px;
+}
+
+.mobile .msg_headers {
+  font-size: 90%;
+}
+
+.mobile .msg_headers table {
+  width: 100%;
+  table-layout: auto;
+}
+
+.mobile .msg_headers th,
+.mobile .msg_headers td {
+  padding: 5px 10px;
+  vertical-align: top;
+}
+
+.mobile .header_subject th {
+  font-size: 110%;
+  font-weight: bold;
+  padding-bottom: 15px;
+}
+
+.mobile .add_contact_row {
+  position: relative !important;
+  top: auto !important;
+  right: auto !important;
+  padding: 10px;
+  margin-bottom: 10px;
+}

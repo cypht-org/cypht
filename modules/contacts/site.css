@@ -185,5 +185,5 @@
 }
 
 .mobile .add_contact_row {
-    display: none;
+    display: none !important;
 }
