@@ -7,6 +7,6 @@ function handleViewMessagePart() {
         const url = new URL(window.location.href);
         url.searchParams.set('part', messagePart);
         history.replaceState(history.state, "", url.toString());
-        get_message_content(messagePart, getMessageUidParam() ?? inline_msg_uid, getListPathParam());
+        get_message_content(messagePart, getMessageUidParam() ?? inline_msg_uid, getListPathParam(), getParam('list_parent') ?? getListPathParam());
     });
 }

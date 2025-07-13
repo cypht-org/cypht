@@ -2,7 +2,6 @@
 .saved_searches_form input { margin-left: 3px; margin-right: 3px; }
 .update_search_label img { opacity: .5; position: absolute; right: 105px; top: 21px; }
 .update_saved_search_title { color: #666; font-size: 110%; padding: 5px; margin-bottom: 10px; }
-.save_search i, .delete_search img { opacity: .5; position: absolute; right: 75px; top: 22px; }
 .update_search img { opacity: .5; position: absolute; right: 135px; top: 22px; }
 
 .mobile .save_search, .mobile .update_search_label, .mobile .delete_search, .mobile .add_search { display: none !important; }

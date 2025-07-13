@@ -49,10 +49,10 @@ class Hm_Handler_update_search extends Hm_Handler_Module {
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('updated_search', true);
-                Hm_Msgs::add('Saved search updated');
+                Hm_Msgs::add('Saved search updated', 'info');
             }
             else {
-                Hm_Msgs::add('ERRUnable to update the search paramaters');
+                Hm_Msgs::add('Unable to update the search paramaters', 'danger');
             }
         }
     }
@@ -113,7 +113,7 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
                 $this->out('saved_search', true);
             }
             else {
-                Hm_Msgs::add('ERRYou already have a search by that name');
+                Hm_Msgs::add('You already have a search by that name', 'warning');
             }
         }
     }

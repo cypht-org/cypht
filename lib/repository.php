@@ -7,7 +7,7 @@ trait Hm_Repository {
     protected static $session;
     protected static $entities;
 
-    protected static function initRepo($name, $user_config, $session, &$entities, callable $init = null) {
+    protected static function initRepo($name, $user_config, $session, &$entities, ? callable $init = null) {
         self::$name = $name;
         self::$user_config = $user_config;
         self::$session = $session;
@@ -17,7 +17,10 @@ trait Hm_Repository {
         if ($init) {
             $init($initial);
         } else {
-            foreach ($initial as $entity) {
+            foreach ($initial as $key => $entity) {
+                if (! array_key_exists('id', $entity)) {
+                    $entity['id'] = $key;
+                }
                 self::add($entity, false);
             }
         }

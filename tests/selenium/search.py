@@ -32,7 +32,10 @@ class SearchTest(WebTest):
         assert row_count >= 0
 
     def reset_search(self):
-        self.by_class('search_reset').click()
+        elem = self.by_class('search_reset')
+        self.driver.execute_script("arguments[0].scrollIntoView()", elem)
+        sleep(1)
+        elem.click()
         self.wait_with_folder_list()
         sleep(1)
         assert self.by_id('search_terms').get_attribute('value') == ''

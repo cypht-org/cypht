@@ -1,5 +1,14 @@
 'use strict';
 
+$.fn.fadeOutAndRemove = function(timeout = 600) {
+    this.fadeOut(timeout)
+    var tm = setTimeout(() => {
+        this.remove();
+        clearTimeout(tm)
+    }, timeout);
+    return this;
+};
+
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
@@ -136,8 +145,18 @@ var Hm_Ajax_Request = function() { return {
         if (config.data) {
             data = this.format_xhr_data(config.data);
         }
-        const url = window.location.next ?? window.location.href;
-        xhr.open('POST', url)
+        const url = new URL(window.location.href);
+        if (window.location.next) {
+            url.search = window.location.next.split('?')[1];
+        }
+        for (const param of url.searchParams) {
+            const configItem = config.data.find(item => item.name === param[0]);
+            if (configItem) {
+                url.searchParams.set(configItem.name, configItem.value);
+            }
+        }
+        
+        xhr.open('POST', url.toString())
         if (config.signal) {
             config.signal.addEventListener('abort', function() {
                 xhr.abort();
@@ -219,25 +238,16 @@ var Hm_Ajax_Request = function() { return {
             }
             if (Hm_Ajax.err_condition) {
                 Hm_Ajax.err_condition = false;
-                Hm_Notices.hide(true);
             }
-            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {             
-                Hm_Notices.show(res.router_user_msgs);
+            if (res.router_user_msgs && !$.isEmptyObject(res.router_user_msgs)) {
+                Object.values(res.router_user_msgs).forEach((msg) => {
+                    Hm_Notices.show(msg.text, msg.type);
+                });
             }
             if (res.folder_status) {
-                for (const name in res.folder_status) {
-                    if (name === getListPathParam()) {
-                        Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
-                        Hm_Folders.update_unread_counts();
-                        const messages = new Hm_MessagesStore(name, Hm_Utils.get_url_page_number());
-                        messages.load().then(() => {
-                            if (messages.count != res.folder_status[name].messages) {
-                                messages.load(true).then(() => {
-                                    display_imap_mailbox(messages.rows, messages.links);
-                                })
-                            }
-                        });
-                    }
+                for (var name in res.folder_status) {
+                    Hm_Folders.unread_counts[name] = res.folder_status[name]['unseen'];
+                    Hm_Folders.update_unread_counts();
                 }
             }
             if (this.callback) {
@@ -256,7 +266,7 @@ var Hm_Ajax_Request = function() { return {
 
     fail: function(xhr, not_callable) {
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
-            Hm_Notices.show([err_msg('Server Error')]);
+            Hm_Notices.show('Server Error', 'danger');
         }
         else {
             $('.offline').show();
@@ -303,9 +313,14 @@ function Hm_Modal(options) {
     };
 
     this.opts = { ...defaults, ...options };
+    this.modal = $(`#${this.opts.modalId}`);
 
     this.init = function () {
-        if (this.modal) {
+        if (this.modal.length) {
+            this.modalContent = this.modal.find('.modal-body');
+            this.modalTitle = this.modal.find('.modal-title');
+            this.modalFooter = this.modal.find('.modal-footer');
+            this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
             return;
         }
 
@@ -338,6 +353,7 @@ function Hm_Modal(options) {
     };
 
     this.open = () => {
+        this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
         this.bsModal.show();
     };
 
@@ -370,41 +386,100 @@ function Hm_Modal(options) {
     this.init();
 }
 
+class Hm_Alert {
+    constructor() {
+        this.container = document.querySelector('.sys_messages');
+        if (! this.container) {
+            console.error('Hm_Alert: .sys_messages container not found.');
+        }
+    }
+
+    /**
+     * Create an alert message and append it to the container.
+     *
+     * @param {string} message - The message to display.
+     * @param {string} type - The type of alert (primary, secondary, success, danger, warning, info).
+     * @param {boolean} dismissible - Whether the alert can be dismissed.
+     * @param {integer} dismissTime - Number of seconds before alert auto-closes
+     */
+    createAlert(message, type = 'primary', dismissible = true, dismissTime = 10) {
+        if (!this.container) {
+            return;
+        }
+
+        const alert = document.createElement('div');
+        alert.className = `d-flex align-items-center alert shadow-lg bg-white fade show flex-sm-row p-2 mb-1`;
+        alert.setAttribute('role', 'alert');
+
+        const icon = document.createElement('i');
+        icon.className = `fs-3 text-${type} bi bi-${this.#getIcon(type)}`;
+        const iconContainer = document.createElement('div');
+        iconContainer.className = 'd-flex justify-content-center align-items-center px-2';
+        iconContainer.appendChild(icon);
+
+        const messageElement = document.createElement('div');
+        messageElement.className = 'flex-grow-1 pe-4';
+        messageElement.innerHTML = message;
+
+        alert.appendChild(iconContainer);
+        alert.appendChild(messageElement);
+
+        if (dismissible) {
+            alert.classList.add('alert-dismissible');
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = `btn-close`;
+            closeButton.setAttribute('data-bs-dismiss', 'alert');
+            closeButton.setAttribute('aria-label', 'Close');
+            alert.appendChild(closeButton);
+        }
+        
+        this.container.appendChild(alert);
+
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, 500);
+        }, dismissTime * 1000);
+    }
+
+    #getIcon(type) {
+        const icons = {
+            success: 'check-circle-fill',
+            danger: 'exclamation-triangle-fill',
+            warning: 'exclamation-octagon-fill',
+            primary: 'info-circle-fill',
+            info: 'info-circle-fill',
+            secondary: 'shield-fill-exclamation',
+        };
+
+        return icons[type] || 'info-circle';
+    }
+}
+
 /* user notification manager */
 var Hm_Notices = {
-    hide_id: false,
+    hm_alert: new Hm_Alert(),
 
-    show: function(msgs) {
-        var message = '';
-        var type = '';
-        for (var i in msgs) {
-            if (msgs[i].match(/^ERR/)) {
-                message = msgs[i].substring(3);
-                type = 'danger';
-            }
-            else {
-                type = 'info';
-                message = msgs[i];
-            }
-
-            Hm_Utils.add_sys_message(message, type);
-        }
+    /**
+     * @param {*} msg : The alert message to display
+     * @param {*} type : The type of message to display (primary, secondary, success, danger, warning, info)
+     */
+    show: function(msg, type = 'success', dismissible = true, dismissTime = 10) {
+        msg = hm_trans(msg);
+        this.hm_alert.createAlert(msg, type, dismissible, dismissTime);
     },
 
-    hide: function(now) {
-        if (Hm_Notices.hide_id) {
-            clearTimeout(Hm_Notices.hide_id);
-        }
-        if (now) {
-            $('.sys_messages').addClass('d-none');
-            Hm_Utils.clear_sys_messages();
-        }
-        else {
-            Hm_Notices.hide_id = setTimeout(function() {
-                $('.sys_messages').addClass('d-none');
-                Hm_Utils.clear_sys_messages();
-            }, 5000);
-        }
+    /**
+     * Shows pending messages on page load
+     */
+    showPendingMessages() {
+        hm_msgs.forEach((msg) => {
+            this.hm_alert.createAlert(msg.text, msg.type);
+        });
     }
 };
 
@@ -471,6 +546,7 @@ function Message_List() {
         'unread': 'formatted_unread_data',
         'flagged': 'formatted_flagged_data',
         'junk': 'formatted_junk_data',
+        'snoozed': 'formatted_snoozed_data',
         'trash': 'formatted_trash_data',
         'sent': 'formatted_sent_data',
         'drafts': 'formatted_drafts_data',
@@ -489,11 +565,14 @@ function Message_List() {
         fixLtrInRtl();
     };
 
-    this.update = function(msgs) {
+    this.update = function(msgs, id, store) {
         Hm_Utils.tbody().html('');
-        for (const index in msgs) {
-            const row = msgs[index][0];
-            Hm_Utils.tbody().append(row);
+        let msgArray = msgs;
+        if (! Array.isArray(msgArray)) {
+            msgArray = Object.entries(msgArray);
+        }
+        for (let row of msgArray) {
+            Hm_Utils.tbody().append(row[0]);
         }
     };
 
@@ -511,31 +590,22 @@ function Message_List() {
         var aval;
         var bval;
         var sort_result = listitems.sort(function(a, b) {
-            switch (Math.abs(fld)) {
-                case 1:
-                case 2:
-                case 3:
-                    aval = $($('td', a)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    bval = $($('td', b)[Math.abs(fld)]).text().replace(/^\s+/g, '');
-                    break;
-                case 4:
-                default:
-                    aval = $('input', $($('td', a)[Math.abs(fld)])).val();
-                    bval = $('input', $($('td', b)[Math.abs(fld)])).val();
-                    break;
-            }
-            if (fld == 4 || fld == -4 || !fld) {
-                if (fld == -4) {
+            const sortField = fld.replace('-', '');
+            if (['arrival', 'date'].includes(sortField)) {
+                aval = new Date($(`input.${sortField}`, $('td.dates', a)).val());
+                bval = new Date($(`input.${sortField}`, $('td.dates', b)).val());
+                if (fld.startsWith('-')) {
                     return aval - bval;
                 }
                 return bval - aval;
             }
-            else {
-                if (fld && fld < 0) {
-                    return bval.toUpperCase().localeCompare(aval.toUpperCase());
-                }
-                return aval.toUpperCase().localeCompare(bval.toUpperCase());
+
+            aval = $(`td.${sortField}`, a).text().replace(/^\s+/g, '');
+            bval = $(`td.${sortField}`, b).text().replace(/^\s+/g, '');
+            if (fld.startsWith('-')) {
+                return bval.toUpperCase().localeCompare(aval.toUpperCase());
             }
+            return aval.toUpperCase().localeCompare(bval.toUpperCase());
         });
         this.sort_fld = fld;
         Hm_Utils.tbody().html('');
@@ -611,6 +681,9 @@ function Message_List() {
         if (action_type == 'unflag' && getListPathParam() == 'flagged') {
             remove = true;
         }
+        if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
+            remove = true;
+        }
         else if (action_type == 'delete' || action_type == 'archive') {
             remove = true;
         }
@@ -641,6 +714,12 @@ function Message_List() {
         var class_name = false;
         var index;
         for (index in selected) {
+            const uid = selected[index].split('_')[2];
+            const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+            store.load().then(store => {
+                store.removeRow(uid);
+            });
+
             class_name = selected[index];
             $('.'+Hm_Utils.clean_selector(class_name)).remove();
             if (action_type == 'delete') {
@@ -742,7 +821,6 @@ function Message_List() {
                 self.clear_read_messages();
             }
             self.set_row_events();
-            $('.combined_sort').show();
         }
         if (getPageNameParam() == 'search' && hm_run_search() == "0") {
             Hm_Timer.add_job(self.load_sources, interval, true);
@@ -829,35 +907,42 @@ function Message_List() {
                 true
             );
         }
-        if (!updated) {
-            self.update_after_action(action_type, selected);
-        }
     };
 
-    this.prev_next_links = function(msgUid) {
-        let phref;
-        let nhref;
+    this.prev_next_links = function(msgUid, listPath = getListPathParam(), cb = null) {
+        let prevUrl;
+        let nextUrl;
+                
         const target = $('.msg_headers tr').last();
-        const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number());
-        messages.load(false, true);
-        const next = messages.getNextRowForMessage(msgUid);
-        const prev = messages.getPreviousRowForMessage(msgUid);
-        if (prev) {
-            const prevSubject = $(prev['0']).find('.subject');
-            phref = prevSubject.find('a').prop('href');
-            const subject = new Option(prevSubject.text()).innerHTML;
-            const plink = '<a class="plink" href="'+phref+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
-            $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
+        let filter = `${getParam('keyword')}_${getParam('filter')}`;
+        if (getParam('search_terms')) {
+            filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
         }
-        if (next) {
-            const nextSubject = $(next['0']).find('.subject');
-            nhref = nextSubject.find('a').prop('href');
-            const subject = new Option(nextSubject.text()).innerHTML;
-            const nlink = '<a class="nlink" href="'+nhref+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
-            $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
-        }
-
-        return [phref, nhref];
+        const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), filter, getParam('sort'));
+        messages.load(false, true, false, function() {
+            $('tr.prev, tr.next').remove();
+            const next = messages.getNextRowForMessage(msgUid);
+            const prev = messages.getPreviousRowForMessage(msgUid);
+            if (prev) {
+                const prevSubject = $(prev['0']).find('.subject a');
+                prevUrl = new URL(prevSubject.prop('href'));
+                prevUrl.searchParams.set('list_parent', listPath);
+                const subject = prevSubject.text();
+                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+                $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
+            }
+            if (next) {
+                const nextSubject = $(next['0']).find('.subject a');
+                nextUrl = new URL(nextSubject.prop('href'));
+                nextUrl.searchParams.set('list_parent', listPath);
+                const subject = nextSubject.text();
+                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+                $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
+            }
+            if (cb) {
+                cb([prevUrl?.href, nextUrl?.href]);
+            }
+        });
     };
 
     this.check_empty_list = function() {
@@ -870,12 +955,10 @@ function Message_List() {
                 else {
                     $('.message_list').append('<div class="empty_list">'+hm_empty_folder()+'</div>');
                 }
-                $(".page_links").css("display", "none");// Hide page links as message list is empty
             }
         }
         else {
             $('.empty_list').remove();
-            $('.combined_sort').show();
         }
         return count === 0;
     };
@@ -999,6 +1082,9 @@ function Message_List() {
     }
 
     this.process_row_click = function(e) {
+        if (e.target.tagName === 'A') {
+            return;
+        }
         document.getSelection().removeAllRanges();
         var target = $(e.target);
         var class_name = target[0].className;
@@ -1046,6 +1132,7 @@ function Message_List() {
     this.set_unread_state = function() { self.set_message_list_state('formatted_unread_data'); };
     this.set_search_state = function() { self.set_message_list_state('formatted_search_data'); };
     this.set_junk_state = function() { self.set_message_list_state('formatted_junk_data'); };
+    this.set_snoozed_state = function() { self.set_message_list_state('formatted_snoozed_data'); };
     this.set_trash_state = function() { self.set_message_list_state('formatted_trash_data'); };
     this.set_draft_state = function() { self.set_message_list_state('formatted_drafts_data'); };
     this.set_tag_state = function() { self.set_message_list_state('formatted_tag_data'); };
@@ -1135,7 +1222,6 @@ var Hm_Folders = {
             Hm_Folders.update_folder_list();
             sessionStorage.clear();
             Hm_Utils.restore_local_settings(ui_state);
-            Hm_Utils.expand_core_settings();
             return true;
         }
         return false;
@@ -1408,7 +1494,7 @@ var Hm_Utils = {
             if (force_on) {
                 $(class_name).css('display', 'none');
             }
-            $(class_name).toggle();
+            $(`[data-bs-target="${class_name}"]`).trigger('click');            
             Hm_Utils.save_to_local_storage('formatted_folder_list', $('.folder_list').html());
         }
         return false;
@@ -1420,41 +1506,6 @@ var Hm_Utils = {
             Hm_Utils.save_to_local_storage(class_name, $(class_name).css('display'));
         }
         return false;
-    },
-
-    expand_core_settings: function() {
-        var sections = Hm_Utils.get_core_settings();
-        var key;
-        var dsp;
-        for (key in sections) {
-            dsp = sections[key];
-            if (!dsp) {
-                dsp = 'none';
-            }
-            $(key).css('display', dsp);
-            Hm_Utils.save_to_local_storage(key, dsp);
-        }
-    },
-
-    get_core_settings: function() {
-        var dsp;
-        var results = {}
-        var i;
-        var hash = window.location.hash;
-        var sections = ['.wp_notifications_setting', '.github_all_setting', '.tfa_setting', '.sent_setting', '.general_setting', '.unread_setting', '.flagged_setting', '.all_setting', '.email_setting', '.junk_setting', '.trash_setting', '.drafts_setting','.tag_setting'];
-        for (i=0;i<sections.length;i++) {
-            dsp = Hm_Utils.get_from_local_storage(sections[i]);
-            if (hash) {
-                if (hash.replace('#', '.') != sections[i]) {
-                    dsp = 'none';
-                }
-                else {
-                    dsp = 'table-row';
-                }
-            }
-            results[sections[i]] = dsp;
-        }
-        return results;
     },
 
     get_from_local_storage: function(key) {
@@ -1502,6 +1553,14 @@ var Hm_Utils = {
         return false;
     },
 
+    remove_from_local_storage: function(key) {
+        var prefix = window.location.pathname;
+        key = prefix+key;
+        if (Storage !== void(0)) {
+            sessionStorage.removeItem(key);
+        }
+    },
+
     clean_selector: function(str) {
         return str.replace(/(:|\.|\[|\]|\/)/g, "\\$1");
     },
@@ -1515,31 +1574,6 @@ var Hm_Utils = {
 
     set_unsaved_changes: function(state) {
         $('#unsaved_changes').val(state);
-    },
-
-    /**
-     * Shows pending messages added with the add_sys_message method
-     */
-    show_sys_messages: function() {
-        $('.sys_messages').removeClass('d-none');
-    },
-
-    /**
-     *
-     * @param {*} msg : The alert message to display
-     * @param {*} type : The type of message to display, depending on the type of boostrap5 alert (primary, secondary, success, danger, warning, info, light, dark )
-     */
-    add_sys_message: function(msg, type = 'info') {
-        if (!msg) {
-            return;
-        }
-        const icon = type == 'success' ? 'bi-check-circle' : 'bi-exclamation-circle';
-        $('.sys_messages').append('<div class="alert alert-'+type+' alert-dismissible fade show" role="alert"><i class="bi '+icon+' me-2"></i><span class="' + type + '">'+msg+'</span><button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button></div>');
-        this.show_sys_messages();
-    },
-
-    clear_sys_messages: function () {
-        $('.sys_messages').html('');
     },
 
     cancel_logout_event: function() {
@@ -1568,7 +1602,7 @@ var Hm_Utils = {
     },
 
     rows: function() {
-        return $('.message_table_body > tr').not('.inline_msg');
+        return this.tbody().find('tr').not('.inline_msg');
     },
 
     tbody: function() {
@@ -1596,7 +1630,7 @@ var Hm_Utils = {
         if (! path) {
             path = window.location.href;
         }
-        window.location.href = path;
+        window.location.href = autoAppendParamsForNavigation(path);
     },
 
     is_valid_email: function (val) {
@@ -1730,10 +1764,6 @@ var decrease_servers = function(section) {
     }
 };
 
-var err_msg = function(msg) {
-    return "ERR"+hm_trans(msg);
-};
-
 var hm_spinner = function(type = 'border', size = '') {
     return `<div class="d-flex justify-content-center spinner">
         <div class="spinner-${type} text-dark${size ? ` spinner-${type}-${size}` : ''}" role="status">
@@ -1742,6 +1772,12 @@ var hm_spinner = function(type = 'border', size = '') {
     </div>`
 };
 
+var hm_spinner_text = function(text, id = 'spinner-text') {
+    return `<div class="d-flex justify-content-between align-items-center p-2 border-bottom" id="${id}">
+        <span class="mailbox-name text-primary">${text}</span>
+        <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+    </div>`;
+};
 var fillImapData = function(details) {
     $('#srv_setup_stepper_imap_address').val(details.server);
     $('#srv_setup_stepper_imap_port').val(details.port);
@@ -1778,7 +1814,6 @@ var fillJmapData = function(details) {
 var imap_smtp_edit_action = function(event) {
     resetQuickSetupForm();
     event.preventDefault();
-    Hm_Notices.hide(true);
     var details = $(this).data('server-details');
 
     $('.imap-jmap-smtp-btn').trigger('click');
@@ -1818,7 +1853,6 @@ var hasLeadingOrTrailingSpaces = function(str) {
 var Hm_Message_List = new Message_List();
 
 function sortHandlerForMessageListAndSearchPage() {
-    $('.combined_sort').on("change", function() { Hm_Message_List.sort($(this).val()); });
     $('.source_link').on("click", function() { $('.list_sources').toggle(); $('#list_controls_menu').hide(); return false; });
     if (getListPathParam() == 'unread' && $('.menu_unread > a').css('font-weight') == 'bold') {
         $('.menu_unread > a').css('font-weight', 'normal');
@@ -1847,9 +1881,9 @@ $(function() {
 
     /* fire up the job scheduler */
     Hm_Timer.fire();
-    
+
     /* show any pending notices */
-    Hm_Utils.show_sys_messages();
+    Hm_Notices.showPendingMessages();
 
     /* load folder list */
     if (hm_is_logged() && (!reloaded && !Hm_Folders.load_from_local_storage())) {
@@ -1878,7 +1912,7 @@ $(function() {
     $(document).on('paste', '.warn_on_paste', function (e) {
         const paste = (e.clipboardData || window.clipboardData).getData('text');
         if (hasLeadingOrTrailingSpaces(paste)) {
-            Hm_Utils.add_sys_message(hm_trans('Pasted text has leading or trailing spaces'), 'danger');
+            Hm_Notices.show('Pasted text has leading or trailing spaces', 'warning');
         }
     });
 
@@ -2027,9 +2061,9 @@ function resetQuickSetupForm() {
 
 function handleCreateProfileCheckboxChange(checkbox) {
     if(checkbox.checked) {
-        $('#srv_setup_stepper_profile_bloc').show();
+        $(checkbox).closest('.form-check').next().show();
     }else{
-        $('#srv_setup_stepper_profile_bloc').hide();
+        $(checkbox).closest('.form-check').next().hide();
     }
 }
 
@@ -2301,7 +2335,7 @@ function handleAllowResource(element, messagePart, inline = false) {
         if (inline) {
             return inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
         }
-        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false);
+        return get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false);
     });
 }
 
@@ -2332,7 +2366,7 @@ const handleExternalResources = (inline) => {
     const messageContainer = document.querySelector('.msg_text_inner');
     messageContainer.insertAdjacentHTML('afterbegin', '<div class="external_notices"></div>');
 
-    const senderEmail = document.querySelector('#contact_info').textContent.match(EMAIL_REGEX)[0];
+    const senderEmail = document.querySelector('#contact_info')?.textContent.match(EMAIL_REGEX)[0];
     const sender = senderEmail + '_external_resources_allowed';
     const elements = messageContainer.querySelectorAll('[data-src]');
     const blockedResources = [];
@@ -2388,7 +2422,7 @@ const handleExternalResources = (inline) => {
                 if (inline) {
                     inline_imap_msg(window.inline_msg_details, window.inline_msg_uid);
                 } else {
-                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), false, false, false)
+                    get_message_content(getParam('part'), getMessageUidParam(), getListPathParam(), getParam('list_parent'), false, false, false)
                 }
             }).finally(() => {
                 popover.dispose();
@@ -2417,3 +2451,57 @@ const observeMessageTextMutationAndHandleExternalResources = (inline) => {
         });
     }
 };
+
+function setupActionSchedule(callback) {
+    $(document).on('click', '.nexter_date_picker', function (e) {
+        document.querySelector('.nexter_input_date').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper', function (e) {
+        e.preventDefault();
+        $('.nexter_input').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input', callback);
+}
+
+function setupActionSnooze(callback) {
+    $(document).on('click', '.nexter_date_picker_snooze', function (e) {
+        document.querySelector('.nexter_input_date_snooze').showPicker();
+    });
+    $(document).on('click', '.nexter_date_helper_snooze', function (e) {
+        e.preventDefault();
+        $('.nexter_input_snooze').val($(this).attr('data-value')).trigger('change');
+    });
+    $(document).on('input', '.nexter_input_date_snooze', function (e) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        $(this).attr('min', now.toJSON().slice(0, 16));
+        if (new Date($(this).val()).getTime() <= now.getTime()) {
+            $('.nexter_date_picker_snooze').css('border', '1px solid red');
+        } else {
+            $('.nexter_date_picker_snooze').css({ 'border': 'unset', 'border-top': '1px solid #ddd' });
+        }
+    });
+    $(document).on('change', '.nexter_input_date_snooze', function (e) {
+        const selectedDate = new Date($(this).val());
+        if ($(this).val() && new Date().getTime() < selectedDate.getTime()) {
+            $('.nexter_input_snooze').val(selectedDate.toISOString()).trigger('change');
+        }
+    });
+    $(document).on('change', '.nexter_input_snooze', callback);
+}

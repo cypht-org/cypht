@@ -79,7 +79,7 @@ if (!hm_exists('oauth2_form')) {
         $res .= '<div class="nux_step_two_title fw-bold">' . $mod->html_safe($details['name']) . '</div><div class="mb-3">';
         $res .= $mod->trans('This provider supports Oauth2 access to your account.');
         $res .= $mod->trans(' This is the most secure way to access your E-mail. Click "Enable" to be redirected to the provider site to allow access.');
-        $res .= '</div><div class="mb-3"><a class="enable_auth2 btn btn-sm btn-success me-2" href="' . $url . '">' . $mod->trans('Enable') . '</a>';
+        $res .= '</div><div class="mb-3"><a class="enable_auth2 btn btn-sm btn-success me-2" data-external="true" href="' . $url . '">' . $mod->trans('Enable') . '</a>';
         $res .= '<a href="" class="reset_nux_form btn btn-sm btn-secondary">Reset</a></div>';
         return $res;
     }
@@ -106,14 +106,14 @@ if (!hm_exists('credentials_form')) {
         $res .= '<div class="form-floating mb-3">';
         $res .= '<input type="password" class="form-control nux_password" id="nux_password" name="nux_password" placeholder="' . $mod->trans('E-Mail Password') . '">';
         $res .= '<label for="nux_password">' . $mod->trans('E-mail Password') . '</label></div>';
-
+        $res .= '<div class="d-flex flex-md-row gap-3 mt-3">';
         // Connect Button
-        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary me-3" value="' . $mod->trans('Connect') . '">';
+        $res .= '<input type="button" class="nux_submit px-5 btn btn-primary w-100 w-md-auto" value="' . $mod->trans('Connect') . '">';
 
         // Reset Link
-        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary">Reset</a>';
+        $res .= '<a href="" class="reset_nux_form px-5 btn btn-secondary w-100 w-md-auto">Reset</a>';
 
-        $res .= '</div></div>';
+        $res .= '</div></div></div>';
 
         return $res;
     }

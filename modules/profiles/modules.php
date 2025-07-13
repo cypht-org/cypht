@@ -67,14 +67,17 @@ class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
         }
 
         if (($profile = Hm_Profiles::get($form['profile_id']))) {
-            if (array_key_exists('autocreate', $profile)) {
-                Hm_Msgs::add('ERRAutomatically created profile cannot be deleted');
+
+            $server = Hm_SMTP_List::get($profile['smtp_id'], false);
+
+            if (array_key_exists('autocreate', $profile) && $server) {
+                Hm_Msgs::add('Automatically created profile cannot be deleted', 'warning');
                 return;
             }
             Hm_Profiles::del($form['profile_id']);
             Hm_Msgs::add('Profile Deleted');
         } else {
-            Hm_Msgs::add('ERRProfile ID not found');
+            Hm_Msgs::add('Profile ID not found', 'warning');
             return;
         }
     }
@@ -140,7 +143,7 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
                     ($existing_profile["address"] === $profile["address"] && $existing_profile["smtp_id"] === $profile["smtp_id"]) ||
                     ($existing_profile["replyto"] === $profile["replyto"] && $existing_profile["smtp_id"] === $profile["smtp_id"])
                 ) {
-                    Hm_Msgs::add('ERRProfile with this email address or reply-to address already exists');
+                    Hm_Msgs::add('Profile with this email address or reply-to address already exists', 'warning');
                     return;
                 }
             }
@@ -150,6 +153,26 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
 
         if ($default) {
             Hm_Profiles::setDefault($form['profile_id']);
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ * If no 'imap_server_id' is provided, we select a default server based on the user profile.
+ * This handler works in conjunction with imap_folders/Hm_Handler_folders_server_id,
+ * which handles the case where 'imap_server_id' is explicitly provided.
+ */
+class Hm_Handler_load_default_server_from_profiles extends Hm_Handler_Module {
+    public function process() {
+        if (!array_key_exists('imap_server_id', $this->request->get)) {
+            Hm_Profiles::init($this);
+            $defaultProfile = Hm_Profiles::getDefault();
+            $server = Hm_IMAP_List::getBy($defaultProfile['server'],'server', true);
+            if (!is_null($server) && !empty($server['id'])) {
+                $this->out('folder_server', $server['id']);
+                $this->out('trigger_default_submit', true);
+            }
         }
     }
 }
@@ -210,7 +233,7 @@ class Hm_Output_profile_page_link extends Hm_Output_Module {
  */
 class Hm_Output_compose_signature_button extends Hm_Output_Module {
     protected function output() {
-        return '<input type="hidden" value="'.$this->trans('You need at least one configured profile to sign messages').'" id="sign_msg" />'.
+        return '<input type="hidden" value="'.$this->trans('You need at least one profile with a signature to sign messages. Please configure a signature in your profile settings.').'" id="sign_msg" />'.
             '<input class="compose_sign btn btn-light float-end mt-3 me-2 border" type="button" value="'.$this->trans('Sign').'" />';
     }
 }

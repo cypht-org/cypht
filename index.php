@@ -22,6 +22,7 @@ define('CACHE_ID', '');
 define('SITE_ID', '');
 define('JS_HASH', '');
 define('CSS_HASH', '');
+define('ASSETS_PATH', APP_PATH.'assets/');
 
 /* show all warnings in debug mode */
 if (DEBUG_MODE) {
@@ -39,6 +40,7 @@ $environment->load();
 
 /* get configuration */
 $config = new Hm_Site_Config_File();
+
 /* set default TZ */
 date_default_timezone_set($config->get('default_setting_timezone', 'UTC'));
 /* set the default since and per_source values */
@@ -52,8 +54,12 @@ if (!$config->get('disable_ini_settings')) {
 /* process the request */
 new Hm_Dispatch($config);
 
+if (empty($config)) {
+    $config = new Hm_Site_Config_File();
+}
+
 /* log some debug stats about the page */
-if (DEBUG_MODE) {
+if (DEBUG_MODE or $config->get('debug_log')) {
     Hm_Debug::load_page_stats();
     Hm_Debug::show();
 }

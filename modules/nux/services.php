@@ -62,9 +62,9 @@ Nux_Quick_Services::add('office365', array(
     'name' => 'Office365',
     'scope' => 'wl.imap',
     'smtp' => array(
-        'server' => 'outlook.office365.com',
+        'server' => 'smtp.office365.com',
         'port' => 587,
-        'tls'=> 'yes'
+        'tls'=> false
     )
 ));
 
@@ -139,14 +139,14 @@ Nux_Quick_Services::add('zoho', array(
 ));
 
 Nux_Quick_Services::add('fastmail', array(
-    'server' => 'mail.messagingengine.com',
+    'server' => 'imap.fastmail.com',
     'type' => 'imap',
     'tls' => true,
     'port' => 993,
     'name' => 'Fastmail',
     'auth' => 'login',
     'smtp' => array(
-        'server' => 'mail.messagingengine.com',
+        'server' => 'smtp.fastmail.com',
         'port' => 465,
         'tls' => true
     )

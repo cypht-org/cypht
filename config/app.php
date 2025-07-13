@@ -781,6 +781,8 @@ return [
     //     */
     //     'developer',
 
+        'debug_log' => env('DEBUG_LOG', false),
+
     //     /*
     //     | -------
     //     | Github
@@ -1020,6 +1022,13 @@ return [
 
     /*
     |
+    | Show the message after sending
+    | Defaults to true
+    */
+    'default_setting_review_sent_email' => env('DEFAULT_SETTING_REVIEW_SENT_EMAIL', true),
+
+    /*
+    |
     | Prefer text parts when viewing a message
     | Defaults to false
     */
@@ -1052,6 +1061,27 @@ return [
     | Defaults 20
     */
     'default_setting_junk_per_source' => env('DEFAULT_SETTING_JUNK_PER_SOURCE', 20),
+
+    /*
+    |
+    | Per source time limit for snoozed page
+    | Defaults to 1 week
+    */
+    'default_setting_snoozed_since' => env('DEFAULT_SETTING_SNOOZED_SINCE', '-1 week'),
+
+        /*
+    |
+    | Per source number limit for snoozed page
+    | Defaults 20
+    */
+    'default_setting_snoozed_per_source' => env('DEFAULT_SETTING_SNOOZED_PER_SOURCE', 20),
+
+    /*
+    |
+    | Enable snooze functionality for messages
+    | Defaults to false
+    */
+    'default_setting_enable_snooze' => env('DEFAULT_SETTING_ENABLE_SNOOZE', false),
 
     /*
     |
@@ -1296,7 +1326,7 @@ return [
     | Display message style inline from the message list
     | Defaults to right
     */
-    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE', 'right'),
+    'default_setting_inline_message_style' => env('DEFAULT_SETTING_INLINE_MESSAGE_STYLE', 'right'),
 
     /*
     |

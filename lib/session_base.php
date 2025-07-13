@@ -403,7 +403,7 @@ class Hm_Session_Setup {
         if (!Hm_Functions::class_exists($auth_class)) {
             Hm_Functions::cease('Invalid auth configuration');
         }
-        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class));
+        Hm_Debug::add(sprintf('Using %s with %s', $session_class, $auth_class), 'info');
         return new $session_class($this->config, $auth_class);
     }
 

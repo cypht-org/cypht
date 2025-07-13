@@ -49,7 +49,7 @@ class Hm_Handler_process_inline_message_setting extends Hm_Handler_Module {
  */
 class Hm_Output_inline_message_flag extends Hm_Output_Module {
     protected function output() {
-        return '<script type="text/javascript">var inline_msg_style = function() { return "'.
+        return '<script type="text/javascript" id="inline-msg-state">var inline_msg_style = function() { return "'.
             $this->get('inline_message_style', DEFAULT_INLINE_MESSAGE_STYLE).'";}; var inline_msg = function() { return '.
             ($this->get('inline_message_setting', DEFAULT_INLINE_MESSAGE) && !$this->get('is_mobile', false) ? 'true' : 'false').
             ';};</script>';
@@ -100,7 +100,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if($selected !== DEFAULT_INLINE_MESSAGE_STYLE) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="inline">'.$this->trans('Inline').'</option></select>'.$reset.'</td></tr>';
         return $res;

@@ -4,13 +4,13 @@
 #### Cypht
 [https://cypht.org](https://cypht.org)
 
-All your email, from all your accounts, in one place. Supports IMAP/SMTP, 
-[JMAP](https://github.com/cypht-org/cypht/issues/180) and 
-[soon EWS](https://github.com/cypht-org/cypht/issues/247). Cypht is like a 
-news reader, but for E-mail. Cypht does not replace your existing accounts - it 
+All your email, from all your accounts, in one place. Supports IMAP/SMTP,
+[JMAP](https://github.com/cypht-org/cypht/issues/180) and
+[EWS](https://github.com/cypht-org/cypht/issues/247). Cypht is like a
+news reader, but for E-mail. Cypht does not replace your existing accounts - it
 combines them into one. And it's also a news reader.
 
-![screenshot](https://github.com/cypht-org/cypht-website/blob/master/img/Inbox.PNG "Inbox View").
+![screenshot](https://github.com/cypht-org/cypht-website/blob/master/static/img/Inbox.PNG "Inbox View").
 
 The driving force behind Cypht development is to provide combined views for
 multiple accounts, but it's also a standard E-mail client that lets you browse
@@ -24,17 +24,17 @@ customize the program without hacking the code.
 
 
 Installation instructions
-* Cypht master: [https://cypht.org/install.html](https://cypht.org/install.html)
-* Version 1: [https://cypht.org/install-1x.html](https://cypht.org/install-1x.html)
-* Version 2: [https://cypht.org/install-2x.html](https://cypht.org/install-2x.html)
+* All Cypht latest and master versions: [https://cypht.org/install](https://cypht.org/install)
 
-Security details: [https://cypht.org/security.html](https://cypht.org/security.html)
+Monthly community meetings: [https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings](https://github.com/cypht-org/cypht/wiki/Monthly-Community-Meetings)
 
-Module info: [https://cypht.org/modules.html](https://cypht.org/modules.html)
+Security details: [https://cypht.org/security](https://cypht.org/security)
 
-Features: [https://cypht.org/features.html](https://cypht.org/features.html)
+Module info: [https://cypht.org/modules](https://cypht.org/modules)
 
-License: [https://cypht.org/license.html](https://cypht.org/license.html)
+Features: [https://cypht.org/features](https://cypht.org/features)
+
+License: [https://cypht.org/license](https://cypht.org/license)
 
 Community chat room: [https://gitter.im/cypht-org/community](https://gitter.im/cypht-org/community)
 

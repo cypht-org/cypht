@@ -26,15 +26,15 @@ return array(
     ),
     'allowed_post' => array(
         'rule_del_id' => FILTER_VALIDATE_INT,
-        'hl_target' => FILTER_DEFAULT,
-        'hl_color' => FILTER_DEFAULT,
-        'hl_source_type' => FILTER_DEFAULT,
+        'hl_target' => FILTER_UNSAFE_RAW,
+        'hl_color' => FILTER_UNSAFE_RAW,
+        'hl_source_type' => FILTER_UNSAFE_RAW,
         'hl_important' => FILTER_VALIDATE_BOOLEAN,
         'hl_feeds_unseen' => FILTER_VALIDATE_BOOLEAN,
         'hl_github_unseen' => FILTER_VALIDATE_BOOLEAN,
-        'hl_imap_flags' =>  array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
-        'hl_imap_sources' =>  array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
-        'hl_github_sources' =>  array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
-        'hl_feeds_sources' =>  array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
+        'hl_imap_flags' =>  array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'hl_imap_sources' =>  array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'hl_github_sources' =>  array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'hl_feeds_sources' =>  array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
     )
 );

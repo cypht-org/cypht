@@ -98,9 +98,10 @@ class Hm_SMTP_List extends Hm_Server_Wrapper {
 class Hm_IMAP_List extends Hm_Server_Wrapper {
     public static $state = false;
     public static function connect($id, $cache=false, $user=false, $pass=false, $save_credentials=false) {
+        global $user_config, $session;
         Hm_IMAP::$allow_connection = self::$state;
         Hm_IMAP::$allow_auth = self::$state;
-        self::$server_list[$id]['object'] = new Hm_IMAP();
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, $user_config, $session, ['type' => 'imap']);
         self::$server_list[$id]['object']->connect();
         self::$server_list[$id]['connected'] = true;
         return self::$server_list[$id]['object'];

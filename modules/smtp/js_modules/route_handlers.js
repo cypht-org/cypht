@@ -1,6 +1,14 @@
 // TODO: This function is too large for a route handler, decouple it into multiple functions with action scope focused.
-function applyComposePageHandlers() {
+function applySmtpComposePageHandlers() {
     init_resumable_upload()
+
+    setupActionSchedule(function () {
+        $('.smtp_send_placeholder').trigger('click');
+    });
+
+    if (window.HTMLEditor) {
+        useKindEditor();
+    }
 
     var interval = Hm_Utils.get_from_global('compose_save_interval', 30);
     Hm_Timer.add_job(function() { save_compose_state(); }, interval, true);
@@ -105,16 +113,22 @@ function applyComposePageHandlers() {
         }
 
         async function handleSendAnyway() {
-
-            if ($('.compose_draft_id').val() == '0') {
-            Hm_Notices.show([hm_trans('Please wait, sending message...')]);
-            await waitForValueChange('.compose_draft_id', '0');
+            if ($('.saving_draft').val() !== '0') {
+                Hm_Notices.show([hm_trans('Please wait, sending message...')]);
+                await waitForValueChange('.saving_draft', '0');
             }
 
-            
-        
             if (handleMissingAttachment()) {
-                document.getElementsByClassName("smtp_send")[0].click();
+                if ($('.nexter_input').val()) {
+                    save_compose_state(false, true, $('.nexter_input').val(), function(res) {
+                        if (res.draft_id) {
+                            reset_smtp_form(false);
+                            Hm_Notices.show([hm_trans('Operation successful')]);
+                        }
+                    });
+                } else {
+                    document.getElementsByClassName("smtp_send")[0].click();
+                }
             } else {
                 e.preventDefault();
             }
@@ -240,11 +254,6 @@ function applyComposePageHandlers() {
             }
         });
     }
-
-    $('.compose_to').on('keyup', function(e) { autocomplete_contact(e, '.compose_to', '#to_contacts'); });
-    $('.compose_cc').on('keyup', function(e) { autocomplete_contact(e, '.compose_cc', '#cc_contacts'); });
-    $('.compose_bcc').on('keyup', function(e) { autocomplete_contact(e, '.compose_bcc', '#bcc_contacts'); });
-    $('.compose_to').focus();
 
     if (window.pgpComposePageHandler) pgpComposePageHandler();
     if (window.profilesComposePageHandler) profilesComposePageHandler();

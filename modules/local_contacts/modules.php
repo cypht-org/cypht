@@ -87,7 +87,7 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
 
                 if ($header !== $expectedHeader) {
                     fclose($csv);
-                    Hm_Msgs::add('ERRInvalid CSV file, please use a valid header: '.implode(', ', $expectedHeader));
+                    Hm_Msgs::add('Invalid CSV file, please use a valid header: '.implode(', ', $expectedHeader), 'danger');
                     return;
                 }
 
@@ -140,16 +140,19 @@ class Hm_Handler_process_import_contact extends Hm_Handler_Module {
                 fclose($csv);
                 $contacts->save();
                 $this->session->record_unsaved('Contact Created');
+                $type = 'danger';
                 if (isset($import_result) && (!$create_count && !$update_count)) {
-                    $message = 'ERR'.$create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $type = 'warning';
                 } elseif (isset($import_result) && ($create_count || $update_count)) {
                     $message = $create_count.' contacts created, '.$update_count.' contacts updated, '.$invalid_mail_count.' Invalid email address';
+                    $type = 'success';
                 } else {
-                    $message = 'ERRAn error occured';
+                    $message = 'An error occured';
                 }
 
                 $this->session->set('imported_contact', $import_result);
-                Hm_Msgs::add($message);
+                Hm_Msgs::add($message, $type);
             }
         }
     }
@@ -279,7 +282,7 @@ class Hm_Output_import_contacts_form extends Hm_Output_Module {
         return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST" enctype="multipart/form-data">'.
             '<button class="server_title mt-2 btn btn-light" title="'.$notice.'"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
             '<div class="'.$form_class.'">'.
-            '<div><a href="'.$csv_sample_path.'">'.$this->trans('download a sample csv file').'</a></div><br />'.
+            '<div><a href="'.$csv_sample_path.'" data-external="true">'.$this->trans('download a sample csv file').'</a></div><br />'.
             '<input type="hidden" name="contact_source" value="csv" />'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<label class="screen_reader" for="contact_csv">'.$this->trans('Csv File').'</label>'.

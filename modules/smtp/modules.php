@@ -49,18 +49,17 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
     }
     public function process() {
         if (!$this->module_is_supported('imap')) {
-            Hm_Msgs::add('ERRIMAP module unavailable.');
+            Hm_Msgs::add('IMAP module unavailable.', 'danger');
             return;
         }
         if (array_key_exists('imap_draft', $this->request->get)
             && array_key_exists('list_path', $this->request->get)
             && array_key_exists('uid', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                list ($msg_struct, $msg_struct_first, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($path[2]), $this->request->get['uid'], false, true);
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
@@ -78,7 +77,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                             $new_attachment['size'] = $sub['size'];
                             $new_attachment['type'] = $sub['type'];
                             $file_path = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
@@ -109,7 +108,7 @@ class Hm_Handler_load_smtp_is_imap_draft extends Hm_Handler_Module {
                 }
                 return;
             }
-            Hm_Msgs::add('ERRCould not load the IMAP mailbox.');
+            Hm_Msgs::add('Could not load the IMAP mailbox.', 'danger');
         }
     }
 }
@@ -126,14 +125,13 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
 
         if (array_key_exists('forward_as_attachment', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
-                $content = $imap->get_message_content($this->request->get['uid'], 0, false, false);
+                $content = $mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid']);
 
                 # Attachment Download
                 $attached_files = [];
@@ -143,7 +141,8 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                 if (!is_dir($file_dir)) {
                     mkdir($file_dir);
                 }
-                $name = $msg_header['subject'] . '.eml';
+                $basename = str_replace(',', '', $msg_header['Subject']);
+                $name = $basename. '.eml';
                 $file_path = $file_dir . $name;
                 $attached_files[$this->request->get['uid']][] = array(
                     'name' => $name,
@@ -151,8 +150,9 @@ class Hm_Handler_load_smtp_is_imap_forward_as_attachment extends Hm_Handler_Modu
                     'size' => strlen($content),
                     'tmp_name' => $file_path,
                     'filename' => $file_path,
-                    'basename' => $msg_header['subject']
+                    'basename' => $basename
                 );
+                $content = Hm_Crypt::ciphertext($content, Hm_Request_Key::generate());
                 file_put_contents($file_path, $content);
                 $this->session->set('uploaded_files', $attached_files);
                 $this->out('as_attr', true);
@@ -172,11 +172,10 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
         }
         if (array_key_exists('forward', $this->request->get)) {
             $path = explode('_', $this->request->get['list_path']);
-            $imap = Hm_IMAP_List::connect($path[1]);
-            if ($imap && $imap->select_mailbox(hex2bin($path[2]))) {
-                $msg_struct = $imap->get_message_structure($this->request->get['uid']);
-                list($part, $msg_text) = $imap->get_first_message_part($this->request->get['uid'], 'text', 'plain', $msg_struct);
-                $msg_header = $imap->get_message_headers($this->request->get['uid']);
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($path[1]);
+            if ($mailbox && $mailbox->authed()) {
+                list ($msg_struct, $msg_struct_first, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($path[2]), $this->request->get['uid'], false, true);
+                $msg_header = $mailbox->get_message_headers(hex2bin($path[2]), $this->request->get['uid']);
                 if (!array_key_exists('From', $msg_header) || count($msg_header) == 0) {
                     return;
                 }
@@ -192,11 +191,11 @@ class Hm_Handler_load_smtp_is_imap_forward extends Hm_Handler_Module
                     foreach ($msg_struct[0]['subs'] as $ind => $sub) {
                         if ($ind != '0.1') {
                             $new_attachment['basename'] = $sub['description'];
-                            $new_attachment['name'] = $sub['attributes']['name'];
+                            $new_attachment['name'] = $sub['attributes']['name'] ?? $sub['attributes']['filename']; // some file types (i.e. pdf) use the filename attribute instead of name.
                             $new_attachment['size'] = $sub['size'];
-                            $new_attachment['type'] = $sub['type'];
+                            $new_attachment['type'] = $sub['type'] . "/" . $sub['subtype'];
                             $file_path = $file_dir . $new_attachment['name'];
-                            $content = Hm_Crypt::ciphertext($imap->get_message_content($this->request->get['uid'], $ind), Hm_Request_Key::generate());
+                            $content = Hm_Crypt::ciphertext($mailbox->get_message_content(hex2bin($path[2]), $this->request->get['uid'], $ind), Hm_Request_Key::generate());
                             file_put_contents($file_path, $content);
                             $new_attachment['tmp_name'] = $file_path;
                             $new_attachment['filename'] = $file_path;
@@ -276,7 +275,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
 
         if (!empty($this->request->files)) foreach ($this->request->files as $file) {
             if ($file['error'] != 0) {
-                Hm_Msgs::add('ERRerror '.$file['error'].' in file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('Error '.$file['error'].' in file '.$this->request->get['resumableFilename'], 'danger');
                 continue;
             }
 
@@ -292,7 +291,7 @@ class Hm_Handler_upload_chunk extends Hm_Handler_Module {
 
             // move the temporary file
             if (!move_uploaded_file($file['tmp_name'], $dest_file)) {
-                Hm_Msgs::add('ERRError saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename']);
+                Hm_Msgs::add('Error saving (move_uploaded_file) chunk '.$this->request->get['resumableChunkNumber'].' for file '.$this->request->get['resumableFilename'], 'danger');
             } else {
                 // check if all the parts present, and create the final destination file
                 $result = createFileFromChunks($temp_dir, $this->request->get['resumableFilename'],
@@ -319,6 +318,8 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         $draft_id = array_key_exists('draft_id', $this->request->post) ? $this->request->post['draft_id'] : false;
         $draft_notice = array_key_exists('draft_notice', $this->request->post) ? $this->request->post['draft_notice'] : false;
         $uploaded_files = array_key_exists('uploaded_files', $this->request->post) ? $this->request->post['uploaded_files'] : false;
+        $delivery_receipt = array_key_exists('compose_delivery_receipt', $this->request->post) ? $this->request->post['compose_delivery_receipt'] : false;
+        $schedule = array_key_exists('schedule', $this->request->post) ? $this->request->post['schedule'] : '';
 
         if (array_key_exists('delete_uploaded_files', $this->request->post) && $this->request->post['delete_uploaded_files']) {
             delete_uploaded_files($this->session, $draft_id);
@@ -335,7 +336,7 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
         if ($this->get('save_draft_to_imap') === false) {
             $from = isset($profile) ? $profile['replyto'] : '';
             $name = isset($profile) ? $profile['name'] : '';
-            $mime = prepare_draft_mime($msg_attrs, $uploaded_files, $from, $name);
+            $mime = prepare_draft_mime($msg_attrs, $uploaded_files, $from, $name, $profile['id']);
             $this->out('draft_mime', $mime);
             return;
         }
@@ -345,15 +346,20 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             foreach($uploaded_files as $key => $file) {
                 $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
             }
-            $new_draft_id = save_imap_draft($msg_attrs, $draft_id, $this->session, $this, $this->cache, $uploaded_files, $profile);
+            $new_draft_id = save_imap_draft(array('draft_smtp' => $smtp, 'draft_to' => $to, 'draft_body' => $body,
+                    'draft_subject' => $subject, 'draft_cc' => $cc, 'draft_bcc' => $bcc,
+                    'draft_in_reply_to' => $inreplyto, 'delivery_receipt' => $delivery_receipt, 'schedule' => $schedule), $draft_id, $this->session,
+                    $this, $this->cache, $uploaded_files, $profile);
             if ($new_draft_id >= 0) {
                 if ($draft_notice) {
-                    Hm_Msgs::add('Draft saved');
+                    $msg = $schedule ? 'Message scheduled to be sent later' : 'Draft saved';
+                    Hm_Msgs::add($msg);
                 }
                 $this->out('draft_id', $new_draft_id);
             }
             elseif ($draft_notice) {
-                Hm_Msgs::add('ERRUnable to save draft');
+                $msg = $schedule ? 'Something went wrong when scheduling draft' : 'Unable to save draft';
+                Hm_Msgs::add($msg, 'danger');
             }
             return;
         }
@@ -367,7 +373,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
     public function process() {
         Hm_SMTP_List::init($this->user_config, $this->session);
         if (Hm_SMTP_List::count() == 0 && $this->page == 'compose') {
-            Hm_Msgs::add('ERRYou need at least one configured SMTP server to send outbound messages');
+            Hm_Msgs::add('You need at least one configured SMTP server to send outbound messages', 'warning');
         }
         $draft = array();
         $draft_id = next_draft_key($this->session);
@@ -392,7 +398,7 @@ class Hm_Handler_load_smtp_servers_from_config extends Hm_Handler_Module {
             $this->out('attachment_dir_access', true);
         } else {
             $this->out('attachment_dir_access', false);
-            Hm_Msgs::add('ERRAttachment storage unavailable, please contact your site administrator');
+            Hm_Msgs::add('Attachment storage unavailable, please contact your site administrator', 'warning');
         }
 
         $this->out('compose_draft', $draft, false);
@@ -431,7 +437,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
         if (isset($this->request->post['submit_smtp_server'])) {
             list($success, $form) = $this->process_form(array('new_smtp_name', 'new_smtp_address', 'new_smtp_port'));
             if (!$success) {
-                Hm_Msgs::add('ERRYou must supply a name, a server and a port');
+                Hm_Msgs::add('You must supply a name, a server and a port', 'warning');
             }
             else {
                 $tls = false;
@@ -450,7 +456,7 @@ class Hm_Handler_process_add_smtp_server extends Hm_Handler_Module {
                 }
                 else {
                     $this->session->set('add_form_vals', $form);
-                    Hm_Msgs::add(sprintf('ERRCould not add server: %s', $errstr));
+                    Hm_Msgs::add(sprintf('Could not add server: %s', $errstr), 'danger');
                 }
             }
         }
@@ -513,18 +519,22 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                     $results = smtp_refresh_oauth2_token($smtp_details, $this->config);
                     if (!empty($results)) {
                         if (Hm_SMTP_List::update_oauth2_token($form['smtp_server_id'], $results[1], $results[0])) {
-                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']));
+                            Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $form['smtp_server_id']), 'info');
                             Hm_SMTP_List::save();
                         }
                     }
                 }
-                $smtp = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
-                if (smtp_authed($smtp)) {
+                $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
+                if ($mailbox && $mailbox->authed()) {
                     Hm_Msgs::add("Successfully authenticated to the SMTP server");
-                    return;
+                }
+                elseif ($mailbox && $mailbox->state() == 'connected') {
+                    Hm_Msgs::add("Connected, but failed to authenticate to the SMTP server", "warning");
+                }
+                else {
+                    Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
                 }
             }
-            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
         }
     }
 }
@@ -538,18 +548,18 @@ class Hm_Handler_profile_status extends Hm_Handler_Module {
         $profile_value = $this->request->post['profile_value'];
 
         if (!mb_strstr($profile_value, '.')) {
-            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            Hm_Msgs::add('Please create a profile for saving sent messages', 'warning');
             return;
         }
         $profile = profile_from_compose_smtp_id($profiles, $profile_value);
         if (!$profile) {
-            Hm_Msgs::add('ERRPlease create a profile for saving sent messages');
+            Hm_Msgs::add('Please create a profile for saving sent messages', 'warning');
             return;
         }
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
         $specials = get_special_folders($this, $imap_profile['id']);
-        if (!array_key_exists('sent', $specials) || !$specials['sent']) {
-            Hm_Msgs::add('ERRPlease configure a sent folder for this IMAP account');
+        if ($imap_profile && (!array_key_exists('sent', $specials) || !$specials['sent'])) {
+            Hm_Msgs::add('Please configure a sent folder for account ' . $imap_profile['name'], 'warning');
         }
     }
 }
@@ -645,7 +655,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* missing field */
         list($success, $form) = $this->process_form(array('compose_to', 'compose_subject', 'compose_body', 'compose_smtp_id', 'draft_id', 'post_archive', 'next_email_post'));
         if (!$success) {
-            Hm_Msgs::add('ERRRequired field missing');
+            Hm_Msgs::add('Required field missing', 'warning');
             return;
         }
 
@@ -660,6 +670,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             'draft_subject' => $form['compose_subject'],
             'draft_smtp' => $smtp_id
         );
+        $delivery_receipt = !empty($this->request->post['compose_delivery_receipt']);
         $from_params = '';
         $recipients_params = '';
 
@@ -679,15 +690,10 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* msg details */
         list($body, $cc, $bcc, $in_reply_to, $draft) = get_outbound_msg_detail($this->request->post, $draft, $body_type);
 
-        if ($this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt'])) {
-            $from_params      = 'RET=HDRS';
-            $recipients_params = 'NOTIFY=SUCCESS,FAILURE';
-        }
-
         /* smtp server details */
         $smtp_details = Hm_SMTP_List::dump($smtp_id, true);
         if (!$smtp_details) {
-            Hm_Msgs::add('ERRCould not use the selected SMTP server');
+            Hm_Msgs::add('Could not use the selected SMTP server', 'warning');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -703,15 +709,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         list($from, $reply_to) = outbound_address_check($this, $from, $reply_to);
 
         /* try to connect */
-        $smtp = Hm_SMTP_List::connect($smtp_id, false);
-        if (!smtp_authed($smtp)) {
-            Hm_Msgs::add("ERRFailed to authenticate to the SMTP server");
+        $mailbox = Hm_SMTP_List::connect($smtp_id, false);
+        if (! $mailbox || ! $mailbox->authed()) {
+            Hm_Msgs::add("Failed to authenticate to the SMTP server", "danger");
             repopulate_compose_form($draft, $this);
             return;
         }
 
         /* build message */
-        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to);
+        $mime = new Hm_MIME_Msg($to, $subject, $body, $from, $body_type, $cc, $bcc, $in_reply_to, $from_name, $reply_to, $delivery_receipt);
 
         /* add attachments */
         $mime->add_attachments($uploaded_files);
@@ -720,15 +726,15 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         /* get smtp recipients */
         $recipients = $mime->get_recipient_addresses();
         if (empty($recipients)) {
-            Hm_Msgs::add("ERRNo valid recipients found");
+            Hm_Msgs::add("No valid recipients found", "warning");
             repopulate_compose_form($draft, $this);
             return;
         }
 
         /* send the message */
-        $err_msg = $smtp->send_message($from, $recipients, $mime->get_mime_msg(), $from_params, $recipients_params);
+        $err_msg = $mailbox->send_message($from, $recipients, $mime->get_mime_msg(), $this->user_config->get('enable_compose_delivery_receipt_setting', false) && !empty($this->request->post['compose_delivery_receipt']));
         if ($err_msg) {
-            Hm_Msgs::add(sprintf("ERR%s", $err_msg));
+            Hm_Msgs::add(sprintf("%s", $err_msg), 'danger');
             repopulate_compose_form($draft, $this);
             return;
         }
@@ -737,7 +743,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         $auto_bcc = $this->user_config->get('smtp_auto_bcc_setting', DEFAULT_SMTP_AUTO_BCC);
         if ($auto_bcc) {
             $mime->set_auto_bcc($from);
-            $bcc_err_msg = $smtp->send_message($from, array($from), $mime->get_mime_msg());
+            $bcc_err_msg = $mailbox->send_message($from, array($from), $mime->get_mime_msg());
         }
 
         /* check for associated IMAP server to save a copy */
@@ -757,13 +763,13 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $msg_path = explode('_', $this->request->post['compose_msg_path']);
             $msg_uid = $this->request->post['compose_msg_uid'];
 
-            $imap = Hm_IMAP_List::connect($msg_path[1]);
-            if ($imap->select_mailbox(hex2bin($msg_path[2]))) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($msg_path[1]);
+            if ($mailbox && $mailbox->authed()) {
                 $specials = get_special_folders($this, $msg_path[1]);
                 if (array_key_exists('archive', $specials) && $specials['archive']) {
                     $archive_folder = $specials['archive'];
-                    $imap->message_action('ARCHIVE', array($msg_uid));
-                    $imap->message_action('MOVE', array($msg_uid), $archive_folder);
+                    $mailbox->message_action(hex2bin($msg_path[2]), 'ARCHIVE', array($msg_uid));
+                    $mailbox->message_action(hex2bin($msg_path[2]), 'MOVE', array($msg_uid), $archive_folder);
                 }
             }
         }
@@ -798,6 +804,19 @@ class Hm_Handler_smtp_from_replace extends Hm_Handler_Module {
     {
         if (array_key_exists('compose_from', $this->request->get)) {
             $this->out('compose_from', $this->request->get['compose_from']);
+        }
+    }
+}
+
+/**
+ * Determine if composer_from is set
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_smtp_subject_replace extends Hm_Handler_Module {
+    public function process()
+    {
+        if (array_key_exists('compose_subject', $this->request->get)) {
+            $this->out('compose_subject', $this->request->get['compose_subject']);
         }
     }
 }
@@ -867,7 +886,7 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
         $settings = $this->get('user_settings');
         if (array_key_exists('enable_compose_delivery_receipt', $settings) && $settings['enable_compose_delivery_receipt']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         else {
             $checked = '';
@@ -924,7 +943,7 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
         if (array_key_exists('enable_attachment_reminder', $settings) && $settings['enable_attachment_reminder']) {
             $checked = ' checked="checked"';
             if(!$settings['enable_attachment_reminder']) {
-                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
             }
             else {
                 $reset='';
@@ -1025,7 +1044,6 @@ class Hm_Output_compose_form_draft_list extends Hm_Output_Module {
 class Hm_Output_compose_form_content extends Hm_Output_Module {
     protected function output() {
         $to = '';
-        $subject = '';
         $body = '';
         $files = $this->get('uploaded_files', array());
         $cc = '';
@@ -1041,6 +1059,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         $msg_path = $this->get('list_path', '');
         $msg_uid = $this->get('uid', '');
         $from = $this->get('compose_from');
+        $subject = $this->get('compose_subject');
         $forward_as_attachment=$this->get('as_attr');
 
         if (!$msg_path) {
@@ -1131,17 +1150,8 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
         }
         $res = '';
         if ($html == 1) {
-            $res .= '<script type="text/javascript" src="'.WEB_ROOT.'modules/smtp/assets/kindeditor/kindeditor-all-min.js"></script>'.
-                '<link href="'.WEB_ROOT.'modules/smtp/assets/kindeditor/themes/default/default.css" rel="stylesheet" />'.
-                '<script type="text/javascript">KindEditor.ready(function(K) { window.kindEditor = K.create("#compose_body", {items:'.
-                "['formatblock', 'fontname', 'fontsize', 'forecolor', 'hilitecolor', 'bold',".
-                "'italic', 'underline', 'strikethrough', 'lineheight', 'table', 'hr', 'pagebreak', 'link', 'unlink',".
-                "'justifyleft', 'justifycenter', 'justifyright',".
-                "'justifyfull', 'insertorderedlist', 'insertunorderedlist', 'indent', 'outdent', '|',".
-                "'undo', 'redo', 'preview', 'print', '|', 'selectall', 'cut', 'copy', 'paste',".
-                "'plainpaste', 'wordpaste', '|', 'source', 'fullscreen']".
-                ",basePath: '".WEB_ROOT."modules/smtp/assets/kindeditor/'".
-                '})});;</script>';
+            // TODO: The client should be provided all relevant configs so it can tell what appropriate js code to execute. This should not be handled by backend modules.
+            $res .= '<script type="text/javascript">window.HTMLEditor = true</script>';
         }
 
         $res .= '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
@@ -1150,13 +1160,14 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                 '<input type="hidden" name="next_email_post" class="compose_next_email_data" value="" />'.
                 '<input type="hidden" name="compose_msg_uid" value="'.$this->html_safe($msg_uid).'" />'.
                 '<input type="hidden" class="compose_draft_id" name="draft_id" value="'.$this->html_safe($draft_id).'" />'.
+                '<input type="hidden" class="saving_draft" name="draft_id" value="0" />'.
                 '<input type="hidden" class="compose_in_reply_to" name="compose_in_reply_to" value="'.$this->html_safe($in_reply_to).'" />'.
 
                 '<div class="to_outer">'.
                     '<div class="mb-3 position-relative compose_container p-1 w-100 form-control">'.
                         '<div class="bubbles bubble_dropdown"></div>'.
                         '<input autocomplete="off" value="'.$this->html_safe($to).'" required name="compose_to" class="compose_to w-75" type="text" placeholder="'.$this->trans('To').'" id="compose_to" />'.
-                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute top-0 end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
+                        '<a href="#" tabindex="-1" class="toggle_recipients position-absolute end-0 pe-2"><i class="bi bi-plus-square-fill fs-3"></i></a>'.
                         '<div id="to_contacts"></div>'.
                     '</div>'.
                 '</div>'.
@@ -1182,7 +1193,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
                     (!$html ? '<label for="compose_body">'.$this->trans('Message').'</label>': '').
                 '</div>';
                 if($this->get('enable_compose_delivery_receipt_setting')) {
-                    $res .= '<div class="form-check mb-3"><input value="0" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" /><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
+                    $res .= '<div class="form-check mb-3"><input value="1" name="compose_delivery_receipt" id="compose_delivery_receipt" type="checkbox" class="form-check-input" checked/><label for="compose_delivery_receipt" class="form-check-label">'.$this->trans('Request a delivery receipt').'</label></div>';
                 }
         if ($html == 2) {
             $res .= '<link href="'.WEB_ROOT.'modules/smtp/assets/markdown/editor.css" rel="stylesheet" />'.
@@ -1243,7 +1254,13 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
 
         $res .= '</table>'.
             smtp_server_dropdown($this->module_output(), $this, $recip, $selected_id).
-            '<button class="smtp_send_placeholder btn btn-primary mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>';
+            '<div class="btn-group dropup">
+                <button class="smtp_send_placeholder btn btn-primary mt-3" type="button" '.$send_disabled.'>'.$this->trans('Send').'</button><input class="smtp_send d-none" type="submit" value="'.$this->trans('Send').'" name="smtp_send"/>
+                <button type="button" class="smtp_schedule_send btn btn-primary mt-3 dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" '.$send_disabled.'>
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>'.
+                schedule_dropdown($this).
+            '</div>';
 
         if ($this->get('list_path') && ($reply_type == 'reply' || $reply_type == 'reply_all')) {
             $res .= '<input class="smtp_send_archive btn btn-primary mt-3" type="button" value="'.$this->trans('Send & Archive').'" name="smtp_send" '.$send_disabled.'/>';
@@ -1354,7 +1371,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
             $res .= 'selected="selected" ';
         }
         if ($selected != 0) {
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_select"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
         $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
         return $res;
@@ -1375,7 +1392,7 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         $res .= '>'.$reset.'</td></tr>';
         return $res;
@@ -1413,6 +1430,10 @@ class Hm_Output_display_configured_smtp_servers extends Hm_Output_Module {
         foreach ($list as $index => $vals) {
 
             $no_edit = false;
+
+            if (array_key_exists('type', $vals) && $vals['type'] == 'ews') {
+                continue;
+            }
 
             if (array_key_exists('user', $vals) && !array_key_exists('nopass', $vals)) {
                 $disabled = 'disabled="disabled"';
@@ -1534,6 +1555,107 @@ class Hm_Output_stepper_setup_server_smtp extends Hm_Output_Module {
                  </div>
            </div>
         ';
+    }
+}
+
+/**
+ * Send scheduled messages
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_send_scheduled_messages extends Hm_Handler_Module {
+    /**
+     * Send delayed messages
+     * This should use cron
+     */
+    public function process() {
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            return;
+        }
+
+        $servers = Hm_IMAP_List::dumpForMailbox();
+        $scheduled_msg_count = 0;
+
+        foreach ($servers as $server_id => $config) {
+            $mailbox = new Hm_Mailbox($server_id, $this->user_config, $this->session, $config);
+            if ($mailbox->connect()) {
+                $folder = 'Scheduled';
+                if (! $mailbox->folder_exists($folder)) {
+                    continue;
+                }
+                $ret = $mailbox->get_messages($folder, 'DATE', false, 'ALL');
+                foreach ($ret[1] as $msg) {
+                    $msg_headers = $mailbox->get_message_headers($folder, $msg['uid']);
+                    if (! empty($msg_headers['X-Schedule'])) {
+                        $scheduled_msg_count++;
+                    } else {
+                        continue;
+                    }
+                    if (send_scheduled_message($this, $mailbox, $folder, $msg['uid'])) {
+                        $scheduled_msg_count++;
+                    }
+                }
+            }
+        }
+
+        $this->out('scheduled_msg_count', $scheduled_msg_count);
+    }
+}
+
+/**
+ * Changes the schedule of the message
+ * @subpackage smtp/handler
+ */
+class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
+    public function process() {
+        if (!($this->module_is_supported('imap') || $this->module_is_supported('profiles'))) {
+            return;
+        }
+        list($success, $form) = $this->process_form(array('schedule_date', 'scheduled_msg_ids'));
+        if (!$success) {
+            return;
+        }
+        $scheduled_msg_count = 0;
+        $new_schedule_date = $form['schedule_date'];
+        if ($form['schedule_date'] != 'now') {
+            $new_schedule_date = get_scheduled_date($form['schedule_date']);
+        }       
+        $ids = explode(',', $form['scheduled_msg_ids']);
+        foreach ($ids as $msg_part) {
+            list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
+            $imap_server = Hm_IMAP_List::getForMailbox($imap_server_id);
+
+            $mailbox = new Hm_Mailbox($imap_server_id, $this->user_config, $this->session, $imap_server);
+                if ($mailbox->connect()) {
+                $folder = hex2bin($folder);
+                if (reschedule_message_sending($this, $mailbox, $msg_id, $folder, $new_schedule_date)) {
+                    $scheduled_msg_count++;
+                }
+            }
+        }
+        $this->out('scheduled_msg_count', $scheduled_msg_count);
+        if ($scheduled_msg_count == count($ids)) {
+            $msg = 'Operation successful';
+        } elseif ($scheduled_msg_count > 0) {
+            $msg = 'Some messages have been scheduled for sending';
+        } else {
+            $msg = 'ERRFailed to schedule sending for messages';
+        }
+        Hm_Msgs::add($msg);
+        $this->save_hm_msgs();
+    }
+}
+
+/**
+ * Add scheduled send to the message list controls
+ * @subpackage imap/output
+ */
+class Hm_Output_scheduled_send_msg_control extends Hm_Output_Module {
+    protected function output() {
+        $parts = explode('_', $this->get('list_path'));
+        if ($parts[0] == 'imap' && hex2bin($parts[2]) == 'Scheduled') {
+            $res = schedule_dropdown($this, true);
+            $this->concat('msg_controls_extra', $res); 
+        }
     }
 }
 
@@ -1692,7 +1814,7 @@ function format_attachment_row($file, $output_mod) {
     return '<tr id="tr-'.$unique_identifier.'"><td>'.
             $output_mod->html_safe($file['name']).'</td><td>'.$output_mod->html_safe($file['type']).' ' .$output_mod->html_safe(round($file['size']/1024, 2)). 'KB '.
             '<td style="display:none"><input name="uploaded_files[]" type="text" value="'.$file['name'].'" /></td>'.
-            '</td><td><a class="remove_attachment invalid-feedback" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
+            '</td><td><a class="remove_attachment text-danger" id="remove-'.$unique_identifier.'" href="#">Remove</a><a style="display:none" id="pause-'.$unique_identifier.'" class="pause_upload" href="#">Pause</a><a style="display:none" id="resume-'.$unique_identifier.'" class="resume_upload" href="#">Resume</a></td></tr><tr><td colspan="2">'.
             '<div class="meter" style="width:100%; display: none;"><span id="progress-'.
             $unique_identifier.'" style="width:0%;"><span class="progress" id="progress-bar-'.
             $unique_identifier.'"></span></span></div></td></tr>';
@@ -1711,8 +1833,17 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
     $headers = lc_headers($headers);
     foreach ($flds as $fld) {
         if (array_key_exists($fld, $headers)) {
-            foreach (process_address_fld($headers[$fld]) as $address) {
-                $addresses[] = $address['email'];
+            $header = $headers[$fld];
+            if (is_array($header)) {
+                foreach ($header as $value) {
+                    foreach (process_address_fld($value) as $address) {
+                        $addresses[] = $address['email'];
+                    }
+                }
+            } else {
+                foreach (process_address_fld($header) as $address) {
+                    $addresses[] = $address['email'];
+                }
             }
         }
     }
@@ -1741,13 +1872,10 @@ function get_primary_recipient($profiles, $headers, $smtp_servers, $is_draft=Fal
  */
 if (!hm_exists('delete_draft')) {
 function delete_draft($id, $cache, $imap_server_id, $folder) {
-    $imap = Hm_IMAP_List::connect($imap_server_id);
-    if (! imap_authed($imap)) {
-        return false;
-    }
-    if ($imap->select_mailbox($folder)) {
-        if ($imap->message_action('DELETE', array($id))) {
-            $imap->message_action('EXPUNGE', array($id));
+    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id);
+    if ($mailbox && $mailbox->authed()) {
+        if ($mailbox->message_action($folder, 'DELETE', array($id))['status']) {
+            $mailbox->message_action($folder, 'EXPUNGE', array($id));
             return true;
         }
     }
@@ -1759,19 +1887,17 @@ function delete_draft($id, $cache, $imap_server_id, $folder) {
  */
 if (!hm_exists('find_imap_by_smtp')) {
 function find_imap_by_smtp($imap_profiles, $smtp_profile) {
-    $id = 0;
     foreach ($imap_profiles as $profile) {
         if ($smtp_profile['user'] == $profile['user']) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
         if (explode('@', $smtp_profile['user'])[0]
             == explode('@', $profile['user'])[0]) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
         if ($smtp_profile['user'] == $profile['name']) {
-            return array_merge(['id' => $id], $profile);
+            return $profile;
         }
-        $id++;
     }
 }}
 
@@ -1866,7 +1992,7 @@ function get_uploaded_files_from_array($uploaded_files) {
 }
 }
 
-function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '') {
+function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '', $profile_id = null) {
     $uploaded_files = get_uploaded_files_from_array($uploaded_files);
     $mime = new Hm_MIME_Msg(
         $atts['draft_to'],
@@ -1878,7 +2004,10 @@ function prepare_draft_mime($atts, $uploaded_files, $from = false, $name = '') {
         $atts['draft_bcc'],
         '',
         $name,
-        $atts['draft_in_reply_to']
+        $atts['draft_in_reply_to'],
+        $atts['delivery_receipt'],
+        $atts['schedule'],
+        $profile_id
     );
 
     $mime->add_attachments($uploaded_files);
@@ -1901,7 +2030,6 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
         $name = $profile['name'];
         $imap_profile = Hm_IMAP_List::fetch($profile['user'], $profile['server']);
     }
-
     if (!$imap_profile || empty($imap_profile)) {
         $imap_profile = find_imap_by_smtp(
             $mod->user_config->get('imap_servers'),
@@ -1911,45 +2039,59 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
             $from = $mod->user_config->get('smtp_servers')[$atts['draft_smtp']]['user'];
         }
     }
-    if (!$imap_profile || empty($imap_profile)) {
+    if (empty($imap_profile)) {
         return -1;
     }
 
+    $imap_profile = Hm_IMAP_List::getForMailbox($imap_profile['id']);
     $specials = get_special_folders($mod, $imap_profile['id']);
 
-    if (!array_key_exists('draft', $specials) || !$specials['draft']) {
-        Hm_Msgs::add('ERRThere is no draft directory configured for this account.');
+    if ((!array_key_exists('draft', $specials) || !$specials['draft']) && !array_key_exists('schedule', $atts)) {
+        Hm_Msgs::add('There is no draft directory configured for this account.', 'warning');
         return -1;
     }
-    $cache = Hm_IMAP_List::get_cache($mod_cache, $imap_profile['id']);
-    $imap = Hm_IMAP_List::connect($imap_profile['id'], $cache);
-    $draft_folder = $imap->select_mailbox($specials['draft']);
+    $mailbox = new Hm_Mailbox($imap_profile['id'], $mod->user_config, $session, $imap_profile);
+    if (! $mailbox->connect()) {
+        return -1;
+    }
+    
+    if (!empty($atts['schedule'])) {
+        $folder ='Scheduled';
+        if (!$mailbox->folder_exists($folder)) {
+            $mailbox->create_folder($folder);
+        }
+        $atts['schedule'] = get_scheduled_date($atts['schedule']);
+    } else {
+        $folder = $specials['draft'];
+    }
 
-    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name);
+    $mime = prepare_draft_mime($atts, $uploaded_files, $from, $name, $profile['id']);
     $res = $mime->process_attachments();
+
+    if (! empty($atts['schedule']) && empty($mime->get_recipient_addresses())) {
+        Hm_Msgs::add("ERRNo valid recipients found");
+        return -1;
+    }
 
     $msg = str_replace("\r\n", "\n", $mime->get_mime_msg());
     $msg = str_replace("\n", "\r\n", $msg);
     $msg = rtrim($msg)."\r\n";
 
-    if ($imap->append_start($specials['draft'], mb_strlen($msg), false, true)) {
-        $imap->append_feed($msg."\r\n");
-        if (!$imap->append_end()) {
-            Hm_Msgs::add('ERRAn error occurred saving the draft message');
-            return -1;
-        }
+    if (! $mailbox->store_message($folder, $msg, false, true)) {
+        Hm_Msgs::add('An error occurred saving the draft message', 'danger');
+        return -1;
     }
 
-    $mailbox_page = $imap->get_mailbox_page($specials['draft'], 'ARRIVAL', true, 'DRAFT', 0, 10);
+    $messages = $mailbox->get_messages($folder, 'ARRIVAL', true, 'DRAFT', 0, 10);
 
     // Remove old version from the mailbox
     if ($id) {
-      $imap->message_action('DELETE', array($id));
-      $imap->message_action('EXPUNGE', array($id));
+      $mailbox->message_action($folder, 'DELETE', array($id));
+      $mailbox->message_action($folder, 'EXPUNGE', array($id));
     }
 
-    foreach ($mailbox_page[1] as $mail) {
-        $msg_header = $imap->get_message_headers($mail['uid']);
+    foreach ($messages[1] as $mail) {
+        $msg_header = $mailbox->get_message_headers($folder, $mail['uid']);
         // Convert all header keys to lowercase
         $msg_header_lower = array_change_key_case($msg_header, CASE_LOWER);
         $mime_headers_lower = array_change_key_case($mime->get_headers(), CASE_LOWER);
@@ -2068,7 +2210,7 @@ function smtp_refresh_oauth2_token_on_send($smtp_details, $mod, $smtp_id) {
         $results = smtp_refresh_oauth2_token($smtp_details, $mod->config);
         if (!empty($results)) {
             if (Hm_SMTP_List::update_oauth2_token($smtp_id, $results[1], $results[0])) {
-                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id));
+                Hm_Debug::add(sprintf('Oauth2 token refreshed for SMTP server id %s', $smtp_id), 'info');
                 Hm_SMTP_List::save();
             }
         }
@@ -2150,14 +2292,6 @@ function profile_from_compose_smtp_id($profiles, $id) {
 /**
  * @subpackage smtp/functions
  */
-if (!hm_exists('smtp_authed')) {
-function smtp_authed($smtp) {
-    return is_object($smtp) && $smtp->state == 'authed';
-}}
-
-/**
- * @subpackage smtp/functions
- */
 if (!hm_exists('parse_mailto')) {
 function parse_mailto($str) {
     $res = array(
@@ -2197,6 +2331,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
     $attributes = array(
         'name' => $config->get('default_smtp_name', 'Default'),
         'default' => true,
+        'type' => 'smtp',
         'server' => $smtp_server,
         'port' => $smtp_port,
         'tls' => $smtp_tls,
@@ -2207,7 +2342,7 @@ function default_smtp_server($user_config, $session, $request, $config, $user, $
         $attributes['no_auth'] = true;
     }
     Hm_SMTP_List::add($attributes);
-    Hm_Debug::add('Default SMTP server added');
+    Hm_Debug::add('Default SMTP server added', 'info');
 }}
 
 /**
@@ -2226,6 +2361,6 @@ function recip_count_check($headers, $omod) {
         $recip_count += count(process_address_fld($headers['cc']));
     }
     if ($recip_count > MAX_RECIPIENT_WARNING) {
-        Hm_Msgs::add('ERRMessage contains more than the maximum number of recipients, proceed with caution');
+        Hm_Msgs::add('Message contains more than the maximum number of recipients, proceed with caution', 'warning');
     }
 }}

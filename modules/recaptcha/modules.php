@@ -16,7 +16,7 @@ class Hm_Handler_process_recaptcha extends Hm_Handler_Module {
         $rconf = recaptcha_config($this->config);
         if (!is_array($rconf) || count($rconf) == 0) {
             $this->out('recaptcha_config', array('site_key' => ''));
-            Hm_Debug::add('Recaptcha module activated, but not configured');
+            Hm_Debug::add('Recaptcha module activated, but not configured', 'warning');
             return;
         }
         $this->out('recaptcha_config', $rconf);
@@ -26,13 +26,13 @@ class Hm_Handler_process_recaptcha extends Hm_Handler_Module {
         }
         if (!array_key_exists('g-recaptcha-response', $this->request->post)) {
             $this->request->post = array();
-            Hm_Msgs::add('ERRRecaptcha failed');
+            Hm_Msgs::add('Recaptcha failed', 'danger');
             return;
         }
         if (!check_recaptcha($rconf['secret'], $this->request->post['g-recaptcha-response'],
             $this->request->server['REMOTE_ADDR'])) {
             $this->request->post = array();
-            Hm_Msgs::add('ERRRecaptcha failed');
+            Hm_Msgs::add('Recaptcha failed', 'danger');
             return;
         }
     }

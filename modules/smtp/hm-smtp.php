@@ -14,8 +14,13 @@ class Hm_SMTP_List {
 
     use Hm_Server_List;
 
+    protected static $user_config;
+    protected static $session;
+
     public static function init($user_config, $session) {
         self::initRepo('smtp_servers', $user_config, $session, self::$server_list);
+        self::$user_config = $user_config;
+        self::$session = $session;
     }
 
     public static function service_connect($id, $server, $user, $pass, $cache=false) {
@@ -25,7 +30,8 @@ class Hm_SMTP_List {
             'port'      => $server['port'],
             'tls'       => $server['tls'],
             'username'  => $user,
-            'password'  => $pass
+            'password'  => $pass,
+            'type'      => array_key_exists('type', $server) && !empty($server['type']) ? $server['type'] : 'smtp',
         );
         if (array_key_exists('auth', $server)) {
             $config['auth'] = $server['auth'];
@@ -33,16 +39,17 @@ class Hm_SMTP_List {
         if (array_key_exists('no_auth', $server)) {
             $config['no_auth'] = true;
         }
-        self::$server_list[$id]['object'] = new Hm_SMTP($config);
-
-        if (!self::$server_list[$id]['object']->connect()) {
+        self::$server_list[$id]['object'] = new Hm_Mailbox($id, self::$user_config, self::$session, $config);
+        if (! self::$server_list[$id]['object']->connect()) {
             return self::$server_list[$id]['object'];
         }
         return false;
     }
+
     public static function get_cache($session, $id) {
         return false;
     }
+
     public static function address_list() {
         $addrs = array();
         foreach (self::$server_list as $server) {

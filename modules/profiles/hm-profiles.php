@@ -56,6 +56,15 @@ class Hm_Profiles {
         return true;
     }
 
+    public static function getDefault() {
+        foreach (self::$data as $vals) {
+            if ($vals['default'] && $vals['default'] = true) {
+                return $vals;
+            }
+        }
+        return null;
+    }
+
     public static function createDefault($hmod) {
         if (! $hmod->module_is_supported('imap') || ! $hmod->module_is_supported('smtp')) {
             return;
@@ -108,5 +117,20 @@ class Hm_Profiles {
                 ));
             }
         }
+    }
+
+    /**
+ * @param string $field The name of the field to search within.
+ * @param mixed $value The value to search for within the specified field.
+ * @return array An array containing profiles that match the search criteria.
+ */
+    public static function search($field, $value) {
+        $res = array();
+        foreach (self::getAll() as $profile) {
+            if (!empty($profile[$field]) && $profile[$field] == $value) {
+                $res[] = $profile;
+            }
+        }
+        return $res;
     }
 }

@@ -52,19 +52,19 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
         }
         if (!$this->validate_date($form['adv_start']) ||
             !$this->validate_date($form['adv_end'])) {
-            Hm_Msgs::add('ERRInvalid date format');
+            Hm_Msgs::add('Invalid date format', 'warning');
             return;
         }
         $flags = array('ALL');
         if (array_key_exists('adv_flags', $this->request->post)) {
             if (!$this->validate_flags($this->request->post['adv_flags'])) {
-                Hm_Msgs::add('ERRInvalid flag');
+                Hm_Msgs::add('Invalid flag', 'warning');
                 return;
             }
             $flags = $this->request->post['adv_flags'];
         }
         if (!$this->validate_source($form['adv_source'])) {
-            Hm_Msgs::add('ERRInvalid source');
+            Hm_Msgs::add('Invalid source', 'warning');
             return;
         }
         $charset = false;
@@ -73,13 +73,12 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             $charset = $this->request->post['charset'];
         }
 
-        $cache = Hm_IMAP_List::get_cache($this->cache, $this->imap_id);
-        $imap = Hm_IMAP_List::connect($this->imap_id, $cache);
-        if (!imap_authed($imap)) {
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($this->imap_id, $this->cache);
+        if (! $mailbox || ! $mailbox->authed()) {
             return;
         }
         if ($charset) {
-            $imap->search_charset = $charset;
+            $mailbox->set_search_charset($charset);
         }
         $params = array(
             array('SENTBEFORE', date('j-M-Y', strtotime($form['adv_end']))),
@@ -91,42 +90,66 @@ class Hm_Handler_process_adv_search_request extends Hm_Handler_Module {
             }
         }
 
-        if ($this->request->post['all_folders']) {
-            $msg_list = $this->all_folders_search($imap, $flags, $params, $limit);
-        } else if (!$imap->select_mailbox($this->folder)) {
+        $searchInAllFolders = $this->request->post['all_folders'] ?? false;
+        $searchInSpecialFolders = $this->request->post['all_special_folders'] ?? false;
+        $includeSubfolders = $this->request->post['include_subfolders'] ?? false;
+        if ($searchInAllFolders) {
+            $msg_list = $this->all_folders_search($mailbox, $flags, $params, $limit);
+        } elseif ($searchInSpecialFolders) {
+            $msg_list = $this->special_folders_search($mailbox, $flags, $params, $limit);
+        } else if ($includeSubfolders) {
+            $msg_list = $this->all_folders_search($mailbox, $flags, $params, $limit, $this->folder);
+        } else if (! $mailbox->select_folder($this->folder)) {
             return;
         } else {
-            $msg_list = $this->imap_search($flags, $imap, $params, $limit);
+            $msg_list = $this->imap_search($flags, $mailbox, $params, $limit);
         }
         $this->out('imap_search_results', $msg_list);
-        $this->out('folder_status', $imap->folder_state);
+        $this->out('folder_status', $mailbox->get_folder_state());
         $this->out('imap_server_ids', array($this->imap_id));
     }
 
-    private function all_folders_search($imap, $flags, $params, $limit) {
-        $folders = $imap->get_mailbox_list();
+    private function all_folders_search($mailbox, $flags, $params, $limit, $parent = '') {
+        if ($parent) {
+            $folders = $mailbox->get_subfolders($parent);
+        } else {
+            $folders = $mailbox->get_folders();
+        }
         $msg_list = array();
         foreach ($folders as $folder) {
             $this->folder = $folder['name'];
-            $imap->select_mailbox($this->folder);
-            $msgs = $this->imap_search($flags, $imap, $params, $limit);
+            $msgs = $this->imap_search($flags, $mailbox, $params, $limit);
             $msg_list = array_merge($msg_list, $msgs);
         }
         return $msg_list;
     }
 
-    private function imap_search($flags, $imap, $params, $limit) {
+    private function special_folders_search($mailbox, $flags, $params, $limit) {
+        $specials = $this->user_config->get('special_imap_folders', array());
+        $folders = $specials[$this->imap_id] ?? [];
+
+        $msg_list = array();
+        foreach ($folders as $folder) {
+            $this->folder = $folder;
+            $mailbox->select_folder($this->folder);
+            $msgs = $this->imap_search($flags, $mailbox, $params, $limit);
+            $msg_list = array_merge($msg_list, $msgs);
+        }
+        return $msg_list;
+    }
+
+    private function imap_search($flags, $mailbox, $params, $limit) {
         $msg_list = array();
         $exclude_deleted = true;
         if (in_array('deleted', $flags, true)) {
             $exclude_deleted = false;
         }
-        $msgs = $imap->search($flags, false, $params, array(), $exclude_deleted);
+        $msgs = $mailbox->search($this->folder, $flags, $params, null, null, $exclude_deleted);
         if (!$msgs) {
             return $msg_list;
         }
         $server_details = Hm_IMAP_List::dump($this->imap_id);
-        foreach ($imap->get_message_list($msgs) as $msg) {
+        foreach ($mailbox->get_message_list($this->folder, $msgs) as $msg) {
             if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                 $msg['flags'] .= ' \Attachment';
             }

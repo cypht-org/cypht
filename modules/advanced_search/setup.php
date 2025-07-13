@@ -31,14 +31,16 @@ return array(
         'ajax_adv_search'
     ),
     'allowed_post' => array(
-        'adv_source' => FILTER_DEFAULT,
-        'adv_start' => FILTER_DEFAULT,
+        'adv_source' => FILTER_UNSAFE_RAW,
+        'adv_start' => FILTER_UNSAFE_RAW,
         'adv_source_limit' => FILTER_VALIDATE_INT,
-        'adv_end' => FILTER_DEFAULT,
-        'adv_charset' => FILTER_DEFAULT,
-        'adv_flags' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
-        'adv_terms' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
-        'adv_targets' => array('filter' => FILTER_DEFAULT, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_end' => FILTER_UNSAFE_RAW,
+        'adv_charset' => FILTER_UNSAFE_RAW,
+        'adv_flags' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_terms' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
+        'adv_targets' => array('filter' => FILTER_UNSAFE_RAW, 'flags' => FILTER_REQUIRE_ARRAY),
         'all_folders' => FILTER_VALIDATE_BOOLEAN,
+        'all_special_folders' => FILTER_VALIDATE_BOOLEAN,
+        'include_subfolders' => FILTER_VALIDATE_BOOLEAN,
     )
 );

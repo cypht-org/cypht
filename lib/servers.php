@@ -179,8 +179,8 @@ trait Hm_Server_List {
         Hm_Repository::get as repo_get;
     }
 
-    public static function init($name, $user_config) {
-        self::initRepo($name, $user_config, self::$server_list);
+    public static function init($name, $user_config, $session) {
+        self::initRepo($name, $user_config, $session, self::$server_list);
     }
 
     /**
@@ -213,6 +213,27 @@ trait Hm_Server_List {
             $list[$index] = $server;
         }
         return $list;
+    }
+
+    /**
+     * Return server details matching $match in column $column.
+     *
+     * @param mixed  $match        Value to match.
+     * @param string $column       Column name to match against.
+     * @param bool   $returnFirst  If true, return only the first matching server.
+     * @return array|null          Array of matches, or a single server array, or null if no match.
+     */
+    public static function getBy($match, $column = 'id', $returnFirst = false) {
+        $results = [];
+        foreach (self::$server_list as $server) {
+            if (isset($server[$column]) && $server[$column] === $match) {
+                if ($returnFirst) {
+                    return $server;
+                }
+                $results[] = $server;
+            }
+        }
+        return $returnFirst ? null : $results;
     }
 
     /**
@@ -272,5 +293,31 @@ trait Hm_Server_List {
             }
         }
         return false;
+    }
+
+    private static function appendPasswordAndUsername(array $server) {
+        $server['password'] = $server['pass'];
+        $server['username'] = $server['user'];
+        return $server;
+    }
+
+    public static function getForMailbox($id) {
+        $server = self::get($id, true);
+        if ($server) {
+            return self::appendPasswordAndUsername($server);
+        }
+        return false;
+    }
+
+    public static function dumpForMailbox($id = false) {
+        $list = self::dump($id, true);
+        if ($id !== false) {
+            return self::appendPasswordAndUsername($list);
+        }
+        foreach ($list as $index => $server) {
+            $server = self::appendPasswordAndUsername($server);
+            $list[$index] = $server;
+        }
+        return $list;
     }
 }

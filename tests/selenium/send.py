@@ -4,6 +4,7 @@ from creds import RECIP
 from runner import test_runner
 from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
+import time
 
 class SendTest(WebTest):
 
@@ -14,6 +15,7 @@ class SendTest(WebTest):
 
     def load_compose_page(self):
         self.load()
+        self.wait_on_class('menu_compose')
         list_item = self.by_class('menu_compose')
         link = list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_with_folder_list()
@@ -30,8 +32,11 @@ class SendTest(WebTest):
         send_button = self.by_class('smtp_send_placeholder')
         if send_button.get_attribute('disabled'):
             self.driver.execute_script("arguments[0].removeAttribute('disabled')", send_button)
+        self.driver.execute_script("arguments[0].scrollIntoView()", send_button)
+        time.sleep(1)
         send_button.click()
         self.wait_with_folder_list()
+        self.wait_on_class('sys_messages')
         sys_messages_element = self.by_class('sys_messages')
         sys_messages = sys_messages_element.text
         expected_messages = [
@@ -45,9 +50,13 @@ class SendTest(WebTest):
         assert message_found, f"Unexpected system message: {sys_messages}"
 
     def view_message_list(self):
+        self.load()
+        self.wait_with_folder_list()
+        self.wait_on_class('menu_unread')
         list_item = self.by_class('menu_unread')
         list_item.find_element(By.TAG_NAME, 'a').click()
         self.wait_for_navigation_to_complete()
+        self.wait_with_folder_list()
         assert self.by_class('mailbox_list_title').text == 'Unread'
         # self.wait_on_class('unseen', 10)
         # try:

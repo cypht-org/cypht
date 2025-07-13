@@ -46,6 +46,19 @@ function format_msg_html($str, $images=false) {
 }}
 
 /**
+ * Sanitize HTML for email
+ * @subpackage core/functions
+ * @param string $html content to sanitize
+ * @return string
+ */
+if (!hm_exists('sanitize_email_html')) {
+function sanitize_email_html($html) {
+    $html = preg_replace('/<([^>]+)style\s*=\s*["\'][^"\']*background-image\s*:\s*url\((["\']?)https?:\/\/.*?\2\)[^"\']*["\']/i', '<$1', $html);
+
+    return $html;
+}}
+
+/**
  * Convert HTML to plain text
  * @param string $html content to convert
  * @return string
@@ -449,8 +462,7 @@ class HTMLToText {
 
     function __construct($html) {
         $doc = new DOMDocument();
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        $doc->loadHTML(htmlentities($html, ENT_QUOTES, 'UTF-8'));
+        $doc->loadHTML(mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8'));
         if (trim($html) && $doc->hasChildNodes()) {
             $this->parse_nodes($doc->childNodes);
         }

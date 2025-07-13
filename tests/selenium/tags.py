@@ -26,7 +26,8 @@ class TagTest(WebTest):
         parent_tag.send_keys('')
         self.by_name('submit_tag').click()
         self.wait_with_folder_list()
-        assert self.by_class('sys_messages').text == 'Tag Created'
+        alert_message = self.by_class('sys_messages').find_element(By.XPATH, ".//div[contains(@class, 'flex-grow-1')]").text
+        assert alert_message.strip() == 'Tag Created'
 
     def edit_tag(self):
         self.wait()
@@ -37,13 +38,15 @@ class TagTest(WebTest):
         name.send_keys('Test 1')
         self.by_name('submit_tag').click()
         self.wait_with_folder_list()
-        assert self.by_class('sys_messages').text == 'Tag Edited'
+        alert_message = self.by_class('sys_messages').find_element(By.XPATH, ".//div[contains(@class, 'flex-grow-1')]").text
+        assert alert_message.strip() == 'Tag Edited'
 
     def del_tag(self):
         self.wait()
         self.by_id('destroy_tag').click()
         self.wait_with_folder_list()
-        assert self.by_class('sys_messages').text == 'Tag Deleted'
+        alert_message = self.by_class('sys_messages').find_element(By.XPATH, ".//div[contains(@class, 'flex-grow-1')]").text
+        assert alert_message.strip() == 'Tag Deleted'
 
 
 if __name__ == '__main__':

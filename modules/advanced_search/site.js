@@ -82,15 +82,22 @@ var expand_adv_folder = function(res) {
         $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
         $('a', list_container).not('.adv_folder_link').off('click');
         $('a', list_container).not('.adv_folder_link').on("click", function() { adv_folder_select($(this).data('id')); return false; });
+        modifyInnerLists();
     }
 };
 
-$(document).on("change", "input#all_folders", function() {
+$(document).on("change", "input[name='all_folders'],input[name='all_special_folders']", function() {
     const folderLi = $(this).closest('li');
+    const divergentCheckboxName = this.name === 'all_folders' ? 'all_special_folders' : 'all_folders';
+    const divergentCheckbox = $(this).closest('div').find(`input[name='${divergentCheckboxName}']`)
+    
     if ($(this).is(':checked')) {
         folderLi.find('a').attr('disabled', 'disabled');
+        divergentCheckbox.prop('checked', false);
+        divergentCheckbox.attr('disabled', 'disabled');
     } else {
         folderLi.find('a').removeAttr('disabled');
+        divergentCheckbox.removeAttr('disabled');
     }
 });
 
@@ -106,17 +113,28 @@ var adv_select_imap_folder = function(el) {
     list_container.show();
     folders.show();
 
-    folders.find('li').each(function() {
-        const wrapper = $('<div class="d-flex justify-content-between"></div>');
+    folders.find('li').each(function(index) {
+        const wrapper = $('<div class="d-flex justify-content-between wrapper"></div>');
         $(this).wrapInner(wrapper);
-        const allFoldersCheckbox = `
+        const allSpecialFoldersCheckbox = `
         <span class="form-check">
-            <label class="form-check-label" for="all_folders">All Folders</label>
-            <input class="form-check-input" type="checkbox" id="all_folders">
+            <label class="form-check-label" for="all_special_folders-${index}">All special folders</label>
+            <input class="form-check-input" type="checkbox" name="all_special_folders" id="all_special_folders-${index}">
         </span>
         `;
-        wrapper.append(allFoldersCheckbox);
-    })
+        const allFoldersCheckbox = `
+        <span class="form-check">
+            <label class="form-check-label" for="all_folders-${index}">All folders</label>
+            <input class="form-check-input" type="checkbox" name="all_folders" id="all_folders-${index}">
+        </span>
+        `;
+        const checkboxesWrapper = $('<div class="d-flex gap-3"></div>');
+        checkboxesWrapper.append(allSpecialFoldersCheckbox);
+        checkboxesWrapper.append(allFoldersCheckbox);
+        $(this).find('.wrapper').append(checkboxesWrapper);
+    });
+
+    modifyInnerLists();
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
     $('.adv_folder_list').html(folders.html());
@@ -131,6 +149,20 @@ var adv_select_imap_folder = function(el) {
         return false;
     });
 };
+
+function modifyInnerLists() {
+    $('.adv_folder_list').find('.inner_list li').each(function(index) {
+        const subFoldersCheckbox = `
+        <span class="form-check form-text">
+            <label class="form-check-label" for="include_subfolders-${index}">Include subfolders</label>
+            <input class="form-check-input" type="checkbox" name="include_subfolders" id="include_subfolders-${index}">
+        </span>
+        `;
+        $(this).wrapInner('<div class="d-flex wrapper"></div>');
+        $(this).find('.wrapper').append(subFoldersCheckbox);
+        $(this).find('#main-link').css('flex-grow', 0)
+    });
+}
 
 var adv_folder_select = function(id) {
     if ($('.'+id, $('.adv_source_list')).length > 0) {
@@ -149,17 +181,19 @@ var adv_folder_select = function(id) {
     var parent_class = '.'+parts[0]+'_'+parts[1]+'_';
     var account = $('a', $(parent_class, container)).first().text();
     var label = account+' &gt; '+folder;
-    add_source_to_list(id, label);
+    const includeSubfolders = $(`.${id}`).closest('li').find('input[name="include_subfolders"]').is(':checked');
+    
+    add_source_to_list(id, label, includeSubfolders);
     $('.adv_folder_list').html('');
     $('.close_adv_folders').remove();
     $('.adv_folder_list').hide();
 };
 
-var add_source_to_list = function(id, label) {
+var add_source_to_list = function(id, label, includeSubfolders) {
     var close = $(globals.close_html);
     close.addClass('adv_remove_source');
     close.attr('data-target', id);
-    var row = '<div class="'+id+'">'+close.prop('outerHTML')+label;
+    var row = '<div class="'+id+'" data-subfolders="'+includeSubfolders+'">'+close.prop('outerHTML')+label;
     row += '<input type="hidden" value="'+id+'" /></div>';
     $('.adv_source_list').append(row);
     $('.adv_remove_source').off('click');
@@ -212,13 +246,18 @@ var adv_expand_sections = function() {
 var get_adv_sources = function() {
     const sources = [];
 
-    const searchInAllFolders = $('.adv_folder_list li input:checked')
+    const searchInAllFolders = $('.adv_folder_list li input[name="all_folders"]:checked');
     searchInAllFolders.each(function() {
         const li = $(this).closest('li');
-        sources.push({'source': li.attr('class'), 'label': li.find('a').text()});
+        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), allFolders: true});
+    });
+
+    const searchInSpecialFolders = $('.adv_folder_list li input[name="all_special_folders"]:checked');
+    searchInSpecialFolders.each(function() {
+        const li = $(this).closest('li');
+        sources.push({'source': li.attr('class'), 'label': li.find('a').text(), specialFolders: true});
     });
     
-
     const selected_sources = $('div', $('.adv_source_list'));
     if (!selected_sources) {
         return sources;
@@ -227,10 +266,10 @@ var get_adv_sources = function() {
         const source = this.className;
         const mailboxSource = source.split('_').slice(0, 2).join('_');
         if (!sources.find(s => s.source.indexOf(mailboxSource) > -1)) {
-            sources.push({'source': source, 'label': $('a', $(this)).text()});
+            sources.push({'source': source, 'label': $('a', $(this)).text(), subFolders: $(this).data('subfolders')});
         }
     });
-    return [sources, searchInAllFolders.length > 0];
+    return sources;
 };
 
 var get_adv_terms = function() {
@@ -322,25 +361,24 @@ var get_adv_other = function() {
 };
 
 var process_advanced_search = function() {
-    Hm_Notices.hide(true);
     var terms = get_adv_terms();
     if (terms.length == 0) {
-        Hm_Notices.show([err_msg('You must enter at least one search term')]);
+        Hm_Notices.show('You must enter at least one search term', 'warning');
         return;
     }
-    const [sources, allFolders] = get_adv_sources();
+    const sources = get_adv_sources();
     if (sources.length == 0) {
-        Hm_Notices.show([err_msg('You must select at least one source')]);
+        Hm_Notices.show('You must select at least one source', 'warning');
         return;
     }
     var targets = get_adv_targets();
     if (targets.length == 0) {
-        Hm_Notices.show([err_msg('You must have at least one target')]);
+        Hm_Notices.show('You must have at least one target', 'warning');
         return;
     }
     var times = get_adv_times();
     if (times.length == 0) {
-        Hm_Notices.show([err_msg('You must enter at least one time range')]);
+        Hm_Notices.show('You must enter at least one time range', 'warning');
         return;
     }
     var other = get_adv_other();
@@ -349,7 +387,7 @@ var process_advanced_search = function() {
     search_summary({ 'terms': terms, 'targets': targets, 'sources': sources,
             'times': times, 'other': other });
 
-    send_requests(build_adv_search_requests(terms, sources, targets, times, other), allFolders);
+    send_requests(build_adv_search_requests(terms, sources, targets, times, other));
 };
 
 var save_search_details = function(terms, sources, targets, times, other) {
@@ -384,7 +422,7 @@ var adv_group_vals = function(data, type) {
     return groups;
 };
 
-var send_requests = function(requests, allFolders) {
+var send_requests = function(requests) {
     var request;
     $('tr', Hm_Utils.tbody()).remove();
     Hm_Utils.save_to_local_storage('formatted_advanced_search_data', '');
@@ -399,9 +437,16 @@ var send_requests = function(requests, allFolders) {
             {'name': 'adv_start', 'value': request['time']['from']},
             {'name': 'adv_end', 'value': request['time']['to']},
             {'name': 'adv_source_limit', 'value': request['other']['limit']},
-            {'name': 'adv_charset', 'value': request['other']['charset']},
-            {'name': 'all_folders', 'value': allFolders}
+            {'name': 'adv_charset', 'value': request['other']['charset']}
         ];
+
+        if (request['all_folders']) {
+            params.push({name: 'all_folders', value: true});
+        } else if (request['all_special_folders']) {
+            params.push({name: 'all_special_folders', value: true});
+        } else if (request['sub_folders']) {
+            params.push({name: 'include_subfolders', value: true});
+        }
 
         for (var i=0, len=request['terms'].length; i < len; i++) {
             params.push({'name': 'adv_terms[]', 'value': request['terms'][i]});
@@ -449,22 +494,31 @@ var build_adv_search_requests = function(terms, sources, targets, times, other) 
     var target_vals;
     var requests = []
     var term_groups = adv_group_vals(terms, 'term');
-    var target_groups = adv_group_vals(targets, 'target');
+    var target_groups = adv_group_vals(targets, 'target');    
 
     for (var tv=0, tvlen=term_groups.length; tv < tvlen; tv++) {
         term_vals = term_groups[tv];
         for (var tag=0, taglen=target_groups.length; tag < taglen; tag++) {
             target_vals = target_groups[tag];
             for (var s=0, slen=sources.length; s < slen; s++) {
-                source = sources[s]['source'];
+                source = sources[s];
                 for (var ti=0, tilen=times.length; ti < tilen; ti++) {
                     time = times[ti];
-                    requests.push({'source': source, 'time': time, 'other': other,
-                        'targets': target_vals, 'terms': term_vals});
+                    const config = {'source': source.source, 'time': time, 'other': other,
+                        'targets': target_vals, 'terms': term_vals};
+                    if (source.allFolders) {
+                        config['all_folders'] = true;
+                    } else if (source.specialFolders) {
+                        config['all_special_folders'] = true;
+                    } else if (source.subFolders) {
+                        config['sub_folders'] = true;
+                    }
+                    requests.push(config);
                 }
             }
         }
-    }
+    }    
+    
     return requests;
 };
 

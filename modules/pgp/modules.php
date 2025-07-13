@@ -29,7 +29,7 @@ class Hm_Handler_pgp_delete_public_key extends Hm_Handler_Module {
         }
         $keys = $this->user_config->get('pgp_public_keys', array());
         if (!array_key_exists($form['delete_public_key_id'], $keys)) {
-            Hm_Msgs::add('ERRCould not find public key to remove');
+            Hm_Msgs::add('Could not find public key to remove', 'warning');
             return;
         }
         unset($keys[$form['delete_public_key_id']]);
@@ -53,7 +53,7 @@ class Hm_Handler_pgp_import_public_key extends Hm_Handler_Module {
         }
         $fingerprint = validate_public_key($this->request->files['public_key']['tmp_name']);
         if (!$fingerprint) {
-            Hm_Msgs::add('ERRUnable to import public key');
+            Hm_Msgs::add('Unable to import public key', 'danger');
             return;
         }
         $keys = $this->user_config->get('pgp_public_keys', array());
@@ -227,16 +227,16 @@ class Hm_Output_pgp_settings_link extends Hm_Output_Module {
 if (!hm_exists('validate_public_key')) {
 function validate_public_key($file_location) {
     if (!class_exists('gnupg')) {
-        Hm_Debug::add('Gnupg PECL extension not found');
+        Hm_Debug::add('Gnupg PECL extension not found', 'warning');
         return false;
     }
     if (!is_readable($file_location)) {
-        Hm_Debug::add('Uploaded public key not readable');
+        Hm_Debug::add('Uploaded public key not readable', 'warning');
         return false;
     }
     $data = file_get_contents($file_location);
     if (!$data) {
-        Hm_Debug::add('Uploaded public key not readable');
+        Hm_Debug::add('Uploaded public key not readable', 'warning');
         return false;
     }
     $tmp_dir = ini_get('upload_tmp_dir') ? ini_get('upload_tmp_dir') : sys_get_temp_dir();

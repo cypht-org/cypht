@@ -98,16 +98,14 @@ class Hm_Handler_process_special_folder extends Hm_Handler_Module {
         if (!$success || !in_array($form['special_folder_type'], array('sent', 'draft', 'trash', 'archive', 'junk'), true)) {
             return;
         }
-        $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-        $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-
-        if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-            Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+        if (!is_object($mailbox) || ! $mailbox->authed()) {
+            Hm_Msgs::add('Unable to connect to the selected IMAP server', 'danger');
             return;
         }
-        $new_folder = prep_folder_name($imap, $form['folder'], true);
-        if (!$new_folder || !$imap->select_mailbox($new_folder)) {
-            Hm_Msgs::add('ERRSelected folder not found');
+        $new_folder = $mailbox->prep_folder_name($form['folder']);
+        if (! $new_folder || ! $mailbox->get_folder_status($new_folder)) {
+            Hm_Msgs::add('Selected folder not found', 'warning');
             return;
         }
         $specials = $this->user_config->get('special_imap_folders', array());
@@ -132,15 +130,13 @@ class Hm_Handler_process_accept_special_folders extends Hm_Handler_Module {
 
         list($success, $form) = $this->process_form(array('imap_server_id', 'imap_service_name'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-
-            if (!is_object($imap) || $imap->get_state() != 'authenticated') {
-                Hm_Msgs::add('ERRUnable to connect to the selected IMAP server');
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if (!is_object($mailbox) || ! $mailbox->authed()) {
+                Hm_Msgs::add('Unable to connect to the selected IMAP server', 'danger');
                 return;
             }
             $specials = $this->user_config->get('special_imap_folders', array());
-            $exposed = $imap->get_special_use_mailboxes();
+            $exposed = $mailbox->get_special_use_mailboxes();
             if ($form['imap_service_name'] == 'gandi') {
                 $specials[$form['imap_server_id']] = array(
                     'sent' => 'Sent',
@@ -178,21 +174,18 @@ class Hm_Handler_process_folder_create extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('folder', 'imap_server_id'));
         if ($success) {
             $parent = false;
-            $parent_str = false;
             if (array_key_exists('parent', $this->request->post) && trim($this->request->post['parent'])) {
-                $parent_str = decode_folder_str($this->request->post['parent']);
+                $parent = decode_folder_str($this->request->post['parent']);
             }
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $new_folder = prep_folder_name($imap, $form['folder'], false, $parent_str);
-                if ($new_folder && $imap->create_mailbox($new_folder)) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                if ($form['folder'] && $mailbox->create_folder($form['folder'], $parent)) {
                     Hm_Msgs::add('Folder created');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred creating the folder');
+                    Hm_Msgs::add('Failed to create folder '.$form['folder'].'. It might already exist. Please check and try again.', 'danger');
                 }
             }
         }
@@ -206,58 +199,19 @@ class Hm_Handler_process_folder_rename extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder', 'new_folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            $parent_str = false;
+            $parent = false;
             if (array_key_exists('parent', $this->request->post)) {
-                $parent_str = $this->request->post['parent'];
+                $parent = $this->request->post['parent'];
             }
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $old_folder = prep_folder_name($imap, $form['folder'], true);
-                $new_folder = prep_folder_name($imap, $form['new_folder'], false, $parent_str);
-                if ($new_folder && $old_folder && $imap->rename_mailbox($old_folder, $new_folder)) {
-                    if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                        $imap_servers = $this->user_config->get('imap_servers');
-                        $imap_account = $imap_servers[$form['imap_server_id']];
-                        $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $this);
-                        if ($linked_mailboxes && in_array($old_folder, $linked_mailboxes)) {
-                            list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
-                            try {
-                                $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-                                $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
-                                $script_names = array_filter(
-                                    $linked_mailboxes,
-                                    function ($value) use($old_folder) {
-                                        return $value == $old_folder;
-                                    }
-                                );
-                                $script_names = array_keys($script_names);
-                                foreach ($script_names as $script_name) {
-                                    $script_parsed = $client->getScript($script_name);
-                                    $script_parsed = str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $script_parsed);
-
-                                    $old_actions = base64_decode(preg_split('#\r?\n#', $script_parsed, 0)[2]);
-                                    $new_actions = base64_encode(str_replace('"'.$old_folder.'"', '"'.$new_folder.'"', $old_actions));
-                                    $script_parsed = str_replace(base64_encode($old_actions), $new_actions, $script_parsed);
-                                    $client->removeScripts($script_name);
-                                    $client->putScript(
-                                        $script_name,
-                                        $script_parsed
-                                    );
-                                }
-                                $client->close();
-                                Hm_Msgs::add('This folder is used in one or many filters, and it will be renamed as well');
-                            } catch (Exception $e) {
-                                Hm_Msgs::add("ERRFailed to rename folder in sieve scripts");
-                            }
-                        }
-                    }
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                if ($form['folder'] && $form['new_folder'] && $mailbox->rename_folder($form['folder'], $form['new_folder'], $parent)) {
                     Hm_Msgs::add('Folder renamed');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred renaming the folder');
+                    Hm_Msgs::add('An error occurred renaming the folder', 'danger');
                 }
             }
         }
@@ -271,23 +225,18 @@ class Hm_Handler_process_folder_delete extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('imap_server_id', 'folder'));
         if ($success) {
-            $cache = Hm_IMAP_List::get_cache($this->cache, $form['imap_server_id']);
-            $imap = Hm_IMAP_List::connect($form['imap_server_id'], $cache);
-            if (is_object($imap) && $imap->get_state() == 'authenticated') {
-                $del_folder = prep_folder_name($imap, $form['folder'], true);
-                if ($this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-                    if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this)) {
-                        Hm_Msgs::add('ERRThis folder can\'t be deleted because it is used in a filter.');
-                        return;
-                    }
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
+            if ($mailbox && $mailbox->authed()) {
+                if ($this->get('sieve_can_delete_folder') === false) {
+                    return;
                 }
-                if ($del_folder && $imap->delete_mailbox($del_folder)) {
+                if ($form['folder'] && $mailbox->delete_folder($form['folder'])) {
                     Hm_Msgs::add('Folder deleted');
                     $this->cache->del('imap_folders_imap_'.$form['imap_server_id'].'_');
                     $this->out('imap_folders_success', true);
                 }
                 else {
-                    Hm_Msgs::add('ERRAn error occurred deleting the folder');
+                    Hm_Msgs::add('An error occurred deleting the folder', 'danger');
                 }
             }
         }
@@ -307,6 +256,14 @@ class Hm_Handler_special_folders extends Hm_Handler_Module {
                 $this->out('archive_folder', $specials[$this->request->get['imap_server_id']]['archive']);
                 $this->out('draft_folder', $specials[$this->request->get['imap_server_id']]['draft']);
                 $this->out('junk_folder', $specials[$this->request->get['imap_server_id']]['junk']);
+                $mailbox = Hm_IMAP_List::get_connected_mailbox($this->request->get['imap_server_id'], $this->cache);
+                if ($mailbox && $mailbox->authed()) {
+                    $folder_names = [];
+                    foreach ($specials[$this->request->get['imap_server_id']] as $name => $folder) {
+                        $folder_names[$name] = $mailbox->get_folder_name($folder);
+                    }
+                    $this->out('special_folder_names', $folder_names);
+                }
             }
         }
         else {
@@ -323,6 +280,7 @@ class Hm_Handler_folders_server_id extends Hm_Handler_Module {
         if (array_key_exists('imap_server_id', $this->request->get)) {
             $this->out('folder_server', $this->request->get['imap_server_id']);
             $this->out('page', $this->request->get['page']);
+            $this->out('trigger_default_submit', false);
         }
     }
 }
@@ -344,16 +302,15 @@ class Hm_Handler_process_imap_folder_subscription extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('folder', 'subscription_state'));
         if ($success) {
             $imap_server_id = $this->request->get['imap_server_id'];
-            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (imap_authed($imap)) {
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+            if ($mailbox && $mailbox->authed()) {
                 $folder = hex2bin($form['folder']);
-                $success = $imap->mailbox_subscription($folder, $form['subscription_state']);
+                $success = $mailbox->folder_subscription($folder, $form['subscription_state']);
                 if ($success) {
-                    Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $folder));
+                    Hm_Msgs::add(sprintf('%s to %s', $form['subscription_state']? 'Subscribed': 'Unsubscribed', $mailbox->get_folder_name($folder)));
                     $this->cache->del('imap_folders_imap_'.$imap_server_id.'_');
                 } else {
-                    Hm_Msgs::add(sprintf('ERRAn error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder));
+                    Hm_Msgs::add(sprintf('An error occurred %s to %s', $form['subscription_state']? 'subscribing': 'unsubscribing', $folder), 'danger');
                 }
                 $this->out('imap_folder_subscription', $success);
             }
@@ -380,14 +337,17 @@ class Hm_Handler_process_only_subscribed_folders_setting extends Hm_Handler_Modu
 class Hm_Output_folders_server_select extends Hm_Output_Module {
     protected function output() {
         $server_id = $this->get('folder_server', '');
-        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get">';
+        // exit(var_dump($server_id));
+        // $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get">';
+        $data_auto_submit = !empty($this->get('trigger_default_submit')) ? ' data-auto-submit="1"' : 'data-auto-submit="0"';
+        $res = '<div class="folders_page mt-4 row mb-4"><div class="col-xl-6 col-sm-12"><form id="form_folder_imap" method="get"'.$data_auto_submit.'>';
         $res .= '<input type="hidden" name="page" value="'.$this->get('page', 'folders').'" />';
         $res .= '<div class="form-floating"><select class="form-select" id="imap_server_folder" name="imap_server_id">';
         $res .= '<option ';
         if (empty($server_id)) {
             $res .= 'selected="selected" ';
         }
-        $res .= 'value="">'.$this->trans('Select an IMAP server').'</option>';
+        $res .= 'value="">'.$this->trans('Select a Mail Account').'</option>';
         foreach ($this->get('imap_servers', array()) as $id => $server) {
             $res .= '<option ';
             if ($server_id == $id) {
@@ -396,8 +356,8 @@ class Hm_Output_folders_server_select extends Hm_Output_Module {
             $res .= 'value="'.$this->html_safe($id).'">';
             $res .= $this->html_safe($server['name']);
         }
-        $res .= '</select><label for="imap_server_folder">'.$this->trans('IMAP Server').'</label></div></form></div></div>';
-        $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select an IMAP server first').'" />';
+        $res .= '</select><label for="imap_server_folder">'.$this->trans('Mail Account').'</label></div></form></div></div>';
+        $res .= '<input type="hidden" id="server_error" value="'.$this->trans('You must select a mail account first').'" />';
         $res .= '<input type="hidden" id="folder_name_error" value="'.$this->trans('New folder name is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_error" value="'.$this->trans('Folder to delete is required').'" />';
         $res .= '<input type="hidden" id="delete_folder_confirm" value="'.$this->trans('Are you sure you want to delete this folder, and all the messages in it?').'" />';
@@ -414,7 +374,7 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">';
             $res .= '<div data-target=".delete_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                        <a href="#" class="pe-auto">'.$this->trans('Delete a Folder').'</a>
+                        <a href="#" class="pe-auto"><i class="bi bi-folder-x fs-5 me-2"></i>'.$this->trans('Delete a Folder').'</a>
                     </div>';
             $res .= '<div class="delete_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-1 px-0">
                         <div class="folder_row">
@@ -426,6 +386,7 @@ class Hm_Output_folders_delete_dialog extends Hm_Output_Module {
                                 <a href="#" class="close">'.$this->trans('Cancel').'</a>
                             </li>
                         </ul>
+                        <input type="hidden" value="" id="children_number" />
                         <input type="hidden" value="" id="delete_source" />
                         <input type="button" id="delete_folder" class="btn btn-danger" value="'.$this->trans('Delete').'">
                      </div></div>';
@@ -443,7 +404,7 @@ class Hm_Output_folders_rename_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">
                         <div data-target=".rename_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                            <a href="#" class="pe-auto">'.$this->trans('Rename a Folder').'</a>
+                            <a href="#" class="pe-auto"><i class="bi bi-folder-check fs-5 me-2"></i>'.$this->trans('Rename a Folder').'</a>
                         </div>
                         <div class="rename_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
                             <div class="folder_row">
@@ -489,13 +450,15 @@ class Hm_Output_folders_sent_dialog extends Hm_Output_Module {
         }
 
         $sent_folder = $this->get('sent_folder', $this->trans('Not set'));
-        if (!$sent_folder) {
-            $sent_folder = $this->trans('Not set');
+        if (! $sent_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['sent'] ?? $sent_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".sent_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Sent Folder').':<span id="sent_val">'.$sent_folder.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-send-check-fill fs-5 me-2"></i>'.$this->trans('Sent Folder').':<span id="sent_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog sent_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -533,13 +496,15 @@ class Hm_Output_folders_archive_dialog extends Hm_Output_Module {
         }
 
         $archive_folder = $this->get('archive_folder', $this->trans('Not set'));
-        if (!$archive_folder) {
-            $archive_folder = $this->trans('Not set');
+        if (! $archive_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['archive'] ?? $archive_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".archive_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Archive Folder').':<span id="archive_val">'.$archive_folder.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-archive fs-5 me-2"></i>'.$this->trans('Archive Folder').':<span id="archive_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog archive_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -577,13 +542,15 @@ class Hm_Output_folders_draft_dialog extends Hm_Output_Module {
         }
 
         $draft_folder = $this->get('draft_folder', $this->trans('Not set'));
-        if (!$draft_folder) {
-            $draft_folder = $this->trans('Not set');
+        if (! $draft_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['draft'] ?? $draft_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".draft_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Draft Folder').':<span id="draft_val">'.$draft_folder.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-pencil-square fs-5 me-2"></i>'.$this->trans('Draft Folder').':<span id="draft_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<div class="folder_dialog draft_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
                     <div class="folder_row">
@@ -621,13 +588,15 @@ class Hm_Output_folders_trash_dialog extends Hm_Output_Module {
         }
 
         $trash_folder = $this->get('trash_folder', $this->trans('Not set'));
-        if (!$trash_folder) {
-            $trash_folder = $this->trans('Not set');
+        if (! $trash_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['trash'] ?? $trash_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".trash_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Trash Folder').':<span id="trash_val">'.$trash_folder.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-trash3 fs-5 me-2"></i>'.$this->trans('Trash Folder').':<span id="trash_val">'.$folder_name.'</span></a>
                 </div>';
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
         $res .= '<div class="folder_dialog trash_folder_dialog col-lg-6 col-md-6 col-sm-12 py-3 px-0">
@@ -662,13 +631,15 @@ class Hm_Output_folders_junk_dialog extends Hm_Output_Module {
         }
 
         $junk_folder = $this->get('junk_folder', $this->trans('Not set'));
-        if (!$junk_folder) {
-            $junk_folder = $this->trans('Not set');
+        if (! $junk_folder) {
+            $folder_name = $this->trans('Not set');
+        } else {
+            $folder_name = $this->get('special_folder_names')['junk'] ?? $junk_folder;
         }
 
         $res = '<div class="row m-0 px-3 mt-3">';
         $res .= '<div data-target=".junk_folder_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                    <a href="#" class="pe-auto">'.$this->trans('Junk Folder').':<span id="junk_val">'.$junk_folder.'</span></a>
+                    <a href="#" class="pe-auto"><i class="bi bi-envelope-x-fill fs-5 me-2"></i>'.$this->trans('Junk Folder').':<span id="junk_val">'.$folder_name.'</span></a>
                 </div>';
 
         $res .= '<input type="hidden" id="not_set_string" value="'.$this->trans('Not set').'" />';
@@ -742,7 +713,7 @@ class Hm_Output_folders_create_dialog extends Hm_Output_Module {
         if ($this->get('folder_server') !== NULL) {
             $res = '<div class="row m-0 px-3 mt-3">
                         <div data-target=".create_dialog" class="settings_subtitle col-12 border-bottom px-0">
-                            <a href="#" class="pe-auto">'.$this->trans('Create a New Folder').'</a>
+                            <a href="#" class="pe-auto"><i class="bi bi-folder-plus fs-5 me-2"></i>'.$this->trans('Create a New Folder').'</a>
                         </div>
                         <div class="create_dialog folder_dialog col-lg-4 col-md-6 col-sm-12 py-3 px-0">
                             <div class="form-floating mb-3">
@@ -818,50 +789,10 @@ class Hm_Output_imap_only_subscribed_folders_setting extends Hm_Output_Module {
         $settings = $this->get('user_settings', array());
         if (array_key_exists('only_subscribed_folders', $settings) && $settings['only_subscribed_folders']) {
             $checked = ' checked="checked"';
-            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
         return '<tr class="general_setting"><td><label for="only_subscribed_folders">'.
             $this->trans('Showing subscribed folders only').'</label></td>'.
             '<td><input type="checkbox" '.$checked.' id="only_subscribed_folders" name="only_subscribed_folders" data-default-value="false" value="1" class="form-check-input" />'.$reset.'</td></tr>';
-    }
-}
-
-if (!hm_exists('get_sieve_linked_mailbox')) {
-    function get_sieve_linked_mailbox ($imap_account, $module) {
-        if (!$module->module_is_supported('sievefilters') && $module->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
-            return;
-        }
-        list($sieve_host, $sieve_port) = parse_sieve_config_host($imap_account['sieve_config_host']);
-        $client = new \PhpSieveManager\ManageSieve\Client($sieve_host, $sieve_port);
-        try {
-            $client->connect($imap_account['user'], $imap_account['pass'], $imap_account['sieve_tls'], "", "PLAIN");
-            $scripts = $client->listScripts();
-            $folders = [];
-            foreach ($scripts as $s) {
-                $script = $client->getScript($s);
-                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
-                $obj = json_decode(base64_decode($base64_obj))[0];
-                if ($obj && in_array($obj->action, ['copy', 'move'])) {
-                    $folders[$s] = $obj->value;
-                }
-            }
-            $client->close();
-            return $folders;
-        } catch (Exception $e) {
-            Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
-            return;
-        }
-    }
-}
-
-if (!hm_exists('is_mailbox_linked_with_filters')) {
-    function is_mailbox_linked_with_filters ($mailbox, $imap_server_id, $module) {
-        $imap_servers = $module->user_config->get('imap_servers');
-        $imap_account = $imap_servers[$imap_server_id];
-        if (isset($imap_account['sieve_config_host'])) {
-            $linked_mailboxes = get_sieve_linked_mailbox($imap_account, $module);
-            return in_array($mailbox, $linked_mailboxes);
-        }
-        return false;
     }
 }

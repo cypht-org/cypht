@@ -15,23 +15,23 @@ add_handler('ajax_imap_message_content', 'vcalendar_check',  true, 'calendar', '
 /*add_output('ajax_imap_message_content', 'vcalendar_add_output', true, 'calendar', 'filter_message_headers', 'after');*/
 add_output('calendar', 'calendar_content', true, 'calendar', 'content_section_start', 'after');
 add_output('calendar', 'add_cal_event_form', true, 'calendar', 'content_section_start', 'after');
-add_output('ajax_hm_folders', 'calendar_page_link', true, 'calendar', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'calendar_page_link', true, 'calendar', 'main_menu_content', 'before');
 
 return array(
     'allowed_pages' => array(
         'calendar',
     ),
     'allowed_post' => array(
-        'event_title' => FILTER_DEFAULT,
-        'event_detail' => FILTER_DEFAULT,
-        'event_date' => FILTER_DEFAULT,
-        'event_time' => FILTER_DEFAULT,
-        'event_repeat' => FILTER_DEFAULT,
-        'delete_id' => FILTER_DEFAULT
+        'event_title' => FILTER_UNSAFE_RAW,
+        'event_detail' => FILTER_UNSAFE_RAW,
+        'event_date' => FILTER_UNSAFE_RAW,
+        'event_time' => FILTER_UNSAFE_RAW,
+        'event_repeat' => FILTER_UNSAFE_RAW,
+        'delete_id' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
-        'date' => FILTER_DEFAULT,
-        'view' => FILTER_DEFAULT,
-        'action' => FILTER_DEFAULT,
+        'date' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'view' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'action' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
 );

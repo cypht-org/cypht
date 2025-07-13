@@ -65,6 +65,8 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
     public function process() {
 
         $imap_servers = NULL;
+        $jmap_servers = NULL;
+        $ews_servers = NULL;
         $smtp_servers = NULL;
         $feed_servers = NULL;
         $profiles = NULL;
@@ -72,13 +74,17 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
         $modules = $this->config->get_modules();
 
         if (data_source_available($modules, 'imap')) {
-            $imap_servers = count(Hm_IMAP_List::dump(false));
+            $servers = Hm_IMAP_List::dump(false);
+            $imap_servers = count(array_filter($servers, function($server) { return empty($server['type']) || $server['type'] === 'imap'; }));
+            $jmap_servers = count(array_filter($servers, function($server) { return @$server['type'] === 'jmap'; }));
+            $ews_servers = count(array_filter($servers, function($server) { return @$server['type'] === 'ews'; }));
         }
         if (data_source_available($modules, 'feeds')) {
             $feed_servers = count(Hm_Feed_List::dump(false));
         }
         if (data_source_available($modules, 'smtp')) {
-            $smtp_servers = count(Hm_SMTP_List::dump(false));
+            $servers = Hm_SMTP_List::dump(false);
+            $smtp_servers = count(array_filter($servers, function($server) { return empty($server['type']) || $server['type'] === 'smtp'; }));
         }
         if (data_source_available($modules, 'profiles')) {
             Hm_Profiles::init($this);
@@ -87,6 +93,8 @@ class Hm_Handler_nux_homepage_data extends Hm_Handler_Module {
 
         $this->out('nux_server_setup', array(
             'imap' => $imap_servers,
+            'jmap' => $jmap_servers,
+            'ews' => $ews_servers,
             'feeds' => $feed_servers,
             'smtp' => $smtp_servers,
             'profiles' => $profiles
@@ -114,7 +122,8 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                         'pass' => $result['access_token'],
                         'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
                         'refresh_token' => $result['refresh_token'],
-                        'auth' => 'xoauth2'
+			'auth' => 'xoauth2',
+			'type' => $details['type']
                     ));
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
@@ -126,11 +135,12 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                             'user' => $details['email'],
                             'pass' => $result['access_token'],
                             'expiration' => strtotime(sprintf("+%d seconds", $result['expires_in'])),
-                            'refresh_token' => $result['refresh_token']
+			    'refresh_token' => $result['refresh_token'],
+			    'type' => 'smtp'
                         ));
                         $this->session->record_unsaved('SMTP server added');
                     }
-                    Hm_Msgs::add('E-mail account successfully added');
+                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                     Hm_IMAP_List::clean_up();
                     $this->session->del('nux_add_service_details');
                     $this->session->record_unsaved('IMAP server added');
@@ -138,14 +148,14 @@ class Hm_Handler_process_oauth2_authorization extends Hm_Handler_Module {
                     $this->session->close_early();
                 }
                 else {
-                    Hm_Msgs::add('ERRAn Error Occurred');
+                    Hm_Msgs::add('An Error Occurred', 'danger');
                 }
             }
             elseif (array_key_exists('error', $this->request->get)) {
-                Hm_Msgs::add('ERR'.ucwords(str_replace('_', ' ', $this->request->get['error'])));
+                Hm_Msgs::add(ucwords(str_replace('_', ' ', $this->request->get['error'])), 'danger');
             }
             else {
-                Hm_Msgs::add('ERRAn Error Occurred');
+                Hm_Msgs::add('An Error Occurred', 'danger');
             }
             $this->save_hm_msgs();
             Hm_Dispatch::page_redirect('?page=servers');
@@ -174,6 +184,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     'tls' => $details['tls'],
                     'user' => $form['nux_email'],
                     'pass' => $form['nux_pass'],
+		    'type' => $details['type']
                 );
                 if ($details['sieve'] && $this->module_is_supported('sievefilters') && $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER)) {
                     $imap_list['sieve_config_host'] = $details['sieve']['host'].':'.$details['sieve']['port'];
@@ -183,8 +194,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 if (! can_save_last_added_server('Hm_IMAP_List', $form['nux_email'])) {
                     return;
                 }
-                $imap = Hm_IMAP_List::connect($new_id, false);
-                if ($imap && $imap->get_state() == 'authenticated') {
+                $mailbox = Hm_IMAP_List::connect($new_id, false);
+                if ($mailbox && $mailbox->authed()) {
                     if (isset($details['smtp'])) {
                         Hm_SMTP_List::add(array(
                             'name' => $details['name'],
@@ -192,7 +203,8 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                             'port' => $details['smtp']['port'],
                             'tls' => $details['smtp']['tls'],
                             'user' => $form['nux_email'],
-                            'pass' => $form['nux_pass']
+			    'pass' => $form['nux_pass'],
+			    'type' => 'smtp'
                         ));
                         if (can_save_last_added_server('Hm_SMTP_List', $form['nux_email'])) {
                             $this->session->record_unsaved('SMTP server added');
@@ -202,7 +214,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                     $this->session->record_unsaved('IMAP server added');
                     $this->session->record_unsaved('SMTP server added');
                     $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
-                    Hm_Msgs::add('E-mail account successfully added');
+                    Hm_Msgs::add("E-mail account successfully added, To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
                     $this->session->close_early();
                     $this->out('nux_account_added', true);
                     if ($this->module_is_supported('imap_folders')) {
@@ -212,7 +224,7 @@ class Hm_Handler_process_nux_add_service extends Hm_Handler_Module {
                 }
                 else {
                     Hm_IMAP_List::del($new_id);
-                    Hm_Msgs::add('ERRAuthentication failed');
+                    Hm_Msgs::add('Authentication failed', 'danger');
                 }
             }
         }
@@ -277,7 +289,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
 
         if ($success) {
             if (! check_file_upload($this->request, 'accounts_sample')) {
-                Hm_Msgs::add('ERRError while uploading accounts sample');
+                Hm_Msgs::add('Error while uploading accounts sample', 'danger');
                 return;
             }
             try {
@@ -305,11 +317,11 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                     }
                 }
             } catch (\Exception $e) {
-                Hm_Msgs::add('ERR' . $e->getMessage());
+                Hm_Msgs::add($e->getMessage(), 'danger');
                 return;
             }
             if(empty($servers)) {
-                Hm_Msgs::add('ERRImported file is empty');
+                Hm_Msgs::add('Imported file is empty', 'warning');
                 return;
             }
             $errors = [];
@@ -378,6 +390,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                             $server['username'],
                             $server['password'],
                             $server['smtp']['tls'],
+			    $server['type'],
                             false
                         );
                         if (! $smtp_server_id) {
@@ -397,6 +410,8 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         continue;
                     }
 
+                    Hm_Profiles::init($this);
+
                     add_profile(
                         $server_name,
                         $server['profile']['signature'],
@@ -404,6 +419,7 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                         $server['profile']['is_default'],
                         $server['username'],
                         ($server['jmap']['server'] ?? $server['imap']['server']),
+                        $server['username'],
                         $smtp_server_id,
                         ($jmap_server_id ?? $imap_server_id),
                         $this
@@ -412,10 +428,10 @@ class Hm_Handler_process_import_accouts_servers extends Hm_Handler_Module
                 $successes[] = $server_name;
             }
             foreach (array_unique($errors) as $error) {
-                Hm_Msgs::add("ERR$error");
+                Hm_Msgs::add("$error", 'danger');
             }
             foreach ($successes as $success) {
-                Hm_Msgs::add("Server $success imported successfully");
+                Hm_Msgs::add("Server $success imported successfully, To preserve these settings after logout, please go to <a href='/?save'>/?save</a>.");
             }
         }
     }
@@ -461,8 +477,8 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             return '';
         }
         $notice = $this->trans('Please ensure your YAML or CSV  file follows the correct format');
-        $yaml_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.yaml';
-        $csv_file_sample_path = WEB_ROOT . 'modules/nux/assets/data/server_accounts_sample.csv';
+        $yaml_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.yaml';
+        $csv_file_sample_path = ASSETS_PATH . 'data/server_accounts_sample.csv';
 
         return '<div class="quick_add_multiple_section">' .
             '<div class="row"><div class="col col-lg-6"><div class="form-floating mb-3">' .
@@ -471,10 +487,10 @@ class Hm_Output_quick_add_multiple_dialog extends Hm_Output_Module {
             '<div class="server_form"><br />' .
             '<div class="row">' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $yaml_file_sample_path . '" download>' . $this->trans('Download a sample yaml file') . '</a></div>' .
+            '<div><a href="' . $yaml_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample yaml file') . '</a></div>' .
             '</div>' .
             '<div class="col-md-6">' .
-            '<div><a href="' . $csv_file_sample_path . '" download>' . $this->trans('Download a sample csv file') . '</a></div><br />' .
+            '<div><a href="' . $csv_file_sample_path . '" download data-external="true">' . $this->trans('Download a sample csv file') . '</a></div><br />' .
             '</div>' .
             '</div>' .
             '<input type="hidden" name="hm_page_key" value="' . $this->html_safe(Hm_Request_Key::generate()) . '" />' .
@@ -543,7 +559,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
 class Hm_Output_nux_help extends Hm_Output_Module {
     protected function output() {
         return '<div class="nux_help mt-3 col-lg-6 col-md-12 col-sm-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Help').'</h4></div>'.
-            $this->trans('Cypht is a webmail program. You can use it to access your E-mail accounts from any service that offers IMAP, or SMTP access - which most do.').' '.
+            $this->trans('Cypht is a webmail aggregator client. You can use it to access your E-mail accounts from any server or service that offers any of the main protocols: IMAP/SMTP, Exchange Web Services (EWS) or the newest protocol: JMAP (RFC8621).').' '.
         '</div></div></div>';
     }
 }
@@ -551,19 +567,33 @@ class Hm_Output_nux_help extends Hm_Output_Module {
 /**
  * @subpackage nux/output
  */
-class Hm_Output_welcome_dialog extends Hm_Output_Module {
+class Hm_Output_start_welcome_dialog extends Hm_Output_Module {
+    protected function output() {
+        if ($this->get('single_server_mode')) {
+            return '';
+        }
+        $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
+        $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
+        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
+        $res .= '</div>';
+        return $res;
+    }
+}
+
+/**
+ * @subpackage nux/output
+ */
+class Hm_Output_end_welcome_dialog extends Hm_Output_Module {
     protected function output() {
         if ($this->get('single_server_mode')) {
             return '';
         }
         $server_data = $this->get('nux_server_setup', array());
         $tz = $this->get('tzone');
-        $protos = array('imap', 'smtp', 'feeds', 'profiles');
+        $protos = array('imap', 'jmap', 'ews', 'smtp', 'feeds', 'profiles');
 
-        $res = '<div class="nux_welcome mt-3 col-lg-6 col-md-5 col-sm-12"><div class="card"><div class="card-body"><div class="card-title"><h4>'.$this->trans('Welcome to Cypht').'</h4></div>';
-        $res .= '<div class="mb-3"><p>'.$this->trans('Add a popular E-mail source quickly and easily').'</p>';
-        $res .= '<a class="mt-3 btn btn-light" href="?page=servers#quick_add_section"><i class="bi bi-person-plus me-3"></i>'.$this->trans('Add an E-mail Account').'</a>';
-        $res .= '</div><ul class="mt-4">';
+        
+        $res = '<ul class="mt-4">';
 
         foreach ($protos as $proto) {
             $proto_dsp = $proto;
@@ -586,12 +616,13 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
                 continue;
             }
 
+            $section = in_array($proto, ['imap', 'smtp']) ? 'server_config' : $proto;
             if ($server_data[$proto] === NULL) {
                 $res .= sprintf($this->trans('%s services are not enabled for this site. Sorry about that!'), mb_strtoupper($proto_dsp));
             }
             elseif ($server_data[$proto] === 0) {
                 $res .= sprintf($this->trans('You don\'t have any %s sources'), mb_strtoupper($proto_dsp));
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Add'));
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Add'));
             }
             else {
                 if ($server_data[$proto] > 1) {
@@ -600,7 +631,7 @@ class Hm_Output_welcome_dialog extends Hm_Output_Module {
                 else {
                     $res .= sprintf($this->trans('You have %d %s source'), $server_data[$proto], mb_strtoupper($proto_dsp));
                 }
-                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $proto, $this->trans('Manage'));
+                $res .= sprintf(' <a href="?page=servers#%s_section">%s</a>', $section, $this->trans('Manage'));
             }
             $res .= '</li>';
         }
@@ -708,5 +739,9 @@ class Nux_Quick_Services {
             return self::$services[$id];
         }
         return array();
+    }
+
+    static public function get() {
+        return self::$services;
     }
 }

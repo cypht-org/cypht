@@ -9,7 +9,25 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
     $('.imap_folder_link', folders).addClass(link_class).removeClass('imap_folder_link');
     folder_location.prepend(folders);
     folder_location.show();
-    $('.'+link_class, folder_location).on("click", function() { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
+
+    // 1. Get the <a> element
+    const link = document.querySelector('.'+link_class);
+    // 2. Save the <i> element
+    const original_icon = link.querySelector('i');
+    const original_icon_clone = original_icon.cloneNode(true);
+    // 3. Create the spinner
+    const spinner = document.createElement('div');
+    spinner.className = 'spinner-border text-info spinner-border-sm';
+    spinner.setAttribute('role', 'status');
+    spinner.setAttribute('id', 'imap-spinner');
+    spinner.innerHTML = '<span class="sr-only"></span>';
+    // 4. Replace the icon with the spinner
+    if (original_icon.parentNode === link) {
+        link.replaceChild(spinner, original_icon);
+    }
+ 
+    var child_link_target =  folder_location.find('a.'+link_class).data('target')
+    $('.' + link_class, folder_location).on("click", function () { return expand_folders_page_list($(this).data('target'), container, link_class, target, id_dest, subscription); });
     $('a', folder_location).not('.'+link_class).not('.close').off('click');
     $('a', folder_location).not('.'+link_class).not('.close').on("click", function() { set_folders_page_value($(this).data('id'), container, target, id_dest); return false; });
     $('.close', folder_location).on("click", function() {
@@ -19,10 +37,11 @@ var folder_page_folder_list = function(container, title, link_class, target, id_
         $('#'+id_dest).val('');
         return false;
     });
+    expand_folders_page_list(child_link_target, container, link_class, target, id_dest, subscription, original_icon_clone, link);
     return false;
 };
 
-var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub) {
+var expand_folders_page_list = function(path, container, link_class, target, id_dest, lsub, original_icon = null, parent_icon_link = null) {
     var detail = Hm_Utils.parse_folder_path(path, 'imap');
     var list = $('.imap_'+detail.server_id+'_'+Hm_Utils.clean_selector(detail.folder), $('.'+container));
     if ($('li', list).length === 0) {
@@ -48,6 +67,15 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                             $('.folder_subscription').on("change", function() { folder_subscribe(this.id, $('#'+this.id).is(':checked')); return false; });
                         }
                     }
+                    if(original_icon != null) {
+                        // 5. Restore the icon by removing the spinner element
+                        const spinner_element = document.getElementById('imap-spinner');
+                        if (spinner_element && spinner_element.parentNode === parent_icon_link) {
+                            if(parent_icon_link != null) {
+                                parent_icon_link.replaceChild(original_icon, spinner_element);
+                            }
+                        }
+                    }
                 }
             );
         }
@@ -68,56 +96,84 @@ var set_folders_page_value = function(id, container, target, id_dest) {
     }
     $('.'+target).html(link);
     $('#'+id_dest).val(id);
+    if (id_dest === 'delete_source') {
+        const folder = document.querySelector(`.${id}`);
+        if (folder) {
+            const numberChildren = folder.getAttribute('data-number-children');
+            $('#children_number').val(numberChildren);
+        } else {
+            $('#children_number').val(0);
+        }
+        
+    }
     list.hide();
 
 };
 
 var folder_page_delete = function() {
+    var children_number = parseInt($('#children_number').val());
     var val = $('#delete_source').val();
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val(), 'danger');
         return;
     }
     if (!val.length) {
-        Hm_Notices.show({0: 'ERR'+$('#delete_folder_error').val()});
+        Hm_Notices.show($('#delete_folder_error').val(), 'danger');
         return;
     }
-    if (!confirm($('#delete_folder_confirm').val())) {
-        return;
+
+    let message = "";
+    if (children_number) {
+        message = `<p>${hm_trans('This folder contains '+ children_number +' sub-folders.')}</p>`;
     }
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
-        {'name': 'imap_server_id', value: id},
-        {'name': 'folder', 'value': val}],
-        function(res) {
-            if (res.imap_folders_success) {
-                $('#delete_source').val('');
-                $('.selected_delete').html('');
-                Hm_Folders.reload_folders(true);
+
+    const modal = new Hm_Modal({
+        modalId: 'emptySubjectBodyModal',
+        title: hm_trans("Deletion confirmation"),
+        btnSize: 'sm'
+    });
+
+    modal.addFooterBtn(hm_trans('Delete anyway'), 'btn-warning', handleDeleteFolder);
+    modal.setContent(message + $('#delete_folder_confirm').val());
+    modal.open();
+    function handleDeleteFolder() {
+        Hm_Ajax.request(
+            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folders_delete'},
+            {'name': 'imap_server_id', value: id},
+            {'name': 'folder', 'value': val}],
+            function(res) {
+                if (res.imap_folders_success) {
+                    $('#delete_source').val('');
+                    $('.selected_delete').html('');
+                    Hm_Folders.reload_folders(true);
+                }
             }
-        }
-    );
+        );
+        modal.hide();
+    };
 };
 
 var folder_page_rename = function() {
     var val = $('#rename_value').val();
     var par = $('#rename_parent_source').val().trim();
     var folder = $('#rename_source').val().trim();
-    var notices = {};
+    var notices = [];
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val(), 'danger');
         return;
     }
     if (!val.length) {
-        notices[0] = 'ERR'+$('#rename_folder_error').val();
+        notices.push($('#rename_folder_error').val());
     }
     if (!folder.length) {
-        notices[1] = 'ERR'+$('#folder_name_error').val();
+        notices.push($('#folder_name_error').val());
     }
-    if (!$.isEmptyObject(notices)) {
-        Hm_Notices.show(notices);
+    if (notices.length) {
+        notices.forEach((msg) => {
+            Hm_Notices.show(msg, 'danger');
+        });
         return;
     }
     Hm_Ajax.request(
@@ -239,11 +295,11 @@ var folder_page_create = function() {
     var folder = $('#create_value').val().trim();
     var id = $('#imap_server_folder').val();
     if (!id.length) {
-        Hm_Notices.show({0: 'ERR'+$('#server_error').val()});
+        Hm_Notices.show($('#server_error').val());
         return;
     }
     if (!folder.length) {
-        Hm_Notices.show({0: 'ERR'+$('#folder_name_error').val()});
+        Hm_Notices.show($('#folder_name_error').val());
         return;
     }
     Hm_Ajax.request(

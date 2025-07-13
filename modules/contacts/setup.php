@@ -16,7 +16,7 @@ add_output('contacts', 'contacts_list', true, 'contacts', 'contacts_content_star
 add_output('contacts', 'contacts_content_end', true, 'contacts', 'contacts_list', 'after');
 add_output('settings', 'contact_auto_collect_setting', true, 'contacts', 'max_google_contacts_number', 'after');
 
-add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'logout_menu_item', 'before');
+add_output('ajax_hm_folders', 'contacts_page_link', true, 'contacts', 'main_menu_content', 'before');
 
 add_handler('compose', 'load_contacts', true, 'contacts', 'load_user_data', 'after');
 add_handler('compose', 'process_send_to_contact', true, 'contacts', 'save_user_data', 'before');
@@ -63,39 +63,30 @@ return array(
         'ajax_autocomplete_contact'
     ),
     'allowed_post' => array(
-        'contact_email' => FILTER_DEFAULT,
-        'contact_name' => FILTER_DEFAULT,
-        'contact_phone' => FILTER_DEFAULT,
-        'contact_id' => FILTER_DEFAULT,
-        'contact_value' => FILTER_DEFAULT,
-        'edit_contact' => FILTER_DEFAULT,
-        'add_contact' => FILTER_DEFAULT,
-        'contact_source' => FILTER_DEFAULT,
-        'contact_type' => FILTER_DEFAULT,
-        'import_contact' => FILTER_DEFAULT,
-        'contact_email' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_phone' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_group' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_value' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'edit_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'add_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
-        'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_email' => FILTER_SANITIZE_EMAIL,
+        'contact_name' => FILTER_UNSAFE_RAW,
+        'contact_phone' => FILTER_UNSAFE_RAW,
+        'contact_id' => FILTER_UNSAFE_RAW,
+        'contact_value' => FILTER_UNSAFE_RAW,
+        'edit_contact' => FILTER_UNSAFE_RAW,
+        'add_contact' => FILTER_UNSAFE_RAW,
+        'contact_source' => FILTER_UNSAFE_RAW,
+        'contact_type' => FILTER_UNSAFE_RAW,
+        'import_contact' => FILTER_UNSAFE_RAW,
         'contact_auto_collect' => FILTER_VALIDATE_BOOLEAN,
         'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT,
-        'email_address' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'email_address' => FILTER_SANITIZE_EMAIL
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_page' => FILTER_VALIDATE_INT,
-        'contact_type' => FILTER_DEFAULT,
-        'contact_source' => FILTER_DEFAULT,
-        'import_contact' => FILTER_DEFAULT,
+        'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'import_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),
-        'imported_contact' => array(FILTER_DEFAULT, FILTER_REQUIRE_ARRAY),
+        'imported_contact' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
         'contact_suggestions' => array(FILTER_SANITIZE_FULL_SPECIAL_CHARS, FILTER_REQUIRE_ARRAY),
         'collect_contacts' => array(FILTER_VALIDATE_BOOLEAN, false),
         'imap_allow_images' => array(FILTER_VALIDATE_BOOLEAN, false),
