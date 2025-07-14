@@ -960,10 +960,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
     public function test_folder_list_content_end() {
         $test = new Output_Test('folder_list_content_end', 'core');
         $res = $test->run();
-        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
         $test->rtype = 'AJAX';
         $res = $test->run();
-        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle rounded-pill fw-bold cursor-pointer"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
+        $this->assertEquals(array('formatted_folder_list' => '<div class="sidebar-footer"><a class="logout_link" href="#" title="Logout"><i class="bi bi-power menu-icon"></i><span class="nav-label">Logout</span></a><a href="#" class="update_message_list" title="Reload"><i class="bi bi-arrow-clockwise menu-icon"></i><span class="nav-label">Reload</span></a><div class="menu-toggle fw-bold cursor-pointer no_mobile"><i class="bi bi-list fs-5 fw-bold"></i></div>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled

@@ -5,16 +5,39 @@ $(() => {
             hideMobileNavbar();
         });
 
-        const menuToggle = `
-        <div class="menu-toggle rounded-pill fw-bold cursor-pointer">
+        // Remove any existing menu-toggle elements to avoid conflicts
+        $('.mobile .cypht-layout .menu-toggle').remove();
+        $('.mobile .cypht-layout nav .menu-toggle').remove();
+        
+        const hamburgerToggle = `
+        <div class="menu-toggle fw-bold cursor-pointer hamburger-toggle">
             <i class="bi bi-list fs-5 fw-bold"></i>
         </div>
         `
+        
+        const closeToggle = `
+        <div class="menu-toggle fw-bold cursor-pointer close-toggle" style="display: none;">
+            <i class="bi bi-x-lg fs-5 fw-bold"></i>
+        </div>
+        `
+        
+        const navHeader = `
+        <div class="nav-header">
+            <a href="?page=home" class="menu_home">
+                <img class="app-logo" src="modules/core/assets/images/logo_dark.svg">
+            </a>
+            <div class="menu-toggle fw-bold cursor-pointer close-toggle" style="display: none;">
+                <i class="bi bi-x-lg fs-5 fw-bold"></i>
+            </div>
+        </div>
+        `
     
-        $('.mobile .cypht-layout nav').before(menuToggle);
+        // Only add these elements on mobile
+        $('.mobile .cypht-layout nav').before(hamburgerToggle);
+        $('.mobile .cypht-layout nav').prepend(navHeader);
     
-        $(document).on('click', '.cypht-layout .menu-toggle', showMobileNavbar);
-        $(document).on('click', '.cypht-layout nav .menu-toggle', hideMobileNavbar)
+        $(document).on('click', '.cypht-layout .hamburger-toggle', showMobileNavbar);
+        $(document).on('click', '.cypht-layout nav .close-toggle', hideMobileNavbar)
     } else {
         $(document).on('click', '.menu-toggle', function() {
             $('.cypht-layout nav').toggleClass('collapsed');
@@ -31,10 +54,16 @@ function hideMobileNavbar() {
     $('.cypht-layout nav').css('transform', 'translateX(-120%)');
     $('#cypht-main').css('max-height', 'unset');
     $('#cypht-main').css('overflow', 'unset');
+    // Show hamburger, hide X
+    $('.hamburger-toggle').show();
+    $('.close-toggle').hide();
 }
 
 function showMobileNavbar() {
     $('.cypht-layout nav').css('transform', 'translateX(0)');
     $('#cypht-main').css('max-height', 'calc(100vh - 3.5rem)');
     $('#cypht-main').css('overflow', 'hidden');
+    // Hide hamburger, show X
+    $('.hamburger-toggle').hide();
+    $('.close-toggle').show();
 }
