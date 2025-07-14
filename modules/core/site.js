@@ -9,6 +9,13 @@ $.fn.fadeOutAndRemove = function(timeout = 600) {
     return this;
 };
 
+if (window.innerWidth <= 768) {
+    document.documentElement.classList.add('mobile');
+    document.cookie = "is_mobile_screen=1; path=/; SameSite=Lax";
+} else {
+    document.cookie = "is_mobile_screen=0; path=/; SameSite=Lax";
+}
+
 /* swipe event handler */
 var swipe_event = function(el, callback, direction) {
     var start_x, start_y, dist_x, dist_y, threshold = 150, restraint = 100,
