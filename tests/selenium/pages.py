@@ -13,8 +13,9 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
 
     def search(self):
-        list_item = self.by_class('menu_search')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        list_item = self.wait_for_element_by_class('menu_search')
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -22,7 +23,8 @@ class PageTests(WebTest):
 
     def sent(self):
         list_item = self.by_class('menu_sent')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -30,7 +32,8 @@ class PageTests(WebTest):
 
     def unread(self):
         list_item = self.by_class('menu_unread')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -40,7 +43,8 @@ class PageTests(WebTest):
         if self.single_server():
             return
         list_item = self.by_class('menu_combined_inbox')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -48,7 +52,8 @@ class PageTests(WebTest):
 
     def flagged(self):
         list_item = self.by_class('menu_flagged')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -58,7 +63,8 @@ class PageTests(WebTest):
         if not self.mod_active('contacts'):
             return
         list_item = self.by_class('menu_contacts')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -68,7 +74,8 @@ class PageTests(WebTest):
         if not self.mod_active('smtp'):
             return
         list_item = self.by_class('menu_compose')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -78,7 +85,8 @@ class PageTests(WebTest):
         if not self.mod_active('calendar'):
             return
         list_item = self.by_class('menu_calendar')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -88,16 +96,18 @@ class PageTests(WebTest):
         if not self.mod_active('history'):
             return
         list_item = self.by_class('menu_history')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
         assert self.by_class('content_title').text == 'Message history'
 
     def home(self):
-        self.by_css('[data-bs-target=".settings"]').click()
+        settings_button = self.by_css('[data-bs-target=".settings"]')
+        self.safe_click(settings_button)
         list_item = self.by_class('menu_home')
-        list_item.click()
+        self.safe_click(list_item)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -106,7 +116,8 @@ class PageTests(WebTest):
     def servers_page(self):
         self.wait_on_class('menu_servers')
         list_item = self.by_class('menu_servers')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -114,7 +125,8 @@ class PageTests(WebTest):
 
     def site(self):
         list_item = self.by_class('menu_settings')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -124,7 +136,8 @@ class PageTests(WebTest):
         if not self.mod_active('imap_folders'):
             return
         list_item = self.by_class('menu_folders')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -132,7 +145,8 @@ class PageTests(WebTest):
 
     def save(self):
         list_item = self.by_class('menu_save')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -145,7 +159,8 @@ class PageTests(WebTest):
             return
         self.wait_on_class('menu_change_password')
         list_item = self.by_class('menu_change_password')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
@@ -155,7 +170,8 @@ class PageTests(WebTest):
         if self.mod_active('profiles'):
             return
         list_item = self.by_class('menu_profiles')
-        list_item.find_element(By.TAG_NAME, 'a').click()
+        link = list_item.find_element(By.TAG_NAME, 'a')
+        self.safe_click(link)
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
