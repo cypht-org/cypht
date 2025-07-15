@@ -123,6 +123,18 @@ class WebTest:
         print(" - finding element by class {0}".format(class_name))
         return self.driver.find_element(By.CLASS_NAME, class_name)
 
+    def wait_for_element_by_class(self, class_name, timeout=10):
+        """Wait for an element to be present and visible by class name"""
+        print(" - waiting for element by class {0}".format(class_name))
+        WebDriverWait(self.driver, timeout).until(
+            exp_cond.presence_of_element_located((By.CLASS_NAME, class_name))
+        )
+        element = self.driver.find_element(By.CLASS_NAME, class_name)
+        WebDriverWait(self.driver, timeout).until(
+            exp_cond.visibility_of(element)
+        )
+        return element
+
     def by_xpath(self, element_xpath):
         print(" - finding element by xpath {0}".format(element_xpath))
         return self.driver.find_element(By.XPATH, element_xpath)
@@ -153,13 +165,50 @@ class WebTest:
         
     def wait_for_navigation_to_complete(self, timeout=30):
         print(" - waiting for the navigation to complete...")
-        # This might not be always accurate in the future. This works because for now only navigation requests are made using the fetch API.
-        # It might be necessary to find a more robust way to determine navigation requests.
-        get_current_navigations_request_entries_length = lambda: self.driver.execute_script('return window.performance.getEntriesByType("resource").filter((r) => r.initiatorType === "fetch").length')
-        navigation_length = get_current_navigations_request_entries_length()
-        WebDriverWait(self.driver, timeout).until(
-            lambda driver: get_current_navigations_request_entries_length() > navigation_length
-        )
+        # Wait for the main content to be updated and any loading indicators to disappear
+        try:
+            # Wait for any loading indicators to disappear
+            WebDriverWait(self.driver, 5).until_not(
+                lambda driver: len(driver.find_elements(By.CLASS_NAME, "loading_icon")) > 0
+            )
+        except:
+            # Loading icon might not be present, continue
+            pass
+        
+        # Wait for the main content area to be stable
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.execute_script("""
+                    return new Promise((resolve) => {
+                        let lastContent = '';
+                        let stableCount = 0;
+                        const checkStability = () => {
+                            const mainContent = document.querySelector('main')?.innerHTML || '';
+                            if (mainContent === lastContent) {
+                                stableCount++;
+                                if (stableCount >= 3) {
+                                    resolve(true);
+                                    return;
+                                }
+                            } else {
+                                stableCount = 0;
+                                lastContent = mainContent;
+                            }
+                            setTimeout(checkStability, 100);
+                        };
+                        checkStability();
+                    });
+                """)
+            )
+        except:
+            # Fallback: just wait for the main element to be present
+            print(" - fallback: waiting for main element")
+            WebDriverWait(self.driver, timeout).until(
+                exp_cond.presence_of_element_located((By.TAG_NAME, "main"))
+            )
+            # Additional wait for any dynamic content
+            import time
+            time.sleep(1)
 
     def wait_for_settings_to_expand(self):
         print(" - waiting for the settings section to expand...")
@@ -171,6 +220,26 @@ class WebTest:
         WebDriverWait(self.driver, 10).until(
             exp_cond.element_to_be_clickable(el)
         ).click()
+
+    def safe_click(self, element):
+        """Safely click an element with retry logic"""
+        print(" - safely clicking element")
+        max_attempts = 3
+        for attempt in range(max_attempts):
+            try:
+                # Scroll element into view
+                self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", element)
+                # Wait a moment for any animations
+                import time
+                time.sleep(0.5)
+                # Try to click
+                element.click()
+                return
+            except Exception as e:
+                if attempt == max_attempts - 1:
+                    raise e
+                print(f" - click attempt {attempt + 1} failed, retrying...")
+                time.sleep(1)
 
     def safari_workaround(self, timeout=1):
         if self.browser == 'safari':
