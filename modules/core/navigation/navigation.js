@@ -64,7 +64,10 @@ function autoAppendParamsForNavigation(href)
                 }
             } else {
                 for (let field of ['list_page', 'search_terms', 'search_fld', 'search_since', 'sort']) {
-                    target.set(field, currentUrl.searchParams.get(field));
+                    const val = currentUrl.searchParams.get(field);
+                    if (val !== null && !target.has(field)) {
+                        target.set(field, val);
+                    }
                 }
             }
             return href.split('?')[0] + '?' + target.toString();

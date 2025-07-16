@@ -111,6 +111,7 @@ class Hm_Handler_save_search extends Hm_Handler_Module {
                 $this->user_config->set('saved_searches', $searches->dump());
                 $this->session->set('user_data', $this->user_config->dump());
                 $this->out('saved_search', true);
+                Hm_Msgs::add('Search saved', 'success');
             }
             else {
                 Hm_Msgs::add('You already have a search by that name', 'warning');
