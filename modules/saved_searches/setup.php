@@ -58,7 +58,10 @@ return array(
         'ajax_update_save_search_label',
     ),
     'allowed_get' => array(
-        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS
+        'search_name' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'search_terms' => FILTER_UNSAFE_RAW,
+        'search_fld' => FILTER_UNSAFE_RAW,
+        'search_since' => FILTER_UNSAFE_RAW,
     ),
     'allowed_post' => array(
         'search_name' => FILTER_UNSAFE_RAW,
