@@ -79,6 +79,7 @@ add_handler('compose', 'imap_forward_attachments', true, 'imap', 'add_imap_serve
 add_handler('compose', 'imap_mark_as_answered', true, 'imap', 'process_compose_form_submit', 'after');
 add_handler('compose', 'imap_save_sent', true, 'imap', 'imap_mark_as_answered', 'after');
 add_handler('compose', 'imap_unflag_on_send', true, 'imap', 'imap_save_sent', 'after');
+add_handler('compose', 'imap_store_reply_details', true, 'imap', 'load_smtp_reply_to_details', 'before');
 add_output('compose', 'imap_unflag_on_send_controls', true, 'imap', 'compose_form_end', 'before');
 
 /* search page data */

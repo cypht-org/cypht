@@ -1904,7 +1904,7 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                 $this->out('msg_struct', $msg_struct);
                 $this->out('list_headers', get_list_headers($msg_headers));
                 $this->out('msg_headers', $msg_headers);
-                $this->out('imap_prefecth', $prefetch);
+                $this->out('imap_prefetch', $prefetch);
                 $this->out('imap_msg_part', "$part");
                 $this->out('use_message_part_icons', $this->user_config->get('msg_part_icons_setting', false));
                 $this->out('simple_msg_part_view', $this->user_config->get('simple_msg_parts_setting', DEFAULT_SIMPLE_MSG_PARTS));
@@ -1936,6 +1936,45 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                         array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => ($save_reply_text ? $msg_text : ''), 'msg_headers' => $msg_headers));
                 }
             }
+        }
+    }
+}
+
+/**
+ * Store reply details for a message if not already in session
+ * @subpackage imap/handler
+ */
+class Hm_Handler_imap_store_reply_details extends Hm_Handler_Module {
+    public function process() {
+        if (! array_key_exists('list_path', $this->request->get) || ! array_key_exists('uid', $this->request->get)) {
+            return;
+        }
+
+        $cache_name = sprintf('reply_details_%s_%s',
+            $this->request->get['list_path'],
+            $this->request->get['uid']
+        );
+        $reply_details = $this->session->get($cache_name, false);
+
+        if ($reply_details) {
+            return;
+        }
+
+        list($type, $server_id, $folder) = explode('_', $this->request->get['list_path']);
+        $uid = $this->request->get['uid'];
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
+        if ($mailbox && $mailbox->authed()) {
+            $mailbox->set_read_only($prefetch);
+            $part = false;
+            list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($folder), $uid, $part, $this->user_config->get('text_only_setting', false));
+            $msg_headers = $mailbox->get_message_headers(hex2bin($folder), $uid);
+
+            clear_existing_reply_details($this->session);
+            $msg_struct_current['type'] = 'text';
+            $msg_struct_current['subtype'] = 'plain';
+            $this->session->set(sprintf('reply_details_imap_%s_%s_%s', $server_id, $folder, $uid),
+                array('ts' => time(), 'msg_struct' => $msg_struct_current, 'msg_text' => $msg_text, 'msg_headers' => $msg_headers));
         }
     }
 }
