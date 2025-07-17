@@ -75,21 +75,21 @@ class Hm_EWS {
             'ParentFolderIds' => $folder->toArray(true)
         );
         $resp = $this->ews->FindFolder($request);
-        $folders = $resp->get('folders')->get('folder');
+        $folders = $resp->getFolders()->getFolder();
         if ($folders) {
             $special = $this->get_special_use_folders();
             if ($folders instanceof Type\FolderType) {
                 $folders = [$folders];
             }
             foreach($folders as $folder) {
-                $id = $folder->get('folderId')->get('id');
-                $name = $folder->get('displayName');
+                $id = $folder->getFolderId()->getId();
+                $name = $folder->getDisplayName();
                 if ($only_subscribed && in_array($id, $unsubscribed_folders)) {
                     continue;
                 }
                 $result[$id] = array(
                     'id' => $id,
-                    'parent' => $folder->get('parentFolderId')->get('id'),
+                    'parent' => $folder->getParentFolderId()->getId(),
                     'delim' => false,
                     'name' => $name,
                     'name_parts' => [],
@@ -99,8 +99,8 @@ class Hm_EWS {
                     'marked' => false, // doesn't seem to be used anywhere but imap returns it
                     'noselect' => false, // all EWS folders are selectable 
                     'can_have_kids' => true,
-                    'has_kids' => $folder->get('childFolderCount') > 0,
-                    'children' => $folder->get('childFolderCount'),
+                    'has_kids' => $folder->getChildFolderCount() > 0,
+                    'children' => $folder->getChildFolderCount(),
                     'special' => in_array($id, $special),
                     'clickable' => ! $with_input && ! in_array($id, $unsubscribed_folders),
                     'subscribed' => ! in_array($id, $unsubscribed_folders),
@@ -125,7 +125,7 @@ class Hm_EWS {
                 try {
                     $distinguishedFolder = $this->api->getFolderByDistinguishedId($folderId);
                     if ($distinguishedFolder) {
-                        $special[$type] = $distinguishedFolder->get('folderId')->get('id');
+                        $special[$type] = $distinguishedFolder->getFolderId()->getId();
                     }
                 } catch (\Exception $e) {
                     Hm_Msgs::add($e->getMessage(), 'danger');
@@ -163,13 +163,13 @@ class Hm_EWS {
                 }
             }
             return [
-                'id' => $result->get('folderId')->get('id'),
-                'name' => $result->get('displayName'),
-                'messages' => $result->get('totalCount'),
+                'id' => $result->getFolderId()->getId(),
+                'name' => $result->getDisplayName(),
+                'messages' => $result->getTotalCount(),
                 'uidvalidity' => false,
                 'uidnext' => false,
                 'recent' => false,
-                'unseen' => $result->get('unreadCount'),
+                'unseen' => $result->getUnreadCount(),
             ];
         } catch (Exception\ExchangeException $e) {
             // since this is used for missing folders check, we skip error reporting
@@ -196,7 +196,7 @@ class Hm_EWS {
                 'ParentFolderId' => $parent->toArray(true),
             ];
             $result = $this->ews->CreateFolder($request);
-            return $result->get('id');
+            return $result->getId();
         } catch(\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -309,7 +309,7 @@ class Hm_EWS {
                 'MessageDisposition' => 'SaveOnly',
                 'SavedItemFolderId' => $folder->toArray(true),
             ]);
-            return $result->get('id');
+            return $result->getId();
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -481,14 +481,14 @@ class Hm_EWS {
         }
         $request = Type::buildFromArray($request);
         $result = $this->ews->FindItem($request);
-        $messages = $result->get('items')->get('message') ?? [];
+        $messages = $result->getItems()->getMessage() ?? [];
         if ($messages instanceof Type\MessageType) {
             $messages = [$messages];
         }
         $itemIds = array_map(function($msg) {
-            return bin2hex($msg->get('itemId')->get('id'));
+            return bin2hex($msg->getItemId()->getId());
         }, $messages);
-        return [$result->get('totalItemsInView'), $itemIds];
+        return [$result->getTotalItemsInView(), $itemIds];
     }
 
     public function get_messages($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders, $include_preview = false) {
@@ -530,16 +530,16 @@ class Hm_EWS {
         $messages = [];
         foreach ($result as $message) {
             $flags = $this->extract_flags($message);
-            $uid = bin2hex($message->get('itemId')->get('id'));
+            $uid = bin2hex($message->getItemId()->getId());
             $msg = [
                 'uid' => $uid,
                 'flags' => implode(' ', $flags),
-                'internal_date' => $message->get('dateTimeCreated'),
-                'size' => $message->get('size'),
-                'date' => $message->get('dateTimeReceived'),
-                'from' => $this->extract_mailbox($message->get('from')),
-                'to' => $this->extract_mailbox($message->get('toRecipients')),
-                'subject' => $message->get('subject'),
+                'internal_date' => $message->getDateTimeCreated(),
+                'size' => $message->getSize(),
+                'date' => $message->getDateTimeReceived(),
+                'from' => $this->extract_mailbox($message->getFrom()),
+                'to' => $this->extract_mailbox($message->getToRecipients()),
+                'subject' => $message->getSubject(),
                 'content-type' => null,
                 'timestamp' => time(),
                 'charset' => null,
@@ -548,17 +548,17 @@ class Hm_EWS {
                 'google_thread_id' => null,
                 'google_labels' => null,
                 'list_archive' => null,
-                'references' => $message->get('references'),
-                'message_id' => $message->get('internetMessageId'),
+                'references' => $message->getRreferences(),
+                'message_id' => $message->getInternetMessageId(),
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
                 'x_schedule' => null,
                 'x_profile_id' => null,
                 'x_delivery' => null,
             ];
-            foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
+            foreach ($message->getInternetMessageHeaders() as $header) {
                 foreach (['x-gm-msgid' => 'google_msg_id', 'x-gm-thrid' => 'google_thread_id', 'x-gm-labels' => 'google_labels', 'x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'content-type' => 'content-type', 'x-priority' => 'x-priority'] as $hname => $key) {
-                    if (strtolower($header->get('headerName')) == $hname) {
+                    if (strtolower($header->getHeaderName()) == $hname) {
                         $msg[$key] = (string) $header;
                     }
                 }
@@ -570,7 +570,7 @@ class Hm_EWS {
                 }
             }
             $msg['charset'] = $cset;
-            $msg['preview_msg'] = $include_preview ? strip_tags($message->get('body')) :  "";
+            $msg['preview_msg'] = $include_preview ? strip_tags($message->getBody()) :  "";
             $messages[$uid] = $msg;
         }
         return $messages;
@@ -703,12 +703,12 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
-        $sender = $message->get('sender');
-        $from = $message->get('from');
+        $sender = $message->getSender();
+        $from = $message->getFrom();
         $headers = [];
-        $headers['Arrival Date'] = $message->get('dateTimeCreated');
+        $headers['Arrival Date'] = $message->getDateTimeCreated();
         if ($sender && $from) {
-            $headers['From'] = $message->get('sender')->get('mailbox')->get('name') . ' <' . $message->get('from')->get('mailbox')->get('emailAddress') . '>';
+            $headers['From'] = $message->getSsender()->getMailbox()->getName() . ' <' . $message->getFrom()->getMailbox()->getEmailAddress() . '>';
         } elseif ($sender) {
             $headers['From'] = $this->extract_mailbox($sender);
         } elseif ($from) {
@@ -716,16 +716,16 @@ class Hm_EWS {
         } else {
             $headers['From'] = null;
         }
-        $headers['To'] = $this->extract_mailbox($message->get('toRecipients'));
-        if ($message->get('ccRecipients')) {
-            $headers['Cc'] = $this->extract_mailbox($message->get('ccRecipients'));
+        $headers['To'] = $this->extract_mailbox($message->getToRecipients());
+        if ($message->getCcRecipients()) {
+            $headers['Cc'] = $this->extract_mailbox($message->getCcRecipients());
         }
-        if ($message->get('bccRecipients')) {
-            $headers['Bcc'] = $this->extract_mailbox($message->get('bccRecipients'));
+        if ($message->getBccRecipients()) {
+            $headers['Bcc'] = $this->extract_mailbox($message->getBccRecipients());
         }
         $headers['Flags'] = implode(' ', $this->extract_flags($message));
-        foreach ($message->get('internetMessageHeaders')->InternetMessageHeader as $header) {
-            $name = $header->get('headerName');
+        foreach ($message->getInternetMessageHeaders() as $header) {
+            $name = $header->getHeaderName();
             if (isset($headers[$name])) {
                 if (! is_array($headers[$name])) {
                     $headers[$name] = [$headers[$name]];
@@ -831,10 +831,10 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
-        $mime = $message->get('mimeContent');
+        $mime = $message->getMmimeContent();
         $content = base64_decode($mime);
-        if (strtoupper($mime->get('characterSet')) != 'UTF-8') {
-            $content = mb_convert_encoding($content, 'UTF-8', $mime->get('characterSet'));
+        if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
         }
         $parser = new MailMimeParser();
         return $parser->parse($content, false);
@@ -924,9 +924,9 @@ class Hm_EWS {
             }
             return $result;
         } elseif (is_object($data) && $data->Mailbox) {
-            return $data->Mailbox->get('name') . ' <' . $data->Mailbox->get('emailAddress') . '>';
-        } elseif (is_object($data) && $data->get('mailbox')) {
-            return $data->get('mailbox')->get('name') . ' <' . $data->get('mailbox')->get('emailAddress') . '>';
+            return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
+        } elseif (is_object($data) && $data->getMailbox()) {
+            return $data->getMailbox()->getName() . ' <' . $data->getMailbox()->getEmailAddress() . '>';
         } else {
             return (string) $data;
         }
@@ -935,21 +935,21 @@ class Hm_EWS {
     protected function extract_flags($message) {
         // note about flags: EWS - doesn't support the \Deleted flag
         $flags = [];
-        if ($message->get('isRead')) {
+        if ($message->getIsRead()) {
             $flags[] = '\\Seen';
         }
-        if ($message->get('isDraft')) {
+        if ($message->getIsDraft()) {
             $flags[] = '\\Draft';
         }
-        if ($extended_properties = $message->get('extendedProperty')) {
+        if ($extended_properties = $message->getExtendedProperty()) {
             if ($extended_properties instanceof Type\ExtendedPropertyType) {
                 $extended_properties = [$extended_properties];
             }
             foreach ($extended_properties as $prop) {
-                if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_FLAG_STATUS && $prop->get('value') > 0) {
+                if (hexdec($prop->getExtendedFieldURI()->getPropertyTag()) == self::PID_TAG_FLAG_STATUS && $prop->getValue() > 0) {
                     $flags[] = '\\Flagged';
                 }
-                if (hexdec($prop->get('extendedFieldURI')->get('propertyTag')) == self::PID_TAG_ICON_INDEX && $prop->get('value') == self::PID_TAG_ICON_REPLIED) {
+                if (hexdec($prop->getExtendedFieldURI()->getPropertyTag()) == self::PID_TAG_ICON_INDEX && $prop->getValue() == self::PID_TAG_ICON_REPLIED) {
                     $flags[] = '\\Answered';
                 }
             }
@@ -1045,7 +1045,7 @@ class Hm_EWS {
                 $trash = $this->api->getFolderByDistinguishedId(Type\DistinguishedFolderIdNameType::DELETED);
                 $folders = $this->get_parent_folders_of_items($itemIds);
                 foreach ($folders as $folder => $itemIds) {
-                    if ($trash && $folder == $trash->get('folderId')->get('id')) {
+                    if ($trash && $folder == $trash->getFolderId()->getId()) {
                         $options = ['DeleteType' => 'HardDelete'];
                     } else {
                         $options = [];
@@ -1081,7 +1081,7 @@ class Hm_EWS {
                 $result = [$result];
             }
             $result = array_map(function($itemId) {
-                return $itemId->get('id');
+                return $itemId->getId();
             }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
@@ -1112,7 +1112,7 @@ class Hm_EWS {
                 $result = [$result];
             }
             $result = array_map(function($itemId) {
-                return $itemId->get('id');
+                return $itemId->getId();
             }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
@@ -1143,7 +1143,7 @@ class Hm_EWS {
             $result = [$result];
         }
         foreach ($result as $message) {
-            $folder = $message->get('ParentFolderId')->get('id');
+            $folder = $message->getParentFolderId()->getId();
             if (! isset($folders[$folder])) {
                 $folders[$folder] = [];
             }

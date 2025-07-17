@@ -676,7 +676,13 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 $this->out('folder', $folder);
             }
             else {
-                Hm_Msgs::add(sprintf('Could not authenticate to the selected %s server (%s)', $mailbox->server_type(), $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']), 'warning');
+                $details = Hm_IMAP_List::get($form['imap_server_id'], false);
+                if ($details) {
+                    $type = $details['type'] ?? '';
+                } else {
+                    $type = '';
+                }
+                Hm_Msgs::add(sprintf('Could not authenticate to the selected %s server (%s)', $type, $this->user_config->get('imap_servers')[$form['imap_server_id']]['user']), 'warning');
             }
         }
     }
