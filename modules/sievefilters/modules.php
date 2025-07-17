@@ -480,7 +480,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
             $email_sender = $email_sender[0][0];
         } elseif (!empty($this->request->post['sender'])) {
             $email_sender = $this->request->post['sender'];
-            if ($this->request->post['is_screened']) {
+            if (isset($this->request->post['is_screened'])) {
                 $array_email_sender = explode(",", $email_sender);
                 $email_sender = null;
             }
@@ -534,8 +534,16 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 $unblock_sender = false;
             }
             if ($unblock_sender == false || $current_script == '') {
-                $blocked_senders[] = $email_sender;
+                if ($email_sender) {
+                    $blocked_senders[] = $email_sender;
+                }
+
+                if ($array_email_sender) {
+                    $blocked_senders = $array_email_sender;
+                }
+                
             }
+
             $blocked_senders = array_unique($blocked_senders);
 
             if (count($blocked_senders) == 0 && $unblock_sender) {
@@ -549,7 +557,7 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
 
             $filter = \PhpSieveManager\Filters\FilterFactory::create('blocked_senders');
             foreach ($blocked_senders as $blocked_sender) {
-                if ($blocked_sender == $email_sender) {
+                if ($blocked_sender == $email_sender || ($array_email_sender && in_array($blocked_sender, $array_email_sender))) {
                     $actions = block_filter(
                         $filter,
                         $this->user_config,
@@ -581,7 +589,6 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
                 }
                 $blocked_list_actions[$blocked_sender] = $actions;
             }
-
             $script_parsed = $filter->toScript();
 
             $main_script = generate_main_script($scripts);
