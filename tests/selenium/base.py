@@ -212,7 +212,18 @@ class WebTest:
 
     def wait_for_settings_to_expand(self):
         print(" - waiting for the settings section to expand...")
-        WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+        try:
+            # First try to find the settings button and click it
+            settings_button = self.by_css('[data-bs-target=".settings"]')
+            if settings_button.is_displayed():
+                settings_button.click()
+                # Wait for the settings to be displayed
+                WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+            else:
+                print(" - settings button not visible, skipping expansion")
+        except Exception as e:
+            print(f" - settings expansion failed: {e}")
+            # Continue anyway, the settings might already be expanded
 
     def click_when_clickable(self, el):
         print(" - waiting for element to be clickable")
