@@ -2073,6 +2073,15 @@ function handleCreateProfileCheckboxChange(checkbox) {
         $(checkbox).closest('.form-check').next().hide();
     }
 }
+function handleQuicklyCreateProfileCheckboxChange(checkbox) {
+    if(checkbox.checked) {
+        $('.form-check-create-profile').hide();
+        $('.form-check-create-profile input').removeAttr("required");
+    }else{
+        $('.form-check-create-profile').show();
+        $('.form-check-create-profile input').attr("required", true);
+    }
+}
 
 function handleSieveStatusChange (checkbox) {
     if(checkbox.checked) {
