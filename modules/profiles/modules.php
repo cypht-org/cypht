@@ -397,8 +397,8 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
 
     // Set as default
     $res .= '<div class="form-check mb-3">';
-    $res .= '<input type="checkbox" class="form-check-input" '.($form_vals['default'] ? 'checked="checked"' : '').' name="profile_default">';
-    $res .= '<label class="form-check-label">'.$out_mod->trans('Set as default').'</label></div>';
+    $res .= '<input type="checkbox" class="form-check-input" '.($form_vals['default'] ? 'checked="checked"' : '').' name="profile_default" id="profile_default">';
+    $res .= '<label for="profile_default" class="form-check-label">'.$out_mod->trans('Set as default').'</label></div>';
 
     // Submit buttons
     $res .= '<div>';
