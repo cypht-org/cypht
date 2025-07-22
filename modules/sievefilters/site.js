@@ -196,7 +196,9 @@ function blockListPageHandlers() {
             $('<input type="text" class="select_default_reject_message form-control" placeholder="'+hm_trans('Reject message')+'" />').insertAfter($(this));
         }
     });
+
     $(document).on('click', '.submit_default_behavior', function(e) {
+        e.preventDefault();
         let parent = $(this).closest('.filter_subblock');
         let elem = parent.find('.select_default_behaviour');
         let submit = $(this);
@@ -221,12 +223,12 @@ function blockListPageHandlers() {
     });
 
     $(document).on('click', '.unblock_button', function(e) {
-       e.preventDefault();
-       if (!confirm(hm_trans('Do you want to unblock sender?'))) {
+        e.preventDefault();
+        if (!confirm(hm_trans('Do you want to unblock sender?'))) {
             return;
         }
-       let sender = $(this).parent().parent().children().html();
-       let elem = $(this);
+        let sender = $(this).parent().parent().children().html();
+        let elem = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_unblock_sender'},
                 {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
@@ -266,18 +268,6 @@ function blockListPageHandlers() {
         );
     });
 
-    $(document).on('click', '.toggle-behavior-dropdown', function(e) {
-        e.preventDefault();
-        var default_val = $(this).data('action');
-        $('#block_sender_form').trigger('reset');
-        $('#reject_message').remove();
-        $('#block_action').val(default_val).trigger('change');
-        $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
-        if (default_val == 'reject_with_message') {
-            $('#reject_message_textarea').val($(this).data('reject-message'));
-        }
-    });
-
     $(document).on('click', '.block_domain_button', function(e) {
         e.preventDefault();
         let sender = $(this).parent().parent().children().html();
@@ -307,8 +297,20 @@ function blockListPageHandlers() {
             }
         );
     });
+    
+    $(document).on('click', '.toggle-behavior-dropdown', function(e) {
+        e.preventDefault();
+        var default_val = $(this).data('action');
+        $('#block_sender_form').trigger('reset');
+        $('#reject_message').remove();
+        $('#block_action').val(default_val).trigger('change');
+        $('#edit_blocked_behavior').attr('data-mailbox-id', $(this).attr('mailbox_id'));
+        if (default_val == 'reject_with_message') {
+            $('#reject_message_textarea').val($(this).data('reject-message'));
+        }
+    });
 
-    $(document).off('click').on('click', '.sievefilters_accounts_title', function() {
+    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
         $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
     });
     load_sieve_filters('ajax_block_account_sieve_filters');
