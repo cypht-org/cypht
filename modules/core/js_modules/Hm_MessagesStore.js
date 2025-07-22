@@ -271,6 +271,7 @@ class Hm_MessagesStore {
                 if (this.path != 'combined_inbox' && this.path != 'search') {
                     sources = sources.filter(s => s.type != 'feeds');
                 }
+                console.log('Sources:', sources);
                 sources.forEach((ds) => {
                     const cfg = config.slice();
                     if (ds.type == 'feeds') {

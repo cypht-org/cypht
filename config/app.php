@@ -1196,6 +1196,12 @@ return [
     'default_setting_flagged_per_source' => env('DEFAULT_SETTING_FLAGGED_PER_SOURCE', 20),
 
     /*
+    | allow searching all in all folders
+    | Defaults to false
+    */
+    'default_setting_flagged_search_in_all_folder' => env('DEFAULT_SETTING_FLAGGED_SEARCH_IN_ALL_FOLDER', false),
+
+    /*
     |
     | Per source time limit for the flagged combined view
     | Defaults to 1 week

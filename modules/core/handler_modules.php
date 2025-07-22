@@ -345,6 +345,24 @@ class Hm_Handler_process_delete_prompt_setting extends Hm_Handler_Module {
 }
 
 /**
+ * Process input from the allow searching flagged in all folders setting
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_allow_search_all_flagged_folder_setting extends Hm_Handler_Module {
+    /**
+     * Allowed vals are bool true/false
+     */
+    public function process() {
+        function allow_search_all_flagged_folder_callback($val) {
+            return $val;
+        }
+        // exit(var_dump($this->request->post['allow_search_all_flagged_folder']));
+        process_site_setting('allow_search_all_flagged_folder', $this, 'allow_search_all_flagged_folder_callback', DEFAULT_FLAGGED_SEARCH_IN_ALL_FOLDERS, true);
+    }
+}
+
+
+/**
  * Process input from the disable delete attachment setting
  * @subpackage core/handler
  */
