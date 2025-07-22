@@ -43,6 +43,7 @@ class Hm_Environment {
         define('DEFAULT_UNREAD_PER_SOURCE', $config->get('default_setting_unread_per_source', 20));
         define('DEFAULT_FLAGGED_SINCE', $config->get('default_setting_flagged_since', '-1 week'));
         define('DEFAULT_FLAGGED_PER_SOURCE', $config->get('default_setting_flagged_per_source', 20));
+        define('DEFAULT_FLAGGED_SEARCH_IN_ALL_FOLDERS', $config->get('default_setting_flagged_search_in_all_folder', false));
         define('DEFAULT_ALL_SINCE', $config->get('default_setting_all_since', '-1 week'));
         define('DEFAULT_ALL_PER_SOURCE', $config->get('default_setting_all_per_source', 20));
         define('DEFAULT_ALL_EMAIL_SINCE', $config->get('default_setting_all_email_since', '-1 week'));
