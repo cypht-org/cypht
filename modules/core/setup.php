@@ -70,7 +70,8 @@ add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_setting
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
-add_output('settings', 'start_general_settings', true, 'core', 'start_settings_form', 'after');
+add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
+add_output('settings', 'start_general_settings', true, 'core', 'start_search_settings', 'after');
 add_output('settings', 'language_setting', true, 'core', 'start_general_settings', 'after');
 add_output('settings', 'timezone_setting', true, 'core', 'language_setting', 'after');
 add_output('settings', 'warn_for_unsaved_changes_setting', true, 'core', 'timezone_setting', 'after');
