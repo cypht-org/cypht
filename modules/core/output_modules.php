@@ -973,6 +973,22 @@ class Hm_Output_start_all_email_settings extends Hm_Output_Module {
 }
 
 /**
+ * Start the search box for settings
+ * @subpackage core/output
+ */
+class Hm_Output_start_search_settings extends Hm_Output_Module {
+    /**
+     * General settings like langauge and timezone will go here
+     */
+    protected function output() {
+        return '<tr><td colspan="2" class="settings_subtitle cursor-pointer border-bottom p-2 py-4">'.
+            '<form><input type="search" id="settingsSearch" class="form-control" placeholder="'.$this->trans('Type a setting').'">'.
+            '<div id="noSettingsFound" class="d-none mt-3">'.$this->trans('No settings found!').'</div>'.
+            '</td></tr>';
+    }
+}
+
+/**
  * Start the general settings section
  * @subpackage core/output
  */
