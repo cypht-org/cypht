@@ -526,7 +526,7 @@ class Hm_Handler_smtp_connect extends Hm_Handler_Module {
                 }
                 $mailbox = Hm_SMTP_List::connect($form['smtp_server_id'], false, $smtp_details['user'], $smtp_details['pass']);
                 if ($mailbox && $mailbox->authed()) {
-                    Hm_Msgs::add("Successfully authenticated to the SMTP server");
+                    Hm_Msgs::add(sprintf("Successfully authenticated to the %s server : %s", $smtp_details['type'], $smtp_details['user']));
                 }
                 elseif ($mailbox && $mailbox->state() == 'connected') {
                     Hm_Msgs::add("Connected, but failed to authenticate to the SMTP server", "warning");
@@ -1618,7 +1618,7 @@ class Hm_Handler_re_schedule_message_sending extends Hm_Handler_Module {
         $new_schedule_date = $form['schedule_date'];
         if ($form['schedule_date'] != 'now') {
             $new_schedule_date = get_scheduled_date($form['schedule_date']);
-        }       
+        }
         $ids = explode(',', $form['scheduled_msg_ids']);
         foreach ($ids as $msg_part) {
             list($imap_server_id, $msg_id, $folder) = explode('_', $msg_part);
@@ -1654,7 +1654,7 @@ class Hm_Output_scheduled_send_msg_control extends Hm_Output_Module {
         $parts = explode('_', $this->get('list_path'));
         if ($parts[0] == 'imap' && hex2bin($parts[2]) == 'Scheduled') {
             $res = schedule_dropdown($this, true);
-            $this->concat('msg_controls_extra', $res); 
+            $this->concat('msg_controls_extra', $res);
         }
     }
 }
@@ -2054,7 +2054,7 @@ function save_imap_draft($atts, $id, $session, $mod, $mod_cache, $uploaded_files
     if (! $mailbox->connect()) {
         return -1;
     }
-    
+
     if (!empty($atts['schedule'])) {
         $folder ='Scheduled';
         if (!$mailbox->folder_exists($folder)) {
