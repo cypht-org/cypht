@@ -323,6 +323,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     }
                 }
             }
+            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
+            if($is_draft) {
+                $txt .= '<tr class="header_space"><th colspan="2"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></th></tr>';
+            }
             foreach ($headers as $name => $value) {
                 if (!in_array(mb_strtolower($name), $small_headers)) {
                     if (is_array($value)) {
@@ -395,7 +399,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 $txt .= ' | ' . schedule_dropdown($this, true);
             }
 
-            $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
             $settings = $this->get('user_settings', array());
             if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
                 $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
@@ -422,9 +425,6 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= ' | <li><a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a></li>';
 
-            if ($is_draft) {
-                $txt .= ' | <li><a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a></li>';
-            }
             $txt .= '</ul><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
