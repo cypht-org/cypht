@@ -179,10 +179,7 @@ class Hm_Output_filter_message_struct extends Hm_Output_Module {
  * @subpackage imap/output
  */
 class Hm_Output_filter_message_headers extends Hm_Output_Module {
-    /**
-     * Build message header HTML
-     */
-    protected function output() {
+      protected function output() {
         if ($this->get('msg_headers')) {
             $txt = '';
             $small_headers = array('subject', 'x-snoozed', 'date', 'from', 'to', 'reply-to', 'cc', 'flags');
@@ -195,33 +192,41 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!array_key_exists('subject', lc_headers($headers)) || !trim(lc_headers($headers)['subject'])) {
                 $headers['subject'] = $this->trans('[No Subject]');
             }
-            $txt .= '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+            
+            // Start Bootstrap container
+            $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle bg-white text-muted">';
+            
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
                     if ($fld == mb_strtolower($name)) {
                         if ($fld == 'subject') {
-                            $txt .= '<tr class="header_'.$fld.'"><th colspan="2">';
+                            $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                            $txt .= '<div class="col-12">';
                             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                                $txt .= ' <i class="bi bi-star-half account_icon"></i> ';
+                                $txt .= '<i class="bi bi-star-half account_icon"></i> ';
                             }
-                            $txt .= $this->html_safe($value).'</th></tr>';
+                            $txt .= '<span class="fs-5 fw-normal text-dark">' . $this->html_safe($value) . '</span>';
+                            $txt .= '</div></div>';
                         }
                         elseif ($fld == 'x-snoozed') {
                             $snooze_header = parse_delayed_header($value, 'X-Snoozed');
-                            $txt .= '<tr class="header_'.$fld.'"><th>';
-                            $txt .= $this->trans('Snoozed').'</th><td>'.$this->trans('Until').' '.$this->html_safe($snooze_header['until']).' <a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper">Unsnooze</a></td></tr>';
+                            $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                            $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans('Snoozed').'</span></div>';
+                            $txt .= '<div class="col-md-10">'.$this->trans('Until').' '.$this->html_safe($snooze_header['until']).' <a href="#" data-value="unsnooze" class="unsnooze nexter_date_helper">Unsnooze</a></div>';
+                            $txt .= '</div>';
                         }
                         elseif ($fld == 'date') {
                             try {
                                 $dt = new DateTime($value);
                                 $value = sprintf('%s (%s)', $dt->format('c Z'), human_readable_interval($value));
                             } catch (Exception $e) {}
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
-                            }
+                            $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                            $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$this->trans($name).'</span></div>';
+                            $txt .= '<div class="col-md-10"><small class="text-muted">'.$this->html_safe($value).'</small></div>';
+                            $txt .= '</div>';
+                        }
                         elseif($fld == 'from'){
-
                             $regexp = '/\s*(.*[^\s])\s*<\s*(.*[^\s])\s*>/';
-
                             $contact_email = "";
                             $contact_name = "";
 
@@ -241,69 +246,45 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $contact = !$contact_store ? null : $contact_store->get(null, false, $contact_email);
                             $contact_exists = !empty($contact);
 
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'
-                                        </th>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <a id="contact_info" data-bs-toggle="dropdown" id="dropdownMenuContact" class="dropdown-toggle" href="#">' . $this->html_safe($value) . '
-                                                    </a>
-                                                    <div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">
-                                                        <div id="contact_popup_body">';
+                            $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                            $txt .= '<div class="col-md-2 d-none d-sm-block"><span class="text-muted">'.$this->trans($name).'</span></div>';
+                            $txt .= '<div class="col-md-10">';
+                            $txt .= '<div class="dropdown">';
+                            $txt .= '<a id="contact_info" data-bs-toggle="dropdown" class="dropdown-toggle text-decoration-none" href="#">' . $this->html_safe($value) . '</a>';
+                            $txt .= '<div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">';
+                            $txt .= '<div id="contact_popup_body">';
 
                             if($contact_exists){
-                                $txt .= '<div>
-                                            <table>
-                                                <tr>
-                                                    <td><strong>Name :</strong></td>
-                                                    <td>
-                                                        '.$this->html_safe($contact->value('display_name')).'
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Email :</strong></td>
-                                                    <td>
-                                                        '.$this->html_safe($contact->value('email_address')).'
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Tel :</strong></td>
-                                                    <td>
-                                                        <a href="tel:'.$this->html_safe($contact->value('phone_number')).'" data-external="true">'.
-                                                        $this->html_safe($contact->value('phone_number')).'</a>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td><strong>Source :</strong></td>
-                                                    <td>
-                                                        '.$this->html_safe($contact->value('source')).'
-                                                    </td>
-                                                </tr>
-                                            </table>
-                                        </div>';
+                                $txt .= '<div class="d-flex flex-column gap-2">';
+                                $txt .= '<div class="d-flex"><span class="fw-bold me-2">Name:</span><span>'.$this->html_safe($contact->value('display_name')).'</span></div>';
+                                $txt .= '<div class="d-flex"><span class="fw-bold me-2">Email:</span><span>'.$this->html_safe($contact->value('email_address')).'</span></div>';
+                                $txt .= '<div class="d-flex"><span class="fw-bold me-2">Tel:</span><span><a href="tel:'.$this->html_safe($contact->value('phone_number')).'" data-external="true">'.$this->html_safe($contact->value('phone_number')).'</a></span></div>';
+                                $txt .= '<div class="d-flex"><span class="fw-bold me-2">Source:</span><span>'.$this->html_safe($contact->value('source')).'</span></div>';
+                                $txt .= '</div>';
                             } else {
-                                $txt .= '<div class="popup-container_footer">
-                                            <button onclick="return add_contact_from_popup(event)" class="add_contact_btn btn btn-primary" type="button" value="">'.$this->trans('Add local contacts').'
-                                            </button>
-                                        </div>';
+                                $txt .= '<div class="popup-container_footer">';
+                                $txt .= '<button onclick="return add_contact_from_popup(event)" class="add_contact_btn btn btn-primary" type="button" value="">'.$this->trans('Add local contacts').'</button>';
+                                $txt .= '</div>';
                             }
 
-                            $txt .= '               </div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>';
+                            $txt .= '</div></div></div></div></div>';
                         }
                         elseif ($fld == 'reply-to') {
                             $from = addr_parse($headers['From']);
-
                             $replyEmails = array_map(function ($addr) {
                                 return $addr['email'];
                             }, process_address_fld($headers['Reply-To']));
 
                             if (count($replyEmails) === 1 && ($replyEmails[0] === $from['email'])) {
-                                $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                                $txt .= '<div class="row g-0 py-1 long_header">';
+                                $txt .= '<div class="col-md-2 col-12"><span class="text-muted">'.$this->html_safe($name).'</span></div>';
+                                $txt .= '<div class="col-md-9 col-12">'.$this->html_safe($value).'</div>';
+                                $txt .= '</div>';
                             } else {
-                                $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe(join(',', $replyEmails)).'</td></tr>';
+                                $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                                $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
+                                $txt .= '<div class="col-md-10">'.$this->html_safe(join(',', $replyEmails)).'</div>';
+                                $txt .= '</div>';
                             }
                         }
                         else {
@@ -315,29 +296,40 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                                     $new_value[] = $this->trans(trim($v));
                                 }
                                 $value = implode(', ', $new_value);
-
                             }
-                            $txt .= '<tr class="header_'.$fld.'"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                            $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+                            $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
+                            $txt .= '<div class="col-md-10 col-12">'.$this->html_safe($value).'</div>';
+                            $txt .= '</div>';
                         }
                         break;
                     }
                 }
             }
+            
+            // Long headers (hidden by default)
             foreach ($headers as $name => $value) {
                 if (!in_array(mb_strtolower($name), $small_headers)) {
                     if (is_array($value)) {
                         foreach ($value as $line) {
-                            $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($line).'</td></tr>';
+                            $txt .= '<div class="row g-0 py-1 long_header">';
+                            $txt .= '<div class="col-md-2 col-12"><span class="text-muted">'.$this->html_safe($name).'</span></div>';
+                            $txt .= '<div class="col-md-9 col-12">'.$this->html_safe($line).'</div>';
+                            $txt .= '</div>';
                         }
-                    }
-                    else {
-                        $txt .= '<tr style="display: none;" class="long_header"><th>'.$this->html_safe($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    } else {
+                        $txt .= '<div class="row g-0 py-1 long_header">';
+                        $txt .= '<div class="col-md-2 col-12"><span class="text-muted">'.$this->html_safe($name).'</span></div>';
+                        $txt .= '<div class="col-md-9 col-12">'.$this->html_safe($value).'</div>';
+                        $txt .= '</div>';
                     }
                 }
             }
+            
             if ($this->get('list_headers')) {
                 $txt .= format_list_headers($this);
             }
+            
             $lc_headers = lc_headers($headers);
             if (array_key_exists('to', $lc_headers)) {
                 $addr_list = process_address_fld($lc_headers['to']);
@@ -359,48 +351,49 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
             }
 
-            $txt .= '<tr><td class="header_space" colspan="2"></td></tr>';
-            $txt .= '<tr><th colspan="2" class="header_links">';
-            $txt .= '<ul class="msg_move_to">'.
-                '<li><a href="#" class="hlink all_headers">'.$this->trans('All headers').'</a></li>'.
-                '<li><a class="hlink small_headers" style="display: none;" href="#">'.$this->trans('Small headers').'</a></li>';
+            // Action links section
+            $txt .= '<div class="row g-0 py-3">';
+            $txt .= '<div class="col-12 msg_actions">';
+            $txt .= '<div class="d-flex flex-wrap gap-2 mb-3">';
+            $txt .= '<a href="#" class="hlink all_headers text-decoration-none">'.$this->trans('All headers').'</a>';
+            $txt .= '<a class="hlink small_headers text-decoration-none" href="#">'.$this->trans('Small headers').'</a>';
+            $txt .= '</div>';
+            
+            $txt .= '<div class="d-flex flex-wrap gap-2">';
             if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
-                $txt .= ' | <li><a class="reply_link hlink" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a></li>';
+                $txt .= '<a class="reply_link hlink text-decoration-none" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
-                    $txt .= ' | <li><a class="reply_all_link hlink" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a></li>';
+                    $txt .= '<a class="reply_all_link hlink text-decoration-none" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                } else {
+                    $txt .= '<a class="reply_all_link hlink disabled_link text-decoration-none">'.$this->trans('Reply-all').'</a>';
                 }
-                else {
-                    $txt .= ' | <li><a class="reply_all_link hlink disabled_link">'.$this->trans('Reply-all').'</a></li>';
-                }
-                $txt .= ' | ' . forward_dropdown($this, $reply_args);
+                $txt .= forward_dropdown($this, $reply_args);
             }
+            
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                $txt .= ' | <li><a style="display: none;" class="flagged_link hlink" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
-                $txt .= '<li><a id="unflag_msg" class="unflagged_link hlink" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
-            }
-            else {
-                $txt .= ' | <li><a id="flag_msg" class="unflagged_link hlink" data-state="unflagged" href="#">'.$this->trans('Flag').'</a></li>';
-                $txt .= '<li><a style="display: none;" class="flagged_link hlink" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a></li>';
+                $txt .= '<a class="flagged_link hlink text-decoration-none" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+            } else {
+                $txt .= '<a id="flag_msg" class="unflagged_link hlink text-decoration-none" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a class="flagged_link hlink text-decoration-none" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
 
-            $txt .= ' | <li><a class="hlink" id="unread_message" href="#" >'.$this->trans('Unread').'</a></li>';
-            $txt .= ' | <li><a class="delete_link hlink" id="delete_message" href="#">'.$this->trans('Delete').'</a></li>';
-            $txt .= ' | <li><a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location"></div></li>';
-            $txt .= ' | <li><a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location"></div></li>';
-            $txt .= ' | <li><a class="archive_link hlink" id="archive_message" href="#">'.$this->trans('Archive').'</a></li>';
+            $txt .= '<a class="hlink text-decoration-none" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
+            $txt .= '<a class="delete_link hlink text-decoration-none" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
+            $txt .= '<a class="hlink text-decoration-none" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
+            $txt .= '<a class="hlink text-decoration-none" id="move_message" href="#">'.$this->trans('Move').'</a>';
+            $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            
             if($this->get('tags')){
-                $txt .= ' | '. tags_dropdown($this, $headers);
+                $txt .= tags_dropdown($this, $headers);
             }
             if (isset($headers['X-Schedule'])) {
-                $txt .= ' | ' . schedule_dropdown($this, true);
+                $txt .= schedule_dropdown($this, true);
             }
 
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
-            $settings = $this->get('user_settings', array());
-            if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-                $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
-            }
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
+                $txt .= snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
@@ -413,25 +406,25 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
                     if(!in_array($sender, $existing_emails)){
-                        $txt .= ' | <li><div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a></li>';
+                        $txt .= '<div class="dropdown d-inline-block"><a class="block_sender_link hlink dropdown-toggle text-decoration-none'.($domain_blocked || $sender_blocked ? '" id="unblock_sender" data-target="'.($domain_blocked? 'domain':'sender').'"' : '"').' href="#" aria-labelledby="dropdownMenuBlockSender" data-bs-toggle="dropdown"><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans($domain_blocked ? 'Unblock Domain' : ($sender_blocked ? 'Unblock Sender' : 'Block Sender')).'</span></a>';
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= ' | <li><span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span></li>';
+                    $txt .= '<span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
-            $txt .= ' | <li><a class="hlink" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a></li>';
+            $txt .= '<a class="hlink text-decoration-none" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             if ($is_draft) {
-                $txt .= ' | <li><a class="edit_draft_link hlink" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a></li>';
+                $txt .= '<a class="edit_draft_link hlink text-decoration-none" id="edit_draft" href="?page=compose'.$reply_args.'&imap_draft=1">'.$this->trans('Edit Draft').'</a>';
             }
-            $txt .= '</ul><span id="extra-header-buttons"></span>';
+            $txt .= '</div><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
-            $txt .= '</th></tr>';
-            $txt .= '</table>';
+            $txt .= '</div></div>';
+            $txt .= '</div>';
 
             $this->out('msg_headers', $txt, false);
         }
