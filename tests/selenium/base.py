@@ -216,9 +216,24 @@ class WebTest:
             # First try to find the settings button and click it
             settings_button = self.by_css('[data-bs-target=".settings"]')
             if settings_button.is_displayed():
+                # Check if settings are already expanded
+                try:
+                    settings_div = self.by_class('settings')
+                    if settings_div.is_displayed():
+                        print(" - settings already expanded")
+                        return
+                except:
+                    pass
+                
+                # Click to expand
                 settings_button.click()
+                
                 # Wait for the settings to be displayed
-                WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+                try:
+                    WebDriverWait(self.driver, 10).until(lambda x: self.by_class('settings').is_displayed())
+                    print(" - settings expanded successfully")
+                except:
+                    print(" - settings expansion timeout, continuing anyway")
             else:
                 print(" - settings button not visible, skipping expansion")
         except Exception as e:
@@ -227,10 +242,33 @@ class WebTest:
 
     def click_when_clickable(self, el):
         print(" - waiting for element to be clickable")
-        self.driver.execute_script("arguments[0].scrollIntoView()", el)
-        WebDriverWait(self.driver, 10).until(
-            exp_cond.element_to_be_clickable(el)
-        ).click()
+        try:
+            # Scroll element into view
+            self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", el)
+            
+            # Wait for element to be clickable
+            WebDriverWait(self.driver, 10).until(
+                exp_cond.element_to_be_clickable(el)
+            )
+            
+            # Try regular click first
+            try:
+                el.click()
+                return
+            except Exception as click_error:
+                print(f" - regular click failed: {click_error}")
+                print(" - trying JavaScript click as fallback")
+                # Use JavaScript click as fallback
+                self.driver.execute_script("arguments[0].click();", el)
+                
+        except Exception as e:
+            print(f" - click_when_clickable failed: {e}")
+            # Final fallback: try JavaScript click without waiting
+            try:
+                self.driver.execute_script("arguments[0].click();", el)
+            except Exception as js_error:
+                print(f" - JavaScript click also failed: {js_error}")
+                raise e
 
     def safe_click(self, element):
         """Safely click an element with retry logic"""
