@@ -1217,6 +1217,14 @@ return [
     'default_setting_search_since' => env('DEFAULT_SETTING_SEARCH_SINCE', '-1 week'),
 
     /*
+    | Enable the "collect address" feature on the send page
+    | This will collect email addresses from the "To", "CC", and "BCC" fields
+    | and save them to the contacts module
+    | Defaults to false
+    */
+    'default_setting_enable_collect_address_on_send' => env('DEFAULT_SETTING_ENABLE_COLLECT_ADDRESS_ON_SEND', false),
+
+    /*
     |
     | Timezone for date displays
     | Defaults to UTC
