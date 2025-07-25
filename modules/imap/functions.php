@@ -1506,8 +1506,8 @@ if (!hm_exists('tags_dropdown')) {
 function tags_dropdown($context, $headers) {
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
+                <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
     $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
     foreach ($folders as $folder) {
