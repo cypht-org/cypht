@@ -1038,7 +1038,7 @@ div.unseen,
 }
 .mobile .msg_controls {
   background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important;
-  z-index: 100;
+  z-index: 1000;
   position: fixed;
   right: -10px;
   height: 54px;
@@ -1582,7 +1582,7 @@ a[disabled] {
   display: none;
 }
 
-/* Bootstrap-based message headers - minimal custom CSS */
+/* Bootstrap-based message headers */
 .msg_text * {
   white-space: normal !important;
   word-break: break-word;
@@ -1597,9 +1597,6 @@ a[disabled] {
 .long_header[style*="display: flex"],
 .long_header[style*="display: grid"] {
   display: flex !important;
-  /* grid-template-columns: 1fr 4fr;
-  gap: 0;
-  align-items: start; */
 }
 
 .long_header > div:nth-of-type(2) {
@@ -1626,88 +1623,10 @@ a[disabled] {
 
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 768px) {
-  .mobile .msg_headers_flex {
-    padding: 0.75rem;
-  }
-  
-  .mobile .header-item .header-date {
-    display: none;
-  }
-  
-  .mobile .header-actions {
-    padding: 0;
-    margin-top: 1rem;
-  }
-  
-  /* Button-like styling for action links on mobile */
-  .mobile .action-links a,
-  .mobile .message-actions a {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    background-color: #f8f9fa;
-    text-decoration: none;
-    color: #495057;
-    font-size: 0.6rem;
-    margin-right: 0;
-  }
-  
-  .mobile .action-links a:hover,
-  .mobile .message-actions a:hover {
-    background-color: #e9ecef;
-  }
-  
-  /* List header specific mobile styling */
-  .mobile .header-item.header-list .header-value {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    align-items: center;
-  }
-
-  .mobile .header-item.header-list .header-value > div {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    flex-wrap: wrap;
-  }
-
-  .mobile .header-item.header-list .header-value p {
-    margin: 0;
-    font-size: 0.77rem;
-  }
-
-  .mobile .header-item.header-list .header-value a {
-    font-size: 0.77rem;
-    color: #495057;
-    text-decoration: none;
-    background-color: #edf3fa;
-    border-radius: 0.25rem;
-    padding: 0 0.07rem; 
-    display: inline-block;
-    transition: all 0.15s ease-in-out;
-  }
-
-  .mobile .header-item.header-list .header-value a:hover {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-    text-decoration: none;
-  }
-
-  .mobile .header-item.header-list .header-value a:active {
-    background-color: #5a6268;
-    border-color: #545b62;
-  }
-  /* end of mobile header list */
-  /* a {
-    white-space: normal !important;
-  } */
-
   .small_header {
     display: flex;
     flex-direction: row;
     column-gap: 0.5rem;
-    /* align-items: center; */
     flex-wrap: nowrap;
   }
 
@@ -1735,139 +1654,5 @@ a[disabled] {
     color: #495057;
     font-size: 0.6rem;
     margin-right: 0;
-  }
-}
-
-/* Additional mobile responsive improvements */
-.mobile .msg_text {
-  padding: 0 10px;
-}
-
-.mobile .msg_headers {
-  font-size: 90%;
-}
-
-.mobile .msg_headers table {
-  width: 100%;
-  table-layout: auto;
-}
-
-.mobile .msg_headers th,
-.mobile .msg_headers td {
-  padding: 5px 10px;
-  vertical-align: top;
-}
-
-.mobile .header_subject th {
-  font-size: 110%;
-  font-weight: bold;
-  padding-bottom: 15px;
-}
-
-.mobile .add_contact_row {
-  position: relative !important;
-  top: auto !important;
-  right: auto !important;
-  padding: 10px;
-  margin-bottom: 10px;
-}
-
-/* Bootstrap-based message headers - minimal custom CSS */
-/* .long_header {
-  display: none;
-} */
-
-/* .long_header[style*="display: block"],
-.long_header[style*="display: flex"],
-.long_header[style*="display: grid"] {
-  display: flex !important;
-  padding-right: 1rem;
-}
-
-.small_header {
-  display: block;
-}
-
-.all_headers {
-  display: inline-block;
-}
-
-.small_headers {
-  display: none;
-} */
-
-/* Mobile responsive overrides for Bootstrap classes */
-@media (max-width: 768px) {
-  .mobile .msg_headers_flex {
-    padding: 0.75rem;
-  }
-  
-  .mobile .header-item .header-date {
-    display: none;
-  }
-  
-  .mobile .header-actions {
-    padding: 0;
-    margin-top: 1rem;
-  }
-  
-  /* Button-like styling for action links on mobile */
-  .mobile .action-links a,
-  .mobile .message-actions a {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    background-color: #f8f9fa;
-    text-decoration: none;
-    color: #495057;
-    font-size: 0.6rem;
-    margin-right: 0;
-  }
-  
-  .mobile .action-links a:hover,
-  .mobile .message-actions a:hover {
-    background-color: #e9ecef;
-  }
-  
-  /* List header specific mobile styling */
-  .mobile .header-item.header-list .header-value {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    align-items: center;
-  }
-
-  .mobile .header-item.header-list .header-value > div {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-    flex-wrap: wrap;
-  }
-
-  .mobile .header-item.header-list .header-value p {
-    margin: 0;
-    font-size: 0.77rem;
-  }
-
-  .mobile .header-item.header-list .header-value a {
-    font-size: 0.77rem;
-    color: #495057;
-    text-decoration: none;
-    background-color: #edf3fa;
-    border-radius: 0.25rem;
-    padding: 0 0.07rem; 
-    display: inline-block;
-    transition: all 0.15s ease-in-out;
-  }
-
-  .mobile .header-item.header-list .header-value a:hover {
-    color: #fff;
-    background-color: #6c757d;
-    border-color: #6c757d;
-    text-decoration: none;
-  }
-
-  .mobile .header-item.header-list .header-value a:active {
-    background-color: #5a6268;
-    border-color: #545b62;
   }
 }
