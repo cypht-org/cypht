@@ -69,6 +69,7 @@
   min-height: 600px;
   background-color: #fff;
   height: 100%;
+  /* max-width: 95% !important; */
 }
 .msg_text_inner {
   min-height: 300px;
