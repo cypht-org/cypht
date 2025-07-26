@@ -1856,6 +1856,20 @@ var hasLeadingOrTrailingSpaces = function(str) {
     return str !== str.trim();
 };
 
+var add_email_in_contact_trusted = function(list_email) {
+    if (list_email) {
+      Hm_Ajax.request(
+        [
+          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
+          { name: 'email_address', value: list_email.join(',') },
+        ],
+        function (res) {
+          window.location.reload();
+        }
+      );
+    }
+};
+
 /* create a default message list object */
 var Hm_Message_List = new Message_List();
 

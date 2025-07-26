@@ -1365,20 +1365,6 @@ var imap_screen_email = function() {
     }
 };
 
-var add_email_in_contact_trusted = function(list_email) {
-    if (list_email) {
-      Hm_Ajax.request(
-        [
-          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
-          { name: 'email_address', value: list_email.join(',') },
-        ],
-        function (res) {
-          window.location.reload();
-        }
-      );
-    }
-};
-
 $('.screen-email-unlike').on("click", function() { imap_screen_email(); return false; });
 
 $('.screen-email-like').on("click", function() {
