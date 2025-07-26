@@ -1413,7 +1413,7 @@ $('.screen-email-like').on("click", function() {
         });
         list_html += "</ol>";
         const modal = new Hm_Modal({
-            modalId: 'emptySubjectBodyModal',
+            modalId: 'confirmaAddToTrustContact',
             title: 'Warning',
             btnSize: 'sm'
         });
