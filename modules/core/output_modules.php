@@ -1986,8 +1986,8 @@ class Hm_Output_message_list_heading extends Hm_Output_Module {
             $search_field = '';
         }
         $res = '';
-        $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex gap-3 justify-content-between px-3 align-items-center">';
-        $res .= '<div class="d-flex align-items-center gap-1">' . message_controls($this).'<div class="mailbox_list_title">'.
+        $res .= '<div class="message_list p-0 '.$this->html_safe($this->get('list_path')).'_list"><div class="content_title d-flex flex-wrap justify-content-between px-3 align-items-center">';
+        $res .= '<div class="d-flex align-items-center gap-1 flex-wrap mb-2 mb-md-0">' . message_controls($this).'<div class="mailbox_list_title ms-2">'.
             implode('<i class="bi bi-caret-right-fill path_delim"></i>', array_map( function($v) { return $this->trans($v); },
                 $this->get('mailbox_list_title', array()))).'</div>';
         if (!$this->get('is_mobile') && mb_substr((string) $this->get('list_path'), 0, 5) != 'imap_') {

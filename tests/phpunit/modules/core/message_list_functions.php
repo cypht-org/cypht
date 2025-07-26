@@ -29,9 +29,9 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
     public function test_get_message_list_meta() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
         $this->assertEquals('', message_list_meta(array(), $mod));
-        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 20 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'message_list_since' => '-1 week'), $mod));
-        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5), $mod));
-        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5, 'message_list_since' => '-1 week'), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">last 7 days<b> :</b><span class="src_count"></span> 20 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'message_list_since' => '-1 week'), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5), $mod));
+        $this->assertEquals('<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">last 7 days<b> :</b><span class="src_count"></span> 5 items per source</div>', message_list_meta(array('list_meta' => 'foo', 'per_source_limit' => 5, 'message_list_since' => '-1 week'), $mod));
     }
     /**
      * @preserveGlobalState disabled
@@ -123,9 +123,9 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      */
     public function test_list_sources() {
         $mod = new Hm_Output_Test(array('foo' => 'bar', 'bar' => 'foo'), array('bar'));
-        $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div></div>', list_sources(array(array('group' => 'background', 'type' => 'imap', 'folder' => 'foo')), $mod));
-        $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah foo</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap', 'folder' => bin2hex('foo'), 'folder_name' => 'foo')), $mod));
-        $this->assertEquals('<div class="list_sources"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah INBOX</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap')), $mod));
+        $this->assertEquals('<div class="list_sources w-100 mt-2"><div class="src_title fs-5 mb-2">Sources</div></div>', list_sources(array(array('group' => 'background', 'type' => 'imap', 'folder' => 'foo')), $mod));
+        $this->assertEquals('<div class="list_sources w-100 mt-2"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah foo</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap', 'folder' => bin2hex('foo'), 'folder_name' => 'foo')), $mod));
+        $this->assertEquals('<div class="list_sources w-100 mt-2"><div class="src_title fs-5 mb-2">Sources</div><div class="list_src">imap blah INBOX</div></div>', list_sources(array(array('name' => 'blah', 'type' => 'imap')), $mod));
     }
     /**
      * @preserveGlobalState disabled
