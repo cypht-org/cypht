@@ -311,7 +311,11 @@ function blockListPageHandlers() {
     });
 
     $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
-        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+        if (parseInt($(this).data("num-blocked")) > 0) {
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+        } else {
+            alert(hm_trans("This action requires at least 1 blocked element."))
+        }
     });
     load_sieve_filters('ajax_block_account_sieve_filters');
 }
