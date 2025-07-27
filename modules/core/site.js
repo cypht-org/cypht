@@ -369,6 +369,8 @@ function Hm_Modal(options) {
     };
 
     this.addFooterBtn = (label, classes, callback) => {
+        this.modalFooter.find('button').filter((_, btn) => btn.textContent.trim() === label).remove();
+
         const btn = document.createElement('button');
         btn.innerHTML = label;
 
@@ -378,7 +380,6 @@ function Hm_Modal(options) {
         }
 
         btn.addEventListener('click', callback);
-
         this.modalFooter.append(btn);
     };
 
