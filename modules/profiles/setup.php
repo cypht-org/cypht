@@ -39,7 +39,8 @@ return array(
         'profile_address' => FILTER_UNSAFE_RAW,
         'profile_sig' => FILTER_UNSAFE_RAW,
         'profile_rmk' => FILTER_UNSAFE_RAW,
-        'profile_delete' => FILTER_UNSAFE_RAW
+        'profile_delete' => FILTER_UNSAFE_RAW,
+        'profile_quickly_create_value' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
         'profile_id' => FILTER_UNSAFE_RAW,

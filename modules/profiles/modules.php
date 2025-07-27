@@ -92,6 +92,16 @@ class Hm_Handler_process_profile_update extends Hm_Handler_Module {
         }
         list($success, $form) = $this->process_form(array('profile_id', 'profile_address',
             'profile_smtp', 'profile_replyto', 'profile_name', 'profile_imap', 'profile_rmk'));
+            
+        if (isset($this->request->post['profile_quickly_create_value']) && $this->request->post['profile_quickly_create_value'] === "yes") {
+            $array_profil_imap = explode("|", $form['profile_imap']);
+            if (count($array_profil_imap) == 2) {
+                $profile_name = explode("@", $array_profil_imap[1]);
+                $form['profile_name'] = $profile_name[0];
+                $form['profile_address'] = $array_profil_imap[1];
+                $form['profile_replyto'] = $array_profil_imap[1];
+            }
+        }
         if (!$success) {
             return;
         }
@@ -345,21 +355,28 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<div class="edit_profile row p-3" '.($form_vals['name'] ? '' : 'style="display: none;"').'><div class="col-12 col-lg-8 col-xl-5">';
 
     $res .= '<form method="post" action="?page=profiles">';
+    if (empty($form_vals['id'])) {
+        $res .= '<div class="form-check form-switch mt-3 mb-3">';
+        $res .= '<input class="form-check-input" name="profile_quickly_create" type="checkbox" role="switch" id="profile_quickly_create">';
+        $res .= '<input type="hidden" name="profile_quickly_create_value" id="profile_quickly_create_value" value="non">';
+        $res .= '<label class="form-check-label" for="profile_quickly_create">'.$out_mod->trans('Quickly create Profile').'</label>';
+        $res .= '</div>';
+    }
     $res .= '<input type="hidden" name="profile_id" value="'.$out_mod->html_safe($id).'" />';
     $res .= '<input type="hidden" name="hm_page_key" value="'.$out_mod->html_safe(Hm_Request_Key::generate()).'" />';
 
     // Display Name
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<input type="text" required name="profile_name" class="form-control" value="'.$out_mod->html_safe($form_vals['name']).'" placeholder="'.$out_mod->trans('Display Name').' *">';
     $res .= '<label>'.$out_mod->trans('Display Name').' *</label></div>';
 
     // Email Address
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<input type="email" required name="profile_address" class="form-control" value="'.$out_mod->html_safe($form_vals['address']).'" placeholder="'.$out_mod->trans('E-mail Address').' *">';
     $res .= '<label>'.$out_mod->trans('E-mail Address').' *</label></div>';
 
     // Reply-to
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<input type="email" required name="profile_replyto" class="form-control" value="'.$out_mod->html_safe($form_vals['replyto']).'" placeholder="'.$out_mod->trans('Reply-to').' *">';
     $res .= '<label>'.$out_mod->trans('Reply-to').' *</label></div>';
 
@@ -386,12 +403,12 @@ function profile_form($form_vals, $id, $smtp_servers, $imap_servers, $out_mod) {
     $res .= '<label>'.$out_mod->trans('SMTP Server').' *</label></div>';
 
     // Signature
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<textarea cols="80" rows="4" name="profile_sig" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Signature').'">'.$out_mod->html_safe($form_vals['sig']).'</textarea>';
     $res .= '<label>'.$out_mod->trans('Signature').'</label></div>';
 
     // Remark
-    $res .= '<div class="form-floating mb-3">';
+    $res .= '<div class="form-floating mb-3 form-check-create-profile">';
     $res .= '<textarea cols="80" rows="4" name="profile_rmk" class="form-control" style="min-height : 120px" placeholder="'.$out_mod->trans('Remark').'">'.$out_mod->html_safe($form_vals['rmk']).'</textarea>';
     $res .= '<label>'.$out_mod->trans('Remark').'</label></div>';
 
