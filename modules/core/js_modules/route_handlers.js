@@ -32,6 +32,59 @@ function applySettingsPageHandlers(routeParams, hash) {
     $('.reset_default_value_input').on("click", reset_default_value_input);
     $('.reset_default_timezone').on("click", reset_default_timezone);
     if (window.smtpSettingsPageHandler) smtpSettingsPageHandler();
+
+    $('#settingsSearch').on('input', function () {
+        const query = $(this).val().trim().toLowerCase();
+        let anyMatch = false;
+
+        $('td.settings_subtitle').each(function () {
+            const $subtitleRow = $(this).closest('tr:not(:first-child)');
+            const targetClass = $(this).data('target'); // e.g. ".general_setting"
+            const $detailRows = $(targetClass);
+            const $matchedDetails = [];
+
+            let sectionMatches = false;
+            let detailMatches = [];
+
+            // Check if section title matches
+            if ($(this).text().toLowerCase().includes(query)) {
+                sectionMatches = true;
+                detailMatches = $matchedDetails.push(...$detailRows.get()); // show all detail rows
+            } else {
+                // Check individual detail rows
+                $detailRows.each(function () {
+                    const $row = $(this);
+                    if ($row.text().toLowerCase().includes(query)) {
+                        sectionMatches = true;
+                        detailMatches.push($row[0]); // add matching row
+                    }
+                });
+            }
+
+            if (sectionMatches || query === '') {
+                anyMatch = true;
+                $subtitleRow.show();
+
+                // Show only matching detail rows (if searching), or all (if empty)
+                if (query) {
+                    $detailRows.hide();
+                    $(detailMatches).show();
+                } else {
+                    $detailRows.show();
+                }
+            } else {
+                $subtitleRow.hide();
+                $detailRows.hide();
+            }
+        });
+
+        // Show "No settings found" if needed
+        if (! anyMatch && query !== '') {
+            $('#noSettingsFound').removeClass('d-none');
+        } else {
+            $('#noSettingsFound').addClass('d-none');
+        }
+    });
 }
 
 function applySearchPageHandlers(routeParams) {
