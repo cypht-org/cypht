@@ -1223,7 +1223,7 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $default_reject_message = $reject_messages[$mailbox['id']];
         }
 
-        $default_behaviour_html = '<div class="col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="' . $mailbox['id'] . '">'
+        $default_behaviour_html = '<div class="col-xxl-12 col-xl-9 mb-4"><div class="input-group"><span class="input-group-text">Default Behaviour:</span> <select class="select_default_behaviour form-select " imap_account="' . $mailbox['id'] . '">'
             . '<option value="Discard"' . ($default_behaviour == 'Discard' ? ' selected' : '') . '>Discard</option>'
             . '<option value="Reject"' . ($default_behaviour == 'Reject' ? ' selected' : '') . '>' . $this->trans('Reject') . '</option>'
             . '<option value="Move" ' . ($default_behaviour == 'Move' ? ' selected' : '') . '>' . $this->trans('Move To Blocked Folder') . '</option></select>';
