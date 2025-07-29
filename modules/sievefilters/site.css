@@ -345,6 +345,26 @@ table.filter_actions_modal_table th {
     text-transform: uppercase;
 }
 
+.header_links #dropdownMenuBlockSender, .header_links #unblock_sender {
+  padding: 0;
+  border: unset;
+  font-variant: inherit;
+  text-transform: inherit;
+  font-size: inherit;
+  vertical-align: baseline;
+}
+
+.header_links #dropdownMenuBlockSender:hover, .header_links #unblock_sender:hover {
+  background-color: inherit;
+  color: inherit;
+}
+
+.header_links .block_sender_link:first-child:active {
+    color: brown;
+    background-color: transparent;
+    border-color: var(--bs-btn-active-border-color);
+}
+
 .mobile table.filter_actions_modal_table {
     border: 0;
 }

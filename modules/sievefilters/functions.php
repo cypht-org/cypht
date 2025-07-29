@@ -411,7 +411,7 @@ if (!hm_exists('block_filter')) {
 
 if (!hm_exists('block_filter_dropdown')) {
     function block_filter_dropdown ($mod, $mailbox_id = null, $with_scope = true, $submit_id = 'block_sender', $submit_title = 'Block', $increment = "") {
-        $ret = '<div class="dropdown-menu p-3" id="dropdownMenuBlockSender' .$increment. '">'
+        $ret = '<div class="dropdown-menu p-3" aria-labelledby="dropdownMenuBlockSender' .$increment. '">'
             .'<form id="block_sender_form' .$increment. '" >';
         if ($with_scope) {
             $ret .= '<div class="mb-2">'
