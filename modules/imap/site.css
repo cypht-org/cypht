@@ -69,6 +69,7 @@
   min-height: 600px;
   background-color: #fff;
   height: 100%;
+  /* max-width: 95% !important; */
 }
 .msg_text_inner {
   min-height: 300px;
@@ -76,6 +77,13 @@
   width: 90%;
   padding: 30px;
   padding-left: 40px;
+}
+
+.mobile .msg_text_inner {
+  width: 100%;
+  padding: 15px;
+  font-family: inherit;
+  font-size: 100%;
 }
 /* .msg_headers { max-width: 100%; border-bottom: solid 1px #ddd; color: #777; padding: 0px; padding-bottom: 10px; padding-top: 10px; } */
 .imap_envelope {
@@ -97,6 +105,14 @@
   white-space: nowrap;
   padding-right: 13px;
 }
+
+.mobile .imap_envelope th,
+.mobile .msg_headers th {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 5px 10px;
+}
 .imap_envelope th {
   padding-left: 0px;
 }
@@ -106,6 +122,13 @@
   word-wrap: break-word;
   padding: 3px;
   padding-top: 5px;
+}
+
+.mobile .imap_envelope td,
+.mobile .msg_headers td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  padding: 5px 10px;
 }
 .imap_update a {
   color: var(--bs-primary);
@@ -171,6 +194,13 @@
 .header_subject th {
   font-size: 1.3em;
   padding-top: 10px;
+}
+
+.mobile .header_subject th {
+  font-size: 1.1em;
+  padding: 10px;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .header_subject th div img {
   margin-right: 10px;

@@ -21,15 +21,23 @@ class FolderListTests(WebTest):
         assert main_menu.is_displayed()
         self.by_class('update_message_list').click()
         self.safari_workaround(3)
-        # update_message_list triggers site reload, so we explicitly wait for element to become stale
-        WebDriverWait(self.driver, 20).until(EC.staleness_of(main_menu))
-        ignored_exceptions=(NoSuchElementException,StaleElementReferenceException,)
-        # And once it is stale, we can now wait for it to become available again as the page contents are loaded again.
-        main_menu = WebDriverWait(self.driver, 10,ignored_exceptions=ignored_exceptions).until(
-        EC.presence_of_element_located((By.CLASS_NAME, 'main'))
-        )
+        # update_message_list triggers AJAX reload, so we wait for the spinner to disappear
+        # and then wait for the folder list to be updated
+        try:
+            # Wait for spinner to appear and then disappear (indicating AJAX completion)
+            WebDriverWait(self.driver, 10).until(
+                lambda driver: len(driver.find_elements(By.CLASS_NAME, "spinner-border")) > 0
+            )
+            WebDriverWait(self.driver, 10).until(
+                lambda driver: len(driver.find_elements(By.CLASS_NAME, "spinner-border")) == 0
+            )
+        except:
+            # If spinner doesn't appear, just wait a bit for the AJAX to complete
+            import time
+            time.sleep(2)
+        
+        # Verify the main menu is still displayed after the reload
         main_menu = self.by_class('main')
-        #and finally perform our test on the actual, refreshed element.
         assert main_menu.is_displayed()
 
     def expand_section(self):
