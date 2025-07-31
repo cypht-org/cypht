@@ -67,6 +67,21 @@ function applySmtpComposePageHandlers() {
                 showBtnSendAnywayDontWarnFuture = false;
             }
 
+            // Below we add emails to Trusted sender
+            if (hm_enable_collect_address_on_send) {
+                const parseEmails = (selector) => {
+                    return $(selector).val().split(',').map(e => e.trim()).filter(Boolean);
+                }
+
+                if (true) {
+                    const listMails = [
+                        ...parseEmails('#compose_to'),
+                        ...parseEmails('#compose_cc'),
+                        ...parseEmails('#compose_bcc')
+                    ];
+                    add_email_in_contact_trusted(listMails);
+                }
+            }
         }
 
         // If the user has disabled the warning, we should send the message
