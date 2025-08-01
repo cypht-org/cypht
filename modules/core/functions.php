@@ -437,7 +437,6 @@ function setup_base_page($name, $source=false, $use_layout=true) {
         add_output($name, 'login_start', false, $source);
         add_output($name, 'login', false, $source);
         add_output($name, 'login_end', false, $source);
-        add_output($name, 'loading_icon', true, $source);
         add_output($name, 'date', true, $source);
         add_output($name, 'msgs', false, $source);
         add_output($name, 'folder_list_start', true, $source);

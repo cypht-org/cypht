@@ -507,6 +507,7 @@ class Hm_Output_header_css extends Hm_Output_Module {
             if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
                 $res .= '<link href="'.WEB_ROOT.'third_party/contact-group.css" media="all" rel="stylesheet" type="text/css" />';
             }
+            $res .= '<link href="'.WEB_ROOT.'third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" />';
         }
         else {
             $res .= '<link href="'.WEB_ROOT.'site.css?v='.CACHE_ID.'" ';
@@ -661,18 +662,6 @@ class Hm_Output_js_data extends Hm_Output_Module {
     }
 }
 
-/**
- * Outputs a load icon
- * @subpackage core/output
- */
-class Hm_Output_loading_icon extends Hm_Output_Module {
-    /**
-     * Sort of ugly loading icon animated with js/css
-     */
-    protected function output() {
-        return '<div class="loading_icon"></div>';
-    }
-}
 
 /**
  * Start the main form on the settings page
@@ -1892,7 +1881,9 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
                 $header_flds[] = '<th></th>';
             }
         }
-        $res = '<div class="p-3"><table class="message_table table">';
+        $res = '<div class="p-3">';
+        $res .= '<div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        $res .= '<table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
                 $res .= '<colgroup>'.implode('', $col_flds).'</colgroup>';

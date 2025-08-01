@@ -8,6 +8,7 @@ define('JS_LIBS', [
     'jquery-are-you-sure' => 'third_party/jquery.are-you-sure.js',
     'sortable' => 'third_party/sortable.min.js',
     'kindeditor' => 'third_party/kindeditor/kindeditor-all-min.js',
+    'nprogress' => 'third_party/nprogress.js',
 ]);
 
 function get_js_libs($exclude_deps = []) {

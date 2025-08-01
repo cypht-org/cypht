@@ -17,7 +17,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test = new Output_Test('header_css', 'core');
         $test->handler_response = array('router_module_list' => array('core'));
         $res = $test->run();
-        $this->assertEquals(array('<link href="modules/themes/assets/default/css/default.css?v=asdf" media="all" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
+        $this->assertEquals(array('<link href="modules/themes/assets/default/css/default.css?v=asdf" media="all" rel="stylesheet" type="text/css" /><link href="vendor/twbs/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet" type="text/css" /><link href="modules/core/site.css" media="all" rel="stylesheet" type="text/css" /><link href="third_party/nprogress.css" media="all" rel="stylesheet" type="text/css" /><style type="text/css">@font-face {font-family:"Behdad";src:url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff2") format("woff2"),url("modules/core/assets/fonts/Behdad/Behdad-Regular.woff") format("woff");</style>'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
@@ -29,7 +29,7 @@ class Hm_Test_Core_Output_Modules_Debug extends TestCase {
         $test->handler_response = array('encrypt_ajax_requests' => true, 'router_module_list' => $given_router_module_list);
         $res = $test->run();
         $dependant_scripts = array('vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js');
-        $third_party_scripts = array('cash.min.js', 'resumable.min.js', 'ays-beforeunload-shim.js', 'jquery.are-you-sure.js', 'sortable.min.js', 'kindeditor/kindeditor-all-min.js', 'forge.min.js');
+        $third_party_scripts = array('cash.min.js', 'resumable.min.js', 'ays-beforeunload-shim.js', 'jquery.are-you-sure.js', 'sortable.min.js', 'kindeditor/kindeditor-all-min.js', 'nprogress.js', 'forge.min.js');
         $expected_scripts = array_merge($dependant_scripts, array_map(function($script) { return 'third_party/'.$script; }, $third_party_scripts));
         
         // The navigation utils and core's site.js should be included before any other module

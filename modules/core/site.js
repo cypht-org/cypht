@@ -99,19 +99,12 @@ var Hm_Ajax = {
         if (Hm_Ajax.icon_loading_id !== false) {
             return;
         }
-        var hm_loading_pos = $('.loading_icon').width()/40;
-        $('.loading_icon').show();
-        function move_background_image() {
-            hm_loading_pos = hm_loading_pos + 50;
-            $('.loading_icon').css('background-position', hm_loading_pos+'px 0');
-            Hm_Ajax.icon_loading_id = setTimeout(move_background_image, 100);
-        }
-        move_background_image();
+        NProgress.start()
     },
 
     stop_loading_icon : function(loading_id) {
         clearTimeout(loading_id);
-        $('.loading_icon').hide();
+        NProgress.done();
         Hm_Ajax.icon_loading_id = false;
     },
 
