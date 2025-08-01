@@ -226,6 +226,7 @@ function get_module_assignments($settings) {
                 $css .= file_get_contents(sprintf("third_party/contact-group.css", 'third_party'));
             }
         }
+        $css .= file_get_contents(sprintf("third_party/nprogress.css", 'third_party'));
     }
     return array($js, $css, $filters, $assets);
 }
