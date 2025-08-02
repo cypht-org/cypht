@@ -53,7 +53,14 @@ function format_msg_html($str, $images=false) {
  */
 if (!hm_exists('sanitize_email_html')) {
 function sanitize_email_html($html) {
-    $html = preg_replace('/<([^>]+)style\s*=\s*["\'][^"\']*background-image\s*:\s*url\((["\']?)https?:\/\/.*?\2\)[^"\']*["\']/i', '<$1', $html);
+    $html = preg_replace_callback(
+        '/<([^>]+)\s*style\s*=\s*(["\'])(.*?)\2/i',
+        function($matches) {
+            $content = preg_replace('/background-image\s*:\s*url\([^)]*\)\s*;?\s*/i', '', $matches[3]);
+            return '<' . $matches[1] . ' style=' . $matches[2] . $content . $matches[2];
+        },
+        $html
+    );
 
     return $html;
 }}
