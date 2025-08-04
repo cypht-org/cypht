@@ -2312,7 +2312,8 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         $hasJmapActivated = in_array('jmap', $this->get('router_module_list'), true);
 
         if($hasImapActivated){
-            $imap_servers_count = count(array_filter($this->get('imap_servers', array()), function($v) { return !array_key_exists('type', $v) || $v['type'] == 'imap'; }));
+            $servers = array_filter($this->get('imap_servers', array()), fn($s) => ($s['type'] ?? null) !== 'ews');
+            $imap_servers_count = count($servers);
             $accordionTitle .= 'IMAP';
             $configuredText .=  '<span class="imap_server_count"> ' . $imap_servers_count .'</span> IMAP';
             $hasEssentialModuleActivated = true;
@@ -2331,7 +2332,8 @@ class Hm_Output_server_config_stepper extends Hm_Output_Module {
         }
 
         if($hasSmtpActivated){
-            $smtp_servers_count = count($this->get('smtp_servers', array()));
+            $servers = array_filter($this->get('smtp_servers', array()), fn($s) => ($s['type'] ?? null) !== 'ews');
+            $smtp_servers_count = count($servers);
             if($accordionTitle != ''){
                 $accordionTitle .= ' - ';
                 $configuredText .= ' / ';
