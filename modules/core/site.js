@@ -2074,6 +2074,18 @@ function handleCreateProfileCheckboxChange(checkbox) {
     }
 }
 
+$('#profile_quickly_create').on('change', function() {
+    if(this.checked) {
+        $('.form-check-create-profile').hide();
+        $('.form-check-create-profile input').removeAttr("required");
+        $("#profile_quickly_create_value").val('yes');
+    }else{
+        $('.form-check-create-profile').show();
+        $('.form-check-create-profile input').attr("required", true);
+        $("#profile_quickly_create_value").val('no');
+    }
+});
+
 function handleSieveStatusChange (checkbox) {
     if(checkbox.checked) {
         $('#srv_setup_stepper_imap_sieve_host_bloc').show();
