@@ -1056,6 +1056,34 @@ class Hm_Output_flagged_source_max_setting extends Hm_Output_Module {
 }
 
 /**
+ * Option for the "allow search in all flagged folders" setting
+ * This setting allows searching flagged messages in all folders, not just the INBOX one.
+ * @subpackage core/output
+ */
+class Hm_Output_allow_search_all_flagged_folder_setting extends Hm_Output_Module {
+    /**
+     * Processed by Hm_Handler_process_allow_search_all_flagged_folder_setting
+     */
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        if (array_key_exists('allow_search_all_flagged_folder', $settings) && $settings['allow_search_all_flagged_folder']) {
+            $checked = ' checked="checked"';
+            if($settings['allow_search_all_flagged_folder'] !== DEFAULT_FLAGGED_SEARCH_IN_ALL_FOLDERS) {
+                $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
+            }
+        }
+        else {
+            $checked = '';
+            $reset='';
+        }
+        return '<tr class="flagged_setting"><td><label class="form-check-label" for="allow_search_all_flagged_folder">'.
+            $this->trans('Allow searching flagged in all folders').'</label></td>'.
+            '<td><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="allow_search_all_flagged_folder" name="allow_search_all_flagged_folder" data-default-value="'.(DEFAULT_FLAGGED_SEARCH_IN_ALL_FOLDERS ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
+    }
+}
+
+/**
  * Option for the "received since" date range for the Flagged page
  * @subpackage core/output
  */
