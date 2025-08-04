@@ -122,7 +122,7 @@ function message_list_meta($input, $output_mod) {
     $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('%d items per source'), $limit);
 
-    return '<div class="list_meta d-flex align-items-center fs-6">'.
+    return '<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">'.
         $date.
         '<b> :</b>'.
         '<span class="src_count"></span> '.$max.
@@ -145,7 +145,7 @@ function combined_sort_dialog($mod) {
         'subject' => $mod->trans('Subject')
     ];
 
-    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm">';
+    $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm ms-2">';
     foreach ($sorts as $name => $val) {
         $res .= '<option value="'.$name.'"'.($mod->get('sort') == $name || $mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
         $res .= '<option value="-'.$name.'"'.($mod->get('sort') == '-'.$name || $mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
@@ -494,7 +494,7 @@ function message_since_dropdown($since, $name, $output_mod, $original_default_va
  */
 if (!hm_exists('list_sources')) {
 function list_sources($sources, $output_mod) {
-    $res = '<div class="list_sources">';
+    $res = '<div class="list_sources w-100 mt-2">';
     $res .= '<div class="src_title fs-5 mb-2">'.$output_mod->html_safe('Sources').'</div>';
     foreach ($sources as $src) {
         if (array_key_exists('group', $src) && $src['group'] == 'background') {
