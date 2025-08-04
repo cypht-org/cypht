@@ -70,22 +70,24 @@ function applySmtpComposePageHandlers() {
             // Below we add emails to Trusted sender
             if (hm_enable_collect_address_on_send) {
                 const parseEmails = (selector) => {
-                    return $(selector).val().split(',').map(e => e.trim()).filter(Boolean);
-                }
+                    return $(selector).val().split(/[,;]+/).map(e => e.trim()).filter(Boolean);
+                };
 
                 if (true) {
-                    const listMails = [
-                        ...parseEmails('#compose_to'),
-                        ...parseEmails('#compose_cc'),
-                        ...parseEmails('#compose_bcc')
-                    ];
+                    const emailSet = new Set();
+                    ['#compose_to', '#compose_cc', '#compose_bcc'].forEach(selector => {
+                        parseEmails(selector).forEach(email => {
+                            emailSet.add(email);
+                        });
+                    });
+                    const listMails = [...emailSet].join(';');
                     add_email_in_contact_trusted(listMails);
                 }
             }
         }
 
-        // If the user has disabled the warning, we should send the message
-        if (Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
+        // If the user has disabled the warning or has enabled it in general settings, we should send the message
+        if (hm_enable_collect_address_on_send || Boolean(Hm_Utils.get_from_local_storage(dontWanValueInStorage))) {
             handleSendAnyway();
         }
         // Otherwise, we should show the modal if we have a headline

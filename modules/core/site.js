@@ -1858,15 +1858,7 @@ var hasLeadingOrTrailingSpaces = function(str) {
 
 var add_email_in_contact_trusted = function(list_email) {
     if (list_email) {
-      Hm_Ajax.request(
-        [
-          { name: 'hm_ajax_hook', value: 'ajax_add_contact' },
-          { name: 'email_address', value: list_email.join(',') },
-        ],
-        function (res) {
-          window.location.reload();
-        }
-      );
+      Hm_Ajax.request([{ name: 'hm_ajax_hook', value: 'ajax_add_contact' },{ name: 'email_address', value: list_email }]);
     }
 };
 

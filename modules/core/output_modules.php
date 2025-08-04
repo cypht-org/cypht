@@ -617,7 +617,7 @@ class Hm_Output_js_data extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
         $enable_snooze = $settings['enable_snooze'] ?? DEFAULT_ENABLE_SNOOZE;
-        $enable_collect_address_on_send = $settings['enable_collect_address_on_send'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
+        $enable_collect_address_on_send = $settings['enable_collect_address_on_send_setting'] ?? DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND;
         $res = '<script type="text/javascript" id="data-store">'.
             'var globals = {};'.
             'var hm_is_logged = function () { return '.($this->get('is_logged') ? '1' : '0').'; };'.

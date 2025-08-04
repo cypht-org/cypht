@@ -79,7 +79,7 @@ return array(
         'contact_auto_collect' => FILTER_VALIDATE_BOOLEAN,
         'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT,
         'enable_collect_address_on_send' => FILTER_VALIDATE_INT,
-        'email_address' => FILTER_SANITIZE_EMAIL
+        'email_address' => FILTER_UNSAFE_RAW
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,

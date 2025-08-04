@@ -450,40 +450,67 @@ class Hm_Handler_save_contact extends Hm_Handler_Module
         if ($success) {
             $contacts = $this->get('contact_store');
             $contact_list = $contacts->getAll();
-            $existingEmails = array_map(function($contact){
-                return $contact->value('email_address');
-            },$contact_list);
+            $emailKeyMap = [];
+            foreach ($contact_list as $key => $contact) {
+                $email = strtolower($contact->value('email_address'));
+                if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    $emailKeyMap[$email] = $key;
+                }
+            }
+            $existingEmails = array_keys($emailKeyMap);
 
-            $list_mails = array_unique(explode(",", $form['email_address']));
-
+            $list_mails = array_unique(
+                preg_split('/[;,]+/', $form['email_address'], -1, PREG_SPLIT_NO_EMPTY)
+            );
+            $addedCount = 0;
+            $updatedCount = 0;
             foreach ($list_mails as $addr) {
                 $addresses = process_address_fld($addr);
                 $newEmails = array_column($addresses, 'email');
-                if (!empty($newEmails)) {
-                    $newContacts = array_filter($newEmails, function ($email) use ($existingEmails) {
-                        return !in_array($email, $existingEmails);
-                    });
-                    $existingContacts = array_filter($existingEmails, function ($email) use ($newEmails) {
-                        return in_array($email, $newEmails);
-                    });
-                    if (!empty($newContacts)) {
-                        $newContacts = array_map(function ($email) {
-                            return ['source' => 'local', 'email_address' => $email, 'display_name' => $email, 'group' => 'Trusted Senders'];
-                        }, $newContacts);
-                        $contacts->add_contact($newContacts[0]);
-                    }
-                    if (!empty($existingContacts)) {
-                        $existingContacts = array_map(function ($email) {
-                            return ['source' => 'local', 'email_address' => $email, 'group' => 'Trusted Senders'];
-                        }, $existingContacts);
-                        foreach ($existingContacts as $key => $contact) {
-                            $contacts->update_contact($key, $contact);
-                        }
-                    }
+                $validEmails = array_filter($newEmails, function($email) {
+                    return filter_var($email, FILTER_VALIDATE_EMAIL);
+                });
+                if (empty($validEmails)) {
+                    continue;
+                }
+
+                $newContacts = array_diff($validEmails, $existingEmails);
+                $existingContacts = array_intersect($validEmails, $existingEmails);
+                // add new contacts
+                foreach ($newContacts as $email) {
+                    $contacts->add_contact([
+                        'source' => 'local',
+                        'email_address' => $email,
+                        'display_name' => $email,
+                        'group' => 'Trusted Senders'
+                    ]);
+                    $addedCount++;
+                }
+
+                // Update existing contacts
+                foreach ($existingContacts as $email) {
+                    $contactKey = $emailKeyMap[$email];
+                    $contacts->update_contact($contactKey, [
+                        'source' => 'local',
+                        'email_address' => $email,
+                        'group' => 'Trusted Senders'
+                    ]);
+                    $updatedCount++;
                 }
             }
-            $this->session->record_unsaved('Contacts added to  Trusted Contacts list');
-            Hm_Msgs::add('Contacts added to  Trusted Contacts list');
+            if ($addedCount > 0 || $updatedCount > 0) {
+                $msgParts = [];
+                if ($addedCount > 0) {
+                    $msgParts[] = "$addedCount new contact" . ($addedCount > 1 ? "s" : "") . " added";
+                }
+                if ($updatedCount > 0) {
+                    $msgParts[] = "$updatedCount contact" . ($updatedCount > 1 ? "s" : "") . " updated";
+                }
+                $finalMsg = implode(', ', $msgParts);
+
+                $this->session->record_unsaved($finalMsg);
+                Hm_Msgs::add($finalMsg);
+            }
         }
 
     }
