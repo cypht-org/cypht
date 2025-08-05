@@ -187,3 +187,7 @@
 .mobile .add_contact_row {
     display: none;
 }
+
+.mobile .add_contact_row a {
+    display: none;
+}

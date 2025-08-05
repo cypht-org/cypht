@@ -1253,25 +1253,27 @@ function format_imap_envelope($env, $mod) {
  */
 if (!hm_exists('format_list_headers')) {
 function format_list_headers($mod) {
-    $res = '<tr><th>'.$mod->trans('List').'</th><td>';
+    $res = '<div class="row g-0 py-1 small_header">';
+    $res .= '<div class="col-md-2 col-12"><span class="text-muted">'.$mod->trans('List').'</span></div>';
+    $res .= '<div class="col-md-10 col-12">';
     $sections = array();
     foreach ($mod->get('list_headers') as $name => $vals) {
         if (count($vals['email']) > 0 || count($vals['links']) > 0) {
             $sources = array();
-            $section = ' '.$mod->html_safe($name).': ';
+            $section = '<div><p class="mb-1">'.$mod->html_safe($name).':</p>';
             foreach ($vals['email'] as $v) {
                 $sources[] = '<a href="?page=compose&compose_to='.urlencode($mod->html_safe($v)).
                     '&compose_from='.$mod->get('msg_headers')['Delivered-To'].
-                    '">'.$mod->trans('email').'</a>';
+                    '" class="text-decoration-none">'.$mod->trans('email').'</a>';
             }
             foreach ($vals['links'] as $v) {
-                $sources[] = '<a href="'.$mod->html_safe($v).'">'.$mod->trans('link').'</a>';
+                $sources[] = '<a href="'.$mod->html_safe($v).'" class="text-decoration-none">'.$mod->trans('link').'</a>';
             }
-            $section .= implode(', ', $sources);
+            $section .= implode(', ', $sources).'</div>';
             $sections[] = $section;
         }
     }
-    $res .= implode(' | ', $sections).'</td></tr>';
+    $res .= implode(' | ', $sections).'</div></div>';
     return $res;
 }}
 
