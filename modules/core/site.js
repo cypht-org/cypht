@@ -312,7 +312,7 @@ var Hm_Ajax_Request = function() { return {
  * Show a modal dialog with a title, content and buttons.
  */
 function Hm_Modal(options) {
-    var defaults = {
+    const defaults = {
         title: 'Cypht',
         size: '',
         btnSize: '',
@@ -320,16 +320,13 @@ function Hm_Modal(options) {
     };
 
     this.opts = { ...defaults, ...options };
-    this.modal = $(`#${this.opts.modalId}`);
+    this.customButtons = [];
+    this.init();
+}
 
-    this.init = function () {
-        if (this.modal.length) {
-            this.modalContent = this.modal.find('.modal-body');
-            this.modalTitle = this.modal.find('.modal-title');
-            this.modalFooter = this.modal.find('.modal-footer');
-            this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
-            return;
-        }
+Hm_Modal.prototype = {
+    init: function() {
+        this.destroy();
 
         const modal = `
             <div id="${this.opts.modalId}" class="modal fade modal-${this.opts.size}" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
@@ -339,59 +336,83 @@ function Hm_Modal(options) {
                             <h2 class="modal-title">${this.opts.title}</h2>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
-
                         <div class="modal-body"></div>
-
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary${this.opts.btnSize? ' btn-' + this.opts.btnSize: ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
+                            <button type="button" class="btn btn-secondary${this.opts.btnSize ? ' btn-' + this.opts.btnSize : ''}" data-bs-dismiss="modal">${hm_trans('Close')}</button>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-        $('body').append(modal);
 
+        $('body').append(modal);
+        
         this.modal = $(`#${this.opts.modalId}`);
         this.modalContent = this.modal.find('.modal-body');
         this.modalTitle = this.modal.find('.modal-title');
         this.modalFooter = this.modal.find('.modal-footer');
+        this.bsModal = new bootstrap.Modal(this.modal[0]);
 
-        this.bsModal = new bootstrap.Modal(document.getElementById(this.opts.modalId));
-    };
+        this.recreateButtons();
+    },
 
-    this.open = () => {
-        this.bsModal = bootstrap.Modal.getOrCreateInstance(this.modal[0]);
-        this.bsModal.show();
-    };
-
-    this.hide = () => {
-        this.bsModal.hide();
-    };
-
-    this.addFooterBtn = (label, classes, callback) => {
-        const btn = document.createElement('button');
-        btn.innerHTML = label;
-
-        btn.classList.add('btn', ...classes.split(' '));
-        if (this.opts.btnSize) {
-            btn.classList.add(`btn-${this.opts.btnSize}`);
+    destroy: function() {
+        if (this.modal && this.modal.length) {
+            this.customButtons.forEach(btn => {
+                btn.element.off('click', btn.handler);
+            });
+            
+            if (this.bsModal) {
+                this.bsModal.dispose();
+            }
+            this.modal.remove();
         }
+        this.customButtons = [];
+    },
 
-        btn.addEventListener('click', callback);
+    recreateButtons: function() {
+        this.modalFooter.children().not('.btn-secondary').remove();
+        
+        this.customButtons.forEach(btn => {
+            this.createButton(btn.label, btn.classes, btn.handler);
+        });
+    },
 
+    createButton: function(label, classes, handler) {
+        const btn = $(`<button type="button" class="btn ${classes} ${this.opts.btnSize ? 'btn-' + this.opts.btnSize : ''}">${label}</button>`);
+        btn.on('click', handler);
         this.modalFooter.append(btn);
-    };
+        return btn;
+    },
 
-    this.setContent = (content) => {
+    addFooterBtn: function(label, classes, callback) {
+        this.customButtons.push({
+            label: label,
+            classes: classes,
+            handler: callback
+        });
+        this.createButton(label, classes, callback);
+    },
+
+    open: function() {
+        if (!this.bsModal) {
+            this.bsModal = new bootstrap.Modal(this.modal[0]);
+        }
+        this.bsModal.show();
+    },
+
+    hide: function() {
+        this.bsModal?.hide();
+    },
+
+    setContent: function(content) {
         this.modalContent.html(content);
-    };
+    },
 
-    this.setTitle = (title) => {
+    setTitle: function(title) {
         this.modalTitle.html(title);
-    };
-
-    this.init();
-}
+    }
+};
 
 class Hm_Alert {
     constructor() {
