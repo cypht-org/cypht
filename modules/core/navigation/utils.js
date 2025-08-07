@@ -1,4 +1,4 @@
-function showRoutingToast(message = 'Redirecting...') {
+function showRoutingToast(message = 'Loading in progress...') {
     if (window.routingToast) hideRoutingToast();
     window.routingToast = showLoaderToast(message);
 }
