@@ -1465,6 +1465,7 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
                     $blocked_senders[] = $blocked_sender;
                 }
             }
+            $this->out('ajax_list_block_sieve', json_encode($blocked_senders));
         } catch (Exception $e) {
             Hm_Msgs::add("ERRSieve: {$e->getMessage()}");
             return;
