@@ -1258,7 +1258,7 @@ class Hm_Output_account_sieve_filters extends Hm_Output_Module {
         $result = get_mailbox_filters($mailbox, $this->get('site_config'), $this->get('user_config'));
         $num_filters = $result['count'];
         $res = '<div class="sievefilters_accounts_item">';
-        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer">' . $mailbox['name'];
+        $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 d-flex justify-content-between border-bottom cursor-pointer" data-num-filters="' . $num_filters . '">' . $mailbox['name'];
         $res .= '<span class="filters_count">' . sprintf($this->trans('%s filters'), $num_filters) . '</span></div>';
         $res .= '<div class="sievefilters_accounts filter_block p-3 d-none"><div class="filter_subblock">';
         $res .= '<button class="add_filter btn btn-primary" account="'.$mailbox['name'].'">Add Filter</button> <button  account="'.$mailbox['name'].'" class="add_script btn btn-light border">Add Script</button>';

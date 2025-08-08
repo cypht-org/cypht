@@ -555,8 +555,12 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
      *                                      MODAL EVENTS
      **************************************************************************************/
-    $(document).off('click').on('click', '.sievefilters_accounts_title', function() {
-        $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+    $(document).off('click', '.sievefilters_accounts_title').on('click', '.sievefilters_accounts_title', function() {
+        if (parseInt($(this).data("num-filters")) > 0) {
+            $(this).parent().find('.sievefilters_accounts').toggleClass('d-none');
+        } else {
+            alert(hm_trans("This action requires at least 1 sieve element."))
+        }
     });
 
     $(document).on('click', '.add_filter', function() {
