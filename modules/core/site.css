@@ -265,22 +265,21 @@ td {
 .placeholder {
   width: 100px !important;
 }
-.loading_icon {
-  background-position: 0px 0px;
-  background: transparent
-    url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAKCAYAAAD2Fg1xAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gkbBRUr8yq4rwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAACASURBVDjL7c/BCsQwCEXRm0STfm+/PjVVZ9XCrGc35MFDcSGccp5nrrVwd9ydiCAzeVJrpdZKaw0RQVVRVXrvjDE4juOdz/60946qIiKICK219x9AKYXMJDOJCCICd+e+b9ZamBlmxnVdb+eczDm/bmZG5U+yIRuyIRuyIRvySz7mT0d4m0OV2gAAAABJRU5ErkJggg==")
-    repeat-x top left;
-  background-size: cover;
-  opacity: 0.6;
-  text-align: center;
-  display: none;
-  position: fixed;
-  right: 0px;
-  top: 0px;
-  left: 0px;
-  height: 6px;
-  z-index: 1001;
+.cypht-spinner {
+    position: absolute;
+    inset-inline-start: 55%;
+    top: 50%;
+    --tw-translate-x: -50%;
+    display: none;
 }
+
+/* On small screens we don't have left menu, so there add 5% to inset-inline-start */
+@media screen and (max-width: 600px) {
+  .cypht-spinner {
+    inset-inline-start: 50%;
+  }
+}
+
 .logout {
   margin: 2px;
   margin-left: 5px;

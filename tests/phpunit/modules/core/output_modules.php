@@ -437,15 +437,6 @@ class Hm_Test_Core_Output_Modules extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_loading_icon() {
-        $test = new Output_Test('loading_icon', 'core');
-        $res = $test->run();
-        $this->assertEquals(array('<div class="loading_icon"></div>'), $res->output_response);
-    }
-    /**
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
     public function test_start_settings_form() {
         $test = new Output_Test('start_settings_form', 'core');
         $res = $test->run();
@@ -1056,10 +1047,10 @@ class Hm_Test_Core_Output_Modules extends TestCase {
         $test = new Output_Test('message_list_start', 'core');
         $test->handler_response = array('message_list_fields' => array('foo', 'bar'));
         $res = $test->run();
-        $this->assertEquals(array('<div class="p-3"><table class="message_table table"><colgroup><col class="f"><col class="b"></colgroup><thead><tr><th class="o">o</th><th class="a">r</th></tr></thead><tbody class="message_table_body">'), $res->output_response);
+        $this->assertEquals(array('<div class="p-3"><div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div><table class="message_table table"><colgroup><col class="f"><col class="b"></colgroup><thead><tr><th class="o">o</th><th class="a">r</th></tr></thead><tbody class="message_table_body">'), $res->output_response);
         $test->handler_response = array('message_list_fields' => array(array(false, true, false)));
         $res = $test->run();
-        $this->assertEquals(array('<div class="p-3"><table class="message_table table"><thead><tr><th></th></tr></thead><tbody class="message_table_body">'), $res->output_response);
+        $this->assertEquals(array('<div class="p-3"><div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div><table class="message_table table"><thead><tr><th></th></tr></thead><tbody class="message_table_body">'), $res->output_response);
     }
     /**
      * @preserveGlobalState disabled
