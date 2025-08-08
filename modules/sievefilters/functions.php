@@ -139,6 +139,12 @@ if (!hm_exists('get_mailbox_filters')) {
         foreach ($scripts_sorted as $script_name => $sc) {
             $exp_name = explode('-', $script_name);
             $parsed_name = str_replace('_', ' ', $exp_name[0]);
+
+            if (count($exp_name) > 3) {
+                $name_parts = array_slice($exp_name, 0, count($exp_name) - 2);
+                $parsed_name = str_replace('_', ' ', implode('-', $name_parts));
+            }
+
             $display_name = str_replace('_', ' ', implode('-', array_slice($exp_name, 0, count($exp_name) - 2)));
             $checked = ' checked';
             if (preg_match('/^s(en|dis)abled/', $display_name)) {
