@@ -12,7 +12,7 @@ RUN set -e \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install gd pdo pdo_mysql mysqli \
     && curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
-    xdebug redis gnupg memcached \
+    xdebug redis gnupg memcached ldap \
     && composer self-update --2 \
     && apk del .build-deps \
     && ln -sf /dev/stdout /var/log/nginx/access.log \

@@ -98,6 +98,11 @@ return [
     'ldap_auth_base_dn' => env('LDAP_AUTH_BASE_DN', 'example,dc=com'),
 
     /*
+    | Attribute to use as the unique identifier for users
+    */
+    'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
+
+    /*
     | -------------------
     | IMAP Authentication
     | -------------------
