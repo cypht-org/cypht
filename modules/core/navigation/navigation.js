@@ -37,7 +37,7 @@ window.addEventListener('load', function() {
 });
 
 
-$(document).on('click', 'a', function(event) {
+$(document).on('click', '.cypht-layout a', function(event) {
     if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
