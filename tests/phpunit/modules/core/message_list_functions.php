@@ -132,11 +132,7 @@ class Hm_Test_Core_Message_List_Functions extends TestCase {
      * @runInSeparateProcess
      */
     public function test_list_controls() {
-        $this->assertEquals('<div class="list_controls no_mobile d-flex gap-3 align-items-center">foobazbar</div>
-    <div class="list_controls on_mobile">
-        <i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>
-        <div id="list_controls_menu" classs="list_controls_menu">foobazbar</div>
-    </div>', list_controls('foo', 'bar', 'baz'));
+        $this->assertEquals('<div class="list_controls no_mobile d-flex gap-3 align-items-center">foobazbar</div><div class="list_controls on_mobile"><i class="bi bi-filter-circle" onclick="listControlsMenu()"></i><div id="list_controls_menu" class="list_controls_menu">foobazbar</div></div>', list_controls('foo', 'bar', 'baz'));
     }
     /**
      * @preserveGlobalState disabled

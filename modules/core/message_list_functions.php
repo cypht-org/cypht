@@ -574,13 +574,17 @@ function update_search_label_field($search_term, $output_mod) {
  * @return string
  */
 if (!hm_exists('list_controls')) {
-function list_controls($refresh_link, $config_link, $source_link=false, $search_field='') {
-    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">'.
-        $refresh_link.$source_link.$config_link.$search_field.'</div>
-    <div class="list_controls on_mobile">'.$search_field.'
-        <i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>
-        <div id="list_controls_menu" classs="list_controls_menu">'.$refresh_link.$source_link.$config_link.'</div>
-    </div>';
+function list_controls($refresh_link, $config_link, $source_link = false, $search_field = '') {
+    return '<div class="list_controls no_mobile d-flex gap-3 align-items-center">' .
+                $refresh_link . $source_link . $config_link . $search_field .
+           '</div>' .
+           '<div class="list_controls on_mobile">' .
+                $search_field .
+                '<i class="bi bi-filter-circle" onclick="listControlsMenu()"></i>' .
+                '<div id="list_controls_menu" class="list_controls_menu">' .
+                    $refresh_link . $source_link . $config_link .
+                '</div>' .
+           '</div>';
 }}
 
 /**
