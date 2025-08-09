@@ -161,6 +161,7 @@ return array(
         'script_details' => array(FILTER_UNSAFE_RAW, FILTER_REQUIRE_ARRAY),
         'ajax_list_block_sieve' => array(FILTER_UNSAFE_RAW, false),
         'mailbox' => array(FILTER_UNSAFE_RAW, false),
+        'reload_page' => array(FILTER_VALIDATE_BOOL, false)
     ),
     'allowed_get' => array(),
     'allowed_post' => array(
