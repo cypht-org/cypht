@@ -7,12 +7,10 @@
 
 if (!defined('DEBUG_MODE')) { die(); }
 
-use PhpSieveManager\ManageSieve\Client;
-use PhpSieveManager\Exceptions\SocketException;
-
 require_once APP_PATH.'modules/imap/functions.php';
 require_once APP_PATH.'modules/imap/hm-imap.php';
 require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+require_once APP_PATH.'modules/sievefilters/hm-sieve-pool.php';
 require_once APP_PATH.'modules/sievefilters/functions.php';
 
 /**
@@ -1237,10 +1235,15 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="' . $default_reject_message . '" placeholder="' . $this->trans('Reject message') . '" />';
         }
         $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">' . $this->trans('Submit') . '</button></div></div>';
-
-        list($scripts, $current_script, $client) = get_all_scripts($this->get('site_config'), $this->get('user_config'), $mailbox, true);
-        $blocked_senders = get_blocked_senders_array($scripts, $current_script);
-        // exit(var_dump($current_script));
+        $client  = SieveConnectionPool::get($mailbox['id']);
+        // $current_script = SieveConnectionPool::getScript($mailbox['id'], 'blocked_senders');
+        $current_script = SieveConnectionPool::getScript($mailbox['id'], 'blocked_senders');
+        // $client->getScript('blocked_senders');
+        $scripts = $client->listScripts();
+        exit(var_dump($scripts, $current_script));//SieveConnectionPool::get($imapServer);
+        list($scripts, $current_script) = get_all_scripts($mailbox['id'], true);
+        $blocked_senders = get_blocked_senders_array($current_script, $scripts);
+        exit(var_dump($blocked_senders));
         $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
         $res = '<div class="sievefilters_accounts_item">';
         $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between" data-num-blocked="' . $num_blocked . '">' . $mailbox['name'];
@@ -1527,6 +1530,29 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
             return;
         }
         $accounts = $this->get('imap_accounts');
+        //filter out the accounts that are not sieve enabled by sieve_config_host
+        $sieve_accounts = array_filter($accounts, function ($account) {
+            return !empty($account['sieve_config_host']);
+        });
+        $sieve_accounts_configs = [];
+        foreach ($sieve_accounts as $key => $item) {
+            $parts = explode(':', $item['sieve_config_host']);
+            $sieveHost = isset($parts[0]) ? $parts[0] : '';
+            $sievePort = isset($parts[1]) ? (int) $parts[1] : 4190;
+            $sieve_accounts_configs[$key] = [
+                'host' => $sieveHost,
+                'port' => $sievePort,
+                'username' => $item['user'],
+                'password' => $item['pass'],
+                'secure' => $item['sieve_tls'],
+                'authType' => 'PLAIN',
+                'id' => $key
+            ];
+        }
+        // set the sieve connection pool with the sieve accounts configs
+        if (!empty($sieve_accounts_configs)) {
+            SieveConnectionPool::setConfig($sieve_accounts_configs);
+        }
         if (isset($accounts[$form['imap_server_id']])) {
             $this->out('mailbox', $accounts[$form['imap_server_id']]);
             $this->session->close_early();
