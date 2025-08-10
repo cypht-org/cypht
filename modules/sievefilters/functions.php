@@ -451,14 +451,17 @@ if (!hm_exists('block_filter_dropdown')) {
 if (!hm_exists('get_blocked_senders_array')) {
     function get_blocked_senders_array($current_script, $scripts)
     {
+        exit(var_dump($scripts, $current_script));
         try {
             if (!is_array($scripts) || array_search('blocked_senders', $scripts, true) === false) {
                 return [];
             }
             $blocked_senders = [];
             if ($current_script != '') {
-                $blocked_list = prepare_sieve_script ($current_script);
-                // exit(var_dump($blocked_list));
+                // $blocked_list = prepare_sieve_script ($current_script);
+                $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
+                $blocked_list = json_decode(base64_decode($base64_obj));
+                exit(var_dump($scripts, $current_script, $blocked_list));
                 if (!$blocked_list) {
                     return [];
                 }
@@ -577,9 +580,9 @@ if (!hm_exists('initialize_sieve_client_factory')) {
  * It returns an array with the list of scripts and the current script content.
  */
 if (!hm_exists('get_all_scripts')) {
-    function get_all_scripts($site_config, $user_config, $imapServer, $load_current = true, $return_only = null) {
+    function get_all_scripts($imapServer, $load_current = true, $return_only = null) {
         try {
-            $client = initialize_sieve_client_factory($site_config, $user_config, $imapServer);
+            $client  = SieveConnectionPool::get($imapServer);
             if(!is_null($client)){
                 $scripts = $client->listScripts();
                 if (!is_array($scripts) || array_search('blocked_senders', $scripts, true) === false) {
@@ -589,14 +592,10 @@ if (!hm_exists('get_all_scripts')) {
                 if($load_current) {
                     $current_script = $client->getScript('blocked_senders');
                 }
-
-                // $client->close();
-
                 if ($return_only === 'scripts') return $scripts;
                 if ($return_only === 'current_script') return $current_script;
-                if ($return_only === 'client') return $client;
 
-                return [$scripts, $current_script, $client];
+                return [$scripts, $current_script];
             }
             return null;
         } catch (Exception $e) {
