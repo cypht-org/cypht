@@ -1,15 +1,16 @@
-FROM php:8.1-fpm-bookworm
+FROM --platform=$BUILDPLATFORM php:8.1-fpm-bookworm
 
 WORKDIR /usr/local/share/cypht
 
-ENV DEBIAN_FRONTEND=noninteractive
-ENV COMPOSER_CACHE_DIR=/tmp/composer_cache
-ENV COMPOSER_HOME=/tmp/composer_home
+ENV DEBIAN_FRONTEND=noninteractive \
+    COMPOSER_CACHE_DIR=/tmp/composer_cache \
+    COMPOSER_HOME=/tmp/composer_home
 
 # Install system packages and PHP extensions
-RUN set -e \
+RUN --mount=type=cache,target=/var/cache/apt \
+    set -eux \
     && apt-get update \
-    && apt-get install -y \
+    && apt-get install -y --no-install-recommends \
         supervisor \
         nginx \
         sqlite3 \
@@ -21,8 +22,9 @@ RUN set -e \
         libpq-dev \
         unzip \
         ca-certificates \
-    && docker-php-ext-configure gd \
-    && docker-php-ext-install \
+        curl \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install -j$(nproc) \
         session \
         fileinfo \
         dom \
@@ -35,12 +37,10 @@ RUN set -e \
         mysqli \
         pgsql \
         soap \
-    && docker-php-ext-configure zip \
-    && docker-php-ext-install zip \
+        zip \
     && curl -sSL https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions -o - | sh -s \
         xdebug redis gnupg memcached \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean \
     && mkdir -p /var/log/php /var/log/supervisord \
     && ln -sf /dev/stdout /var/log/nginx/access.log \
     && ln -sf /dev/stderr /var/log/nginx/error.log \
