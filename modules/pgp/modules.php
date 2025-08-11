@@ -142,7 +142,7 @@ class Hm_Output_pgp_settings_start extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="public_title settings_subtitle p-3 border-bottom"><i class="bi bi-filetype-key me-3"></i> '.$this->trans('Public Keys');
+        $res = '<div class="public_title settings_subtitle p-3 border-bottom cursor-pointer"><i class="bi bi-filetype-key me-3"></i> '.$this->trans('Public Keys');
         $res .= '<span class="key_count">'.sprintf($this->trans('%s imported'), count($this->get('pgp_public_keys', array()))).'</span></div>';
         $res .= '<div class="public_keys pgp_block col-lg-7 col-xl-4">';
         $res .= '<form enctype="multipart/form-data" method="post" action="?page=pgp#public_keys" class="pgp_subblock col-lg-6"><div class="mb-2"><label class="form-label">'.$this->trans('Import a public key from a file').'</label><input required id="public_key" name="public_key" type="file" class="form-control"></div>';
@@ -173,7 +173,7 @@ class Hm_Output_pgp_settings_public_keys extends Hm_Output_Module {
  */
 class Hm_Output_pgp_settings_private_key extends Hm_Output_Module {
     protected function output() {
-        $res = '<div class="priv_title settings_subtitle p-3 border-bottom"><i class="bi bi-key-fill me-3"></i> '.$this->trans('Private Keys');
+        $res = '<div class="priv_title settings_subtitle p-3 border-bottom cursor-pointer"><i class="bi bi-key-fill me-3"></i> '.$this->trans('Private Keys');
         $res .= '<span class="private_key_count">'.sprintf($this->trans('%s imported'), 0).'</span></div>';
         $res .= '<div class="priv_keys pgp_block col-lg-7 col-xl-4"><div class="pgp_subblock mb-3">';
         $res .= $this->trans('Private keys never leave your browser, and are deleted when you logout');
