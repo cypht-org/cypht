@@ -278,13 +278,19 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
             save_main_script($client, $main_script, $scripts);
             $client->activateScript('main_script');
             $client->close();
+            $this->out('reload_page', true);
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return;
         }
     }
 }
-
+class Hm_Output_sieve_block_domain_output extends Hm_Output_Module {
+    public function output() {
+        $reload_page = $this->get('reload_page', false);
+        $this->out('reload_page', $reload_page);
+    }
+}
 
 /**
  * @subpackage sievefilters/handler

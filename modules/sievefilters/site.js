@@ -274,11 +274,13 @@ function blockListPageHandlers() {
         let elem = $(this);
         Hm_Ajax.request(
             [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_block_domain'},
-                {'name': 'imap_server_id', 'value': $(this).attr('data-mailbox_id')},
+                {'name': 'imap_server_id', 'value': $(this).attr('mailbox_id')},
                 {'name': 'sender', 'value': sender}
             ],
             function(res) {
-                window.location = window.location;
+                if (res && res.reload_page) {
+                    window.location = window.location;
+                }
             }
         );
     });
