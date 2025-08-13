@@ -52,7 +52,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 RUN printf "[xdebug] \n\
 zend_extension=xdebug.so \n\
 xdebug.mode=debug \n\
-xdebug.client_host=host.docker.internal" > /tmp/xdebug.ini
+xdebug.client_host=host.docker.internal" > /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN printf "post_max_size = 60M \n\
 upload_max_filesize = 50M \n\
@@ -64,7 +64,6 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 COPY docker/supervisord.conf /etc/supervisord.conf
-COPY docker/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # Application and config files
 COPY composer.* ./
