@@ -264,7 +264,7 @@ class Hm_SMTP {
     function connect() {
         $certfile = false;
         $certpass = false;
-        $result = 'An error occurred connecting to the SMTP server';
+        $result = "We couldn't connect to the email server (SMTP). Please check your internet connection or server settings, and try again.";
         $server = $this->server;
 
         if ($this->tls) {
@@ -283,7 +283,7 @@ class Hm_SMTP {
         else {
             $this->debug[] = 'Could not connect to the SMTP server';
             $this->debug[] = 'fsockopen errors #'.$errorno.'. '.$errorstr;
-            $result = 'Could not connect to the configured SMTP server';
+            $result = "Unable to connect to the email server. Please check your internet connection or server settings, and try again.";
         }
         $this->banner = $this->get_response();
         $command = 'EHLO '.$this->hostname;
@@ -295,7 +295,7 @@ class Hm_SMTP {
             $this->send_command($command);
             $response = $this->get_response();
             if ($this->compare_response($response, '220') != 0) {
-                $result = 'An error occurred during the STARTTLS command';
+                $result = "We couldn't secure the connection to the email server (STARTTLS). Please try again later.";
             }
             if(isset($certfile) && $certfile) {
                 stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
@@ -310,7 +310,7 @@ class Hm_SMTP {
             $this->capabilities($response);
         }
         if($this->compare_response($response,'250') != 0) {
-            $result = 'An error occurred during the EHLO command';
+            $result = "We couldn't complete the connection to the email server (EHLO command fail). Please try again.";
         }
         else {
             if($this->auth) {
@@ -352,7 +352,7 @@ class Hm_SMTP {
             if ($result) {
                 return 'Authentication successful';
             }
-            return 'Authentication failed';
+            return "Login to the email server failed. Please check your username and password";
         } else {
             switch ($mech) {
                 case 'external':
@@ -419,13 +419,13 @@ class Hm_SMTP {
             }
         }
         if (!isset($result)) {
-            $result = 'An error occurred authenticating to the SMTP server';
+            $result = "We couldn't log in to the email server. Please check your username and password.";
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
                 $this->state = 'authed';
                 $result = false;
             } else {
-                $result = 'Authorization failure';
+                $result = "Login to the email server was not authorized. Please check your username and password, and try again.";
                 if (isset($res[0][1])) {
                     $result .= ': '.implode(' ', $res[0][1]);
                 }
@@ -568,7 +568,7 @@ class Hm_SMTP {
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
-        $result = 'An error occurred sending the message';
+        $result = "Sorry, we couldn't send your message right now. Please, try again.";
         if(is_array($recipients)) {
             if ($recipients_params) {
                 $recipients_params = ' ' . $recipients_params;
@@ -598,7 +598,7 @@ class Hm_SMTP {
             $this->send_command($command);
             $res = $this->get_response();
             if ($this->compare_response($res, '354') != 0) {
-                $result = 'An error occurred during the DATA command';
+                $result = "Sorry, we couldn't send your message right now. The server didn't accept the message for delivery. Please try again later (DATA command failed)";
             }
             else {
                 $this->send_command($message);
@@ -610,12 +610,12 @@ class Hm_SMTP {
                     $result = false;
                 }
                 else {
-                    $result = 'An error occurred sending the message DATA';
+                    $result = "Your message could not be sent. The server did not confirm delivery. Please try again later.";
                 }
             }
         }
         else {
-            $result = 'An error occurred during the RCPT command';
+            $result = "There was an error sending your message. One or more of the recipient addresses may be invalid. Please check the email addresses and try again.";
         }
         return $result;
     }
