@@ -592,8 +592,7 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
     protected function output() {
         /* TODO: show "cannot find feed item if feed_message_headers is not present */
         if ($this->get('feed_message_headers')) {
-            $header_str = '<table class="msg_headers">'.
-                '<col class="header_name_col"><col class="header_val_col"></colgroup>';
+            $header_str = '<div class="msg_headers d-flex flex-column border-bottom border-2 border-secondary-subtle pb-3 mb-3">';
             foreach ($this->get('feed_message_headers', array()) as $name => $value) {
                 if (in_array($name, array('server_id', 'server_name', 'guid', 'id', 'content'), true)) {
                     continue;
@@ -602,23 +601,22 @@ class Hm_Output_filter_feed_item_content extends Hm_Output_Module {
                     $value = mb_substr($value, 0, 75).'...';
                 }
                 if ($name == 'title') {
-                    $header_str .= '<tr class="header_subject"><th colspan="2">'.$this->html_safe($value).'</td></tr>';
+                    $header_str .= '<div class="header_subject d-flex justify-content-center"><h4 class="text-center mb-0 fw-bold">'.$this->html_safe($value).'</h4></div>';
                 }
                 elseif ($name == 'link' || $name == 'link_alternate') {
-                    $header_str .= '<tr class="header_'.$name.'"><th>'.$this->trans($name).'</th><td><a data-external="true" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></td></tr>';
+                    $header_str .= '<div class="header_'.$name.' d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$this->trans($name).':</span><a class="text-break" data-external="true" href="'.$this->html_safe($value).'">'.$this->html_safe($value).'</a></div>';
                 }
                 elseif ($name == 'author' || $name == 'dc:creator' || $name == 'name') {
-                    $header_str .= '<tr class="header_from"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $header_str .= '<div class="header_from d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$this->trans($name).':</span><span class="text-break">'.$this->html_safe($value).'</span></div>';
                 }
                 elseif ($name == 'pubdate' || $name == 'dc:date') {
-                    $header_str .= '<tr class="header_date"><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $header_str .= '<div class="header_date d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$this->trans($name).':</span><span class="text-break">'.$this->html_safe($value).'</span></div>';
                 }
                 else {
-                    $header_str .= '<tr><th>'.$this->trans($name).'</th><td>'.$this->html_safe($value).'</td></tr>';
+                    $header_str .= '<div class="d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$this->trans($name).':</span><span class="text-break">'.$this->html_safe($value).'</span></div>';
                 }
             }
-            $header_str .= '<tr><td class="header_space" colspan="2"></td></tr>';
-            $header_str .= '<tr><td colspan="2"></td></tr></table>';
+            $header_str .= '</div>';
             $this->out('feed_message_content', str_replace(array('<', '>', '&ldquo;'), array(' <', '> ', ' &ldquo;'), $this->get('feed_message_content')));
             $txt = '<div class="msg_text_inner">'.format_msg_html($this->get('feed_message_content')).'</div>';
             $this->out('feed_msg_text', $txt);
