@@ -1029,6 +1029,7 @@ div.unseen,
   vertical-align: -13px;
 }
 .mobile .msg_text {
+  white-space: nowrap !important;
   width: 100%;
   max-width: 480px !important;
   word-break: break-all;
@@ -1072,12 +1073,11 @@ div.unseen,
 .mobile .msg_headers th {
   padding-left: 10px !important;
 }
-.mobile .nlink,
 .mobile .plink,
 .mobile .msg_headers td {
-  white-space: normal;
-  word-break: break-all;
-  word-wrap: break-word;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mobile .msg_text_inner {
   padding-left: 10px !important;
@@ -1094,9 +1094,9 @@ div.unseen,
 }
 .mobile .header_links,
 .mobile .nlink {
-  white-space: normal !important;
-  word-break: break-all;
-  word-wrap: break-word;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mobile .search_form {
   margin-top: 20px !important;
