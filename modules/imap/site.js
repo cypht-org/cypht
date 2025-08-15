@@ -932,8 +932,7 @@ var imap_move_copy = function(e, action, context) {
         move_to = $('.msg_controls .move_to_location');
     }
     else {
-        var li = e.target.closest('li');
-        move_to = li.querySelector('.move_to_location');
+        move_to = $(e.target).next('.move_to_location')[0];
     }
     unselect_non_imap_messages();
     var label;
