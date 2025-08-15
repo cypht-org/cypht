@@ -934,7 +934,7 @@ function Message_List() {
         let prevUrl;
         let nextUrl;
                 
-        const target = $('.msg_headers .header_date').last();
+        const target = $('.msg_text .small_header').last();
         let filter = `${getParam('keyword')}_${getParam('filter')}`;
         if (getParam('search_terms')) {
             filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
@@ -948,17 +948,17 @@ function Message_List() {
                 const prevSubject = $(prev['0']).find('.subject a');
                 prevUrl = new URL(prevSubject.prop('href'));
                 prevUrl.searchParams.set('list_parent', listPath);
-                const subject = prevSubject.text();
+                const subject = prevSubject.text().substring(0, 50) + (prevSubject.text().length > 50 ? '...' : '');
                 const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
-                $('<div class="prev d-flex justify-content-start py-2"><span class="fw-semibold">'+plink+'</span></div>').insertAfter(target);
+                $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertAfter(target);
             }
             if (next) {
                 const nextSubject = $(next['0']).find('.subject a');
                 nextUrl = new URL(nextSubject.prop('href'));
                 nextUrl.searchParams.set('list_parent', listPath);
-                const subject = nextSubject.text();
+                const subject = nextSubject.text().substring(0, 50) + (nextSubject.text().length > 50 ? '...' : '');
                 const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
-                $('<div class="next d-flex justify-content-start py-2"><span class="fw-semibold">'+nlink+'</span></div>').insertAfter(target);
+                $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertAfter(target.siblings('.prev')[0] || target);
             }
             if (cb) {
                 cb([prevUrl?.href, nextUrl?.href]);
