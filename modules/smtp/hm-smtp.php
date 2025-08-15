@@ -264,7 +264,7 @@ class Hm_SMTP {
     function connect() {
         $certfile = false;
         $certpass = false;
-        $result = "We couldn't connect to the email server (SMTP). Please check your internet connection or server settings, and try again.";
+        $result = "We couldn't connect to the SMTP server. Please check your internet connection or server settings, and try again.";
         $server = $this->server;
 
         if ($this->tls) {
@@ -283,7 +283,9 @@ class Hm_SMTP {
         else {
             $this->debug[] = 'Could not connect to the SMTP server';
             $this->debug[] = 'fsockopen errors #'.$errorno.'. '.$errorstr;
-            $result = "Unable to connect to the email server. Please check your internet connection or server settings, and try again.";
+            // Log technical details for debugging
+            error_log("SMTP connection failed to {$this->server}:{$this->port} - Error #{$errorno}: {$errorstr}");
+            $result = "Unable to connect to the SMTP server. Please check your internet connection or server settings, and try again.";
         }
         $this->banner = $this->get_response();
         $command = 'EHLO '.$this->hostname;
@@ -295,7 +297,9 @@ class Hm_SMTP {
             $this->send_command($command);
             $response = $this->get_response();
             if ($this->compare_response($response, '220') != 0) {
-                $result = "We couldn't secure the connection to the email server (STARTTLS). Please try again later.";
+                // Log technical details for debugging
+                error_log("SMTP STARTTLS command failed. Expected 220, got: " . print_r($response, true));
+                $result = "We couldn't secure the connection to the SMTP server (STARTTLS failed). Please try again later.";
             }
             if(isset($certfile) && $certfile) {
                 stream_context_set_option($this->handle, 'tls', 'local_cert', $certfile);
@@ -310,7 +314,9 @@ class Hm_SMTP {
             $this->capabilities($response);
         }
         if($this->compare_response($response,'250') != 0) {
-            $result = "We couldn't complete the connection to the email server (EHLO command fail). Please try again.";
+            // Log technical details for debugging
+            error_log("SMTP EHLO command failed. Expected 250, got: " . print_r($response, true));
+            $result = "We couldn't complete the connection to the SMTP server (EHLO command failed). Please try again.";
         }
         else {
             if($this->auth) {
@@ -419,13 +425,15 @@ class Hm_SMTP {
             }
         }
         if (!isset($result)) {
-            $result = "We couldn't log in to the email server. Please check your username and password.";
+            $result = "We couldn't log in to the SMTP server. Please check your username and password.";
             $res = $this->get_response();
             if ($this->compare_response($res, '235') == 0) {
                 $this->state = 'authed';
                 $result = false;
             } else {
-                $result = "Login to the email server was not authorized. Please check your username and password, and try again.";
+                // Log technical details for debugging
+                error_log("SMTP authentication failed. Expected 235, got: " . print_r($res, true));
+                $result = "Login to the SMTP server was not authorized. Please check your username and password, and try again.";
                 if (isset($res[0][1])) {
                     $result .= ': '.implode(' ', $res[0][1]);
                 }
@@ -568,7 +576,7 @@ class Hm_SMTP {
         $this->send_command($command);
         $res = $this->get_response();
         $bail = false;
-        $result = "Sorry, we couldn't send your message right now. Please, try again.";
+        $result = "Sorry, we couldn't send your message through the SMTP server right now. Please check your connection and try again.";
         if(is_array($recipients)) {
             if ($recipients_params) {
                 $recipients_params = ' ' . $recipients_params;
@@ -598,7 +606,9 @@ class Hm_SMTP {
             $this->send_command($command);
             $res = $this->get_response();
             if ($this->compare_response($res, '354') != 0) {
-                $result = "Sorry, we couldn't send your message right now. The server didn't accept the message for delivery. Please try again later (DATA command failed)";
+                // Log technical details for debugging
+                error_log("SMTP DATA command failed. Expected 354, got: " . print_r($res, true));
+                $result = "Sorry, we couldn't send your message right now. The SMTP server didn't accept the message for delivery (DATA command failed). Please try again later.";
             }
             else {
                 $this->send_command($message);
@@ -610,12 +620,16 @@ class Hm_SMTP {
                     $result = false;
                 }
                 else {
-                    $result = "Your message could not be sent. The server did not confirm delivery. Please try again later.";
+                    // Log technical details for debugging
+                    error_log("SMTP message delivery failed. Expected 250, got: " . print_r($res, true));
+                    $result = "Your message could not be sent. The SMTP server did not confirm delivery. Please try again later.";
                 }
             }
         }
         else {
-            $result = "There was an error sending your message. One or more of the recipient addresses may be invalid. Please check the email addresses and try again.";
+            // Log technical details for debugging
+            error_log("SMTP RCPT command failed for one or more recipients");
+            $result = "There was an error sending your message. One or more of the recipient addresses may be invalid (RCPT command failed). Please check the email addresses and try again.";
         }
         return $result;
     }
