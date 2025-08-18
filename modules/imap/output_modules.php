@@ -380,8 +380,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $txt .= '<a class="hlink text-decoration-none" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
             $txt .= '<a class="delete_link hlink text-decoration-none" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
-            $txt .= '<a class="hlink text-decoration-none" id="copy_message" href="#">'.$this->trans('Copy').'</a>';
-            $txt .= '<a class="hlink text-decoration-none" id="move_message" href="#">'.$this->trans('Move').'</a>';
+            $txt .= '<div class="copy-wrapper position-relative d-inline-block"><a class="hlink text-decoration-none" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu"></div></div>';
+            $txt .= '<div class="move-wrapper position-relative d-inline-block"><a class="hlink text-decoration-none" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu"></div></div>';
             $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             
             if($this->get('tags')){
