@@ -934,14 +934,14 @@ function Message_List() {
         let prevUrl;
         let nextUrl;
                 
-        const target = $('.msg_headers tr').last();
+        const target = $('.msg_headers .header_date').last();
         let filter = `${getParam('keyword')}_${getParam('filter')}`;
         if (getParam('search_terms')) {
             filter = `${getParam('search_terms')}_${getParam('search_fld')}_${getParam('search_since')}`;
         }
         const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), filter, getParam('sort'));
         messages.load(false, true, false, function() {
-            $('tr.prev, tr.next').remove();
+            $('div.prev, div.next').remove();
             const next = messages.getNextRowForMessage(msgUid);
             const prev = messages.getPreviousRowForMessage(msgUid);
             if (prev) {
@@ -950,7 +950,7 @@ function Message_List() {
                 prevUrl.searchParams.set('list_parent', listPath);
                 const subject = prevSubject.text();
                 const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
-                $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertBefore(target);
+                $('<div class="prev d-flex justify-content-start py-2"><span class="fw-semibold">'+plink+'</span></div>').insertAfter(target);
             }
             if (next) {
                 const nextSubject = $(next['0']).find('.subject a');
@@ -958,7 +958,7 @@ function Message_List() {
                 nextUrl.searchParams.set('list_parent', listPath);
                 const subject = nextSubject.text();
                 const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
-                $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertBefore(target);
+                $('<div class="next d-flex justify-content-start py-2"><span class="fw-semibold">'+nlink+'</span></div>').insertAfter(target);
             }
             if (cb) {
                 cb([prevUrl?.href, nextUrl?.href]);

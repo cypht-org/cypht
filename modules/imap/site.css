@@ -94,8 +94,7 @@
   padding-top: 0px;
   margin-top: -10px;
 }
-.imap_envelope th,
-.msg_headers th {
+.imap_envelope th {
   vertical-align: top;
   padding: 3px;
   padding-top: 5px;
@@ -106,8 +105,7 @@
   padding-right: 13px;
 }
 
-.mobile .imap_envelope th,
-.mobile .msg_headers th {
+.mobile .imap_envelope th {
   white-space: normal;
   word-break: break-word;
   overflow-wrap: break-word;
@@ -116,16 +114,14 @@
 .imap_envelope th {
   padding-left: 0px;
 }
-.imap_envelope td,
-.msg_headers td {
+.imap_envelope td {
   word-break: break-all;
   word-wrap: break-word;
   padding: 3px;
   padding-top: 5px;
 }
 
-.mobile .imap_envelope td,
-.mobile .msg_headers td {
+.mobile .imap_envelope td {
   word-break: break-word;
   overflow-wrap: break-word;
   padding: 5px 10px;

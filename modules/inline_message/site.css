@@ -1,11 +1,7 @@
 .search_content .inline_right, .message_list .inline_right { float: right; width: 50%; max-width: 50%; }
 .inline_right .msg_text_inner, .inline_right .msg_text_inner { padding-left: 10px; }
-.inline_right .msg_headers th, .inline_right .msg_headers td, .inline_right .msg_headers th, .inline_right .msg_headers td { padding-left: 5px; white-space: normal; overflow-wrap: break-word; }
-
 .close_inline_msg { float: right; margin-right: 10px; cursor: pointer;}
 .search_content .tag_icon, .search_content .add_contact_row, .message_list .tag_icon, .message_list .add_contact_row { display: none; }
-.msg_headers th, .msg_headers td{ display: table-cell; border: none; }
-.msg_headers th:hover {color: #777 !important; }
 .msg_parts th, .msg_parts td { border: none; }
 .inline_msg .msg_text, .inline_msg .msg_text_inner { min-height: 100px; }
 .inline_msg td { border-bottom: none !important; }
