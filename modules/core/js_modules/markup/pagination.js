@@ -27,6 +27,7 @@ function showPagination (totalPages) {
         $('.message_list .pagination').remove();
     }
     if (totalPages > 1) {
+        $(paginationMarkup(totalPages)).insertBefore('.message_table');
         $(paginationMarkup(totalPages)).insertAfter('.message_table');
         handlePagination();
         refreshNextButton(getParam('list_page') || 1);
