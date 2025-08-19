@@ -23,17 +23,22 @@ function applyImapMessageContentPageHandlers(routeParams) {
         window.dispatchEvent(new CustomEvent('message-loaded'));
     });
 
-    const messages = new Hm_MessagesStore(routeParams.list_path, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`, getParam('sort'));
+    const listPath = routeParams.list_parent || routeParams.list_path;
+    const messages = new Hm_MessagesStore(listPath, routeParams.list_page, `${routeParams.keyword}_${routeParams.filter}`, getParam('sort'));
     messages.load(false);
     const next = messages.getNextRowForMessage(routeParams.uid);
     const prev = messages.getPreviousRowForMessage(routeParams.uid);
     if (next) {
+        const nextHref = $(next['0']).find(".subject a").prop('href');
+        const nextListPath = new URLSearchParams(nextHref.split('?')[1]).get('list_path');
         const nextMessageUid = $(next['0']).data('uid');
-        preFetchMessageContent(false, nextMessageUid, routeParams.list_path);
+        preFetchMessageContent(false, nextMessageUid, nextListPath);
     }
     if (prev) {
+        const prevHref = $(prev['0']).find(".subject a").prop('href');
+        const prevListPath = new URLSearchParams(prevHref.split('?')[1]).get('list_path');
         const prevMessageUid = $(prev['0']).data('uid');
-        preFetchMessageContent(false, prevMessageUid, routeParams.list_path);
+        preFetchMessageContent(false, prevMessageUid, prevListPath);
     }
 
     if (window.pgpMessageContentPageHandler) pgpMessageContentPageHandler();
