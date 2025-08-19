@@ -424,6 +424,8 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
 
         showPagination(messages.pages);
 
+        Hm_Message_List.update_title(path);
+
         messages.newMessages.forEach((newMessage) => {
             const row = $(newMessage);
             triggerNewMessageEvent(row.data('uid'), row[0]);
@@ -472,9 +474,6 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     if (hadLocalData) {
         await select_imap_folder(listPath, listPage, true)
     }
-
-    // Update browser title
-    Hm_Message_List.update_title(listPath);
 
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
     const backgroundAbortController = new AbortController();
@@ -647,7 +646,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             $('.msg_text').append(res.msg_text);
             $('.msg_text').append(res.msg_parts);
 
-            document.title = $('.header_subject th').text();
+            document.title = $('.msg_text .small_header').first().text();
             imap_message_view_finished(uid, detail, listParent);
 
             if (!res.show_pagination_links) {
