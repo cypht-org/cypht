@@ -1454,6 +1454,7 @@ div.unseen,
   justify-content: flex-end;
   padding: 0;
   border-bottom: 1px solid var(--bs-secondary-bg);
+  background-color: var(--bs-body-bg);
 }
 
 .mobile .nav-header a {

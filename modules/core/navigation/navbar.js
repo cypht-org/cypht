@@ -21,10 +21,18 @@ $(() => {
         </div>
         `
         
+        // Get the appropriate logo based on current theme
+        const getLogoPath = () => {
+            const isDarkTheme = getComputedStyle(document.documentElement)
+                .getPropertyValue('--bs-secondary-bg') === '#333';
+            const logoFile = isDarkTheme ? 'logo.svg' : 'logo_dark.svg';
+            return `${hm_web_root_path()}modules/core/assets/images/${logoFile}`;
+        };
+
         const navHeader = `
         <div class="nav-header">
             <a href="?page=home" class="menu_home">
-                <img class="app-logo" src="modules/core/assets/images/logo_dark.svg">
+                <img class="app-logo" src="${getLogoPath()}">
             </a>
             <div class="menu-toggle fw-bold cursor-pointer close-toggle" style="display: none;">
                 <i class="bi bi-x-lg fs-5 fw-bold"></i>
