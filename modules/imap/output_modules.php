@@ -352,6 +352,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
 
             // Action links section
+            $txt .= '<div class="event_calendar_section"></div>';
             $txt .= '<div class="row g-0 py-3">';
             $txt .= '<div class="col-12 msg_actions">';
             $txt .= '<div class="d-flex flex-wrap gap-2 mb-3">';
