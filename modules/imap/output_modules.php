@@ -194,7 +194,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             
             // Start Bootstrap container
-            $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle bg-white text-muted">';
+            $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle text-muted">';
             
             foreach ($small_headers as $fld) {
                 foreach ($headers as $name => $value) {
