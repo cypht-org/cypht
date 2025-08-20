@@ -122,8 +122,8 @@ var update_imap_links = function(uid, details) {
 };
 
 var capture_subject_click = function() {
-    $('.subject a').off('click');
-    $('.subject a').on("click", function(e) {
+    $(document).off('click', ".subject a");
+    $(document).on("click", ".subject a", function(e) {
         var msg_details = get_inline_msg_details(this);
         var uid = msg_details[0];
         var list_path = msg_details[1];
