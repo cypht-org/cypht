@@ -1307,8 +1307,8 @@ if (!class_exists('Hm_IMAP')) {
          * use IMAP SEARCH or ESEARCH
          * @param string $target message types to search. can be ALL, UNSEEN, ANSWERED, etc
          * @param mixed $uids an array of uids or a valid IMAP sequence set as a string (or false for ALL)
-         * @param string $fld optional field to search
-         * @param string $term optional search term
+         * @param array $terms optional search term
+         * @param array $esearch optional ESEARCH parameters
          * @param bool $exclude_deleted extra argument to exclude messages with the deleted flag
          * @param bool $exclude_auto_bcc don't include auto-bcc'ed messages
          * @param bool $only_auto_bcc only include auto-bcc'ed messages
