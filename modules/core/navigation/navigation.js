@@ -7,6 +7,8 @@ function trackLocationSearchChanges() {
 }
 
 window.addEventListener('popstate', function(event) {
+    Hm_Ajax.abort_all_requests();
+
     if (event.state) {
         $('#cypht-main').replaceWith(event.state.main);
         loadCustomScripts(event.state.scripts);
@@ -78,6 +80,7 @@ function autoAppendParamsForNavigation(href)
 
 async function navigate(url, loaderMessage) {
     showRoutingToast(loaderMessage);
+    Hm_Ajax.abort_all_requests();
 
     try {
         const response = await fetch(url, {

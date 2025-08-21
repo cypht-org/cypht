@@ -57,11 +57,11 @@ var Hm_Ajax = {
     batch_callbacks: {},
     callback_hooks: [],
     p_callbacks: [],
-    aborted: false,
     err_condition: false,
     batch_callback: false,
     active_reqs: 0,
     icon_loading_id: false,
+    active_requests: [],
 
     get_ajax_hook_name: function(args) {
         var index;
@@ -71,6 +71,20 @@ var Hm_Ajax = {
             }
         }
         return;
+    },
+
+    abort_all_requests: function() {
+        this.active_requests.forEach(function(request) {
+            if (request && request.abort) {
+                request.abort();
+            }
+        });
+
+        this.active_requests = [];
+        this.active_reqs = 0;
+
+        this.stop_loading_icon(this.icon_loading_id);
+        $('body').removeClass('wait');
     },
 
     request: function(args, callback, extra, no_icon, batch_callback, on_failure, signal) {
@@ -138,9 +152,14 @@ var Hm_Ajax_Request = function() { return {
     index: 0,
     on_failure: false,
     start_time: 0,
+    xhr: null,
 
     xhr_fetch: function(config) {
         var xhr = new XMLHttpRequest();
+        this.xhr = xhr;
+
+        Hm_Ajax.active_requests.push(this);
+
         var data = '';
         if (config.data) {
             data = this.format_xhr_data(config.data);
@@ -174,7 +193,6 @@ var Hm_Ajax_Request = function() { return {
         xhr.addEventListener('abort', function() {
             Hm_Ajax.stop_loading_icon(Hm_Ajax.icon_loading_id);
             config.callback.always(Hm_Utils.json_decode(xhr.response, true));
-
         });
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         xhr.setRequestHeader('X-Requested-with', 'xmlhttprequest');
@@ -220,10 +238,7 @@ var Hm_Ajax_Request = function() { return {
     },
 
     done: function(res, xhr) {
-        if (Hm_Ajax.aborted) {
-            return;
-        }
-        else if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
+        if (!res || typeof res == 'string' && (res == 'null' || res.indexOf('<') === 0 || res == '{}')) {
             this.fail(xhr);
             return;
         }
@@ -277,6 +292,12 @@ var Hm_Ajax_Request = function() { return {
 
     always: function(res) {
         Hm_Ajax.active_reqs--;
+
+        var index = Hm_Ajax.active_requests.indexOf(this);
+        if (index > -1) {
+            Hm_Ajax.active_requests.splice(index, 1);
+        }
+
         var batch_count = 1;
         if (this.batch_callback) {
             if (typeof Hm_Ajax.batch_callbacks[this.batch_callback.toString()] != 'undefined') {
@@ -286,7 +307,6 @@ var Hm_Ajax_Request = function() { return {
         Hm_Message_List.set_row_events();
         if (batch_count === 0) {
             Hm_Ajax.batch_callbacks[this.batch_callback.toString()] = 0;
-            Hm_Ajax.aborted = false;
             Hm_Ajax.p_callbacks = [];
             this.batch_callback(res);
             this.batch_callback = false;
@@ -298,6 +318,18 @@ var Hm_Ajax_Request = function() { return {
             $('body').removeClass('wait');
         }
         res = null;
+    },
+
+    abort: function() {
+        if (this.xhr) {
+            this.xhr.abort();
+            this.xhr = null;
+        }
+
+        var index = Hm_Ajax.active_requests.indexOf(this);
+        if (index > -1) {
+            Hm_Ajax.active_requests.splice(index, 1);
+        }
     }
 }};
 
