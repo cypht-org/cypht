@@ -479,7 +479,11 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     const interval = setInterval(async () => {
         select_imap_folder(listPath, 1, true, true);
     }, 30000);
-    return [interval];
+
+    // Return cleanup function to clear interval when page unmounts
+    return () => {
+        clearInterval(interval);
+    };
 };
 
 $(document).on('submit', '#imap_filter_form', async function(event) { 

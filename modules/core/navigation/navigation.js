@@ -46,6 +46,7 @@ $(document).on('click', '.cypht-layout a', function(event) {
         const currentPage = currentUrl.searchParams.toString();
         const target = new URLSearchParams($(this).attr('href').split('?')[1]);
         if (currentPage !== target.toString()) {
+            Hm_Ajax.abort_all_requests();
             navigate(autoAppendParamsForNavigation($(this).attr('href')));
         }
     }
