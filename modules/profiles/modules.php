@@ -59,6 +59,44 @@ class Hm_Handler_compose_profile_data extends Hm_Handler_Module {
 /**
  * @subpackage profile/handler
  */
+class Hm_Handler_process_smtp_server_data_delete extends Hm_Handler_Module {
+    public function process() {
+        if (isset($this->request->post['smtp_delete'])) {
+            $deleted_server_id = $this->get('deleted_server_id', '');
+            Hm_Profiles::init($this);
+            $servers = Hm_Profiles::getBy($deleted_server_id,'smtp_id');
+            if ($servers) {
+                foreach ($servers as $server) {
+                    Hm_Profiles::del($server['id']);
+                    Hm_Msgs::add("Profile {$server['name']} has been deleted since its server was removed.");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ */
+class Hm_Handler_process_imap_server_data_delete extends Hm_Handler_Module {
+    public function process() {
+        if (isset($this->request->post['imap_delete'])) {
+            $deleted_server_id = $this->get('deleted_server_id', '');
+            Hm_Profiles::init($this);
+            $servers = Hm_Profiles::getBy($deleted_server_id,'imap_id');
+            if ($servers) {
+                foreach ($servers as $server) {
+                    Hm_Profiles::del($server['id']);
+                    Hm_Msgs::add("Profile {$server['name']} has been deleted since its server was removed.");
+                }
+            }
+        }
+    }
+}
+
+/**
+ * @subpackage profile/handler
+ */
 class Hm_Handler_process_profile_delete extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('profile_delete', 'profile_id'));
