@@ -13,7 +13,7 @@ if (!defined('DEBUG_MODE')) { die(); }
  */
 class Hm_Profiles {
 
-    use Hm_Repository;
+    use Hm_Repository, Searchable;
 
     private static $data = array();
 
@@ -65,6 +65,15 @@ class Hm_Profiles {
         return null;
     }
 
+
+    /**
+     * Get the dataset for the server list
+     * @return array
+     */
+    protected static function getDataset() {
+        return self::$data;
+    }
+
     public static function createDefault($hmod) {
         if (! $hmod->module_is_supported('imap') || ! $hmod->module_is_supported('smtp')) {
             return;
@@ -84,6 +93,7 @@ class Hm_Profiles {
                 'address' => $address,
                 'replyto' => $reply_to,
                 'smtp_id' => $smtp_server['id'],
+                'imap_id' => $imap_server['id'],
                 'sig' => '',
                 'rmk' => '',
                 'type' => 'imap',
@@ -109,6 +119,7 @@ class Hm_Profiles {
                     'address' => array_key_exists('profile_address', $profile) ? $profile['profile_address'] : '',
                     'replyto' => $profile['profile_replyto'],
                     'smtp_id' => $profile['profile_smtp'],
+                    'imap_id' => $server['id'],
                     'sig' => $profile['profile_sig'],
                     'rmk' => $profile['profile_rmk'],
                     'type' => 'imap',
@@ -120,10 +131,10 @@ class Hm_Profiles {
     }
 
     /**
- * @param string $field The name of the field to search within.
- * @param mixed $value The value to search for within the specified field.
- * @return array An array containing profiles that match the search criteria.
- */
+     * @param string $field The name of the field to search within.
+     * @param mixed $value The value to search for within the specified field.
+     * @return array An array containing profiles that match the search criteria.
+     */
     public static function search($field, $value) {
         $res = array();
         foreach (self::getAll() as $profile) {
