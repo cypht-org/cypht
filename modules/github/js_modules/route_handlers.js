@@ -39,26 +39,24 @@ function applyGithubMessageListPageHandler(routeParams) {
             })
         });
 
-        const abortController = new AbortController();
         const refreshIntervalId = setInterval(() => {
-            refreshAll(dataSources, true, abortController);
+            refreshAll(dataSources, true);
         }, 30000);
 
         $('.refresh_link').on("click", function(e) {
             e.preventDefault();
-            refreshAll(dataSources, false, abortController);
+            refreshAll(dataSources, false);
         });
 
         return () => {
             clearInterval(refreshIntervalId);
-            abortController.abort();
         }
     }
 }
 
-function refreshAll(dataSources, background = false, abortController) {
+function refreshAll(dataSources, background = false) {
     dataSources.forEach((id) => {
-        const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], abortController);
+        const messages = new Hm_MessagesStore('github_' + id, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
         messages.load(true, background).then(store => {
             for (let row of store.rows) {
                 row = row['0'];

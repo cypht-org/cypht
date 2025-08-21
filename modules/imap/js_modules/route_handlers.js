@@ -10,8 +10,7 @@ function applyImapMessageListPageHandlers(routeParams) {
     if (window.wpMessageListPageHandler) wpMessageListPageHandler(routeParams);
 
     return async function() {
-        const [refreshIntervalId, abortController] = await setupPageResult;
-        abortController.abort();
+        const [refreshIntervalId] = await setupPageResult;
         clearInterval(refreshIntervalId);
     }
 }

@@ -15,7 +15,7 @@ class Hm_MessagesStore {
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
      */
 
-    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = [], abortController = new AbortController()) {
+    constructor(path, page = 1, filter = '', sortFld = 'arrival', rows = []) {
         this.path = path;
         this.list = path + '_' + (filter ? filter.replace(/\s+/g, '_') + '_' + sortFld + '_': '') + page;
         this.sortFld = sortFld;
@@ -23,7 +23,6 @@ class Hm_MessagesStore {
         this.sources = {};
         this.count = 0;
         this.flagAsReadOnOpen = true;
-        this.abortController = abortController;
         this.pages = 0;
         this.page = page;
         this.newMessages = [];
@@ -238,8 +237,7 @@ class Hm_MessagesStore {
                     [],
                     hideLoadingState,
                     undefined,
-                    reject,
-                    this.abortController?.signal
+                    reject
                 );
             }).finally(() => {
                 // Hide the spinner

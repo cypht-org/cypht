@@ -394,8 +394,8 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
     });
 }
 
-async function select_imap_folder(path, page = 1,reload, processInTheBackground = false, abortController = null) {
-    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), [], abortController);
+async function select_imap_folder(path, page = 1,reload, processInTheBackground = false) {
+    const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground) {
             for (let row of messages.rows) {
@@ -476,11 +476,10 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     }
 
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
-    const backgroundAbortController = new AbortController();
     const interval = setInterval(async () => {
-        select_imap_folder(listPath, 1, true, true, backgroundAbortController);
+        select_imap_folder(listPath, 1, true, true);
     }, 30000);
-    return [interval, backgroundAbortController];
+    return [interval];
 };
 
 $(document).on('submit', '#imap_filter_form', async function(event) { 
