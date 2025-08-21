@@ -74,14 +74,12 @@ var Hm_Ajax = {
     },
 
     abort_all_requests: function() {
-        this.active_requests.forEach(function(request) {
+        let requests = this.active_requests.slice();
+        requests.forEach(function(request) {
             if (request && request.abort) {
                 request.abort();
             }
         });
-
-        this.active_requests = [];
-        this.active_reqs = 0;
 
         this.stop_loading_icon(this.icon_loading_id);
         $('body').removeClass('wait');
@@ -324,11 +322,6 @@ var Hm_Ajax_Request = function() { return {
         if (this.xhr) {
             this.xhr.abort();
             this.xhr = null;
-        }
-
-        var index = Hm_Ajax.active_requests.indexOf(this);
-        if (index > -1) {
-            Hm_Ajax.active_requests.splice(index, 1);
         }
     }
 }};
