@@ -2355,8 +2355,12 @@ if (!class_exists('Hm_IMAP')) {
             if ($exclude_auto_bcc && !mb_strstr($this->server, 'yahoo') && $this->server_supports_custom_headers()) {
                $fld .= ' NOT HEADER X-Auto-Bcc cypht';
             }
+            if ($filter == 'ALL') {
+                $filter = '';
+                $charset = trim($charset);
+            }
             $command = 'UID SORT ';
-            $command .= '('.$sort.') '.$charset.$filter.' '.$fld."\r\n";
+            $command .= '('.$sort.') '.$charset.$filter.$fld."\r\n";
             $cache_command = $command.(string)$reverse;
             $cache = $this->check_cache($cache_command);
             if ($cache !== false) {

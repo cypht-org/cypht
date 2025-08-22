@@ -23,6 +23,7 @@ $(function() {
     setInterval(() => {
         // undefined_undefined: load with no filter and no keyword
         new Hm_MessagesStore('unread', 1, 'undefined_undefined').load(true, true).then((store) => {
+            $('.total_unread_count').html('&#160;'+store.count+'&#160;');
             store.newMessages.forEach((messageRow) => {
                 triggerNewMessageEvent($(messageRow).data('uid'), $(messageRow)[0]);
             });

@@ -121,12 +121,10 @@ function message_list_meta($input, $output_mod) {
     }
     $date = sprintf('%s', mb_strtolower($output_mod->trans($times[$since])));
     $max = sprintf($output_mod->trans('%d items per source'), $limit);
+    $sources = '<span class="src_count">0</span>&nbsp;' . $output_mod->trans('sources');
+    $total = '<span class="total">0</span>&nbsp;' .$output_mod->trans('total');
 
-    return '<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">'.
-        $date.
-        '<b> :</b>'.
-        '<span class="src_count"></span> '.$max.
-        '</div>';
+    return '<div class="list_meta d-flex align-items-center fs-6 text-nowrap me-auto mb-2 mb-md-0">'.$date.':&nbsp;'.$sources.',&nbsp;'.$max.',&nbsp;'.$total.'</div>';
 }}
 
 /**

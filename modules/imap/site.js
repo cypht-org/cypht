@@ -426,6 +426,10 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
 
         Hm_Message_List.update_title(path);
 
+        const sources = hm_data_sources();
+        $('.src_count').text(sources.length);
+        $('.total').text(Hm_Utils.rows().length);
+
         messages.newMessages.forEach((newMessage) => {
             const row = $(newMessage);
             triggerNewMessageEvent(row.data('uid'), row[0]);
@@ -474,6 +478,8 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     if (hadLocalData) {
         await select_imap_folder(listPath, listPage, true)
     }
+
+    new Hm_MessagesStore('unread', 1, 'undefined_undefined').load(true, true);
 
     // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
     const interval = setInterval(async () => {

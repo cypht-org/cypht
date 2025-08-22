@@ -67,6 +67,9 @@ class Hm_MessagesStore {
             return this;
         }
 
+        const sourcesToRemove = Object.keys(this.sources).filter(key => !this.currentlyAvailableSources().includes(key));
+        sourcesToRemove.forEach(key => delete this.sources[key]);
+
         this.fetch(hideLoadingState).forEach(async (req) => {
             const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
             // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
@@ -83,9 +86,13 @@ class Hm_MessagesStore {
             }
             this.sources[sourceId] = Object.keys(updatedMessages);
             for (const id in updatedMessages) {
-                if (this.rows.indexOf(updatedMessages[id]) === -1) {
+                if (this.rows.map(row => row['1']).indexOf(id) === -1) {
                     this.rows.push(updatedMessages[id]);
                 }
+            }
+
+            if (this.path == 'unread') {
+                $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
             }
 
             this.sort();
@@ -246,6 +253,11 @@ class Hm_MessagesStore {
         });
     }
 
+    currentlyAvailableSources() {
+        let store = this;
+        return this.getRequestConfigs().map((config) => store.hashObject(config));
+    }
+
     getRequestConfigs() {
         const config = [{ name: "list_page", value: this.page }, { name: "sort", value: this.sortFld }];
         const configs = [];
@@ -285,6 +297,7 @@ class Hm_MessagesStore {
                         cfg.push({ name: "hm_ajax_hook", value: this.path == 'search' ? 'ajax_imap_search' : 'ajax_imap_message_list' });
                         cfg.push({ name: "imap_server_ids", value: ds.id });
                         cfg.push({ name: "imap_folder_ids", value: ds.folder });
+                        cfg.push({ name: "list_path", value: this.path });
                     }
                     configs.push(cfg);
                 });
