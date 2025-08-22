@@ -383,7 +383,11 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a class="delete_link hlink text-decoration-none" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= '<div class="position-relative"><a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location"></div></div>';
-            $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+                        
+            $current_folder = end(explode("_", $this->html_safe($this->get('msg_list_path'))));
+            if (bin2hex('Archive') != $current_folder) {
+                $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            }
             
             if($this->get('tags')){
                 $txt .= tags_dropdown($this, $headers);
