@@ -1282,7 +1282,13 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
 
         list($sort, $reverse) = process_sort_arg($this->request->get['sort'], $this->user_config->get('default_sort_order_setting', 'arrival'));
 
-        switch ($this->get('list_path')) {
+        if (isset($this->request->post['list_path'])) {
+            $list_path = $this->request->post['list_path'];
+        } else {
+            $list_path = $this->get('list_path');
+        }
+
+        switch ($list_path) {
             case 'email':
                 $filter = 'ALL';
                 $limit = $this->user_config->get('all_email_per_source_setting', DEFAULT_ALL_EMAIL_PER_SOURCE);
@@ -1295,14 +1301,14 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 break;
             case 'flagged':
             case 'unread':
-                $filter = $this->get('list_path') == 'unread' ? 'UNSEEN' : mb_strtoupper($this->get('list_path'));
+                $filter = $list_path == 'unread' ? 'UNSEEN' : mb_strtoupper($list_path);
             default:
                 if (empty($filter)) {
                     $filter = 'ALL';
                 }
-                if ($this->get('list_path')) {
-                    $limit = $this->user_config->get($this->get('list_path').'_per_source_setting', DEFAULT_PER_SOURCE);
-                    $date = process_since_argument($this->user_config->get($this->get('list_path').'_since_setting', DEFAULT_SINCE));
+                if ($list_path) {
+                    $limit = $this->user_config->get($list_path.'_per_source_setting', DEFAULT_PER_SOURCE);
+                    $date = process_since_argument($this->user_config->get($list_path.'_since_setting', DEFAULT_SINCE));
                 } else {
                     $limit = $this->user_config->get('all_per_source_setting', DEFAULT_ALL_PER_SOURCE);
                     $date = process_since_argument($this->user_config->get('all_since_setting', DEFAULT_SINCE));

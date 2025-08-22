@@ -479,12 +479,10 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         await select_imap_folder(listPath, listPage, true)
     }
 
-    new Hm_MessagesStore('unread', 1, 'undefined_undefined').load(true, true);
-
-    // Refresh in the background each 30 seconds and abort any pending request when the page unmounts
+    // Refresh in the background each 60 seconds
     const interval = setInterval(async () => {
         select_imap_folder(listPath, 1, true, true);
-    }, 30000);
+    }, 60000);
 
     // Return cleanup function to clear interval when page unmounts
     return () => {
