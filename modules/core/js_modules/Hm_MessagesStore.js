@@ -88,6 +88,9 @@ class Hm_MessagesStore {
             for (const id in updatedMessages) {
                 if (this.rows.map(row => row['1']).indexOf(id) === -1) {
                     this.rows.push(updatedMessages[id]);
+                } else {
+                    const index = this.rows.map(row => row['1']).indexOf(id);
+                    this.rows[index] = updatedMessages[id];
                 }
             }
 
