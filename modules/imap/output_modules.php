@@ -396,10 +396,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $settings = $this->get('user_settings', array());
             if(array_key_exists('enable_snooze_setting', $settings) && $settings['enable_snooze_setting']) {
-                $txt .= ' | ' . snooze_dropdown($this, isset($headers['X-Snoozed']));
+                $txt .= snooze_dropdown($this, isset($headers['X-Snoozed']));
             }
             if ($this->get('sieve_filters_enabled') && !$is_draft) {
-                $txt .= snooze_dropdown($this, isset($headers['X-Snoozed']));
                 $server_id = $this->get('msg_server_id');
                 $imap_server = $this->get('imap_accounts')[$server_id];
                 if ($this->get('sieve_filters_client')) {
