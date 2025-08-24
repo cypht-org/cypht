@@ -35,7 +35,7 @@
         "docs": "https://cypht.org/documentation.html"
     },
     "require": {
-        "bacon/bacon-qr-code": "^1.0.3 || ^2.0.0 || ^3.0.0",
+        "bacon/bacon-qr-code": "^3.0.0",
         "christian-riesen/base32": "^1.3.2",
         "composer": "^2.0.0",
         "ext-curl": "*",
@@ -50,7 +50,7 @@
         "henrique-borba/php-sieve-manager": "^1.0",
         "league/commonmark": "^2.7",
         "php": ">=8.1",
-        "symfony/dotenv": "^4.3 || 5.4",
+        "symfony/dotenv": "^6.4",
         "symfony/yaml": "~6.4.3",
         "thomaspark/bootswatch": "^5.3",
         "twbs/bootstrap": "^5.3",
