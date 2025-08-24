@@ -268,9 +268,10 @@ class Hm_Handler_smtp_save_draft extends Hm_Handler_Module {
             delete_uploaded_files($this->session, $draft_id);
             return;
         }
-        
+
+        $uploaded_files = !$uploaded_files ? []: explode(',', $uploaded_files);
+
         if ($this->module_is_supported('imap')) {
-            $uploaded_files = explode(',', $uploaded_files);
             $userpath = md5($this->session->get('username', false));
             foreach($uploaded_files as $key => $file) {
                 $uploaded_files[$key] = $this->config->get('attachment_dir').DIRECTORY_SEPARATOR.$userpath.DIRECTORY_SEPARATOR.$file;
@@ -665,9 +666,12 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
         );
 
         /* parse attachments */
-        $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
-        foreach($uploaded_files as $key => $file) {
-            $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+        $uploaded_files = [];
+        if (!empty($this->request->post['send_uploaded_files'])) {
+            $uploaded_files = explode(',', $this->request->post['send_uploaded_files']);
+            foreach($uploaded_files as $key => $file) {
+                $uploaded_files[$key] = $this->config->get('attachment_dir').'/'.md5($this->session->get('username', false)).'/'.$file;
+            }
         }
 
         $uploaded_files = get_uploaded_files_from_array(
