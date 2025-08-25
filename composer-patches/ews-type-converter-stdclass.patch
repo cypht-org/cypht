@@ -1,0 +1,680 @@
+From da3f6fcd333d38c0b27029d3ab37f6445496e349 Mon Sep 17 00:00:00 2001
+From: Bruno Kambere <brunokambere@gmail.com>
+Date: Wed, 9 Jul 2025 02:05:56 +0300
+Subject: [PATCH 1/4] Add TypeConverter class for converting stdClass objects
+ to EWS types
+
+---
+ src/API/TypeConverter.php | 100 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
+ create mode 100644 src/API/TypeConverter.php
+
+diff --git a/src/API/TypeConverter.php b/src/API/TypeConverter.php
+new file mode 100644
+index 00000000..a959f826
+--- /dev/null
++++ b/src/API/TypeConverter.php
+@@ -0,0 +1,100 @@
++<?php
++
++namespace garethp\ews\API;
++
++/**
++ * Type converter for handling SOAP stdClass objects
++ * Automatically converts stdClass objects to proper EWS type objects
++ */
++class TypeConverter
++{
++    /**
++     * Convert stdClass objects to proper EWS types using reflection
++     *
++     * @param mixed $value The value to convert
++     * @param string $targetType The expected EWS type class name
++     * @return mixed Converted value or original if no conversion needed
++     */
++    public static function convertToType($value, string $targetType)
++    {
++        if (is_array($value)) {
++            return array_map(function ($item) use ($targetType) {
++                return self::convertSingleObject($item, $targetType);
++            }, $value);
++        }
++        
++        return self::convertSingleObject($value, $targetType);
++    }
++    
++    /**
++     * Convert a single stdClass object to target type
++     *
++     * @param mixed $value The value to convert
++     * @param string $targetType The target EWS type class name
++     * @return mixed Converted object or original value
++     */
++    private static function convertSingleObject($value, string $targetType)
++    {
++        if (!($value instanceof \stdClass)) {
++            return $value;
++        }
++        
++        if (!class_exists($targetType)) {
++            return $value;
++        }
++        
++        $instance = new $targetType();
++        
++        // Map stdClass properties to typed object
++        foreach (get_object_vars($value) as $property => $propertyValue) {
++            self::setProperty($instance, $property, $propertyValue);
++        }
++        
++        return $instance;
++    }
++    
++    /**
++     * Set property on target object using setter method or direct assignment
++     *
++     * @param object $instance Target object
++     * @param string $property Property name
++     * @param mixed $value Property value
++     */
++    private static function setProperty(object $instance, string $property, $value): void
++    {
++        // Try setter method first
++        $setterMethod = 'set' . ucfirst($property);
++        if (method_exists($instance, $setterMethod)) {
++            $instance->$setterMethod($value);
++            return;
++        }
++        
++        // Try direct property assignment
++        if (property_exists($instance, $property)) {
++            $instance->$property = $value;
++        }
++    }
++    
++    /**
++     * Check if value contains any stdClass objects
++     *
++     * @param mixed $value Value to check
++     * @return bool True if contains stdClass objects
++     */
++    public static function containsStdClass($value): bool
++    {
++        if ($value instanceof \stdClass) {
++            return true;
++        }
++        
++        if (is_array($value)) {
++            foreach ($value as $item) {
++                if ($item instanceof \stdClass) {
++                    return true;
++                }
++            }
++        }
++        
++        return false;
++    }
++}
+
+From 9cce00376880728021d58be6996d411237f2c6d0 Mon Sep 17 00:00:00 2001
+From: Bruno Kambere <brunokambere@gmail.com>
+Date: Wed, 9 Jul 2025 02:06:33 +0300
+Subject: [PATCH 2/4] Refactor MagicMethodsTrait to enhance type conversion for
+ setter methods
+
+---
+ src/API/MagicMethodsTrait.php | 65 ++++++++++++++++++++++++++++++++++-
+ 1 file changed, 64 insertions(+), 1 deletion(-)
+
+diff --git a/src/API/MagicMethodsTrait.php b/src/API/MagicMethodsTrait.php
+index b4e528f1..9ec5c451 100644
+--- a/src/API/MagicMethodsTrait.php
++++ b/src/API/MagicMethodsTrait.php
+@@ -19,7 +19,8 @@ public function __set($name, $value)
+         }
+ 
+         if ($this->methodExists("set" . ucfirst($name))) {
+-            $this->{"set" . ucfirst($name)}($value);
++            $convertedValue = $this->convertValueToExpectedType($value, $name);
++            $this->{"set" . ucfirst($name)}($convertedValue);
+             return;
+         }
+ 
+@@ -39,4 +40,66 @@ public function methodExists($name)
+     {
+         return method_exists($this, $name);
+     }
++
++    /**
++     * Automatically convert stdClass objects to proper EWS types
++     *
++     * @param mixed $value The value to convert
++     * @param string $propertyName The property name
++     * @return mixed Converted value
++     */
++    private function convertValueToExpectedType($value, string $propertyName)
++    {
++        if (!TypeConverter::containsStdClass($value)) {
++            return $value;
++        }
++        
++        $expectedType = $this->getExpectedTypeFromSetter($propertyName);
++        
++        if ($expectedType) {
++            return TypeConverter::convertToType($value, $expectedType);
++        }
++        
++        return $value;
++    }
++
++    /**
++     * Get expected type from setter method using reflection
++     *
++     * @param string $propertyName Property name
++     * @return string|null Expected type class name
++     */
++    private function getExpectedTypeFromSetter(string $propertyName): ?string
++    {
++        $methodName = "set" . ucfirst($propertyName);
++
++        if (!method_exists($this, $methodName)) {
++            return null;
++        }
++
++        $reflection = new \ReflectionMethod($this, $methodName);
++        $parameters = $reflection->getParameters();
++        
++        if (empty($parameters)) {
++            return null;
++        }
++
++        $type = $parameters[0]->getType();
++
++        // Handle union types (e.g., array|InternetHeaderType)
++        if ($type instanceof \ReflectionUnionType) {
++            foreach ($type->getTypes() as $unionType) {
++                if (!$unionType->isBuiltin() && $unionType->getName() !== 'array') {
++                    return $unionType->getName();
++                }
++            }
++        }
++
++        // Handle single types
++        if ($type && !$type->isBuiltin()) {
++            return $type->getName();
++        }
++
++        return null;
++    }
+ }
+
+From 2a5a09e323eee9bfcacab70b800f3a7ba47a2de4 Mon Sep 17 00:00:00 2001
+From: Bruno Kambere <brunokambere@gmail.com>
+Date: Wed, 30 Jul 2025 22:54:41 +0300
+Subject: [PATCH 3/4] Improve TypeConverter stdClass and union handling
+
+---
+ src/API/MagicMethodsTrait.php |  64 +--------------
+ src/API/TypeConverter.php     | 144 +++++++++++++++++++++-------------
+ 2 files changed, 91 insertions(+), 117 deletions(-)
+
+diff --git a/src/API/MagicMethodsTrait.php b/src/API/MagicMethodsTrait.php
+index 9ec5c451..586b3e03 100644
+--- a/src/API/MagicMethodsTrait.php
++++ b/src/API/MagicMethodsTrait.php
+@@ -19,7 +19,7 @@ public function __set($name, $value)
+         }
+ 
+         if ($this->methodExists("set" . ucfirst($name))) {
+-            $convertedValue = $this->convertValueToExpectedType($value, $name);
++            $convertedValue = TypeConverter::convertValueToExpectedType($this, $value, $name);
+             $this->{"set" . ucfirst($name)}($convertedValue);
+             return;
+         }
+@@ -40,66 +40,4 @@ public function methodExists($name)
+     {
+         return method_exists($this, $name);
+     }
+-
+-    /**
+-     * Automatically convert stdClass objects to proper EWS types
+-     *
+-     * @param mixed $value The value to convert
+-     * @param string $propertyName The property name
+-     * @return mixed Converted value
+-     */
+-    private function convertValueToExpectedType($value, string $propertyName)
+-    {
+-        if (!TypeConverter::containsStdClass($value)) {
+-            return $value;
+-        }
+-        
+-        $expectedType = $this->getExpectedTypeFromSetter($propertyName);
+-        
+-        if ($expectedType) {
+-            return TypeConverter::convertToType($value, $expectedType);
+-        }
+-        
+-        return $value;
+-    }
+-
+-    /**
+-     * Get expected type from setter method using reflection
+-     *
+-     * @param string $propertyName Property name
+-     * @return string|null Expected type class name
+-     */
+-    private function getExpectedTypeFromSetter(string $propertyName): ?string
+-    {
+-        $methodName = "set" . ucfirst($propertyName);
+-
+-        if (!method_exists($this, $methodName)) {
+-            return null;
+-        }
+-
+-        $reflection = new \ReflectionMethod($this, $methodName);
+-        $parameters = $reflection->getParameters();
+-        
+-        if (empty($parameters)) {
+-            return null;
+-        }
+-
+-        $type = $parameters[0]->getType();
+-
+-        // Handle union types (e.g., array|InternetHeaderType)
+-        if ($type instanceof \ReflectionUnionType) {
+-            foreach ($type->getTypes() as $unionType) {
+-                if (!$unionType->isBuiltin() && $unionType->getName() !== 'array') {
+-                    return $unionType->getName();
+-                }
+-            }
+-        }
+-
+-        // Handle single types
+-        if ($type && !$type->isBuiltin()) {
+-            return $type->getName();
+-        }
+-
+-        return null;
+-    }
+ }
+diff --git a/src/API/TypeConverter.php b/src/API/TypeConverter.php
+index a959f826..3eee6aac 100644
+--- a/src/API/TypeConverter.php
++++ b/src/API/TypeConverter.php
+@@ -4,55 +4,87 @@
+ 
+ /**
+  * Type converter for handling SOAP stdClass objects
+- * Automatically converts stdClass objects to proper EWS type objects
++ * Converts stdClass objects to proper EWS type objects
+  */
+ class TypeConverter
+ {
+     /**
+-     * Convert stdClass objects to proper EWS types using reflection
++     * Convert stdClass objects to proper EWS type objects
+      *
++     * @param object $object The object containing the property
+      * @param mixed $value The value to convert
+-     * @param string $targetType The expected EWS type class name
+-     * @return mixed Converted value or original if no conversion needed
++     * @param string $propertyName The property name
++     * @return mixed Converted value
+      */
+-    public static function convertToType($value, string $targetType)
++    public static function convertValueToExpectedType($object, $value, string $propertyName)
+     {
+-        if (is_array($value)) {
+-            return array_map(function ($item) use ($targetType) {
+-                return self::convertSingleObject($item, $targetType);
+-            }, $value);
++        if (!($value instanceof \stdClass || (is_array($value) && current($value) instanceof \stdClass))) {
++            return $value;
+         }
+-        
+-        return self::convertSingleObject($value, $targetType);
++
++        $type = self::getSetterType($object, $propertyName);
++        return $type ? self::convertToType($value, $type) : $value;
+     }
+-    
++
+     /**
+-     * Convert a single stdClass object to target type
++     * Convert stdClass objects to proper EWS types using reflection
+      *
+      * @param mixed $value The value to convert
+-     * @param string $targetType The target EWS type class name
+-     * @return mixed Converted object or original value
++     * @param string $targetType The expected EWS type class name
++     * @return mixed Converted value or original if no conversion needed
+      */
+-    private static function convertSingleObject($value, string $targetType)
++    public static function convertToType($value, string $type)
+     {
+-        if (!($value instanceof \stdClass)) {
++        if (!class_exists($type)) {
+             return $value;
+         }
+-        
+-        if (!class_exists($targetType)) {
++
++        if (is_array($value)) {
++            return array_map(fn($v) => self::convertToType($v, $type), $value);
++        }
++
++        if (!($value instanceof \stdClass)) {
+             return $value;
+         }
+-        
+-        $instance = new $targetType();
+-        
+-        // Map stdClass properties to typed object
+-        foreach (get_object_vars($value) as $property => $propertyValue) {
+-            self::setProperty($instance, $property, $propertyValue);
++
++        $object = new $type();
++        foreach (get_object_vars($value) as $prop => $val) {
++            self::setProperty($object, $prop, $val);
++        }
++
++        return $object;
++    }
++
++    /**
++     * Get the setter method type for a property
++     *
++     * @param object $object The object to inspect
++     * @param string $property The property name
++     * @return string|null The expected type or null if no setter exists
++     */
++    private static function getSetterType($object, string $property): ?string
++    {
++        $method = 'set' . ucfirst($property);
++        if (!method_exists($object, $method)) {
++            return null;
++        }
++
++        $type = (new \ReflectionMethod($object, $method))
++            ->getParameters()[0]?->getType();
++
++        if ($type instanceof \ReflectionUnionType) {
++            foreach ($type->getTypes() as $t) {
++                if (!$t->isBuiltin() && $t->getName() !== 'array') {
++                    return $t->getName();
++                }
++            }
+         }
+-        
+-        return $instance;
++
++        return ($type instanceof \ReflectionNamedType && !$type->isBuiltin())
++            ? $type->getName()
++            : null;
+     }
+-    
++
+     /**
+      * Set property on target object using setter method or direct assignment
+      *
+@@ -62,39 +94,43 @@ private static function convertSingleObject($value, string $targetType)
+      */
+     private static function setProperty(object $instance, string $property, $value): void
+     {
+-        // Try setter method first
+-        $setterMethod = 'set' . ucfirst($property);
+-        if (method_exists($instance, $setterMethod)) {
+-            $instance->$setterMethod($value);
++        $setter = 'set' . ucfirst($property);
++        if (!method_exists($instance, $setter)) {
++            if (property_exists($instance, $property)) {
++                $instance->$property = $value;
++            }
+             return;
+         }
+-        
+-        // Try direct property assignment
+-        if (property_exists($instance, $property)) {
+-            $instance->$property = $value;
+-        }
++
++        $type = (new \ReflectionMethod($instance, $setter))->getParameters()[0]?->getType();
++        $value = self::convertIfStdClass($value, $type);
++        $instance->$setter($value);
+     }
+-    
+-    /**
+-     * Check if value contains any stdClass objects
+-     *
+-     * @param mixed $value Value to check
+-     * @return bool True if contains stdClass objects
+-     */
+-    public static function containsStdClass($value): bool
++
++    private static function convertIfStdClass($value, ?\ReflectionType $type)
+     {
+-        if ($value instanceof \stdClass) {
+-            return true;
++        if (!($value instanceof \stdClass) || !$type) {
++            return $value;
+         }
+-        
+-        if (is_array($value)) {
+-            foreach ($value as $item) {
+-                if ($item instanceof \stdClass) {
+-                    return true;
++
++        if ($type instanceof \ReflectionUnionType) {
++            foreach ($type->getTypes() as $t) {
++                $name = $t->getName();
++                if (!$t->isBuiltin() && class_exists($name)) {
++                    return self::convertToType($value, $name);
++                }
++                if ($name === 'array') {
++                    $props = get_object_vars($value);
++                    $arr = count($props) === 1 ? current($props) : (array)$value;
++                    return is_array($arr) ? $arr : [$arr];
+                 }
+             }
+         }
+-        
+-        return false;
++
++        if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
++            return self::convertToType($value, $type->getName());
++        }
++
++        return $value;
+     }
+ }
+
+From 8e8e9b05d1e1e9613637e3639e543abb9379d66b Mon Sep 17 00:00:00 2001
+From: Bruno Kambere <brunokambere@gmail.com>
+Date: Wed, 30 Jul 2025 23:00:37 +0300
+Subject: [PATCH 4/4] Add TypeConverterTest for stdClass conversion to various
+ EWS types
+
+---
+ tests/src/API/TypeConverterTest.php | 172 ++++++++++++++++++++++++++++
+ 1 file changed, 172 insertions(+)
+ create mode 100644 tests/src/API/TypeConverterTest.php
+
+diff --git a/tests/src/API/TypeConverterTest.php b/tests/src/API/TypeConverterTest.php
+new file mode 100644
+index 00000000..35bfbc92
+--- /dev/null
++++ b/tests/src/API/TypeConverterTest.php
+@@ -0,0 +1,172 @@
++<?php
++
++namespace garethp\ews\Test\API;
++
++use garethp\ews\API\Type\InternetHeaderType;
++use garethp\ews\API\Type\ItemType;
++use garethp\ews\API\Type\BodyType;
++use garethp\ews\API\Type\MimeContentType;
++use garethp\ews\API\Type\AttachmentType;
++use garethp\ews\API\Type\ExtendedPropertyType;
++use garethp\ews\API\Type\PathToExtendedFieldType;
++use garethp\ews\API\Type\SingleRecipientType;
++use garethp\ews\API\Type\EmailAddressType;
++use garethp\ews\API\Type\FolderType;
++use garethp\ews\API\Type\PermissionSetType;
++use garethp\ews\API\Type\PermissionType;
++use PHPUnit\Framework\TestCase;
++
++class TypeConverterTest extends TestCase
++{
++    public function testConvertStdClassToMessageHeaders()
++    {
++        $item = new ItemType();
++        
++        // Simulate SOAP assigning stdClass objects
++        $soapData = [
++            (object)['HeaderName' => 'X-Priority', '_' => '1'],
++            (object)['HeaderName' => 'X-Mailer', '_' => 'Test-Mailer']
++        ];
++        
++        // This triggers __set() which should auto-convert
++        $item->internetMessageHeaders = $soapData;
++        
++        $headers = $item->getInternetMessageHeaders();
++        
++        $this->assertIsArray($headers, 'Expected internetMessageHeaders to be an array');
++        $this->assertCount(2, $headers, 'Expected 2 headers to be converted');
++        $this->assertInstanceOf(InternetHeaderType::class, $headers[0], 'First header should be InternetHeaderType');
++        $this->assertInstanceOf(InternetHeaderType::class, $headers[1], 'Second header should be InternetHeaderType');
++        $this->assertEquals('X-Priority', $headers[0]->getHeaderName(), 'First header name should be X-Priority');
++        $this->assertEquals('X-Mailer', $headers[1]->getHeaderName(), 'Second header name should be X-Mailer');
++    }
++    
++    public function testConvertStdClassToMimeContent()
++    {
++        $item = new ItemType();
++        
++        // Simulate SOAP assigning stdClass for MimeContent
++        $soapData = (object)[
++            'CharacterSet' => 'UTF-8',
++            '_' => 'base64encodedcontent'
++        ];
++        
++        $item->mimeContent = $soapData;
++        
++        $mimeContent = $item->getMimeContent();
++        
++        $this->assertInstanceOf(MimeContentType::class, $mimeContent, 'Expected mimeContent to be MimeContentType');
++        $this->assertEquals('UTF-8', $mimeContent->getCharacterSet(), 'Expected CharacterSet to be UTF-8');
++        $this->assertEquals('base64encodedcontent', $mimeContent->_, 'Expected _ to match base64encodedcontent');
++    }
++
++    public function testConvertStdClassToBody()
++    {
++        $item = new ItemType();
++        
++        // Simulate SOAP assigning stdClass for Body
++        $soapData = (object)[
++            'BodyType' => 'HTML',
++            '_' => '<html><body>Test</body></html>'
++        ];
++        
++        $item->body = $soapData;
++        
++        $body = $item->getBody();
++        
++        $this->assertInstanceOf(BodyType::class, $body, 'Expected body to be BodyType');
++        $this->assertEquals('HTML', $body->getBodyType(), 'Expected BodyType to be HTML');
++        $this->assertEquals('<html><body>Test</body></html>', $body->_, 'Expected _ to match HTML content');
++    }
++
++    public function testConvertStdClassToExtendedPropertyType()
++    {
++        $item = new ItemType();
++        $soapData = [
++            (object)[
++                'ExtendedFieldURI' => (object)[
++                    'PropertyTag' => '0x1234',
++                    'PropertyType' => 'String'
++                ],
++                'Value' => 'TestValue'
++            ]
++        ];
++        $item->extendedProperty = $soapData;
++        $extProps = $item->getExtendedProperty();
++        $this->assertIsArray($extProps, 'Expected extendedProperty to be an array');
++        $this->assertCount(1, $extProps, 'Expected 1 extended property');
++        $this->assertInstanceOf(ExtendedPropertyType::class, $extProps[0], 'Should be ExtendedPropertyType');
++        $this->assertEquals('TestValue', $extProps[0]->getValue());
++        $this->assertInstanceOf(PathToExtendedFieldType::class, $extProps[0]->getExtendedFieldURI());
++        $this->assertEquals('0x1234', $extProps[0]->getExtendedFieldURI()->getPropertyTag());
++    }
++
++    public function testConvertStdClassToSingleRecipientType()
++    {
++        $recipient = new SingleRecipientType();
++        // Simulate SOAP assigning stdClass for mailbox
++        $soapData = (object)[
++            'Name' => 'John Doe',
++            'EmailAddress' => 'john.doe@example.com',
++            'RoutingType' => 'SMTP',
++            'MailboxType' => 'Mailbox'
++        ];
++        $recipient->mailbox = $soapData;
++        $mailbox = $recipient->getMailbox();
++        $this->assertInstanceOf(EmailAddressType::class, $mailbox, 'Expected mailbox to be EmailAddressType');
++        $this->assertEquals('John Doe', $mailbox->getName(), 'Expected Name to match');
++        $this->assertEquals('john.doe@example.com', $mailbox->getEmailAddress(), 'Expected emailAddress to match');
++        $this->assertEquals('SMTP', $mailbox->getRoutingType(), 'Expected RoutingType to be SMTP');
++        $this->assertEquals('Mailbox', $mailbox->getMailboxType(), 'Expected mailboxType to be Mailbox');
++    }
++
++    public function testConvertStdClassToFolderTypeProperties()
++    {
++        $folder = new FolderType();
++        // Simulate SOAP assigning stdClass for permissionSet
++        $soapPermissionSet = (object)[
++            'Permissions' => (object)[
++                'UserId' => (object)[
++                    'SID' => 'S-1-5-21',
++                    'PrimarySmtpAddress' => 'user@example.com'
++                ],
++                'canCreateItems' => true,
++                'canCreateSubFolders' => true,
++                'readItems' => 'All',
++                'permissionLevel' => 'Editor',
++            ]
++        ];
++
++        $folder->permissionSet = $soapPermissionSet;
++        $permissionSet = $folder->getPermissionSet();
++        $this->assertInstanceOf(PermissionSetType::class, $permissionSet, 'Expected permissionSet to be PermissionSetType');
++
++        $permissions = $permissionSet->getPermissions();
++        $this->assertIsArray($permissions, 'Permissions should be an array');
++        $this->assertCount(1, $permissions, 'Expected 1 permission to be present');
++        $this->assertInstanceOf(PermissionType::class, $permissions[0], 'Should be PermissionType');
++        $this->assertEquals('Editor', $permissions[0]->getPermissionLevel(), 'Permission level should be Editor');
++        $this->assertEquals('S-1-5-21', $permissions[0]->getUserId()->getSID(), 'User SID should match');
++        $this->assertEquals('user@example.com', $permissions[0]->getUserId()->getPrimarySmtpAddress(), 'User email should match');
++
++        // Test normal assignment for unreadCount
++        $folder->unreadCount = 42;
++        $this->assertEquals(42, $folder->getUnreadCount(), 'Expected unreadCount to match');
++    }
++
++    public function testHandlesNonStdClassData()
++    {
++        $item = new ItemType();
++        
++        // Regular typed object should pass through unchanged
++        $properHeader = new InternetHeaderType();
++        $properHeader->setHeaderName('Test');
++        $item->internetMessageHeaders = [$properHeader];
++        
++        $headers = $item->getInternetMessageHeaders();
++        
++        $this->assertIsArray($headers, 'Expected internetMessageHeaders to be an array');
++        $this->assertCount(1, $headers, 'Expected 1 header to be present');
++        $this->assertSame($properHeader, $headers[0], 'Expected header to match the original InternetHeaderType instance');
++    }
++}
