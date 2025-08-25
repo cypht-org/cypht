@@ -1236,14 +1236,10 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
         }
         $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">' . $this->trans('Submit') . '</button></div></div>';
         $client  = SieveConnectionPool::get($mailbox['id']);
-        // $current_script = SieveConnectionPool::getScript($mailbox['id'], 'blocked_senders');
         $current_script = SieveConnectionPool::getScript($mailbox['id'], 'blocked_senders');
-        // $client->getScript('blocked_senders');
         $scripts = $client->listScripts();
-        exit(var_dump($scripts, $current_script));//SieveConnectionPool::get($imapServer);
         list($scripts, $current_script) = get_all_scripts($mailbox['id'], true);
         $blocked_senders = get_blocked_senders_array($current_script, $scripts);
-        exit(var_dump($blocked_senders));
         $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
         $res = '<div class="sievefilters_accounts_item">';
         $res .= '<div class="sievefilters_accounts_title settings_subtitle py-2 border-bottom cursor-pointer d-flex justify-content-between" data-num-blocked="' . $num_blocked . '">' . $mailbox['name'];
@@ -1466,7 +1462,7 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
         }
         
         try {
-            $current_script = get_all_scripts($this->config, $this->user_config, $imap_account, true, 'current_script');
+            list($scripts, $current_script) = get_all_scripts($form['imap_server_id'], true);
 
             $blocked_senders = [];
             if ($current_script != '') {
@@ -1551,6 +1547,7 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
         }
         // set the sieve connection pool with the sieve accounts configs
         if (!empty($sieve_accounts_configs)) {
+            SieveConnectionPool::setCache($this->cache);
             SieveConnectionPool::setConfig($sieve_accounts_configs);
         }
         if (isset($accounts[$form['imap_server_id']])) {
@@ -1574,7 +1571,8 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
-            list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox, true);
+            // list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox, true);
+            list($scripts, $current_script) = get_all_scripts($form['imap_server_id'], true);
             $linked_mailboxes = get_sieve_linked_mailbox($scripts, $current_script);
             if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
                 try {
@@ -1623,7 +1621,9 @@ class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
             $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
-            list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox);
+            $client  = SieveConnectionPool::get($mailbox['id']);
+            // list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox);
+            list($scripts) = get_all_scripts($form['imap_server_id'], false);
             if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this, $scripts, $client)) {
                 $this->out('sieve_can_delete_folder', false);
                 Hm_Msgs::add('This folder can\'t be deleted because it is used in a Sieve filter.', 'warning');

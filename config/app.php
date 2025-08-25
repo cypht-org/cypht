@@ -430,10 +430,11 @@ return [
     | only one email source, this option is less likely to be a problem.
     |
     |
-    | 'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
-    | 'cache_class' => env('CACHE_CLASS')
     */
 
+    'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
+
+    'cache_class' => env('CACHE_CLASS'),
 
     /*
     | -------------

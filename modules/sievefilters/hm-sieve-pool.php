@@ -87,7 +87,6 @@ class SieveConnectionPool
 
         // Try to fetch from persistent cache
         $cached = self::$cache->get($cacheKey, false, true);
-        // global $session;
         
         if ($cached && isset($cached['time']) && (time() - $cached['time']) < self::$scriptCacheTTL) {
             return $cached['data'];
@@ -103,9 +102,6 @@ class SieveConnectionPool
             'time' => time()
         ], self::$scriptCacheTTL, true);
 
-        // exit(var_dump("CACHE HIT", self::$cache->get($cacheKey, 'HEHEHEHE', true)));
-        // exit(var_dump("CACHE HIT", self::$cache->type));
-        // die();
         return $script;
     }
 
@@ -135,7 +131,7 @@ class SieveConnectionPool
      */
     private static function connectServer(array $serverConfig)
     {
-        $client = new ClientWithTimeout($serverConfig['host'], $serverConfig['port']);
+        $client = new Client($serverConfig['host'], $serverConfig['port']);
         $client->connect(
             $serverConfig['username'],
             $serverConfig['password'],
@@ -145,12 +141,4 @@ class SieveConnectionPool
         );
         return $client;
     }
-}
-
-class ClientWithTimeout extends Client
-{
-    // public function getSocket()
-    // {
-    //     return $this->sock;
-    // }
 }
