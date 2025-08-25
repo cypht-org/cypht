@@ -614,13 +614,13 @@ function Message_List() {
     };
 
     this.update = function(msgs, id, store) {
-        Hm_Utils.tbody().html('');
+        Hm_Utils.tbody(id).html('');
         let msgArray = msgs;
         if (! Array.isArray(msgArray)) {
             msgArray = Object.entries(msgArray);
         }
         for (let row of msgArray) {
-            Hm_Utils.tbody().append(row[0]);
+            Hm_Utils.tbody(id).append(row[0]);
         }
     };
 
@@ -1649,11 +1649,14 @@ var Hm_Utils = {
         }
     },
 
-    rows: function() {
-        return this.tbody().find('tr').not('.inline_msg');
+    rows: function(id) {
+        return this.tbody(id).find('tr').not('.inline_msg');
     },
 
-    tbody: function() {
+    tbody: function(id) {
+        if (id) {
+            return $('#'+id);
+        }
         return $('.message_table_body');
     },
 
