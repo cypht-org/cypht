@@ -22,7 +22,7 @@ $(function() {
     // refresh the unread messages state
     setInterval(() => {
         // undefined_undefined: load with no filter and no keyword
-        new Hm_MessagesStore('unread', 1, 'undefined_undefined').load(true, true).then((store) => {
+        new Hm_MessagesStore('unread', getParam('list_page') || 1, 'undefined_undefined').load(true, true).then((store) => {
             store.newMessages.forEach((messageRow) => {
                 triggerNewMessageEvent($(messageRow).data('uid'), $(messageRow)[0]);
             });
