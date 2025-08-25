@@ -1,4 +1,5 @@
-version: '3.8'
+# this is a demo of using the production cypht image
+
 services:
   db:
     image: mariadb:10
@@ -12,7 +13,7 @@ services:
       - MYSQL_USER=cypht
       - MYSQL_PASSWORD=cypht_password
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ucypht", "-pcypht_password"]
       interval: 10s
       timeout: 5s
       retries: 5
