@@ -269,7 +269,12 @@ class Hm_EWS {
             $msg = new Type\MessageType();
             $msg->setFrom($from);
             $msg->setToRecipients($recipients);
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             if ($delivery_receipt) {
                 $msg->setIsDeliveryReceiptRequested($delivery_receipt);
             }
@@ -290,7 +295,12 @@ class Hm_EWS {
                 $folder = new Type\FolderIdType($folder);
             }
             $msg = new Type\MessageType();
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             $flags = 0;
             if ($seen) {
                 $flags |= self::PID_TAG_MESSAGE_READ;
@@ -298,13 +308,17 @@ class Hm_EWS {
             if ($draft) {
                 $flags |= self::PID_TAG_MESSAGE_DRAFT;
             }
-            $msg->addExtendedProperty(Type\ExtendedPropertyType::buildFromArray([
-                'ExtendedFieldURI' => [
-                    'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
-                    'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
-                ],
+            $extendedFieldURI = Type\PathToExtendedFieldType::buildFromArray([
+                'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
+                'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+            ]);
+
+            $extendedProperty = Type\ExtendedPropertyType::buildFromArray([
+                'ExtendedFieldURI' => $extendedFieldURI,
                 'Value' => $flags,
-            ]));
+            ]);
+            $msg->addExtendedProperty($extendedProperty);
+
             $result = $this->api->sendMail($msg, [
                 'MessageDisposition' => 'SaveOnly',
                 'SavedItemFolderId' => $folder->toArray(true),
@@ -548,7 +562,7 @@ class Hm_EWS {
                 'google_thread_id' => null,
                 'google_labels' => null,
                 'list_archive' => null,
-                'references' => $message->getRreferences(),
+                'references' => $message->getReferences(),
                 'message_id' => $message->getInternetMessageId(),
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
@@ -924,10 +938,29 @@ class Hm_EWS {
             }
             return $result;
         } elseif (is_object($data) && $data->Mailbox) {
-            return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
-        } elseif (is_object($data) && $data->getMailbox()) {
-            return $data->getMailbox()->getName() . ' <' . $data->getMailbox()->getEmailAddress() . '>';
-        } else {
+            if(is_array($data->Mailbox)) {
+                $result = [];
+                foreach ($data->Mailbox as $mailbox) {
+                    $result[] = $this->extract_mailbox($mailbox);
+                }
+                return $result;
+            }else {
+                return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
+            }
+        } elseif (is_object($data) && method_exists($data, 'getMailbox')) {
+            $mailbox = $data->getMailbox();
+            if (method_exists($mailbox, 'getName') && method_exists($mailbox, 'getEmailAddress')) {
+                $name = $mailbox->getName();
+                $email = $mailbox->getEmailAddress();
+                return $name ? $name . ' <' . $email . '>' : $email;
+            } else {
+                return (string) $mailbox;
+            }
+        } elseif (is_object($data) && method_exists($data, 'getName') && method_exists($data, 'getEmailAddress')) {
+            $name = $data->getName();
+            $email = $data->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
+        }else {
             return (string) $data;
         }
     }
