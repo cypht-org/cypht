@@ -2,7 +2,6 @@
 ini_set('memory_limit', '2048M');
 
 use PhpSieveManager\ManageSieve\Client;
-
 class SieveConnectionPool
 {
     private static $config = [];
@@ -11,15 +10,29 @@ class SieveConnectionPool
     /**
      * Default timeout for connections in seconds.
      */
-    private static $timeout = 300;
+    private static $timeout = 600;
 
-    private static $scriptCache = [];
     /**
      * Cache TTL in seconds
      */
-    private static $scriptCacheTTL = 300;
+    private static $scriptCacheTTL = 600;
+
+    /**
+     * Cache instance (injected or global)
+     */
+    private static $cache = null;
 
     private function __construct() {}
+
+    /**
+     * Optionally inject a global cache instance (Hm_Cache)
+     */
+    public static function setCache($cacheInstance)
+    {
+        if(!self::$cache) {
+            self::$cache = $cacheInstance;
+        }
+    }
 
     /**
      * Set the configuration for all servers
@@ -62,30 +75,50 @@ class SieveConnectionPool
     }
 
     /**
-     * Get a script by name for a given connection key with caching
+     * Get a script by name for a given connection key with persistent caching
      */
     public static function getScript($key, string $scriptName)
     {
-        // Check cache first
-        if (isset(self::$scriptCache[$key][$scriptName])) {
-            $cacheEntry = self::$scriptCache[$key][$scriptName];
-            if ((time() - $cacheEntry['time']) < self::$scriptCacheTTL) {
-                return $cacheEntry['data'];
-            }
+        if (!self::$cache) {
+            throw new Exception("Cache instance not set. Call SieveConnectionPool::setCache() first.");
+        }
+
+        $cacheKey = "sieve_script_{$key}_{$scriptName}";
+
+        // Try to fetch from persistent cache
+        $cached = self::$cache->get($cacheKey, false, true);
+        // global $session;
+        
+        if ($cached && isset($cached['time']) && (time() - $cached['time']) < self::$scriptCacheTTL) {
+            return $cached['data'];
         }
         
-        // Cache miss or expired — fetch from server
+        // Cache miss — fetch from server
         $client = self::get($key);
-        exit(var_dump($client));
         $script = $client->getScript($scriptName);
-
-        // Cache the script data with current timestamp
-        self::$scriptCache[$key][$scriptName] = [
+        
+        // Save into persistent cache
+        self::$cache->set($cacheKey, [
             'data' => $script,
             'time' => time()
-        ];
+        ], self::$scriptCacheTTL, true);
 
+        // exit(var_dump("CACHE HIT", self::$cache->get($cacheKey, 'HEHEHEHE', true)));
+        // exit(var_dump("CACHE HIT", self::$cache->type));
+        // die();
         return $script;
+    }
+
+    /**
+     * Optional: clear cached script
+     */
+    public static function clearScriptCache($key, string $scriptName)
+    {
+        if (!self::$cache) {
+            return false;
+        }
+        $cacheKey = "sieve_script_{$key}_{$scriptName}";
+        return self::$cache->del($cacheKey);
     }
 
     /**
@@ -110,12 +143,6 @@ class SieveConnectionPool
             "",
             $serverConfig['authType'] ?? "PLAIN"
         );
-        // $client->listScripts();
-        self::getScript($serverConfig['id'],'blocked_senders');
-        // $sock = $client->getSocket();
-        // if (is_resource($sock)) {
-        //     stream_set_timeout($sock, 10);
-        // }
         return $client;
     }
 }
