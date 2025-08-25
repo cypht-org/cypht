@@ -1185,6 +1185,9 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             if (!$mailbox->message_action($folder_name, mb_strtoupper($action_type), $uids)['status']) {
                 $error = true;
             } else {
+                foreach ($uids as $uid) {
+                    $moved[] = sprintf("imap_%s_%s_%s", $server_details['id'], $uid, $folder);
+                }
                 if ($action_type == 'delete') {
                     $mailbox->message_action($folder_name, 'EXPUNGE', $uids);
                 }
