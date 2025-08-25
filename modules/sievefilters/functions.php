@@ -451,7 +451,6 @@ if (!hm_exists('block_filter_dropdown')) {
 if (!hm_exists('get_blocked_senders_array')) {
     function get_blocked_senders_array($current_script, $scripts)
     {
-        exit(var_dump($scripts, $current_script));
         try {
             if (!is_array($scripts) || array_search('blocked_senders', $scripts, true) === false) {
                 return [];
@@ -461,7 +460,6 @@ if (!hm_exists('get_blocked_senders_array')) {
                 // $blocked_list = prepare_sieve_script ($current_script);
                 $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $current_script, 0)[1]);
                 $blocked_list = json_decode(base64_decode($base64_obj));
-                exit(var_dump($scripts, $current_script, $blocked_list));
                 if (!$blocked_list) {
                     return [];
                 }
@@ -590,7 +588,7 @@ if (!hm_exists('get_all_scripts')) {
                 }
                 $current_script = '';
                 if($load_current) {
-                    $current_script = $client->getScript('blocked_senders');
+                    $current_script = SieveConnectionPool::getScript($imapServer, 'blocked_senders');
                 }
                 if ($return_only === 'scripts') return $scripts;
                 if ($return_only === 'current_script') return $current_script;
