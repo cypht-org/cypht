@@ -56,10 +56,14 @@
         "twbs/bootstrap": "^5.3",
         "twbs/bootstrap-icons": "^1.11",
         "webklex/composer-info": "^0.0.1",
-        "zbateson/mail-mime-parser": "^3.0"
+        "zbateson/mail-mime-parser": "^3.0",
+        "cweagans/composer-patches": "^1.7"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
+    },
+    "extra": {
+        "patches-file": "./composer-patches.json"
     },
     "suggest": {
         "ext-pdo": "To use database features, this needs to be installed",
@@ -75,7 +79,8 @@
         },
         "optimize-autoloader": true,
         "allow-plugins": {
-            "endroid/installer": false
+            "endroid/installer": false,
+            "cweagans/composer-patches": true
         }
     },
     "scripts": {

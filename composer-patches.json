@@ -1,0 +1,7 @@
+{
+  "patches": {
+    "garethp/php-ews": {
+      "Add TypeConverter class to handle stdClass deserialization": "./composer-patches/ews-type-converter-stdclass.patch"
+    }
+  }
+}
