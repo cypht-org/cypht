@@ -128,8 +128,8 @@ var capture_subject_click = function() {
         var uid = msg_details[0];
         var list_path = msg_details[1];
         var inline_msg_loaded_callback = function() {
-            if ($('.header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
-                $('.header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
+            if ($('.js-header_subject th').find('i.bi.bi-x-lg.close_inline_msg').length === 0) {
+                $('.js-header_subject th').append('<i class="bi bi-x-lg close_inline_msg"></i>');
                 $('.close_inline_msg').on("click", function() { msg_inline_close(); });
                 $('.msg_part_link').on("click", function() { return get_message_content($(this).data('messagePart'), uid, list_path, list_path, details, inline_msg_loaded_callback); });
             }

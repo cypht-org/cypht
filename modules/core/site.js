@@ -1999,7 +1999,7 @@ function fixLtrInRtl() {
     function getElements() {
         var pageName = getPageNameParam();
         if (pageName == "message") {
-            return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
+            return [...$(".msg_text_inner").find('*'), ...$(".js-header_subject").find("*")];
         }
         if (pageName == "message_list" || pageName == "?page=history") {
             return [...$('*')];
