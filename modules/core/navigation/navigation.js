@@ -86,6 +86,7 @@ async function navigate(url, loaderMessage) {
     try {
         const response = await fetch(url, {
             method: 'GET',
+            credentials: 'include',
         });
 
         if (!response.ok) {
@@ -98,16 +99,32 @@ async function navigate(url, loaderMessage) {
         }
 
         const html = await response.text();
-        const main = html.match(/<main[^>]*>((.|[\n\r])*)<\/main>/i)[0];
-        const title = html.match(/<title[^>]*>((.|[\n\r])*)<\/title>/i)[0];
+        if (!html || typeof html !== 'string') {
+            throw new Error("Failed navigating to page, empty or invalid response body.");
+        }
+        const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+        if (!titleMatch) {
+            throw new Error("No <title> element found in response HTML");
+        }
+        const title = titleMatch[1];
+        const mainMatch = html.match(/<main\b[^>]*>[\s\S]*?<\/main>/im);
+        if (!mainMatch) {
+            throw new Error("No <main> element found in response HTML");
+        }
+        const main = mainMatch[0];
 
+        let $mainEl = $(main);
         let cyphtMain;
-        if ($(main).attr('id') === 'cypht-main') {
-            $('main#cypht-main').replaceWith(main);
-            cyphtMain = main;
+        if ($mainEl.attr('id') === 'cypht-main') {
+            $('main#cypht-main').replaceWith($mainEl);
+            cyphtMain = $mainEl.prop('outerHTML');
         } else {
-            $('main#cypht-main').replaceWith($(main).find('#cypht-main'));
-            cyphtMain = $(main).find('#cypht-main').prop('outerHTML');
+            const innerMain = $mainEl.find('#cypht-main');
+            if (innerMain.length === 0) {
+                throw new Error("Element with id='cypht-main' not found in new main.");
+            }
+            $('main#cypht-main').replaceWith(innerMain);
+            cyphtMain = innerMain.prop('outerHTML');
         }
         document.title = title.replace(/<[^>]*>/g, '');
         
