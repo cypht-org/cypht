@@ -976,14 +976,11 @@ class Hm_EWS {
                 return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
             }
         } elseif (is_object($data) && method_exists($data, 'getMailbox')) {
-            $mailbox = $data->getMailbox();
-            if (method_exists($mailbox, 'getName') && method_exists($mailbox, 'getEmailAddress')) {
-                $name = $mailbox->getName();
-                $email = $mailbox->getEmailAddress();
-                return $name ? $name . ' <' . $email . '>' : $email;
-            } else {
-                return (string) $mailbox;
-            }
+            $mailbox = $data->getMailbox()->getMailbox();
+            
+            $name = $mailbox->getName();
+            $email = $mailbox->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
         } elseif (is_object($data) && method_exists($data, 'getName') && method_exists($data, 'getEmailAddress')) {
             $name = $data->getName();
             $email = $data->getEmailAddress();
