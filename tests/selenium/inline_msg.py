@@ -34,8 +34,8 @@ class InlineMsgTests(SettingsHelpers):
             body = self.by_class('message_table_body')
             subject = body.find_element(By.CLASS_NAME, 'subject')
             subject.find_element(By.TAG_NAME, 'a').click()
-            self.wait_on_class('header_subject')
-            detail_subject = self.by_class('header_subject')
+            self.wait_on_class('js-header_subject')
+            detail_subject = self.by_class('js-header_subject')
             header = detail_subject.find_element(By.TAG_NAME, 'th')
             assert header.text.startswith('recent')
 
