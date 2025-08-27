@@ -372,13 +372,12 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 }
                 $txt .= forward_dropdown($this, $reply_args);
             }
-            
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                $txt .= '<a class="flagged_link hlink text-decoration-none" id="flag_msg" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none hide" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
                 $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             } else {
-                $txt .= '<a id="flag_msg" class="unflagged_link hlink text-decoration-none" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a class="flagged_link hlink text-decoration-none" id="unflag_msg" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none hide" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
 
             $txt .= '<a class="hlink text-decoration-none" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
