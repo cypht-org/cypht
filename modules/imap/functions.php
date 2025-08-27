@@ -261,21 +261,18 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         if ($is_snoozed) {
             $snooze_header = parse_delayed_header('X-Snoozed: '.$msg['x_snoozed'], 'X-Snoozed');
             $date = $snooze_header['until'];
-            $convertedDate = $date instanceof DateTime ? $date->format('Y-m-d H:i:s') : $date;
-            $timestamp = strtotime($convertedDate);
+            $timestamp = strtotime($date);
         } elseif ($is_scheduled) {
             $date = $msg['x_schedule'];
-            $convertedDate = $date instanceof DateTime ? $date->format('Y-m-d H:i:s') : $date;
-            $timestamp = strtotime($convertedDate);
+            $timestamp = strtotime($date);
         } else {
             if ($list_sort == 'date') {
                 $date_field = 'date';
             } else {
                 $date_field = 'internal_date';
             }
-            $convertedDate = $msg[$date_field] instanceof DateTime ? $msg[$date_field]->format('Y-m-d H:i:s') : $msg[$date_field];
-            $date = translate_time_str(human_readable_interval($convertedDate), $output_module);
-            $timestamp = strtotime($convertedDate);
+            $date = translate_time_str(human_readable_interval($msg[$date_field]), $output_module);
+            $timestamp = strtotime($msg[$date_field]);
         }
 
         $flags = array();
@@ -342,7 +339,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('safe_output_callback', 'source', $source),
                     array('safe_output_callback', 'from'.$nofrom, $from, null, str_replace(array($from, '<', '>'), '', $msg['from'])),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
-                    array('dates_holders_callback', $msg['internal_date'] instanceof DateTime ? $msg['internal_date']->format('Y-m-d H:i:s') : $msg['internal_date'], $msg['date'] instanceof DateTime ? $msg['date']->format('Y-m-d H:i:s') : $msg['date']),
+                    array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
                 $id,
                 $style,
@@ -360,7 +357,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
                     array('subject_callback', $subject, $url, $flags, null, $preview_msg),
                     array('date_callback', $date, $timestamp, $is_snoozed || $is_scheduled),
                     array('icon_callback', $flags),
-                    array('dates_holders_callback', $msg['internal_date'] instanceof DateTime ? $msg['internal_date']->format('Y-m-d H:i:s') : $msg['internal_date'], $msg['date'] instanceof DateTime ? $msg['date']->format('Y-m-d H:i:s') : $msg['date']),
+                    array('dates_holders_callback', $msg['internal_date'], $msg['date']),
                 ),
                 $id,
                 $style,

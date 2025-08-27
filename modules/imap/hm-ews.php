@@ -548,9 +548,9 @@ class Hm_EWS {
             $msg = [
                 'uid' => $uid,
                 'flags' => implode(' ', $flags),
-                'internal_date' => $message->getDateTimeCreated(),
+                'internal_date' => $message->getDateTimeCreated()->format('Y-m-d H:i:s.u'),
                 'size' => $message->getSize(),
-                'date' => $message->getDateTimeReceived(),
+                'date' => $message->getDateTimeReceived()->format('Y-m-d H:i:s.u'),
                 'from' => $this->extract_mailbox($message->getFrom()),
                 'to' => $this->extract_mailbox($message->getToRecipients()),
                 'subject' => $message->getSubject(),
@@ -698,6 +698,7 @@ class Hm_EWS {
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
+                'IncludeMimeContent' => true,
                 'AdditionalProperties' => [
                     'ExtendedFieldURI' => [
                         [
@@ -720,9 +721,9 @@ class Hm_EWS {
         $sender = $message->getSender();
         $from = $message->getFrom();
         $headers = [];
-        $headers['Arrival Date'] = $message->getDateTimeCreated();
+        $headers['Arrival Date'] = $message->getDateTimeCreated()->format('Y-m-d H:i:s.u');
         if ($sender && $from) {
-            $headers['From'] = $message->getSsender()->getMailbox()->getName() . ' <' . $message->getFrom()->getMailbox()->getEmailAddress() . '>';
+            $headers['From'] = $message->getSender()->getMailbox()->getName() . ' <' . $message->getSender()->getMailbox()->getEmailAddress() . '>';
         } elseif ($sender) {
             $headers['From'] = $this->extract_mailbox($sender);
         } elseif ($from) {
@@ -731,13 +732,40 @@ class Hm_EWS {
             $headers['From'] = null;
         }
         $headers['To'] = $this->extract_mailbox($message->getToRecipients());
+        if(is_array($headers['To'])) {
+            $headers['To'] = implode(', ', $headers['To']);
+        }
         if ($message->getCcRecipients()) {
             $headers['Cc'] = $this->extract_mailbox($message->getCcRecipients());
+        }
+        if(is_array($headers['Cc'])) {
+            $headers['Cc'] = implode(', ', $headers['Cc']);
         }
         if ($message->getBccRecipients()) {
             $headers['Bcc'] = $this->extract_mailbox($message->getBccRecipients());
         }
+        if(is_array($headers['Bcc'])) {
+            $headers['Bcc'] = implode(', ', $headers['Bcc']);
+        }
         $headers['Flags'] = implode(' ', $this->extract_flags($message));
+
+        $mime = $message->getMimeContent();
+        $content = base64_decode($mime);
+        if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
+        }
+        $parser = new MailMimeParser();
+        $n = $parser->parse($content, false);
+        // Get ONLY the headers
+        $h = $n->getAllHeaders();
+
+        // Display headers
+        foreach ($h as $header) {
+            if(!isset($headers[$header->getName()])) {
+                $headers[$header->getName()] = $header->getValue();
+            }
+        }
+
         foreach ($message->getInternetMessageHeaders() as $header) {
             $name = $header->getHeaderName();
             if (isset($headers[$name])) {
@@ -845,7 +873,7 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
-        $mime = $message->getMmimeContent();
+        $mime = $message->getMimeContent();
         $content = base64_decode($mime);
         if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
             $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
