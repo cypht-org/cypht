@@ -126,7 +126,7 @@ var display_feed_item_content = function(res) {
     $('.msg_text').append(res.feed_msg_headers);
     $('.msg_text').append(res.feed_msg_text);
     set_message_content();
-    document.title = $('.js-header_subject h4').text();
+    document.title = $('.header_subject h4').text();
     const path = getListPathParam();
     Hm_Message_List.prev_next_links(msg_uid, getParam('list_parent'));
     if (Hm_Message_List.track_read_messages(path+'_'+msg_uid)) {
