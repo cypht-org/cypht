@@ -795,7 +795,7 @@ return [
     //     |
     //     | Github repository tracking.
     //     */
-    //     // 'github',
+        'github',
 
     //     /*
     //     | ---------
@@ -813,7 +813,7 @@ return [
     //     |
     //     | WordPress.com notifications.
     //     */
-    //     // 'wordpress',
+        'wordpress',
 
     //     /*
     //     | -------
@@ -885,7 +885,7 @@ return [
     //     |
     //     | Support for adding/renaming/deleting folders in IMAP accounts
     //     */
-    //     'imap_folders',
+         'imap_folders',
 
     //     /*
     //     | ------------------
