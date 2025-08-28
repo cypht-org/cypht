@@ -519,6 +519,7 @@ function format_msg_part_row($id, $vals, $output_mod, $level, $part, $dl_args, $
             $res .= '</td><td class="part_encoding">'.(isset($vals['encoding']) ? $output_mod->html_safe(mb_strtolower($vals['encoding'])) : '').
                 '</td><td class="part_charset">'.(isset($vals['attributes']['charset']) && trim($vals['attributes']['charset']) ? $output_mod->html_safe(mb_strtolower($vals['attributes']['charset'])) : '');
         }
+        exit(var_dump($desc));
         $res .= '</td><td class="part_desc">'.$output_mod->html_safe(decode_fld($desc)).'</td>';
         $res .= '<td class="download_link"><a href="#" data-src="?'.$dl_args.'&amp;imap_msg_part='.$output_mod->html_safe($id).'">'.$output_mod->trans('Download').'</a></td>';
     }
@@ -590,6 +591,7 @@ function get_part_desc($vals, $id, $part) {
     elseif (isset($vals['envelope']['subject']) && trim($vals['envelope']['subject'])) {
         $desc = $vals['envelope']['subject'];
     }
+    // exit(var_dump("filename", $vals));
     $filename = get_imap_part_name($vals, $id, $part, true);
     if (!$desc && $filename) {
         $desc = $filename;
