@@ -550,6 +550,10 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
+                
+                // Handle folder conversion - both IMAP and EWS use hex2bin but for different purposes
+                // IMAP: hex2bin("494e424f58") -> "INBOX" (folder name)
+                // EWS: hex2bin("41414d6b...") -> "AAMkADk5..." (base64 Exchange folder ID)
                 $folder = hex2bin($parts[2]);
                 $spcial_folders = get_special_folders($this, $parts[1]);
                 if (array_key_exists(strtolower($folder), $spcial_folders)) {
@@ -560,9 +564,20 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
                     }
+                    
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
-                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
+                    
+                    // For EWS, if we can't get a friendly name, try to use a connected mailbox
+                    if (!$label && isset($details['type']) && $details['type'] === 'ews') {
+                        $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
+                        if ($connected_mailbox && $connected_mailbox->authed()) {
+                            $folder_status = $connected_mailbox->get_folder_status($folder, false);
+                            $label = $folder_status['name'] ?? null;
+                        }
+                    }
+                 
+                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label ?: $folder);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
@@ -1990,6 +2005,7 @@ class Hm_Handler_imap_store_reply_details extends Hm_Handler_Module {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
+            $prefetch = true;  // Set prefetch to true for this context
             $mailbox->set_read_only($prefetch);
             $part = false;
             list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($folder), $uid, $part, $this->user_config->get('text_only_setting', false));
