@@ -382,8 +382,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
 
             $txt .= '<a class="hlink text-decoration-none" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
             $txt .= '<a class="delete_link hlink text-decoration-none" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
-            $txt .= '<div class="position-relative"><a class="hlink" id="copy_message" href="#">'.$this->trans('Copy').'</a><div class="move_to_location"></div></div>';
-            $txt .= '<div class="position-relative"><a class="hlink" id="move_message" href="#">'.$this->trans('Move').'</a><div class="move_to_location"></div></div>';
+            $txt .= '<div class="position-relative"><a class="hlink" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
+            $txt .= '<div class="position-relative"><a class="hlink" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             
             if($this->get('tags')){
@@ -812,11 +812,11 @@ class Hm_Output_get_list_imap_folders_permissions extends Hm_Output_Module {
 class Hm_Output_move_copy_controls extends Hm_Output_Module {
     protected function output() {
         if ($this->get('move_copy_controls', false)) {
-            $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-            $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="copy" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" data-bs-toggle="dropdown" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
-            $res .= '<div class="move_to_location dropdown-menu"></div>';
+            $res .= '<div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
