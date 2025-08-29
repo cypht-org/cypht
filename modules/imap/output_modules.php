@@ -308,7 +308,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $is_draft = isset($headers['Flags']) && mb_stristr($headers['Flags'], 'draft');
             if($is_draft) {
-                $txt .= '<tr class="header_space"><th colspan="2"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></th></tr>';
+                $txt .= '<div class="row g-0 py-2"><div class="col-12 text-center"><a class="btn btn-primary" href="?page=compose'.$reply_args.'&imap_draft=1"><i class="bi bi-pencil"></i> '.$this->trans('Edit Draft').'</a></div></div>';
             }
             foreach ($headers as $name => $value) {
                 if (!in_array(mb_strtolower($name), $small_headers)) {
