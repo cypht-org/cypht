@@ -981,13 +981,14 @@ div.unseen,
 .mobile .folder_list {
   margin-right: 0px;
   width: 100%;
+  padding-top: 0px;
 }
 .mobile .folder_list li {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 .mobile .content_cell {
-  padding-top: 60px;
+  padding-top: 50px;
   display: block;
   width: 100%;
 }
@@ -1021,9 +1022,6 @@ div.unseen,
 .mobile .message_table {
   padding-left: 5px !important;
 }
-.mobile .message_list {
-  margin-top: 30px !important;
-}
 .mobile .list_settings_link {
   width: 24px;
   height: 24px;
@@ -1032,7 +1030,7 @@ div.unseen,
 .mobile .msg_text {
   white-space: nowrap !important;
   width: 100%;
-  max-width: 480px !important;
+  max-width: 768px !important;
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
@@ -1431,7 +1429,7 @@ div.unseen,
   z-index: 1000;
   text-align: left;
   top: 0;
-  padding: 15px 0 15px 20px;
+  padding: 10px 0 10px 20px;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
@@ -1649,13 +1647,8 @@ a[disabled] {
   }
 
   .msg_actions a {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    background-color: #f8f9fa;
-    text-decoration: none;
     color: #495057;
-    font-size: 0.6rem;
-    margin-right: 0;
+    font-size: 0.85rem;
   }
 
   .mobile nav.folder_cell { width: 50%; }
@@ -1663,4 +1656,5 @@ a[disabled] {
 
 @media (max-width: 575px) {
   .mobile nav.folder_cell { width: 100%; }
+  .mobile .msg_text { padding-top: 5px; }
 }
