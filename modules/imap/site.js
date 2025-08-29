@@ -409,7 +409,7 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
                     } else {
                         Hm_Utils.tbody().append(row);
                     }
-                } else if (tableRow.attr('class') !== $(row).attr('class')) {
+                } else if (tableRow.attr('class').trim() !== $(row).attr('class').trim()) {
                     tableRow.replaceWith(row);
                 }
             }
@@ -470,14 +470,8 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         $('#imap_filter_form').trigger('submit');
     });
 
-    const hadLocalData = store.hasLocalData();
     await select_imap_folder(listPath, listPage);
-
     handleMessagesDragAndDrop();
-
-    if (hadLocalData) {
-        await select_imap_folder(listPath, listPage, true)
-    }
 
     // Refresh in the background each 60 seconds
     const interval = setInterval(async () => {
