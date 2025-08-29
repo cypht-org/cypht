@@ -1610,6 +1610,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
+            $this->out('move_copy_controls', true);
         }
         else {
             $path = '';
