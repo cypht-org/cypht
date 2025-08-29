@@ -908,8 +908,8 @@ var search_selected_for_imap = function() {
         $('.imap_move').addClass('disabled_input');
         $('.imap_move').off('click');
         $('.imap_move').on("click", function() { return false; });
+        bootstrap.Dropdown.getOrCreateInstance($('.move_to_location')[0]).hide();
         $('.move_to_location').html('');
-        $('.move_to_location').hide();
     }
 };
 
@@ -925,7 +925,7 @@ var imap_move_copy = function(e, action, context) {
     e.preventDefault()
     var move_to;
     if (!e.target || e.target.classList.contains('imap_move')) {
-        move_to = $('.msg_controls .move_to_location');
+        move_to = $('.msg_controls .move_to_location')[0];
     }
     else {
         move_to = $(e.target).next('.move_to_location')[0];
@@ -952,10 +952,9 @@ var imap_move_copy = function(e, action, context) {
     $('.move_to_type').val(action);
     $('.close_move_to').on("click", function() {
         $('.move_to_location').html('');
-        $('.move_to_location').hide();
+        bootstrap.Dropdown.getOrCreateInstance(move_to).hide();
         return false;
     });
-    $(move_to).show();
     return false;
 };
 
@@ -965,8 +964,8 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
     }
     var ids = [];
     var page = getPageNameParam();
+    bootstrap.Dropdown.getOrCreateInstance($('.move_to_location')[0]).hide();
     $('.move_to_location').html('');
-    $('.move_to_location').hide();
 
     if (context == 'message') {
         var inline_uuid = Hm_Utils.get_from_global('inline_move_uuid', false);
