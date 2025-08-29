@@ -269,7 +269,12 @@ class Hm_EWS {
             $msg = new Type\MessageType();
             $msg->setFrom($from);
             $msg->setToRecipients($recipients);
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             if ($delivery_receipt) {
                 $msg->setIsDeliveryReceiptRequested($delivery_receipt);
             }
@@ -290,7 +295,12 @@ class Hm_EWS {
                 $folder = new Type\FolderIdType($folder);
             }
             $msg = new Type\MessageType();
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             $flags = 0;
             if ($seen) {
                 $flags |= self::PID_TAG_MESSAGE_READ;
@@ -298,13 +308,17 @@ class Hm_EWS {
             if ($draft) {
                 $flags |= self::PID_TAG_MESSAGE_DRAFT;
             }
-            $msg->addExtendedProperty(Type\ExtendedPropertyType::buildFromArray([
-                'ExtendedFieldURI' => [
-                    'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
-                    'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
-                ],
+            $extendedFieldURI = Type\PathToExtendedFieldType::buildFromArray([
+                'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
+                'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+            ]);
+
+            $extendedProperty = Type\ExtendedPropertyType::buildFromArray([
+                'ExtendedFieldURI' => $extendedFieldURI,
                 'Value' => $flags,
-            ]));
+            ]);
+            $msg->addExtendedProperty($extendedProperty);
+
             $result = $this->api->sendMail($msg, [
                 'MessageDisposition' => 'SaveOnly',
                 'SavedItemFolderId' => $folder->toArray(true),
@@ -534,9 +548,9 @@ class Hm_EWS {
             $msg = [
                 'uid' => $uid,
                 'flags' => implode(' ', $flags),
-                'internal_date' => $message->getDateTimeCreated(),
+                'internal_date' => $message->getDateTimeCreated()->format('Y-m-d H:i:s.u'),
                 'size' => $message->getSize(),
-                'date' => $message->getDateTimeReceived(),
+                'date' => $message->getDateTimeReceived()->format('Y-m-d H:i:s.u'),
                 'from' => $this->extract_mailbox($message->getFrom()),
                 'to' => $this->extract_mailbox($message->getToRecipients()),
                 'subject' => $message->getSubject(),
@@ -548,7 +562,7 @@ class Hm_EWS {
                 'google_thread_id' => null,
                 'google_labels' => null,
                 'list_archive' => null,
-                'references' => $message->getRreferences(),
+                'references' => $message->getReferences(),
                 'message_id' => $message->getInternetMessageId(),
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
@@ -684,6 +698,7 @@ class Hm_EWS {
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
+                'IncludeMimeContent' => true,
                 'AdditionalProperties' => [
                     'ExtendedFieldURI' => [
                         [
@@ -706,9 +721,9 @@ class Hm_EWS {
         $sender = $message->getSender();
         $from = $message->getFrom();
         $headers = [];
-        $headers['Arrival Date'] = $message->getDateTimeCreated();
+        $headers['Arrival Date'] = $message->getDateTimeCreated()->format('Y-m-d H:i:s.u');
         if ($sender && $from) {
-            $headers['From'] = $message->getSsender()->getMailbox()->getName() . ' <' . $message->getFrom()->getMailbox()->getEmailAddress() . '>';
+            $headers['From'] = $message->getSender()->getMailbox()->getName() . ' <' . $message->getSender()->getMailbox()->getEmailAddress() . '>';
         } elseif ($sender) {
             $headers['From'] = $this->extract_mailbox($sender);
         } elseif ($from) {
@@ -717,13 +732,40 @@ class Hm_EWS {
             $headers['From'] = null;
         }
         $headers['To'] = $this->extract_mailbox($message->getToRecipients());
+        if(is_array($headers['To'])) {
+            $headers['To'] = implode(', ', $headers['To']);
+        }
         if ($message->getCcRecipients()) {
             $headers['Cc'] = $this->extract_mailbox($message->getCcRecipients());
+        }
+        if(is_array($headers['Cc'])) {
+            $headers['Cc'] = implode(', ', $headers['Cc']);
         }
         if ($message->getBccRecipients()) {
             $headers['Bcc'] = $this->extract_mailbox($message->getBccRecipients());
         }
+        if(is_array($headers['Bcc'])) {
+            $headers['Bcc'] = implode(', ', $headers['Bcc']);
+        }
         $headers['Flags'] = implode(' ', $this->extract_flags($message));
+
+        $mime = $message->getMimeContent();
+        $content = base64_decode($mime);
+        if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
+            $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
+        }
+        $parser = new MailMimeParser();
+        $n = $parser->parse($content, false);
+        // Get ONLY the headers
+        $h = $n->getAllHeaders();
+
+        // Display headers
+        foreach ($h as $header) {
+            if(!isset($headers[$header->getName()])) {
+                $headers[$header->getName()] = $header->getValue();
+            }
+        }
+
         foreach ($message->getInternetMessageHeaders() as $header) {
             $name = $header->getHeaderName();
             if (isset($headers[$name])) {
@@ -831,7 +873,7 @@ class Hm_EWS {
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
-        $mime = $message->getMmimeContent();
+        $mime = $message->getMimeContent();
         $content = base64_decode($mime);
         if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
             $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
@@ -856,6 +898,8 @@ class Hm_EWS {
             $charset = $part->getCharset();
             if ($charset) {
                 $struct[$part_num]['attributes'] = ['charset' => $charset];
+            } else {
+                $struct[$part_num]['attributes'] = [];
             }
             $struct[$part_num]['id'] = $part->getContentId();
             $struct[$part_num]['description'] = $part->getHeaderValue('Content-Description');
@@ -864,13 +908,28 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
-            if ($filename = $part->getFilename()) {
+            
+            $filename = $this->extract_attachment_filename($part);
+            
+            if ($filename) {
+                $struct[$part_num]['attributes']['name'] = $filename;
+                $struct[$part_num]['attributes']['filename'] = $filename;
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+                $struct[$part_num]['name'] = $filename;
+                $struct[$part_num]['description'] = $filename;
+                $struct[$part_num]['filename'] = $filename;
+                
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
+                    $struct[$part_num]['disposition'] = [
+                        'attachment' => ['filename', $filename]
+                    ];
                 }
             } else {
                 $struct[$part_num]['file_attributes'] = '';
+                if (!$struct[$part_num]['description']) {
+                    $struct[$part_num]['description'] = '';
+                }
             }
             $struct[$part_num]['language'] = '';
             $struct[$part_num]['location'] = '';
@@ -916,6 +975,61 @@ class Hm_EWS {
         return $found;
     }
 
+    protected function extract_attachment_filename($part) {
+        $filename = $part->getFilename();
+        if ($filename) {
+            return $filename;
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Type', 'name');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Disposition', 'name');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $description = $part->getHeaderValue('Content-Description');
+        if ($description && strlen($description) < 100) {
+            return $description;
+        }
+        
+        return null;
+    }
+    
+    protected function decode_attachment_name($name) {
+        $name = trim($name, '"\'');
+        
+        if (preg_match('/=\?([^?]+)\?([BQ])\?([^?]+)\?=/i', $name, $matches)) {
+            $charset = $matches[1];
+            $encoding = strtoupper($matches[2]);
+            $text = $matches[3];
+            
+            if ($encoding === 'B') {
+                $decoded = base64_decode($text);
+            } elseif ($encoding === 'Q') {
+                $decoded = quoted_printable_decode(str_replace('_', ' ', $text));
+            } else {
+                $decoded = $text;
+            }
+            
+            return mb_convert_encoding($decoded, 'UTF-8', $charset);
+        }
+        
+        if (strpos($name, '%') !== false) {
+            $name = urldecode($name);
+        }
+        
+        return $name;
+    }
+
     protected function extract_mailbox($data) {
         if (is_array($data)) {
             $result = [];
@@ -924,10 +1038,26 @@ class Hm_EWS {
             }
             return $result;
         } elseif (is_object($data) && $data->Mailbox) {
-            return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
-        } elseif (is_object($data) && $data->getMailbox()) {
-            return $data->getMailbox()->getName() . ' <' . $data->getMailbox()->getEmailAddress() . '>';
-        } else {
+            if(is_array($data->Mailbox)) {
+                $result = [];
+                foreach ($data->Mailbox as $mailbox) {
+                    $result[] = $this->extract_mailbox($mailbox);
+                }
+                return $result;
+            }else {
+                return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
+            }
+        } elseif (is_object($data) && method_exists($data, 'getMailbox')) {
+            $mailbox = $data->getMailbox()->getMailbox();
+            
+            $name = $mailbox->getName();
+            $email = $mailbox->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
+        } elseif (is_object($data) && method_exists($data, 'getName') && method_exists($data, 'getEmailAddress')) {
+            $name = $data->getName();
+            $email = $data->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
+        }else {
             return (string) $data;
         }
     }
@@ -972,28 +1102,40 @@ class Hm_EWS {
 
     protected function archive_items($itemIds) {
         $result = true;
-        $folders = $this->get_parent_folders_of_items($itemIds);
-        foreach ($folders as $folder => $itemIds) {
-            if ($this->is_distinguished_folder($folder)) {
-                $folder = new Type\DistinguishedFolderIdType($folder);
-            } else {
-                $folder = new Type\FolderIdType($folder);
-            }
-            $request = [
-                'ArchiveSourceFolderId' => $folder->toArray(true),
-                'ItemIds' => [
-                    'ItemId' => $itemIds = array_map(function($itemId) {
-                        return (new Type\ItemIdType($itemId))->toArray();
-                    }, $itemIds),
-                ]
-            ];
-            $request = Type::buildFromArray($request);
+        try {
+            $archiveFolder = null;
             try {
-                $result = $result && $this->ews->ArchiveItem($request);
+                $archiveFolder = $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_INBOX);
             } catch (\Exception $e) {
-                Hm_Msgs::add($e->getMessage(), 'danger');
-                $result = false;
+                try {
+                    $rootFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+                    $createRequest = [
+                        'Folders' => ['Folder' => [
+                            'DisplayName' => 'Archive'
+                        ]],
+                        'ParentFolderId' => $rootFolder->toArray(true),
+                    ];
+                    $createResult = $this->ews->CreateFolder($createRequest);
+                    $archiveFolder = $this->api->getFolderByDisplayName('Archive', Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+                } catch (\Exception $createE) {
+                    Hm_Msgs::add('Unable to create or find archive folder: ' . $createE->getMessage(), 'danger');
+                    return false;
+                }
             }
+            
+            if (!$archiveFolder) {
+                Hm_Msgs::add('Archive folder not available', 'danger');
+                return false;
+            }
+
+            // use move_items to archive the items
+            $archiveFolderId = $archiveFolder->getFolderId()->getId();
+            $newIds = $this->move_items($itemIds, $archiveFolderId);
+            $result = !empty($newIds);
+            
+        } catch (\Exception $e) {
+            Hm_Msgs::add('Archive operation failed: ' . $e->getMessage(), 'danger');
+            $result = false;
         }
         return $result;
     }
@@ -1008,7 +1150,7 @@ class Hm_EWS {
                 $folder = new Type\FolderIdType($folder);
             }
 
-            $junkFolder = new Type\DistinguishedFolderIdType(Type\DistinguishedFolderIdType::JUNK);
+            $junkFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::JUNK);
             $request = [
                 'SourceFolderId' => $folder->toArray(true),
                 'DestinationFolderId' => $junkFolder->toArray(true),
