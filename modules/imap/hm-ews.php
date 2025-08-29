@@ -1102,28 +1102,40 @@ class Hm_EWS {
 
     protected function archive_items($itemIds) {
         $result = true;
-        $folders = $this->get_parent_folders_of_items($itemIds);
-        foreach ($folders as $folder => $itemIds) {
-            if ($this->is_distinguished_folder($folder)) {
-                $folder = new Type\DistinguishedFolderIdType($folder);
-            } else {
-                $folder = new Type\FolderIdType($folder);
-            }
-            $request = [
-                'ArchiveSourceFolderId' => $folder->toArray(true),
-                'ItemIds' => [
-                    'ItemId' => $itemIds = array_map(function($itemId) {
-                        return (new Type\ItemIdType($itemId))->toArray();
-                    }, $itemIds),
-                ]
-            ];
-            $request = Type::buildFromArray($request);
+        try {
+            $archiveFolder = null;
             try {
-                $result = $result && $this->ews->ArchiveItem($request);
+                $archiveFolder = $this->api->getFolderByDistinguishedId(Enumeration\DistinguishedFolderIdNameType::ARCHIVE_INBOX);
             } catch (\Exception $e) {
-                Hm_Msgs::add($e->getMessage(), 'danger');
-                $result = false;
+                try {
+                    $rootFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+                    $createRequest = [
+                        'Folders' => ['Folder' => [
+                            'DisplayName' => 'Archive'
+                        ]],
+                        'ParentFolderId' => $rootFolder->toArray(true),
+                    ];
+                    $createResult = $this->ews->CreateFolder($createRequest);
+                    $archiveFolder = $this->api->getFolderByDisplayName('Archive', Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
+                } catch (\Exception $createE) {
+                    Hm_Msgs::add('Unable to create or find archive folder: ' . $createE->getMessage(), 'danger');
+                    return false;
+                }
             }
+            
+            if (!$archiveFolder) {
+                Hm_Msgs::add('Archive folder not available', 'danger');
+                return false;
+            }
+
+            // use move_items to archive the items
+            $archiveFolderId = $archiveFolder->getFolderId()->getId();
+            $newIds = $this->move_items($itemIds, $archiveFolderId);
+            $result = !empty($newIds);
+            
+        } catch (\Exception $e) {
+            Hm_Msgs::add('Archive operation failed: ' . $e->getMessage(), 'danger');
+            $result = false;
         }
         return $result;
     }
@@ -1138,7 +1150,7 @@ class Hm_EWS {
                 $folder = new Type\FolderIdType($folder);
             }
 
-            $junkFolder = new Type\DistinguishedFolderIdType(Type\DistinguishedFolderIdType::JUNK);
+            $junkFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::JUNK);
             $request = [
                 'SourceFolderId' => $folder->toArray(true),
                 'DestinationFolderId' => $junkFolder->toArray(true),
