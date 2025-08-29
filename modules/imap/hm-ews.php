@@ -898,6 +898,8 @@ class Hm_EWS {
             $charset = $part->getCharset();
             if ($charset) {
                 $struct[$part_num]['attributes'] = ['charset' => $charset];
+            } else {
+                $struct[$part_num]['attributes'] = [];
             }
             $struct[$part_num]['id'] = $part->getContentId();
             $struct[$part_num]['description'] = $part->getHeaderValue('Content-Description');
@@ -910,6 +912,8 @@ class Hm_EWS {
             $filename = $this->extract_attachment_filename($part);
             
             if ($filename) {
+                $struct[$part_num]['attributes']['name'] = $filename;
+                $struct[$part_num]['attributes']['filename'] = $filename;
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
                 $struct[$part_num]['name'] = $filename;
                 $struct[$part_num]['description'] = $filename;
@@ -923,6 +927,9 @@ class Hm_EWS {
                 }
             } else {
                 $struct[$part_num]['file_attributes'] = '';
+                if (!$struct[$part_num]['description']) {
+                    $struct[$part_num]['description'] = '';
+                }
             }
             $struct[$part_num]['language'] = '';
             $struct[$part_num]['location'] = '';

@@ -1981,12 +1981,16 @@ if (!hm_exists('get_uploaded_files_from_array')) {
 function get_uploaded_files_from_array($uploaded_files) {
     $parsed_files = [];
     foreach($uploaded_files as $file) {
-        $parsed_path = explode('/', $file);
-        $parsed_files[] = [
-            'filename' => $file,
-            'type' => get_mime_type($file),
-            'name' => end($parsed_path)
-        ];
+        if (is_array($file)) {
+            $parsed_files[] = $file;
+        } else {
+            $parsed_path = explode('/', $file);
+            $parsed_files[] = [
+                'filename' => $file,
+                'type' => get_mime_type($file),
+                'name' => end($parsed_path)
+            ];
+        }
     }
     return $parsed_files;
 }
