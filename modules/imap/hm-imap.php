@@ -981,10 +981,11 @@ if (!class_exists('Hm_IMAP')) {
             if ($this->is_supported( 'X-GM-EXT-1' )) {
                 $command .= 'X-GM-MSGID X-GM-THRID X-GM-LABELS ';
             }
-            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY)]";
+            $command .= "BODY.PEEK[HEADER.FIELDS (SUBJECT X-AUTO-BCC FROM DATE CONTENT-TYPE X-PRIORITY TO LIST-ARCHIVE REFERENCES MESSAGE-ID IN-REPLY-TO X-SNOOZED X-SCHEDULE X-PROFILE-ID X-DELIVERY X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID SENDER)]";
             if ($include_content_body) {
                 $command .= " BODY.PEEK[TEXT]<0.500>";
             }
+            $command .= " BODY.PEEK[1.MIME] BODY.PEEK[2.MIME]";
             $command .= ")\r\n";
             $cache_command = $command.(string)$raw;
             $cache = $this->check_cache($cache_command);
@@ -995,8 +996,10 @@ if (!class_exists('Hm_IMAP')) {
             $res = $this->get_response(false, true);
             $status = $this->check_response($res, true);
             $tags = array('X-GM-MSGID' => 'google_msg_id', 'X-GM-THRID' => 'google_thread_id', 'X-GM-LABELS' => 'google_labels', 'UID' => 'uid', 'FLAGS' => 'flags', 'RFC822.SIZE' => 'size', 'INTERNALDATE' => 'internal_date');
-            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE');
-            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body');
+            $junk = array('X-AUTO-BCC', 'MESSAGE-ID', 'IN-REPLY-TO', 'REFERENCES', 'X-SNOOZED', 'X-SCHEDULE', 'X-PROFILE-ID', 'X-DELIVERY', 'LIST-ARCHIVE', 'SUBJECT', 'FROM', 'CONTENT-TYPE', 'TO', '(', ')', ']', 'X-PRIORITY', 'DATE', 'X-MS-EXCHANGE-CALENDAR-SERIES-INSTANCE-ID', 'SENDER');
+            $flds = array('x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'in-reply-to' => 'in_reply_to', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'date' => 'date', 'from' => 'from', 'to' => 'to', 'subject' => 'subject', 'content-type' => 'content_type', 'x-priority' => 'x_priority', 'body' => 'content_body', 'type_msg' => 'type_msg');
+            $flds['x-ms-exchange-calendar-series-instance-id'] = "x_ms_exchange_calendar_series_instance_id";
+            $flds['sender'] = "sender";
             $headers = array();
 
             foreach ($res as $n => $vals) {
@@ -1023,9 +1026,12 @@ if (!class_exists('Hm_IMAP')) {
                     $x_schedule = '';
                     $x_profile_id = '';
                     $x_delivery = '';
+                    $x_ms_exchange_calendar_series_instance_id = '';
+                    $sender = '';
                     $count = count($vals);
                     $header_founded = false;
                     $body_founded = false;
+                    $flds['type_msg'] = '';
                     for ($i=0;$i<$count;$i++) {
                         if ($vals[$i] == 'BODY[HEADER.FIELDS' && !$header_founded) {
                             $header_founded = true;
@@ -1044,6 +1050,14 @@ if (!class_exists('Hm_IMAP')) {
                                     ${$flds[$header]} = mb_substr($line, (mb_strpos($line, ':') + 1));
                                     $last_header = $header;
                                 }
+                            }
+                        }
+                        elseif ($vals[$i] == 'BODY[1.MIME' || $vals[$i] == 'BODY[2.MIME') {
+                            $content = '';
+                            $i++;
+                            $i++;
+                            if (mb_strpos($vals[$i], 'text/calendar') !== false || mb_strpos($vals[$i], '.ics') !== false) {
+                                $flds['type_msg'] = 'calendar';
                             }
                         }
                         elseif ($vals[$i] == 'BODY[TEXT' && !$body_founded) {
@@ -1103,7 +1117,17 @@ if (!class_exists('Hm_IMAP')) {
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
                                          'google_thread_id' => $google_thread_id, 'google_labels' => $google_labels, 'list_archive' => $list_archive,
                                          'references' => $references, 'message_id' => $message_id, 'in_reply_to' => $in_reply_to, 'x_auto_bcc' => $x_auto_bcc,
-                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery);
+                                         'x_snoozed'  => $x_snoozed, 'x_schedule' => $x_schedule, 'x_profile_id' => $x_profile_id, 'x_delivery' => $x_delivery, 'x_ms_exchange_calendar_series_instance_id' => $x_ms_exchange_calendar_series_instance_id, 'sender' => $sender);
+
+                        $headers[$uid]['type_msg'] = $flds['type_msg'] != "type_msg" ? $flds['type_msg'] :  "";
+                        if ($headers[$uid]['x_ms_exchange_calendar_series_instance_id'] || $headers[$uid]['sender']) {
+                            if (strpos($headers[$uid]['sender'], 'Google Calendar <calendar-')) {
+                                $headers[$uid]['type_msg'] = "calendar";
+                            }
+                            if (! empty(trim($headers[$uid]['x_ms_exchange_calendar_series_instance_id']))) {
+                                $headers[$uid]['type_msg'] = "calendar";
+                            }
+                        }
                         $headers[$uid]['preview_msg'] = $flds['body'] != "content_body" ? $flds['body'] :  "";
 
                         if ($raw) {
