@@ -2548,7 +2548,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $level mailbox name or empty string for the top level
          * @return array list of matching folders
          */
-        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false, $is_delete_action = false) {
+        public function get_folder_list_by_level($level='', $only_subscribed=false, $with_input = false, $count_children = false) {
             $result = array();
             $folders = array();
             if ($this->server_support_children_capability()) {
@@ -2571,8 +2571,8 @@ if (!class_exists('Hm_IMAP')) {
                 if ($with_input) {
                     $result[$name]['special'] = $folder['special'];
                 }
-                if ($folder['can_have_kids'] && !$is_delete_action) {
-                    $result[$name]['number_of_children'] = count($this->get_folder_list_by_level($folder['name'], false, false, $is_delete_action));
+                if ($folder['has_kids'] && $count_children) {
+                    $result[$name]['number_of_children'] = count($this->get_folder_list_by_level($folder['name'], false, false));
                 }
             }
             if ($only_subscribed || $with_input) {
