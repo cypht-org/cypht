@@ -205,7 +205,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
                                 $txt .= '<i class="bi bi-star-half account_icon"></i> ';
                             }
-                            $txt .= '<span class="fs-5 fw-normal text-dark">' . $this->html_safe($value) . '</span>';
+                            $txt .= '<span class="fs-5 fw-normal text-dark js-header_subject">' . $this->html_safe($value) . '</span>';
                             $txt .= '</div></div>';
                         }
                         elseif ($fld == 'x-snoozed') {
@@ -222,7 +222,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             } catch (Exception $e) {}
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$this->trans($name).'</span></div>';
-                            $txt .= '<div class="col-md-10"><small class="text-muted">'.$this->html_safe($value).'</small></div>';
+                            $txt .= '<div class="col-md-10"><small class="text-muted js-header_date">'.$this->html_safe($value).'</small></div>';
                             $txt .= '</div>';
                         }
                         elseif($fld == 'from'){
@@ -250,7 +250,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             $txt .= '<div class="col-md-2 d-none d-sm-block"><span class="text-muted">'.$this->trans($name).'</span></div>';
                             $txt .= '<div class="col-md-10">';
                             $txt .= '<div class="dropdown">';
-                            $txt .= '<a id="contact_info" data-bs-toggle="dropdown" class="dropdown-toggle text-decoration-none" href="#">' . $this->html_safe($value) . '</a>';
+                            $txt .= '<a id="contact_info" data-bs-toggle="dropdown" class="dropdown-toggle text-decoration-none js-header_from" href="#">' . $this->html_safe($value) . '</a>';
                             $txt .= '<div class="dropdown-menu p-4" id="contact_popup" aria-labelledby="dropdownMenuContact">';
                             $txt .= '<div id="contact_popup_body">';
 
@@ -299,7 +299,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                             }
                             $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
                             $txt .= '<div class="col-md-2"><span class="text-muted">'.$this->trans($name).'</span></div>';
-                            $txt .= '<div class="col-md-10 col-12">'.$this->html_safe($value).'</div>';
+                            $txt .= '<div class="col-md-10 col-12 js-header_' . strtolower($name) . '">'.$this->html_safe($value).'</div>';
                             $txt .= '</div>';
                         }
                         break;
