@@ -906,10 +906,20 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
-            if ($filename = $part->getFilename()) {
+            
+            $filename = $this->extract_attachment_filename($part);
+            
+            if ($filename) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+                $struct[$part_num]['name'] = $filename;
+                $struct[$part_num]['description'] = $filename;
+                $struct[$part_num]['filename'] = $filename;
+                
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
+                    $struct[$part_num]['disposition'] = [
+                        'attachment' => ['filename', $filename]
+                    ];
                 }
             } else {
                 $struct[$part_num]['file_attributes'] = '';
@@ -956,6 +966,61 @@ class Hm_EWS {
             }
         }
         return $found;
+    }
+
+    protected function extract_attachment_filename($part) {
+        $filename = $part->getFilename();
+        if ($filename) {
+            return $filename;
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Type', 'name');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $filename = $part->getHeaderParameter('Content-Disposition', 'name');
+        if ($filename) {
+            return $this->decode_attachment_name($filename);
+        }
+        
+        $description = $part->getHeaderValue('Content-Description');
+        if ($description && strlen($description) < 100) {
+            return $description;
+        }
+        
+        return null;
+    }
+    
+    protected function decode_attachment_name($name) {
+        $name = trim($name, '"\'');
+        
+        if (preg_match('/=\?([^?]+)\?([BQ])\?([^?]+)\?=/i', $name, $matches)) {
+            $charset = $matches[1];
+            $encoding = strtoupper($matches[2]);
+            $text = $matches[3];
+            
+            if ($encoding === 'B') {
+                $decoded = base64_decode($text);
+            } elseif ($encoding === 'Q') {
+                $decoded = quoted_printable_decode(str_replace('_', ' ', $text));
+            } else {
+                $decoded = $text;
+            }
+            
+            return mb_convert_encoding($decoded, 'UTF-8', $charset);
+        }
+        
+        if (strpos($name, '%') !== false) {
+            $name = urldecode($name);
+        }
+        
+        return $name;
     }
 
     protected function extract_mailbox($data) {
