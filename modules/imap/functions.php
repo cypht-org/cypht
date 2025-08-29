@@ -1236,19 +1236,20 @@ function process_list_fld($fld) {
 if (!hm_exists('format_imap_envelope')) {
 function format_imap_envelope($env, $mod) {
     $env = lc_headers($env);
-    $res = '<table class="imap_envelope"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    $res = '<div class="imap_envelope d-flex flex-column border-bottom border-2 border-secondary-subtle pb-3 mb-3">';
+    
+    // Subject header (full width, centered)
     if (array_key_exists('subject', $env) && trim($env['subject'])) {
-        $res .= '<tr class="header_subject"><th colspan="2">'.$mod->html_safe($env['subject']).
-            '</th></tr>';
+        $res .= '<div class="header_subject d-flex justify-content-center"><h5 class="text-center mb-0 fw-bold">'.$mod->html_safe($env['subject']).'</h5></div>';
     }
 
+    // Other envelope headers
     foreach ($env as $name => $val) {
         if (in_array($name, array('date', 'from', 'to', 'message-id'), true)) {
-            $res .= '<tr><th>'.$mod->html_safe(ucfirst($name)).'</th>'.
-                '<td>'.$mod->html_safe($val).'</td></tr>';
+            $res .= '<div class="d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$mod->html_safe(ucfirst($name)).':</span><span class="text-break">'.$mod->html_safe($val).'</span></div>';
         }
     }
-    $res .= '</table>';
+    $res .= '</div>';
     return $res;
 }}
 
