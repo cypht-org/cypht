@@ -277,8 +277,8 @@ var Hm_Ajax_Request = function() { return {
         return false;
     },
 
-    fail: function(xhr, not_callable, logout) {
-        if (logout) {
+    fail: function(xhr, not_callable, shouldLogout) {
+        if (shouldLogout) {
             logout();
             return;
         }
