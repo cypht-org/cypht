@@ -419,7 +419,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             }
             $txt .= '<a class="hlink text-decoration-none" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
-            $txt .= '</ul><span id="extra-header-buttons"></span>';
+            $txt .= '</div><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
             $txt .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
             $txt .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
