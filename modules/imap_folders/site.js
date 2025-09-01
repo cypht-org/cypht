@@ -51,7 +51,8 @@ var expand_folders_page_list = function(path, container, link_class, target, id_
                 [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_folder_expand'},
                 {'name': 'imap_server_id', 'value': detail.server_id},
                 {'name': 'folder', 'value': detail.folder},
-                {'name': 'subscription_state', 'value': lsub}],
+                {'name': 'subscription_state', 'value': lsub},
+                {'name': 'count_children', 'value': id_dest === 'delete_source'}],
                 function(res) {
                     if (res.imap_expanded_folder_path) {
                         var folder_location = $('.'+container);
