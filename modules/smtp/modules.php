@@ -787,10 +787,19 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
             $specials = get_special_folders($this, $imap_server);
             delete_draft($form['draft_id'], $this->cache, $imap_server, $specials['draft']);
         }
-
-        delete_uploaded_files($this->session, $form['draft_id']);
-        if ($form['draft_id'] > 0) {
-            delete_uploaded_files($this->session, 0);
+        
+        /* Clean up uploaded files
+         * Note: EWS server handles draft deletion differently than IMAP/SMTP.
+         * For EWS, drafts are completely removed during delete_draft operation,
+         * making uploaded file cleanup unnecessary as files are no longer accessible.
+         * For IMAP/SMTP, drafts may remain flagged as deleted but still exist on server,
+         * requiring explicit cleanup of associated uploaded files.
+         */
+        if($mailbox->server_type() !== 'EWS') {
+            delete_uploaded_files($this->session, $form['draft_id']);
+            if ($form['draft_id'] > 0) {
+                delete_uploaded_files($this->session, 0);
+            }
         }
     }
 }

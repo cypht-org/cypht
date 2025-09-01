@@ -732,40 +732,16 @@ class Hm_EWS {
             $headers['From'] = null;
         }
         $headers['To'] = $this->extract_mailbox($message->getToRecipients());
-        if(is_array($headers['To'])) {
-            $headers['To'] = implode(', ', $headers['To']);
-        }
-        if ($message->getCcRecipients()) {
+        $headers['To'] = flatten_headers_to_string($headers, 'To');
+        if($message->getCcRecipients()) {
             $headers['Cc'] = $this->extract_mailbox($message->getCcRecipients());
-        }
-        if(is_array($headers['Cc'])) {
-            $headers['Cc'] = implode(', ', $headers['Cc']);
+            $headers['Cc'] = flatten_headers_to_string($headers, 'Cc');
         }
         if ($message->getBccRecipients()) {
             $headers['Bcc'] = $this->extract_mailbox($message->getBccRecipients());
-        }
-        if(is_array($headers['Bcc'])) {
-            $headers['Bcc'] = implode(', ', $headers['Bcc']);
+            $headers['Bcc'] = flatten_headers_to_string($headers, 'Bcc');
         }
         $headers['Flags'] = implode(' ', $this->extract_flags($message));
-
-        $mime = $message->getMimeContent();
-        $content = base64_decode($mime);
-        if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
-            $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
-        }
-        $parser = new MailMimeParser();
-        $n = $parser->parse($content, false);
-        // Get ONLY the headers
-        $h = $n->getAllHeaders();
-
-        // Display headers
-        foreach ($h as $header) {
-            if(!isset($headers[$header->getName()])) {
-                $headers[$header->getName()] = $header->getValue();
-            }
-        }
-
         foreach ($message->getInternetMessageHeaders() as $header) {
             $name = $header->getHeaderName();
             if (isset($headers[$name])) {
@@ -1292,5 +1268,23 @@ class Hm_EWS {
             $folders[$folder][] = $message->getItemId();
         }
         return $folders;
+    }
+}
+
+if(!hm_exists('flatten_headers_to_string')) {
+    function flatten_headers_to_string($headers, $key) {
+        if (!isset($headers[$key]) || !is_array($headers[$key])) {
+            return isset($headers[$key]) ? $headers[$key] : '';
+        }
+        
+        $flattened_header = [];
+        foreach ($headers[$key] as $to_item) {
+            if (is_array($to_item)) {
+                $flattened_header = array_merge($flattened_header, $to_item);
+            } else {
+                $flattened_header[] = $to_item;
+            }
+        }
+        return implode(', ', $flattened_header);
     }
 }
