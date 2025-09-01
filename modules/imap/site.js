@@ -403,9 +403,9 @@ async function select_imap_folder(path, page = 1,reload, processInTheBackground 
                 const rowUid = row.data('uid');
                 const tableRow = Hm_Utils.tbody().find(`tr[data-uid="${rowUid}"]`);
                 if (!tableRow.length) {
-                    const index = messages.rows.indexOf(row);
+                    const index = messages.rows.map(r => $(r['0']).data('uid')).indexOf(rowUid);
                     if (Hm_Utils.rows().length >= index) {
-                        Hm_Utils.rows().eq(index).after(row);
+                        Hm_Utils.rows().eq(index).before(row);
                     } else {
                         Hm_Utils.tbody().append(row);
                     }
