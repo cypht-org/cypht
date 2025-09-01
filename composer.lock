@@ -120,54 +120,6 @@
             "time": "2021-02-26T10:19:33+00:00"
         },
         {
-            "name": "cweagans/composer-patches",
-            "version": "1.7.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cweagans/composer-patches.git",
-                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cweagans/composer-patches/zipball/e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
-                "reference": "e190d4466fe2b103a55467dfa83fc2fecfcaf2db",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0 || ^2.0",
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "composer/composer": "~1.0 || ~2.0",
-                "phpunit/phpunit": "~4.6"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "cweagans\\Composer\\Patches"
-            },
-            "autoload": {
-                "psr-4": {
-                    "cweagans\\Composer\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "authors": [
-                {
-                    "name": "Cameron Eagans",
-                    "email": "me@cweagans.net"
-                }
-            ],
-            "description": "Provides a way to patch Composer packages.",
-            "support": {
-                "issues": "https://github.com/cweagans/composer-patches/issues",
-                "source": "https://github.com/cweagans/composer-patches/tree/1.7.3"
-            },
-            "time": "2022-12-20T22:53:13+00:00"
-        },
-        {
             "name": "dasprid/enum",
             "version": "1.0.6",
             "source": {
@@ -397,12 +349,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Garethp/php-ews.git",
-                "reference": "045306e5cdc6eeca6770adee40221acb092c672c"
+                "reference": "182f6aca8873276468f5e1b09b65f73085af04f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/045306e5cdc6eeca6770adee40221acb092c672c",
-                "reference": "045306e5cdc6eeca6770adee40221acb092c672c",
+                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/182f6aca8873276468f5e1b09b65f73085af04f6",
+                "reference": "182f6aca8873276468f5e1b09b65f73085af04f6",
                 "shasum": ""
             },
             "require": {
@@ -454,9 +406,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Garethp/php-ews/issues",
-                "source": "https://github.com/Garethp/php-ews/tree/master"
+                "source": "https://github.com/Garethp/php-ews/tree/v0.11.1"
             },
-            "time": "2025-07-06T11:41:00+00:00"
+            "time": "2025-08-30T22:33:12+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
