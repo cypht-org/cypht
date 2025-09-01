@@ -2314,7 +2314,7 @@ if (!class_exists('Hm_IMAP')) {
          * @param string $filter can be one of ALL, SEEN, UNSEEN, ANSWERED, UNANSWERED, DELETED, UNDELETED, FLAGGED, or UNFLAGGED
          * @return array list of IMAP message UIDs
          */
-        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        public function get_message_sort_order($sort='ARRIVAL', $reverse=true, $filter='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=false, $only_auto_bcc=false) {
             if (!$this->is_clean($sort, 'keyword') || !$this->is_clean($filter, 'keyword') || !$this->is_supported('SORT')) {
                 return [];
             }
