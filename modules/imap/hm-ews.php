@@ -695,6 +695,7 @@ class Hm_EWS {
     }
 
     public function get_message_headers($itemId) {
+        $base64Id = $this->get_item_id_base64($itemId);
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
@@ -713,7 +714,7 @@ class Hm_EWS {
                 ],
             ),
             'ItemIds' => [
-                'ItemId' => ['Id' => hex2bin($itemId)],
+                'ItemId' => ['Id' => $base64Id],
             ],
         );
         $request = Type::buildFromArray($request);
@@ -838,13 +839,14 @@ class Hm_EWS {
     }
 
     public function get_mime_message_by_id($itemId) {
+        $base64Id = $this->get_item_id_base64($itemId);
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'IdOnly',
                 'IncludeMimeContent' => true,
             ),
             'ItemIds' => [
-                'ItemId' => ['Id' => hex2bin($itemId)],
+                'ItemId' => ['Id' => $base64Id],
             ],
         );
         $request = Type::buildFromArray($request);
@@ -856,6 +858,25 @@ class Hm_EWS {
         }
         $parser = new MailMimeParser();
         return $parser->parse($content, false);
+    }
+
+    protected function get_item_id_base64($itemId) {
+        if (is_string($itemId) && strlen($itemId) > 0) {
+            // Check if it's hex encoded (internal format) - convert to base64 first
+            if (ctype_xdigit($itemId)) {
+                return hex2bin($itemId);
+            }
+
+            // Check if it's already base64
+            if (base64_encode(base64_decode($itemId, true)) === $itemId) {
+                return $itemId;
+            }
+
+            // If it's binary, encode to base64
+            return base64_encode($itemId);
+        }
+
+        return $itemId;
     }
 
     protected function parse_mime_part($part, &$struct, $part_num) {
