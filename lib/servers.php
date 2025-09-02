@@ -174,6 +174,7 @@ trait Hm_Server_Modify {
 trait Hm_Server_List {
 
     use Hm_Server_Modify;
+    use Searchable;
     use Hm_Repository {
         Hm_Repository::add as repo_add;
         Hm_Repository::get as repo_get;
@@ -216,24 +217,11 @@ trait Hm_Server_List {
     }
 
     /**
-     * Return server details matching $match in column $column.
-     *
-     * @param mixed  $match        Value to match.
-     * @param string $column       Column name to match against.
-     * @param bool   $returnFirst  If true, return only the first matching server.
-     * @return array|null          Array of matches, or a single server array, or null if no match.
+     * Get the dataset for the server list
+     * @return array
      */
-    public static function getBy($match, $column = 'id', $returnFirst = false) {
-        $results = [];
-        foreach (self::$server_list as $server) {
-            if (isset($server[$column]) && $server[$column] === $match) {
-                if ($returnFirst) {
-                    return $server;
-                }
-                $results[] = $server;
-            }
-        }
-        return $returnFirst ? null : $results;
+    protected static function getDataset() {
+        return self::$server_list;
     }
 
     /**
