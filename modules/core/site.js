@@ -976,7 +976,7 @@ function Message_List() {
                 prevUrl = new URL(prevSubject.prop('href'));
                 prevUrl.searchParams.set('list_parent', listPath);
                 const subject = prevSubject.text().substring(0, 50) + (prevSubject.text().length > 50 ? '...' : '');
-                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-up-square-fill"></i> '+subject+'</a>';
                 $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertAfter(target);
             }
             if (next) {
@@ -984,7 +984,7 @@ function Message_List() {
                 nextUrl = new URL(nextSubject.prop('href'));
                 nextUrl.searchParams.set('list_parent', listPath);
                 const subject = nextSubject.text().substring(0, 50) + (nextSubject.text().length > 50 ? '...' : '');
-                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-down-square-fill"></i> '+subject+'</a>';
                 $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertAfter(target.siblings('.prev')[0] || target);
             }
             if (cb) {
