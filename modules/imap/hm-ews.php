@@ -699,7 +699,6 @@ class Hm_EWS {
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
-                'IncludeMimeContent' => true,
                 'AdditionalProperties' => [
                     'ExtendedFieldURI' => [
                         [
