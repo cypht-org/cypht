@@ -9,7 +9,7 @@ class Hm_MessagesStore {
      * @property {String} 1 - The IMAP key
      */
 
-    /** 
+    /**
      * @typedef {Array} RowEntry
      * @property {String} 0 - The IMAP key
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
@@ -43,7 +43,7 @@ class Hm_MessagesStore {
      * as well as combined source paths like All email, unread, sent, trash, etc.
      * When it works on multiple data-sources, you can pass messagesReadyCB to refresh the UI element, so
      * user doesn't have to wait for all sources to be loaded to see something on screen.
-     * 
+     *
      * @returns {Promise<this>}
      */
     async load(reload = false, hideLoadingState = false, doNotFetch = false, messagesReadyCB = null) {
@@ -54,11 +54,11 @@ class Hm_MessagesStore {
             this.pages = parseInt(storedMessages.pages);
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
+            this.sort();
+            if (messagesReadyCB) {
+                messagesReadyCB(this);
+            }
             if (!reload) {
-                this.sort();
-                if (messagesReadyCB) {
-                    messagesReadyCB(this);
-                }
                 return this;
             }
         }
@@ -132,13 +132,13 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
+     *
      * @param {String} uid the id of the message to be marked as read
      * @returns {Boolean} true if the message was marked as read, false otherwise
      */
     markRowAsRead(uid) {
         const row = this.getRowByUid(uid);
-        
+
         if (row) {
             const htmlRow = $(row['0']);
             const wasUnseen = htmlRow.find('.unseen').length > 0 || htmlRow.hasClass('unseen');
@@ -147,7 +147,7 @@ class Hm_MessagesStore {
             htmlRow.find('.unseen').removeClass('unseen');
 
             row['0'] = htmlRow[0].outerHTML;
-            
+
             this.saveToLocalStorage();
 
             return wasUnseen;
@@ -156,13 +156,13 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
-     * @param {*} uid 
+     *
+     * @param {*} uid
      * @returns {RowObject|false} the next row entry if found, false otherwise
      */
     getNextRowForMessage(uid) {
         const row = this.getRowByUid(uid);
-        
+
         if (row) {
             const index = this.rows.indexOf(row);
             const nextRow = this.rows[index + 1];
@@ -174,8 +174,8 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
-     * @param {*} uid 
+     *
+     * @param {*} uid
      * @returns {RowObject|false} the previous row entry if found, false otherwise
      */
     getPreviousRowForMessage(uid) {
@@ -189,16 +189,16 @@ class Hm_MessagesStore {
         }
         return false;
     }
-    
+
     removeRow(uid) {
         const row = this.getRowByUid(uid);
         if (row) {
             this.rows = this.rows.filter(r => r !== row);
             this.saveToLocalStorage();
         }
-        
+
     }
-    
+
     updateRow(uid, html) {
         const row = this.getRowByUid(uid);
         if (row) {
@@ -331,13 +331,13 @@ class Hm_MessagesStore {
      * @typedef {Object} RowOutput
      * @property {Number} index - The index of the row
      * @property {RowEntry} value - The row entry
-     * 
-     * @param {String} uid 
+     *
+     * @param {String} uid
      * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
     getRowByUid(uid) {
         const row = this.rows.find(row => $(row['0']).attr('data-uid') == uid);
-        
+
         if (row) {
             return row;
         }

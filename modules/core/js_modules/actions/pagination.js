@@ -1,5 +1,5 @@
 function refreshNextButton(current) {
-    const totalPages = $(".pagination .max").text();
+    const totalPages = $(".pagination .max:first").text();
     if (parseInt(current) >= parseInt(totalPages)) {
         $(".pagination .next").prop('disabled', true);
     } else {
@@ -16,7 +16,7 @@ function refreshPreviousButton(current) {
 }
 
 async function nextPage() {
-    const currentPage = $(".pagination .current").text();
+    const currentPage = $(".pagination .current:first").text();
 
     const nextPage = parseInt(currentPage) + 1;
 
@@ -27,7 +27,7 @@ async function nextPage() {
 }
 
 async function previousPage() {
-    const currentPage = $(".pagination .current").text();
+    const currentPage = $(".pagination .current:first").text();
 
     const previousPage = parseInt(currentPage) - 1;
 

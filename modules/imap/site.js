@@ -54,7 +54,7 @@ var imap_unhide = function(event) {
     imap_hide_action(form, server_id, 0);
 };
 
-var imap_test_action = function(event) {    
+var imap_test_action = function(event) {
     $('.imap_folder_data').empty();
     event.preventDefault();
     var form = $(this).closest('.imap_connect');
@@ -394,7 +394,7 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
     });
 }
 
-async function select_imap_folder(path, page = 1,reload, processInTheBackground = false) {
+async function select_imap_folder(path, page = 1, reload, processInTheBackground = false) {
     const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
     await messages.load(reload, processInTheBackground, false, () => {
         if (processInTheBackground) {
@@ -457,7 +457,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
             select_imap_folder(listPath, listPage, true);
         }
     });
-    $('.imap_filter').on("change", function(e) { 
+    $('.imap_filter').on("change", function(e) {
         e.preventDefault();
         $('#imap_filter_form').trigger('submit');
     });
@@ -470,7 +470,8 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         $('#imap_filter_form').trigger('submit');
     });
 
-    await select_imap_folder(listPath, listPage);
+    // try to fetch from cache but also reload messages, so user don't wait 60 seconds to see the new list (useful for read/unread UI and other updates)
+    await select_imap_folder(listPath, listPage, true);
     handleMessagesDragAndDrop();
 
     // Refresh in the background each 60 seconds
@@ -484,13 +485,13 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
     };
 };
 
-$(document).on('submit', '#imap_filter_form', async function(event) { 
+$(document).on('submit', '#imap_filter_form', async function(event) {
     event.preventDefault();
     const url = new URL(location.href);
     url.search = $(this).serialize();
     history.pushState(history.state, "", url.toString());
     location.next = url.search;
-    try {        
+    try {
         const messages = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
         await messages.load(!messages.hasLocalData(), false, false, () => {
             display_imap_mailbox(messages.rows, messages.list, messages);
@@ -535,14 +536,14 @@ function getMessageStorageKey(uid) {
 async function markPrefetchedMessagesAsRead(uid) {
     const listPath = getListPathParam();
     const detail = Hm_Utils.parse_folder_path(listPath, 'imap');
-    const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;    
+    const msgId = `${detail.type}_${detail.server_id}_${uid}_${detail.folder}`;
 
     const messages = new Hm_MessagesStore(listPath, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     await messages.load(false, true);
     if (!messages.flagAsReadOnOpen) {
         return;
     }
-    
+
     if (messages.markRowAsRead(uid)) {
         const folderId = `${detail.type}_${detail.server_id}_${detail.folder}`;
         Hm_Folders.unread_counts[folderId] -= 1;
@@ -584,8 +585,8 @@ var prefetch_imap_folders = function() {
         {'name': 'imap_server_id', 'value': id},
         {'name': 'imap_prefetch', 'value': true},
         {'name': 'folder', 'value': ''}],
-        function(res) { 
-            $('#imap_prefetch_ids').val(ids.join(',')); 
+        function(res) {
+            $('#imap_prefetch_ids').val(ids.join(','));
             prefetch_imap_folders();
             if ($('.email_folders ul.folders li').length == 1) {
                 expand_imap_mailbox(res);
@@ -655,7 +656,7 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             }
             globals.auto_advance_email_enabled = Boolean(res.auto_advance_email_enabled);
         };
-        
+
         if (!msg_part) {
             var msgContent = get_local_message_content(uid, list_path);
             if (msgContent) {
@@ -666,38 +667,40 @@ var get_message_content = function(msg_part, uid, list_path, listParent, detail,
             }
         }
 
-        Hm_Ajax.request(
-            [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
-            {'name': 'imap_msg_uid', 'value': uid},
-            {'name': 'imap_msg_part', 'value': msg_part},
-            {'name': 'imap_server_id', 'value': detail.server_id},
-            {'name': 'folder', 'value': detail.folder}],
-            function(res) {
-                if (res.msg_text === '<div class="msg_text_inner"></div>' && noupdate) {
-                    const modal = new Hm_Modal({
-                        title: 'Message not found',
-                        modalId: 'messageNotFoundModal',
-                    })
-                    modal.setContent("The email you're looking for isn't here.<br>It may have been deleted, moved.");
-                    modal.addFooterBtn('Go to message list', 'btn-success', function() {
-                        Hm_Utils.redirect("?page=message_list&list_path="+listParent);
-                    });
-                    modal.addFooterBtn('Search mail', 'btn-success', function() {
-                        Hm_Utils.redirect("?page=search");
-                    });
-                    modal.open();
-                }
-                if (!noupdate) {
-                    onSuccess(res);
-                }
-                if (!noupdate && !msg_part) {
-                    Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
-                }
-            },
-            [],
-            false,
-            callback
-        );
+        if (detail.type == 'imap') {
+            Hm_Ajax.request(
+                [{'name': 'hm_ajax_hook', 'value': 'ajax_imap_message_content'},
+                {'name': 'imap_msg_uid', 'value': uid},
+                {'name': 'imap_msg_part', 'value': msg_part},
+                {'name': 'imap_server_id', 'value': detail.server_id},
+                {'name': 'folder', 'value': detail.folder}],
+                function(res) {
+                    if (res.msg_text === '<div class="msg_text_inner"></div>' && noupdate) {
+                        const modal = new Hm_Modal({
+                            title: 'Message not found',
+                            modalId: 'messageNotFoundModal',
+                        })
+                        modal.setContent("You are looking at a cached version of a message that might have been deleted or moved from the server.");
+                        modal.addFooterBtn('Go to message list', 'btn-success', function() {
+                            Hm_Utils.redirect("?page=message_list&list_path="+listParent);
+                        });
+                        modal.addFooterBtn('Search mail', 'btn-success', function() {
+                            Hm_Utils.redirect("?page=search");
+                        });
+                        modal.open();
+                    }
+                    if (!noupdate) {
+                        onSuccess(res);
+                    }
+                    if (!noupdate && !msg_part) {
+                        Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
+                    }
+                },
+                [],
+                false,
+                callback
+            );
+        }
     }
     return false;
 };
@@ -852,7 +855,7 @@ var imap_setup_message_view_page = function(uid, details, list_path, listParent,
     if (!uid) {
         uid = getMessageUidParam();
     }
-    
+
     const msg_content = get_local_message_content(uid, list_path);
     const noupdate = Boolean(msg_content);
     get_message_content(false, uid, list_path, listParent, details, callback, noupdate);
@@ -988,7 +991,7 @@ var imap_perform_move_copy = function(dest_id, context, action = null) {
             {'name': 'imap_move_page', 'value': page},
             {'name': 'imap_move_action', 'value': action}],
             async function(res) {
-                
+
                 var index;
                 const store = new Hm_MessagesStore(getListPathParam(), Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                 await store.load(false, true, true);
@@ -1191,7 +1194,7 @@ var imap_setup_snooze = function() {
                     const path = getParam("list_parent") || getListPathParam();
                     const store = new Hm_MessagesStore(path, Hm_Utils.get_url_page_number(), `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
                     await store.load(false, true, true);
-                    
+
                     snoozedMessages.forEach((msg) => {
                         store.removeRow(msg);
                     });
