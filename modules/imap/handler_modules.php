@@ -550,18 +550,31 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
+                
+                // Handle folder conversion - both IMAP and EWS use hex2bin but for different purposes
+                // IMAP: hex2bin("494e424f58") -> "INBOX" (folder name)
+                // EWS: hex2bin("41414d6b...") -> "AAMkADk5..." (base64 Exchange folder ID)
                 $folder = hex2bin($parts[2]);
+                
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
                     }
-                    else {
-                        $folder = hex2bin($parts[2]);
-                    }
+                    
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
-                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
+                    
+                    // For EWS, if we can't get a friendly name, try to use a connected mailbox
+                    if (!$label && isset($details['type']) && $details['type'] === 'ews') {
+                        $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
+                        if ($connected_mailbox && $connected_mailbox->authed()) {
+                            $folder_status = $connected_mailbox->get_folder_status($folder, false);
+                            $label = $folder_status['name'] ?? null;
+                        }
+                    }
+                 
+                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label ?: $folder);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
@@ -1583,6 +1596,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 ];
                 $this->user_config->set('special_imap_folders', $specials);
             }
+            Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
             $this->session->record_unsaved('EWS server added');
             $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
         }
@@ -1985,6 +1999,7 @@ class Hm_Handler_imap_store_reply_details extends Hm_Handler_Module {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
+            $prefetch = true;  // Set prefetch to true for this context
             $mailbox->set_read_only($prefetch);
             $part = false;
             list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($folder), $uid, $part, $this->user_config->get('text_only_setting', false));
