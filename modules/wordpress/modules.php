@@ -461,14 +461,26 @@ function wp_build_notice_headers($data, $output_mod) {
     if (!$subject) {
         $subject = '[No subject]';
     }
-    return '<table class="msg_headers">'.
-        '<col class="header_name_col"><col class="header_val_col"></colgroup>'.
-        '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe(html_entity_decode($data['subject']['text'])).
-        '</th></tr>'.
-        '<tr class="header_date"><th>'.$output_mod->trans('Date').'</th><td>'.date('r', $data['timestamp']).
-        ' ('.human_readable_interval(date('r', $data['timestamp'])).')</td></tr>'.
-        '<tr class="header_type"><th>'.$output_mod->trans('Type').'</th><td>'.$data['type'].'</td></tr>'.
-        '<tr class="header_cid"><th>'.$output_mod->trans('Id').'</th><td>'.$data['id'].'</td></tr><tr><td></td><td></td></tr></table>';
+    $txt = '';
+    $txt .= '<div class="container-fluid p-0 ml-0 border-bottom border-secondary-subtle text-muted">';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-12">';
+    $txt .= '<span class="fs-5 fw-normal text-dark">' . $output_mod->html_safe(html_entity_decode($data['subject']['text'])) . '</span>';
+    $txt .= '</div></div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Date').'</span></div>';
+    $txt .= '<div class="col-md-10"><small class="text-muted">'.date('r', $data['timestamp']).' ('.human_readable_interval(date('r', $data['timestamp'])).')</small></div>';
+    $txt .= '</div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Type').'</span></div>';
+    $txt .= '<div class="col-md-10">'.$output_mod->html_safe($data['type']).'</div>';
+    $txt .= '</div>';
+    $txt .= '<div class="row g-0 py-0 py-sm-1 small_header d-flex">';
+    $txt .= '<div class="col-md-2 d-none d-md-block"><span class="text-muted">'.$output_mod->trans('Id').'</span></div>';
+    $txt .= '<div class="col-md-10">'.$output_mod->html_safe($data['id']).'</div>';
+    $txt .= '</div>';
+    $txt .= '</div>';
+    return $txt;
 }}
 
 /**
