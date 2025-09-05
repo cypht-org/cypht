@@ -102,6 +102,16 @@ async function navigate(url, loaderMessage) {
         if (!html || typeof html !== 'string') {
             throw new Error("Failed navigating to page, empty or invalid response body.");
         }
+
+        // load custom javascript
+        const scripts = extractCustomScripts($(html));
+        loadCustomScripts(scripts);
+
+        if (!hm_is_logged()) {
+            logout();
+            return;
+        }
+
         const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
         if (!titleMatch) {
             throw new Error("No <title> element found in response HTML");
@@ -127,10 +137,6 @@ async function navigate(url, loaderMessage) {
             cyphtMain = innerMain.prop('outerHTML');
         }
         document.title = title.replace(/<[^>]*>/g, '');
-        
-        // load custom javascript
-        const scripts = extractCustomScripts($(html));
-        loadCustomScripts(scripts);
 
         window.location.next = url;
 
