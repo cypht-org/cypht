@@ -507,6 +507,7 @@ button {
   padding-top: 20px;
   letter-spacing: -1px;
   gap: 1rem;
+  font-size: 1.25rem;
 }
 .header_subject .content_title {
   color: #555;
@@ -982,13 +983,14 @@ div.unseen,
 .mobile .folder_list {
   margin-right: 0px;
   width: 100%;
+  padding-top: 0px;
 }
 .mobile .folder_list li {
   padding-top: 5px;
   padding-bottom: 5px;
 }
 .mobile .content_cell {
-  padding-top: 60px;
+  padding-top: 55px;
   display: block;
   width: 100%;
 }
@@ -998,7 +1000,7 @@ div.unseen,
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 2rem;
   border-top: none;
 }
 .mobile .list_meta,
@@ -1022,9 +1024,6 @@ div.unseen,
 .mobile .message_table {
   padding-left: 5px !important;
 }
-.mobile .message_list {
-  margin-top: 30px !important;
-}
 .mobile .list_settings_link {
   width: 24px;
   height: 24px;
@@ -1037,6 +1036,7 @@ div.unseen,
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
+  padding-top: 10px !important;
 }
 .mobile .msg_controls {
   z-index: 1000;
@@ -1053,9 +1053,6 @@ div.unseen,
   .mobile .msg_controls {
     top: 12px;
     height: 26px;
-  }
-  .mobile .toggle_link {
-    height: 17px !important;
   }
   .mobile .search_form {
     margin-left: -18px !important;
@@ -1139,7 +1136,7 @@ div.unseen,
   display: none;
 }
 .mobile .checkbox_cell {
-  width: 35px;
+  width: 25px;
   padding-top: 15px !important;
 }
 .mobile .checkbox_cell label {
@@ -1169,7 +1166,7 @@ div.unseen,
   height: 24px;
 }
 .mobile .toggle_link {
-  padding: 4px 6px !important;
+  padding: 0px 6px !important;
   line-height: normal !important;
   margin-left: -3px !important;
   position: relative;
@@ -1410,7 +1407,7 @@ div.unseen,
   width: 30%;
   min-height: 100vh;
   height: 100%;
-  z-index: 1000;
+  z-index: 1001;
   transform: translateX(-120%);
   transition: transform 0.3s;
   border-right: 1px solid var(--bs-secondary-bg);
@@ -1432,7 +1429,7 @@ div.unseen,
   z-index: 1000;
   text-align: left;
   top: 0;
-  padding: 15px 0 15px 20px;
+  padding: 10px 0 10px 20px;
   background: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
@@ -1479,7 +1476,7 @@ div.unseen,
   backdrop-filter: none;
   width: fit-content;
   margin-left: 0;
-  padding: 15px 20px;
+  padding: 10px 20px;
 }
 
 .mobile .app-logo{
@@ -1624,6 +1621,11 @@ a[disabled] {
   display: none;
 }
 
+.mobile .folders {
+  margin-top: 1rem;
+  margin-left: 1rem !important;
+}
+
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 768px) {
   .small_header {
@@ -1664,4 +1666,12 @@ a[disabled] {
 
 @media (max-width: 575px) {
   .mobile nav.folder_cell { width: 100%; }
+  .mobile #list_controls_menu.show { left: auto; right: 0px; }
+  .mobile .calendar .month_label { padding: 1rem !important; }
+  .mobile .calendar .border.m-4 { margin: 1rem !important; }
+  .mobile .content_title { gap: 0.25rem; }
+  .mobile .message_list { position: relative; }
+  .mobile .message_list .list_controls.on_mobile {
+    position: absolute; top: 12px; right: 15px;
+  }
 }
