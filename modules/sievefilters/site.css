@@ -1,3 +1,9 @@
+.sortable-ghost {
+    background-color: var(--bs-secondary-bg-subtle);
+    border: 2px dashed var(--bs-secondary);
+    opacity: 0.6;
+}
+
 .tingle-modal * {
     box-sizing: border-box
 }
