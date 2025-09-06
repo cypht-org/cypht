@@ -795,7 +795,7 @@ return [
     //     |
     //     | Github repository tracking.
     //     */
-    //     // 'github',
+        'github',
 
     //     /*
     //     | ---------
@@ -813,7 +813,7 @@ return [
     //     |
     //     | WordPress.com notifications.
     //     */
-    //     // 'wordpress',
+        'wordpress',
 
     //     /*
     //     | -------

@@ -792,7 +792,7 @@ function build_github_subject($event, $output_mod) {
  */
 if (!hm_exists('github_parse_headers')) {
 function github_parse_headers($data, $output_mod) {
-    $res = '<table class="msg_headers"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    $res = '<div class="msg_headers d-flex flex-column border-bottom border-2 border-secondary-subtle pb-3 mb-3">';
     if (array_key_exists('type', $data)) {
         $type = build_github_subject($data, $output_mod);
     }
@@ -800,7 +800,7 @@ function github_parse_headers($data, $output_mod) {
         $type = '[Unknown Type]';
     }
     if (array_key_exists('created_at', $data)) {
-        $date = sprintf("%s", date('r', strtotime($data['created_at'])));
+        $date = sprintf("%s (%s)", date('r', strtotime($data['created_at'])), human_readable_interval($data['created_at']));
     }
     else {
         $date = '[No date]';
@@ -822,11 +822,11 @@ function github_parse_headers($data, $output_mod) {
     else {
         $name = '[No Repo]';
     }
-    $res .= '<tr class="header_subject"><th colspan="2">'.$output_mod->html_safe($type).'</th></tr>';
-    $res .= '<tr class="header_date"><th>'.$output_mod->trans('Date').'</th><td>'.$output_mod->html_safe($date).'</td></tr>';
-    $res .= '<tr class="header_from"><th>'.$output_mod->trans('Author').'</th><td>'.$output_mod->html_safe($from).$from_link.'</td></tr>';
-    $res .= '<tr><th>'.$output_mod->trans('Repository').'</th><td>'.$output_mod->html_safe($name).$repo_link.'</td></tr>';
-    $res .= '<tr><td></td><td></td></tr></table>';
+    $res .= '<div class="header_subject d-flex justify-content-center"><h4 class="text-center mb-0 fw-bold">'.$output_mod->html_safe($type).'</h4></div>';
+    $res .= '<div class="header_date d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Date').':</span><span class="text-break">'.$output_mod->html_safe($date).'</span></div>';
+    $res .= '<div class="header_from d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Author').':</span><span class="text-break">'.$output_mod->html_safe($from).$from_link.'</span></div>';
+    $res .= '<div class="d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$output_mod->trans('Repository').':</span><span class="text-break">'.$output_mod->html_safe($name).$repo_link.'</span></div>';
+    $res .= '</div>';
     return $res;
 }}
 

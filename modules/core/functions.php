@@ -706,7 +706,7 @@ function schedule_dropdown($output, $send_now = false) {
     $txt = '';
     if ($send_now) {
         $txt .= '<div class="dropdown d-inline-block">
-                <button type="button" class="btn btn-light btn-sm dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</button>';
+                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuNexterDate" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Reschedule').'</a>';
     }
     $txt .= '<ul class="dropdown-menu nexter_dropdown schedule_dropdown" aria-labelledby="dropdownMenuNexterDate">';
     foreach ($values as $format) {

@@ -15,7 +15,7 @@ body {
   display: grid;
   width: 100%;
   grid-template-areas: "nav main";
-  grid-template-columns: var(--nav-size) 1fr;
+  grid-template-columns: calc(var(--nav-size) - 40px) 1fr;
   grid-template-rows: auto;
   transition: all 0.1s linear;
 }
@@ -404,7 +404,7 @@ button {
   background-color: #fff;
   padding-right: 15px;
   padding-bottom: 40px;
-  width: calc(var(--nav-size) - 20px);
+  width: calc(var(--nav-size) - 60px);
   min-height: 100vh;
   height: 100%;
   padding-top: 20px;
@@ -424,6 +424,7 @@ button {
   border-radius: var(--bs-border-radius);
   transition: all linear 0.3s;
   position: relative;
+  white-space: nowrap;
 }
 .inner_list li {
   margin: 2px;
@@ -955,7 +956,7 @@ div.unseen,
 
 /* mobile */
 .mobile {
-  font-size: 90%;
+  font-size: 100%;
   min-width: 100%;
   background: none;
 }
@@ -992,12 +993,13 @@ div.unseen,
   width: 100%;
 }
 .mobile .content_title {
-  padding-top: 0;
+  padding-top: 12px;
   display: flex;
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
+  border-top: none;
 }
 .mobile .list_meta,
 .mobile .search_form {
@@ -1031,22 +1033,21 @@ div.unseen,
 .mobile .msg_text {
   white-space: nowrap !important;
   width: 100%;
-  max-width: 480px !important;
+  max-width: 768px !important;
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
 }
 .mobile .msg_controls {
-  background: linear-gradient(180deg, #fff, #fff, #f7f2ef) !important;
   z-index: 1000;
   position: fixed;
-  right: -10px;
+  right: 0px;
   height: 54px;
   font-size: 115%;
   padding-left: 5px;
   padding-top: 5px;
   top: 1px;
-  left: 70px !important;
+  left: 60px !important;
 }
 @media (orientation: landscape) {
   .mobile .msg_controls {
@@ -1139,10 +1140,11 @@ div.unseen,
 }
 .mobile .checkbox_cell {
   width: 35px;
+  padding-top: 15px !important;
 }
 .mobile .checkbox_cell label {
-  width: 30px;
-  height: 30px;
+  width: 20px;
+  height: 20px;
 }
 .mobile .github_para {
   white-space: normal !important;
@@ -1405,12 +1407,13 @@ div.unseen,
 .mobile nav.folder_cell {
   position: absolute;
   inset: 0;
-  width: 100%;
+  width: 30%;
   min-height: 100vh;
   height: 100%;
   z-index: 1000;
   transform: translateX(-120%);
   transition: transform 0.3s;
+  border-right: 1px solid var(--bs-secondary-bg);
 }
 
 .menu-toggle {
@@ -1655,4 +1658,10 @@ a[disabled] {
     font-size: 0.6rem;
     margin-right: 0;
   }
+
+  .mobile nav.folder_cell { width: 50%; }
+}
+
+@media (max-width: 575px) {
+  .mobile nav.folder_cell { width: 100%; }
 }
