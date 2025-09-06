@@ -46,13 +46,6 @@ if (!hm_exists('get_classic_filter_modal_content')) {
                 <label for="sieve-filter-priority" class="form-label fw-bold">Priority:</label>
                 <input class="modal_sieve_filter_priority form-control" type="number" placeholder="0" id="sieve-filter-priority" />
             </div>
-            <div class="mb-2">
-                <label for="sieve-filter-test" class="form-label fw-bold">Test:</label>
-                <select class="modal_sieve_filter_test form-control" name="test_type" placeholder="0" id="sieve-filter-test">
-                    <option value="ANYOF">ANYOF (OR)</option>
-                    <option value="ALLOF" selected>ALLOF (AND)</option>
-                </select>
-            </div>
             <div class="d-block mb-2 mt-4">
                 <h3 class="mb-1">Conditions & Actions</h3>
                 <small>Filters must have at least one action and one condition</small>

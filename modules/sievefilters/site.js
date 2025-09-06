@@ -630,7 +630,7 @@ function sieveFiltersPageHandler() {
         });
         let extra_options = '<td class="col-sm-3"><input type="hidden" class="condition_extra_value form-control form-control-sm" name="sieve_selected_extra_option_value[]" /></td>';
         $('.sieve_list_conditions_modal').append(
-            '                            <tr>' +
+            '                            <tr class="sieve_condition_row">' +
             '                                <td class="col-sm-2">' +
             '                                    <select class="add_condition_sieve_filters form-control form-control-sm" name="sieve_selected_conditions_field[]">' +
             '                                        <optgroup label="Message">' +
@@ -674,11 +674,30 @@ function sieveFiltersPageHandler() {
         );
     }
 
+    function add_filter_match_mode() {
+        let conditionRows = $(".sieve_list_conditions_modal tr").length;
+        if (conditionRows >= 2) {
+            if ($(".sieve_match_mode").length === 0) {
+                $(".sieve_list_conditions_modal").before(
+                  '<div class="sieve_match_mode mb-2">' +
+                    '   <label class="me-2">Match</label>' +
+                    '   <select name="sieve_match_mode" class="modal_sieve_filter_test form-select-sm d-inline w-auto">' +
+                    '       <option value="ALLOF">ALL</option>' +
+                    '       <option value="ANYOF">ANY</option>' +
+                    "   </select>" +
+                    "   of the following rules:" +
+                    "</div>"
+                );
+            }
+        }
+    }
+
     /**
      * Add Condition Button
      */
     $(document).on('click', '.sieve_add_condition_modal_button', function () {
         add_filter_condition();
+        add_filter_match_mode();
     });
 
     function add_filter_action(default_value = '') {
