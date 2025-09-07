@@ -35,10 +35,8 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
         }
 
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
-            
+            //we need this for sieve_filters page edit script
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $script = SieveService::getScript($imap_account['id'], $this->request->post['sieve_script_name']);
             $list = prepare_sieve_script ($script, 1, "encode");
             $this->out('conditions', $list);
@@ -63,6 +61,7 @@ class Hm_Handler_sieve_edit_filter extends Hm_Handler_Module {
 class Hm_Handler_sieve_filters_enabled extends Hm_Handler_Module {
     public function process() {
         $this->out('sieve_filters_enabled', $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER));
+        ensure_sieve_service_initialized($this->user_config, $this->cache);
     }
 }
 
@@ -75,15 +74,8 @@ class Hm_Handler_sieve_filters_enabled_message_content extends Hm_Handler_Module
         $sieve_filters_enabled = $this->user_config->get('enable_sieve_filter_setting', DEFAULT_ENABLE_SIEVE_FILTER);
         if ($sieve_filters_enabled && !empty($server['sieve_config_host'])) {
             try {
-                // Initialize SieveService with cache and server configurations
-                $servers = [];
-                foreach ($this->user_config->get('imap_servers') as $id => $s) {
-                    if (!empty($s['sieve_config_host'])) {
-                        $servers[$id] = $s;
-                    }
-                }
-                SieveService::init($this->cache, $servers);
-                
+                // we need this for message page block sender button view to work
+                ensure_sieve_service_initialized($this->user_config, $this->cache);
                 $client = SieveService::getConnection($server['id']);
                 $sieve_filters_enabled = true;
                 $this->out('sieve_filters_client', $client);
@@ -131,9 +123,6 @@ class Hm_Handler_sieve_edit_script extends Hm_Handler_Module {
         }
         
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
             
             $script = SieveService::getScript($imap_account['id'], $this->request->post['sieve_script_name']);
             SieveService::closeConnection($imap_account['id']);
@@ -177,10 +166,8 @@ class Hm_Handler_sieve_delete_filter extends Hm_Handler_Module {
         }
         
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
-
+            //we need this for sieve_filters page delete script action to work
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
                 if ($script == 'main_script') {
@@ -226,9 +213,6 @@ class Hm_Handler_sieve_delete_script extends Hm_Handler_Module {
         }
         
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
 
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
@@ -270,10 +254,8 @@ class Hm_Handler_sieve_block_domain_script extends Hm_Handler_Module {
 
         $email_sender = $this->request->post['sender'];
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
-            
+            //we need this block for block domain action to work
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $scripts = SieveService::listScripts($imap_account['id']);
 
             $current_script = SieveService::getScript($imap_account['id'], 'blocked_senders');
@@ -407,10 +389,8 @@ class Hm_Handler_sieve_unblock_sender extends Hm_Handler_Module {
         }
 
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
-            
+            // we need this for block_list page for unblock sender action to work
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             $scripts = SieveService::listScripts($imap_account['id']);
 
             if(array_search('blocked_senders', $scripts, true) === false) {
@@ -540,9 +520,8 @@ class Hm_Handler_sieve_block_unblock_script extends Hm_Handler_Module {
         $scope_title = ucfirst($scope);
 
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
+            // we need this for message page block sender action to work
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             
             $scripts = SieveService::listScripts($imap_account['id']);
 
@@ -1049,9 +1028,8 @@ class Hm_Handler_sieve_save_filter extends Hm_Handler_Module {
         $script_parsed = $header_obj."\n\n".$script_parsed;
 
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
+            //we need this for sieve_filters page add script
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
             
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
@@ -1106,9 +1084,6 @@ class Hm_Handler_sieve_save_script extends Hm_Handler_Module {
         }
         
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
             
             $scripts = SieveService::listScripts($imap_account['id']);
             foreach ($scripts as $script) {
@@ -1286,7 +1261,6 @@ class Hm_Output_blocklist_settings_accounts extends Hm_Output_Module {
             $default_behaviour_html .= '<input type="text" class="select_default_reject_message form-control" value="' . $default_reject_message . '" placeholder="' . $this->trans('Reject message') . '" />';
         }
         $default_behaviour_html .= '<button class="submit_default_behavior btn btn-primary">' . $this->trans('Submit') . '</button></div></div>';
-        $current_script = SieveService::getScript($mailbox['id'], 'blocked_senders');
         list($scripts, $current_script) = get_all_scripts($mailbox['id'], true);
         $blocked_senders = get_blocked_senders_array($current_script, $scripts);
         $num_blocked = $blocked_senders ? sizeof($blocked_senders) : 0;
@@ -1421,14 +1395,8 @@ class Hm_Handler_sieve_status extends Hm_Handler_Module {
                     }
 
                     try {
-                        // Initialize SieveService with cache and server configurations
-                        $servers = [];
-                        foreach ($this->user_config->get('imap_servers') as $sid => $server) {
-                            if (!empty($server['sieve_config_host'])) {
-                                $servers[$sid] = $server;
-                            }
-                        }
-                        SieveService::init($this->cache, $servers);
+                        // we need this for info page to load the capabilities
+                        ensure_sieve_service_initialized($this->user_config, $this->cache);
                         
                         $capabilities = SieveService::getCapabilities($id);
                         $this->out('sieve_server_capabilities', $capabilities);
@@ -1453,10 +1421,6 @@ class Hm_Handler_sieve_connect extends Hm_Handler_Module {
 
         if ($imap_details = $this->get('imap_connect_details')) {
             try {
-                // Initialize SieveService with cache and server configurations
-                $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-                SieveService::init($this->cache, $servers);
-                
                 // Test connection
                 $client = SieveService::getConnection($imap_details['id']);
                 SieveService::closeConnection($imap_details['id']);
@@ -1480,9 +1444,6 @@ class Hm_Handler_sieve_toggle_script_state extends Hm_Handler_Module {
         $imap_account = Hm_IMAP_List::dump($form['imap_account']);
         $success = false;
         try {
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
             
             $state = $form['script_state'] ? 'enabled': 'disabled';
             $scripts = SieveService::listScripts($imap_account['id']);
@@ -1525,6 +1486,8 @@ class Hm_Handler_list_block_sieve_script extends Hm_Handler_Module {
 
         if (empty($imap_account['sieve_config_host'])) {
             return;
+        }else{
+            ensure_sieve_service_initialized($this->user_config, $this->cache);
         }
         
         try {
@@ -1592,29 +1555,10 @@ class Hm_Handler_load_account_sieve_filters extends Hm_Handler_Module
             return;
         }
         $accounts = $this->get('imap_accounts');
-        //filter out the accounts that are not sieve enabled by sieve_config_host
-        $sieve_accounts = array_filter($accounts, function ($account) {
-            return !empty($account['sieve_config_host']);
-        });
-        $sieve_accounts_configs = [];
-        foreach ($sieve_accounts as $key => $item) {
-            $parts = explode(':', $item['sieve_config_host']);
-            $sieveHost = isset($parts[0]) ? $parts[0] : '';
-            $sievePort = isset($parts[1]) ? (int) $parts[1] : 4190;
-            $sieve_accounts_configs[$key] = [
-                'host' => $sieveHost,
-                'port' => $sievePort,
-                'username' => $item['user'],
-                'password' => $item['pass'],
-                'secure' => $item['sieve_tls'],
-                'authType' => 'PLAIN',
-                'id' => $key
-            ];
-        }
-        // set the sieve connection pool with the sieve accounts configs
-        if (!empty($sieve_accounts_configs)) {
-            SieveService::init($this->cache, $sieve_accounts_configs);
-        }
+        
+        // Initialize SieveService with all sieve-enabled accounts
+        ensure_sieve_service_initialized($this->user_config, $this->cache);
+        
         if (isset($accounts[$form['imap_server_id']])) {
             $this->out('mailbox', $accounts[$form['imap_server_id']]);
             $this->session->close_early();
@@ -1636,12 +1580,7 @@ class Hm_Handler_sieve_remame_folder extends Hm_Handler_Module
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
-            // list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox, true);
             list($scripts, $current_script) = get_all_scripts($form['imap_server_id'], true);
-            
-            // Initialize SieveService with cache and server configurations
-            $servers = transform_imap_to_sieve_config($this->user_config->get('imap_servers'));
-            SieveService::init($this->cache, $servers);
             
             $linked_mailboxes = get_sieve_linked_mailbox($scripts, $current_script);
             if ($linked_mailboxes && in_array($form['folder'], $linked_mailboxes)) {
@@ -1685,11 +1624,12 @@ class Hm_Handler_sieve_can_delete_folder extends Hm_Handler_Module
             return;
         }
 
+        ensure_sieve_service_initialized($this->user_config, $this->cache);
+
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
         if ($mailbox && $mailbox->authed() && $mailbox->is_imap()) {
             $del_folder = prep_folder_name($mailbox->get_connection(), $form['folder'], true);
-            $client  = SieveService::getConnection($mailbox['id']);
-            // list($scripts, $current_script, $client) = get_all_scripts($this->config, $this->user_config, $mailbox);
+            $client  = SieveService::getConnection($form['imap_server_id']);
             list($scripts) = get_all_scripts($form['imap_server_id'], false);
             if (is_mailbox_linked_with_filters($del_folder, $form['imap_server_id'], $this, $scripts, $client)) {
                 $this->out('sieve_can_delete_folder', false);
