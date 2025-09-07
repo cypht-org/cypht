@@ -104,22 +104,49 @@ if (!hm_exists('get_classic_filter_modal_content')) {
 if (!hm_exists('get_mailbox_filters')) {
     function get_mailbox_filters($mailbox, $site_config, $user_config)
     {
-        $factory = get_sieve_client_factory($site_config);
         try {
-            $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
-            $scripts = [];
-            foreach ($client->listScripts() as $script) {
-                if (mb_strstr($script, 'cypht')) {
-                    $scripts[] = $script;
+            // Initialize SieveService with proper cache and server config
+            $servers = [];
+            foreach ($user_config->get('imap_servers') as $id => $server) {
+                if (!empty($server['sieve_config_host'])) {
+                    $servers[$id] = $server;
                 }
             }
+            
+            // Get cache instance safely
+            $cacheInstance = null;
+            if ($site_config && method_exists($site_config, 'get')) {
+                $cacheInstance = $site_config->get('hm_cache_instance');
+            }
+            
+            // Only initialize if we have a valid cache instance
+            if ($cacheInstance && is_object($cacheInstance)) {
+                SieveService::init($cacheInstance, $servers);
+                
+                // Get scripts using SieveService
+                $scripts = SieveService::listScripts($mailbox['id']);
+            } else {
+                // Fallback to direct client connection if no cache available
+                $factory = get_sieve_client_factory($site_config);
+                $client = $factory->init($user_config, $mailbox, in_array(mb_strtolower('nux'), $site_config->get_modules(true), true));
+                $scripts = $client->listScripts();
+            }
+            
+            // Filter only cypht scripts
+            $cypht_scripts = [];
+            foreach ($scripts as $script) {
+                if (mb_strstr($script, 'cypht')) {
+                    $cypht_scripts[] = $script;
+                }
+            }
+            
         } catch (Exception $e) {
             Hm_Msgs::add("Sieve: {$e->getMessage()}", "danger");
             return ['count' => 0, 'list' => ''];
         }
 
         $scripts_sorted = [];
-        foreach ($scripts as $script_name) {
+        foreach ($cypht_scripts as $script_name) {
             $exp_name = explode('-', $script_name);
             if (end($exp_name) == 'cypht') {
                 $base_class = 'script';
@@ -171,7 +198,7 @@ if (!hm_exists('get_mailbox_filters')) {
             </tr>
             ';
         }
-        return ['count' => count($scripts), 'list' => $script_list];
+        return ['count' => count($cypht_scripts), 'list' => $script_list];
     }
 }
 
@@ -204,8 +231,36 @@ if (!hm_exists('generate_main_script')) {
 }
 
 if (!hm_exists('save_main_script')) {
-    function save_main_script($client, $main_script, $scripts)
+    function save_main_script($client, $main_script, $scripts, $accountKey = null)
     {
+        // New mode: use SieveService only
+        if ($client === null && $accountKey !== null) {
+            $success = SieveService::putScript($accountKey, 'main_script', $main_script);
+            if (! $success) {
+                // Try to handle include errors using SieveService
+                $main_script = '';
+                foreach ($scripts as $scriptName) {
+                    if ($scriptName == 'main_script') {
+                        SieveService::removeScripts($accountKey, 'main_script');
+                        continue;
+                    }
+                    $script = SieveService::getScript($accountKey, $scriptName);
+                    if (mb_strpos($script, 'failed to include') !== false) {
+                        $script = mb_substr($script, mb_strpos($script, '#'));
+                        SieveService::putScript($accountKey, $scriptName, $script);
+                    }
+                    $main_script .= $script . "\n";
+                }
+                $main_script = format_main_script($main_script);
+                $ret = SieveService::putScript($accountKey, 'main_script', $main_script);
+                if (! $ret) {
+                    throw new Exception("Failed to save main script");
+                }
+            }
+            return;
+        }
+        
+        // Legacy mode: use client directly
         $success = $client->putScript(
             'main_script',
             $main_script
@@ -217,7 +272,12 @@ if (!hm_exists('save_main_script')) {
                     $client->removeScripts('main_script');
                     continue;
                 }
-                $script = $client->getScript($scriptName);
+                // Use cached script if account key is available
+                if ($accountKey !== null) {
+                    $script = SieveService::getScript($accountKey, $scriptName);
+                } else {
+                    $script = $client->getScript($scriptName);
+                }
                 if (mb_strpos($script, 'failed to include') !== false) {
                     $script = mb_substr($script, mb_strpos($script, '#'));
                     $client->putScript(
@@ -519,7 +579,9 @@ if (!hm_exists('get_blocked_senders')){
             ];
             $ret = '';
             foreach ($blocked_senders as $k => $sender) {
-                $reject_message = $blocked_list_actions[$sender]['reject_message'];
+                $reject_message = isset($blocked_list_actions[$sender]['reject_message']) 
+                    ? $blocked_list_actions[$sender]['reject_message'] 
+                    : '';
                 $ret .= '<tr><td>'.$sender.'</td><td>';
                 if (is_array($blocked_list_actions) && array_key_exists($sender, $blocked_list_actions)) {
                     $action = $blocked_list_actions[$sender]['action'] ?: 'default';
@@ -580,7 +642,7 @@ if (!hm_exists('initialize_sieve_client_factory')) {
 if (!hm_exists('get_all_scripts')) {
     function get_all_scripts($imapServer, $load_current = true, $return_only = null) {
         try {
-            $client  = SieveConnectionPool::get($imapServer);
+            $client  = SieveService::getConnection($imapServer);
             if(!is_null($client)){
                 $scripts = $client->listScripts();
                 if (!is_array($scripts) || array_search('blocked_senders', $scripts, true) === false) {
@@ -588,7 +650,7 @@ if (!hm_exists('get_all_scripts')) {
                 }
                 $current_script = '';
                 if($load_current) {
-                    $current_script = SieveConnectionPool::getScript($imapServer, 'blocked_senders');
+                    $current_script = SieveService::getScript($imapServer, 'blocked_senders');
                 }
                 if ($return_only === 'scripts') return $scripts;
                 if ($return_only === 'current_script') return $current_script;
@@ -621,11 +683,16 @@ if (!hm_exists('get_sieve_host_from_services')) {
 }
 
 if (!hm_exists('get_sieve_linked_mailbox')) {
-    function get_sieve_linked_mailbox ($scripts, $client) {
+    function get_sieve_linked_mailbox ($scripts, $client, $accountKey = null) {
         try {
             $folders = [];
             foreach ($scripts as $s) {
-                $script = $client->getScript($s);
+                // Use cached script if account key is available
+                if ($accountKey !== null) {
+                    $script = SieveService::getScript($accountKey, $s);
+                } else {
+                    $script = $client->getScript($s);
+                }
                 $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
                 $obj = json_decode(base64_decode($base64_obj))[0];
                 if ($obj && in_array($obj->action, ['copy', 'move'])) {
@@ -650,5 +717,35 @@ if (!hm_exists('is_mailbox_linked_with_filters')) {
             return in_array($mailbox, $linked_mailboxes);
         }
         return false;
+    }
+}
+
+if (!hm_exists('transform_imap_to_sieve_config')) {
+    function transform_imap_to_sieve_config($imapServers) {
+        $servers = [];
+        foreach ($imapServers as $id => $server) {
+            if (!empty($server['sieve_config_host'])) {
+                $sieveHost = $server['server'];
+                $sievePort = 4190;
+                
+                if (isset($server['sieve_config_host']) && $server['sieve_config_host']) {
+                    $hostPort = explode(':', $server['sieve_config_host']);
+                    $sieveHost = $hostPort[0];
+                    if (isset($hostPort[1])) {
+                        $sievePort = (int)$hostPort[1];
+                    }
+                }
+                
+                $servers[$id] = [
+                    'host' => $sieveHost,
+                    'port' => $sievePort,
+                    'username' => $server['user'],
+                    'password' => $server['pass'],
+                    'secure' => isset($server['sieve_tls']) ? (bool)$server['sieve_tls'] : false,
+                    'authType' => 'PLAIN'
+                ];
+            }
+        }
+        return $servers;
     }
 }
