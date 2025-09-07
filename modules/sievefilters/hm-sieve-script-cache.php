@@ -17,11 +17,6 @@ class SieveScriptCache
      */
     private static $cache = null;
 
-    /**
-     * Debug: Track cache access count per request
-     */
-    private static $accessCount = [];
-
     private function __construct() {}
 
     /**
@@ -57,12 +52,6 @@ class SieveScriptCache
         }
 
         $cacheKey = "sieve_script_{$key}_{$scriptName}";
-        
-        // Track access count
-        if (!isset(self::$accessCount[$cacheKey])) {
-            self::$accessCount[$cacheKey] = 0;
-        }
-        self::$accessCount[$cacheKey]++;
         
         $cached = self::$cache->get($cacheKey, false, true);
         
@@ -109,6 +98,8 @@ class SieveScriptCache
 
     /**
      * Invalidate all scripts cache for a connection key
+     * We need to track script names to invalidate, 
+     * for now we'll invalidate the list cache and scripts will be re-fetched
      */
     public static function invalidateAllScripts($key)
     {
@@ -116,8 +107,6 @@ class SieveScriptCache
             return false;
         }
 
-        // We need to track script names to invalidate, 
-        // for now we'll invalidate the list cache and scripts will be re-fetched
         $listCacheKey = "sieve_scripts_list_{$key}";
         return self::$cache->del($listCacheKey);
     }
@@ -132,7 +121,7 @@ class SieveScriptCache
         }
 
         $cacheKey = "sieve_scripts_list_{$key}";
-        return self::$cache->set($cacheKey, $scripts, 300); // 5 minutes TTL
+        return self::$cache->set($cacheKey, $scripts, 300);
     }
 
     /**
@@ -189,8 +178,8 @@ class SieveScriptCache
         if (!self::$cache) {
             return false;
         }
-        // Implementation depends on cache backend
-        // This is a simplified version
+        //TODO: Implement a method to clear all cache entries for a given key
+        self::invalidateAllScripts($key);
         return true;
     }
 }
@@ -210,6 +199,11 @@ class SieveConnectionManager
     private static $timeout = 600;
 
     private function __construct() {}
+
+    public static function getConfig()
+    {
+        return self::$config;
+    }
 
     /**
      * Set the configuration for all servers
@@ -327,17 +321,14 @@ class SieveService
      */
     public static function getScript($key, string $scriptName)
     {
-        // Try cache first
         $cachedScript = SieveScriptCache::getCachedScript($key, $scriptName);
         if ($cachedScript !== false) {
             return $cachedScript;
         }
         
-        // Cache miss — fetch from server
         $client = SieveConnectionManager::getConnection($key);
         $script = $client->getScript($scriptName);
         
-        // Cache the result
         SieveScriptCache::cacheScript($key, $scriptName, $script);
 
         return $script;
@@ -348,17 +339,14 @@ class SieveService
      */
     public static function listScripts($key)
     {
-        // Try cache first
         $cached = SieveScriptCache::getCachedScriptsList($key);
         if ($cached !== false) {
             return $cached;
         }
         
-        // Get from server and cache
         $client = SieveConnectionManager::getConnection($key);
         $scripts = $client->listScripts();
         
-        // Cache the list
         if ($scripts !== false) {
             SieveScriptCache::cacheScriptsList($key, $scripts);
         }
@@ -374,10 +362,8 @@ class SieveService
         $client = SieveConnectionManager::getConnection($key);
         $result = $client->putScript($scriptName, $scriptContent);
         
-        // Clear cache for this script since it's been updated
         SieveScriptCache::clearScriptCache($key, $scriptName);
         
-        // Invalidate scripts list cache since a new script might have been added
         SieveScriptCache::invalidateScriptsList($key);
         
         return $result;
@@ -400,10 +386,8 @@ class SieveService
         $client = SieveConnectionManager::getConnection($key);
         $result = $client->removeScripts($scriptName);
         
-        // Clear cache for this script since it's been removed
         SieveScriptCache::clearScriptCache($key, $scriptName);
         
-        // Invalidate scripts list cache since a script has been removed
         SieveScriptCache::invalidateScriptsList($key);
         
         return $result;
@@ -420,6 +404,7 @@ class SieveService
 
     /**
      * Rename a script on the server
+     * Also clears cache for old and new names
      */
     public static function renameScript($key, string $oldName, string $newName)
     {
@@ -427,7 +412,6 @@ class SieveService
             $connection = self::getConnection($key);
             $result = $connection->renameScript($oldName, $newName);
             
-            // Invalidate cache for both old and new names
             self::clearScriptCache($key, $oldName);
             self::clearScriptCache($key, $newName);
             
@@ -479,5 +463,10 @@ class SieveService
     public static function setConnectionTimeout(int $timeout)
     {
         SieveConnectionManager::setTimeout($timeout);
+    }
+
+    public static function hasAccounts()
+    {
+        return !empty(SieveConnectionManager::getConfig());
     }
 }
