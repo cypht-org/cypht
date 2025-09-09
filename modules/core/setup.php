@@ -68,6 +68,7 @@ add_handler('settings', 'reset_factory', true, 'core', 'save_user_data', 'before
 add_handler('settings', 'save_user_settings', true, 'core', 'save_user_data', 'before');
 add_handler('settings', 'reload_folder_cookie', true, 'core', 'save_user_settings', 'after');
 add_handler('settings', 'privacy_settings', true, 'core', 'date', 'after');
+add_handler('settings', 'process_allow_search_all_flagged_folder_setting', true, 'core', 'save_user_settings', 'before');
 
 add_output('settings', 'start_settings_form', true, 'core', 'content_section_start', 'after');
 add_output('settings', 'start_search_settings', true, 'core', 'start_settings_form', 'after');
@@ -109,6 +110,7 @@ add_output('settings', 'all_email_since_setting', true, 'core', 'start_all_email
 add_output('settings', 'all_email_source_max_setting', true, 'core', 'all_email_since_setting', 'after');
 add_output('settings', 'end_settings_form', true, 'core', 'content_section_end', 'before');
 add_output('settings', 'privacy_settings', 'true', 'core', 'start_unread_settings', 'before');
+add_output('settings', 'allow_search_all_flagged_folder_setting', true, 'core', 'flagged_source_max_setting', 'after');
 
 /* message list page */
 setup_base_page('message_list');
@@ -301,6 +303,7 @@ return array(
         'language' => FILTER_UNSAFE_RAW,
         'flagged_per_source' => FILTER_VALIDATE_INT,
         'flagged_since' => FILTER_UNSAFE_RAW,
+        'allow_search_all_flagged_folder' => FILTER_VALIDATE_INT,
         'unread_per_source' => FILTER_VALIDATE_INT,
         'unread_since' => FILTER_UNSAFE_RAW,
         'all_email_per_source' => FILTER_VALIDATE_INT,
