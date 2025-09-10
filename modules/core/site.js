@@ -245,8 +245,8 @@ var Hm_Ajax_Request = function() { return {
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
-            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                this.fail(xhr, true);
+            if ((res.status && res.status == 'not callable') || !res.router_login_state) {
+                this.fail(xhr, true, !res.router_login_state);
                 return;
             }
             if (Hm_Ajax.err_condition) {
@@ -277,7 +277,11 @@ var Hm_Ajax_Request = function() { return {
         return false;
     },
 
-    fail: function(xhr, not_callable) {
+    fail: function(xhr, not_callable, shouldLogout) {
+        if (shouldLogout) {
+            logout();
+            return;
+        }
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
             Hm_Notices.show('Server Error', 'danger');
         }
