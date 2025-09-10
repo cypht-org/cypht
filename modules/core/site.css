@@ -1584,7 +1584,7 @@ a[disabled] {
 
 /* Bootstrap-based message headers */
 .msg_text * {
-  white-space: normal !important;
+  white-space: normal;
   word-break: break-word;
   overflow-wrap: anywhere;
 }
