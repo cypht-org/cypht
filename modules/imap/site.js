@@ -469,7 +469,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
         e.preventDefault();
         $('#imap_filter_form').trigger('submit');
     });
-
+ 
     // try to fetch from cache but also reload messages, so user don't wait 60 seconds to see the new list (useful for read/unread UI and other updates)
     await select_imap_folder(listPath, listPage, true);
     handleMessagesDragAndDrop();
