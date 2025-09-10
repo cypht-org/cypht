@@ -944,7 +944,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         }
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
-        if ($mailbox && ! $mailbox->is_imap() && empty($archive_folder)) {
+        if ($mailbox && ! $mailbox->is_imap()) {
             // EWS supports archiving to user archive folders
             $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {

@@ -201,7 +201,7 @@ class Hm_EWS {
                     return [
                         'id' => bin2hex($folder->getFolderId()->getId()),
                         'name' => $folder->getDisplayName(),
-                        'parent' => bin2hex($folder->getParentFolderId()->getId()),
+                        'parent' => !is_null($folder->getParentFolderId()) ? bin2hex($folder->getParentFolderId()->getId()) : null,
                         'messages' => $folder->getTotalCount() ?? 0,
                         'unseen' => $folder->getUnreadCount() ?? 0,
                     ];
@@ -637,9 +637,9 @@ class Hm_EWS {
             $msg = [
                 'uid' => $uid,
                 'flags' => implode(' ', $flags),
-                'internal_date' => $message->getDateTimeCreated()->format('Y-m-d H:i:s.u'),
+                'internal_date' => $message->getDateTimeCreated()->format('d-M-Y H:i:s O'),
                 'size' => $message->getSize(),
-                'date' => $message->getDateTimeReceived()->format('Y-m-d H:i:s.u'),
+                'date' => $message->getDateTimeReceived()->format('d-M-Y H:i:s O'),
                 'from' => $this->extract_mailbox($message->getFrom()),
                 'to' => $this->extract_mailbox($message->getToRecipients()),
                 'subject' => $message->getSubject(),
@@ -975,27 +975,14 @@ class Hm_EWS {
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
             
-            $filename = $this->extract_attachment_filename($part);
-            
-            if ($filename) {
-                $struct[$part_num]['attributes']['name'] = $filename;
-                $struct[$part_num]['attributes']['filename'] = $filename;
+            if ($filename = $part->getFilename()) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
-                $struct[$part_num]['name'] = $filename;
-                $struct[$part_num]['description'] = $filename;
-                $struct[$part_num]['filename'] = $filename;
                 
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
-                    $struct[$part_num]['disposition'] = [
-                        'attachment' => ['filename', $filename]
-                    ];
                 }
             } else {
                 $struct[$part_num]['file_attributes'] = '';
-                if (!$struct[$part_num]['description']) {
-                    $struct[$part_num]['description'] = '';
-                }
             }
             $struct[$part_num]['language'] = '';
             $struct[$part_num]['location'] = '';
@@ -1039,61 +1026,6 @@ class Hm_EWS {
             }
         }
         return $found;
-    }
-
-    protected function extract_attachment_filename($part) {
-        $filename = $part->getFilename();
-        if ($filename) {
-            return $filename;
-        }
-        
-        $filename = $part->getHeaderParameter('Content-Disposition', 'filename');
-        if ($filename) {
-            return $this->decode_attachment_name($filename);
-        }
-        
-        $filename = $part->getHeaderParameter('Content-Type', 'name');
-        if ($filename) {
-            return $this->decode_attachment_name($filename);
-        }
-        
-        $filename = $part->getHeaderParameter('Content-Disposition', 'name');
-        if ($filename) {
-            return $this->decode_attachment_name($filename);
-        }
-        
-        $description = $part->getHeaderValue('Content-Description');
-        if ($description && strlen($description) < 100) {
-            return $description;
-        }
-        
-        return null;
-    }
-    
-    protected function decode_attachment_name($name) {
-        $name = trim($name, '"\'');
-        
-        if (preg_match('/=\?([^?]+)\?([BQ])\?([^?]+)\?=/i', $name, $matches)) {
-            $charset = $matches[1];
-            $encoding = strtoupper($matches[2]);
-            $text = $matches[3];
-            
-            if ($encoding === 'B') {
-                $decoded = base64_decode($text);
-            } elseif ($encoding === 'Q') {
-                $decoded = quoted_printable_decode(str_replace('_', ' ', $text));
-            } else {
-                $decoded = $text;
-            }
-            
-            return mb_convert_encoding($decoded, 'UTF-8', $charset);
-        }
-        
-        if (strpos($name, '%') !== false) {
-            $name = urldecode($name);
-        }
-        
-        return $name;
     }
 
     protected function extract_mailbox($data) {
