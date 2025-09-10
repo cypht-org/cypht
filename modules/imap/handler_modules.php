@@ -550,10 +550,6 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                         $this->out('list_filter', $this->request->get['filter']);
                     }
                 }
-                
-                // Handle folder conversion - both IMAP and EWS use hex2bin but for different purposes
-                // IMAP: hex2bin("494e424f58") -> "INBOX" (folder name)
-                // EWS: hex2bin("41414d6b...") -> "AAMkADk5..." (base64 Exchange folder ID)
                 $folder = hex2bin($parts[2]);
                 $spcial_folders = get_special_folders($this, $parts[1]);
                 if (array_key_exists(strtolower($folder), $spcial_folders)) {
@@ -563,21 +559,13 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
+                    } else {
+                        $folder = hex2bin($parts[2]);
                     }
                     
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
-                    
-                    // For EWS, if we can't get a friendly name, try to use a connected mailbox
-                    if (!$label && isset($details['type']) && $details['type'] === 'ews') {
-                        $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
-                        if ($connected_mailbox && $connected_mailbox->authed()) {
-                            $folder_status = $connected_mailbox->get_folder_status($folder, false);
-                            $label = $folder_status['name'] ?? null;
-                        }
-                    }
-                 
-                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label ?: $folder);
+                    $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
                     }
@@ -947,7 +935,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         }
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
-        if ($mailbox && ! $mailbox->is_imap() && empty($archive_folder)) {
+        if ($mailbox && ! $mailbox->is_imap()) {
             // EWS supports archiving to user archive folders
             $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {
