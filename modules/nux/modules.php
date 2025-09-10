@@ -537,7 +537,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
         if (!$this->get('nux_dev_news')) {
             return '';
         }
-        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Development Updates').'</h4></div><table>';
+        $res = '<div class="nux_dev_news mt-3 col-12"><div class="card"><div class="card-body"><div class="card_title"><h4>'.$this->trans('Development Updates').'</h4></div><div class="table-responsive"><table class="table table-bordered">';
         foreach ($this->get('nux_dev_news', array()) as $vals) {
             $res .= sprintf('<tr><td><a href="https://github.com/cypht-org/cypht/commit/%s" target="_blank" rel="noopener">%s</a>'.
                 '</td><td class="msg_date">%s</td><td>%s</td><td>%s</td></tr>',
@@ -548,7 +548,7 @@ class Hm_Output_nux_dev_news extends Hm_Output_Module {
                 $this->html_safe($vals['note'])
             );
         }
-        $res .= '</table></div></div></div>';
+        $res .= '</table></div></div></div></div>';
         return $res;
     }
 }
