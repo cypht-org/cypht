@@ -1652,13 +1652,8 @@ a[disabled] {
   }
 
   .msg_actions a {
-    padding: 0.5rem;
-    border-radius: 0.25rem;
-    background-color: #f8f9fa;
-    text-decoration: none;
     color: #495057;
-    font-size: 0.6rem;
-    margin-right: 0;
+    font-size: 0.85rem;
   }
 
   .mobile nav.folder_cell { width: 50%; }

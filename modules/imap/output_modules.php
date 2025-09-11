@@ -358,33 +358,33 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<div class="row g-0 py-3">';
             $txt .= '<div class="col-12 msg_actions">';
             $txt .= '<div class="d-flex flex-wrap gap-2 mb-3">';
-            $txt .= '<a href="#" class="hlink all_headers text-decoration-none">'.$this->trans('All headers').'</a>';
-            $txt .= '<a class="hlink small_headers text-decoration-none" href="#">'.$this->trans('Small headers').'</a>';
+            $txt .= '<a href="#" class="hlink all_headers text-decoration-none btn btn-sm btn-outline-secondary">'.$this->trans('All headers').'</a>';
+            $txt .= '<a class="hlink small_headers text-decoration-none btn btn-sm btn-outline-secondary" href="#">'.$this->trans('Small headers').'</a>';
             $txt .= '</div>';
             
             $txt .= '<div class="d-flex flex-wrap gap-2">';
             if (!isset($headers['Flags']) || !mb_stristr($headers['Flags'], 'draft')) {
-                $txt .= '<a class="reply_link hlink text-decoration-none" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
+                $txt .= '<a class="reply_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply=1'.$reply_args.'">'.$this->trans('Reply').'</a>';
                 if ($size > 1) {
-                    $txt .= '<a class="reply_all_link hlink text-decoration-none" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
+                    $txt .= '<a class="reply_all_link hlink text-decoration-none btn btn-sm btn-outline-secondary" href="?page=compose&amp;reply_all=1'.$reply_args.'">'.$this->trans('Reply-all').'</a>';
                 } else {
                     $txt .= '<a class="reply_all_link hlink disabled_link text-decoration-none">'.$this->trans('Reply-all').'</a>';
                 }
                 $txt .= forward_dropdown($this, $reply_args);
             }
             if (isset($headers['Flags']) && mb_stristr($headers['Flags'], 'flagged')) {
-                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none hide" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary hide" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             } else {
-                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
-                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none hide" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
+                $txt .= '<a id="flag_msg" class="flagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary" data-state="unflagged" href="#">'.$this->trans('Flag').'</a>';
+                $txt .= '<a id="unflag_msg" class="unflagged_link hlink text-decoration-none btn btn-sm btn-outline-secondary hide" data-state="flagged" href="#">'.$this->trans('Unflag').'</a>';
             }
 
-            $txt .= '<a class="hlink text-decoration-none" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
-            $txt .= '<a class="delete_link hlink text-decoration-none" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
-            $txt .= '<div class="position-relative"><a class="hlink" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
-            $txt .= '<div class="position-relative"><a class="hlink" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
-            $txt .= '<a class="archive_link hlink text-decoration-none" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="unread_message" href="#">'.$this->trans('Unread').'</a>';
+            $txt .= '<a class="delete_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
+            $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
+            $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
+            $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             
             if($this->get('tags')){
                 $txt .= tags_dropdown($this, $headers);
@@ -414,10 +414,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                         $txt .= block_filter_dropdown($this);
                     }
                 } else {
-                    $txt .= '<span data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
+                    $txt .= '<span class="btn btn-sm" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
-            $txt .= '<a class="hlink text-decoration-none" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
+            $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             $txt .= '</div><span id="extra-header-buttons"></span>';
             $txt .= '<input type="hidden" class="move_to_type" value="" />';
