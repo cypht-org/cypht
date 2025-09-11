@@ -237,7 +237,11 @@ class Hm_Auth_LDAP extends Hm_Auth {
         $prefix = 'ldaps://';
         $server = $this->apply_config_value('server', 'localhost');
         $port = $this->apply_config_value('port', 389);
-        if (empty($this->config['enable_tls'])) {
+        if (
+            empty($this->config['enable_tls']) ||
+            $this->config['enable_tls'] === false ||
+            strtolower($this->config['enable_tls']) === "false"
+        ) {
             $prefix = 'ldap://';
         }
         return $prefix.$server.':'.$port;
@@ -261,9 +265,9 @@ class Hm_Auth_LDAP extends Hm_Auth {
     public function check_credentials($user, $pass) {
         list($server, $port, $tls) = get_auth_config($this->site_config, 'ldap');
         $base_dn = $this->site_config->get('ldap_auth_base_dn', false);
-        $uid_attr = $this->site_config->get('ldap_uid_attr', false);
+        $uid_auth_attr = $this->site_config->get('ldap_auth_uid_attr', false);
         if ($server && $port && $base_dn) {
-            $user = sprintf('%s=%s,%s', $uid_attr, $user, $base_dn);
+            $user = sprintf('%s=%s,%s', $uid_auth_attr, $user, $base_dn);
             $this->config = [
                 'server' => $server,
                 'port' => $port,
