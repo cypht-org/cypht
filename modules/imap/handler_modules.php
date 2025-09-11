@@ -1127,7 +1127,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         foreach ($folders as $folder => $uids) {
                             $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
                             $action_result = $this->perform_action($mailbox, $form['action_type'], $uids, $folder, $specials, $server_details);
-                            if ($action_result['error']) {
+                            if ($action_result['error'] && ! $action_result['folder_not_found_error']) {
                                 $errs++;
                             } else {
                                 $msgs += count($uids);
@@ -1197,7 +1197,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
-        return ['error' => $error, 'moved' => $moved];
+
+        $folderNotFoundError = false;
+        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
+            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders seetting</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
+            $folderNotFoundError = true;
+        }
+
+        return ['error' => $error, 'moved' => $moved, 'folder_not_found_error' => $folderNotFoundError];
     }
 
     /**
@@ -1221,9 +1228,6 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             $folder = $specials['archive'];
         } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
             $folder = $specials['junk'];
-        }
-        if (!$folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
-            Hm_Msgs::add(sprintf('ERRNo %s folder configured for %s', $action_type, $server_details['name']));
         }
         return $folder;
     }
