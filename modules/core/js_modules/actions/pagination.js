@@ -27,7 +27,7 @@ async function nextPage() {
 }
 
 async function previousPage() {
-    const currentPage = $(".pagination .current:first").text();
+    const currentPage = $(".pagination .current").first().text();
 
     const previousPage = parseInt(currentPage) - 1;
 
