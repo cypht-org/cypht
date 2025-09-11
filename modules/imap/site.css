@@ -364,7 +364,6 @@
   position: relative;
 }
 .move_to_location {
-  display: none;
   position: absolute;
   left: -5%;
   top: 40px;

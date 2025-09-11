@@ -9,6 +9,7 @@ if (!hm_exists('add_profile')) {
             'sig' => $signature,
             'rmk' => $remark,
             'smtp_id' => $smtp_server_id,
+            'imap_id' => $imap_server_id,
             'replyto' => $reply_to,
             'default' => $is_default,
             'address' => $email,

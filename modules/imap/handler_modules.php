@@ -664,7 +664,11 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if ($with_subscription) {
                     $only_subscribed = false;
                 }
-                $msgs = $mailbox->get_subfolders(hex2bin($folder), $only_subscribed, $with_subscription);
+                $count_children = false;
+                if (isset($this->request->post['count_children'])){
+                    $count_children = $this->request->post['count_children'];
+                }
+                $msgs = $mailbox->get_subfolders(hex2bin($folder), $only_subscribed, $with_subscription, $count_children);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
@@ -1610,6 +1614,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
+            $this->out('move_copy_controls', true);
         }
         else {
             $path = '';
