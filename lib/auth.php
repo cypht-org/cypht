@@ -306,7 +306,6 @@ class Hm_Auth_LDAP extends Hm_Auth {
      */
     protected function auth() {
         $result = @ldap_bind($this->fh, $this->config['user'], $this->config['pass']);
-        ldap_unbind($this->fh);
         if (!$result) {
             Hm_Debug::add(sprintf('LDAP AUTH failed for %s', $this->config['user']));
         }

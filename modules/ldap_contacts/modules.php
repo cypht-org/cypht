@@ -101,13 +101,29 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
             return;
         }
         $config = ldap_config($this->config, $form['ldap_source']);
-        $dn = sprintf('cn=%s %s,%s', $form['ldap_first_name'], $form['ldap_last_name'], $config['base_dn']);
-        $cn = sprintf('%s %s', $form['ldap_first_name'], $form['ldap_last_name']);
-        $result = array('cn' => $cn, 'objectclass' => $config['objectclass']);
+        $uidattr = isset($form['ldap_uidattr']) ? $form['ldap_uidattr'] : 'cn';
+        $uid_val = '';
+        if ($uidattr === 'uid' && !empty($form['ldap_uid'])) {
+            $uid_val = $form['ldap_uid'];
+        } else {
+            $uid_val = trim($form['ldap_first_name'].' '.$form['ldap_last_name']);
+        }
+
+        $dn = sprintf('%s=%s,%s', $uidattr, $uid_val, $config['base_dn']);
+
+        $result = array('objectclass' => $config['objectclass']);
+        $cn = trim($form['ldap_first_name'].' '.$form['ldap_last_name']);
+        $result['cn'] = $cn;
+        
+        if ($uidattr === 'uid' && !empty($form['ldap_uid'])) {
+            $result['uid'] = $form['ldap_uid'];
+        }
+        
         $ldap_map = array(
             'ldap_first_name' => 'givenname',
             'ldap_last_name' => 'sn',
             'ldap_displayname' => 'displayname',
+            'ldap_uid' => 'uid',
             'ldap_mail' => 'mail',
             'ldap_locality' => 'l',
             'ldap_state' => 'st',
@@ -128,6 +144,9 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
             'ldap_uri' => 'labeleduri'
         );
         foreach ($ldap_map as $name => $val) {
+            if ($name === 'ldap_uid' && $uidattr === 'cn') {
+                continue;
+            }      
             if (array_key_exists($name, $form)) {
                 $result[$val] = $form[$name];
             }
@@ -188,6 +207,7 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
         if (!is_array($entry) || count($entry) == 0) {
             return;
         }
+
         $config = $this->get('ldap_config');
         $dn = $this->get('entry_dn');
         $ldap = new Hm_LDAP_Contacts($config);
@@ -198,6 +218,8 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
             else {
                 Hm_Msgs::add('Could not add contact', 'danger');
             }
+        } else {
+            Hm_Msgs::add('Could not add contact: failed to connect to LDAP server', 'danger');
         }
     }
 }
@@ -222,8 +244,20 @@ class Hm_Handler_process_update_ldap_contact extends Hm_Handler_Module {
 class Hm_Handler_process_add_ldap_contact extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('contact_source', 'ldap_first_name',
-            'add_ldap_contact', 'ldap_last_name', 'ldap_mail', 'ldap_source'));
+            'add_ldap_contact', 'ldap_last_name', 'ldap_mail', 'ldap_source', 'ldap_uidattr'));
+        
         if ($success && $form['contact_source'] == 'ldap') {
+            if (isset($form['ldap_uidattr']) && $form['ldap_uidattr'] === 'uid') {
+                if (empty($this->request->post['ldap_uid'])) {
+                    return;
+                }
+                $form['ldap_uid'] = $this->request->post['ldap_uid'];
+            } else {
+                if (isset($this->request->post['ldap_uid'])) {
+                    $form['ldap_uid'] = $this->request->post['ldap_uid'];
+                }
+            }
+            
             $this->out('ldap_entry_data', $form, false);
             $this->out('ldap_action', 'add');
         }
@@ -494,6 +528,35 @@ class Hm_Output_ldap_form_displayname extends Hm_Output_Module {
             '<input placeholder="'.$this->trans('Display Name').'" id="ldap_displayname" type="text" name="ldap_displayname" '.
             'value="'.$this->html_safe($val).'" class="form-control" />'.
             '<label for="ldap_displayname">'.$this->trans('Display Name').'</label></div>';
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/output
+ */
+
+class Hm_Output_ldap_form_uidattr extends Hm_Output_Module {
+    protected function output() {
+        if (!$this->get('ldap_edit')) {
+            return;
+        }
+        $val = get_ldap_value('uidattr', $this);
+        $options = array('cn', 'uid');
+        $select = '<div class="form-floating mb-2">';
+        $select .= '<select id="ldap_uidattr" name="ldap_uidattr" class="form-select">';
+        foreach ($options as $opt) {
+            $selected = ($val == $opt) ? ' selected' : '';
+            $select .= '<option value="'.$this->html_safe($opt).'"'.$selected.'>'.$this->trans($opt).'</option>';
+        }
+        $select .= '</select>';
+        $select .= '<label for="ldap_uidattr">'.$this->trans('UID Attribute').'</label></div>';
+        $uid_val = get_ldap_value('uid', $this);
+        $required = ($val === 'uid') ? ' required' : '';
+        $select .= '<div class="form-floating mb-2" id="ldap_uid_field_wrapper">'.
+            '<input placeholder="'.$this->trans('Username').'" id="ldap_uid" type="text" name="ldap_uid" '.
+            'value="'.$this->html_safe($uid_val).'" class="form-control" autocomplete="username"'.$required.' />'.
+            '<label for="ldap_uid">'.$this->trans('Username').'</label></div>';
+        return $select;
     }
 }
 
@@ -778,6 +841,23 @@ function get_ldap_value($fld, $mod) {
     if (!is_array($current) || !array_key_exists('all_fields', $current)) {
         return '';
     }
+    
+    if ($fld === 'uidattr') {
+        $all_fields = $current['all_fields'];
+        if (isset($all_fields['dn'])) {
+            $dn = $all_fields['dn'];
+            if (strpos($dn, 'uid=') === 0) {
+                return 'uid';
+            } elseif (strpos($dn, 'cn=') === 0) {
+                return 'cn';
+            }
+        }
+        if (isset($all_fields['uid']) && !empty($all_fields['uid'])) {
+            return 'uid';
+        }
+        return 'uid';
+    }
+    
     if (array_key_exists($fld, $current['all_fields'])) {
         return $current['all_fields'][$fld];
     }
@@ -825,7 +905,8 @@ function ldap_add_user_auth($ldap_config, $auths) {
                 if (!$vals['user']) {
                     continue;
                 }
-                $user = sprintf('cn=%s,%s', $vals['user'], $ldap_config[$name]['base_dn']);
+                $uid_attr = $ldap_config[$name]['ldap_uid_attr'] ?? 'uid';
+                $user = sprintf('%s=%s,%s', $uid_attr, $vals['user'], $ldap_config[$name]['base_dn']);
                 $ldap_config[$name]['user'] = $user;
             }
             if (array_key_exists('pass', $vals)) {
