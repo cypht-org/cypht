@@ -104,7 +104,7 @@ class Hm_MessagesStore {
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
-        }, this);
+        });
 
         return this;
     }
@@ -235,12 +235,13 @@ class Hm_MessagesStore {
 
         let store = this;
         return this.getRequestConfigs().map((config) => {
+            const initialConfig = Object.assign([], config);
             return new Promise((resolve, reject) => {
                 Hm_Ajax.request(
                     config,
                     (response) => {
                         if (response) {
-                            response.sourceId = store.hashObject(config);
+                            response.sourceId = store.hashObject(initialConfig); // Do not use this config object because the request appends a "hm_page_key" entry, which would change the hash
                             resolve(response);
                         }
                     },
