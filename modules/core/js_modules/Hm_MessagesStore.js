@@ -70,50 +70,37 @@ class Hm_MessagesStore {
         const sourcesToRemove = Object.keys(this.sources).filter(key => !this.currentlyAvailableSources().includes(key));
         sourcesToRemove.forEach(key => delete this.sources[key]);
 
-        Promise.all(
-            this.fetch(hideLoadingState).map((req) => {
-                return new Promise(async (resolve) => {
-                    const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
-                    // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
-                    this.count = folder_status && Object.values(folder_status)[0]?.messages;
-                    this.pages = parseInt(pages);
-                    this.newMessages = this.getNewMessages(updatedMessages);
+        this.fetch(hideLoadingState).forEach(async (req) => {
+            const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
+            // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
+            this.count = folder_status && Object.values(folder_status)[0]?.messages;
+            this.pages = parseInt(pages);
+            this.newMessages = this.getNewMessages(updatedMessages);
 
-                    if (typeof do_not_flag_as_read_on_open == 'booelan') {
-                        this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
-                    }
+            if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
+            }
 
-                    if (this.sources[sourceId]) {
-                        this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
-                    }
-                    this.sources[sourceId] = Object.keys(updatedMessages);
-                    for (const id in updatedMessages) {
-                        if (this.rows.map(row => row['1']).indexOf(id) === -1) {
-                            this.rows.push(updatedMessages[id]);
-                        } else {
-                            const index = this.rows.map(row => row['1']).indexOf(id);
-                            this.rows[index] = updatedMessages[id];
-                        }
-                    }
+            if (this.sources[sourceId]) {
+                this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
+            }
+            this.sources[sourceId] = Object.keys(updatedMessages);
+            for (const id in updatedMessages) {
+                if (this.rows.map(row => row['1']).indexOf(id) === -1) {
+                    this.rows.push(updatedMessages[id]);
+                } else {
+                    const index = this.rows.map(row => row['1']).indexOf(id);
+                    this.rows[index] = updatedMessages[id];
+                }
+            }
 
-                    if (this.path == 'unread') {
-                        $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
-                    }
+            if (this.path == 'unread') {
+                $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
+            }
 
-                    this.sort();
-                    this.saveToLocalStorage();
-
-                    if (messagesReadyCB) {
-                        messagesReadyCB(this);
-                    }
-
-                    resolve();
-                });
-            }, this)
-        ).then(() => {
-            // remove all existing rows that are not present in any of the fetched data
-            this.rows = this.rows.filter(row => Object.values(this.sources).some(sourceRows => sourceRows.includes(row['1'])));
+            this.sort();
             this.saveToLocalStorage();
+
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
