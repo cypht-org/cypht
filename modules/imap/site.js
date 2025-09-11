@@ -225,6 +225,15 @@ var imap_flag_message = function(state, supplied_uid, supplied_detail) {
                 if (state === 'flagged') {
                     $('#flag_msg').show();
                     $('#unflag_msg').hide();
+                    if (getParam('list_parent') === 'flagged') {
+                        // try to navigate to the next message in the list, if none found go back to the list
+                        const nextLink = $('.nlink').attr('href');
+                        if (nextLink) {
+                            navigate(nextLink);
+                        } else {
+                            navigate(`?page=message_list&list_path=${getParam('list_parent')}&list_page=${getParam('list_page')}&sort=${getParam('sort')}`);
+                        }
+                    }
                 }
                 else {
                     $('#flag_msg').hide();
