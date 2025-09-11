@@ -222,6 +222,9 @@
   text-overflow: ellipsis;
   width: 20%;
 }
+.msg_parts td * {
+  white-space: nowrap;
+}
 .download_link {
   width: 100px;
 }
@@ -442,13 +445,13 @@
 }
 .mobile .download_link,
 .mobile .remove_attachment {
-  width: 50px !important;
   overflow: visible !important;
-  margin-left: 25px;
 }
 .mobile .part_desc,
 .mobile .part_size {
-  margin-left: 25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mobile .unflag_send_div {
   float: right;
@@ -465,13 +468,8 @@
   height: 200px;
 }
 .attached_image_box {
-  display: flex;
-  flex-wrap: wrap;
   border-top: solid 1px #ddd;
-  padding-top: 20px;
-  padding-left: 20px;
-  width: 100%;
-  padding-bottom: 40px;
+  padding-top: 1rem;
 }
 /* .list_meta { float: none; margin-left: 37%; } */
 

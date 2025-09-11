@@ -711,7 +711,10 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     $isThereAnyImg = false;
     foreach ($struct as $id => $vals) {
         if ($vals['type'] === 'image') {
-            $res .= '<div><img class="attached_image" src="?'.$dl_link.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" ></div>';
+            $res .= '<div class="col-6 col-md-3">
+                        <img class="attached_image img-fluid" 
+                             src="?' . $dl_link . '&amp;imap_msg_part=' . $output_mod->html_safe($id) . '" >
+                     </div>';
             $isThereAnyImg = true;
         }
         if (isset($vals['subs'])) {
@@ -720,7 +723,7 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     }
 
     if ($isThereAnyImg) {
-        $res = '<div class="attached_image_box">' . $res . '</div>';
+        $res = '<div class="container-fluid"><div class="row text-center attached_image_box">' . $res . '</div></div>';
     }
 
     return $res;
