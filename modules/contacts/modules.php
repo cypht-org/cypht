@@ -396,16 +396,22 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         $this->html_safe($c->value('phone_number')).'</a></td>'.
                         '<td class="text-end" style="width : 100px">';
                     if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $res .= '<a data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).
-                            '" class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
+                        $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                        if ($c->value('type') == 'ldap' && $c->value('all_fields')) {
+                            $all_fields = $c->value('all_fields');
+                            if (isset($all_fields['dn'])) {
+                                $delete_attrs .= ' data-ldap-dn="'.$this->html_safe($all_fields['dn']).'"';
+                            }
+                        }
+                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
                             '<a href="?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
                             $this->html_safe($c->value('source')).'&amp;contact_type='.
                             $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page.
-                            '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
+                            '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-pencil-square ms-2"></i></a>';
                     }
                     $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
                         '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-                        '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+                        '<i class="bi bi-envelope-arrow-up ms-2"></i></a>';
 
                     $res .= '</td></tr>';
                     $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
