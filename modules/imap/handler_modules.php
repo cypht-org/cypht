@@ -1360,7 +1360,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $messages[] = $msg;
             }
 
-            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_status(hex2bin($folders[$key]));
+            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_state(); // this is faster than get_folder_status as search call above already gets this folder's state
         }
 
         $this->out('folder_status', $status);

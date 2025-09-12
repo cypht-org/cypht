@@ -70,30 +70,42 @@ class Hm_MessagesStore {
         const sourcesToRemove = Object.keys(this.sources).filter(key => !this.currentlyAvailableSources().includes(key));
         sourcesToRemove.forEach(key => delete this.sources[key]);
 
-        this.fetch(hideLoadingState).forEach(async (req) => {
-            const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
-            // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
-            this.count = folder_status && Object.values(folder_status)[0]?.messages;
-            this.pages = parseInt(pages);
-            this.newMessages = this.getNewMessages(updatedMessages);
+        // Batch processing for multiple requests
+        const pendingResponses = new Map();
+        let processingTimeout = null;
 
-            if (typeof do_not_flag_as_read_on_open == 'booelan') {
-                this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
-            }
+        const processPendingResponses = () => {
+            if (pendingResponses.size === 0) return;
 
-            if (this.sources[sourceId]) {
-                this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
-            }
-            this.sources[sourceId] = Object.keys(updatedMessages);
-            for (const id in updatedMessages) {
-                if (this.rows.map(row => row['1']).indexOf(id) === -1) {
-                    this.rows.push(updatedMessages[id]);
-                } else {
-                    const index = this.rows.map(row => row['1']).indexOf(id);
-                    this.rows[index] = updatedMessages[id];
+            // Process all pending responses at once
+            const responses = Array.from(pendingResponses.values());
+            pendingResponses.clear();
+
+            responses.forEach(({ formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId }) => {
+                // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
+                this.count = folder_status && Object.values(folder_status)[0]?.messages;
+                this.pages = parseInt(pages);
+                this.newMessages = this.getNewMessages(updatedMessages);
+
+                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                    this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
-            }
 
+                if (this.sources[sourceId]) {
+                    this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
+                }
+                this.sources[sourceId] = Object.keys(updatedMessages);
+                for (const id in updatedMessages) {
+                    if (this.rows.map(row => row['1']).indexOf(id) === -1) {
+                        this.rows.push(updatedMessages[id]);
+                    } else {
+                        const index = this.rows.map(row => row['1']).indexOf(id);
+                        this.rows[index] = updatedMessages[id];
+                    }
+                }
+            });
+
+            // Do expensive operations only once for all responses
             if (this.path == 'unread') {
                 $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
             }
@@ -104,6 +116,21 @@ class Hm_MessagesStore {
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
+        };
+
+        this.fetch(hideLoadingState).forEach((req) => {
+            req.then((response) => {
+                pendingResponses.set(response.sourceId, response);
+
+                if (processingTimeout) {
+                    clearTimeout(processingTimeout);
+                }
+
+                // Process after a short delay to allow batching
+                processingTimeout = setTimeout(processPendingResponses, 10);
+            }).catch((error) => {
+                console.error('Error loading messages from source:', error);
+            });
         });
 
         return this;

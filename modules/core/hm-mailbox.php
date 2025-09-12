@@ -277,7 +277,7 @@ class Hm_Mailbox {
             return $this->connection->get_special_use_folders($folder);
         }
     }
-    
+
     /**
      * Get messages in a folder applying filters, sorting and pagination
      * @return array - [total results found, results for a single page]
@@ -307,7 +307,7 @@ class Hm_Mailbox {
         } else {
             return $this->connection->get_message_headers($msg_id);
         }
-        
+
     }
 
     public function get_message_content($folder, $msg_id, $part = 0) {
