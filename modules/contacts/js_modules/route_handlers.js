@@ -1,6 +1,7 @@
 function applyContactsPageHandlers() {
     $('.delete_contact').on("click", function() {
-        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
+        let ldap_dn = $(this).data('ldap-dn') || '';
+        delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'), ldap_dn);
         return false;
     });
     $('.show_contact').on("click", function() {

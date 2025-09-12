@@ -71,21 +71,89 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
             $config = $ldap_config[$form['contact_source']];
             $contact = $contacts->get($form['contact_id']);
             if (!$contact) {
-                Hm_Msgs::add('Unable to find contact to delete', 'danger');
+                $all_contacts = $contacts->dump();
+                $found_contact = null;
+                $target_dn = null;
+                
+                if (isset($this->request->post['ldap_dn']) && !empty($this->request->post['ldap_dn'])) {
+                    $target_dn = $this->request->post['ldap_dn'];
+                }
+                
+                if (!$target_dn && isset($this->request->get['dn'])) {
+                    $target_dn = $this->request->get['dn'];
+                }
+                
+                foreach ($all_contacts as $contact_id => $contact_obj) {
+                    if ($contact_obj->value('source') == $form['contact_source'] && 
+                        $contact_obj->value('type') == 'ldap') {
+                        
+                        $all_fields = $contact_obj->value('all_fields');
+                        
+                        if ($target_dn && isset($all_fields['dn']) && $all_fields['dn'] === $target_dn) {
+                            $found_contact = $contact_obj;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!$found_contact) {
+                    $ldap_contacts = array();
+                    foreach ($all_contacts as $contact_id => $contact_obj) {
+                        if ($contact_obj->value('source') == $form['contact_source'] && 
+                            $contact_obj->value('type') == 'ldap') {
+                            $ldap_contacts[] = array('id' => $contact_id, 'obj' => $contact_obj);
+                        }
+                    }
+                    
+                    if (count($ldap_contacts) == 1) {
+                        $found_contact = $ldap_contacts[0]['obj'];
+                    }
+                }
+                
+                if (!$found_contact) {
+                    Hm_Msgs::add('Unable to find contact to delete', 'danger');
+                    return;
+                }
+                $contact = $found_contact;
             }
+            
             $ldap = new Hm_LDAP_Contacts($config);
             if ($ldap->connect()) {
                 $flds = $contact->value('all_fields');
+                
+                if (!$flds || !isset($flds['dn']) || empty($flds['dn'])) {
+                    Hm_Msgs::add('Contact DN not found, cannot delete', 'danger');
+                    return;
+                }
+                
                 if ($ldap->delete($flds['dn'])) {
                     Hm_Msgs::add('Contact Deleted');
                     $this->out('contact_deleted', 1);
                 }
                 else {
-                    Hm_Msgs::add('Could not delete contact', 'danger');
+                    if (is_resource($ldap->fh) || (is_object($ldap->fh) && get_class($ldap->fh) === 'LDAP\Connection')) {
+                        $ldap_error = @ldap_error($ldap->fh);
+                        $ldap_errno = @ldap_errno($ldap->fh);
+                    } else {
+                        $ldap_error = '';
+                        $ldap_errno = 0;
+                    }
+                    
+                    switch ($ldap_errno) {
+                        case 50: // LDAP_INSUFFICIENT_ACCESS
+                            Hm_Msgs::add('Permission denied: You do not have sufficient privileges to delete contacts from this LDAP directory', 'danger');
+                            break;
+                        case 66: // LDAP_NOT_ALLOWED_ON_NONLEAF
+                            Hm_Msgs::add('Cannot delete: This contact has dependent entries that must be deleted first', 'danger');
+                            break;
+                        default:
+                            Hm_Msgs::add('Could not delete contact', 'danger');
+                            break;
+                    }
                 }
             }
             else {
-                Hm_Msgs::add('Could not delete contact', 'danger');
+                Hm_Msgs::add('Could not connect to LDAP server', 'danger');
             }
         }
     }
