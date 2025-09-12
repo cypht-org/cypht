@@ -428,7 +428,7 @@ async function select_imap_folder(path, page = 1, reload, processInTheBackground
                 }
             });
         } else {
-            display_imap_mailbox(messages.rows, messages.list, messages);
+            display_imap_mailbox(messages.rows, messages.list, messages, false);
         }
 
         showPagination(messages.pages);
@@ -444,6 +444,8 @@ async function select_imap_folder(path, page = 1, reload, processInTheBackground
             triggerNewMessageEvent(row.data('uid'), row[0]);
         });
     });
+
+    Hm_Message_List.check_empty_list();
 
     if (path === 'unread') {
         Hm_Message_List.set_unread_state();
@@ -512,10 +514,14 @@ $(document).on('submit', '#imap_filter_form', async function(event) {
     }
 });
 
-var display_imap_mailbox = function(rows, id, store) {
+var display_imap_mailbox = function(rows, id, store, checkEmptyState = true) {
     Hm_Message_List.toggle_msg_controls();
     Hm_Message_List.update(rows, id, store);
-    Hm_Message_List.check_empty_list();
+
+    if (checkEmptyState) {
+        Hm_Message_List.check_empty_list();
+    }
+
     $('input[type=checkbox]').on("click", function(e) {
         Hm_Message_List.toggle_msg_controls();
     });
