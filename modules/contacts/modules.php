@@ -391,7 +391,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         '<i class="bi bi-person-fill"></i> '.
                         '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
                         ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
-                        '</td><td>' . $this->html_safe($name) . '</td>' .
+                        '</td><td class="contact_name_fld" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="' . $this->html_safe($name) . '">' . $this->html_safe($name) . '</td>' .
                         '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
                         '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
                         $this->html_safe($c->value('phone_number')).'</a></td>'.
