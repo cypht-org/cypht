@@ -406,7 +406,7 @@ var remove_from_cached_imap_pages = function(msg_cache_key) {
 async function select_imap_folder(path, page = 1, reload, processInTheBackground = false) {
     const messages = new Hm_MessagesStore(path, page, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'), []);
     await messages.load(reload, processInTheBackground, false, () => {
-        if (processInTheBackground) {
+        if (processInTheBackground || Hm_Utils.rows().length) {
             for (let row of messages.rows) {
                 row = $(row['0']);
                 const rowUid = row.data('uid');
