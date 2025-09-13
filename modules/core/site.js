@@ -1379,6 +1379,7 @@ var Hm_Folders = {
 
     listen_for_new_messages: function() {
         var target = $('.total_unread_count').get(0);
+        if (!target) return;
         if (!Hm_Folders.observer) {
             Hm_Folders.observer = new MutationObserver(function(mutations) {
                 $('body').trigger('new_message');
