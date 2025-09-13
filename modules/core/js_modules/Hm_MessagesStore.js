@@ -91,9 +91,6 @@ class Hm_MessagesStore {
                     this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
 
-                if (this.sources[sourceId]) {
-                    this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
-                }
                 this.sources[sourceId] = Object.keys(updatedMessages);
                 for (const id in updatedMessages) {
                     if (this.rows.map(row => row['1']).indexOf(id) === -1) {
@@ -104,6 +101,8 @@ class Hm_MessagesStore {
                     }
                 }
             });
+
+            this.rows = this.rows.filter(row => Object.values(this.sources).flat().indexOf(row['1']) !== -1);
 
             // Do expensive operations only once for all responses
             if (this.path == 'unread') {
