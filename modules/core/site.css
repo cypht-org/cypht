@@ -503,8 +503,8 @@ button {
   margin-top: 0px;
   border-bottom: solid 1px var(--bs-secondary-bg);
   border-top: solid 1px var(--bs-secondary-bg);
-  padding-bottom: 10px;
-  padding-top: 20px;
+  padding-bottom: 15px;
+  padding-top: 15px;
   letter-spacing: -1px;
   gap: 1rem;
   font-size: 1.25rem;
@@ -656,13 +656,15 @@ button {
   color: var(--bs-body-color);
 }
 .prevnext {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   margin-right: 5px;
   vertical-align: -3px;
 }
 .plink,
 .nlink {
   color: #666;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
 }
 .plink:hover,
 .nlink:hover {
@@ -995,8 +997,9 @@ div.unseen,
   width: 100%;
 }
 .mobile .content_title {
-  padding-top: 12px;
   display: flex;
+  padding-top: 12px;
+  padding-bottom: 12px;
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
@@ -1078,9 +1081,8 @@ div.unseen,
   text-overflow: ellipsis;
 }
 .mobile .msg_text_inner {
-  padding-left: 10px !important;
   font-size: 120%;
-  padding: 10px !important;
+  padding: 5px !important;
 }
 .mobile .list_meta {
   display: none;
@@ -1621,6 +1623,14 @@ a[disabled] {
   display: none;
 }
 
+.add_contact_row {
+  background-color: white;
+}
+
+.add_contact_row #add_contact {
+  white-space: nowrap;
+}
+
 .mobile .folders {
   margin-top: 1rem;
   margin-left: 1rem !important;
@@ -1652,11 +1662,11 @@ a[disabled] {
   }
 
   .msg_actions a {
-    color: #495057;
     font-size: 0.85rem;
   }
 
   .mobile nav.folder_cell { width: 50%; }
+  .mobile .news_cell .subject div { padding-bottom: 0px !important; }
 }
 
 @media (max-width: 575px) {
@@ -1664,7 +1674,7 @@ a[disabled] {
   .mobile #list_controls_menu.show { left: auto; right: 0px; }
   .mobile .calendar .month_label { padding: 1rem !important; }
   .mobile .calendar .border.m-4 { margin: 1rem !important; }
-  .mobile .content_title { gap: 0.25rem; }
+  .mobile .content_title { gap: 0.25rem; padding-bottom: 10px !important; }
   .mobile .message_list { position: relative; }
   .mobile .message_list .list_controls.on_mobile {
     position: absolute; top: 12px; right: 15px;

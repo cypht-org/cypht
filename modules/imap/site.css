@@ -69,6 +69,7 @@
   min-height: 600px;
   background-color: #fff;
   height: 100%;
+  padding: calc(var(--bs-gutter-x) * .5);
   /* max-width: 95% !important; */
 }
 .msg_text_inner {
@@ -399,6 +400,7 @@
 }
 .block_sender_link {
   color: brown;
+  margin-right: 8px;
 }
 
 .msg_part_desc {
