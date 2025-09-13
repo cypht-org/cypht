@@ -110,16 +110,16 @@ class Hm_MessagesStore {
                 $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
             }
 
-            this.sort();
-            this.saveToLocalStorage();
+                    this.sort();
+                    this.saveToLocalStorage();
 
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
         };
 
-        this.fetch(hideLoadingState).forEach((req) => {
-            req.then((response) => {
+        await Promise.all(this.fetch(hideLoadingState).map((req) => {
+            return req.then((response) => {
                 pendingResponses.set(response.sourceId, response);
 
                 if (processingTimeout) {
@@ -128,10 +128,10 @@ class Hm_MessagesStore {
 
                 // Process after a short delay to allow batching
                 processingTimeout = setTimeout(processPendingResponses, 10);
-            }).catch((error) => {
+            }, (error) => {
                 console.error('Error loading messages from source:', error);
             });
-        });
+        }));
 
         return this;
     }
