@@ -1636,6 +1636,11 @@ a[disabled] {
   margin-left: 1rem !important;
 }
 
+pre.msg_source {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 768px) {
   .small_header {
