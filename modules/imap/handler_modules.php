@@ -551,13 +551,14 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $folder = hex2bin($parts[2]);
+                $spcial_folders = get_special_folders($this, $parts[1]);
+                if (array_key_exists(strtolower($folder), $spcial_folders)) {
+                    $this->out('core_msg_control_folder', $spcial_folders[strtolower($folder)]);
+                }
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
-                    }
-                    else {
-                        $folder = hex2bin($parts[2]);
                     }
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
