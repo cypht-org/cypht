@@ -171,8 +171,14 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
         $config = ldap_config($this->config, $form['ldap_source']);
         $uidattr = isset($form['ldap_uidattr']) ? $form['ldap_uidattr'] : 'cn';
         $uid_val = '';
-        if ($uidattr === 'uid' && !empty($form['ldap_uid'])) {
-            $uid_val = $form['ldap_uid'];
+
+        if ($uidattr === 'uid') {
+            if (!empty($form['ldap_uid'])) {
+                $uid_val = $form['ldap_uid'];
+            } else {
+                Hm_Msgs::add('Username is required for UID-based contacts', 'danger');
+                return;
+            }
         } else {
             $uid_val = trim($form['ldap_first_name'].' '.$form['ldap_last_name']);
         }
@@ -180,6 +186,7 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
         $dn = sprintf('%s=%s,%s', $uidattr, $uid_val, $config['base_dn']);
 
         $result = array('objectclass' => $config['objectclass']);
+        // Always include cn as it's required by most objectclasses
         $cn = trim($form['ldap_first_name'].' '.$form['ldap_last_name']);
         $result['cn'] = $cn;
         
@@ -212,6 +219,7 @@ class Hm_Handler_process_ldap_fields extends Hm_Handler_Module {
             'ldap_uri' => 'labeleduri'
         );
         foreach ($ldap_map as $name => $val) {
+            // Skip uid attribute when uidattr is 'cn' to avoid empty uid values
             if ($name === 'ldap_uid' && $uidattr === 'cn') {
                 continue;
             }      
@@ -240,25 +248,20 @@ class Hm_Handler_process_update_ldap_server extends Hm_Handler_Module {
         if (!is_array($entry) || count($entry) == 0) {
             return;
         }
-        $new_dn = $this->get('entry_dn');
-        $old_dn = get_ldap_value('dn', $this);
+        $dn = get_ldap_value('dn', $this);
         $config = $this->get('ldap_config');
         $ldap = new Hm_LDAP_Contacts($config);
         if ($ldap->connect()) {
-            if ($new_dn != $old_dn) {
-                $rdn = sprintf('cn=%s', $entry['cn']);
-                $parent = $config['base_dn'];
-                if (!$ldap->rename($old_dn, $rdn, $parent)) {
-                    Hm_Msgs::add('Unable to update contact', 'danger');
-                    return;
-                }
-            }
-            if ($ldap->modify($entry, $new_dn)) {
+            if ($ldap->modify($entry, $dn)) {
                 Hm_Msgs::add('Contact Updated');
+                $this->save_hm_msgs();
+                Hm_Dispatch::page_redirect('?page=contacts');
             }
             else {
                 Hm_Msgs::add('Unable to update contact', 'danger');
             }
+        } else {
+            Hm_Msgs::add('Unable to connect to LDAP server', 'danger');
         }
     }
 }
@@ -298,8 +301,20 @@ class Hm_Handler_process_add_to_ldap_server extends Hm_Handler_Module {
 class Hm_Handler_process_update_ldap_contact extends Hm_Handler_Module {
     public function process() {
         list($success, $form) = $this->process_form(array('ldap_source', 'contact_source',
-            'ldap_first_name', 'update_ldap_contact', 'ldap_last_name', 'ldap_mail'));
+            'ldap_first_name', 'update_ldap_contact', 'ldap_last_name', 'ldap_mail', 'ldap_uidattr'));
         if ($success && $form['contact_source'] == 'ldap') {
+            if (isset($form['ldap_uidattr']) && $form['ldap_uidattr'] === 'uid') {
+                if (empty($this->request->post['ldap_uid'])) {
+                    Hm_Msgs::add('Username is required when using UID attribute', 'danger');
+                    return;
+                }
+                $form['ldap_uid'] = $this->request->post['ldap_uid'];
+            } else {
+                if (isset($this->request->post['ldap_uid'])) {
+                    $form['ldap_uid'] = $this->request->post['ldap_uid'];
+                }
+            }
+            
             $this->out('ldap_entry_data', $form, false);
             $this->out('ldap_action', 'update');
         }
@@ -369,11 +384,47 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
 
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
+
+            $contact_id = $this->request->get['contact_id'];
+            $contact_source = $this->request->get['contact_source'];
+            $target_dn = isset($this->request->get['dn']) ? urldecode($this->request->get['dn']) : null;
+
+            if (!$contact) {
+                $all_contacts = $contacts->dump();
+                $found_contact = null;
+                
+                if ($target_dn) {
+                    foreach ($all_contacts as $contact_id_key => $contact_obj) {
+                        if ($contact_obj->value('source') == $contact_source && 
+                            $contact_obj->value('type') == 'ldap') {
+                            
+                            $all_fields = $contact_obj->value('all_fields');
+                            
+                            if (isset($all_fields['dn']) && $all_fields['dn'] === $target_dn) {
+                                $found_contact = $contact_obj;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                $contact = $found_contact;
+            }
+            
             if (is_object($contact)) {
                 $current = $contact->export();
-                $current['id'] = $this->request->get['contact_id'];
+                $current['id'] = $contact_id;
                 $this->out('current_ldap_contact', $current);
+                $this->handler_response['ldap_edit'] = true;
             }
+        } else {
+            $missing = array();
+            if (!array_key_exists('contact_source', $this->request->get)) $missing[] = 'contact_source';
+            if (!array_key_exists('contact_type', $this->request->get)) $missing[] = 'contact_type';
+            if (!array_key_exists('contact_id', $this->request->get)) $missing[] = 'contact_id';
+            if (array_key_exists('contact_source', $this->request->get) && !array_key_exists($this->request->get['contact_source'], $ldap_config)) $missing[] = 'ldap_config_for_source';
+            
+            error_log("LDAP Edit: Handler skipped due to missing: " . implode(', ', $missing));
         }
     }
 }
@@ -490,6 +541,20 @@ class Hm_Output_ldap_form_first_name extends Hm_Output_Module {
             return;
         }
         $name = get_ldap_value('givenname', $this);
+        $current = $this->get('current_ldap_contact');
+        $is_edit = !empty($current);
+        
+        if ($is_edit) {
+            $uidattr = get_ldap_value('uidattr', $this);
+            if ($uidattr === 'cn') {
+                // For CN-based contacts, make first name read-only to prevent DN conflicts
+                return '<div class="form-floating mb-2">'.
+                    '<input placeholder="'.$this->trans('First Name').'" id="ldap_first_name" '.
+                    'type="text" name="ldap_first_name" value="'.$this->html_safe($name).'" class="form-control" readonly />'.
+                    '<label for="ldap_first_name">'.$this->trans('First Name').' ('.$this->trans('Read Only').')</label></div>';
+            }
+        }
+
         return '<div class="form-floating mb-2">'.
             '<input required placeholder="'.$this->trans('First Name').'" id="ldap_first_name" '.
             'type="text" name="ldap_first_name" value="'.$this->html_safe($name).'" class="form-control" />'.
@@ -525,6 +590,20 @@ class Hm_Output_ldap_form_last_name extends Hm_Output_Module {
             return;
         }
         $name = get_ldap_value('sn', $this);
+        $current = $this->get('current_ldap_contact');
+        $is_edit = !empty($current);
+        
+        if ($is_edit) {
+            $uidattr = get_ldap_value('uidattr', $this);
+            if ($uidattr === 'cn') {
+                // For CN-based contacts, make last name read-only to prevent DN conflicts
+                return '<div class="form-floating mb-2">'.
+                    '<input placeholder="'.$this->trans('Last Name').'" id="ldap_last_name" type="text" '.
+                    'name="ldap_last_name" value="'.$this->html_safe($name).'" class="form-control" readonly />'.
+                    '<label for="ldap_last_name">'.$this->trans('Last Name').' ('.$this->trans('Read Only').')</label></div>';
+            }
+        }
+
         return '<div class="form-floating mb-2">'.
             '<input required placeholder="'.$this->trans('Last Name').'" id="ldap_last_name" type="text" '.
             'name="ldap_last_name" value="'.$this->html_safe($name).'" class="form-control" />'.
@@ -566,20 +645,21 @@ class Hm_Output_ldap_contact_form_start extends Hm_Output_Module {
             $current_source = $current['source'];
             $title = sprintf($this->trans('Update LDAP - %s'), $this->html_safe($current_source));
         }
+        $source_html = '';
         if ($current_source) {
-            $source = '<input type="hidden" name="ldap_source" value="'.$this->html_safe($current_source).'" />';
-        }
-        else {
-            $source = '<select name="ldap_source" class="form-select">';
+            $source_html = '<input type="hidden" name="ldap_source" value="'.$this->html_safe($current_source).'" />';
+        } else {
+            $source_select = '<select id="ldap_source" name="ldap_source" class="form-select">';
             foreach ($sources as $name) {
-                $source .= '<option value="'.$this->html_safe($name).'">'.$this->html_safe($name).'</option>';
+                $source_select .= '<option value="'.$this->html_safe($name).'">'.$this->html_safe($name).'</option>';
             }
-            $source .= '</select>';
+            $source_select .= '</select>';
+            $source_html = '<div class="form-floating mb-2">'.$source_select.'<label for="ldap_source">'.$this->trans('Source').'</label></div>';
         }
         return '<div class="add_contact_responsive"><form class="add_contact_form" method="POST">'.
             '<input type="hidden" name="hm_page_key" value="'.$this->html_safe(Hm_Request_Key::generate()).'" />'.
             '<button class="server_title mt-2 btn btn-light"><i class="bi bi-person-add me-2"></i>'.$title.'</button>'.
-            '<div class="'.$form_class.'"><div class="form-floating mb-2"><input type="hidden" name="contact_source" value="ldap" />'.$source.'<label for="ldap_displayname">'.$this->trans('Source').'</label></div>';
+            '<div class="'.$form_class.'"><input type="hidden" name="contact_source" value="ldap" />'.$source_html;
     }
 }
 
@@ -609,22 +689,75 @@ class Hm_Output_ldap_form_uidattr extends Hm_Output_Module {
             return;
         }
         $val = get_ldap_value('uidattr', $this);
+        $current = $this->get('current_ldap_contact');
+        $is_edit = !empty($current);
         $options = array('cn', 'uid');
-        $select = '<div class="form-floating mb-2">';
-        $select .= '<select id="ldap_uidattr" name="ldap_uidattr" class="form-select">';
-        foreach ($options as $opt) {
-            $selected = ($val == $opt) ? ' selected' : '';
-            $select .= '<option value="'.$this->html_safe($opt).'"'.$selected.'>'.$this->trans($opt).'</option>';
+        
+        if ($is_edit) {
+            $select = '<div class="form-floating mb-2">'.
+                '<input placeholder="'.$this->trans('UID Attribute').'" id="ldap_uidattr_display" type="text" '.
+                'value="'.$this->html_safe($this->trans($val)).'" class="form-control" readonly />'.
+                '<label for="ldap_uidattr_display">'.$this->trans('UID Attribute').' ('.$this->trans('Read Only').')</label></div>';
+            
+            $select .= '<input type="hidden" name="ldap_uidattr" value="'.$this->html_safe($val).'" />';
+            
+            $uid_val = get_ldap_value('uid', $this);
+            
+            // Username field - also read-only in edit mode
+            if ($val === 'uid' && !empty($uid_val)) {
+                $select .= '<div class="form-floating mb-2">'.
+                    '<input placeholder="'.$this->trans('Username').'" id="ldap_uid_display" type="text" '.
+                    'value="'.$this->html_safe($uid_val).'" class="form-control" readonly />'.
+                    '<label for="ldap_uid_display">'.$this->trans('Username').' ('.$this->trans('Read Only').')</label></div>';
+                
+                $select .= '<input type="hidden" name="ldap_uid" value="'.$this->html_safe($uid_val).'" />';
+            }
+        } else {
+            $select = '<div class="form-floating mb-2">';
+            
+            $select .= '<select id="ldap_uidattr" name="ldap_uidattr" class="form-select">';
+            foreach ($options as $opt) {
+                $selected = ($val == $opt) ? ' selected' : '';
+                $select .= '<option value="'.$this->html_safe($opt).'"'.$selected.'>'.$this->trans($opt).'</option>';
+            }
+            $select .= '</select>';
+            $select .= '<label for="ldap_uidattr">'.$this->trans('UID Attribute').'</label></div>';
+            
+            $uid_val = get_ldap_value('uid', $this);
+            
+            $required = ($val === 'uid') ? ' required' : '';
+            $hidden_class = ($val !== 'uid') ? ' d-none' : '';
+            $select .= '<div class="form-floating mb-2'.$hidden_class.'" id="ldap_uid_field_wrapper">'.
+                '<input placeholder="'.$this->trans('Username').'" id="ldap_uid" type="text" name="ldap_uid" '.
+                'value="'.$this->html_safe($uid_val).'" class="form-control" autocomplete="username"'.$required.' />'.
+                '<label for="ldap_uid">'.$this->trans('Username').'</label></div>';
         }
-        $select .= '</select>';
-        $select .= '<label for="ldap_uidattr">'.$this->trans('UID Attribute').'</label></div>';
-        $uid_val = get_ldap_value('uid', $this);
-        $required = ($val === 'uid') ? ' required' : '';
-        $select .= '<div class="form-floating mb-2" id="ldap_uid_field_wrapper">'.
-            '<input placeholder="'.$this->trans('Username').'" id="ldap_uid" type="text" name="ldap_uid" '.
-            'value="'.$this->html_safe($uid_val).'" class="form-control" autocomplete="username"'.$required.' />'.
-            '<label for="ldap_uid">'.$this->trans('Username').'</label></div>';
+        
         return $select;
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/output
+ */
+class Hm_Output_ldap_form_dn_display extends Hm_Output_Module {
+    protected function output() {
+        if (!$this->get('ldap_edit')) {
+            return;
+        }
+        $current = $this->get('current_ldap_contact');
+        if (empty($current)) {
+            return; // Only show DN in edit mode
+        }
+        
+        $dn = get_ldap_value('dn', $this);
+        if (empty($dn)) {
+            return;
+        }
+        
+        return '<div class="form-floating mb-2">'.
+            '<input type="text" id="ldap_dn_display" class="form-control" value="'.$this->html_safe($dn).'" readonly />'.
+            '<label for="ldap_dn_display">'.$this->trans('Distinguished Name').' ('.$this->trans('Read Only').')</label></div>';
     }
 }
 

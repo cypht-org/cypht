@@ -88,6 +88,7 @@ return array(
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'import_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'dn' => FILTER_UNSAFE_RAW,
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),

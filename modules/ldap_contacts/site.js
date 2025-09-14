@@ -7,20 +7,24 @@ $(function() {
     });
 
     function toggleUsernameField() {
-        var uidattr = $('#ldap_uidattr').val();
+        var uidattrSelect = $('#ldap_uidattr');
         var usernameFieldWrapper = $('#ldap_uid_field_wrapper');
         var usernameField = $('#ldap_uid');
+        var uidattr = uidattrSelect.val();
         
         if (uidattr === 'uid') {
-            usernameFieldWrapper.show();
+            usernameFieldWrapper.removeClass('d-none');
             usernameField.prop('required', true);
         } else {
-            usernameFieldWrapper.hide();
+            usernameFieldWrapper.addClass('d-none');
             usernameField.prop('required', false);
             usernameField.val('');
         }
     }
 
-    toggleUsernameField();
-    $('#ldap_uidattr').on('change', toggleUsernameField);
+    $(document).ready(function() {
+        toggleUsernameField();
+    });
+    
+    $(document).on('change', '#ldap_uidattr', toggleUsernameField);
 });

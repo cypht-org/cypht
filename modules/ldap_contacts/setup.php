@@ -19,7 +19,8 @@ add_output('contacts', 'ldap_form_last_name', true, 'ldap_contacts', 'ldap_form_
 add_output('contacts', 'ldap_form_mail', true, 'ldap_contacts', 'ldap_form_last_name', 'after');
 add_output('contacts', 'ldap_form_displayname', true, 'ldap_contacts', 'ldap_form_mail', 'after');
 add_output('contacts', 'ldap_form_uidattr', true, 'ldap_contacts', 'ldap_form_displayname', 'after');
-add_output('contacts', 'ldap_form_locality', true, 'ldap_contacts', 'ldap_form_uidattr', 'after');
+add_output('contacts', 'ldap_form_dn_display', true, 'ldap_contacts', 'ldap_form_uidattr', 'after');
+add_output('contacts', 'ldap_form_locality', true, 'ldap_contacts', 'ldap_form_dn_display', 'after');
 add_output('contacts', 'ldap_form_state', true, 'ldap_contacts', 'ldap_form_locality', 'after');
 add_output('contacts', 'ldap_form_street', true, 'ldap_contacts', 'ldap_form_state', 'after');
 add_output('contacts', 'ldap_form_postalcode', true, 'ldap_contacts', 'ldap_form_street', 'after');

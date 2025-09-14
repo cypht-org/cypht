@@ -403,11 +403,20 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                                 $delete_attrs .= ' data-ldap-dn="'.$this->html_safe($all_fields['dn']).'"';
                             }
                         }
-                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
-                            '<a href="?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
+                        $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
                             $this->html_safe($c->value('source')).'&amp;contact_type='.
-                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page.
-                            '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-pencil-square ms-2"></i></a>';
+                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
+                        
+                        // Add DN parameter for LDAP contacts lookup
+                        if ($c->value('type') == 'ldap' && $c->value('all_fields')) {
+                            $all_fields = $c->value('all_fields');
+                            if (isset($all_fields['dn'])) {
+                                $edit_url .= '&amp;dn='.urlencode($all_fields['dn']);
+                            }
+                        }
+                        
+                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
+                            '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-pencil-square ms-2"></i></a>';
                     }
                     $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
                         '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
