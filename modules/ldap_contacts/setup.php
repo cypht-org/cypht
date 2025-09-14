@@ -47,6 +47,7 @@ add_handler('ajax_delete_contact', 'load_ldap_contacts', true, 'ldap_contacts', 
 add_handler('ajax_delete_contact', 'process_delete_ldap_contact', true, 'ldap_contacts', 'load_ldap_contacts', 'after');
 add_handler('ajax_add_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'process_add_ldap_contact_from_message', true, 'ldap_contacts', 'save_user_data', 'before');
+add_handler('compose', 'ldap_send_to_contact', true, 'ldap_contacts', 'process_send_to_contact', 'after');
 
 add_handler('settings', 'load_ldap_settings', true, 'ldap_contacts', 'load_user_data', 'after');
 add_handler('settings', 'process_ldap_auth_settings', true, 'ldap_contacts', 'save_user_settings', 'before');

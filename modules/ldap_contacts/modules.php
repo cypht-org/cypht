@@ -69,64 +69,35 @@ class Hm_Handler_process_delete_ldap_contact extends Hm_Handler_Module {
         list($success, $form) = $this->process_form(array('contact_type', 'contact_source', 'contact_id'));
         if ($success && $form['contact_type'] == 'ldap' && in_array($form['contact_source'], $sources, true)) {
             $config = $ldap_config[$form['contact_source']];
-            $contact = $contacts->get($form['contact_id']);
-            if (!$contact) {
-                $all_contacts = $contacts->dump();
-                $found_contact = null;
-                $target_dn = null;
-                
-                if (isset($this->request->post['ldap_dn']) && !empty($this->request->post['ldap_dn'])) {
-                    $target_dn = $this->request->post['ldap_dn'];
-                }
-                
-                if (!$target_dn && isset($this->request->get['dn'])) {
-                    $target_dn = $this->request->get['dn'];
-                }
-                
-                foreach ($all_contacts as $contact_id => $contact_obj) {
-                    if ($contact_obj->value('source') == $form['contact_source'] && 
-                        $contact_obj->value('type') == 'ldap') {
-                        
-                        $all_fields = $contact_obj->value('all_fields');
-                        
-                        if ($target_dn && isset($all_fields['dn']) && $all_fields['dn'] === $target_dn) {
-                            $found_contact = $contact_obj;
-                            break;
-                        }
-                    }
-                }
-                
-                if (!$found_contact) {
-                    $ldap_contacts = array();
-                    foreach ($all_contacts as $contact_id => $contact_obj) {
-                        if ($contact_obj->value('source') == $form['contact_source'] && 
-                            $contact_obj->value('type') == 'ldap') {
-                            $ldap_contacts[] = array('id' => $contact_id, 'obj' => $contact_obj);
-                        }
-                    }
-                    
-                    if (count($ldap_contacts) == 1) {
-                        $found_contact = $ldap_contacts[0]['obj'];
-                    }
-                }
-                
-                if (!$found_contact) {
-                    Hm_Msgs::add('Unable to find contact to delete', 'danger');
-                    return;
-                }
-                $contact = $found_contact;
+            
+            // For LDAP contacts, skip contact ID lookup and use DN-based lookup directly
+            $contacts = $this->get('contact_store');
+            $dn = null;
+            $contact = null;
+            
+            // Get DN from request data
+            $target_dn = null;
+            if (isset($this->request->post['ldap_dn']) && !empty($this->request->post['ldap_dn'])) {
+                $target_dn = $this->request->post['ldap_dn'];
+            } elseif (isset($this->request->get['dn'])) {
+                $target_dn = Hm_LDAP_Contact::decodeDN($this->request->get['dn']);
+            } elseif (isset($this->request->post['dn'])) {
+                $target_dn = Hm_LDAP_Contact::decodeDN($this->request->post['dn']);
+            }
+            
+            if ($target_dn) {
+                $contact = Hm_LDAP_Contact::findByDN($contacts, $target_dn, $form['contact_source']);
+                $dn = $target_dn;
+            }
+            
+            if (!$contact || !$dn) {
+                Hm_Msgs::add('Unable to find contact to delete', 'danger');
+                return;
             }
             
             $ldap = new Hm_LDAP_Contacts($config);
             if ($ldap->connect()) {
-                $flds = $contact->value('all_fields');
-                
-                if (!$flds || !isset($flds['dn']) || empty($flds['dn'])) {
-                    Hm_Msgs::add('Contact DN not found, cannot delete', 'danger');
-                    return;
-                }
-                
-                if ($ldap->delete($flds['dn'])) {
+                if ($ldap->delete($dn)) {
                     Hm_Msgs::add('Contact Deleted');
                     $this->out('contact_deleted', 1);
                 }
@@ -383,40 +354,22 @@ class Hm_Handler_load_edit_ldap_contact extends Hm_Handler_Module {
             array_key_exists('contact_id', $this->request->get)) {
 
             $contacts = $this->get('contact_store');
-            $contact = $contacts->get($this->request->get['contact_id']);
-
             $contact_id = $this->request->get['contact_id'];
             $contact_source = $this->request->get['contact_source'];
-            $target_dn = isset($this->request->get['dn']) ? urldecode($this->request->get['dn']) : null;
-
-            if (!$contact) {
-                $all_contacts = $contacts->dump();
-                $found_contact = null;
+            
+            $target_dn = isset($this->request->get['dn']) ? Hm_LDAP_Contact::decodeDN($this->request->get['dn']) : null;
+            
+            if ($target_dn) {
+                $contact = Hm_LDAP_Contact::findByDN($contacts, $target_dn, $contact_source);
                 
-                if ($target_dn) {
-                    foreach ($all_contacts as $contact_id_key => $contact_obj) {
-                        if ($contact_obj->value('source') == $contact_source && 
-                            $contact_obj->value('type') == 'ldap') {
-                            
-                            $all_fields = $contact_obj->value('all_fields');
-                            
-                            if (isset($all_fields['dn']) && $all_fields['dn'] === $target_dn) {
-                                $found_contact = $contact_obj;
-                                break;
-                            }
-                        }
-                    }
+                if ($contact) {
+                    $current = $contact->export();
+                    $current['id'] = $contact_id;
+                    $this->out('current_ldap_contact', $current);
+                    $this->handler_response['ldap_edit'] = true;
                 }
-
-                $contact = $found_contact;
             }
             
-            if (is_object($contact)) {
-                $current = $contact->export();
-                $current['id'] = $contact_id;
-                $this->out('current_ldap_contact', $current);
-                $this->handler_response['ldap_edit'] = true;
-            }
         } else {
             $missing = array();
             if (!array_key_exists('contact_source', $this->request->get)) $missing[] = 'contact_source';
@@ -479,6 +432,34 @@ class Hm_Handler_load_ldap_settings extends Hm_Handler_Module {
         }
         $this->out('ldap_contacts_auth', $this->user_config->get('ldap_contacts_auth_setting'));
         $this->out('ldap_contact_connections', $connections);
+    }
+}
+
+/**
+ * @subpackage ldap_contacts/handler
+ */
+class Hm_Handler_ldap_send_to_contact extends Hm_Handler_Module {
+    public function process() {
+        if (!$this->get('compose_draft') && 
+            array_key_exists('contact_id', $this->request->get) &&
+            array_key_exists('contact_type', $this->request->get) &&
+            array_key_exists('contact_source', $this->request->get) &&
+            array_key_exists('dn', $this->request->get) &&
+            $this->request->get['contact_type'] == 'ldap') {
+            
+            $contacts = $this->get('contact_store');
+            $contact_id = $this->request->get['contact_id'];
+            $contact_source = $this->request->get['contact_source'];
+            
+            // For LDAP contacts, use DN-based lookup directly (contact_id is unreliable for LDAP)
+            $target_dn = Hm_LDAP_Contact::decodeDN($this->request->get['dn']);
+            $contact = Hm_LDAP_Contact::findByDN($contacts, $target_dn, $contact_source);
+            
+            if ($contact) {
+                $to = sprintf('%s <%s>', $contact->value('display_name'), $contact->value('email_address'));
+                $this->out('compose_draft', array('draft_to' => $to, 'draft_subject' => '', 'draft_body' => ''));
+            }
+        }
     }
 }
 

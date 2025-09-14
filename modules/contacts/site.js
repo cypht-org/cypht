@@ -1,6 +1,6 @@
 'use strict';
 
-var delete_contact = function(id, source, type, ldap_dn) {
+var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;
     }
@@ -10,10 +10,6 @@ var delete_contact = function(id, source, type, ldap_dn) {
         {'name': 'contact_type', 'value': type},
         {'name': 'contact_source', 'value': source}
     ];
-    
-    if (ldap_dn) {
-        request_data.push({'name': 'ldap_dn', 'value': ldap_dn});
-    }
     
     Hm_Ajax.request(
         request_data,

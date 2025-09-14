@@ -104,3 +104,83 @@ class Hm_LDAP_Contacts extends Hm_Auth_LDAP {
         return array();
     }
 }
+
+/**
+ * @subpackage ldap_contacts/lib
+ */
+class Hm_LDAP_Contact extends Hm_Contact {
+    
+    public function getDN() {
+        $all_fields = $this->value('all_fields');
+        if ($all_fields && isset($all_fields['dn'])) {
+            return $all_fields['dn'];
+        }
+        return null;
+    }
+    
+    public static function findByDN($contact_store, $target_dn, $contact_source) {
+        $all_contacts = $contact_store->dump();
+        
+        foreach ($all_contacts as $contact_id => $contact_obj) {
+            if ($contact_obj->value('source') == $contact_source && 
+                $contact_obj->value('type') == 'ldap') {
+                
+                $all_fields = $contact_obj->value('all_fields');
+                
+                if (isset($all_fields['dn']) && $all_fields['dn'] === $target_dn) {
+                    return $contact_obj;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public static function isLdapContact($contact) {
+        return $contact instanceof self || $contact->value('type') === 'ldap';
+    }
+
+    public static function decodeDN($encoded_dn) {
+        return urldecode($encoded_dn);
+    }
+
+    public static function generateDeleteAttributes($contact, $html_safe) {
+        if (!self::isLdapContact($contact)) {
+            return '';
+        }
+        
+        $all_fields = $contact->value('all_fields');
+        if ($all_fields && isset($all_fields['dn'])) {
+            return ' data-ldap-dn="'.$html_safe($all_fields['dn']).'"';
+        }
+        
+        return '';
+    }
+
+    public static function addDNToUrl($contact, $base_url) {
+        if (!self::isLdapContact($contact)) {
+            return $base_url;
+        }
+        
+        $all_fields = $contact->value('all_fields');
+        if ($all_fields && isset($all_fields['dn'])) {
+            return $base_url . '&amp;dn='.urlencode($all_fields['dn']);
+        }
+        
+        return $base_url;
+    }
+
+    public static function fromContact($contact) {
+        if ($contact->value('type') !== 'ldap') {
+            return null;
+        }
+
+        if ($contact instanceof self) {
+            return $contact;
+        }
+        
+        $contact_data = $contact->export();
+        $ldap_contact = new self($contact_data);
+        
+        return $ldap_contact;
+    }
+}
