@@ -264,10 +264,4 @@ var check_cc_exist_in_contacts_list = function() {
     }
     return "";
 };
-// Initialize Bootstrap tooltips for contact names
-$(document).ready(function() {
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
-});
+
