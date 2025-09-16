@@ -1901,7 +1901,6 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
             }
         }
         $res = '<div class="p-3">';
-        $res .= '<div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         $res .= '<table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {

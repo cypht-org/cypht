@@ -256,10 +256,6 @@ class Hm_MessagesStore {
     }
 
     fetch(hideLoadingState = false) {
-        // show my custom cypht spinner(class = cypht-spinner)
-        const spinner = document.querySelector('.cypht-spinner');
-        if (spinner) spinner.style.display = 'block';
-
         let store = this;
         return this.getRequestConfigs().map((config) => {
             const initialConfig = Object.assign([], config);
@@ -277,9 +273,6 @@ class Hm_MessagesStore {
                     undefined,
                     reject
                 );
-            }).finally(() => {
-                // Hide the spinner
-                if (spinner) spinner.style.display = 'none';
             });
         });
     }
