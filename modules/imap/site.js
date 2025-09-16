@@ -109,7 +109,7 @@ var set_message_content = function(path, msg_uid) {
     if (!path) {
         path = getListPathParam();
     }
-    Hm_Utils.remove_from_local_storage(getMessageStorageKey(msg_uid));
+    Hm_Utils.remove_from_local_storage(getMessageStorageKey(msg_uid, path));
     preFetchMessageContent(false, msg_uid, path);
 };
 
@@ -528,7 +528,7 @@ var display_imap_mailbox = function(rows, id, store, checkEmptyState = true) {
 };
 
 function preFetchMessageContent(msgPart, uid, path) {
-    if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid))) {
+    if (Hm_Utils.get_from_local_storage(getMessageStorageKey(uid, path))) {
         return;
     }
     const detail = Hm_Utils.parse_folder_path(path, 'imap');
@@ -540,12 +540,12 @@ function preFetchMessageContent(msgPart, uid, path) {
         {'name': 'folder', 'value': detail.folder},
         {'name': 'imap_prefetch', 'value': true}
     ], (res) => {
-        Hm_Utils.save_to_local_storage(getMessageStorageKey(uid), JSON.stringify(res));
+        Hm_Utils.save_to_local_storage(getMessageStorageKey(uid, path), JSON.stringify(res));
     }, null, true)
 }
 
-function getMessageStorageKey(uid) {
-    return uid + '_' + getListPathParam();
+function getMessageStorageKey(uid, listPath = getListPathParam()) {
+    return uid + '_' + listPath;
 }
 
 async function markPrefetchedMessagesAsRead(uid) {
