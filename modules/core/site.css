@@ -1,5 +1,5 @@
 :root {
-  --nav-collapsed-size: 100px;
+  --nav-collapsed-size: 140px;
   --nav-expanded-size: 320px;
   --nav-size: var(--nav-expanded-size);
 }
