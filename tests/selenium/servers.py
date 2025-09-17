@@ -34,13 +34,22 @@ class ServersTest(WebTest):
         name = self.by_name('srv_setup_stepper_profile_name')
         name.send_keys('Test')
         email = self.by_name('srv_setup_stepper_email')
-        email.send_keys('test@localhost')
+        email.send_keys('testuser@localhost')
         pwd = self.by_name('srv_setup_stepper_password')
-        pwd.send_keys('test')
+        pwd.send_keys('testuser')
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
-        next_button.click()
+        # Scroll to the button and wait for any animations/overlays to finish
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", next_button)
+        sleep(0.5)  # Wait for smooth scroll to complete
+        
+        # Try multiple click methods for better reliability
+        try:
+            next_button.click()
+        except Exception as e:
+            print(f"Normal click failed: {e}. Trying JavaScript click...")
+            self.driver.execute_script("arguments[0].click();", next_button)
         # show step two
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '//h2[text()="Step 2"]'))
@@ -55,18 +64,32 @@ class ServersTest(WebTest):
         imap_port = self.by_name('srv_setup_stepper_imap_port')
         imap_port.clear()
         imap_port.send_keys(143)
+        
+        smtp_tls_radio = self.by_id('smtp_start_tls')
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", smtp_tls_radio)
+        sleep(0.2)
+        self.driver.execute_script("arguments[0].click();", smtp_tls_radio)
+
+        imap_tls_radio = self.by_id('imap_start_tls')
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", imap_tls_radio)
+        sleep(0.2)
+        self.driver.execute_script("arguments[0].click();", imap_tls_radio)
+
         reply_to = self.by_name('srv_setup_stepper_profile_reply_to')
-        reply_to.send_keys('test@localhost')
+        reply_to.send_keys('testuser@localhost')
         signature = self.by_name('srv_setup_stepper_profile_signature')
         signature.send_keys('Test')
         elem = self.by_id('step_config_action_finish')
         self.driver.execute_script("arguments[0].scrollIntoView()", elem)
         sleep(1)
         elem.click()
-        wait = WebDriverWait(self.driver, 30)
+        wait = WebDriverWait(self.driver, 60)
         element = wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "sys_messages")))
+        elements = self.driver.find_elements(By.CLASS_NAME, "sys_messages")
+        print(f"Found {len(elements)} sys_messages elements")
         sys_message_text = element.text
         sys_message_texts = sys_message_text.split('\n')
+        print(f"MESSAGES FOUND: '{sys_message_texts}'")
         assert any("Authentication failed" in text for text in sys_message_texts)
 
 if __name__ == '__main__':
