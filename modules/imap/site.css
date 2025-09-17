@@ -387,6 +387,12 @@
   display: flex;
   flex-direction: column;
 }
+.move_to_location .folders .inner_list li {
+  flex-direction: row;
+}
+.move_to_location .folders li.m-has-children {
+  flex-direction: column;
+}
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
   width: 120px;
