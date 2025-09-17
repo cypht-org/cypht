@@ -265,20 +265,6 @@ td {
 .placeholder {
   width: 100px !important;
 }
-.cypht-spinner {
-    position: absolute;
-    inset-inline-start: 55%;
-    top: 50%;
-    --tw-translate-x: -50%;
-    display: none;
-}
-
-/* On small screens we don't have left menu, so there add 5% to inset-inline-start */
-@media screen and (max-width: 600px) {
-  .cypht-spinner {
-    inset-inline-start: 50%;
-  }
-}
 
 .logout {
   margin: 2px;
