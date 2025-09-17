@@ -22,6 +22,7 @@ class PageTests(WebTest):
         # More flexible text matching for search page
         content_title = self.by_class('content_title')
         title_text = content_title.text.strip()
+        print(f"MESSAGES FOUND: '{title_text}'")
         assert 'Search' in title_text or 'search' in title_text.lower(), f"Expected 'Search' in title, got: '{title_text}'"
 
     def sent(self):
@@ -87,16 +88,9 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # Look for mailbox_list_title inside content_title
-        try:
-            mailbox_title = self.by_class('mailbox_list_title')
-            title_text = mailbox_title.text.strip()
-            assert 'Flagged' in title_text, f"Expected 'Flagged' in mailbox title, got: '{title_text}'"
-        except:
-            # Fallback: check content_title for flagged-related text
-            content_title = self.by_class('content_title')
-            title_text = content_title.text.strip()
-            assert 'Flagged' in title_text, f"Expected 'Flagged' in content title, got: '{title_text}'"
+        mailbox_title = self.by_class('mailbox_list_title')
+        title_text = mailbox_title.text.strip()
+        assert 'Flagged' in title_text, f"Expected 'Flagged' in mailbox title, got: '{title_text}'"
 
     def contacts(self):
         if not self.mod_active('contacts'):
@@ -138,7 +132,7 @@ class PageTests(WebTest):
         # Try calendar_content_title first, then fallback to content_title
         try:
             calendar_title = self.by_class('calendar_content_title')
-            title_text = calendar_title.text.strip()
+            title_text = calendar_title.text
             assert 'Calendar' in title_text, f"Expected 'Calendar' in calendar title, got: '{title_text}'"
         except:
             # Fallback: check content_title for calendar-related text
