@@ -137,6 +137,7 @@
       <file>./modules/core/handler_modules.php</file>
       <file>./modules/core/output_modules.php</file>
       <file>./modules/core/output_modules_debug.php</file>
+      <file>./modules/core/mailbox.php</file>
     </testsuite>
   </testsuites>
   <source>
