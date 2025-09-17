@@ -361,3 +361,153 @@ function build_parent_mock($request_type='HTML5') {
 function delete_uploaded_files($obj) {
     return true;
 }
+
+class Hm_Mock_IMAP {
+    public $state = 'disconnected';
+    public $mailbox_status = [];
+    public $select_mailbox_result = true;
+    public $mailbox_page_result = [0, []];
+    public $subscription_result = true;
+    public $search_result = [];
+    public $sort_support = true;
+    public $get_state_values = ['authenticated'];
+    public $get_state_call_count = 0;
+    
+    public function get_state() {
+        if (!empty($this->get_state_values)) {
+            $value = isset($this->get_state_values[$this->get_state_call_count]) 
+                ? $this->get_state_values[$this->get_state_call_count] 
+                : 'authenticated';
+            $this->get_state_call_count++;
+            return $value;
+        }
+        return $this->state;
+    }
+    
+    public function get_mailbox_status($mailbox, $args = []) {
+        if ($mailbox === 'INBOX') {
+            return ['exists' => 100, 'recent' => 5];
+        }
+        return $this->mailbox_status[$mailbox] ?? [];
+    }
+    
+    public function select_mailbox($mailbox) {
+        if ($mailbox === 'NonExistent') {
+            return false;
+        }
+        return $this->select_mailbox_result;
+    }
+    
+    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[], $include_preview=false) {
+        if ($this->select_mailbox_result && $mailbox === 'INBOX') {
+            return [100, [['uid' => 1, 'subject' => 'Test 1'], ['uid' => 2, 'subject' => 'Test 2']]];
+        }
+        return $this->mailbox_page_result;
+    }
+    
+    public function mailbox_subscription($mailbox, $action) {
+        return $this->subscription_result;
+    }
+    
+    public function search($target='ALL', $uids=false, $terms=[], $esearch=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        return $this->search_result;
+    }
+    
+    public function is_supported($capability) {
+        return $this->sort_support;
+    }
+    
+    public function get_message_sort_order($target='ALL', $sort='ARRIVAL', $reverse=true, $folder='INBOX', $terms=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        return $this->search_result;
+    }
+    
+    public function sort_by_fetch($ids, $sort, $reverse) {
+        return $this->search_result;
+    }
+    
+    public function message_action($action, $ids) {
+        return ['status' => true];
+    }
+}
+
+class Hm_Mock_SMTP {
+    public $state = 'disconnected';
+    public $send_result = true;
+    
+    public function send_message($from, $recipients, $message, $ret='', $notify='') {
+        return $this->send_result;
+    }
+}
+
+class Hm_Mock_EWS {
+    public $authed_result = true;
+    public $search_result = [];
+    public $select_mailbox_result = true;
+    public $sort_support = true;
+    
+    public function authed() {
+        return $this->authed_result;
+    }
+    
+    public function search($folder, $sort='date', $reverse=false, $target='ALL', $offset=0, $limit=9999, $terms=[], $params=[]) {
+        return [count($this->search_result), $this->search_result];
+    }
+    
+    public function select_mailbox($mailbox) {
+        return $this->select_mailbox_result;
+    }
+    
+    public function is_supported($capability) {
+        return $this->sort_support;
+    }
+    
+    public function get_folder_status($folder, $report_error = true) {
+        if ($folder === 'INBOX') {
+            return ['name' => 'INBOX', 'id' => 'inbox'];
+        }
+        return false;
+    }
+}
+
+class Hm_Mock_JMAP {
+    public $authed_result = true;
+    public $search_result = [];
+    public $select_mailbox_result = true;
+    public $sort_support = true;
+    public $state = 'authenticated';
+    
+    public function get_state() {
+        return $this->state;
+    }
+    
+    public function authed() {
+        return $this->authed_result;
+    }
+    
+    public function search($folder, $target='ALL', $terms=[], $sort='date', $reverse=false) {
+        return $this->search_result;
+    }
+    
+    public function select_mailbox($mailbox) {
+        return $this->select_mailbox_result;
+    }
+    
+    public function is_supported($capability) {
+        return $this->sort_support;
+    }
+    
+    public function get_message_sort_order($target='ALL', $sort='ARRIVAL', $reverse=true, $folder='INBOX', $terms=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        return $this->search_result;
+    }
+    
+    public function sort_by_fetch($sort, $reverse, $target, $uids) {
+        return $this->search_result;
+    }
+    
+    public function get_folder_status($folder, $report_error = true) {
+        if ($folder === 'INBOX') {
+            return ['name' => 'INBOX', 'id' => 'inbox'];
+        }
+        return false;
+    }
+}
