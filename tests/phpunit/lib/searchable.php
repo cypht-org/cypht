@@ -14,7 +14,7 @@ class Hm_Test_Searchable extends TestCase {
 
     public function setUp(): void {
         require __DIR__.'/../bootstrap.php';
-        Mock_Searchable_Entity::resetTestData(); 
+        Searchable_Wrapper::resetTestData(); 
     }
 
     /**
@@ -24,7 +24,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_with_id_search() {
-        $results = Mock_Searchable_Entity::getBy(1);
+        $results = Searchable_Wrapper::getBy(1);
         
         $this->assertIsArray($results);
         $this->assertCount(1, $results);
@@ -38,7 +38,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_with_custom_column() {
-        $results = Mock_Searchable_Entity::getBy('active', 'status');
+        $results = Searchable_Wrapper::getBy('active', 'status');
         
         $this->assertIsArray($results);
         $this->assertCount(3, $results); // John, Bob, Charlie
@@ -54,7 +54,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_return_first_match() {
-        $result = Mock_Searchable_Entity::getBy('active', 'status', true);
+        $result = Searchable_Wrapper::getBy('active', 'status', true);
         
         $this->assertIsArray($result);
         $this->assertEquals(1, $result['id']);
@@ -68,7 +68,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_no_matches() {
-        $results = Mock_Searchable_Entity::getBy(999);
+        $results = Searchable_Wrapper::getBy(999);
         
         $this->assertIsArray($results);
         $this->assertCount(0, $results);
@@ -80,7 +80,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_no_matches_return_first() {
-        $result = Mock_Searchable_Entity::getBy(999, 'id', true);
+        $result = Searchable_Wrapper::getBy(999, 'id', true);
         
         $this->assertNull($result);
     }
@@ -91,7 +91,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_non_existent_column() {
-        $results = Mock_Searchable_Entity::getBy('test', 'non_existent_column');
+        $results = Searchable_Wrapper::getBy('test', 'non_existent_column');
         
         $this->assertIsArray($results);
         $this->assertCount(0, $results);
@@ -103,7 +103,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_multiple_matches() {
-        $results = Mock_Searchable_Entity::getBy(30, 'age');
+        $results = Searchable_Wrapper::getBy(30, 'age');
         
         $this->assertIsArray($results);
         $this->assertCount(2, $results); // John and Charlie both age 30
@@ -119,7 +119,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_string_search() {
-        $results = Mock_Searchable_Entity::getBy('john@example.com', 'email');
+        $results = Searchable_Wrapper::getBy('john@example.com', 'email');
         
         $this->assertIsArray($results);
         $this->assertCount(1, $results);
@@ -132,7 +132,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_empty_dataset() {
-        $results = Mock_Empty_Searchable_Entity::getBy(1);
+        $results = Empty_Searchable_Wrapper::getBy(1);
         
         $this->assertIsArray($results);
         $this->assertCount(0, $results);
@@ -144,7 +144,7 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_empty_dataset_return_first() {
-        $result = Mock_Empty_Searchable_Entity::getBy(1, 'id', true);
+        $result = Empty_Searchable_Wrapper::getBy(1, 'id', true);
         
         $this->assertNull($result);
     }
@@ -156,11 +156,11 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_null_value_search() {
-        Mock_Searchable_Entity::setTestData([
+        Searchable_Wrapper::setTestData([
             ['id' => 1, 'name' => 'Test', 'email' => null, 'status' => 'active']
         ]);
         
-        $results = Mock_Searchable_Entity::getBy(null, 'email');
+        $results = Searchable_Wrapper::getBy(null, 'email');
         
         $this->assertIsArray($results);
         $this->assertCount(0, $results);
@@ -172,13 +172,13 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_missing_vs_null_column() {
-        Mock_Searchable_Entity::setTestData([
+        Searchable_Wrapper::setTestData([
             ['id' => 1, 'name' => 'Test1', 'email' => null],
             ['id' => 2, 'name' => 'Test2']
         ]);
         
-        $nullResults = Mock_Searchable_Entity::getBy(null, 'email');
-        $missingResults = Mock_Searchable_Entity::getBy('anything', 'missing_column');
+        $nullResults = Searchable_Wrapper::getBy(null, 'email');
+        $missingResults = Searchable_Wrapper::getBy('anything', 'missing_column');
         
         $this->assertCount(0, $nullResults);
         $this->assertCount(0, $missingResults);
@@ -190,13 +190,13 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess
      */
     public function test_getBy_boolean_value_search() {
-        Mock_Searchable_Entity::setTestData([
+        Searchable_Wrapper::setTestData([
             ['id' => 1, 'name' => 'Test1', 'active' => true],
             ['id' => 2, 'name' => 'Test2', 'active' => false],
             ['id' => 3, 'name' => 'Test3', 'active' => true]
         ]);
         
-        $results = Mock_Searchable_Entity::getBy(true, 'active');
+        $results = Searchable_Wrapper::getBy(true, 'active');
         
         $this->assertIsArray($results);
         $this->assertCount(2, $results);
@@ -212,12 +212,12 @@ class Hm_Test_Searchable extends TestCase {
      * @runInSeparateProcess 
      */
     public function test_getBy_numeric_string_search() {
-        Mock_Searchable_Entity::setTestData([
+        Searchable_Wrapper::setTestData([
             ['id' => 1, 'name' => 'Test', 'code' => '123'],
             ['id' => 2, 'name' => 'Test2', 'code' => 123]
         ]);
         
-        $results = Mock_Searchable_Entity::getBy('123', 'code');
+        $results = Searchable_Wrapper::getBy('123', 'code');
         
         $this->assertIsArray($results);
         $this->assertCount(1, $results);
