@@ -818,6 +818,14 @@ function Message_List() {
                 $('.icon', row).empty();
             }
             flagged++;
+
+            // if the message content was present in the local storage, update it too
+            const urlParams = new URLSearchParams(row.find('.subject a').attr('href'));
+            const storageKey = getMessageStorageKey(row.data('uid'), urlParams.get('list_path'));
+            const message = Hm_Utils.get_from_local_storage(storageKey);
+            if (message) {
+                set_message_content(urlParams.get('list_path'), row.data('uid'));
+            }
         }
         return flagged;
     };
