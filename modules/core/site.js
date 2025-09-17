@@ -624,7 +624,11 @@ function Message_List() {
             msgArray = Object.entries(msgArray);
         }
         for (let row of msgArray) {
-            Hm_Utils.tbody().append(row[0]);
+            if (row[1] && typeof row[1] === 'object' && row[1][0]) {
+                Hm_Utils.tbody().append(row[1][0]);
+            } else {
+                Hm_Utils.tbody().append(row[0]);
+            }
         }
     };
 
