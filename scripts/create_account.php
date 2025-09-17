@@ -43,6 +43,21 @@ if ($config->get('auth_type') != 'DB') {
 
 $auth = new Hm_Auth_DB($config);
 
+$dbh = Hm_DB::connect($config);
+if ($dbh) {
+    try {
+        $result = $dbh->query("SELECT 1 FROM hm_user LIMIT 1");
+    } catch (Exception $e) {
+        fwrite(STDERR, "Error: Required table 'hm_user' does not exist in the database.\n" .
+            "You may need to initialize the database structure first.\n" .
+            "Run: php ./scripts/setup_database.php\n");
+        exit(2);
+    }
+} else {
+    fwrite(STDERR, "Error: Unable to connect to the database.\n");
+    exit(2);
+}
+
 if ($user && $pass) {
     $auth->create($user, $pass);
 }
