@@ -13,6 +13,7 @@ use PHPUnit\Framework\TestCase;
  * 
  * Tests for the Hm_Mailbox bridge class that provides a unified interface
  * for different mail server types (IMAP, JMAP, EWS, SMTP).
+ * 
  */
 
 class Hm_Test_Mailbox extends TestCase {
@@ -22,46 +23,29 @@ class Hm_Test_Mailbox extends TestCase {
     private $server_id = 'test_server_1';
 
     public function setUp(): void {
-        // Mock user config et session seront créés dans loadRequiredFiles
-        $this->mock_user_config = null;
-        $this->mock_session = null;
+        define('IMAP_TEST', true);
+        require_once __DIR__.'/../../bootstrap.php';
+        require_once APP_PATH.'modules/imap/hm-imap.php';
+        require_once APP_PATH.'modules/imap/hm-jmap.php';
+        require_once APP_PATH.'modules/imap/hm-ews.php';
+        require_once APP_PATH.'modules/smtp/hm-smtp.php';
+        require_once APP_PATH.'modules/core/hm-mailbox.php';
+        
+        $this->mock_user_config = new Hm_Mock_Config();
+        $this->mock_user_config->set('unsubscribed_folders', ['test_server_1' => ['Junk', 'Spam']]);
+        
+        $this->mock_session = new Hm_Mock_Session();
     }
 
-    private function loadRequiredFiles() {
-        if (!defined('APP_PATH')) {
-            require_once __DIR__.'/../../bootstrap.php';
-        }
-        
-        // Load mocks first
-        if (!class_exists('Hm_Mock_Session', false)) {
-            require_once APP_PATH.'tests/phpunit/mocks.php';
-        }
-        
-        if (!class_exists('Hm_IMAP', false)) {
-            require_once APP_PATH.'modules/imap/hm-imap.php';
-        }
-        if (!class_exists('Hm_JMAP', false)) {
-            require_once APP_PATH.'modules/imap/hm-jmap.php';
-        }
-        if (!class_exists('Hm_EWS', false)) {
-            require_once APP_PATH.'modules/imap/hm-ews.php';
-        }
-        if (!class_exists('Hm_SMTP', false)) {
-            require_once APP_PATH.'modules/smtp/hm-smtp.php';
-        }
-        if (!class_exists('Hm_Mailbox', false)) {
-            require_once APP_PATH.'modules/core/hm-mailbox.php';
-        }
-        
-        // Create mocks using the real mock classes
-        if (!$this->mock_user_config) {
-            $this->mock_user_config = new Hm_Mock_Config();
-            $this->mock_user_config->set('unsubscribed_folders', ['test_server_1' => ['Junk', 'Spam']]);
-        }
-        
-        if (!$this->mock_session) {
-            $this->mock_session = new Hm_Mock_Session();
-        }
+    /**
+     * Helper method to create a mailbox with injected mock connection
+     * This eliminates the need for ReflectionClass in our tests
+     */
+    private function createMailboxWithMockConnection($type, $mock_connection , $config = []) {
+        $config = array_merge(['type' => $type], $config);
+        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mailbox->set_connection($mock_connection);
+        return $mailbox;
     }
 
     /**
@@ -70,8 +54,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_imap_mailbox_construction() {
-        $this->loadRequiredFiles();
-        
         $config = [
             'type' => 'imap',
             'server' => 'imap.example.com',
@@ -93,8 +75,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_jmap_mailbox_construction() {
-        $this->loadRequiredFiles();
-        
         $config = [
             'type' => 'jmap',
             'server' => 'jmap.example.com',
@@ -114,8 +94,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_smtp_mailbox_construction() {
-        $this->loadRequiredFiles();
-        
         $config = [
             'type' => 'smtp',
             'server' => 'smtp.example.com',
@@ -138,8 +116,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_ews_mailbox_construction() {
-        $this->loadRequiredFiles();
-        
         $config = [
             'type' => 'ews',
             'server' => 'ews.example.com',
@@ -159,8 +135,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_unknown_type_construction() {
-        $this->loadRequiredFiles();
-        
         $config = [
             'type' => 'unknown',
             'server' => 'unknown.example.com'
@@ -180,12 +154,19 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_connect_without_connection() {
-        $this->loadRequiredFiles();
-        
         $config = ['type' => 'unknown'];
         $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
         
+        $this->assertFalse($mailbox->is_imap());
+        $this->assertFalse($mailbox->is_smtp());
+        $this->assertNull($mailbox->server_type());
+        $this->assertNull($mailbox->get_connection());
+        $this->assertFalse($mailbox->authed());
+        
         $this->assertFalse($mailbox->connect());
+        
+        $this->assertNull($mailbox->get_connection());
+        $this->assertFalse($mailbox->authed());
     }
 
     /**
@@ -194,22 +175,26 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_imap_authed_status() {
-        $this->loadRequiredFiles();
+        $this->assertEquals('1', Hm_Mailbox::TYPE_IMAP);
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')
+            ->willReturnCallback(function() {
+                static $call_count = 0;
+                $call_count++;
+                return $call_count === 1 ? 'disconnected' : 'authenticated';
+            });
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->get_state_values = ['disconnected', 'authenticated', 'authenticated'];
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap, [
+            'username' => 'testuser',
+            'password' => 'testpass'
+        ]);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $this->assertTrue($mailbox->is_imap());
+        $this->assertFalse($mailbox->is_smtp());
         
-        $this->assertFalse($mailbox->authed()); // disconnected
-        $this->assertTrue($mailbox->authed());  // authenticated
-        $this->assertTrue($mailbox->authed());  // authenticated
+        $this->assertFalse($mailbox->authed());
+        $this->assertTrue($mailbox->authed());
     }
 
     /**
@@ -218,22 +203,19 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_smtp_authed_status() {
-        $this->loadRequiredFiles();
+        $this->assertEquals('4', Hm_Mailbox::TYPE_SMTP);
         
-        $config = [
-            'type' => 'smtp',
-            'username' => 'testuser',
-            'password' => 'testpass'
-        ];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_smtp = $this->createMock(Hm_SMTP::class);
         
-        $mock_smtp = new Hm_Mock_SMTP();
         $mock_smtp->state = 'disconnected';
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_smtp);
+        $mailbox = $this->createMailboxWithMockConnection('smtp', $mock_smtp, [
+            'username' => 'testuser',
+            'password' => 'testpass'
+        ]);
+        
+        $this->assertFalse($mailbox->is_imap());
+        $this->assertTrue($mailbox->is_smtp());
         
         $this->assertFalse($mailbox->authed());
         
@@ -247,20 +229,39 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_folder_exists() {
-        $this->loadRequiredFiles();
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap->method('get_mailbox_status')
+            ->willReturnCallback(function($folder) {
+                if ($folder === 'INBOX') {
+                    return [
+                        'messages' => 42,
+                        'recent' => 3,
+                        'uidnext' => 1000,
+                        'uidvalidity' => 12345,
+                        'unseen' => 5
+                    ];
+                }
+                return [];
+            });
         
-        $mock_imap = new Hm_Mock_IMAP();
+        $mock_imap->method('get_mailbox_list')
+            ->willReturn(['INBOX' => []]);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $this->assertArrayHasKey(
+            'INBOX',
+            $mailbox->get_connection()->get_mailbox_list()
+        );
+        $this->assertArrayNotHasKey(
+            'Sent',
+            $mailbox->get_connection()->get_mailbox_list()
+        );
         
         $this->assertTrue($mailbox->folder_exists('INBOX'));
-        $this->assertFalse($mailbox->folder_exists('NonExistent'));
+        $this->assertFalse($mailbox->folder_exists('NonExistentFolder'));
     }
 
     /**
@@ -269,18 +270,10 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_folder_status_not_authed() {
-        $this->loadRequiredFiles();
-        
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
         $mock_imap = $this->createMock(Hm_IMAP::class);
         $mock_imap->method('get_state')->willReturn('disconnected');
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
         $this->assertNull($mailbox->get_folder_status('INBOX'));
     }
@@ -291,52 +284,66 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_get_messages_with_pagination() {
-        $this->loadRequiredFiles();
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
         
-        $mock_imap = new Hm_Mock_IMAP();
+        $mock_imap->method('get_mailbox_page')
+            ->with('INBOX', 'arrival', false, 'ALL', 5, 5, false, [], false)
+            ->willReturn([
+                15,
+                [
+                    [
+                        'uid' => 10, 'flags' => [], 'internal_date' => '2023-10-15 10:30:00',
+                        'from' => 'sender1@example.com', 'subject' => 'Test Message 10'
+                    ],
+                    [
+                        'uid' => 9, 'flags' => ['\\Seen'], 'internal_date' => '2023-10-15 09:15:00',
+                        'from' => 'sender2@example.com', 'subject' => 'Test Message 9'
+                    ],
+                    [
+                        'uid' => 8, 'flags' => [], 'internal_date' => '2023-10-15 08:45:00',
+                        'from' => 'sender3@example.com', 'subject' => 'Test Message 8'
+                    ],
+                    [
+                        'uid' => 7, 'flags' => ['\\Seen', '\\Flagged'], 'internal_date' => '2023-10-14 16:20:00',
+                        'from' => 'sender4@example.com', 'subject' => 'Important Message 7'
+                    ],
+                    [
+                        'uid' => 6, 'flags' => [], 'internal_date' => '2023-10-14 14:10:00',
+                        'from' => 'sender5@example.com', 'subject' => 'Test Message 6'
+                    ]
+                ]
+            ]);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
-        $result = $mailbox->get_messages('INBOX', 'arrival', false, 'ALL', 0, 20);
+        $result = $mailbox->get_messages('INBOX', 'arrival', false, 'ALL', 5, 5);
         
-        $this->assertEquals(100, $result[0]);
-        $this->assertEquals(2, count($result[1]));
-        $this->assertEquals('Test 1', $result[1][0]['subject']);
+        $this->assertEquals(15, $result[0]);
+        $this->assertCount(5, $result[1]);
         
-        foreach ($result[1] as $msg) {
-            $this->assertArrayHasKey('folder', $msg);
+        $messages = $result[1];
+        $this->assertEquals(10, $messages[0]['uid']);
+        $this->assertEquals('Test Message 10', $messages[0]['subject']);
+        $this->assertEquals('sender1@example.com', $messages[0]['from']);
+        
+        $this->assertEquals(9, $messages[1]['uid']);
+        $this->assertContains('\\Seen', $messages[1]['flags']);
+        
+        $this->assertEquals(8, $messages[2]['uid']);
+        $this->assertEquals(7, $messages[3]['uid']);
+        $this->assertContains('\\Flagged', $messages[3]['flags']);
+        
+        $this->assertEquals(6, $messages[4]['uid']);
+        
+        foreach ($messages as $message) {
+            $this->assertArrayHasKey('folder', $message);
+            $this->assertEquals(bin2hex('INBOX'), $message['folder']);
         }
-    }
-
-    /**
-     * Test message retrieval when folder selection fails
-     * @preserveGlobalState disabled
-     * @runInSeparateProcess
-     */
-    public function test_get_messages_folder_selection_fails() {
-        $this->loadRequiredFiles();
-        
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->select_mailbox_result = false; // Simulate failure
-        
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
-        
-        $result = $mailbox->get_messages('NonExistent', 'arrival', false, 'ALL');
-        
-        $this->assertEquals([0, []], $result);
     }
 
     /**
@@ -345,21 +352,19 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_imap_folder_subscription() {
-        $this->loadRequiredFiles();
-        
         $config = ['type' => 'imap'];
         $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->subscription_result = true;
+        $this->assertNull($mailbox->folder_subscription('INBOX', true));
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        $mock_imap->method('mailbox_subscription')->willReturn(true);
         
-        $this->assertTrue($mailbox->folder_subscription('INBOX', true));
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $this->assertTrue($mailbox->folder_subscription('TestFolder', true));
+        $this->assertTrue($mailbox->folder_subscription('TestFolder', false));
     }
 
     /**
@@ -368,18 +373,10 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_non_imap_folder_subscription() {
-        $this->loadRequiredFiles();
-        
-        $config = ['type' => 'ews'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
         $mock_ews = $this->createMock(Hm_EWS::class);
         $mock_ews->method('authed')->willReturn(true);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_ews);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
         
         $this->mock_user_config->set('unsubscribed_folders', ['test_server_1' => ['TestFolder']]);
         $this->mock_session->set('user_data', []);
@@ -393,21 +390,19 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_search_functionality() {
-        $this->loadRequiredFiles();
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap->selected_mailbox = ['name' => 'INBOX'];
+        $mock_imap->method('select_mailbox')->willReturn(true);
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->select_mailbox_result = true;
-        $mock_imap->sort_support = true;
-        $mock_imap->search_result = [1, 2, 3];
+        $mock_imap->method('is_supported')->with('SORT')->willReturn(true);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mock_imap->method('get_message_sort_order')
+            ->with('date', true, 'ALL', [], true, true, false)
+            ->willReturn([1, 2, 3]);
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
         $result = $mailbox->search('INBOX', 'ALL', [], 'date', true);
         
@@ -420,25 +415,75 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_search_without_sort_support() {
-        $this->loadRequiredFiles();
-        
         $config = ['type' => 'imap'];
         $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->select_mailbox_result = true;
-        $mock_imap->sort_support = false;
-        $mock_imap->search_result = [1, 2, 3];
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mock_imap->selected_mailbox = ['name' => 'INBOX'];
+        $mock_imap->method('select_mailbox')->willReturn(true);
+        
+        $mock_imap->method('is_supported')->with('SORT')->willReturn(false);
+        
+        $mock_imap->method('search')
+            ->with('ALL', false, [], [], true, true, false)
+            ->willReturn([3, 1, 2]);
+        
+        $mock_imap->method('sort_by_fetch')
+            ->with('date', false, 'ALL', '3,1,2')
+            ->willReturn([1, 2, 3]);
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
         $result = $mailbox->search('INBOX', 'ALL', [], 'date', false);
         
         $this->assertEquals([1, 2, 3], $result);
+    }
+
+    /**
+     * Test search without sorting
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_search_without_sorting() {
+        $config = ['type' => 'imap'];
+        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        
+        $mock_imap->selected_mailbox = ['name' => 'INBOX'];
+        $mock_imap->method('select_mailbox')->willReturn(true);
+        
+        $mock_imap->method('search')
+            ->with('ALL', false, [], [], true, true, false)
+            ->willReturn([4, 5, 6]);
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $result = $mailbox->search('INBOX', 'ALL', [], null, null);
+        
+        $this->assertEquals([4, 5, 6], $result);
+    }
+
+    /**
+     * Test search when folder selection fails
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_search_folder_selection_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        
+        $mock_imap->selected_mailbox = ['name' => 'INBOX'];
+        $mock_imap->method('select_mailbox')->with('NonExistent')->willReturn(false);
+    
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $result = $mailbox->search('NonExistent', 'ALL', [], 'date', true);
+        
+        $this->assertEquals([], $result);
     }
 
     /**
@@ -447,25 +492,24 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_jmap_search_functionality() {
-        $this->loadRequiredFiles();
-        
         $config = ['type' => 'jmap'];
         $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
         
-        $mock_jmap = new Hm_Mock_JMAP();
-        $mock_jmap->state = 'authenticated';
-        $mock_jmap->select_mailbox_result = true;
-        $mock_jmap->sort_support = true;
-        $mock_jmap->search_result = [4, 5, 6];
+        $mock_jmap = $this->createMock(Hm_JMAP::class);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_jmap);
+        $mock_jmap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
         
-        $result = $mailbox->search('INBOX', 'ALL', [], 'date', true);
+        $mock_jmap->method('search')
+            ->with('ALL', false, [], [], true, true, false)
+            ->willReturn(['uid1', 'uid2', 'uid3']);
         
-        $this->assertEquals([4, 5, 6], $result);
+        $mailbox = $this->createMailboxWithMockConnection('jmap', $mock_jmap);
+        
+        $result = $mailbox->search('INBOX');
+        
+        $this->assertEquals(['uid1', 'uid2', 'uid3'], $result);
     }
 
     /**
@@ -473,22 +517,27 @@ class Hm_Test_Mailbox extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_ews_search_functionality() {
-        $this->loadRequiredFiles();
+    public function test_ews_search_functionality() {        
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
         
-        $config = ['type' => 'ews'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_ews->method('search')
+            ->with('INBOX', 'date', true, 'ALL', 0, 9999, [], [])
+            ->willReturn([200, [7, 8, 9]]);
         
-        $mock_ews = new Hm_Mock_EWS();
-        $mock_ews->authed_result = true;
-        $mock_ews->select_mailbox_result = true;
-        $mock_ews->sort_support = true;
-        $mock_ews->search_result = [7, 8, 9];
+        $mock_ews->method('get_folder_status')
+            ->with('INBOX')
+            ->willReturn([
+                'id' => 'inbox-folder-id',
+                'name' => 'INBOX',
+                'messages' => 200,
+                'uidvalidity' => false,
+                'uidnext' => false,
+                'recent' => false,
+                'unseen' => 15
+            ]);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_ews);
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
         
         $result = $mailbox->search('INBOX', 'ALL', [], 'date', true);
         
@@ -500,26 +549,22 @@ class Hm_Test_Mailbox extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_jmap_search_without_sort_support() {
-        $this->loadRequiredFiles();
+    public function test_jmap_search_without_sort_support() {        
+        $mock_jmap = $this->createMock(Hm_JMAP::class);
         
-        $config = ['type' => 'jmap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_jmap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
         
-        $mock_jmap = new Hm_Mock_JMAP();
-        $mock_jmap->state = 'authenticated';
-        $mock_jmap->select_mailbox_result = true;
-        $mock_jmap->sort_support = false;
-        $mock_jmap->search_result = [10, 11, 12];
+        $mock_jmap->method('search')
+            ->with('ALL', false, [], [], true, true, false)
+            ->willReturn(['uid4', 'uid5', 'uid6']);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_jmap);
+        $mailbox = $this->createMailboxWithMockConnection('jmap', $mock_jmap);
         
         $result = $mailbox->search('INBOX', 'ALL', [], 'date', false);
         
-        $this->assertEquals([10, 11, 12], $result);
+        $this->assertEquals(['uid4', 'uid5', 'uid6'], $result);
     }
 
     /**
@@ -527,22 +572,27 @@ class Hm_Test_Mailbox extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_ews_search_without_sort_support() {
-        $this->loadRequiredFiles();
+    public function test_ews_search_without_sort_support() {        
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
         
-        $config = ['type' => 'ews'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_ews->method('search')
+            ->with('INBOX', 'date', false, 'ALL', 0, 9999, [], [])
+            ->willReturn([250, [13, 14, 15]]);
         
-        $mock_ews = new Hm_Mock_EWS();
-        $mock_ews->authed_result = true;
-        $mock_ews->select_mailbox_result = true;
-        $mock_ews->sort_support = false;
-        $mock_ews->search_result = [13, 14, 15];
-        
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_ews);
+        $mock_ews->method('get_folder_status')
+            ->with('INBOX')
+            ->willReturn([
+                'id' => 'inbox-folder-id',
+                'name' => 'INBOX',
+                'messages' => 250,
+                'uidvalidity' => false,
+                'uidnext' => false,
+                'recent' => false,
+                'unseen' => 20
+            ]);
+
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
         
         $result = $mailbox->search('INBOX', 'ALL', [], 'date', false);
         
@@ -555,19 +605,13 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_jmap_search_folder_selection_fails() {
-        $this->loadRequiredFiles();
+        $mock_jmap = $this->createMock(Hm_JMAP::class);
+        $mock_jmap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'jmap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_jmap->selected_mailbox = ['name' => 'INBOX'];
+        $mock_jmap->method('select_mailbox')->with('NonExistent')->willReturn(false);
         
-        $mock_jmap = new Hm_Mock_JMAP();
-        $mock_jmap->state = 'authenticated';
-        $mock_jmap->select_mailbox_result = false; // Simulate failure
-        
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_jmap);
+        $mailbox = $this->createMailboxWithMockConnection('jmap', $mock_jmap);
         
         $result = $mailbox->search('NonExistent', 'ALL', [], 'date', true);
         
@@ -580,19 +624,14 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_ews_search_folder_selection_fails() {
-        $this->loadRequiredFiles();
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
         
-        $config = ['type' => 'ews'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
-        $mock_ews = new Hm_Mock_EWS();
-        $mock_ews->authed_result = true;
-        $mock_ews->select_mailbox_result = false; // Simulate failure
-        
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_ews);
+        $mock_ews->method('get_folder_status')
+            ->with('NonExistent')
+            ->willReturn([]);
+
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
         
         $result = $mailbox->search('NonExistent', 'ALL', [], 'date', true);
         
@@ -604,22 +643,23 @@ class Hm_Test_Mailbox extends TestCase {
      * @preserveGlobalState disabled
      * @runInSeparateProcess
      */
-    public function test_delete_message_with_trash() {
-        $this->loadRequiredFiles();
+    public function test_delete_message_with_trash() {        
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->select_mailbox_result = true;
+        $mock_imap->method('message_action')
+            ->with('MOVE', [123], 'Trash')
+            ->willReturn(['status' => true]);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
-        $this->assertTrue($mailbox->delete_message('INBOX', 123, 'Trash'));
+        $result = $mailbox->delete_message('INBOX', 123, 'Trash');
+        
+        $this->assertTrue($result);
     }
 
     /**
@@ -628,21 +668,108 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_delete_message_without_trash() {
-        $this->loadRequiredFiles();
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
         
-        $config = ['type' => 'imap'];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
+        $mock_imap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
         
-        $mock_imap = new Hm_Mock_IMAP();
-        $mock_imap->state = 'authenticated';
-        $mock_imap->select_mailbox_result = true;
+        $mock_imap->method('message_action')
+            ->willReturnCallback(function($action, $ids, $mailbox = null) {
+                if ($action === 'DELETE' && $ids === [123]) {
+                    return ['status' => true];
+                }
+                if ($action === 'EXPUNGE' && $ids === [123]) {
+                    return ['status' => true];
+                }
+                return ['status' => false];
+            });
+
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_imap);
+        $result = $mailbox->delete_message('INBOX', 123, null);
         
-        $this->assertTrue($mailbox->delete_message('INBOX', 123, null));
+        $this->assertTrue($result);
+    }
+
+    /**
+     * Test delete message when folder selection fails
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_message_folder_selection_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        
+        $mock_imap->method('select_mailbox')
+            ->with('NonExistentFolder')
+            ->willReturn(false);
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $result = $mailbox->delete_message('NonExistentFolder', 123, 'Trash');
+        
+        $this->assertNull($result);
+    }
+
+    /**
+     * Test delete message when MOVE action fails
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_delete_message_move_fails() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        
+        $mock_imap->method('select_mailbox')
+            ->with('INBOX')
+            ->willReturn(true);
+        
+        $mock_imap->method('message_action')
+            ->with('MOVE', [123], 'Trash')
+            ->willReturn(['status' => false]);
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $result = $mailbox->delete_message('INBOX', 123, 'Trash');
+        
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Test EWS delete message without trash folder
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_ews_delete_message_without_trash() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->method('authed')->willReturn(true);
+        
+        $mock_ews->method('get_folder_status')
+            ->with('INBOX')
+            ->willReturn([
+                'id' => 'inbox-folder-id',
+                'name' => 'INBOX',
+                'messages' => 100
+            ]);
+        
+        $mock_ews->method('message_action')
+            ->willReturnCallback(function($action, $ids) {
+                if ($action === 'DELETE' && $ids === [123]) {
+                    return ['status' => true];
+                }
+                if ($action === 'EXPUNGE' && $ids === [123]) {
+                    return ['status' => true];
+                }
+                return ['status' => false];
+            });
+        
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews);
+        
+        $result = $mailbox->delete_message('INBOX', 123, null);
+        
+        $this->assertTrue($result);
     }
 
     /**
@@ -651,22 +778,21 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_smtp_send_message() {
-        $this->loadRequiredFiles();
+        $mock_smtp = $this->createMock(Hm_SMTP::class);
         
-        $config = [
-            'type' => 'smtp',
-            'username' => 'testuser',
-            'password' => 'testpass'
-        ];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
-        $mock_smtp = new Hm_Mock_SMTP();
-        
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_smtp);
-        
+        $mock_smtp->expects($this->once())
+            ->method('send_message')
+            ->with(
+                'test@example.com',
+                ['recipient@example.com'],
+                'Test message content',
+                '',
+                ''
+            )
+            ->willReturn(true);
+
+        $mailbox = $this->createMailboxWithMockConnection('smtp', $mock_smtp, ['username' => 'testuser', 'password' => 'testpass']);
+
         $from = 'test@example.com';
         $recipients = ['recipient@example.com'];
         $message = 'Test message content';
@@ -680,15 +806,6 @@ class Hm_Test_Mailbox extends TestCase {
      * @runInSeparateProcess
      */
     public function test_smtp_send_message_with_delivery_receipt() {
-        $this->loadRequiredFiles();
-        
-        $config = [
-            'type' => 'smtp',
-            'username' => 'testuser',
-            'password' => 'testpass'
-        ];
-        $mailbox = new Hm_Mailbox($this->server_id, $this->mock_user_config, $this->mock_session, $config);
-        
         $mock_smtp = $this->createMock(Hm_SMTP::class);
         $mock_smtp->expects($this->once())
             ->method('send_message')
@@ -701,10 +818,7 @@ class Hm_Test_Mailbox extends TestCase {
             )
             ->willReturn(true);
         
-        $reflection = new ReflectionClass($mailbox);
-        $connection_property = $reflection->getProperty('connection');
-        $connection_property->setAccessible(true);
-        $connection_property->setValue($mailbox, $mock_smtp);
+        $mailbox = $this->createMailboxWithMockConnection('smtp', $mock_smtp, ['username' => 'testuser', 'password' => 'testpass']);
         
         $this->assertTrue($mailbox->send_message(
             'test@example.com',
@@ -712,5 +826,79 @@ class Hm_Test_Mailbox extends TestCase {
             'Test message',
             true // delivery receipt
         ));
+    }
+
+    /**
+     * Test SMTP message sending failure
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_smtp_send_message_failure() {
+        $mock_smtp = $this->createMock(Hm_SMTP::class);
+        $mock_smtp->expects($this->once())
+            ->method('send_message')
+            ->with(
+                'test@example.com',
+                ['recipient@example.com'],
+                'Test message',
+                '',
+                ''
+            )
+            ->willReturn(false);
+        
+        $mailbox = $this->createMailboxWithMockConnection('smtp', $mock_smtp, ['username' => 'testuser', 'password' => 'testpass']);
+        
+        $this->assertFalse($mailbox->send_message(
+            'test@example.com',
+            ['recipient@example.com'],
+            'Test message'
+        ));
+    }
+
+    /**
+     * Test EWS message sending (non-SMTP protocol that supports send_message)
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_non_smtp_send_message() {
+        $mock_ews = $this->createMock(Hm_EWS::class);
+        $mock_ews->expects($this->once())
+            ->method('send_message')
+            ->with(
+                'test@example.com',
+                ['recipient@example.com'],
+                'Test message',
+                false
+            )
+            ->willReturn(true);
+        
+        $mailbox = $this->createMailboxWithMockConnection('ews', $mock_ews, ['username' => 'testuser', 'password' => 'testpass']);
+        
+        $this->assertTrue($mailbox->send_message(
+            'test@example.com',
+            ['recipient@example.com'],
+            'Test message',
+            false
+        ));
+    }
+
+    /**
+     * Test message sending with protocol that doesn't support send_message (IMAP)
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
+     */
+    public function test_unsupported_send_message() {
+        $mock_imap = $this->createMock(Hm_IMAP::class);
+        $mock_imap->method('get_state')->willReturn('authenticated');
+        
+        $mailbox = $this->createMailboxWithMockConnection('imap', $mock_imap);
+        
+        $this->expectException(Error::class);
+        
+        $mailbox->send_message(
+            'test@example.com',
+            ['recipient@example.com'],
+            'Test message'
+        );
     }
 }

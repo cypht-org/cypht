@@ -189,54 +189,6 @@ class Hm_Mock_Request {
         $this->type = $type;
     }
 }
-
-class Mock_Searchable_Entity {
-    use Searchable;
-    
-    private static $testData = [
-        ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
-        ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
-        ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
-        ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
-        ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
-    ];
-    
-    /**
-     * Implementation of the abstract method required by Searchable trait
-     */
-    protected static function getDataset() {
-        return self::$testData;
-    }
-    
-    /**
-     * Method to reset test data (useful for testing)
-     */
-    public static function resetTestData() {
-        self::$testData = [
-            ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
-            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
-            ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
-            ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
-            ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
-        ];
-    }
-    
-    /**
-     * Method to set custom test data
-     */
-    public static function setTestData(array $data) {
-        self::$testData = $data;
-    }
-}
-
-class Mock_Empty_Searchable_Entity {
-    use Searchable;
-    
-    protected static function getDataset() {
-        return [];
-    }
-}
-
 class Fake_Server {
     protected $position;
     protected $response = '';
@@ -290,7 +242,6 @@ class Fake_IMAP_Server extends Fake_Server {
         return $pre." BAD Error in IMAP command received by server.\r\n";
     }
 }
-if (!class_exists('Hm_Functions')) {
 class Hm_Functions {
     public static $resource = false;
     public static $rand_bytes = 'good';
@@ -373,7 +324,6 @@ class Hm_Functions {
         return true;
     }
 }
-}
 function setup_db($config) {
     require_once __DIR__.'/bootstrap.php';
     $config->set('db_connection_type', env('DB_CONNECTION_TYPE', 'host'));
@@ -410,154 +360,4 @@ function build_parent_mock($request_type='HTML5') {
 }
 function delete_uploaded_files($obj) {
     return true;
-}
-
-class Hm_Mock_IMAP {
-    public $state = 'disconnected';
-    public $mailbox_status = [];
-    public $select_mailbox_result = true;
-    public $mailbox_page_result = [0, []];
-    public $subscription_result = true;
-    public $search_result = [];
-    public $sort_support = true;
-    public $get_state_values = ['authenticated'];
-    public $get_state_call_count = 0;
-    
-    public function get_state() {
-        if (!empty($this->get_state_values)) {
-            $value = isset($this->get_state_values[$this->get_state_call_count]) 
-                ? $this->get_state_values[$this->get_state_call_count] 
-                : 'authenticated';
-            $this->get_state_call_count++;
-            return $value;
-        }
-        return $this->state;
-    }
-    
-    public function get_mailbox_status($mailbox, $args = []) {
-        if ($mailbox === 'INBOX') {
-            return ['exists' => 100, 'recent' => 5];
-        }
-        return $this->mailbox_status[$mailbox] ?? [];
-    }
-    
-    public function select_mailbox($mailbox) {
-        if ($mailbox === 'NonExistent') {
-            return false;
-        }
-        return $this->select_mailbox_result;
-    }
-    
-    public function get_mailbox_page($mailbox, $sort, $rev, $filter, $offset=0, $limit=0, $keyword=false, $trusted_senders=[], $include_preview=false) {
-        if ($this->select_mailbox_result && $mailbox === 'INBOX') {
-            return [100, [['uid' => 1, 'subject' => 'Test 1'], ['uid' => 2, 'subject' => 'Test 2']]];
-        }
-        return $this->mailbox_page_result;
-    }
-    
-    public function mailbox_subscription($mailbox, $action) {
-        return $this->subscription_result;
-    }
-    
-    public function search($target='ALL', $uids=false, $terms=[], $esearch=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
-        return $this->search_result;
-    }
-    
-    public function is_supported($capability) {
-        return $this->sort_support;
-    }
-    
-    public function get_message_sort_order($target='ALL', $sort='ARRIVAL', $reverse=true, $folder='INBOX', $terms=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
-        return $this->search_result;
-    }
-    
-    public function sort_by_fetch($ids, $sort, $reverse) {
-        return $this->search_result;
-    }
-    
-    public function message_action($action, $ids) {
-        return ['status' => true];
-    }
-}
-
-class Hm_Mock_SMTP {
-    public $state = 'disconnected';
-    public $send_result = true;
-    
-    public function send_message($from, $recipients, $message, $ret='', $notify='') {
-        return $this->send_result;
-    }
-}
-
-class Hm_Mock_EWS {
-    public $authed_result = true;
-    public $search_result = [];
-    public $select_mailbox_result = true;
-    public $sort_support = true;
-    
-    public function authed() {
-        return $this->authed_result;
-    }
-    
-    public function search($folder, $sort='date', $reverse=false, $target='ALL', $offset=0, $limit=9999, $terms=[], $params=[]) {
-        return [count($this->search_result), $this->search_result];
-    }
-    
-    public function select_mailbox($mailbox) {
-        return $this->select_mailbox_result;
-    }
-    
-    public function is_supported($capability) {
-        return $this->sort_support;
-    }
-    
-    public function get_folder_status($folder, $report_error = true) {
-        if ($folder === 'INBOX') {
-            return ['name' => 'INBOX', 'id' => 'inbox'];
-        }
-        return false;
-    }
-}
-
-class Hm_Mock_JMAP {
-    public $authed_result = true;
-    public $search_result = [];
-    public $select_mailbox_result = true;
-    public $sort_support = true;
-    public $state = 'authenticated';
-    
-    public function get_state() {
-        return $this->state;
-    }
-    
-    public function authed() {
-        return $this->authed_result;
-    }
-    
-    public function search($folder, $target='ALL', $terms=[], $sort='date', $reverse=false) {
-        return $this->search_result;
-    }
-    
-    public function select_mailbox($mailbox) {
-        return $this->select_mailbox_result;
-    }
-    
-    public function is_supported($capability) {
-        return $this->sort_support;
-    }
-    
-    public function get_message_sort_order($target='ALL', $sort='ARRIVAL', $reverse=true, $folder='INBOX', $terms=[], $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
-        return $this->search_result;
-    }
-    
-    public function sort_by_fetch($sort, $reverse, $target, $uids) {
-        return $this->search_result;
-    }
-    
-    public function get_folder_status($folder, $report_error = true) {
-        if ($folder === 'INBOX') {
-            return ['name' => 'INBOX', 'id' => 'inbox'];
-        }
-        return false;
-    }
 }
