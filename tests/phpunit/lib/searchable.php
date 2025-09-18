@@ -13,16 +13,8 @@ use PHPUnit\Framework\TestCase;
 class Hm_Test_Searchable extends TestCase {
 
     public function setUp(): void {
-        if (!defined('APP_PATH')) {
-            require_once __DIR__.'/../bootstrap.php';
-        }
-        // Load mocks first
-        if (!class_exists('Hm_Mock_Session', false)) {
-            require_once APP_PATH.'tests/phpunit/mocks.php';
-        }
-
-        Mock_Searchable_Entity::resetTestData();
-        
+        require __DIR__.'/../bootstrap.php';
+        Mock_Searchable_Entity::resetTestData(); 
     }
 
     /**

@@ -20,11 +20,12 @@ define('SITE_ID', 'randomid');
 /* cache id */
 define('CACHE_ID', 'asdf');
 
-/* get mock objects */
-require APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the framework */
 require APP_PATH.'lib/framework.php';
+
+/* get mock objects */
+require APP_PATH.'tests/phpunit/mocks.php';
 
 /* get the stubs */
 require APP_PATH.'tests/phpunit/stubs.php';

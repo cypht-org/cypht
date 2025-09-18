@@ -190,34 +190,8 @@ class Hm_Mock_Request {
     }
 }
 
-trait Mock_Searchable {
-    /**
-     * Return items matching $match in column $column.
-     *
-     * @param mixed  $match
-     * @param string $column
-     * @param bool   $returnFirst
-     * @return array|null
-     */
-    public static function getBy($match, $column = 'id', $returnFirst = false) {
-        $results = [];
-        foreach (static::getDataset() as $item) {
-            if (isset($item[$column]) && $item[$column] === $match) {
-                if ($returnFirst) {
-                    return $item;
-                }
-                $results[] = $item;
-            }
-        }
-        return $returnFirst ? null : $results;
-    }
-
-    // Each class must implement this
-    abstract protected static function getDataset();
-}
-
 class Mock_Searchable_Entity {
-    use Mock_Searchable;
+    use Searchable;
     
     private static $testData = [
         ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
@@ -256,7 +230,7 @@ class Mock_Searchable_Entity {
 }
 
 class Mock_Empty_Searchable_Entity {
-    use Mock_Searchable;
+    use Searchable;
     
     protected static function getDataset() {
         return [];
@@ -316,6 +290,7 @@ class Fake_IMAP_Server extends Fake_Server {
         return $pre." BAD Error in IMAP command received by server.\r\n";
     }
 }
+if (!class_exists('Hm_Functions')) {
 class Hm_Functions {
     public static $resource = false;
     public static $rand_bytes = 'good';
@@ -397,6 +372,7 @@ class Hm_Functions {
     public static function stream_socket_enable_crypto($socket, $type) {
         return true;
     }
+}
 }
 function setup_db($config) {
     require_once __DIR__.'/bootstrap.php';
