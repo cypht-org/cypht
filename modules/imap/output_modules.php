@@ -815,8 +815,8 @@ class Hm_Output_move_copy_controls extends Hm_Output_Module {
         if ($this->get('move_copy_controls', false)) {
             $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" href="#" data-action="copy" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a>';
             $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary no_mobile" data-bs-toggle="dropdown" href="#" data-action="move">'.$this->trans('Move').'</a>';
-            $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-            $res .= '<a class="imap_move disabled_input btn btn-outline-success btn-sm on_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
+            $res .= '<a class="imap_move disabled_input text-decoration-none btn btn-outline-secondary btn-sm on_mobile" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
+            $res .= '<a class="imap_move disabled_input text-decoration-none btn btn-outline-secondary btn-sm on_mobile" href="#" data-action="move">'.$this->trans('Move').'</a>';
             $res .= '<div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div>';
             $res .= '<input type="hidden" class="move_to_type" value="" />';
             $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
