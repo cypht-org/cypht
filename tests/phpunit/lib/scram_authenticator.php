@@ -16,9 +16,7 @@ class Hm_Test_Scram_Authenticator extends TestCase {
     private $scram;
 
     public function setUp(): void {
-        if (!defined('APP_PATH')) {
-            require_once __DIR__.'/../bootstrap.php';
-        }
+        require __DIR__.'/../bootstrap.php';
         
         // Mock Hm_Debug if it doesn't exist
         if (!class_exists('Hm_Debug', false)) {
