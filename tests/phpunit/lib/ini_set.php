@@ -16,9 +16,7 @@ class Hm_Test_Ini_Set extends TestCase {
     private $originalIniValues = [];
 
     public function setUp(): void {
-        if (!defined('APP_PATH')) {
-            require_once __DIR__.'/../bootstrap.php';
-        }
+        require __DIR__.'/../bootstrap.php';
 
         $this->storeOriginalIniValues();
     }
