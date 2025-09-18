@@ -29,7 +29,7 @@ class Hm_Test_Mailbox extends TestCase {
 
     private function loadRequiredFiles() {
         if (!defined('APP_PATH')) {
-            require __DIR__.'/../../bootstrap.php';
+            require_once __DIR__.'/../../bootstrap.php';
         }
         
         // Load mocks first

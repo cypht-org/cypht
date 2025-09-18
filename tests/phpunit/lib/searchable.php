@@ -14,7 +14,7 @@ class Hm_Test_Searchable extends TestCase {
 
     public function setUp(): void {
         if (!defined('APP_PATH')) {
-            require __DIR__.'/../bootstrap.php';
+            require_once __DIR__.'/../bootstrap.php';
         }
         // Load mocks first
         if (!class_exists('Hm_Mock_Session', false)) {
@@ -27,6 +27,9 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with ID search (default column)
+     * 
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_with_id_search() {
         $results = Mock_Searchable_Entity::getBy(1);
@@ -39,6 +42,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with custom column search
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_with_custom_column() {
         $results = Mock_Searchable_Entity::getBy('active', 'status');
@@ -53,6 +58,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with returnFirst = true
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_return_first_match() {
         $result = Mock_Searchable_Entity::getBy('active', 'status', true);
@@ -65,6 +72,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with no matches
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_no_matches() {
         $results = Mock_Searchable_Entity::getBy(999);
@@ -75,6 +84,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with no matches and returnFirst = true
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_no_matches_return_first() {
         $result = Mock_Searchable_Entity::getBy(999, 'id', true);
@@ -84,6 +95,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with non-existent column
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_non_existent_column() {
         $results = Mock_Searchable_Entity::getBy('test', 'non_existent_column');
@@ -94,6 +107,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with multiple matches
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_multiple_matches() {
         $results = Mock_Searchable_Entity::getBy(30, 'age');
@@ -108,6 +123,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with string search
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_string_search() {
         $results = Mock_Searchable_Entity::getBy('john@example.com', 'email');
@@ -119,6 +136,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test with empty dataset
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_empty_dataset() {
         $results = Mock_Empty_Searchable_Entity::getBy(1);
@@ -129,6 +148,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test with empty dataset and returnFirst = true
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_empty_dataset_return_first() {
         $result = Mock_Empty_Searchable_Entity::getBy(1, 'id', true);
@@ -139,6 +160,8 @@ class Hm_Test_Searchable extends TestCase {
     /**
      * Test getBy with null value search
      * Note: isset() returns false for null values, so null values won't be found
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_null_value_search() {
         Mock_Searchable_Entity::setTestData([
@@ -153,6 +176,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with missing vs null column
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_missing_vs_null_column() {
         Mock_Searchable_Entity::setTestData([
@@ -169,6 +194,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with boolean value search
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess
      */
     public function test_getBy_boolean_value_search() {
         Mock_Searchable_Entity::setTestData([
@@ -189,6 +216,8 @@ class Hm_Test_Searchable extends TestCase {
 
     /**
      * Test getBy with numeric string search
+     * @preserveGlobalState disabled
+     * @runInSeparateProcess 
      */
     public function test_getBy_numeric_string_search() {
         Mock_Searchable_Entity::setTestData([
