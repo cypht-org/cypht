@@ -23,7 +23,12 @@ private $hashes = array(
 
 private function getHashAlgorithm($scramAlgorithm) {
     $parts = explode('-', mb_strtolower($scramAlgorithm));
-    return $this->hashes[$parts[1]] ?? 'sha1'; // Default to sha1 if the algorithm is not found
+    if (count($parts) > 2) {
+        $hashAlgorithm = implode('-', array_slice($parts, 1));
+    } else {
+        $hashAlgorithm = $parts[1] ?? '';
+    }
+    return $this->hashes[$hashAlgorithm] ?? 'sha1'; // Default to sha1 if the algorithm is not found
 }
 private function log($message) {
     // Use Hm_Debug to add the debug message
