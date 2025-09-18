@@ -989,7 +989,8 @@ div.unseen,
   max-height: 35rem;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2rem;
+}
+.mobile .content_title:not(.search_result_title) {
   border-top: none;
 }
 .mobile .list_meta,
@@ -1021,7 +1022,6 @@ div.unseen,
 .mobile .msg_text {
   white-space: nowrap !important;
   width: 100%;
-  max-width: 768px !important;
   word-break: break-all;
   word-wrap: break-word;
   font-size: 100%;
@@ -1030,12 +1030,10 @@ div.unseen,
 .mobile .msg_controls {
   z-index: 1000;
   position: fixed;
-  right: 0px;
-  height: 54px;
+  height: 50px;
   font-size: 115%;
   padding-left: 5px;
-  padding-top: 5px;
-  top: 1px;
+  top: 0px;
   left: 60px !important;
 }
 @media (orientation: landscape) {
@@ -1068,7 +1066,7 @@ div.unseen,
 }
 .mobile .msg_text_inner {
   font-size: 120%;
-  padding: 5px !important;
+  padding: 10px !important;
 }
 .mobile .list_meta {
   display: none;
@@ -1084,15 +1082,12 @@ div.unseen,
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.mobile .search_form {
-  margin-top: 20px !important;
-}
 .mobile .search_form select,
 .mobile .search_form button,
 .mobile .search_form input {
   margin-left: 0px !important;
   margin: 0px;
-  margin-top: 5px;
+  margin-top: 2px;
 }
 .mobile .search_form > form {
   flex-wrap: wrap;
@@ -1118,7 +1113,6 @@ div.unseen,
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
 }
 .mobile .unsaved_reminder {
   display: none;
@@ -1627,6 +1621,10 @@ pre.msg_source {
   word-break: break-word;
 }
 
+.msg_text .col-md-2 {
+  font-weight: bold;
+}
+
 /* Mobile responsive overrides for Bootstrap classes */
 @media (max-width: 768px) {
   .small_header {
@@ -1640,12 +1638,6 @@ pre.msg_source {
     flex: 0 0 auto;
     padding: 0;
     flex-wrap: wrap;
-  }
-
-  .small_header .col-md-2 {
-    font-weight: bold;
-    white-space: nowrap;
-    width: fit-content !important;
   }
 
   .long_header .col-md-2 {
@@ -1670,4 +1662,8 @@ pre.msg_source {
   .mobile .message_list .list_controls.on_mobile {
     position: absolute; top: 12px; right: 15px;
   }
+  .mobile .small_header .col-md-2 {
+    font-weight: bold; white-space: nowrap; width: fit-content !important;
+  }
+  .mobile .small_header:nth-child(-n+3) { padding-bottom: 6px !important; }
 }

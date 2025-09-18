@@ -75,9 +75,7 @@
 .msg_text_inner {
   min-height: 300px;
   font-family: monospace;
-  width: 90%;
   padding: 30px;
-  padding-left: 40px;
 }
 
 .mobile .msg_text_inner {

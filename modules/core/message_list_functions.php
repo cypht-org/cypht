@@ -429,7 +429,7 @@ function message_controls($output_mod) {
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
         '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
             '<div class="dropdown on_mobile">'.
-                '<button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
+                '<button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
                 '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">';
     foreach ($controls as $control) {
         $res .= '<li><a class="dropdown-item msg_'.$control.' core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a></li>';
