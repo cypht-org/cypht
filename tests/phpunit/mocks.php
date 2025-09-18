@@ -189,6 +189,80 @@ class Hm_Mock_Request {
         $this->type = $type;
     }
 }
+
+trait Mock_Searchable {
+    /**
+     * Return items matching $match in column $column.
+     *
+     * @param mixed  $match
+     * @param string $column
+     * @param bool   $returnFirst
+     * @return array|null
+     */
+    public static function getBy($match, $column = 'id', $returnFirst = false) {
+        $results = [];
+        foreach (static::getDataset() as $item) {
+            if (isset($item[$column]) && $item[$column] === $match) {
+                if ($returnFirst) {
+                    return $item;
+                }
+                $results[] = $item;
+            }
+        }
+        return $returnFirst ? null : $results;
+    }
+
+    // Each class must implement this
+    abstract protected static function getDataset();
+}
+
+class Mock_Searchable_Entity {
+    use Mock_Searchable;
+    
+    private static $testData = [
+        ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
+        ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
+        ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
+        ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
+        ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
+    ];
+    
+    /**
+     * Implementation of the abstract method required by Searchable trait
+     */
+    protected static function getDataset() {
+        return self::$testData;
+    }
+    
+    /**
+     * Method to reset test data (useful for testing)
+     */
+    public static function resetTestData() {
+        self::$testData = [
+            ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
+            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
+            ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
+            ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
+            ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
+        ];
+    }
+    
+    /**
+     * Method to set custom test data
+     */
+    public static function setTestData(array $data) {
+        self::$testData = $data;
+    }
+}
+
+class Mock_Empty_Searchable_Entity {
+    use Mock_Searchable;
+    
+    protected static function getDataset() {
+        return [];
+    }
+}
+
 class Fake_Server {
     protected $position;
     protected $response = '';
