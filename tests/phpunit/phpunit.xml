@@ -130,6 +130,7 @@
     <testsuite name="lib">
       <file>./lib/searchable.php</file>
       <file>./lib/scram_authenticator.php</file>
+      <file>./lib/ini_set.php</file>
     </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
