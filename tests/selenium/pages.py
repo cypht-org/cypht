@@ -203,7 +203,7 @@ class PageTests(WebTest):
             import time
             time.sleep(0.5)
             
-            list_item = self.by_class('menu_site')
+            list_item = self.by_class('menu_settings')
             link = list_item.find_element(By.TAG_NAME, 'a')
             
             # Try to scroll the element into view and wait a bit more
@@ -218,8 +218,8 @@ class PageTests(WebTest):
         except Exception as e:
             print(f" - site test failed: {e}")
             # Check if the element exists
-            if not self.element_exists('menu_site'):
-                print(" - menu_site element not found")
+            if not self.element_exists('menu_settings'):
+                print(" - menu_settings element not found")
                 return
             raise e
 
