@@ -100,7 +100,7 @@ class Hm_Output_idle_time_setting extends Hm_Output_Module {
         else {
             $idle_time = 1;
         }
-        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="idle_time">'.$this->trans('Allowed idle time until logout').'</label></span><select class="form-select form-select-sm w-auto" id="idle_time" name="idle_time">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="idle_time">'.$this->trans('Allowed idle time until logout').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" id="idle_time" name="idle_time">';
         foreach ($options as $val => $label) {
             $res .= '<option ';
             if ($idle_time == $val) {

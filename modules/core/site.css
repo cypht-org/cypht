@@ -305,7 +305,7 @@ td {
   width: 100%;
 }
 .user_settings table td {
-  height: 34px;
+  height: auto;
   vertical-align: middle;
   padding: 5px;
   padding-left: 37px;

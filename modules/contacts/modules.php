@@ -193,8 +193,8 @@ class Hm_Output_contact_auto_collect_setting extends Hm_Output_Module {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
 
-        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="contact_auto_collect">' .
-            $this->trans('Automatically add outgoing email addresses') . '</label></span><div><input class="form-check-input" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" data-default-value="true" value="1" />' . $reset . '</div></div></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="contact_auto_collect">' .
+            $this->trans('Automatically add outgoing email addresses') . '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" ' . $checked . ' id="contact_auto_collect" name="contact_auto_collect" data-default-value="true" value="1" />' . $reset . '</div></td></tr>';
     }
 }
 
@@ -320,9 +320,9 @@ class Hm_Output_enable_collect_address_on_send_setting extends Hm_Output_Module 
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_collect_address_on_send">'.
-            $this->trans('Enable collect address on send').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_collect_address_on_send" name="enable_collect_address_on_send" data-default-value="'.(DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND ? 'true' : 'false') . '"/>'.$reset.'</div></div></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_collect_address_on_send">'.
+            $this->trans('Enable collect address on send').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_collect_address_on_send" name="enable_collect_address_on_send" data-default-value="'.(DEFAULT_ENABLE_COLLECT_ADDRESS_ON_SEND ? 'true' : 'false') . '"/>'.$reset.'</div></td></tr>';
     }
 }
 
@@ -605,9 +605,9 @@ class Hm_Output_enable_warn_contacts_cc_not_exist_in_list_contact extends Hm_Out
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_warn_contacts_cc_not_exist_in_list_contact">'.
-            $this->trans('Enable warn if contacts Cc not exist in list contact').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_warn_contacts_cc_not_exist_in_list_contact" name="enable_warn_contacts_cc_not_exist_in_list_contact" />'.$reset.'</div></div></td></tr>';
+        return '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="enable_warn_contacts_cc_not_exist_in_list_contact">'.
+            $this->trans('Enable warn if contacts Cc not exist in list contact').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input class="form-check-input me-2" type="checkbox" '.$checked.
+            ' value="1" id="enable_warn_contacts_cc_not_exist_in_list_contact" name="enable_warn_contacts_cc_not_exist_in_list_contact" />'.$reset.'</div></td></tr>';
     }
 }
 
