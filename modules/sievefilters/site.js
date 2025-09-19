@@ -400,6 +400,31 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
      *                                    FUNCTIONS
      **************************************************************************************/
+
+    function showErrorMsg(msg, parentClass, fadeTime = null) {
+        let $parent = $(parentClass);
+
+        if (!$parent.data("highlight-added")) {
+            $parent.data("highlight-added", true);
+            $parent.addClass("highlight-active border border-info rounded p-2 bg-light");
+        }
+
+        let $msg = $('<small class="text-info d-block mt-1"></small>').text(msg);
+
+        $parent.append($msg).show();
+
+        if (fadeTime !== null) {
+            setTimeout(function () {
+                $msg.remove();
+
+                if ($parent.data("highlight-added") && $parent.find("small").length === 0) {
+                    $parent.removeClass("highlight-active border border-info rounded p-2 bg-light");
+                    $parent.removeData("highlight-added");
+                }
+            }, fadeTime);
+        }
+    }
+
     function save_filter(imap_account, gen_script = false) {
         let validation_failed = false
         let conditions_parsed = []
@@ -422,7 +447,11 @@ function sieveFiltersPageHandler() {
 
         let idx = 0;
         if (conditions.length === 0) {
-            Hm_Notices.show('You must provide at least one condition', 'warning');
+            showErrorMsg(
+              "You must provide at least one condition",
+              ".sieve-filter-conditions-block",
+              10000
+            );
             return false;
         }
 
@@ -431,7 +460,11 @@ function sieveFiltersPageHandler() {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' condition (' + elem + ') must be provided', 'warning');
+                showErrorMsg(
+                  "The " + order + " condition (" + elem + ") must be provided",
+                  ".sieve-filter-conditions-block",
+                  10000
+                );
                 validation_failed = true;
             }
              conditions_parsed.push(
@@ -460,7 +493,7 @@ function sieveFiltersPageHandler() {
         }).get();
 
         if (actions_type.length === 0) {
-            Hm_Notices.show('You must provide at least one action', 'warning');
+            showErrorMsg('You must provide at least one action', '.sieve-filter-actions-block', 10000);
             return false;
         }
 
@@ -471,7 +504,11 @@ function sieveFiltersPageHandler() {
                 let order = ordinal_number(key + 1);
                 let previous_messages = $('.sys_messages').html();
                 previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' action (' + elem + ') must be provided', 'waring');
+                showErrorMsg(
+                  "The " + order + " action (" + elem + ") must be provided",
+                  ".sieve-filter-actions-block",
+                  10000
+                );
                 validation_failed = true;
             }
             actions_parsed.push(
@@ -496,7 +533,7 @@ function sieveFiltersPageHandler() {
             )
         }
         if ($('.modal_sieve_filter_name').val() == "") {
-            Hm_Notices.show('Filter name is required', 'danger');
+            showErrorMsg("Filter name is required", ".sieve-filter-name-group");
             return false;
         }
 
