@@ -739,7 +739,7 @@ class Hm_Handler_process_compose_form_submit extends Hm_Handler_Module {
 
         /* check for associated IMAP server to save a copy */
         if ($imap_server !== false) {
-            $this->out('save_sent_server', $imap_server);
+            $this->out('save_sent_server', $imap_server, false);
             $this->out('save_sent_msg', $mime);
         }
         else {
