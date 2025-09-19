@@ -82,6 +82,7 @@ COPY index.php index.php
 # Entrypoint
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+COPY .env.example .env
 
 # Healthcheck
 HEALTHCHECK CMD curl --fail http://localhost || exit 1

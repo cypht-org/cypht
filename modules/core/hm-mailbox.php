@@ -240,12 +240,12 @@ class Hm_Mailbox {
         }
     }
 
-    public function get_subfolders($folder, $only_subscribed = false, $with_input = false) {
+    public function get_subfolders($folder, $only_subscribed = false, $with_input = false, $count_children = false) {
         if (! $this->authed()) {
             return;
         }
         if ($this->is_imap()) {
-            return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input);
+            return $this->connection->get_folder_list_by_level($folder, $only_subscribed, $with_input, $count_children);
         } else {
             return $this->connection->get_folders($folder, $only_subscribed, $this->user_config->get('unsubscribed_folders')[$this->server_id] ?? [], $with_input);
         }
