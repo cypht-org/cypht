@@ -481,7 +481,7 @@ var setup_imap_folder_page = async function(listPath, listPage = 1) {
 
     // Refresh in the background each 60 seconds
     const interval = setInterval(async () => {
-        select_imap_folder(listPath, 1, true, true);
+        select_imap_folder(listPath, getParam('list_page') || 1, true, true);
     }, 60000);
 
     // Return cleanup function to clear interval when page unmounts

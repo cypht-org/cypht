@@ -20,7 +20,7 @@ async function nextPage() {
 
     const nextPage = parseInt(currentPage) + 1;
 
-    const store = new Hm_MessagesStore(getListPathParam(), currentPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+    const store = new Hm_MessagesStore(getListPathParam(), nextPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
     store.load(false, false, true);
 
     await changePage(nextPage, this);
@@ -32,7 +32,7 @@ async function previousPage() {
     const previousPage = parseInt(currentPage) - 1;
 
     if (previousPage > 1) {
-        const store = new Hm_MessagesStore(getListPathParam(), previousPage - 1, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
+        const store = new Hm_MessagesStore(getListPathParam(), previousPage, `${getParam('keyword')}_${getParam('filter')}`, getParam('sort'));
         store.load(false, false, true);
     }
 

@@ -39,11 +39,6 @@ require APP_PATH.'lib/js_libs.php';
 
 require_once APP_PATH.'modules/core/functions.php';
 
-/* load random bytes polyfill if needed */
-if (!function_exists('random_bytes')) {
-    require VENDOR_PATH.'paragonie/random_compat/lib/random.php';
-}
-
 /* check for and load the correct libsodium interface */
 if (!defined('LIBSODIUM')) {
     if (extension_loaded('libsodium') && function_exists('\Sodium\crypto_pwhash_str_verify')) {

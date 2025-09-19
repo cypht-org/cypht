@@ -157,13 +157,17 @@
   background-color: inherit;
   color: inherit;
 }
-.header_links #dropdownMenuForward {
+.header_links #dropdownMenuForward, .header_links #dropdownMenuSnooze, .header_links #dropdownMenuTag, .header_links #dropdownMenuNexterDate {
   padding: 0;
   border: unset;
   font-variant: inherit;
   text-transform: inherit;
   font-size: inherit;
   vertical-align: baseline;
+}
+.header_links .dropdown .btn:hover, .header_links .dropdown .btn:active, .header_links .dropdown .btn:focus {
+    color: inherit;
+    background-color: inherit;
 }
 
 .header_links #dropdownMenuForward:hover {
@@ -599,8 +603,8 @@
     opacity: 1;
 }
 .inner_list li {
-  display: flex !important;
-  flex-direction: row !important;
+  display: flex;
+  flex-direction: row;
   gap: 2px;
   align-items: center;
 }
@@ -610,4 +614,20 @@
     left: 33.5%;
     top: 50%;
     transform: translate(-50%, -50%);
+}
+
+ul.inner_list > li[class^="m-has-children"] {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+}
+.inner_list li[class^="m-has-children"] .m-has-children-wrapper {
+    display: flex;
+}
+
+.inner_list li[class^="m-has-children"] ul {
+    padding-left: 5px;
+    margin-bottom: 0px;
+    margin-top: 0px;
 }
