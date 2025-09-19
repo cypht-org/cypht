@@ -780,13 +780,12 @@ function getSettingsSectionOutput($section, $sectionLabel, $sectionIcon, $settin
         }
 
         $res .= "<tr class='{$section}_setting'>" .
-        "<td><label for='$key'>$label</label></td>" .
-        "<td>
+        "<td><div class='d-flex flex-column flex-md-row'><span class='fw-bold me-md-3'><label for='$key'>$label</label></span>
             <div>
                 $input
             </div>
             <div class='setting_description'>$description</div>
-        </td>" .
+        </div></td>" .
         "</tr>";
     }
     return $res;

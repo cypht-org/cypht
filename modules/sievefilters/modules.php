@@ -1339,10 +1339,9 @@ class Hm_Output_enable_sieve_filter_setting extends Hm_Output_Module {
         }else {
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_sieve_filter">'.
-            $this->trans('Enable sieve filter').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" data-default-value="'.(DEFAULT_ENABLE_SIEVE_FILTER ? 'true' : 'false') . '"/>'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_sieve_filter">'.
+            $this->trans('Enable sieve filter').'</label></span><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="enable_sieve_filter" name="enable_sieve_filter" data-default-value="'.(DEFAULT_ENABLE_SIEVE_FILTER ? 'true' : 'false') . '"/>'.$reset.'</div></td></tr>';
     }
 }
 

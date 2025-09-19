@@ -918,10 +918,9 @@ class Hm_Output_enable_compose_delivery_receipt_setting extends Hm_Output_Module
             $checked = '';
             $reset = '';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_compose_delivery_receipt">'.
-            $this->trans('Enable delivery receipt').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.
-            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_compose_delivery_receipt">'.
+            $this->trans('Enable delivery receipt').'</label></span><input class="form-check-input" type="checkbox" '.$checked.
+            ' value="1" id="enable_compose_delivery_receipt" name="enable_compose_delivery_receipt" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -954,9 +953,8 @@ class Hm_Output_attachment_setting extends Hm_Output_Module {
         if ($size_in_kbs > 0) {
             $size_in_kbs = round(($size_in_kbs / 1024), 2);
         }
-        return '<tr class="general_setting"><td><label>'.
-            $this->trans('Attachment Chunks').'</label></td>'.
-            '<td><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label>'.
+            $this->trans('Attachment Chunks').'</label></span><small>('.$num_chunks.' Chunks) '.$size_in_kbs.' KB</small> <button id="clear_chunks_button" class="btn btn-light btn-sm border">Clear Chunks</button></div></td></tr>';
     }
 }
 
@@ -979,10 +977,9 @@ class Hm_Output_enable_attachment_reminder_setting extends Hm_Output_Module {
             $checked = '';
             $reset='';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_attachment_reminder">'.
-            $this->trans('Enable Attachment Reminder').'</label></td>'.
-            '<td><input type="checkbox" '.$checked.
-            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_attachment_reminder">'.
+            $this->trans('Enable Attachment Reminder').'</label></span><input type="checkbox" '.$checked.
+            ' value="1" id="enable_attachment_reminder" class="form-check-input" name="enable_attachment_reminder" data-default-value="false" />'.$reset.'</div></td></tr>';
     }
 }
 
@@ -1386,7 +1383,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_compose_type', $settings)) {
             $selected = $settings['smtp_compose_type'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Outbound mail format').'</td><td><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3">'.$this->trans('Outbound mail format').'</span><select class="form-select form-select-sm w-auto" name="smtp_compose_type" data-default-value="'.DEFAULT_SMTP_COMPOSE_TYPE.'">';
         $res .= '<option ';
         if ($selected == 0) {
             $res .= 'selected="selected" ';
@@ -1402,7 +1399,7 @@ class Hm_Output_compose_type_setting extends Hm_Output_Module {
         if ($selected != 0) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
-        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</td></tr>';
+        $res .= 'value="2">'.$this->trans('Markdown').'</option></select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -1417,13 +1414,13 @@ class Hm_Output_auto_bcc_setting extends Hm_Output_Module {
         if (array_key_exists('smtp_auto_bcc', $settings)) {
             $auto = $settings['smtp_auto_bcc'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></td><td><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="smtp_auto_bcc">'.$this->trans('Always BCC sending address').'</label></span><input class="form-check-input" value="1" type="checkbox" name="smtp_auto_bcc" id="smtp_auto_bcc"  data-default-value="false"';
         $reset = '';
         if ($auto) {
             $res .= ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res .= '>'.$reset.'</td></tr>';
+        $res .= '>'.$reset.'</div></td></tr>';
         return $res;
     }
 }

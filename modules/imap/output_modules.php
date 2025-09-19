@@ -1059,9 +1059,8 @@ class Hm_Output_imap_unread_on_open extends Hm_Output_Module {
         if (array_key_exists('unread_on_open', $settings) && $settings['unread_on_open']) {
             $checked = ' checked="checked"';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="unread_on_open">'.
-            $this->trans('Don\'t flag a message as read on open').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" data-default-value="false" value="1" /></td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="unread_on_open">'.
+            $this->trans('Don\'t flag a message as read on open').'</label></span><input class="form-check-input" type="checkbox" '.$checked.' id="unread_on_open" name="unread_on_open" data-default-value="false" value="1" /></div></td></tr>';
     }
 }
 
@@ -1079,9 +1078,8 @@ class Hm_Output_imap_simple_msg_parts extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="simple_msg_parts">'.
-            $this->trans('Show simple message part structure when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="simple_msg_parts">'.
+            $this->trans('Show simple message part structure when reading a message').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="simple_msg_parts" name="simple_msg_parts" data-default-value="false" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1100,9 +1098,8 @@ class Hm_Output_imap_pagination_links extends Hm_Output_Module {
         if($settings['pagination_links'] !== DEFAULT_PAGINATION_LINKS) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="pagination_links">'.
-            $this->trans('Show next & previous emails links when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links"  data-default-value="'.(DEFAULT_PAGINATION_LINKS ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="pagination_links">'.
+            $this->trans('Show next & previous emails links when reading a message').'</label></span><div><input class="form-check-input" type="checkbox"'.$checked.' id="pagination_links" name="pagination_links"  data-default-value="'.(DEFAULT_PAGINATION_LINKS ? 'true' : 'false') . '" value="1" />'.$reset.'</div></div></td></tr>';
         return $res;
     }
 }
@@ -1121,9 +1118,8 @@ class Hm_Output_imap_auto_advance_email extends Hm_Output_Module {
         } else {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="auto_advance_email">'.
-            $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" data-default-value="true" value="1" />'.$reset.'</td></tr>';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="auto_advance_email">'.
+            $this->trans('Show next email instead of your inbox after performing action (delete, archive, move, etc)').'</label></span><div><input class="form-check-input" type="checkbox"'.$checked.' id="auto_advance_email" name="auto_advance_email" data-default-value="true" value="1" />'.$reset.'</div></div></td></tr>';
         return $res;
     }
 }
@@ -1157,9 +1153,9 @@ class Hm_Output_imap_per_page_setting extends Hm_Output_Module {
         if ($per_page != DEFAULT_IMAP_PER_PAGE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="imap_per_page">'.
-            $this->trans('Messages per page for IMAP folder views').'</label></td><td class="d-flex"><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
-            'name="imap_per_page" value="'.$this->html_safe($per_page).'" data-default-value="'.DEFAULT_IMAP_PER_PAGE.'"/>'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="imap_per_page">'.
+            $this->trans('Messages per page for IMAP folder views').'</label></span><div><input class="form-control form-control-sm w-auto" type="text" id="imap_per_page" '.
+            'name="imap_per_page" value="'.$this->html_safe($per_page).'" data-default-value="'.DEFAULT_IMAP_PER_PAGE.'"/>'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1178,9 +1174,9 @@ class Hm_Output_max_google_contacts_number extends Hm_Output_Module {
         if ($max_google_contacts_number != DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input" default-value="'.DEFAULT_MAX_GOOGLE_CONTACTS_NUMBER.'"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="max_google_contacts_number">'.
-            $this->trans('Max google contacts number').'</label></td><td><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
-            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="max_google_contacts_number">'.
+            $this->trans('Max google contacts number').'</label></span><div><input class="form-control form-control-sm w-auto" type="number" id="max_google_contacts_number" '.
+            'name="max_google_contacts_number" value="'.$this->html_safe($max_google_contacts_number).'" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1197,9 +1193,8 @@ class Hm_Output_imap_msg_icons_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="msg_part_icons">'.
-            $this->trans('Show message part icons when reading a message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="msg_part_icons">'.
+            $this->trans('Show message part icons when reading a message').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="msg_part_icons" name="msg_part_icons" data-default-value="false" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1218,9 +1213,8 @@ class Hm_Output_text_only_setting extends Hm_Output_Module {
         if($settings['text_only'] !== DEFAULT_TEXT_ONLY) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="text_only">'.
-            $this->trans('Prefer text over HTML when reading messages').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" data-default-value="'.(DEFAULT_TEXT_ONLY ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="text_only">'.
+            $this->trans('Prefer text over HTML when reading messages').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="text_only" name="text_only" data-default-value="'.(DEFAULT_TEXT_ONLY ? 'true' : 'false') . '" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1258,9 +1252,8 @@ class Hm_Output_original_folder_setting extends Hm_Output_Module {
             $checked = ' checked="checked"';
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="original_folder">'.
-            $this->trans('Archive to the original folder').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="original_folder">'.
+            $this->trans('Archive to the original folder').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="original_folder" name="original_folder" data-default-value="false" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1279,9 +1272,8 @@ class Hm_Output_setting_enable_snooze extends Hm_Output_Module {
         if ($settings['enable_snooze'] !== DEFAULT_ENABLE_SNOOZE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-repeat refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="enable_snooze">'.
-            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="enable_snooze">'.
+            $this->trans('Enable Snooze functionality').' <span class="badge bg-warning text-dark ms-2">'.$this->trans('Experimental').'</span></label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="enable_snooze" name="enable_snooze" data-default-value="'.(DEFAULT_ENABLE_SNOOZE ? 'true' : 'false') . '" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1299,9 +1291,8 @@ class Hm_Output_review_sent_email extends Hm_Output_Module {
         if($settings['review_sent_email'] !== DEFAULT_REVIEW_SENT_EMAIL) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_checkbox"></i></span>';
         }
-        return '<tr class="general_setting"><td><label class="form-check-label" for="review_sent_email">'.
-            $this->trans('Review sent message').'</label></td>'.
-            '<td><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="'.(DEFAULT_REVIEW_SENT_EMAIL ? 'true' : 'false') . '" value="1" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label class="form-check-label" for="review_sent_email">'.
+            $this->trans('Review sent message').'</label></span><div><input class="form-check-input" type="checkbox" '.$checked.' id="review_sent_email" name="review_sent_email" data-default-value="'.(DEFAULT_REVIEW_SENT_EMAIL ? 'true' : 'false') . '" value="1" />'.$reset.'</div></div></td></tr>';
     }
 }
 
@@ -1632,9 +1623,9 @@ class Hm_Output_first_time_screen_emails_per_page_setting extends Hm_Output_Modu
         if ($per_page != 20) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
         }
-        return '<tr class="general_setting"><td><label for="first_time_screen_emails">'.
-            $this->trans('First-time screen senders').'</label></td><td><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.
-            'name="first_time_screen_emails" value="'.$this->html_safe($per_page).'" />'.$reset.'</td></tr>';
+        return '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="first_time_screen_emails">'.
+            $this->trans('First-time screen senders').'</label></span><div><input class="form-control form-control-sm w-auto" type="text" id="first_time_screen_emails" '.
+            'name="first_time_screen_emails" value="'.$this->html_safe($per_page).'" />'.$reset.'</div></div></td></tr>';
     }
 }
 class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
@@ -1646,8 +1637,8 @@ class Hm_Output_setting_move_messages_in_screen_email extends Hm_Output_Module {
                 $checked = "checked";
             }
         }
-        $res = '<tr class="general_setting"><td><label for="move_messages_in_screen_email">'.
-            $this->trans('Move all messages in Screen Email folder if dislike email').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></td></tr>';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="move_messages_in_screen_email">'.
+            $this->trans('Move all messages in Screen Email folder if dislike email').'</label></span><input class="form-check-input" type="checkbox" role="switch" id="move_messages_in_screen_email" name="move_messages_in_screen_email" '.$checked.' ></div></td></tr>';
 
         return $res;
     }
@@ -1662,8 +1653,8 @@ class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
                 $checked = "checked";
             }
         }
-        $res = '<tr class="general_setting"><td><label for="active_preview_message">'.
-            $this->trans('Active preview message').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></td></tr>';
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="active_preview_message">'.
+            $this->trans('Active preview message').'</label></span><input class="form-check-input" type="checkbox" role="switch" id="active_preview_message" name="active_preview_message" '.$checked.' ></div></td></tr>';
         return $res;
     }
 }
@@ -1718,18 +1709,18 @@ class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
             }
         }
 
-        $res = '<tr class="general_setting"><td><label for="ceo_use_detect_ceo_fraud">'.
+        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="ceo_use_detect_ceo_fraud">'.
             $this->trans('CEO fraud: Use Detect CEO Fraud').
-            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_use_trusted_contact">'.
+            '</label></span><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_detect_ceo_fraud" name="ceo_use_detect_ceo_fraud" '. $ceo_use_detect_ceo_fraud .' ></div></td></tr>';
+        $res .= '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="ceo_use_trusted_contact">'.
             $this->trans('CEO fraud: Use Trusted Contacts as Valid emails ').
-            '</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_trusted_contact" name="ceo_use_trusted_contact" '. $ceo_use_trusted_contact .' ></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_suspicious_terms">'.
+            '</label></span><input class="form-check-input" type="checkbox" role="switch" id="ceo_use_trusted_contact" name="ceo_use_trusted_contact" '. $ceo_use_trusted_contact .' ></div></td></tr>';
+        $res .= '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="ceo_suspicious_terms">'.
             $this->trans('CEO fraud: Suspicious Phrases or Requests(separate by ",")').
-            '</label></td><td><textarea class="form-control form-control-sm w-auto" role="switch" id="ceo_suspicious_terms" name="ceo_suspicious_terms">'. $ceo_suspicious_terms .'</textarea></td></tr>';
-        $res .= '<tr class="general_setting"><td><label for="ceo_rate_limit">'.
+            '</label></span><textarea class="form-control form-control-sm w-auto" role="switch" id="ceo_suspicious_terms" name="ceo_suspicious_terms">'. $ceo_suspicious_terms .'</textarea></div></td></tr>';
+        $res .= '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="ceo_rate_limit">'.
             $this->trans('CEO fraud: Rate-Limit or Monitor Unusual Requests').
-            '</label></td><td><input class="form-control form-control-sm w-auto" type="number" min="0" role="switch" id="ceo_rate_limit" name="ceo_rate_limit" value="'. $ceo_rate_limit .'" ></td></tr>';
+            '</label></span><input class="form-control form-control-sm w-auto" type="number" min="0" role="switch" id="ceo_rate_limit" name="ceo_rate_limit" value="'. $ceo_rate_limit .'" ></div></td></tr>';
         return $res;
     }
 }
