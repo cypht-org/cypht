@@ -551,13 +551,14 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     }
                 }
                 $folder = hex2bin($parts[2]);
+                $spcial_folders = get_special_folders($this, $parts[1]);
+                if (array_key_exists(strtolower($folder), $spcial_folders)) {
+                    $this->out('core_msg_control_folder', $spcial_folders[strtolower($folder)]);
+                }
                 if (!empty($details)) {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
-                    }
-                    else {
-                        $folder = hex2bin($parts[2]);
                     }
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
@@ -664,7 +665,11 @@ class Hm_Handler_imap_folder_expand extends Hm_Handler_Module {
                 if ($with_subscription) {
                     $only_subscribed = false;
                 }
-                $msgs = $mailbox->get_subfolders(hex2bin($folder), $only_subscribed, $with_subscription);
+                $count_children = false;
+                if (isset($this->request->post['count_children'])){
+                    $count_children = $this->request->post['count_children'];
+                }
+                $msgs = $mailbox->get_subfolders(hex2bin($folder), $only_subscribed, $with_subscription, $count_children);
                 if (isset($msgs[$folder])) {
                     unset($msgs[$folder]);
                 }
@@ -1123,7 +1128,7 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                         foreach ($folders as $folder => $uids) {
                             $status['imap_'.$server.'_'.$folder] = $mailbox->get_folder_state();
                             $action_result = $this->perform_action($mailbox, $form['action_type'], $uids, $folder, $specials, $server_details);
-                            if ($action_result['error']) {
+                            if ($action_result['error'] && ! $action_result['folder_not_found_error']) {
                                 $errs++;
                             } else {
                                 $msgs += count($uids);
@@ -1193,7 +1198,14 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
                 }
             }
         }
-        return ['error' => $error, 'moved' => $moved];
+
+        $folderNotFoundError = false;
+        if (!$special_folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
+            Hm_Msgs::add(sprintf('No %s folder configured for %s. Please go to <a href="?page=folders&imap_server_id=%s">Folders seetting</a> and configure one', $action_type, $server_details['name'], $server_details['id']), empty($moved) ? 'danger' : 'warning');
+            $folderNotFoundError = true;
+        }
+
+        return ['error' => $error, 'moved' => $moved, 'folder_not_found_error' => $folderNotFoundError];
     }
 
     /**
@@ -1217,9 +1229,6 @@ class Hm_Handler_imap_message_action extends Hm_Handler_Module {
             $folder = $specials['archive'];
         } elseif ($action_type == 'junk' && array_key_exists('junk', $specials)) {
             $folder = $specials['junk'];
-        }
-        if (!$folder && $action_type != 'read' && $action_type != 'unread' && $action_type != 'flag' && $action_type != 'unflag') {
-            Hm_Msgs::add(sprintf('ERRNo %s folder configured for %s', $action_type, $server_details['name']));
         }
         return $folder;
     }
@@ -1352,7 +1361,7 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
                 $messages[] = $msg;
             }
 
-            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_status(hex2bin($folders[$key]));
+            $status['imap_'.$id.'_'.$folders[$key]] = $mailbox->get_folder_state(); // this is faster than get_folder_status as search call above already gets this folder's state
         }
 
         $this->out('folder_status', $status);
@@ -1610,6 +1619,7 @@ class Hm_Handler_load_imap_servers_for_message_list extends Hm_Handler_Module {
     public function process() {
         if (array_key_exists('list_path', $this->request->get)) {
             $path = $this->request->get['list_path'];
+            $this->out('move_copy_controls', true);
         }
         else {
             $path = '';

@@ -429,5 +429,6 @@ return array(
         'filter_type' => FILTER_UNSAFE_RAW,
         'list_page' => FILTER_UNSAFE_RAW,
         'sort' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'count_children' => FILTER_VALIDATE_BOOL,
     )
 );

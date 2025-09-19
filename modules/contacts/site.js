@@ -4,11 +4,15 @@ var delete_contact = function(id, source, type) {
     if (!hm_delete_prompt()) {
         return false;
     }
-    Hm_Ajax.request(
-        [{'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
+    var request_data = [
+        {'name': 'hm_ajax_hook', 'value': 'ajax_delete_contact'},
         {'name': 'contact_id', 'value': id},
         {'name': 'contact_type', 'value': type},
-        {'name': 'contact_source', 'value': source}],
+        {'name': 'contact_source', 'value': source}
+    ];
+    
+    Hm_Ajax.request(
+        request_data,
         function(res) {
             if (res.contact_deleted && res.contact_deleted === 1) {
                 $('.contact_row_'+id).remove();

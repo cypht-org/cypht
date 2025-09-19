@@ -145,8 +145,8 @@ function combined_sort_dialog($mod) {
 
     $res = '<select name="sort" style="width: 150px" class="combined_sort form-select form-select-sm ms-2">';
     foreach ($sorts as $name => $val) {
-        $res .= '<option value="'.$name.'"'.($mod->get('sort') == $name || $mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
-        $res .= '<option value="-'.$name.'"'.($mod->get('sort') == '-'.$name || $mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
+        $res .= '<option value="'.$name.'"'.($mod->get('list_sort') == $name ? ' selected' : '').'>'.$val.' &darr;</option>';
+        $res .= '<option value="-'.$name.'"'.($mod->get('list_sort') == '-'.$name ? ' selected' : '').'>'.$val.' &uarr;</option>';
     }
     $res .= '</select>';
     return $res;
@@ -415,27 +415,31 @@ function icon_callback($vals, $style, $output_mod) {
 if (!hm_exists('message_controls')) {
 function message_controls($output_mod) {
     $txt = '';
+    $controls = ['read', 'unread', 'flag', 'unflag', 'delete', 'archive', 'junk'];
+    $controls = array_filter($controls, function($val) use ($output_mod) {
+        if (in_array($val, [$output_mod->get('list_path', ''), strtolower($output_mod->get('core_msg_control_folder', ''))])) {
+            return false;
+        }
+        if ($val == 'flag' && $output_mod->get('list_path', '') == 'flagged') {
+            return false;
+        }
+        return true;
+    });
+
     $res = '<a class="toggle_link" href="#"><i class="bi bi-check-square-fill"></i></a>'.
         '<div class="msg_controls fs-6 d-none gap-1 align-items-center">'.
             '<div class="dropdown on_mobile">'.
-                '<button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
-                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">'.
-                    '<li><a class="dropdown-item msg_read core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a></li>'.
-                    '<li><a class="dropdown-item msg_unread core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a></li>'.
-                    '<li><a class="dropdown-item msg_flag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a></li>'.
-                    '<li><a class="dropdown-item msg_unflag core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a></li>'.
-                    '<li><a class="dropdown-item msg_delete core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a></li>'.
-                    '<li><a class="dropdown-item msg_archive core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a></li>'.
-                    '<li><a class="dropdown-item msg_junk core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="junk">'.$output_mod->trans('Junk').'</a></li>'.
-                '</ul>'.
-            '</div>'.
-            '<a class="msg_read core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="read">'.$output_mod->trans('Read').'</a>'.
-            '<a class="msg_unread core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unread">'.$output_mod->trans('Unread').'</a>'.
-            '<a class="msg_flag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="flag">'.$output_mod->trans('Flag').'</a>'.
-            '<a class="msg_unflag core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="unflag">'.$output_mod->trans('Unflag').'</a>'.
-            '<a class="msg_delete core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="delete">'.$output_mod->trans('Delete').'</a>'.
-            '<a class="msg_archive core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="archive">'.$output_mod->trans('Archive').'</a>'. 
-            '<a class="msg_junk core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="junk">'.$output_mod->trans('Junk').'</a>';
+                '<button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="coreMsgControlDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Actions</button>'.
+                '<ul class="dropdown-menu" aria-labelledby="coreMsgControlDropdown">';
+    foreach ($controls as $control) {
+        $res .= '<li><a class="dropdown-item msg_'.$control.' core_msg_control btn btn-sm btn-light text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a></li>';
+    }
+    $res .= '</ul>'.
+            '</div>';
+
+    foreach ($controls as $control) {
+        $res .= '<a class="msg_'.$control.' core_msg_control btn btn-sm btn-light no_mobile border text-black-50" href="#" data-action="'.$control.'">'.$output_mod->trans(ucfirst($control)).'</a>';
+    }
 
     if ($output_mod->get('msg_controls_extra')) {
         $res .= $output_mod->get('msg_controls_extra');

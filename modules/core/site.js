@@ -245,8 +245,8 @@ var Hm_Ajax_Request = function() { return {
             if (hm_encrypt_ajax_requests()) {
                 res = Hm_Utils.json_decode(Hm_Crypt.decrypt(res.payload));
             }
-            if ((res.state && res.state == 'not callable') || !res.router_login_state) {
-                this.fail(xhr, true);
+            if ((res.status && res.status == 'not callable') || !res.router_login_state) {
+                this.fail(xhr, true, !res.router_login_state);
                 return;
             }
             if (Hm_Ajax.err_condition) {
@@ -277,7 +277,11 @@ var Hm_Ajax_Request = function() { return {
         return false;
     },
 
-    fail: function(xhr, not_callable) {
+    fail: function(xhr, not_callable, shouldLogout) {
+        if (shouldLogout) {
+            logout();
+            return;
+        }
         if (not_callable === true || (xhr.status && xhr.status == 500)) {
             Hm_Notices.show('Server Error', 'danger');
         }
@@ -732,7 +736,7 @@ function Message_List() {
         if (action_type == 'unsnooze' && getListPathParam() == 'snoozed') {
             remove = true;
         }
-        else if (action_type == 'delete' || action_type == 'archive') {
+        else if (action_type == 'delete' || ['archive', 'junk'].includes(action_type)) {
             remove = true;
         }
         if (remove) {
@@ -814,6 +818,14 @@ function Message_List() {
                 $('.icon', row).empty();
             }
             flagged++;
+
+            // if the message content was present in the local storage, update it too
+            const urlParams = new URLSearchParams(row.find('.subject a').attr('href'));
+            const storageKey = getMessageStorageKey(row.data('uid'), urlParams.get('list_path'));
+            const message = Hm_Utils.get_from_local_storage(storageKey);
+            if (message) {
+                set_message_content(urlParams.get('list_path'), row.data('uid'));
+            }
         }
         return flagged;
     };
@@ -976,7 +988,7 @@ function Message_List() {
                 prevUrl = new URL(prevSubject.prop('href'));
                 prevUrl.searchParams.set('list_parent', listPath);
                 const subject = prevSubject.text().substring(0, 50) + (prevSubject.text().length > 50 ? '...' : '');
-                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-left-square-fill"></i> '+subject+'</a>';
+                const plink = '<a class="plink" href="'+prevUrl.href+'"><i class="prevnext bi bi-arrow-up-square-fill"></i> '+subject+'</a>';
                 $('<tr class="prev"><th colspan="2">'+plink+'</th></tr>').insertAfter(target);
             }
             if (next) {
@@ -984,7 +996,7 @@ function Message_List() {
                 nextUrl = new URL(nextSubject.prop('href'));
                 nextUrl.searchParams.set('list_parent', listPath);
                 const subject = nextSubject.text().substring(0, 50) + (nextSubject.text().length > 50 ? '...' : '');
-                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-right-square-fill"></i> '+subject+'</a>';
+                const nlink = '<a class="nlink" href="'+nextUrl.href+'"><i class="prevnext bi bi-arrow-down-square-fill"></i> '+subject+'</a>';
                 $('<tr class="next"><th colspan="2">'+nlink+'</th></tr>').insertAfter(target.siblings('.prev')[0] || target);
             }
             if (cb) {
@@ -1375,6 +1387,7 @@ var Hm_Folders = {
 
     listen_for_new_messages: function() {
         var target = $('.total_unread_count').get(0);
+        if (!target) return;
         if (!Hm_Folders.observer) {
             Hm_Folders.observer = new MutationObserver(function(mutations) {
                 $('body').trigger('new_message');
@@ -1999,7 +2012,7 @@ function fixLtrInRtl() {
     function getElements() {
         var pageName = getPageNameParam();
         if (pageName == "message") {
-            return [...$(".msg_text_inner").find('*'), ...$(".header_subject").find("*")];
+            return [...$(".msg_text_inner").find('*'), ...$(".js-header_subject").find("*")];
         }
         if (pageName == "message_list" || pageName == "?page=history") {
             return [...$('*')];

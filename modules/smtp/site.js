@@ -391,7 +391,7 @@ function smtpSettingsPageHandler() {
 }
 
 $(function() {
-    if (hm_is_logged()) {
+    if (hm_is_logged() && window.inAppContext) {
         let scheduled_msg_count = 0;
         let sendScheduledMessages = function() { 
             Hm_Ajax.request(

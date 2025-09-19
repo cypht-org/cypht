@@ -261,14 +261,14 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
             $this->targets().
             $this->times().
             $this->other().
-            '<div class="submit_section px-5"><input type="button" class="btn btn-primary" id="adv_search" value="'.$this->trans('Search').'" />'.
+            '<div class="submit_section px-3 mb-3"><input type="button" class="btn btn-primary" id="adv_search" value="'.$this->trans('Search').'" />'.
             ' <input class="btn btn-light border" type="button" class="adv_reset" value="'.$this->trans('Reset').'" />';
     }
 
     protected function targets() {
-        return '<div data-target=".targets_section" class="settings_subtitle cursor-pointer px-3 py-2 "><i class="bi bi-file-earmark-fill me-2"></i>'.$this->trans('Targets').
+        return '<div data-target=".targets_section" class="settings_subtitle cursor-pointer px-3 py-2 mt-3"><i class="bi bi-file-earmark-fill me-2"></i>'.$this->trans('Targets').
             '<span class="target_count">'.sprintf($this->trans('targets: %d'), 0).'</span></div>'.
-            '<div class="targets_section mx-5 py-4"><div class="col-lg-6 col-12" id="adv_target"><table class="adv_targets table table-borderless"><tr><th>'.
+            '<div class="targets_section mx-5 py-1"><div class="col-lg-6 col-12" id="adv_target"><table class="adv_targets table table-borderless"><tr><th>'.
             '<input type="radio" value="TEXT" id="adv_msg" class="target_radio form-check-input" checked="checked" '.
             'name="target_type" /><label class="form-check-label ms-2" for="adv_msg">'.$this->trans('Entire message').'</label></th>'.
             '<th><input type="radio" class="target_radio form-check-input" value="BODY" name="target_type" id="adv_body" '.
@@ -286,7 +286,7 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         return '<div data-target=".terms_section" class="settings_subtitle cursor-pointer px-3 py-2 mt-3">'.
             '<i class="bi bi-search me-2"></i>'.$this->trans('Terms').
             '<span class="term_count">'.sprintf($this->trans('terms: %d'), 0).'</span></div>'.
-            '<div class="terms_section mx-5 py-4">'.
+            '<div class="terms_section mx-5 py-1">'.
             '<div class="d-flex align-items-center"><span id="adv_term_not" class="adv_term_nots"><input type="checkbox" class="form-check-input" value="not" id="adv_term_not" /> !</span>'.
             '<input class="adv_terms form-control w-auto" id="adv_term" type="text" /><i class="bi bi-plus-circle new_term cursor-pointer ms-3"></i></div></div>';
     }
@@ -296,25 +296,25 @@ class Hm_Output_advanced_search_form_content extends Hm_Output_Module {
         $from_date = date("Y-m-d", $from_time);
         $to_time = strtotime("+1 day", time());
         $to_date = date("Y-m-d", $to_time);
-        return '<div data-target=".time_section" class="settings_subtitle cursor-pointer px-3 py-2 "><i class="bi bi-calendar3-week-fill me-2"></i>'.$this->trans('Time').
+        return '<div data-target=".time_section" class="settings_subtitle cursor-pointer px-3 py-2 mt-3"><i class="bi bi-calendar3-week-fill me-2"></i>'.$this->trans('Time').
             '<span class="time_count">'.sprintf($this->trans('time ranges: %d'), 0).'</span></div>'.
-            '<div class="time_section mx-5 py-4"><span id="adv_time" class="adv_times d-flex align-items-center gap-2">'.$this->trans('From').
+            '<div class="time_section mx-5 py-1"><span id="adv_time" class="adv_times d-flex align-items-center gap-2">'.$this->trans('From').
             ' <input class="adv_time_fld_from form-control w-auto" type="date" value="'.$this->html_safe($from_date).
             '" /> '.$this->trans('To').' <input class="adv_time_fld_to form-control w-auto" type="date" value="'.
             $this->html_safe($to_date).'" /></span><i class="bi bi-plus-circle new_time cursor-pointer"></i></div>';
     }
 
     protected function sources() {
-        return '<div data-target=".source_section" class="settings_subtitle cursor-pointer px-3 py-2 "><i class="bi bi-folder-fill me-2"></i>'.$this->trans('Sources').
+        return '<div data-target=".source_section" class="settings_subtitle cursor-pointer px-3 py-2 mt-3"><i class="bi bi-folder-fill me-2"></i>'.$this->trans('Sources').
             '<span class="source_count">'.sprintf($this->trans('sources: %d'), 0).'</span></div>'.
-            '<div class="source_section mx-5 py-4">'.$this->trans('IMAP').' <i class="bi bi-plus-circle adv_folder_select cursor-pointer"></i><br /><div '.
+            '<div class="source_section mx-5 py-1">'.$this->trans('IMAP').' <i class="bi bi-plus-circle adv_folder_select cursor-pointer"></i><br /><div '.
             'class="adv_folder_list"></div><div class="adv_source_list"></div></div>';
     }
 
     protected function other() {
-        return '<div data-target=".other_section" class="settings_subtitle cursor-pointer px-3 py-2 "><i class="bi bi-gear-fill me-2"></i>'.$this->trans('Other').
+        return '<div data-target=".other_section" class="settings_subtitle cursor-pointer px-3 py-2 mt-3"><i class="bi bi-gear-fill me-2"></i>'.$this->trans('Other').
             '<span class="other_count">'.sprintf($this->trans('other settings: %d'), 0).'</span></div>'.
-            '<div class="other_section mx-5 py-4"><div class="col-lg-6 col-12"><table class="table table-borderless"><tr><th>'.$this->trans('Character set').'</th><td><select class="charset form-select w-auto">'.
+            '<div class="other_section mx-5 py-1 mb-3"><div class="col-lg-6 col-12"><table class="table table-borderless"><tr><th>'.$this->trans('Character set').'</th><td><select class="charset form-select w-auto">'.
             '<option value="">'.$this->trans('Default').'</option><option value="UTF-8">UTF-8</option>'.
             '<option value="ASCII">ASCII</option></select></td></tr><tr><th>'.$this->trans('Results per source').'</th>'.
             '<td><input type="number" value="100" class="adv_source_limit form-control" /></td></tr><tr><th>'.$this->trans('Flags').'</th><td>'.

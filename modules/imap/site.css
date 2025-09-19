@@ -69,14 +69,13 @@
   min-height: 600px;
   background-color: #fff;
   height: 100%;
+  padding: calc(var(--bs-gutter-x) * .5);
   /* max-width: 95% !important; */
 }
 .msg_text_inner {
   min-height: 300px;
   font-family: monospace;
-  width: 90%;
   padding: 30px;
-  padding-left: 40px;
 }
 
 .mobile .msg_text_inner {
@@ -222,6 +221,9 @@
   text-overflow: ellipsis;
   width: 20%;
 }
+.msg_parts td * {
+  white-space: nowrap;
+}
 .download_link {
   width: 100px;
 }
@@ -364,7 +366,6 @@
   position: relative;
 }
 .move_to_location {
-  display: none;
   position: absolute;
   left: -5%;
   top: 40px;
@@ -384,6 +385,12 @@
   display: flex;
   flex-direction: column;
 }
+.move_to_location .folders .inner_list li {
+  flex-direction: row;
+}
+.move_to_location .folders li.m-has-children {
+  flex-direction: column;
+}
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
   width: 120px;
@@ -397,6 +404,7 @@
 }
 .block_sender_link {
   color: brown;
+  margin-right: 8px;
 }
 
 .msg_part_desc {
@@ -443,13 +451,13 @@
 }
 .mobile .download_link,
 .mobile .remove_attachment {
-  width: 50px !important;
   overflow: visible !important;
-  margin-left: 25px;
 }
 .mobile .part_desc,
 .mobile .part_size {
-  margin-left: 25px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .mobile .unflag_send_div {
   float: right;
@@ -466,13 +474,8 @@
   height: 200px;
 }
 .attached_image_box {
-  display: flex;
-  flex-wrap: wrap;
   border-top: solid 1px #ddd;
-  padding-top: 20px;
-  padding-left: 20px;
-  width: 100%;
-  padding-bottom: 40px;
+  padding-top: 1rem;
 }
 /* .list_meta { float: none; margin-left: 37%; } */
 

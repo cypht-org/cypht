@@ -123,6 +123,7 @@ class Hm_Handler_process_send_to_contact extends Hm_Handler_Module {
         if (array_key_exists('contact_id', $this->request->get)) {
             $contacts = $this->get('contact_store');
             $contact = $contacts->get($this->request->get['contact_id']);
+            
             if ($contact) {
                 $to = sprintf('%s <%s>', $contact->value('display_name'), $contact->value('email_address'));
                 $this->out('compose_draft', array('draft_to' => $to, 'draft_subject' => '', 'draft_body' => ''));
@@ -396,16 +397,34 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         $this->html_safe($c->value('phone_number')).'</a></td>'.
                         '<td class="text-end" style="width : 100px">';
                     if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $res .= '<a data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).
-                            '" class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
-                            '<a href="?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
+                        $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                        
+                        if (class_exists('Hm_LDAP_Contact')) {
+                            $delete_attrs .= Hm_LDAP_Contact::generateDeleteAttributes($c, [$this, 'html_safe']);
+                        }
+                        
+                        $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
                             $this->html_safe($c->value('source')).'&amp;contact_type='.
-                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page.
-                            '" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
+                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
+                        
+                        if (class_exists('Hm_LDAP_Contact')) {
+                            $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
+                        }
+                        
+                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
+                            '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-pencil-square ms-2"></i></a>';
                     }
-                    $res .= '<a href="?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
-                        '" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-                        '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+
+                    $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
+                        '&amp;contact_source='.$this->html_safe($c->value('source')).
+                        '&amp;contact_type='.$this->html_safe($c->value('type'));
+                    
+                    if (class_exists('Hm_LDAP_Contact')) {
+                        $send_to_url = Hm_LDAP_Contact::addDNToUrl($c, $send_to_url);
+                    }
+                    
+                    $res .= '<a href="'.$send_to_url.'" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
+                        '<i class="bi bi-envelope-arrow-up ms-2"></i></a>';
 
                     $res .= '</td></tr>';
                     $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
@@ -607,6 +626,7 @@ function build_contact_detail($output_mod, $contact, $id) {
     $all_fields = false;
     $contacts = $contact->export();
     ksort($contacts);
+    
     foreach ($contacts as $name => $val) {
         if ($name == 'all_fields') {
             $all_fields = $val;
@@ -624,7 +644,7 @@ function build_contact_detail($output_mod, $contact, $id) {
     if ($all_fields) {
         ksort($all_fields);
         foreach ($all_fields as $name => $val) {
-            if (in_array($name, array(0, 'raw', 'objectclass', 'dn', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
+            if (in_array($name, array(0, 'raw', 'objectclass', 'ID', 'APP:EDITED', 'UPDATED'), true)) {
                 continue;
             }
             $res .= '<tr><th>'.$output_mod->trans(name_map($name)).'</th>';
@@ -681,7 +701,8 @@ function name_map($val) {
         'fn' => 'Full Name',
         'uid' => 'Uid',
         'src_url' => 'URL',
-        'adr' => 'Address'
+        'adr' => 'Address',
+        'dn' => 'Distinguished Name'
     );
     if (array_key_exists($val, $names)) {
         return $names[$val];

@@ -1,5 +1,5 @@
 function applyContactsPageHandlers() {
-    $('.delete_contact').on("click", function() {
+    $('.delete_contact:not([data-ldap-dn])').on("click", function() {
         delete_contact($(this).data('id'), $(this).data('source'), $(this).data('type'));
         return false;
     });

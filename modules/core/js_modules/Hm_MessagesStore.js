@@ -9,7 +9,7 @@ class Hm_MessagesStore {
      * @property {String} 1 - The IMAP key
      */
 
-    /** 
+    /**
      * @typedef {Array} RowEntry
      * @property {String} 0 - The IMAP key
      * @property {RowObject} 1 - An object containing the row message and the IMAP key
@@ -43,7 +43,7 @@ class Hm_MessagesStore {
      * as well as combined source paths like All email, unread, sent, trash, etc.
      * When it works on multiple data-sources, you can pass messagesReadyCB to refresh the UI element, so
      * user doesn't have to wait for all sources to be loaded to see something on screen.
-     * 
+     *
      * @returns {Promise<this>}
      */
     async load(reload = false, hideLoadingState = false, doNotFetch = false, messagesReadyCB = null) {
@@ -54,11 +54,11 @@ class Hm_MessagesStore {
             this.pages = parseInt(storedMessages.pages);
             this.count = storedMessages.count;
             this.flagAsReadOnOpen = storedMessages.flagAsReadOnOpen;
+            this.sort();
+            if (messagesReadyCB) {
+                messagesReadyCB(this);
+            }
             if (!reload) {
-                this.sort();
-                if (messagesReadyCB) {
-                    messagesReadyCB(this);
-                }
                 return this;
             }
         }
@@ -70,41 +70,68 @@ class Hm_MessagesStore {
         const sourcesToRemove = Object.keys(this.sources).filter(key => !this.currentlyAvailableSources().includes(key));
         sourcesToRemove.forEach(key => delete this.sources[key]);
 
-        this.fetch(hideLoadingState).forEach(async (req) => {
-            const { formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId } = await req;
-            // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
-            this.count = folder_status && Object.values(folder_status)[0]?.messages;
-            this.pages = parseInt(pages);
-            this.newMessages = this.getNewMessages(updatedMessages);
+        // Batch processing for multiple requests
+        const pendingResponses = new Map();
+        let processingTimeout = null;
 
-            if (typeof do_not_flag_as_read_on_open == 'booelan') {
-                this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
-            }
+        const processPendingResponses = () => {
+            if (pendingResponses.size === 0) return;
 
-            if (this.sources[sourceId]) {
-                this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
-            }
-            this.sources[sourceId] = Object.keys(updatedMessages);
-            for (const id in updatedMessages) {
-                if (this.rows.map(row => row['1']).indexOf(id) === -1) {
-                    this.rows.push(updatedMessages[id]);
-                } else {
-                    const index = this.rows.map(row => row['1']).indexOf(id);
-                    this.rows[index] = updatedMessages[id];
+            // Process all pending responses at once
+            const responses = Array.from(pendingResponses.values());
+            pendingResponses.clear();
+
+            responses.forEach(({ formatted_message_list: updatedMessages, pages, folder_status, do_not_flag_as_read_on_open, sourceId }) => {
+                // count and pages only available in non-combined pages where there is only one ajax call, so it is safe to overwrite
+                this.count = folder_status && Object.values(folder_status)[0]?.messages;
+                this.pages = parseInt(pages);
+                this.newMessages = this.getNewMessages(updatedMessages);
+
+                if (typeof do_not_flag_as_read_on_open == 'booelan') {
+                    this.flagAsReadOnOpen = !do_not_flag_as_read_on_open;
                 }
-            }
 
+                if (this.sources[sourceId]) {
+                    this.rows = this.rows.filter(row => !this.sources[sourceId].includes(row['1']));
+                }
+                this.sources[sourceId] = Object.keys(updatedMessages);
+                for (const id in updatedMessages) {
+                    if (this.rows.map(row => row['1']).indexOf(id) === -1) {
+                        this.rows.push(updatedMessages[id]);
+                    } else {
+                        const index = this.rows.map(row => row['1']).indexOf(id);
+                        this.rows[index] = updatedMessages[id];
+                    }
+                }
+            });
+
+            // Do expensive operations only once for all responses
             if (this.path == 'unread') {
                 $('.total_unread_count').html('&#160;'+this.rows.length+'&#160;');
             }
 
-            this.sort();
-            this.saveToLocalStorage();
+                    this.sort();
+                    this.saveToLocalStorage();
 
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
-        }, this);
+        };
+
+        await Promise.all(this.fetch(hideLoadingState).map((req) => {
+            return req.then((response) => {
+                pendingResponses.set(response.sourceId, response);
+
+                if (processingTimeout) {
+                    clearTimeout(processingTimeout);
+                }
+
+                // Process after a short delay to allow batching
+                processingTimeout = setTimeout(processPendingResponses, 10);
+            }, (error) => {
+                console.error('Error loading messages from source:', error);
+            });
+        }));
 
         return this;
     }
@@ -132,13 +159,13 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
+     *
      * @param {String} uid the id of the message to be marked as read
      * @returns {Boolean} true if the message was marked as read, false otherwise
      */
     markRowAsRead(uid) {
         const row = this.getRowByUid(uid);
-        
+
         if (row) {
             const htmlRow = $(row['0']);
             const wasUnseen = htmlRow.find('.unseen').length > 0 || htmlRow.hasClass('unseen');
@@ -147,7 +174,7 @@ class Hm_MessagesStore {
             htmlRow.find('.unseen').removeClass('unseen');
 
             row['0'] = htmlRow[0].outerHTML;
-            
+
             this.saveToLocalStorage();
 
             return wasUnseen;
@@ -156,13 +183,13 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
-     * @param {*} uid 
+     *
+     * @param {*} uid
      * @returns {RowObject|false} the next row entry if found, false otherwise
      */
     getNextRowForMessage(uid) {
         const row = this.getRowByUid(uid);
-        
+
         if (row) {
             const index = this.rows.indexOf(row);
             const nextRow = this.rows[index + 1];
@@ -174,8 +201,8 @@ class Hm_MessagesStore {
     }
 
     /**
-     * 
-     * @param {*} uid 
+     *
+     * @param {*} uid
      * @returns {RowObject|false} the previous row entry if found, false otherwise
      */
     getPreviousRowForMessage(uid) {
@@ -189,16 +216,16 @@ class Hm_MessagesStore {
         }
         return false;
     }
-    
+
     removeRow(uid) {
         const row = this.getRowByUid(uid);
         if (row) {
             this.rows = this.rows.filter(r => r !== row);
             this.saveToLocalStorage();
         }
-        
+
     }
-    
+
     updateRow(uid, html) {
         const row = this.getRowByUid(uid);
         if (row) {
@@ -229,18 +256,15 @@ class Hm_MessagesStore {
     }
 
     fetch(hideLoadingState = false) {
-        // show my custom cypht spinner(class = cypht-spinner)
-        const spinner = document.querySelector('.cypht-spinner');
-        if (spinner) spinner.style.display = 'block';
-
         let store = this;
         return this.getRequestConfigs().map((config) => {
+            const initialConfig = Object.assign([], config);
             return new Promise((resolve, reject) => {
                 Hm_Ajax.request(
                     config,
                     (response) => {
                         if (response) {
-                            response.sourceId = store.hashObject(config);
+                            response.sourceId = store.hashObject(initialConfig); // Do not use this config object because the request appends a "hm_page_key" entry, which would change the hash
                             resolve(response);
                         }
                     },
@@ -249,9 +273,6 @@ class Hm_MessagesStore {
                     undefined,
                     reject
                 );
-            }).finally(() => {
-                // Hide the spinner
-                if (spinner) spinner.style.display = 'none';
             });
         });
     }
@@ -331,13 +352,13 @@ class Hm_MessagesStore {
      * @typedef {Object} RowOutput
      * @property {Number} index - The index of the row
      * @property {RowEntry} value - The row entry
-     * 
-     * @param {String} uid 
+     *
+     * @param {String} uid
      * @returns {RowOutput|false} row - The row object if found, false otherwise
      */
     getRowByUid(uid) {
         const row = this.rows.find(row => $(row['0']).attr('data-uid') == uid);
-        
+
         if (row) {
             return row;
         }

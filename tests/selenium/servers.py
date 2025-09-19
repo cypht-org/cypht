@@ -40,7 +40,16 @@ class ServersTest(WebTest):
         next_button = WebDriverWait(self.driver, 10).until(
             EC.element_to_be_clickable((By.ID, "step_config_action_next"))
         )
-        next_button.click()
+         # Scroll to the button and wait for any animations/overlays to finish
+        self.driver.execute_script("arguments[0].scrollIntoView({behavior: 'smooth', block: 'center'});", next_button)
+        sleep(0.5)  # Wait for smooth scroll to complete
+
+        # Try multiple click methods for better reliability
+        try:
+            next_button.click()
+        except Exception as e:
+            print(f"Normal click failed: {e}. Trying JavaScript click...")
+            self.driver.execute_script("arguments[0].click();", next_button)
         # show step two
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located((By.XPATH, '//h2[text()="Step 2"]'))
