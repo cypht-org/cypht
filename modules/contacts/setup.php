@@ -79,7 +79,8 @@ return array(
         'contact_auto_collect' => FILTER_VALIDATE_BOOLEAN,
         'enable_warn_contacts_cc_not_exist_in_list_contact' => FILTER_VALIDATE_INT,
         'enable_collect_address_on_send' => FILTER_VALIDATE_INT,
-        'email_address' => FILTER_UNSAFE_RAW
+        'email_address' => FILTER_UNSAFE_RAW,
+        'ldap_dn' => FILTER_UNSAFE_RAW,
     ),
     'allowed_get' => array(
         'contact_id' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
@@ -87,6 +88,7 @@ return array(
         'contact_type' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'contact_source' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
         'import_contact' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
+        'dn' => FILTER_UNSAFE_RAW,
     ),
     'allowed_output' => array(
         'contact_deleted' => array(FILTER_VALIDATE_INT, false),

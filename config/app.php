@@ -100,7 +100,7 @@ return [
     /*
     | Attribute to use as the unique identifier for users
     */
-    'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
+    'ldap_auth_uid_attr' => env('LDAP_AUTH_UID_ATTR', 'uid'),
 
     /*
     | -------------------
