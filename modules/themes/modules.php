@@ -83,8 +83,8 @@ class Hm_Output_theme_setting extends Hm_Output_Module
     {
 
         $current = $this->get('theme', DEFAULT_THEME);
-        $res = '<tr class="general_setting"><td><div class="d-flex flex-column flex-md-row"><span class="fw-bold me-md-3"><label for="theme_setting">' .
-            $this->trans('Theme') . '</label></span><select class="form-select form-select-sm" id="theme_setting" name="theme_setting" data-default-value="'.DEFAULT_THEME.'">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="theme_setting">' .
+            $this->trans('Theme') . '</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm" id="theme_setting" name="theme_setting" data-default-value="'.DEFAULT_THEME.'">';
         $reset = '';
         foreach ($this->get('themes', array()) as $name => $label) {
             $res .= '<option ';
