@@ -158,6 +158,34 @@ class WebTest:
         print(" - finding element by class {0}".format(class_name))
         return self.driver.find_element(By.CLASS_NAME, class_name)
 
+    def visible_by_class(self, class_name):
+        print(" - finding visible element by class {0}".format(class_name))
+        elements = self.driver.find_elements(By.CLASS_NAME, class_name)
+        for element in elements:
+            try:
+                if element.is_displayed():
+                    return element
+            except exceptions.StaleElementReferenceException:
+                continue
+        raise exceptions.NoSuchElementException(
+            f"No visible element found with class name '{class_name}'"
+        )
+
+    def wait_for_class_text_contains(self, class_name, expected_text, timeout=60):
+        print(f" - waiting for class {class_name} to contain '{expected_text}'")
+        def _condition(driver):
+            elements = driver.find_elements(By.CLASS_NAME, class_name)
+            for element in elements:
+                try:
+                    if element.is_displayed():
+                        text = element.text.strip()
+                        if expected_text in text:
+                            return element
+                except exceptions.StaleElementReferenceException:
+                    continue
+            return False
+        return WebDriverWait(self.driver, timeout).until(_condition)
+
     def wait_for_element_by_class(self, class_name, timeout=60):
         """Wait for an element to be present and visible by class name"""
         print(" - waiting for element by class {0}".format(class_name))
