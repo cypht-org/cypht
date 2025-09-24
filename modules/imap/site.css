@@ -394,6 +394,10 @@
 /* .imap_keyword, .imap_sort, .imap_filter { font-size: 75%; float: left; margin-top: 8px; } */
 .imap_keyword {
   width: 120px;
+  margin-right: 10px;
+}
+.imap_sort {
+  margin-right: 10px;
 }
 .msg_part_icon {
   opacity: 0.4;
