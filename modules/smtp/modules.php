@@ -1066,7 +1066,7 @@ class Hm_Output_compose_form_content extends Hm_Output_Module {
             '" required name="compose_to" class="compose_to" type="text" placeholder="'.$this->trans('To').'" /></div>'.
             '<a href="#" tabindex="-1" class="toggle_recipients">+</a></div><div id="to_contacts"></div>'.
             '<div class="recipient_fields"><div class="compose_container"><div class="bubbles"></div><input autocomplete="off" value="'.$this->html_safe($cc).
-            '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').
+            '" name="compose_cc" class="compose_cc" type="text" placeholder="'.$this->trans('Cc').'" id="compose_cc"'.
             '" /><div id="cc_contacts"></div></div><div class="compose_container" ><div class="bubbles"></div><input autocomplete="off" value="'.$this->html_safe($bcc).
             '" name="compose_bcc" class="compose_bcc" type="text" placeholder="'.$this->trans('Bcc').'" />'.
             '<div id="bcc_contacts"></div></div></div><input value="'.$this->html_safe($subject).
@@ -1336,7 +1336,7 @@ class Hm_Output_compose_page_link extends Hm_Output_Module {
  */
 if (!hm_exists('smtp_server_dropdown')) {
 function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
-    $res = '<select name="compose_smtp_id" class="compose_server">';
+    $res = '<select name="compose_smtp_id" class="compose_server" id="compose_smtp_id">';
     $profiles = array();
     if (array_key_exists('compose_profiles', $data)) {
         $profiles = $data['compose_profiles'];
@@ -1370,7 +1370,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
             $smtp_profiles = profiles_by_smtp_id($profiles, $id);
             if (count($smtp_profiles) > 0) {
                 foreach ($smtp_profiles as $index => $profile) {
-                    $res .= '<option ';
+                    $res .= '<option data-email="'.$profile['address'].'"';
                     if ((string) $selected === sprintf('%s.%s', $id, ($index + 1)) || (! strstr(strval($selected), '.') && strval($selected) === strval($id))) {
                         $res .= 'selected="selected" ';
                     }
@@ -1380,7 +1380,7 @@ function smtp_server_dropdown($data, $output_mod, $recip, $selected_id=false) {
                 }
             }
             else {
-                $res .= '<option ';
+                $res .= '<option data-email="'.$vals['user'].'"';
                 if ($selected === $id) {
                     $res .= 'selected="selected" ';
                 }
