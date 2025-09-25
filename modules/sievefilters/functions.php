@@ -27,10 +27,9 @@ if (!hm_exists('ensure_sieve_service_initialized')) {
         $sieve_accounts_configs = [];
         foreach ($sieve_accounts as $key => $item) {
             $parts = explode(':', $item['sieve_config_host']);
-            $sieveHost = isset($parts[0]) ? $parts[0] : '';
-            $sievePort = isset($parts[1]) ? (int) $parts[1] : 4190;
+            $sievePort = isset($parts[2]) ? (int) $parts[2] : (isset($parts[1]) ? (int) $parts[1] : 4190);
             $sieve_accounts_configs[$key] = [
-                'host' => $sieveHost,
+                'host' => isset($parts[2]) ? str_replace('//', '', $parts[1]) : $parts[0],
                 'port' => $sievePort,
                 'username' => $item['user'],
                 'password' => $item['pass'],
@@ -663,6 +662,7 @@ if (!hm_exists('get_all_scripts')) {
                 return '';
             }
             $current_script = '';
+            $scripts = '';
             if($load_current) {
                 $current_script = SieveService::getScript($imapServer, 'blocked_senders');
             }
