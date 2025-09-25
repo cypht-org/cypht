@@ -72,7 +72,7 @@ class Hm_MessagesStore {
 
         // Batch processing for multiple requests
         const pendingResponses = new Map();
-        const processingTimeouts = {};
+        let processingTimeout = null;
 
         const processPendingResponses = () => {
             if (pendingResponses.size === 0) return;
@@ -116,22 +116,24 @@ class Hm_MessagesStore {
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
+
+            responses.forEach(response => {
+                response.resolvePromise(response);
+            });
         };
 
         await Promise.all(this.fetch(hideLoadingState).map((req) => {
             return new Promise((resolve) => {
                 req.then((response) => {
+                    response.resolvePromise = resolve;
                     pendingResponses.set(response.sourceId, response);
 
-                    if (processingTimeouts[response.sourceId]) {
-                        clearTimeout(processingTimeouts[response.sourceId]);
+                    if (processingTimeout) {
+                        clearTimeout(processingTimeout);
                     }
 
                     // Process after a short delay to allow batching
-                    processingTimeouts[response.sourceId] = setTimeout(() => {
-                        processPendingResponses();
-                        resolve(response);
-                    }, 10);
+                    processingTimeout = setTimeout(processPendingResponses, 10);
                 }, (error) => {
                     console.error('Error loading messages from source:', error);
                 });
