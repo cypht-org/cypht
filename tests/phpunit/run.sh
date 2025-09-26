@@ -43,4 +43,4 @@ else
 fi
 
 phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
-coverage-check clover.xml 100
+vendor/bin/coverage-check ${SCRIPT_DIR}/clover.xml 100

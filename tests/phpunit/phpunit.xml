@@ -5,7 +5,7 @@
   </php>
   <coverage>
     <report>
-      <clover outputFile="clover.xml"/>
+      <clover outputFile="./clover.xml"/>
     </report>
   </coverage>
   <testsuites>
