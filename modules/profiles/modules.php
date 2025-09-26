@@ -360,7 +360,7 @@ class Hm_Output_profile_content extends Hm_Output_Module {
                     '<td class="d-none d-sm-table-cell">'.(mb_strlen($profile['rmk']) > 0 ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="d-none d-sm-table-cell">'.($profile['default'] ? $this->trans('Yes') : $this->trans('No')).'</td>'.
                     '<td class="text-right"><a href="?page=profiles&amp;profile_id='.$this->html_safe($profile['id']).'" title="'.$this->trans('Edit').'">'.
-                    '<i class="bi bi-gear-fill"></i></a></td>'.
+                    '<i class="bi bi-pencil-fill"></i></a></td>'.
                     '</tr>';
             }
             $res .= '</table></div>';
