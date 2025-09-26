@@ -91,3 +91,50 @@ if (!defined("IMAP_TEST")) {
         public function show_debug() {}
     }
 }
+
+class Searchable_Wrapper {
+    use Searchable;
+    
+    private static $testData = [
+        ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
+        ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
+        ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
+        ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
+        ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
+    ];
+    
+    /**
+     * Implementation of the abstract method required by Searchable trait
+     */
+    protected static function getDataset() {
+        return self::$testData;
+    }
+    
+    /**
+     * Method to reset test data (useful for testing)
+     */
+    public static function resetTestData() {
+        self::$testData = [
+            ['id' => 1, 'name' => 'John Doe', 'email' => 'john@example.com', 'status' => 'active', 'age' => 30],
+            ['id' => 2, 'name' => 'Jane Smith', 'email' => 'jane@example.com', 'status' => 'inactive', 'age' => 25],
+            ['id' => 3, 'name' => 'Bob Johnson', 'email' => 'bob@example.com', 'status' => 'active', 'age' => 35],
+            ['id' => 4, 'name' => 'Alice Brown', 'email' => 'alice@example.com', 'status' => 'pending', 'age' => 28],
+            ['id' => 5, 'name' => 'Charlie Wilson', 'email' => 'charlie@example.com', 'status' => 'active', 'age' => 30],
+        ];
+    }
+    
+    /**
+     * Method to set custom test data
+     */
+    public static function setTestData(array $data) {
+        self::$testData = $data;
+    }
+}
+
+class Empty_Searchable_Wrapper {
+    use Searchable;
+    
+    protected static function getDataset() {
+        return [];
+    }
+}
