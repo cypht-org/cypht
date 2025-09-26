@@ -42,4 +42,4 @@ else
     exit 1
 fi
 
-phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
+phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox --min-coverage=100 $@
