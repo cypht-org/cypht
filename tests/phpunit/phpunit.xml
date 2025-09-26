@@ -55,6 +55,15 @@
     <testsuite name="environment">
       <file>./environment.php</file>
     </testsuite>
+    <testsuite name="sieve_cache">
+      <file>./sieve_cache.php</file>
+    </testsuite>
+    <testsuite name="sieve_connection_manager">
+      <file>./sieve_connection_manager.php</file>
+    </testsuite>
+    <testsuite name="sieve_service">
+      <file>./sieve_service.php</file>
+    </testsuite>
     <testsuite name="db">
       <file>./db.php</file>
     </testsuite>

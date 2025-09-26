@@ -114,6 +114,98 @@ class Hm_Mock_Memcached {
     }
 }
 
+/**
+ * Mock cache class for testing
+ */
+class MockCache {
+    private $data = [];
+    
+    public function get($key, $default = false, $returnArray = false) {
+        return isset($this->data[$key]) ? $this->data[$key] : $default;
+    }
+    
+    public function set($key, $value, $ttl = 0, $returnArray = false) {
+        $this->data[$key] = $value;
+        return true;
+    }
+    
+    public function del($key) {
+        if (isset($this->data[$key])) {
+            unset($this->data[$key]);
+            return true;
+        }
+        return false;
+    }
+    
+    public function clear() {
+        $this->data = [];
+    }
+}
+
+/**
+ * Mock Sieve Client for testing
+ */
+class MockSieveClient {
+    private $scripts = [];
+    private $connected = false;
+    
+    public function connect($username, $password, $secure = true, $authzid = "", $authType = "PLAIN") {
+        $this->connected = true;
+        return true;
+    }
+    
+    public function getScript($name) {
+        return isset($this->scripts[$name]) ? $this->scripts[$name] : false;
+    }
+    
+    public function listScripts() {
+        return array_keys($this->scripts);
+    }
+    
+    public function putScript($name, $content) {
+        $this->scripts[$name] = $content;
+        return true;
+    }
+    
+    public function activateScript($name) {
+        return isset($this->scripts[$name]);
+    }
+    
+    public function removeScripts($name) {
+        if (isset($this->scripts[$name])) {
+            unset($this->scripts[$name]);
+            return true;
+        }
+        return false;
+    }
+    
+    public function close() {
+        $this->connected = false;
+        return true;
+    }
+    
+    public function renameScript($oldName, $newName) {
+        if (isset($this->scripts[$oldName])) {
+            $this->scripts[$newName] = $this->scripts[$oldName];
+            unset($this->scripts[$oldName]);
+            return true;
+        }
+        return false;
+    }
+    
+    public function getCapabilities() {
+        return ['SIEVE' => '1.0', 'STARTTLS'];
+    }
+    
+    public function isConnected() {
+        return $this->connected;
+    }
+    
+    public function setScript($name, $content) {
+        $this->scripts[$name] = $content;
+    }
+}
+
 class Hm_Mock_Redis extends Hm_Mock_Memcached {
     function connect($server, $port) {
         return true;
