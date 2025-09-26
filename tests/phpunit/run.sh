@@ -42,5 +42,5 @@ else
     exit 1
 fi
 
-phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --coverage-clover clover.xml --testdox $@
+phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
 coverage-check clover.xml 100
