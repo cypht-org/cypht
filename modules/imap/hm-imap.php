@@ -2668,15 +2668,5 @@ if (!class_exists('Hm_IMAP')) {
             return false;
         }
 
-        public function is_archive_folder($id, $user_config, $current_folder) {
-            
-            if (isset($user_config->get('special_imap_folders', array())[$id]['archive'])) {
-                $archive_folder = $user_config->get('special_imap_folders', array())[$id]['archive'];
-                if (bin2hex($archive_folder) == $current_folder) {
-                    return true;
-                }                
-            }
-            return  false;
-        }
     }
 }
