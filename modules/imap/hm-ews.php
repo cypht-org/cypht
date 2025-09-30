@@ -83,8 +83,8 @@ class Hm_EWS {
                 $folders = [$folders];
             }
             foreach($folders as $folder) {
-                $id = bin2hex($folder->getFolderId()->getId());
-                $parentId = bin2hex($folder->getParentFolderId()->getId());
+                $id = $folder->getFolderId()->getId();
+                $parentId = $folder->getParentFolderId()->getId();
                 $name = $folder->getDisplayName();
                 if ($only_subscribed && in_array($id, $unsubscribed_folders)) {
                     continue;
@@ -119,7 +119,7 @@ class Hm_EWS {
             'flagged' => false,
             'all' => false,
             'junk' => Enumeration\DistinguishedFolderIdNameType::JUNKEMAIL,
-            'archive' => Enumeration\DistinguishedFolderIdNameType::ARCHIVE,
+            'archive' => false,
             'drafts' => Enumeration\DistinguishedFolderIdNameType::DRAFTS,
         ];
         foreach ($special as $type => $folderId) {
@@ -127,7 +127,7 @@ class Hm_EWS {
                 try {
                     $distinguishedFolder = $this->api->getFolderByDistinguishedId($folderId);
                     if ($distinguishedFolder) {
-                        $special[$type] = bin2hex($distinguishedFolder->getFolderId()->getId());
+                        $special[$type] = $distinguishedFolder->getFolderId()->getId();
                     }
                 } catch (\Exception $e) {
                     Hm_Msgs::add($e->getMessage(), 'danger');
@@ -150,100 +150,17 @@ class Hm_EWS {
         }
     }
 
-    /**
-     * TODO: Remove this one, we needed it only while testing
-     * Find a folder by its display name
-     * @param string $folderName The display name to search for
-     * @param string $parentFolder Parent folder ID (hex) or distinguished folder name
-     * @return array|false Folder details or false if not found
-     */
-    public function find_folder_by_name($folderName, $parentFolder = null) {
-        if (!$parentFolder) {
-            $parentFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MSGFOLDERROOT);
-        } elseif ($this->is_distinguished_folder($parentFolder)) {
-            $parentFolder = new Type\DistinguishedFolderIdType($parentFolder);
-        } elseif (ctype_xdigit($parentFolder)) {
-            $parentFolder = new Type\FolderIdType(hex2bin($parentFolder));
-        } else {
-            return false;
-        }
-
-        $findFolderRequest = array(
-            'Traversal' => 'Shallow',
-            'FolderShape' => array(
-                'BaseShape' => 'Default'
-            ),
-            'ParentFolderIds' => $parentFolder->toArray(true),
-            'Restriction' => array(
-                'IsEqualTo' => array(
-                    'FieldURI' => array(
-                        'FieldURI' => 'folder:DisplayName'
-                    ),
-                    'FieldURIOrConstant' => array(
-                        'Constant' => array(
-                            'Value' => $folderName
-                        )
-                    )
-                )
-            )
-        );
-
-        try {
-            $response = $this->ews->FindFolder($findFolderRequest);
-            $folders = $response->getFolders()->getFolder();
-            
-            if ($folders) {
-                if ($folders instanceof Type\FolderType) {
-                    $folders = [$folders];
-                }
-                
-                foreach ($folders as $folder) {
-                    return [
-                        'id' => bin2hex($folder->getFolderId()->getId()),
-                        'name' => $folder->getDisplayName(),
-                        'parent' => !is_null($folder->getParentFolderId()) ? bin2hex($folder->getParentFolderId()->getId()) : null,
-                        'messages' => $folder->getTotalCount() ?? 0,
-                        'unseen' => $folder->getUnreadCount() ?? 0,
-                    ];
-                }
-            }
-        } catch (\Exception $e) {
-            Hm_Msgs::add('Error finding folder: ' . $e->getMessage(), 'danger');
-        }
-        
-        return false;
-    }
-
     public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {
                 $folderObj = new Type\DistinguishedFolderIdType($folder);
                 $result = $this->api->getFolder($folderObj->toArray(true));
-            } elseif (ctype_xdigit($folder) || base64_encode(base64_decode($folder, true)) === $folder) {
-                $folderObj = new Type\FolderIdType(hex2bin($folder));
-                $result = $this->api->getFolder($folderObj->toArray(true));
-                
             } else {
-                // TODO: To be removed, we needed it only while testing
-                // Try to find by display name using our new function
-                $folderData = $this->find_folder_by_name($folder);
-                if ($folderData) {
-                    return [
-                        'id' => $folderData['id'],
-                        'name' => $folderData['name'],
-                        'messages' => $folderData['messages'],
-                        'uidvalidity' => false,
-                        'uidnext' => false,
-                        'recent' => false,
-                        'unseen' => $folderData['unseen'],
-                    ];
-                } else {
-                    return [];
-// ;                    throw new Exception('Folder not found: ' . $folder);
-                }
+                $folderObj = new Type\FolderIdType($folder);
+                $result = $this->api->getFolder($folderObj->toArray(true));
             }
             return [
-                'id' => bin2hex($result->getFolderId()->getId()),
+                'id' => $result->getFolderId()->getId(),
                 'name' => $result->getDisplayName(),
                 'messages' => $result->getTotalCount(),
                 'uidvalidity' => false,
@@ -266,7 +183,7 @@ class Hm_EWS {
         if (empty($parent)) {
             $parent = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
         } else {
-            $parent = new Type\FolderIdType(hex2bin($parent));
+            $parent = new Type\FolderIdType($parent);
         }
         try {
             $request = [
@@ -276,7 +193,7 @@ class Hm_EWS {
                 'ParentFolderId' => $parent->toArray(true),
             ];
             $result = $this->ews->CreateFolder($request);
-            return bin2hex($result->getId());
+            return $result->getId();
         } catch(\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -338,7 +255,6 @@ class Hm_EWS {
 
     public function delete_folder($folder) {
         try {
-            // Convert hex ID to binary for EWS
             return $this->api->deleteFolder(new Type\FolderIdType(hex2bin($folder)));
         } catch(\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
@@ -423,12 +339,10 @@ class Hm_EWS {
         $lower_folder = strtolower($folder);
         if ($this->is_distinguished_folder($lower_folder)) {
             $folderObj = new Type\DistinguishedFolderIdType($lower_folder);
+        } elseif (ctype_xdigit($folder)) {
+            $folderObj = new Type\FolderIdType(hex2bin($folder));
         } else {
-            if(!hex2bin($folder)) {
-                $folderObj = new Type\FolderIdType($folder);
-            }else {
-                $folderObj = new Type\FolderIdType(hex2bin($folder));
-            }
+            $folderObj = new Type\FolderIdType($folder);
         }
         $request = array(
             'Traversal' => 'Shallow',
@@ -1150,7 +1064,6 @@ class Hm_EWS {
                 'DestinationFolderId' => $junkFolder->toArray(true),
                 'ItemIds' => [
                     'ItemId' => $itemIds = array_map(function($itemId) {
-                        // Convert hex item ID to binary for EWS API
                         return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
                     }, $itemIds),
                 ]
@@ -1185,13 +1098,13 @@ class Hm_EWS {
                     return false;
                 }
                 foreach ($folders as $folder => $itemIds) {
-                    if ($trash && bin2hex($trash->getFolderId()->getId()) == $folder) {
+                    if ($trash && $trash->getFolderId()->getId() == $folder) {
                         $options = ['DeleteType' => 'HardDelete'];
                     } else {
                         $options = [];
                     }
                     $binaryItemIds = array_map(function($itemId) {
-                        return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                        return (new Type\ItemIdType($itemId))->toArray();
                     }, $itemIds);
                     $result = $result && $this->api->deleteItems($binaryItemIds, $options);
                 }
@@ -1207,8 +1120,7 @@ class Hm_EWS {
         if ($this->is_distinguished_folder($folder)) {
             $folder = new Type\DistinguishedFolderIdType($folder);
         } else {
-            // Convert hex folder ID to binary for EWS API
-            $folder = new Type\FolderIdType(hex2bin($folder));
+            $folder = new Type\FolderIdType($folder);
         }
         $request = [
             'ToFolderId' => $folder->toArray(true),
@@ -1225,8 +1137,7 @@ class Hm_EWS {
                 $result = [$result];
             }
             $result = array_map(function($itemId) {
-                // Convert binary result back to hex format
-                return bin2hex($itemId->getId());
+                return $itemId->getId();
             }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
@@ -1239,7 +1150,7 @@ class Hm_EWS {
         if ($this->is_distinguished_folder($folder)) {
             $folder = new Type\DistinguishedFolderIdType($folder);
         } else {
-            $folder = new Type\FolderIdType(hex2bin($folder));
+            $folder = new Type\FolderIdType($folder);
         }
         $request = [
             'ToFolderId' => $folder->toArray(true),
@@ -1257,7 +1168,7 @@ class Hm_EWS {
                 $result = [$result];
             }
             $result = array_map(function($itemId) {
-                return bin2hex($itemId->getId());
+                return $itemId->getId();
             }, $result);
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
@@ -1288,11 +1199,11 @@ class Hm_EWS {
             $result = [$result];
         }
         foreach ($result as $message) {
-            $folder = bin2hex($message->getParentFolderId()->getId());
+            $folder = $message->getParentFolderId()->getId();
             if (! isset($folders[$folder])) {
                 $folders[$folder] = [];
             }
-            $folders[$folder][] = bin2hex($message->getItemId()->getId());
+            $folders[$folder][] = $message->getItemId()->getId();
         }
         return $folders;
     }

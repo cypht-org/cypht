@@ -2000,7 +2000,7 @@ class Hm_Handler_imap_store_reply_details extends Hm_Handler_Module {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
-            $prefetch = true;  // Set prefetch to true for this context
+            $prefetch = true;
             $mailbox->set_read_only($prefetch);
             $part = false;
             list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($folder), $uid, $part, $this->user_config->get('text_only_setting', false));
