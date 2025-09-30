@@ -95,6 +95,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
     protected function output() {
         $txt = '<div class="msg_text_inner">';
         if ($this->get('msg_text')) {
+            $msg_text = strip_dns_prefetch_tags($this->get('msg_text'));
             $struct = $this->get('msg_struct_current', array());
             if (array_key_exists('envelope', $struct) && is_array($struct['envelope']) && count($struct['envelope']) > 0) {
                 $txt .= format_imap_envelope($struct['envelope'], $this);
@@ -102,7 +103,7 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
             if (isset($struct['subtype']) && strtolower($struct['subtype']) == 'html') {
                 $allowed = $this->get('header_allow_images');
                 $images = $this->get('imap_allow_images', false);
-                if ($allowed && stripos($this->get('msg_text'), 'img')) {
+                if ($allowed && stripos($msg_text, 'img')) {
                     if (!$images) {
                         $id = $this->get('imap_msg_part');
                         $txt .= '<div class="allow_image_link">'.
@@ -111,20 +112,19 @@ class Hm_Output_filter_message_body extends Hm_Output_Module {
                             $this->trans('Allow Images').'</a></div>';
                     }
                 }
-                $txt .= format_msg_html($this->get('msg_text'), $images);
+                $txt .= format_msg_html($msg_text, $images);
             }
             elseif (isset($struct['type']) && strtolower($struct['type']) == 'image') {
-                $txt .= format_msg_image($this->get('msg_text'), strtolower($struct['subtype']));
+                $txt .= format_msg_image($msg_text, strtolower($struct['subtype']));
             }
             else {
                 if ($this->get('imap_msg_part') === "0") {
-                    $txt .= format_msg_text($this->get('msg_text'), $this, false);
+                    $txt .= format_msg_text($msg_text, $this, false);
                 }
                 else {
-                    $txt .= format_msg_text($this->get('msg_text'), $this);
+                    $txt .= format_msg_text($msg_text, $this);
                 }
             }
-            $msg_text = strip_dns_prefetch_tags('msg_text');
         }
         $txt .= '</div>';
         $this->out('msg_text', $txt);
