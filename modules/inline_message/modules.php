@@ -66,7 +66,7 @@ class Hm_Output_inline_message_setting extends Hm_Output_Module {
         if (array_key_exists('inline_message', $settings)) {
             $inline = $settings['inline_message'];
         }
-        $res = '<tr class="general_setting"><td><label class="form-check-label" for="inline_message">'.$this->trans('Show messages inline').'</label></td><td><input value="1" type="checkbox" class="form-check-input" name="inline_message" id="inline_message" data-default-value="'.(DEFAULT_INLINE_MESSAGE ? 'true' : 'false') . '"';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label for="inline_message">'.$this->trans('Show messages inline').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><input value="1" type="checkbox" class="form-check-input me-2" name="inline_message" id="inline_message" data-default-value="'.(DEFAULT_INLINE_MESSAGE ? 'true' : 'false') . '"';
         $reset = '';
         if ($inline) {
             $res .= ' checked="checked"';
@@ -74,7 +74,7 @@ class Hm_Output_inline_message_setting extends Hm_Output_Module {
         if($inline !== DEFAULT_INLINE_MESSAGE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise fs-6 cursor-pointer refresh_list reset_default_value_checkbox"></i></span>';
         }
-        $res .= '>'.$reset.'</td></tr>';
+        $res .= '>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
@@ -90,7 +90,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         if (array_key_exists('inline_message_style', $settings)) {
             $selected = $settings['inline_message_style'];
         }
-        $res = '<tr class="general_setting"><td>'.$this->trans('Inline Message Style').'</td><td><select class="form-select form-select-sm w-auto" name="inline_message_style" data-default-value="'.DEFAULT_INLINE_MESSAGE_STYLE.'">';
+        $res = '<tr class="general_setting"><td class="d-block d-md-table-cell"><label>'.$this->trans('Inline Message Style').'</label></td><td class="d-block d-md-table-cell"><div class="d-flex align-items-center"><select class="form-select form-select-sm w-auto" name="inline_message_style" data-default-value="'.DEFAULT_INLINE_MESSAGE_STYLE.'">';
         $res .= '<option ';
         if ($selected == 'right') {
             $res .= 'selected="selected" ';
@@ -102,7 +102,7 @@ class Hm_Output_inline_message_style extends Hm_Output_Module {
         if($selected !== DEFAULT_INLINE_MESSAGE_STYLE) {
             $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_select"></i></span>';
         }
-        $res .= 'value="inline">'.$this->trans('Inline').'</option></select>'.$reset.'</td></tr>';
+        $res .= 'value="inline">'.$this->trans('Inline').'</option></select>'.$reset.'</div></td></tr>';
         return $res;
     }
 }
