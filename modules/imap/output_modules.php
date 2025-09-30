@@ -409,7 +409,8 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $existing_emails = array_column($contact_list, 'email_address');
                     $sender = addr_parse($headers['From'])['email'];
                     $domain = '*@'.get_domain($sender);
-                    $blocked_senders = get_blocked_senders_array($imap_server, $this->get('site_config'), $this->get('user_config'));
+                    list($scripts, $current_script) = get_all_scripts($server_id, true);
+                    $blocked_senders = get_blocked_senders_array($current_script, $scripts);
                     $sender_blocked = in_array($sender, $blocked_senders);
                     $domain_blocked = in_array($domain, $blocked_senders);
                     if(!in_array($sender, $existing_emails)){
