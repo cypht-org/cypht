@@ -1651,3 +1651,19 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
     }
     return [$uid, $sent_folder];
 }}
+
+/**
+ * Check if the current folder is the configured trash folder
+ * @param object $handler handler module object
+ * @param int $server_id IMAP server id
+ * @param string $folder current folder name
+ * @return bool true if current folder is trash folder
+ */
+if (!hm_exists('is_imap_trash_folder')) {
+function is_imap_trash_folder($handler, $server_id, $folder) {
+    $specials = get_special_folders($handler, $server_id);
+    if (array_key_exists('trash', $specials) && $specials['trash']) {
+        return $specials['trash'] === $folder;
+    }
+    return false;
+}}
