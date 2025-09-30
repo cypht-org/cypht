@@ -1925,6 +1925,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $save_reply_text = true;
                 }
                 $msg_headers = $mailbox->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
+
+                $this->out('is_archive_folder', $mailbox->is_archive_folder($form['imap_server_id'], $this->user_config, $form['folder']));
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
                 $this->out('msg_struct', $msg_struct);
                 $this->out('list_headers', get_list_headers($msg_headers));

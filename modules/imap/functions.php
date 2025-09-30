@@ -1651,3 +1651,17 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
     }
     return [$uid, $sent_folder];
 }}
+
+if (!hm_exists('is_imap_archive_folder')) {
+function is_imap_archive_folder($server_id, $user_config, $current_folder) {
+    $special_folders = $user_config->get('special_imap_folders', array());
+    
+    if (isset($special_folders[$server_id]['archive'])) {
+        $archive_folder = $special_folders[$server_id]['archive'];
+        if (bin2hex($archive_folder) == $current_folder) {
+            return true;
+        }
+    }
+    
+    return false;
+}}

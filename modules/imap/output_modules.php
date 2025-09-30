@@ -385,7 +385,9 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             $txt .= '<a class="delete_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="delete_message" href="#">'.$this->trans('Delete').'</a>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="copy_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
             $txt .= '<div class="position-relative"><a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="move_message" href="#" data-bs-toggle="dropdown">'.$this->trans('Move').'</a><div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div></div>';
-            $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            if (!$this->get('is_archive_folder')) {
+                $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
+            }
             
             if($this->get('tags')){
                 $txt .= tags_dropdown($this, $headers);
