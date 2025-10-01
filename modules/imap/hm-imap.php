@@ -178,7 +178,7 @@ if (!class_exists('Hm_IMAP')) {
         );
 
         /* holds the current IMAP connection state */
-        private $state = 'disconnected';
+        public $state = 'disconnected';
 
         /* used for message part content streaming */
         private $stream_size = 0;

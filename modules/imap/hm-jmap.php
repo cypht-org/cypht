@@ -1359,4 +1359,35 @@ class Hm_JMAP {
         $this->api->format = 'json';
         return $res;
     }
+
+    /**
+     * Check if a feature is supported (JMAP compatibility method)
+     * JMAP doesn't use IMAP extensions, so most features are handled differently
+     */
+    public function is_supported($feature) {
+        // TODO: Implement more features as needed, but most IMAP features don't have direct JMAP equivalents
+        return false;
+    }
+
+    /**
+     * Get message sort order (JMAP compatibility method) 
+     * This provides IMAP-like interface for JMAP sorting
+     * JMAP doesn't have direct equivalent to IMAP SORT
+     * Fall back to search and let JMAP handle sorting internally
+     */
+    public function get_message_sort_order($sort, $reverse=false, $target='ALL', $terms=array(), $exclude_deleted=true, $exclude_auto_bcc=true, $only_auto_bcc=false) {
+        return $this->search($target, false, $terms, [], $exclude_deleted, $exclude_auto_bcc, $only_auto_bcc);
+    }
+
+    /**
+     * Sort by fetch (JMAP compatibility method)
+     * JMAP doesn't need this since it handles sorting differently
+     */
+    public function sort_by_fetch($sort, $reverse=false, $target='ALL', $uids='') {
+        // TODO: implement according to JMAP spec if needed
+        if (empty($uids)) {
+            return [];
+        }
+        return explode(',', $uids);
+    }
 }

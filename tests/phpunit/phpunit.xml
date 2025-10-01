@@ -127,6 +127,11 @@
     <testsuite name="tags">
       <file>./tags.php</file>
     </testsuite>
+    <testsuite name="lib">
+      <file>./lib/searchable.php</file>
+      <file>./lib/scram_authenticator.php</file>
+      <file>./lib/ini_set.php</file>
+    </testsuite>
     <!--<testsuite name="modules_imap">
             <file>./modules/imap/hm-imap.php</file>
         </testsuite>-->
@@ -137,6 +142,7 @@
       <file>./modules/core/handler_modules.php</file>
       <file>./modules/core/output_modules.php</file>
       <file>./modules/core/output_modules_debug.php</file>
+      <file>./modules/core/mailbox.php</file>
     </testsuite>
   </testsuites>
   <source>
