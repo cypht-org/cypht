@@ -250,7 +250,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $from = $msg['from'];
         }
-        $from = format_imap_from_fld($from);
+        $from = format_imap_from_fld(is_array($from) ? implode(', ', $from) : $from);
         $nofrom = '';
         if (!trim($from)) {
             $from = '[No From]';

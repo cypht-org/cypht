@@ -349,12 +349,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Garethp/php-ews.git",
-                "reference": "045306e5cdc6eeca6770adee40221acb092c672c"
+                "reference": "182f6aca8873276468f5e1b09b65f73085af04f6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/045306e5cdc6eeca6770adee40221acb092c672c",
-                "reference": "045306e5cdc6eeca6770adee40221acb092c672c",
+                "url": "https://api.github.com/repos/Garethp/php-ews/zipball/182f6aca8873276468f5e1b09b65f73085af04f6",
+                "reference": "182f6aca8873276468f5e1b09b65f73085af04f6",
                 "shasum": ""
             },
             "require": {
@@ -406,9 +406,9 @@
             ],
             "support": {
                 "issues": "https://github.com/Garethp/php-ews/issues",
-                "source": "https://github.com/Garethp/php-ews/tree/master"
+                "source": "https://github.com/Garethp/php-ews/tree/v0.11.1"
             },
-            "time": "2025-07-06T11:41:00+00:00"
+            "time": "2025-08-30T22:33:12+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",

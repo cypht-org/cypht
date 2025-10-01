@@ -12,6 +12,7 @@
  */
 
 use garethp\ews\API\Enumeration;
+use garethp\ews\API\Enumeration\DistinguishedFolderIdNameType;
 use garethp\ews\API\Exception;
 use garethp\ews\API\ExchangeWebServices;
 use garethp\ews\API\ItemUpdateBuilder;
@@ -83,13 +84,14 @@ class Hm_EWS {
             }
             foreach($folders as $folder) {
                 $id = $folder->getFolderId()->getId();
+                $parentId = $folder->getParentFolderId()->getId();
                 $name = $folder->getDisplayName();
                 if ($only_subscribed && in_array($id, $unsubscribed_folders)) {
                     continue;
                 }
                 $result[$id] = array(
                     'id' => $id,
-                    'parent' => $folder->getParentFolderId()->getId(),
+                    'parent' => $parentId,
                     'delim' => false,
                     'name' => $name,
                     'name_parts' => [],
@@ -151,16 +153,11 @@ class Hm_EWS {
     public function get_folder_status($folder, $report_error = true) {
         try {
             if ($this->is_distinguished_folder($folder)) {
-                $folder = new Type\DistinguishedFolderIdType($folder);
-                $result = $this->api->getFolder($folder->toArray(true));
-            } elseif (base64_encode(base64_decode($folder, true)) === $folder) {
-                $folder = new Type\FolderIdType($folder);
-                $result = $this->api->getFolder($folder->toArray(true));
+                $folderObj = new Type\DistinguishedFolderIdType($folder);
+                $result = $this->api->getFolder($folderObj->toArray(true));
             } else {
-                $result = $this->api->getFolderByDisplayName($folder, Enumeration\DistinguishedFolderIdNameType::MESSAGE_ROOT);
-                if (! $result) {
-                    throw new Exception('Folder not found: ' . $folder);
-                }
+                $folderObj = new Type\FolderIdType($folder);
+                $result = $this->api->getFolder($folderObj->toArray(true));
             }
             return [
                 'id' => $result->getFolderId()->getId(),
@@ -206,16 +203,16 @@ class Hm_EWS {
     public function rename_folder($folder, $new_name, $parent = null) {
         $result = [];
         if ($this->is_distinguished_folder($folder)) {
-            $folder = new Type\DistinguishedFolderIdType($folder);
+            $folderObj = new Type\DistinguishedFolderIdType($folder);
         } else {
-            $folder = new Type\FolderIdType($folder);
+            $folderObj = new Type\FolderIdType(hex2bin($folder));
         }
         $new_folder = new Type\FolderType();
         $new_folder->displayName = $new_name;
         $request = [
             'FolderChanges' => [
                 'FolderChange' => [
-                    'FolderId' => $folder->toArray(false),
+                    'FolderId' => $folderObj->toArray(false),
                     'Updates' => [
                         'SetFolderField' => [
                             'FieldURI' => [
@@ -236,13 +233,14 @@ class Hm_EWS {
         }
         if ($parent) {
             if ($this->is_distinguished_folder($parent)) {
-                $parent = new Type\DistinguishedFolderIdType($parent);
+                $parentObj = new Type\DistinguishedFolderIdType($parent);
             } else {
-                $parent = new Type\FolderIdType($parent);
+                // Convert hex ID to binary for EWS
+                $parentObj = new Type\FolderIdType(hex2bin($parent));
             }
             $request = [
-                'FolderIds' => Utilities\getFolderIds([$folder]),
-                'ToFolderId' => $parent->toArray(true),
+                'FolderIds' => Utilities\getFolderIds([$folderObj]),
+                'ToFolderId' => $parentObj->toArray(true),
             ];
             try {
                 $request = Type::buildFromArray($request);
@@ -257,7 +255,7 @@ class Hm_EWS {
 
     public function delete_folder($folder) {
         try {
-            return $this->api->deleteFolder(new Type\FolderIdType($folder));
+            return $this->api->deleteFolder(new Type\FolderIdType(hex2bin($folder)));
         } catch(\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -269,7 +267,12 @@ class Hm_EWS {
             $msg = new Type\MessageType();
             $msg->setFrom($from);
             $msg->setToRecipients($recipients);
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             if ($delivery_receipt) {
                 $msg->setIsDeliveryReceiptRequested($delivery_receipt);
             }
@@ -284,13 +287,19 @@ class Hm_EWS {
 
     public function store_message($folder, $message, $seen = true, $draft = false) {
         try {
+
             if ($this->is_distinguished_folder($folder)) {
-                $folder = new Type\DistinguishedFolderIdType($folder);
-            } else {
-                $folder = new Type\FolderIdType($folder);
+                $folderObj = new Type\DistinguishedFolderIdType($folder);
+            } else {                
+                $folderObj = new Type\FolderIdType($folder);
             }
             $msg = new Type\MessageType();
-            $msg->setMimeContent(base64_encode($message));
+            $mimeContent = Type\MimeContentType::buildFromArray([
+                'CharacterSet' => 'UTF-8',
+                '_' => base64_encode($message)
+            ]);
+            $msg->setMimeContent($mimeContent);
+
             $flags = 0;
             if ($seen) {
                 $flags |= self::PID_TAG_MESSAGE_READ;
@@ -298,18 +307,22 @@ class Hm_EWS {
             if ($draft) {
                 $flags |= self::PID_TAG_MESSAGE_DRAFT;
             }
-            $msg->addExtendedProperty(Type\ExtendedPropertyType::buildFromArray([
-                'ExtendedFieldURI' => [
-                    'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
-                    'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
-                ],
+            $extendedFieldURI = Type\PathToExtendedFieldType::buildFromArray([
+                'PropertyTag' => self::PID_TAG_MESSAGE_FLAGS,
+                'PropertyType' => Enumeration\MapiPropertyTypeType::INTEGER,
+            ]);
+
+            $extendedProperty = Type\ExtendedPropertyType::buildFromArray([
+                'ExtendedFieldURI' => $extendedFieldURI,
                 'Value' => $flags,
-            ]));
+            ]);
+            $msg->addExtendedProperty($extendedProperty);
+
             $result = $this->api->sendMail($msg, [
                 'MessageDisposition' => 'SaveOnly',
-                'SavedItemFolderId' => $folder->toArray(true),
+                'SavedItemFolderId' => $folderObj->toArray(true),
             ]);
-            return $result->getId();
+            return bin2hex($result->getId());
         } catch (\Exception $e) {
             Hm_Msgs::add($e->getMessage(), 'danger');
             return false;
@@ -325,9 +338,11 @@ class Hm_EWS {
     public function search($folder, $sort, $reverse, $flag_filter, $offset, $limit, $keyword, $trusted_senders) {
         $lower_folder = strtolower($folder);
         if ($this->is_distinguished_folder($lower_folder)) {
-            $folder = new Type\DistinguishedFolderIdType($lower_folder);
+            $folderObj = new Type\DistinguishedFolderIdType($lower_folder);
+        } elseif (ctype_xdigit($folder)) {
+            $folderObj = new Type\FolderIdType(hex2bin($folder));
         } else {
-            $folder = new Type\FolderIdType($folder);
+            $folderObj = new Type\FolderIdType($folder);
         }
         $request = array(
             'Traversal' => 'Shallow',
@@ -339,7 +354,7 @@ class Hm_EWS {
                 'Offset' => $offset,
                 'BasePoint' => 'Beginning',
             ],
-            'ParentFolderIds' => $folder->toArray(true)
+            'ParentFolderIds' => $folderObj->toArray(true)
         );
         if (! empty($sort)) {
             switch ($sort) {
@@ -534,9 +549,9 @@ class Hm_EWS {
             $msg = [
                 'uid' => $uid,
                 'flags' => implode(' ', $flags),
-                'internal_date' => $message->getDateTimeCreated(),
+                'internal_date' => $message->getDateTimeCreated()->format('d-M-Y H:i:s O'),
                 'size' => $message->getSize(),
-                'date' => $message->getDateTimeReceived(),
+                'date' => $message->getDateTimeReceived()->format('d-M-Y H:i:s O'),
                 'from' => $this->extract_mailbox($message->getFrom()),
                 'to' => $this->extract_mailbox($message->getToRecipients()),
                 'subject' => $message->getSubject(),
@@ -548,7 +563,7 @@ class Hm_EWS {
                 'google_thread_id' => null,
                 'google_labels' => null,
                 'list_archive' => null,
-                'references' => $message->getRreferences(),
+                'references' => $message->getReferences(),
                 'message_id' => $message->getInternetMessageId(),
                 'x_auto_bcc' => null,
                 'x_snoozed'  => null,
@@ -681,6 +696,7 @@ class Hm_EWS {
     }
 
     public function get_message_headers($itemId) {
+        $binaryId = hex2bin($itemId);
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'AllProperties',
@@ -698,7 +714,7 @@ class Hm_EWS {
                 ],
             ),
             'ItemIds' => [
-                'ItemId' => ['Id' => hex2bin($itemId)],
+                'ItemId' => ['Id' => $binaryId],
             ],
         );
         $request = Type::buildFromArray($request);
@@ -706,9 +722,9 @@ class Hm_EWS {
         $sender = $message->getSender();
         $from = $message->getFrom();
         $headers = [];
-        $headers['Arrival Date'] = $message->getDateTimeCreated();
+        $headers['Arrival Date'] = $message->getDateTimeCreated()->format('Y-m-d H:i:s.u');
         if ($sender && $from) {
-            $headers['From'] = $message->getSsender()->getMailbox()->getName() . ' <' . $message->getFrom()->getMailbox()->getEmailAddress() . '>';
+            $headers['From'] = $message->getSender()->getMailbox()->getName() . ' <' . $message->getSender()->getMailbox()->getEmailAddress() . '>';
         } elseif ($sender) {
             $headers['From'] = $this->extract_mailbox($sender);
         } elseif ($from) {
@@ -717,11 +733,14 @@ class Hm_EWS {
             $headers['From'] = null;
         }
         $headers['To'] = $this->extract_mailbox($message->getToRecipients());
-        if ($message->getCcRecipients()) {
+        $headers['To'] = flatten_headers_to_string($headers, 'To');
+        if($message->getCcRecipients()) {
             $headers['Cc'] = $this->extract_mailbox($message->getCcRecipients());
+            $headers['Cc'] = flatten_headers_to_string($headers, 'Cc');
         }
         if ($message->getBccRecipients()) {
             $headers['Bcc'] = $this->extract_mailbox($message->getBccRecipients());
+            $headers['Bcc'] = flatten_headers_to_string($headers, 'Bcc');
         }
         $headers['Flags'] = implode(' ', $this->extract_flags($message));
         foreach ($message->getInternetMessageHeaders() as $header) {
@@ -820,18 +839,19 @@ class Hm_EWS {
     }
 
     public function get_mime_message_by_id($itemId) {
+        $binaryId = hex2bin($itemId);
         $request = array(
             'ItemShape' => array(
                 'BaseShape' => 'IdOnly',
                 'IncludeMimeContent' => true,
             ),
             'ItemIds' => [
-                'ItemId' => ['Id' => hex2bin($itemId)],
+                'ItemId' => ['Id' => $binaryId],
             ],
         );
         $request = Type::buildFromArray($request);
         $message = $this->ews->GetItem($request);
-        $mime = $message->getMmimeContent();
+        $mime = $message->getMimeContent();
         $content = base64_decode($mime);
         if (strtoupper($mime->getCharacterSet()) != 'UTF-8') {
             $content = mb_convert_encoding($content, 'UTF-8', $mime->getCharacterSet());
@@ -856,6 +876,8 @@ class Hm_EWS {
             $charset = $part->getCharset();
             if ($charset) {
                 $struct[$part_num]['attributes'] = ['charset' => $charset];
+            } else {
+                $struct[$part_num]['attributes'] = [];
             }
             $struct[$part_num]['id'] = $part->getContentId();
             $struct[$part_num]['description'] = $part->getHeaderValue('Content-Description');
@@ -864,8 +886,10 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
+            
             if ($filename = $part->getFilename()) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
+                
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
                 }
@@ -924,10 +948,26 @@ class Hm_EWS {
             }
             return $result;
         } elseif (is_object($data) && $data->Mailbox) {
-            return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
-        } elseif (is_object($data) && $data->getMailbox()) {
-            return $data->getMailbox()->getName() . ' <' . $data->getMailbox()->getEmailAddress() . '>';
-        } else {
+            if(is_array($data->Mailbox)) {
+                $result = [];
+                foreach ($data->Mailbox as $mailbox) {
+                    $result[] = $this->extract_mailbox($mailbox);
+                }
+                return $result;
+            }else {
+                return $data->Mailbox->getName() . ' <' . $data->Mailbox->getEmailAddress() . '>';
+            }
+        } elseif (is_object($data) && method_exists($data, 'getMailbox')) {
+            $mailbox = $data->getMailbox()->getMailbox();
+            
+            $name = $mailbox->getName();
+            $email = $mailbox->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
+        } elseif (is_object($data) && method_exists($data, 'getName') && method_exists($data, 'getEmailAddress')) {
+            $name = $data->getName();
+            $email = $data->getEmailAddress();
+            return $name ? $name . ' <' . $email . '>' : $email;
+        }else {
             return (string) $data;
         }
     }
@@ -973,21 +1013,27 @@ class Hm_EWS {
     protected function archive_items($itemIds) {
         $result = true;
         $folders = $this->get_parent_folders_of_items($itemIds);
-        foreach ($folders as $folder => $itemIds) {
+        if (!$folders) {
+            return false;
+        }
+        foreach ($folders as $folder => $folderItemIds) {
             if ($this->is_distinguished_folder($folder)) {
-                $folder = new Type\DistinguishedFolderIdType($folder);
+                $folderObj = new Type\DistinguishedFolderIdType($folder);
             } else {
-                $folder = new Type\FolderIdType($folder);
+                $folderObj = new Type\FolderIdType(hex2bin($folder));
             }
-            $request = [
-                'ArchiveSourceFolderId' => $folder->toArray(true),
+            
+            $payload = [
+                'ArchiveSourceFolderId' => $folderObj->toArray(true),
                 'ItemIds' => [
-                    'ItemId' => $itemIds = array_map(function($itemId) {
-                        return (new Type\ItemIdType($itemId))->toArray();
-                    }, $itemIds),
+                    'ItemId' => array_map(function($itemId) {
+                        return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                    }, $folderItemIds),
                 ]
             ];
-            $request = Type::buildFromArray($request);
+
+            $request = Type::buildFromArray($payload);
+            
             try {
                 $result = $result && $this->ews->ArchiveItem($request);
             } catch (\Exception $e) {
@@ -1001,20 +1047,24 @@ class Hm_EWS {
     protected function move_items_to_junk($itemIds) {
         $result = true;
         $folders = $this->get_parent_folders_of_items($itemIds);
+        if (!$folders) {
+            return false;
+        }
         foreach ($folders as $folder => $itemIds) {
             if ($this->is_distinguished_folder($folder)) {
                 $folder = new Type\DistinguishedFolderIdType($folder);
             } else {
-                $folder = new Type\FolderIdType($folder);
+                // Convert hex folder ID to binary for EWS API
+                $folder = new Type\FolderIdType(hex2bin($folder));
             }
 
-            $junkFolder = new Type\DistinguishedFolderIdType(Type\DistinguishedFolderIdType::JUNK);
+            $junkFolder = new Type\DistinguishedFolderIdType(Enumeration\DistinguishedFolderIdNameType::JUNK);
             $request = [
                 'SourceFolderId' => $folder->toArray(true),
                 'DestinationFolderId' => $junkFolder->toArray(true),
                 'ItemIds' => [
                     'ItemId' => $itemIds = array_map(function($itemId) {
-                        return (new Type\ItemIdType($itemId))->toArray();
+                        return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
                     }, $itemIds),
                 ]
             ];
@@ -1037,20 +1087,26 @@ class Hm_EWS {
         try {
             if ($hard) {
                 $result = $this->api->deleteItems(array_map(function($itemId) {
-                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
+                    return (new Type\ItemIdType(hex2bin($itemId)))->toArray(true);
                 }, $itemIds), [
                     'DeleteType' => 'HardDelete',
                 ]);
             } else {
                 $trash = $this->api->getFolderByDistinguishedId(Type\DistinguishedFolderIdNameType::DELETED);
                 $folders = $this->get_parent_folders_of_items($itemIds);
+                if (!$folders) {
+                    return false;
+                }
                 foreach ($folders as $folder => $itemIds) {
-                    if ($trash && $folder == $trash->getFolderId()->getId()) {
+                    if ($trash && $trash->getFolderId()->getId() == $folder) {
                         $options = ['DeleteType' => 'HardDelete'];
                     } else {
                         $options = [];
                     }
-                    $result = $result && $this->api->deleteItems($itemIds, $options);
+                    $binaryItemIds = array_map(function($itemId) {
+                        return (new Type\ItemIdType($itemId))->toArray();
+                    }, $itemIds);
+                    $result = $result && $this->api->deleteItems($binaryItemIds, $options);
                 }
             }
         } catch (\Exception $e) {
@@ -1147,8 +1203,26 @@ class Hm_EWS {
             if (! isset($folders[$folder])) {
                 $folders[$folder] = [];
             }
-            $folders[$folder][] = $message->getItemId();
+            $folders[$folder][] = $message->getItemId()->getId();
         }
         return $folders;
+    }
+}
+
+if(!hm_exists('flatten_headers_to_string')) {
+    function flatten_headers_to_string($headers, $key) {
+        if (!isset($headers[$key]) || !is_array($headers[$key])) {
+            return isset($headers[$key]) ? $headers[$key] : '';
+        }
+        
+        $flattened_header = [];
+        foreach ($headers[$key] as $to_item) {
+            if (is_array($to_item)) {
+                $flattened_header = array_merge($flattened_header, $to_item);
+            } else {
+                $flattened_header[] = $to_item;
+            }
+        }
+        return implode(', ', $flattened_header);
     }
 }
