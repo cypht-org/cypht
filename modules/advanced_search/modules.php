@@ -370,7 +370,20 @@ class Hm_Output_filter_imap_advanced_search extends Hm_Output_Module {
      */
     protected function output() {
         if ($this->get('imap_search_results')) {
-            prepare_imap_message_list($this->get('imap_search_results'), $this, 'advanced_search');
+            $adv_search_result = format_imap_message_list(
+                $this->get('imap_search_results'), 
+                $this, 
+                'advanced_search',
+                'email'
+            );
+            
+            // Convert format (ID => [HTML, ID]) to format expected (HTML => ID)
+            $res = array();
+            foreach ($adv_search_result as $id => $row_data) {
+                $res[$row_data[0]] = $id;
+            }
+            
+            $this->out('formatted_message_list', $res);
         }
         elseif (!$this->get('formatted_message_list')) {
             $this->out('formatted_message_list', array());

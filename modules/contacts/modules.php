@@ -97,16 +97,18 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
     public function process() {
-        $contacts = array();
         $existing = $this->get('contact_store');
         $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
         $headers = $this->get('msg_headers', array());
         $addresses = array();
         foreach ($headers as $name => $value) {
             if (in_array(mb_strtolower($name), $addr_headers, true)) {
-                foreach (Hm_Address_Field::parse($value) as $vals) {
-                    if (!$existing->search(array('email_address' => $vals['email']))) {
-                        $addresses[] = $vals;
+                $values = is_array($value) ? $value : array($value);
+                foreach ($values as $val) {
+                    foreach (Hm_Address_Field::parse($val) as $v) {
+                        if (!$existing->search(array('email_address' => $v['email']))) {
+                            $addresses[] = $v;
+                        }
                     }
                 }
             }

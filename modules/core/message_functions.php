@@ -142,11 +142,6 @@ function reply_to_address($headers, $type) {
     $msg_cc = '';
     $headers = lc_headers($headers);
     $parsed = array();
-    $delivered_address = false;
-    if (array_key_exists('delivered-to', $headers)) {
-        $delivered_address = array('email' => $headers['delivered-to'],
-            'comment' => '', 'label' => '');
-    }
 
     if ($type == 'forward') {
         return $msg_to;
@@ -160,9 +155,6 @@ function reply_to_address($headers, $type) {
         }
     }
     if ($type == 'reply_all') {
-        if ($delivered_address) {
-            $parsed[] = $delivered_address;
-        }
         if (array_key_exists('cc', $headers)) {
             list($cc_parsed, $msg_cc) = format_reply_address($headers['cc'], $parsed);
             $parsed += $cc_parsed;
