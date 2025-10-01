@@ -259,14 +259,12 @@ class Hm_Output_contacts_form extends Hm_Output_Module {
             'value="'.$this->html_safe($phone).'" /><br />'.
             '<label class="form-label" for="contact_group">'.$this->trans('Contact Group').'</label>'.
             '<select class="form-select" id="contact_group" name="contact_group">'.
-            '<option value="'.$this->trans('Personal Addresses').'" selected>'.$this->trans('Personal Addresses').'</option>'.
-            '<option value="'.$this->trans('Trusted Senders').'">'.$this->trans('Trusted Senders').'</option>'.
-            '<option value="'.$this->trans('Collected Recipients').'">'.$this->trans('Collected Recipients').'</option>' .
+            '<option value="'.$this->trans('Personal Addresses').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Personal Addresses') ? ' selected' : '').'>'.$this->trans('Personal Addresses').'</option>'.
+            '<option value="'.$this->trans('Trusted Senders').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Trusted Senders') ? ' selected' : '').'>'.$this->trans('Trusted Senders').'</option>'.
+            '<option value="'.$this->trans('Collected Recipients').'"'.(isset($group) && $this->html_safe($group) == $this->trans('Collected Recipients') ? ' selected' : '').'>'.$this->trans('Collected Recipients').'</option>' .
             '</select><br />'.
             $button.' <input type="button" class="btn btn-secondary reset_contact" value="'.
             $this->trans('Cancel').'" /></div></form></div>';
-        
-        
         return $form_html;
     }
 }
