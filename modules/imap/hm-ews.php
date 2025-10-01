@@ -290,7 +290,7 @@ class Hm_EWS {
 
             if ($this->is_distinguished_folder($folder)) {
                 $folderObj = new Type\DistinguishedFolderIdType($folder);
-            } else {                
+            } else {
                 $folderObj = new Type\FolderIdType($folder);
             }
             $msg = new Type\MessageType();
@@ -523,9 +523,7 @@ class Hm_EWS {
 
         $itemIds = [];
         foreach ($items as $item) {
-            if (is_object($item)) {
-                $itemIds[] = bin2hex($item->getItemId()->getId());
-            }
+            $itemIds[] = bin2hex($item->getItemId()->getId());
         }
         return [$result->getTotalItemsInView(), $itemIds];
     }
@@ -679,13 +677,6 @@ class Hm_EWS {
             'content-type' => null,
             'references' => null,
             'message_id' => null,
-            // Calendar-specific properties
-            'calendar_start' => $message->getStart() ? $message->getStart()->format('Y-m-d H:i:s') : null,
-            'calendar_end' => $message->getEnd() ? $message->getEnd()->format('Y-m-d H:i:s') : null,
-            'calendar_location' => $message->getLocation() ?: null,
-            'is_all_day' => $message->getIsAllDayEvent() ?: false,
-            'is_meeting' => $message->getIsMeeting() ?: false,
-            'is_recurring' => $message->getIsRecurring() ?: false,
         ];
 
         return $props;
@@ -707,12 +698,6 @@ class Hm_EWS {
             'content-type' => null,
             'references' => $message->getReferences() ?: null,
             'message_id' => $message->getInternetMessageId() ?: null,
-            // Meeting request specific properties
-            'meeting_request_type' => $message->getMeetingRequestType() ?: null,
-            'response_type' => $message->getResponseType() ?: null,
-            'is_delegated' => $message->getIsDelegated() ?: false,
-            'has_been_processed' => $message->getHasBeenProcessed() ?: false,
-            'is_out_of_date' => $message->getIsOutOfDate() ?: false,
         ];
 
         return $props;
@@ -1045,10 +1030,10 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
-            
+
             if ($filename = $part->getFilename()) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
-                
+
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
                 }
@@ -1180,7 +1165,7 @@ class Hm_EWS {
             } else {
                 $folderObj = new Type\FolderIdType(hex2bin($folder));
             }
-            
+
             $payload = [
                 'ArchiveSourceFolderId' => $folderObj->toArray(true),
                 'ItemIds' => [
@@ -1191,7 +1176,7 @@ class Hm_EWS {
             ];
 
             $request = Type::buildFromArray($payload);
-            
+
             try {
                 $result = $result && $this->ews->ArchiveItem($request);
             } catch (\Exception $e) {
