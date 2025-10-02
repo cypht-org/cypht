@@ -412,6 +412,10 @@ button {
   position: relative;
   white-space: nowrap;
 }
+.email_folders .folders > li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .inner_list li {
   margin: 2px;
   white-space: nowrap;
@@ -1470,6 +1474,7 @@ div.unseen,
   width: fit-content;
   margin-left: 0;
   padding: 10px 20px;
+  display: block !important;
 }
 
 .mobile .app-logo{

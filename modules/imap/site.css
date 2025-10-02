@@ -627,7 +627,6 @@ ul.inner_list > li[class^="m-has-children"] {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0;
 }
 .inner_list li[class^="m-has-children"] .m-has-children-wrapper {
     display: flex;
