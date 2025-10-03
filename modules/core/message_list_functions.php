@@ -313,6 +313,7 @@ function subject_callback($vals, $style, $output_mod) {
     $img = '';
     $subject = '';
     $preview_msg = '';
+    $icon_type_msg = '';
     if (isset($vals[3]) && $vals[3]) {
         $img = '<i class="bi bi-filetype-'.$vals[3].'"></i>';
     }
@@ -330,19 +331,25 @@ function subject_callback($vals, $style, $output_mod) {
         $clean_text = implode("\n", $clean);
         $preview_msg = $output_mod->html_safe($clean_text);
     }
+
+    if (isset($vals[5]) && $vals[5]) {
+        if ($vals[5] == 'calendar') {
+            $icon_type_msg = '<span class="bi bi-calendar4-event"></span>';
+        }
+    }
     
     $hl_subject = preg_replace("/^(\[[^\]]+\])/", '<span class="s_pre">$1</span>', $subject);
     if ($style == 'news') {
         if ($output_mod->get('is_mobile')) {
-            return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject);
+            return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a href="%s">%s</a></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $icon_type_msg, $output_mod->html_safe($vals[1]), $hl_subject);
         }
-        return sprintf('<div class="subject"><div class="%s" title="%s">%s <a href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $img, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
+        return sprintf('<div class="subject"><div class="%s" title="%s">%s %s <a href="%s">%s</a><p class="fw-light">%s</p></div></div>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $icon_type_msg, $img, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
     }
 
     if ($output_mod->get('is_mobile')) {
-        return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject);
+        return sprintf('<td class="subject"><div class="%s"> %s <a title="%s" href="%s">%s</a></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $output_mod->html_safe($vals[1]), $hl_subject);
     }
-    return sprintf('<td class="subject"><div class="%s"><a title="%s" href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $subject, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
+    return sprintf('<td class="subject"><div class="%s"> %s <a title="%s" href="%s">%s</a><p class="fw-light">%s</p></div></td>', $output_mod->html_safe(implode(' ', $vals[2])), $icon_type_msg, $subject, $output_mod->html_safe($vals[1]), $hl_subject, $preview_msg);
 }}
 
 /**
