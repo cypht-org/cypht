@@ -100,7 +100,7 @@ return [
     /*
     | Attribute to use as the unique identifier for users
     */
-    'ldap_uid_attr' => env('LDAP_UID_ATTR', 'uid'),
+    'ldap_auth_uid_attr' => env('LDAP_AUTH_UID_ATTR', 'uid'),
 
     /*
     | -------------------
@@ -434,7 +434,9 @@ return [
     | 'cache_class' => env('CACHE_CLASS')
     */
 
+    'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
+    'cache_class' => env('CACHE_CLASS'),
     /*
     | -------------
     | Redis Support

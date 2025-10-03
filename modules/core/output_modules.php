@@ -424,6 +424,7 @@ class Hm_Output_content_start extends Hm_Output_Module {
         $res = '<body class="'.($this->get('is_mobile', false) ? 'mobile' : '').'"><noscript class="noscript">'.
             sprintf($this->trans('You need to have Javascript enabled to use %s, sorry about that!'),
                 $this->html_safe($this->get('router_app_name'))).'</noscript>';
+        $res .= '<script type="text/javascript">window.inAppContext = true;</script>';
         if (!$this->get('router_login_state')) {
             $res .= '<script type="text/javascript">sessionStorage.clear();</script>';
         }
@@ -1900,7 +1901,6 @@ class Hm_Output_message_list_start extends Hm_Output_Module {
             }
         }
         $res = '<div class="p-3">';
-        $res .= '<div class="cypht-spinner"><div class="spinner-border text-danger" role="status"><span class="visually-hidden">Loading...</span></div></div>';
         $res .= '<table class="message_table table">';
         if (!$this->get('no_message_list_headers')) {
             if (!empty($col_flds)) {
@@ -2031,13 +2031,13 @@ class Hm_Output_message_list_end extends Hm_Output_Module {
  */
 class Hm_Output_search_move_copy_controls extends Hm_Output_Module {
     protected function output() {
-        $res = '<span class="ctr_divider"></span> <a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy">'.$this->trans('Copy').'</a>';
-        $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move">'.$this->trans('Move').'</a>';
-        $res .= '<div class="move_to_location"></div>';
+        $res = '<span class="ctr_divider"></span> <div class="d-flex align-items-start gap-1 dropdown"><a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="copy" data-bs-toggle="dropdown">'.$this->trans('Copy').'</a>';
+        $res .= '<a class="imap_move disabled_input btn btn-sm btn-secondary" href="#" data-action="move" data-bs-toggle="dropdown">'.$this->trans('Move').'</a>';
+        $res .= '<div class="move_to_location dropdown-menu" data-bs-auto-close="outside"></div>';
         $res .= '<input type="hidden" class="move_to_type" value="" />';
         $res .= '<input type="hidden" class="move_to_string1" value="'.$this->trans('Move to ...').'" />';
         $res .= '<input type="hidden" class="move_to_string2" value="'.$this->trans('Copy to ...').'" />';
-        $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" />';
+        $res .= '<input type="hidden" class="move_to_string3" value="'.$this->trans('Removed non-IMAP messages from selection. They cannot be moved or copied').'" /></div>';
         // $res = "<strong>COPY/MOVE</strong>";
         $this->concat('msg_controls_extra', $res);
     }

@@ -255,7 +255,7 @@ function format_imap_message_list($msg_list, $output_module, $parent_list=false,
         else {
             $from = $msg['from'];
         }
-        $from = format_imap_from_fld($from);
+        $from = format_imap_from_fld(is_array($from) ? implode(', ', $from) : $from);
         $nofrom = '';
         if (!trim($from)) {
             $from = '[No From]';
@@ -716,7 +716,10 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     $isThereAnyImg = false;
     foreach ($struct as $id => $vals) {
         if ($vals['type'] === 'image') {
-            $res .= '<div><img class="attached_image" src="?'.$dl_link.'&amp;imap_msg_part='.$output_mod->html_safe($id).'" ></div>';
+            $res .= '<div class="col-6 col-md-3">
+                        <img class="attached_image img-fluid" 
+                             src="?' . $dl_link . '&amp;imap_msg_part=' . $output_mod->html_safe($id) . '" >
+                     </div>';
             $isThereAnyImg = true;
         }
         if (isset($vals['subs'])) {
@@ -725,7 +728,7 @@ function format_attached_image_section($struct, $output_mod, $dl_link) {
     }
 
     if ($isThereAnyImg) {
-        $res = '<div class="attached_image_box">' . $res . '</div>';
+        $res = '<div class="container-fluid"><div class="row text-center attached_image_box">' . $res . '</div></div>';
     }
 
     return $res;
@@ -1241,19 +1244,20 @@ function process_list_fld($fld) {
 if (!hm_exists('format_imap_envelope')) {
 function format_imap_envelope($env, $mod) {
     $env = lc_headers($env);
-    $res = '<table class="imap_envelope"><colgroup><col class="header_name_col"><col class="header_val_col"></colgroup>';
+    $res = '<div class="imap_envelope d-flex flex-column border-bottom border-2 border-secondary-subtle pb-3 mb-3">';
+    
+    // Subject header (full width, centered)
     if (array_key_exists('subject', $env) && trim($env['subject'])) {
-        $res .= '<tr class="header_subject"><th colspan="2">'.$mod->html_safe($env['subject']).
-            '</th></tr>';
+        $res .= '<div class="header_subject d-flex justify-content-center"><h5 class="text-center mb-0 fw-bold">'.$mod->html_safe($env['subject']).'</h5></div>';
     }
 
+    // Other envelope headers
     foreach ($env as $name => $val) {
         if (in_array($name, array('date', 'from', 'to', 'message-id'), true)) {
-            $res .= '<tr><th>'.$mod->html_safe(ucfirst($name)).'</th>'.
-                '<td>'.$mod->html_safe($val).'</td></tr>';
+            $res .= '<div class="d-flex align-items-center py-1"><span class="fw-semibold me-2 text-nowrap">'.$mod->html_safe(ucfirst($name)).':</span><span class="text-break">'.$mod->html_safe($val).'</span></div>';
         }
     }
-    $res .= '</table>';
+    $res .= '</div>';
     return $res;
 }}
 
@@ -1493,7 +1497,7 @@ function snooze_dropdown($output, $unsnooze = false) {
     $values = nexter_formats();
 
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuSnooze" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true" data-bs-auto-close="outside">'.$output->trans('Snooze').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuSnooze">';
     foreach ($values as $format) {
         $labels = get_scheduled_date($format, true);
@@ -1515,7 +1519,7 @@ if (!hm_exists('tags_dropdown')) {
 function tags_dropdown($context, $headers) {
     $folders = $context->get('tags', array());
     $txt = '<div class="dropdown d-inline-block">
-                <a class="hlink text-decoration-none dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
+                <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" id="dropdownMenuTag" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$context->trans('Tags').'</a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuTag">';
 
     $tags =  !empty($headers['X-Cypht-Tags']) ? explode(',', $headers['X-Cypht-Tags']) : array();
@@ -1538,10 +1542,10 @@ function tags_dropdown($context, $headers) {
 if (!hm_exists('forward_dropdown')) {
     function forward_dropdown($output,$reply_args) {
         $txt = '<div class="dropdown d-inline-block">
-                    <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" id="dropdownMenuForward" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">'.$output->trans('Forward').'</button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownMenuForward">';
-        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
-        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5"><span>'.$output->trans('Edit as new message').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward_as_attachment=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none" ><span>'.$output->trans('Forward as message attachment').'</a></li>';
+        $txt .= '<li><a href="?page=compose&amp;forward=1'.$reply_args.'" class="forward_link hlink dropdown-item d-flex justify-content-between gap-5 text-decoration-none"><span>'.$output->trans('Edit as new message').'</a></li>';
         $txt .= '</ul></div>';
         return $txt;
     }
@@ -1651,4 +1655,18 @@ function save_sent_msg($handler, $imap_id, $mailbox, $imap_details, $msg, $msg_i
         }
     }
     return [$uid, $sent_folder];
+}}
+
+if (!hm_exists('is_imap_archive_folder')) {
+function is_imap_archive_folder($server_id, $user_config, $current_folder) {
+    $special_folders = $user_config->get('special_imap_folders', array());
+    
+    if (isset($special_folders[$server_id]['archive'])) {
+        $archive_folder = $special_folders[$server_id]['archive'];
+        if (bin2hex($archive_folder) == $current_folder) {
+            return true;
+        }
+    }
+    
+    return false;
 }}

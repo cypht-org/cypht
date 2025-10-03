@@ -145,7 +145,7 @@ function applyMessageListPageHandlers(routeParams) {
         $('.combined_sort').val(routeParams.sort);
     }
     $('.combined_sort').on("change", function() {
-        sortCombinedLists($(this).val());
+        Hm_Message_List.sort($(this).val());
     });
 
     // TODO: Refactor this handler to be more modular(applicable only for the imap list type)

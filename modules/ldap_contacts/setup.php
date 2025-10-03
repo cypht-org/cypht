@@ -18,7 +18,9 @@ add_output('contacts', 'ldap_form_first_name', true, 'ldap_contacts', 'ldap_cont
 add_output('contacts', 'ldap_form_last_name', true, 'ldap_contacts', 'ldap_form_first_name', 'after');
 add_output('contacts', 'ldap_form_mail', true, 'ldap_contacts', 'ldap_form_last_name', 'after');
 add_output('contacts', 'ldap_form_displayname', true, 'ldap_contacts', 'ldap_form_mail', 'after');
-add_output('contacts', 'ldap_form_locality', true, 'ldap_contacts', 'ldap_form_displayname', 'after');
+add_output('contacts', 'ldap_form_uidattr', true, 'ldap_contacts', 'ldap_form_displayname', 'after');
+add_output('contacts', 'ldap_form_dn_display', true, 'ldap_contacts', 'ldap_form_uidattr', 'after');
+add_output('contacts', 'ldap_form_locality', true, 'ldap_contacts', 'ldap_form_dn_display', 'after');
 add_output('contacts', 'ldap_form_state', true, 'ldap_contacts', 'ldap_form_locality', 'after');
 add_output('contacts', 'ldap_form_street', true, 'ldap_contacts', 'ldap_form_state', 'after');
 add_output('contacts', 'ldap_form_postalcode', true, 'ldap_contacts', 'ldap_form_street', 'after');
@@ -45,6 +47,7 @@ add_handler('ajax_delete_contact', 'load_ldap_contacts', true, 'ldap_contacts', 
 add_handler('ajax_delete_contact', 'process_delete_ldap_contact', true, 'ldap_contacts', 'load_ldap_contacts', 'after');
 add_handler('ajax_add_contact', 'load_ldap_contacts', true, 'ldap_contacts', 'load_contacts', 'after');
 add_handler('ajax_add_contact', 'process_add_ldap_contact_from_message', true, 'ldap_contacts', 'save_user_data', 'before');
+add_handler('compose', 'ldap_send_to_contact', true, 'ldap_contacts', 'process_send_to_contact', 'after');
 
 add_handler('settings', 'load_ldap_settings', true, 'ldap_contacts', 'load_user_data', 'after');
 add_handler('settings', 'process_ldap_auth_settings', true, 'ldap_contacts', 'save_user_settings', 'before');
@@ -76,6 +79,8 @@ return array(
         'add_ldap_contact' => FILTER_UNSAFE_RAW,
         'update_ldap_contact' => FILTER_UNSAFE_RAW,
         'ldap_source' => FILTER_UNSAFE_RAW,
+        'ldap_uidattr' => FILTER_UNSAFE_RAW,
+        'ldap_uid' => FILTER_UNSAFE_RAW,
         'ldap_usernames' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY),
         'ldap_passwords' => array('filter' => FILTER_UNSAFE_RAW, 'flags'  => FILTER_FORCE_ARRAY)
     )

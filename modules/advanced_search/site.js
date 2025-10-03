@@ -76,13 +76,14 @@ var expand_adv_folder = function(res) {
         var list_container = $('.adv_folder_list');
         var folders = $(res.imap_expanded_folder_formatted);
         folders.find('.manage_folders_li').remove();
-        $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.adv_folder_list')).append(folders);
+        const foldersWrapper = $('.'+Hm_Utils.clean_selector(res.imap_expanded_folder_path), $('.adv_folder_list'));
+        foldersWrapper.append(folders);
         $('.imap_folder_link', list_container).addClass('adv_folder_link').removeClass('imap_folder_link');
         $('.adv_folder_link', list_container).off('click');
         $('.adv_folder_link', list_container).on("click", function() { return expand_adv_folder_list($(this).data('target')); });
         $('a', list_container).not('.adv_folder_link').off('click');
         $('a', list_container).not('.adv_folder_link').on("click", function() { adv_folder_select($(this).data('id')); return false; });
-        modifyInnerLists();
+        modifyInnerLists(foldersWrapper);
     }
 };
 
@@ -134,7 +135,7 @@ var adv_select_imap_folder = function(el) {
         $(this).find('.wrapper').append(checkboxesWrapper);
     });
 
-    modifyInnerLists();
+    modifyInnerLists(folders);
 
     $('.imap_folder_link', folders).addClass('adv_folder_link').removeClass('imap_folder_link');
     $('.adv_folder_list').html(folders.html());
@@ -150,8 +151,8 @@ var adv_select_imap_folder = function(el) {
     });
 };
 
-function modifyInnerLists() {
-    $('.adv_folder_list').find('.inner_list li').each(function(index) {
+function modifyInnerLists(foldersWrapper) {
+    foldersWrapper.find('.inner_list li').each(function(index) {
         const subFoldersCheckbox = `
         <span class="form-check form-text">
             <label class="form-check-label" for="include_subfolders-${index}">Include subfolders</label>

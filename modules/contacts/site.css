@@ -102,8 +102,8 @@
 
 @media (max-width: 767px) {
     .add_contact_responsive {
-        width: 100%;
-        margin: 10px 0;
+        width: 95vw;
+        margin: 10px;
     }
 }
 
@@ -152,6 +152,13 @@
     text-overflow: ellipsis;
 }
 
+.contact_name_fld {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 #contact_csv {
     width: 80%;
 }
@@ -161,9 +168,8 @@
 }
 
 .mobile .contact_list {
-    margin-left: 0px;
-    font-size: 125%;
-    width: 100%;
+    width: 95vw;
+    margin: auto;
 }
 
 .mobile .contact_controls img {
@@ -178,6 +184,10 @@
 
 .mobile .contact_fld {
     display: none;
+}
+
+.mobile .contact_name_fld {
+    max-width: 120px;
 }
 
 .contact_src {

@@ -169,7 +169,7 @@ class WebTest:
         try:
             # Wait for any loading indicators to disappear
             WebDriverWait(self.driver, 5).until_not(
-                lambda driver: len(driver.find_elements(By.CLASS_NAME, "loading_icon")) > 0
+                lambda driver: len(driver.find_elements(By.ID, "loading_indicator")) > 0
             )
         except:
             # Loading icon might not be present, continue
