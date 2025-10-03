@@ -99,7 +99,7 @@ class Hm_EWS {
                     'realname' => $name,
                     'namespace' => '',
                     'marked' => false, // doesn't seem to be used anywhere but imap returns it
-                    'noselect' => false, // all EWS folders are selectable 
+                    'noselect' => false, // all EWS folders are selectable
                     'can_have_kids' => true,
                     'has_kids' => $folder->getChildFolderCount() > 0,
                     'children' => $folder->getChildFolderCount(),
@@ -290,7 +290,7 @@ class Hm_EWS {
 
             if ($this->is_distinguished_folder($folder)) {
                 $folderObj = new Type\DistinguishedFolderIdType($folder);
-            } else {                
+            } else {
                 $folderObj = new Type\FolderIdType($folder);
             }
             $msg = new Type\MessageType();
@@ -344,6 +344,7 @@ class Hm_EWS {
         } else {
             $folderObj = new Type\FolderIdType($folder);
         }
+
         $request = array(
             'Traversal' => 'Shallow',
             'ItemShape' => array(
@@ -496,13 +497,34 @@ class Hm_EWS {
         }
         $request = Type::buildFromArray($request);
         $result = $this->ews->FindItem($request);
-        $messages = $result->getItems()->getMessage() ?? [];
-        if ($messages instanceof Type\MessageType) {
-            $messages = [$messages];
+        $items = [];
+        $responseItems = $result->getItems();
+
+        if (method_exists($responseItems, 'getMessage') && $messages = $responseItems->getMessage()) {
+            if (!is_array($messages)) {
+                $messages = [$messages];
+            }
+            $items = array_merge($items, $messages);
         }
-        $itemIds = array_map(function($msg) {
-            return bin2hex($msg->getItemId()->getId());
-        }, $messages);
+
+        if (method_exists($responseItems, 'getCalendarItem') && $calendarItems = $responseItems->getCalendarItem()) {
+            if (!is_array($calendarItems)) {
+                $calendarItems = [$calendarItems];
+            }
+            $items = array_merge($items, $calendarItems);
+        }
+
+        if (method_exists($responseItems, 'getMeetingRequest') && $meetingRequests = $responseItems->getMeetingRequest()) {
+            if (!is_array($meetingRequests)) {
+                $meetingRequests = [$meetingRequests];
+            }
+            $items = array_merge($items, $meetingRequests);
+        }
+
+        $itemIds = [];
+        foreach ($items as $item) {
+            $itemIds[] = bin2hex($item->getItemId()->getId());
+        }
         return [$result->getTotalItemsInView(), $itemIds];
     }
 
@@ -512,6 +534,7 @@ class Hm_EWS {
     }
 
     public function get_message_list($itemIds, $include_preview = false) {
+
         if (empty($itemIds)) {
             return [];
         }
@@ -537,58 +560,179 @@ class Hm_EWS {
                 }, $itemIds),
             ],
         );
+
         $request = Type::buildFromArray($request);
         $result = $this->ews->GetItem($request);
-        if ($result instanceof Type\MessageType) {
-            $result = [$result];
-        }
         $messages = [];
+
         foreach ($result as $message) {
             $flags = $this->extract_flags($message);
             $uid = bin2hex($message->getItemId()->getId());
-            $msg = [
-                'uid' => $uid,
-                'flags' => implode(' ', $flags),
-                'internal_date' => $message->getDateTimeCreated()->format('d-M-Y H:i:s O'),
-                'size' => $message->getSize(),
-                'date' => $message->getDateTimeReceived()->format('d-M-Y H:i:s O'),
-                'from' => $this->extract_mailbox($message->getFrom()),
-                'to' => $this->extract_mailbox($message->getToRecipients()),
-                'subject' => $message->getSubject(),
-                'content-type' => null,
-                'timestamp' => time(),
-                'charset' => null,
-                'x-priority' => null,
-                'google_msg_id' => null,
-                'google_thread_id' => null,
-                'google_labels' => null,
-                'list_archive' => null,
-                'references' => $message->getReferences(),
-                'message_id' => $message->getInternetMessageId(),
-                'x_auto_bcc' => null,
-                'x_snoozed'  => null,
-                'x_schedule' => null,
-                'x_profile_id' => null,
-                'x_delivery' => null,
-            ];
+            $msg = $this->getMessageProperties($message, $uid, $flags, $include_preview);
+            $messages[$uid] = $msg;
+        }
+        return $messages;
+    }
+
+    /**
+     * Extract message properties based on EWS item type
+     */
+    protected function getMessageProperties($message, $uid, $flags, $include_preview = false) {
+        $messageType = $this->detectMessageType($message);
+
+        $msg = [
+            'uid' => $uid,
+            'flags' => implode(' ', $flags),
+            'type_msg' => $messageType,
+            'timestamp' => time(),
+            'charset' => null,
+            'x-priority' => null,
+            'google_msg_id' => null,
+            'google_thread_id' => null,
+            'google_labels' => null,
+            'list_archive' => null,
+            'x_auto_bcc' => null,
+            'x_snoozed'  => null,
+            'x_schedule' => null,
+            'x_profile_id' => null,
+            'x_delivery' => null,
+        ];
+
+        switch ($messageType) {
+            case 'calendar':
+                $msg = array_merge($msg, $this->getCalendarProperties($message));
+                break;
+            case 'meeting_request':
+                $msg = array_merge($msg, $this->getMeetingRequestProperties($message));
+                break;
+            case 'message':
+            default:
+                $msg = array_merge($msg, $this->getRegularMessageProperties($message));
+                break;
+        }
+
+        $this->extractInternetHeaders($message, $msg);
+        $cset = '';
+        if (mb_stristr($msg['content-type'], 'charset=')) {
+            if (preg_match("/charset\=([^\s;]+)/", $msg['content-type'], $matches)) {
+                $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
+            }
+        }
+        $msg['charset'] = $cset;
+        $msg['preview_msg'] = $include_preview ? strip_tags($message->getBody()) : "";
+
+        return $msg;
+    }
+
+    /**
+     * Detect the type of EWS message/item
+     */
+    protected function detectMessageType($message) {
+        if ($message instanceof Type\CalendarItemType) {
+            return 'calendar';
+        } elseif ($message instanceof Type\MeetingRequestMessageType ||
+                  $message instanceof Type\MeetingResponseMessageType ||
+                  $message instanceof Type\MeetingCancellationMessageType) {
+            return 'meeting_request';
+        } elseif ($message instanceof Type\MessageType) {
+            return 'message';
+        } else {
+            return 'unknown';
+        }
+    }
+
+    /**
+     * Extract properties specific to regular messages
+     */
+    protected function getRegularMessageProperties($message) {
+        return [
+            'internal_date' => $message->getDateTimeCreated() ?
+                $message->getDateTimeCreated()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u'),
+            'size' => $message->getSize() ?: 0,
+            'date' => $message->getDateTimeReceived() ?
+                $message->getDateTimeReceived()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u'),
+            'from' => $message->getFrom() ? $this->extract_mailbox($message->getFrom()) : '',
+            'to' => $message->getToRecipients() ? $this->extract_mailbox($message->getToRecipients()) : '',
+            'subject' => $message->getSubject() ?: '',
+            'content-type' => null,
+            'references' => $message->getReferences() ?: null,
+            'message_id' => $message->getInternetMessageId() ?: null,
+        ];
+    }
+
+    /**
+     * Extract properties specific to calendar items
+     */
+    protected function getCalendarProperties($message) {
+        $props = [
+            'internal_date' => $message->getDateTimeCreated() ?
+                $message->getDateTimeCreated()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u'),
+            'size' => $message->getSize() ?: 0,
+            'date' => $message->getDateTimeReceived() ?
+                $message->getDateTimeReceived()->format('Y-m-d H:i:s.u') :
+                ($message->getStart() ? $message->getStart()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u')),
+            'from' => $message->getOrganizer() ? $this->extract_mailbox($message->getOrganizer()) : '',
+            'to' => $message->getRequiredAttendees() ? $this->extract_mailbox($message->getRequiredAttendees()) : '',
+            'subject' => $message->getSubject() ?: '',
+            'content-type' => null,
+            'references' => null,
+            'message_id' => null,
+        ];
+
+        return $props;
+    }
+
+    /**
+     * Extract properties specific to meeting requests
+     */
+    protected function getMeetingRequestProperties($message) {
+        $props = [
+            'internal_date' => $message->getDateTimeCreated() ?
+                $message->getDateTimeCreated()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u'),
+            'size' => $message->getSize() ?: 0,
+            'date' => $message->getDateTimeReceived() ?
+                $message->getDateTimeReceived()->format('Y-m-d H:i:s.u') : date('Y-m-d H:i:s.u'),
+            'from' => $message->getFrom() ? $this->extract_mailbox($message->getFrom()) : '',
+            'to' => $message->getToRecipients() ? $this->extract_mailbox($message->getToRecipients()) : '',
+            'subject' => $message->getSubject() ?: '',
+            'content-type' => null,
+            'references' => $message->getReferences() ?: null,
+            'message_id' => $message->getInternetMessageId() ?: null,
+        ];
+
+        return $props;
+    }
+
+    /**
+     * Extract internet message headers that may be present
+     */
+    protected function extractInternetHeaders($message, &$msg) {
+        if (method_exists($message, 'getInternetMessageHeaders') && $message->getInternetMessageHeaders()) {
+
             foreach ($message->getInternetMessageHeaders() as $header) {
-                foreach (['x-gm-msgid' => 'google_msg_id', 'x-gm-thrid' => 'google_thread_id', 'x-gm-labels' => 'google_labels', 'x-auto-bcc' => 'x_auto_bcc', 'message-id' => 'message_id', 'references' => 'references', 'x-snoozed' => 'x_snoozed', 'x-schedule' => 'x_schedule', 'x-profile-id' => 'x_profile_id', 'x-delivery' => 'x_delivery', 'list-archive' => 'list_archive', 'content-type' => 'content-type', 'x-priority' => 'x-priority'] as $hname => $key) {
-                    if (strtolower($header->getHeaderName()) == $hname) {
+                $headerMappings = [
+                    'x-gm-msgid' => 'google_msg_id',
+                    'x-gm-thrid' => 'google_thread_id',
+                    'x-gm-labels' => 'google_labels',
+                    'x-auto-bcc' => 'x_auto_bcc',
+                    'message-id' => 'message_id',
+                    'references' => 'references',
+                    'x-snoozed' => 'x_snoozed',
+                    'x-schedule' => 'x_schedule',
+                    'x-profile-id' => 'x_profile_id',
+                    'x-delivery' => 'x_delivery',
+                    'list-archive' => 'list_archive',
+                    'content-type' => 'content-type',
+                    'x-priority' => 'x-priority'
+                ];
+
+                foreach ($headerMappings as $hname => $key) {
+                    if (method_exists($header, 'getHeaderName') && strtolower($header->getHeaderName()) == $hname) {
                         $msg[$key] = (string) $header;
                     }
                 }
             }
-            $cset = '';
-            if (mb_stristr($msg['content-type'], 'charset=')) {
-                if (preg_match("/charset\=([^\s;]+)/", $msg['content-type'], $matches)) {
-                    $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
-                }
-            }
-            $msg['charset'] = $cset;
-            $msg['preview_msg'] = $include_preview ? strip_tags($message->getBody()) :  "";
-            $messages[$uid] = $msg;
         }
-        return $messages;
     }
 
     public function message_action($action, $itemIds, $folder=false, $keyword=false) {
@@ -616,7 +760,7 @@ class Hm_EWS {
                 break;
             case 'COPY':
                 $newIds = $this->copy_items($itemIds, $folder);
-                if ($newIds) {                
+                if ($newIds) {
                     foreach ($newIds as $key => $newId) {
                         $responses[] = ['oldUid' => $itemIds[$key], 'newUid' => $newId];
                     }
@@ -886,10 +1030,10 @@ class Hm_EWS {
             $struct[$part_num]['lines'] = substr_count($content, "\n");
             $struct[$part_num]['md5'] = '';
             $struct[$part_num]['disposition'] = $part->getContentDisposition();
-            
+
             if ($filename = $part->getFilename()) {
                 $struct[$part_num]['file_attributes'] = ['filename' => $filename];
-                
+
                 if ($part->getContentDisposition() == 'attachment') {
                     $struct[$part_num]['file_attributes']['attachment'] = true;
                 }
@@ -959,7 +1103,6 @@ class Hm_EWS {
             }
         } elseif (is_object($data) && method_exists($data, 'getMailbox')) {
             $mailbox = $data->getMailbox()->getMailbox();
-            
             $name = $mailbox->getName();
             $email = $mailbox->getEmailAddress();
             return $name ? $name . ' <' . $email . '>' : $email;
@@ -1022,7 +1165,7 @@ class Hm_EWS {
             } else {
                 $folderObj = new Type\FolderIdType(hex2bin($folder));
             }
-            
+
             $payload = [
                 'ArchiveSourceFolderId' => $folderObj->toArray(true),
                 'ItemIds' => [
@@ -1033,7 +1176,7 @@ class Hm_EWS {
             ];
 
             $request = Type::buildFromArray($payload);
-            
+
             try {
                 $result = $result && $this->ews->ArchiveItem($request);
             } catch (\Exception $e) {
@@ -1181,7 +1324,7 @@ class Hm_EWS {
         $itemIds = array_map(function($itemId) {
             return (new Type\ItemIdType(hex2bin($itemId)))->toArray();
         }, $itemIds);
-        $folders = null;
+        $folders = [];
         $request = [
             'ItemShape' => [
                 'BaseShape' => 'IdOnly',
@@ -1214,7 +1357,7 @@ if(!hm_exists('flatten_headers_to_string')) {
         if (!isset($headers[$key]) || !is_array($headers[$key])) {
             return isset($headers[$key]) ? $headers[$key] : '';
         }
-        
+
         $flattened_header = [];
         foreach ($headers[$key] as $to_item) {
             if (is_array($to_item)) {
