@@ -116,20 +116,27 @@ class Hm_MessagesStore {
             if (messagesReadyCB) {
                 messagesReadyCB(this);
             }
+
+            responses.forEach(response => {
+                response.resolvePromise(response);
+            });
         };
 
         await Promise.all(this.fetch(hideLoadingState).map((req) => {
-            return req.then((response) => {
-                pendingResponses.set(response.sourceId, response);
+            return new Promise((resolve) => {
+                req.then((response) => {
+                    response.resolvePromise = resolve;
+                    pendingResponses.set(response.sourceId, response);
 
-                if (processingTimeout) {
-                    clearTimeout(processingTimeout);
-                }
+                    if (processingTimeout) {
+                        clearTimeout(processingTimeout);
+                    }
 
-                // Process after a short delay to allow batching
-                processingTimeout = setTimeout(processPendingResponses, 10);
-            }, (error) => {
-                console.error('Error loading messages from source:', error);
+                    // Process after a short delay to allow batching
+                    processingTimeout = setTimeout(processPendingResponses, 10);
+                }, (error) => {
+                    console.error('Error loading messages from source:', error);
+                });
             });
         }));
 

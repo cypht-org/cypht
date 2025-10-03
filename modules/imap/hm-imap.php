@@ -2667,5 +2667,6 @@ if (!class_exists('Hm_IMAP')) {
 
             return false;
         }
+
     }
 }

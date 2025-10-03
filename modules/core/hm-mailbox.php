@@ -631,6 +631,13 @@ class Hm_Mailbox {
         return true;
     }
 
+    public function is_archive_folder($id, $user_config, $current_folder) {
+        if ($this->is_imap()) {
+            return is_imap_archive_folder($id, $user_config, $current_folder);
+        }
+        return false;
+    }
+
     public function get_config() {
         return $this->config;
     }

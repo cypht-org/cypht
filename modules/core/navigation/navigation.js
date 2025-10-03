@@ -40,14 +40,24 @@ window.addEventListener('load', function() {
 
 
 $(document).on('click', '.cypht-layout a', function(event) {
-    if ($(this).attr('href') !== "#" && $(this).attr('target') !== '_blank' && !$(this).data('external')) {
+    const href = $(this).attr('href');
+    const target = $(this).attr('target');
+    const isExternal = $(this).data('external');
+    
+    const isExternalDomain = href && (
+        href.startsWith('http://') || 
+        href.startsWith('https://') || 
+        href.startsWith('//')
+    ) && !href.includes(window.location.hostname);
+    
+    if (href !== "#" && target !== '_blank' && !isExternal && !isExternalDomain) {
         event.preventDefault();
         const currentUrl = new URL(window.location.href);
         const currentPage = currentUrl.searchParams.toString();
-        const target = new URLSearchParams($(this).attr('href').split('?')[1]);
-        if (currentPage !== target.toString()) {
+        const targetParams = new URLSearchParams(href.split('?')[1]);
+        if (currentPage !== targetParams.toString()) {
             Hm_Ajax.abort_all_requests();
-            navigate(autoAppendParamsForNavigation($(this).attr('href')));
+            navigate(autoAppendParamsForNavigation(href));
         }
     }
 });

@@ -97,16 +97,18 @@ class Hm_Handler_autocomplete_contact extends Hm_Handler_Module {
  */
 class Hm_Handler_find_message_contacts extends Hm_Handler_Module {
     public function process() {
-        $contacts = array();
         $existing = $this->get('contact_store');
         $addr_headers = array('to', 'cc', 'bcc', 'sender', 'reply-to', 'from');
         $headers = $this->get('msg_headers', array());
         $addresses = array();
         foreach ($headers as $name => $value) {
             if (in_array(mb_strtolower($name), $addr_headers, true)) {
-                foreach (Hm_Address_Field::parse($value) as $vals) {
-                    if (!$existing->search(array('email_address' => $vals['email']))) {
-                        $addresses[] = $vals;
+                $values = is_array($value) ? $value : array($value);
+                foreach ($values as $val) {
+                    foreach (Hm_Address_Field::parse($val) as $v) {
+                        if (!$existing->search(array('email_address' => $v['email']))) {
+                            $addresses[] = $v;
+                        }
                     }
                 }
             }
@@ -391,7 +393,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                         '<i class="bi bi-person-fill"></i> '.
                         '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
                         ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
-                        '</td><td>' . $this->html_safe($name) . '</td>' .
+                        '</td><td class="contact_name_fld" data-title="' . $this->html_safe($name) . '">' . $this->html_safe($name) . '</td>' .
                         '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
                         '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
                         $this->html_safe($c->value('phone_number')).'</a></td>'.
@@ -411,8 +413,7 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                             $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
                         }
                         
-                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger ms-2"></i></a>'.
-                            '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-pencil-square ms-2"></i></a>';
+                        $res .= '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
                     }
 
                     $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
@@ -424,7 +425,11 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                     }
                     
                     $res .= '<a href="'.$send_to_url.'" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-                        '<i class="bi bi-envelope-arrow-up ms-2"></i></a>';
+                        '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+                    
+                    if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer ms-3" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger"></i></a>';
+                    }
 
                     $res .= '</td></tr>';
                     $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';

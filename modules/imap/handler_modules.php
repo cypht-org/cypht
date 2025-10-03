@@ -559,9 +559,29 @@ class Hm_Handler_imap_message_list_type extends Hm_Handler_Module {
                     if (array_key_exists('folder_label', $this->request->get)) {
                         $folder = $this->request->get['folder_label'];
                         $this->out('folder_label', $folder);
+                    } else {
+                        $folder = hex2bin($parts[2]);
                     }
+                    
                     $mailbox = Hm_IMAP_List::get_mailbox_without_connection($details);
                     $label = $mailbox->get_folder_name($folder);
+                    if(!$label) {
+                        if ($this->config->get('allow_session_cache', false)) {
+                            $paths = explode("_", $path);
+                            $short_path = $paths[0] . "_" . $paths[1] . "_";
+                            $cached_folders = $this->cache->get('imap_folders_'.$short_path, true);
+                            $label = !empty($cached_folders[$folder]['name']) ? $cached_folders[$folder]['name'] : '';
+                        } else {
+                            Hm_Msgs::add('Folder name loaded directly from the server. This may be slower. Enable session caching for better performance.', 'warning');
+                            if (isset($details['type']) && $details['type'] === 'ews') {
+                                $connected_mailbox = Hm_IMAP_List::get_connected_mailbox($parts[1], $this->cache);
+                                if ($connected_mailbox && $connected_mailbox->authed()) {
+                                    $folder_status = $connected_mailbox->get_folder_status($folder, false);
+                                    $label = $folder_status['name'] ?? null;
+                                }
+                            }
+                        }
+                    }
                     $title = array(strtoupper($details['type'] ?? 'IMAP'), $details['name'], $label);
                     if ($this->get('list_page', 0)) {
                         $title[] = sprintf('Page %d', $this->get('list_page', 0));
@@ -932,7 +952,7 @@ class Hm_Handler_imap_archive_message extends Hm_Handler_Module {
         }
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($form['imap_server_id'], $this->cache);
-        if ($mailbox && ! $mailbox->is_imap() && empty($archive_folder)) {
+        if ($mailbox && ! $mailbox->is_imap()) {
             // EWS supports archiving to user archive folders
             $status = $mailbox->message_action($form_folder, 'ARCHIVE', array($form['imap_msg_uid']))['status'];
         } else {
@@ -1588,6 +1608,7 @@ class Hm_Handler_save_ews_server extends Hm_Handler_Module {
                 ];
                 $this->user_config->set('special_imap_folders', $specials);
             }
+            Hm_Msgs::add("EWS server saved. To preserve these settings after logout, please go to <a class='alert-link' href='/?page=save'>Save Settings</a>.");
             $this->session->record_unsaved('EWS server added');
             $this->session->secure_cookie($this->request, 'hm_reload_folders', '1');
         }
@@ -1925,6 +1946,8 @@ class Hm_Handler_imap_message_content extends Hm_Handler_Module {
                     $save_reply_text = true;
                 }
                 $msg_headers = $mailbox->get_message_headers(hex2bin($form['folder']), $form['imap_msg_uid']);
+
+                $this->out('is_archive_folder', $mailbox->is_archive_folder($form['imap_server_id'], $this->user_config, $form['folder']));
                 $this->out('folder_status', array('imap_'.$form['imap_server_id'].'_'.$form['folder'] => $mailbox->get_folder_state()));
                 $this->out('msg_struct', $msg_struct);
                 $this->out('list_headers', get_list_headers($msg_headers));
@@ -1990,6 +2013,7 @@ class Hm_Handler_imap_store_reply_details extends Hm_Handler_Module {
 
         $mailbox = Hm_IMAP_List::get_connected_mailbox($server_id, $this->cache);
         if ($mailbox && $mailbox->authed()) {
+            $prefetch = true;
             $mailbox->set_read_only($prefetch);
             $part = false;
             list($msg_struct, $msg_struct_current, $msg_text, $part) = $mailbox->get_structured_message(hex2bin($folder), $uid, $part, $this->user_config->get('text_only_setting', false));

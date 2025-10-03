@@ -195,13 +195,23 @@ function applySmtpComposePageHandlers() {
     if ($('.compose_cc').val() || $('.compose_bcc').val()) {
         toggle_recip_flds();
     }
+    // Handle focus management for different compose scenarios
     if (window.location.href.search('&reply=1') !== -1 || window.location.href.search('&reply_all=1') !== -1) {
         replace_cursor_positon ($('textarea[name="compose_body"]'));
     }
-    if (window.location.href.search('&forward=1') !== -1) {
+    else if (window.location.href.search('&forward=1') !== -1) {
+        replace_cursor_positon ($('textarea[name="compose_body"]'));
         setTimeout(function() {
             save_compose_state();
         }, 100);
+    }
+    else {
+        var toField = $('.compose_to');
+        if (toField.val().trim() === '') {
+            toField.focus();
+        } else {
+            $('textarea[name="compose_body"]').focus();
+        }
     }
     if ($('.sys_messages').text() != 'Message Sent') {
         get_smtp_profile($('.compose_server').val());

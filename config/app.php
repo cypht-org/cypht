@@ -434,7 +434,9 @@ return [
     | 'cache_class' => env('CACHE_CLASS')
     */
 
+    'allow_session_cache' => env('ALLOW_SESSION_CACHE', false),
 
+    'cache_class' => env('CACHE_CLASS'),
     /*
     | -------------
     | Redis Support
