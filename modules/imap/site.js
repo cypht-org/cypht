@@ -922,7 +922,7 @@ var search_selected_for_imap = function() {
         $('.imap_move').on("click", function() { return false; });
         bootstrap.Dropdown.getOrCreateInstance($('.move_to_location')[0]).hide();
         $('.move_to_location').html('');
-    }
+    }es                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 };
 
 var unselect_non_imap_messages = function() {

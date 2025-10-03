@@ -418,6 +418,56 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                     $txt .= '<span class="btn btn-sm" data-bs-toogle="tooltip" title="This functionality requires the email server support &quot;Sieve&quot; technology which is not provided. Contact your email provider to fix it or enable it if supported."><i class="bi bi-lock-fill"></i> <span id="filter_block_txt">'.$this->trans('Block Sender').'</span></span>';
                 }
             }
+
+            $txt .= '<a class="hLink text-decoration-none btn btn-sm btn-outline-secondary dropdown-toggle" '
+                . 'id="filter_message" href="#" data-bs-toggle="dropdown" aria-expanded="false">'
+                . $this->trans('Filter similar messages')
+                . '</a>'
+                . '<div class="dropdown-menu move_to_location p-3">'
+                . '<form class="filter-form" style="min-width:260px;">'
+
+                // From (enabled, checked by default)
+                . '<div class="form-check mb-1">'
+                . '<input class="form-check-input" type="checkbox" id="use_from" checked>'
+                . '<input type="hidden" name="from" value="' . htmlspecialchars($sender) . '">'
+                . '<label class="form-check-label small" for="use_from">'
+                . $this->trans('From:') . ' ' . htmlspecialchars($sender)
+                . '</label>'
+                . '</div>'
+
+                // To (disabled by default)
+                . '<div class="form-check mb-1">'
+                . '<input class="form-check-input" type="checkbox" id="use_to" >'
+                . '<input type="hidden" name="to" value="' . htmlspecialchars($headers['To']) . '">'
+                . '<label class="form-check-label small text-muted" for="use_to">'
+                . $this->trans('To:') . ' ' . $headers['To']
+                . '</label>'
+                . '</div>'
+
+                // Subject (disabled by default)
+                . '<div class="form-check mb-1">'
+                . '<input class="form-check-input" type="checkbox" id="use_subject" >'
+                . '<input type="hidden" name="subject" value="' . htmlspecialchars($headers['Subject']) . '">'
+                . '<label class="form-check-label small text-muted" for="use_subject">'
+                . $this->trans('Subject contains:') . ' ' . $headers['Subject']
+                . '</label>'
+                . '</div>'
+
+                // Reply-To (disabled by default)
+                . '<div class="form-check mb-2">'
+                . '<input class="form-check-input" type="checkbox" id="use_reply" >'
+                . '<input type="hidden" name="reply-to" value="' . htmlspecialchars($headers['Reply-To']) . '">'
+                . '<label class="form-check-label small text-muted" for="use_reply">'
+                . $this->trans('Reply-To:') . ' ' . $headers['Reply-To']
+                . '</label>'
+                . '</div>'
+
+                . '<button type="submit" class="btn btn-primary btn-sm">'
+                . $this->trans('Create filter')
+                . '</button>'
+                . '</form>'
+                . '</div>';
+
             $txt .= '<a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="show_message_source" href="#">' . $this->trans('Show Source') . '</a>';
 
             $txt .= '</div><span id="extra-header-buttons"></span>';
