@@ -54,7 +54,8 @@ class LoginTests(WebTest):
         self.wait()
         self.safari_workaround()
         self.wait_on_class('sys_messages')
-        assert self.by_class('sys_messages') != None
+        sys_messages = self.by_class('sys_messages')
+        assert sys_messages is not None
 
 if __name__ == '__main__':
 
