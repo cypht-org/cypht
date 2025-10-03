@@ -605,14 +605,17 @@ class Hm_EWS {
             'x_schedule' => null,
             'x_profile_id' => null,
             'x_delivery' => null,
+            'type_msg' => '',
         ];
 
         switch ($messageType) {
             case 'calendar':
                 $msg = array_merge($msg, $this->getCalendarProperties($message));
+                $msg['type_msg'] = 'calendar';
                 break;
             case 'meeting_request':
                 $msg = array_merge($msg, $this->getMeetingRequestProperties($message));
+                $msg['type_msg'] = 'calendar';
                 break;
             case 'message':
             default:
