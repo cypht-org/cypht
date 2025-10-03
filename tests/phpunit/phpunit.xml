@@ -3,6 +3,11 @@
   <php>
       <const name="CYPHT_PHPUNIT_TEST_MODE" value="phpunit"/>
   </php>
+  <coverage>
+    <report>
+      <clover outputFile="./clover.xml"/>
+    </report>
+  </coverage>
   <testsuites>
     <testsuite name="session">
       <file>./session.php</file>
