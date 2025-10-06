@@ -1358,6 +1358,11 @@ class Hm_Handler_imap_message_list extends Hm_Handler_Module {
         foreach ($ids as $key => $id) {
             $details = Hm_IMAP_List::dump($id);
             $mailbox = Hm_IMAP_List::get_connected_mailbox($id, $this->cache);
+
+            if (!$mailbox || !$mailbox->authed()) {
+                continue; // Skip this server if connection failed
+            }
+
             if($this->get('list_path') == 'snoozed' && !$mailbox->folder_exists('Snoozed')) {
                 continue;
             }
