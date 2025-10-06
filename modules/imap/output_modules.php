@@ -1649,6 +1649,23 @@ class Hm_Output_setting_active_preview_message extends Hm_Output_Module {
         return $res;
     }
 }
+
+class Hm_Output_setting_active_body_structure extends Hm_Output_Module {
+    protected function output() {
+        $settings = $this->get('user_settings', array());
+        $checked = "checked";
+        if (array_key_exists('active_body_structure', $settings)) {
+            if (!$settings['active_body_structure']) {
+                $checked = "";
+            }
+        }
+
+        $res = '<tr class="general_setting"><td><label for="active_body_structure">'.
+            $this->trans('Analyze the structure of the message (BODYSTRUCTURE)').'</label></td><td><input class="form-check-input" type="checkbox" role="switch" id="active_body_structure" name="active_body_structure" '.$checked.' ></td></tr>';
+        return $res;
+    }
+}
+
 class Hm_Output_setting_ceo_detection_fraud extends Hm_Output_Module {
     protected function output() {
         $settings = $this->get('user_settings', array());
