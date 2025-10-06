@@ -130,16 +130,7 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # Try calendar_content_title first, then fallback to content_title
-        try:
-            calendar_title = self.by_class('calendar_content_title')
-            title_text = calendar_title.text
-            assert 'Calendar' in title_text, f"Expected 'Calendar' in calendar title, got: '{title_text}'"
-        except:
-            # Fallback: check content_title for calendar-related text
-            content_title = self.by_class('content_title')
-            title_text = content_title.text.strip()
-            assert 'Calendar' in title_text, f"Expected 'Calendar' in content title, got: '{title_text}'"
+        assert self.by_class('calendar_content_title').text == 'Calendar'
 
     def history(self):
         if not self.mod_active('history'):
@@ -150,10 +141,7 @@ class PageTests(WebTest):
         self.wait_with_folder_list()
         self.safari_workaround()
         self.wait_for_navigation_to_complete()
-        # More flexible text matching for history page
-        content_title = self.by_class('content_title')
-        title_text = content_title.text.strip()
-        assert 'Message history' in title_text or 'History' in title_text, f"Expected 'Message history' or 'History' in title, got: '{title_text}'"
+        assert 'Message history' in self.by_class('content_title').text
 
     def home(self):
         list_item = self.by_class('menu_home')
