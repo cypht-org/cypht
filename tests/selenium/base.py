@@ -59,6 +59,11 @@ class WebTest:
                 print(" - Could not maximize Safari")
 
     def mod_active(self, name):
+        # debug self.modules
+        echo = " - modules enabled: "
+        for mod in self.modules:
+            echo += mod + " "
+        print(echo) 
         if name in self.modules:
             return True
         print(" - module not enabled: %s" % name)
