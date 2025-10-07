@@ -338,6 +338,7 @@ function sieveFiltersPageHandler() {
     /**************************************************************************************
          *                             BOOTSTRAP SCRIPT MODAL
          **************************************************************************************/
+    const save_filter = Hm_Filters.save_filter;
     var edit_script_modal = new Hm_Modal({
         size: 'xl',
         modalId: 'myEditScript'
@@ -382,154 +383,142 @@ function sieveFiltersPageHandler() {
     });
 
 
-    function ordinal_number(n)
-    {
-        let ord = 'th';
 
-        if (n % 10 == 1 && n % 100 != 11) {
-            ord = 'st';
-        } else if (n % 10 == 2 && n % 100 != 12) {
-            ord = 'nd';
-        } else if (n % 10 == 3 && n % 100 != 13) {
-            ord = 'rd';
-        }
-
-        return n + ord;
-    }
 
     /**************************************************************************************
      *                                    FUNCTIONS
      **************************************************************************************/
-    function save_filter(imap_account, gen_script = false) {
-        let validation_failed = false
-        let conditions_parsed = []
-        let actions_parsed = []
-        let conditions = $('select[name^=sieve_selected_conditions_field]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
+   
+    // function save_filter(imap_account, gen_script = false) {
+    //     let validation_failed = false
+    //     let conditions_parsed = []
+    //     let actions_parsed = []
+    //     let conditions = $('select[name^=sieve_selected_conditions_field]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
 
-        let conditions_type = $('select[name^=sieve_selected_conditions_options]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
+    //     let conditions_type = $('select[name^=sieve_selected_conditions_options]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
 
-        let conditions_value = $('input[name^=sieve_selected_option_value]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
+    //     let conditions_value = $('input[name^=sieve_selected_option_value]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
 
-        let conditions_extra_value = $('input[name^=sieve_selected_extra_option_value]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
+    //     let conditions_extra_value = $('input[name^=sieve_selected_extra_option_value]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
 
-        let idx = 0;
-        if (conditions.length === 0) {
-            Hm_Notices.show('You must provide at least one condition', 'warning');
-            return false;
-        }
+    //     let idx = 0;
+    //     if (conditions.length === 0) {
+    //         Hm_Notices.show('You must provide at least one condition', 'warning');
+    //         return false;
+    //     }
 
-        conditions.forEach(function (elem, key) {
-            if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
-                let order = ordinal_number(key + 1);
-                let previous_messages = $('.sys_messages').html();
-                previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' condition (' + elem + ') must be provided', 'warning');
-                validation_failed = true;
-            }
-             conditions_parsed.push(
-                 {
-                     'condition': elem,
-                     'type': conditions_type[idx],
-                     'extra_option': conditions[idx].extra_option,
-                     'extra_option_value': conditions_extra_value[idx],
-                     'value': conditions_value[idx]
-                 }
-             )
-            idx = idx + 1;
-        });
+    //     conditions.forEach(function (elem, key) {
+    //         if (conditions_value[idx] === "" && conditions_value[idx] !== 'none') {
+    //             let order = ordinal_number(key + 1);
+    //             let previous_messages = $('.sys_messages').html();
+    //             previous_messages += previous_messages ? '<br>': '';
+    //             Hm_Notices.show('The ' + order + ' condition (' + elem + ') must be provided', 'warning');
+    //             validation_failed = true;
+    //         }
+    //          conditions_parsed.push(
+    //              {
+    //                  'condition': elem,
+    //                  'type': conditions_type[idx],
+    //                  'extra_option': conditions[idx].extra_option,
+    //                  'extra_option_value': conditions_extra_value[idx],
+    //                  'value': conditions_value[idx]
+    //              }
+    //          )
+    //         idx = idx + 1;
+    //     });
 
-        let actions_type = $('select[name^=sieve_selected_actions]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
-        let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
-        let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
-            return $(elem).attr('type');
-        }).get();
-        let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
-            return $(elem).val();
-        }).get();
+    //     let actions_type = $('select[name^=sieve_selected_actions]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
+    //     let actions_value = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
+    //     let actions_field_type = $('[name^=sieve_selected_action_value]').map(function(idx, elem) {
+    //         return $(elem).attr('type');
+    //     }).get();
+    //     let actions_extra_value = $('input[name^=sieve_selected_extra_action_value]').map(function(idx, elem) {
+    //         return $(elem).val();
+    //     }).get();
 
-        if (actions_type.length === 0) {
-            Hm_Notices.show('You must provide at least one action', 'warning');
-            return false;
-        }
+    //     if (actions_type.length === 0) {
+    //         Hm_Notices.show('You must provide at least one action', 'warning');
+    //         return false;
+    //     }
 
-        idx = 0;
-        actions_type.forEach(function (elem, key) {
-            console.log(actions_field_type[idx])
-            if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
-                let order = ordinal_number(key + 1);
-                let previous_messages = $('.sys_messages').html();
-                previous_messages += previous_messages ? '<br>': '';
-                Hm_Notices.show('The ' + order + ' action (' + elem + ') must be provided', 'waring');
-                validation_failed = true;
-            }
-            actions_parsed.push(
-                {
-                    'action': elem,
-                    'value': actions_value[idx],
-                    'extra_option': actions_type[idx].extra_option,
-                    'extra_option_value': actions_extra_value[idx],
-                }
-            )
-            idx = idx + 1;
-        });
+    //     idx = 0;
+    //     actions_type.forEach(function (elem, key) {
+    //         console.log(actions_field_type[idx])
+    //         if (actions_value[idx] === "" && actions_field_type[idx] !== 'hidden') {
+    //             let order = ordinal_number(key + 1);
+    //             let previous_messages = $('.sys_messages').html();
+    //             previous_messages += previous_messages ? '<br>': '';
+    //             Hm_Notices.show('The ' + order + ' action (' + elem + ') must be provided', 'waring');
+    //             validation_failed = true;
+    //         }
+    //         actions_parsed.push(
+    //             {
+    //                 'action': elem,
+    //                 'value': actions_value[idx],
+    //                 'extra_option': actions_type[idx].extra_option,
+    //                 'extra_option_value': actions_extra_value[idx],
+    //             }
+    //         )
+    //         idx = idx + 1;
+    //     });
 
-        if ($('#stop_filtering').is(':checked')) {
-            actions_parsed.push(
-                {
-                    'action': "stop",
-                    'value': "",
-                    'extra_option': "",
-                    'extra_option_value': "",
-                }
-            )
-        }
-        if ($('.modal_sieve_filter_name').val() == "") {
-            Hm_Notices.show('Filter name is required', 'danger');
-            return false;
-        }
+    //     if ($('#stop_filtering').is(':checked')) {
+    //         actions_parsed.push(
+    //             {
+    //                 'action': "stop",
+    //                 'value': "",
+    //                 'extra_option': "",
+    //                 'extra_option_value': "",
+    //             }
+    //         )
+    //     }
+    //     if ($('.modal_sieve_filter_name').val() == "") {
+    //         Hm_Notices.show('Filter name is required', 'danger');
+    //         return false;
+    //     }
 
-        if (validation_failed) {
-            return false;
-        }
+    //     if (validation_failed) {
+    //         return false;
+    //     }
 
-        Hm_Ajax.request(
-            [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_filter'},
-                {'name': 'imap_account', 'value': imap_account},
-                {'name': 'sieve_filter_name', 'value': $('.modal_sieve_filter_name').val()},
-                {'name': 'sieve_filter_priority', 'value': $('.modal_sieve_filter_priority').val()},
-                {'name': 'is_editing_filter', 'value': is_editing_filter},
-                {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
-                {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
-                {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
-                {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
-                {'name': 'gen_script', 'value': gen_script},
-            ],
-            function(res) {
-                if (Object.keys(res.script_details).length === 0) {
-                    window.location = window.location;
-                } else {
-                    edit_script_modal.open();
-                    $('.modal_sieve_script_textarea').val(res.script_details.gen_script);
-                    $('.modal_sieve_script_name').val(res.script_details.filter_name);
-                    $('.modal_sieve_script_priority').val(res.script_details.filter_priority);
-                }
-            }
-        );
+    //     Hm_Ajax.request(
+    //         [   {'name': 'hm_ajax_hook', 'value': 'ajax_sieve_save_filter'},
+    //             {'name': 'imap_account', 'value': imap_account},
+    //             {'name': 'sieve_filter_name', 'value': $('.modal_sieve_filter_name').val()},
+    //             {'name': 'sieve_filter_priority', 'value': $('.modal_sieve_filter_priority').val()},
+    //             {'name': 'is_editing_filter', 'value': is_editing_filter},
+    //             {'name': 'current_editing_filter_name', 'value': current_editing_filter_name},
+    //             {'name': 'conditions_json', 'value': JSON.stringify(conditions_parsed)},
+    //             {'name': 'actions_json', 'value': JSON.stringify(actions_parsed)},
+    //             {'name': 'filter_test_type', 'value': $('.modal_sieve_filter_test').val()},
+    //             {'name': 'gen_script', 'value': gen_script},
+    //         ],
+    //         function(res) {
+    //             if (Object.keys(res.script_details).length === 0) {
+    //                 window.location = window.location;
+    //             } else {
+    //                 edit_script_modal.open();
+    //                 $('.modal_sieve_script_textarea').val(res.script_details.gen_script);
+    //                 $('.modal_sieve_script_name').val(res.script_details.filter_name);
+    //                 $('.modal_sieve_script_priority').val(res.script_details.filter_priority);
+    //             }
+    //         }
+    //     );
 
-        return true;
-    }
+    //     return true;
+    // }
 
     function save_script(imap_account) {
         if ($('.modal_sieve_script_name').val() === "") {
