@@ -9,6 +9,7 @@
 if (!defined('DEBUG_MODE')) { die(); }
 
 require APP_PATH.'modules/contacts/hm-contacts.php';
+require APP_PATH.'modules/contacts/functions.php';
 
 /**
  * @subpackage contacts/handler
@@ -227,10 +228,86 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
         foreach ($contact_source_list as $value) {
             $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source='.$this->html_safe($value).'">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
         }
+        $res = '<div class="app-container">';
+        $res .= '<div class="container-fluid py-5">';
+        // $res .= '<div class="row mb-4">';
+        // $res .= '<div class="col-12">';
+        // $res .= '<div class="text-center">';
+        // $res .= '<h1 class="app-title mb-3">Gestion des Contacts</h1>;';
+        // $res .= '<p class="app-subtitle">Organisez vos contacts par catégorie</p>';
+        // $res .= '</div>';
+        // $res .= '</div>';
+        // $res .= '</div>';
+        // category tabs starts here
+        $res .= '<div class="row mb-4">';
+        $res .= '<div class="col-12 px-0">';
+        // start Tabs
+        // $res .= '<div class="category-tabs-container">';
+        // $res .= '<div class="category-tabs">';
 
-        return '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
-            '<i class="bi bi-download" width="16" height="16" onclick="listControlsMenu()"></i></a></div></div>'.
-            '<div class="list_actions">'.$actions.'</div>';
+        // $res .= '<button class="category-tab active">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= 'Categorie 1 icon';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Categorie 1';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Categorie 1 description';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '2';
+        // $res .= '</div>';
+        // $res .= '/<button>';
+
+        // $res .= '<button class="category-tab">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= 'Categorie 2 icon';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Categorie 2';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Categorie 2 description';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '4';
+        // $res .= '</div>';
+        // $res .= '/<button>';
+
+        // $res .= '<button class="category-tab">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= 'Categorie 3 icon';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Categorie 3';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Categorie 3 description';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '6';
+        // $res .= '</div>';
+        // $res .= '/<button>';
+
+        // $res .= '</div>';
+        // $res .= '</div>';
+
+        return $res;
+        // end tabs
+
+        // $res .= '</div>';
+        // $res .= '</div>';
+
+        // return '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
+        //     '<i class="bi bi-download" width="16" height="16" onclick="listControlsMenu()"></i></a></div></div>'.
+        //     '<div class="list_actions">'.$actions.'</div>';
     }
 }
 
@@ -239,7 +316,10 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
  */
 class Hm_Output_contacts_content_end extends Hm_Output_Module {
     protected function output() {
-        return '</div>';
+        
+        $res = '</div>';
+        $res .= '</div>';
+        return $res;
     }
 }
 
@@ -340,21 +420,10 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         }
         $per_page = 25;
         $current_page = $this->get('contact_page', 1);
-        $res = '<div class="px-3 mt-3"><table class="contact_list table">';
-        $modal = '';
-        if ($imported_contact) {
-            $res .=
-            '<tr class="contact_import_detail"><td colspan="7"><a href="#" class="show_import_detail text-danger" data-bs-toggle="modal" data-bs-target="#importDetailModal">'.$this->trans('More info about import operation').'</a></td></tr>';
-            $modal .=  get_import_detail_modal_content($this, $imported_contact);
-        }
-
-        $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
-
 
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
 
-        $res = '<div class="contact-group contact-group-effect-scale contact-group-theme-1">';
         $tabIndex = 1;
         $contactGroups = [];
         if ($contacts) {
@@ -365,99 +434,369 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
                 $contactGroups[$key][] = $contact;
             }
         }
-        
-        foreach ($contactGroups as $group => $groupContacts) {
-            $res .= '<input type="radio" name="contact-group" ' . ($tabIndex === 1 ? 'checked ' : '') . 'id="tab' . $tabIndex . '" class="' . ($tabIndex === 1 ? 'tab-content-first' : 'tab-content-' . $tabIndex) . '">';
-            $res .= '<label for="tab' . $tabIndex . '">' . $this->html_safe($group) . '</label>';
 
+        $collectedRecipientsContacts = [];
+        $trustedSendersContacts = [];
+        $personalAddressesContacts = [];
+        $tabsHtml = '';
+
+        foreach ($contactGroups as $groupName => $groupContacts) {
+            switch (strtolower($groupName)) {
+                case 'collected recipients':
+                    $collectedRecipientsContacts = $groupContacts;
+                    break;
+                case 'trusted senders':
+                    $trustedSendersContacts = $groupContacts;
+                    break;
+                case 'personal addresses':
+                    $personalAddressesContacts = $groupContacts;
+                    break;
+                default:
+                    $personalAddressesContacts = array_merge($personalAddressesContacts, $groupContacts);
+                    break;
+            }
+        }
+
+        $predefinedTabs = [
+            ['Collected Recipients', $collectedRecipientsContacts, 'collected-recipients', 'bi-people-fill'],
+            ['Trusted Senders', $trustedSendersContacts, 'trusted-senders', 'bi-person-check-fill'],
+            ['Personal Addresses', $personalAddressesContacts, 'personal-addresses', 'bi-person-badge-fill']
+        ];
+
+        $tabIndex = 1;
+        foreach ($predefinedTabs as $tabData) {
+            list($groupName, $groupContacts, $targetId, $iconClass) = $tabData;
+            
+            $activeClass = (strtolower($groupName) === 'collected recipients') ? ' active' : '';
+            
+            $contactCount = array_sum(array_map('count', $groupContacts));
+            
+            $tabsHtml .= '<button class="category-tab tab-'.$targetId.$activeClass.'" data-target="'.$targetId.'">';
+            $tabsHtml .= '<div class="tab-icon">';
+            $tabsHtml .= '<i class="bi ' . $iconClass . '"></i>';
+            $tabsHtml .= '</div>';
+            $tabsHtml .= '<div class="tab-content">';
+            $tabsHtml .= '<h3 class="tab-title">';
+            $tabsHtml .= htmlspecialchars($groupName);
+            $tabsHtml .= '</h3>';
+            $tabsHtml .= '<p class="tab-description">';
+            $tabsHtml .= 'Description for '.htmlspecialchars($groupName);
+            $tabsHtml .= '</p>';
+            $tabsHtml .= '</div>';
+            $tabsHtml .= '<div class="tab-badge">';
+            $tabsHtml .= $contactCount;
+            $tabsHtml .= '</div>';
+            $tabsHtml .= '</button>';
             $tabIndex++;
         }
-        $tabIndex = 1;
-        $res .= '<ul>';
 
-        foreach ($contactGroups as $group => $groupContacts) {
+        $res = '<div class="category-tabs-container">';
+        $res .= '<div class="category-tabs">';
+        $res .= $tabsHtml;
+        // $res .= '<button class="category-tab tab-collected active">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= '<i class="bi bi-people-fill"></i>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Collected Sender';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Contacts collectés automatiquement';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '2';
+        // $res .= '</div>';
+        // $res .= '</button>';
 
-            $res .= '<li class="tab-content '.($tabIndex === 1 ? 'tab-content-first' : 'tab-content-'.$tabIndex).' typography">';
-            $res .= '<table class="contact_list">';
-            $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
-            foreach ($groupContacts as $contact) {
-                foreach ($contact as $c) {
+        // $res .= '<button class="category-tab tab-trusted">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= '<i class="bi bi-person-check-fill"></i>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Trusted Sender';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Expéditeurs de confiance';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '4';
+        // $res .= '</div>';
+        // $res .= '</button>';
+
+        // $res .= '<button class="category-tab tab-trusted-senders">';
+        // $res .= '<div class="tab-icon">';
+        // $res .= '<i class="bi bi-person-badge-fill"></i>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-content">';
+        // $res .= '<h3 class="tab-title">';
+        // $res .= 'Trusted Senders';
+        // $res .= '</h3>';
+        // $res .= '<p class="tab-description">';
+        // $res .= 'Expéditeurs hautement fiables';
+        // $res .= '</p>';
+        // $res .= '</div>';
+        // $res .= '<div class="tab-badge">';
+        // $res .= '6';
+        // $res .= '</div>';
+        // $res .= '</button>';
+
+        $res .= '</div>';
+        $res .= '</div>';
+
+        $res .= '<div class="row p-3">';
+        $res .= '<div class="col-12 px-0">';
+
+        $contactGroupsToDisplay = [
+            'list-collected' => ['Collected Recipients', $collectedRecipientsContacts, 'collected-recipients', true],
+            'list-trusted-senders' => ['Trusted Senders', $trustedSendersContacts, 'trusted-senders', false],
+            'list-personal' => ['Personal Addresses', $personalAddressesContacts, 'personal-addresses', false]
+        ];
+
+        foreach ($contactGroupsToDisplay as $containerClass => $groupData) {
+            list($listTitle, $contactsToShow, $contentId, $isActive) = $groupData;
+            $activeClass = $isActive ? ' active' : '';
+            
+            $contactCount = array_sum(array_map('count', $contactsToShow));
+            
+            $res .= '<div id="' . $contentId . '" class="contact-list-container ' . $containerClass . ' tab-content-section' . $activeClass . '">';
+
+            $res .= '<div class="contact-list-header">';
+            $res .= '<h2 class="list-title">';
+            $res .= $listTitle;
+            $res .= '</h2>';
+            $res .= '<span class="list-count">';
+            $res .= $contactCount;
+            $res .= '</span>';
+            $res .= '</div>';
+
+            if (!empty($contactsToShow)) {
+                $res .= '<div class="table-responsive">';
+                $res .= '<table class="table contact-table">';
+
+                $res .= '<thead>';
+                $res .= '<tr>';
+                $res .= '<th>Name</th>';
+                $res .= '<th>Source</th>';
+                $res .= '<th>E-mail</th>';
+                $res .= '<th>Phone</th>';
+                $res .= '<th>Actions</th>';
+                $res .= '</tr>';
+                $res .= '</thead>';
+                $res .= '<tbody>';
+
+                foreach ($contactsToShow as $contact) {
+                    foreach ($contact as $c) {
                     $name = $c->value('display_name');
                     if (!trim($name)) {
                         $name = $c->value('fn');
                     }
+                    if (!trim($name)) {
+                        $name = $c->value('email_address');
+                    }
+                    
+                    $initials = get_initials($name);
+                    $avatarColor = get_avatar_color($c->value('id'));
 
-                    $res .= '<tr class="contact_row_'.$this->html_safe($c->value('id')).'">';
-                    $res .= '<td><a data-id="contact_'.$this->html_safe($c->value('id')).'_detail" '.
-                        '" class="show_contact" title="'.$this->trans('Details').'">'.
-                        '<i class="bi bi-person-fill"></i> '.
-                        '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
-                        ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
-                        '</td><td class="contact_name_fld" data-title="' . $this->html_safe($name) . '">' . $this->html_safe($name) . '</td>' .
-                        '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
-                        '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
-                        $this->html_safe($c->value('phone_number')).'</a></td>'.
-                        '<td class="text-end" style="width : 100px">';
+                    $res .= '<tr class="contact-row">';
+                    
+                    $res .= '<td>';
+                    $res .= '<div class="contact-info">';
+                    $res .= '<div class="contact-avatar-small" style="background: ' . $avatarColor . '">';
+                    $res .= '<span>' . $this->html_safe($initials) . '</span>';
+                    $res .= '</div>';
+                    $res .= '<span class="contact-name-text">' . $this->html_safe($name) . '</span>';
+                    $res .= '</div>';
+                    $res .= '</td>';
+
+                    $res .= '<td>';
+                    $res .= '<div class="contact-source-cell">';
+                    $res .= '<i class="bi bi-database-fill"></i>';
+                    $res .= '<span>' . $this->html_safe($c->value('source')) . '</span>';
+                    $res .= '</div>';
+                    $res .= '</td>';
+
+                    $res .= '<td>';
+                    $res .= '<div class="contact-email-cell">';
+                    $res .= '<i class="bi bi-envelope-fill"></i>';
+                    $res .= '<span>' . $this->html_safe($c->value('email_address')) . '</span>';
+                    $res .= '</div>';
+                    $res .= '</td>';
+
+                    $res .= '<td>';
+                    $res .= '<div class="contact-phone-cell">';
+                    $res .= '<i class="bi bi-telephone-fill"></i>';
+                    $res .= '<span>' . $this->html_safe($c->value('phone_number')) . '</span>';
+                    $res .= '</div>';
+                    $res .= '</td>';
+
+                    $res .= '<td>';
+                    $res .= '<div class="contact-actions">';
+                    
                     if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
-                        
-                        if (class_exists('Hm_LDAP_Contact')) {
-                            $delete_attrs .= Hm_LDAP_Contact::generateDeleteAttributes($c, [$this, 'html_safe']);
-                        }
-                        
                         $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
                             $this->html_safe($c->value('source')).'&amp;contact_type='.
                             $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
-                        
-                        if (class_exists('Hm_LDAP_Contact')) {
-                            $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
-                        }
-                        
-                        $res .= '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
+                        $res .= '<a href="'.$edit_url.'" class="action-btn action-btn-edit" title="Modifier">';
+                        $res .= '<i class="bi bi-pencil-fill"></i>';
+                        $res .= '</a>';
                     }
 
                     $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
                         '&amp;contact_source='.$this->html_safe($c->value('source')).
                         '&amp;contact_type='.$this->html_safe($c->value('type'));
-                    
-                    if (class_exists('Hm_LDAP_Contact')) {
-                        $send_to_url = Hm_LDAP_Contact::addDNToUrl($c, $send_to_url);
-                    }
-                    
-                    $res .= '<a href="'.$send_to_url.'" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-                        '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+                    $res .= '<a href="'.$send_to_url.'" class="action-btn action-btn-more" title="Envoyer à">';
+                    $res .= '<i class="bi bi-envelope-fill"></i>';
+                    $res .= '</a>';
                     
                     if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer ms-3" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger"></i></a>';
+                        $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                        $res .= '<a '.$delete_attrs.' class="action-btn action-btn-delete delete_contact" title="Supprimer">';
+                        $res .= '<i class="bi bi-trash-fill"></i>';
+                        $res .= '</a>';
                     }
-
-                    $res .= '</td></tr>';
-                    $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
-                    $res .= build_contact_detail($this, $c, $c->value('id')).'</td>';
-                    $res .= '</td></tr>';
+                    
+                    $res .= '</div>';
+                    $res .= '</td>';
+                    $res .= '</tr>';
                 }
             }
-            $res .= '<tr><td class="contact_pages" colspan="7">';
-            $contactsPerPage = $per_page;
-            $totalContacts = count($contact);
-            $totalPages = ceil($totalContacts / $contactsPerPage);
-            $currentPage = $current_page;
-            if ($currentPage > 1) {
-                $res .= '<a href="?page=contacts&contact_page='.($currentPage - 1).'">Previous</a>';
-            }
-            if ($currentPage <= $totalPages) {
-                $res .= ' <a href="?page=contacts&contact_page='.($currentPage + 1).'">Next</a>';
-            }
-            $res .= '</td></tr>';
-            $res .= '</table>';
 
-            $res .= '</li>';
-            $tabIndex++;
+                $res .= '</tbody>';
+                $res .= '</table>';
+                $res .= '</div>';
+            } else {
+                $res .= '<div class="empty-state">';
+                $res .= '<p>Aucun contact dans cette catégorie</p>';
+                $res .= '</div>';
+            }
+
+            $res .= '</div>';
         }
-        $res .= '</table>'.$modal.'</div>';
-        $res .= '</ul>';
 
         $res .= '</div>';
+        $res .= '</div>';
+        // $res = '<div class="px-3 mt-3"><table class="contact_list table">';
+        // $modal = '';
+        // if ($imported_contact) {
+        //     $res .=
+        //     '<tr class="contact_import_detail"><td colspan="7"><a href="#" class="show_import_detail text-danger" data-bs-toggle="modal" data-bs-target="#importDetailModal">'.$this->trans('More info about import operation').'</a></td></tr>';
+        //     $modal .=  get_import_detail_modal_content($this, $imported_contact);
+        // }
+
+        // $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+
+
+        // $contacts = $this->get('contact_store');
+        // $editable = $this->get('contact_edit', array());
+
+        // $res = '<div class="contact-group contact-group-effect-scale contact-group-theme-1">';
+        // $tabIndex = 1;
+        // $contactGroups = [];
+        // if ($contacts) {
+        //     foreach ($contacts->paginate_grouped('group', $current_page, $per_page) as $key => $contact) {
+        //         if (!array_key_exists($key, $contactGroups)) {
+        //             $contactGroups[$key] = [];
+        //         }
+        //         $contactGroups[$key][] = $contact;
+        //     }
+        // }
+        
+        // foreach ($contactGroups as $group => $groupContacts) {
+        //     $res .= '<input type="radio" name="contact-group" ' . ($tabIndex === 1 ? 'checked ' : '') . 'id="tab' . $tabIndex . '" class="' . ($tabIndex === 1 ? 'tab-content-first' : 'tab-content-' . $tabIndex) . '">';
+        //     $res .= '<label for="tab' . $tabIndex . '">' . $this->html_safe($group) . '</label>';
+
+        //     $tabIndex++;
+        // }
+        // $tabIndex = 1;
+        // $res .= '<ul>';
+
+        // foreach ($contactGroups as $group => $groupContacts) {
+
+        //     $res .= '<li class="tab-content '.($tabIndex === 1 ? 'tab-content-first' : 'tab-content-'.$tabIndex).' typography">';
+        //     $res .= '<table class="contact_list">';
+        //     $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+        //     foreach ($groupContacts as $contact) {
+        //         foreach ($contact as $c) {
+        //             $name = $c->value('display_name');
+        //             if (!trim($name)) {
+        //                 $name = $c->value('fn');
+        //             }
+
+        //             $res .= '<tr class="contact_row_'.$this->html_safe($c->value('id')).'">';
+        //             $res .= '<td><a data-id="contact_'.$this->html_safe($c->value('id')).'_detail" '.
+        //                 '" class="show_contact" title="'.$this->trans('Details').'">'.
+        //                 '<i class="bi bi-person-fill"></i> '.
+        //                 '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
+        //                 ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
+        //                 '</td><td class="contact_name_fld" data-title="' . $this->html_safe($name) . '">' . $this->html_safe($name) . '</td>' .
+        //                 '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
+        //                 '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
+        //                 $this->html_safe($c->value('phone_number')).'</a></td>'.
+        //                 '<td class="text-end" style="width : 100px">';
+        //             if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+        //                 $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                        
+        //                 if (class_exists('Hm_LDAP_Contact')) {
+        //                     $delete_attrs .= Hm_LDAP_Contact::generateDeleteAttributes($c, [$this, 'html_safe']);
+        //                 }
+                        
+        //                 $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
+        //                     $this->html_safe($c->value('source')).'&amp;contact_type='.
+        //                     $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
+                        
+        //                 if (class_exists('Hm_LDAP_Contact')) {
+        //                     $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
+        //                 }
+                        
+        //                 $res .= '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
+        //             }
+
+        //             $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
+        //                 '&amp;contact_source='.$this->html_safe($c->value('source')).
+        //                 '&amp;contact_type='.$this->html_safe($c->value('type'));
+                    
+        //             if (class_exists('Hm_LDAP_Contact')) {
+        //                 $send_to_url = Hm_LDAP_Contact::addDNToUrl($c, $send_to_url);
+        //             }
+                    
+        //             $res .= '<a href="'.$send_to_url.'" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
+        //                 '<i class="bi bi-file-earmark-text ms-2"></i></a>';
+                    
+        //             if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+        //                 $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer ms-3" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger"></i></a>';
+        //             }
+
+        //             $res .= '</td></tr>';
+        //             $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
+        //             $res .= build_contact_detail($this, $c, $c->value('id')).'</td>';
+        //             $res .= '</td></tr>';
+        //         }
+        //     }
+        //     $res .= '<tr><td class="contact_pages" colspan="7">';
+        //     $contactsPerPage = $per_page;
+        //     $totalContacts = count($contact);
+        //     $totalPages = ceil($totalContacts / $contactsPerPage);
+        //     $currentPage = $current_page;
+        //     if ($currentPage > 1) {
+        //         $res .= '<a href="?page=contacts&contact_page='.($currentPage - 1).'">Previous</a>';
+        //     }
+        //     if ($currentPage <= $totalPages) {
+        //         $res .= ' <a href="?page=contacts&contact_page='.($currentPage + 1).'">Next</a>';
+        //     }
+        //     $res .= '</td></tr>';
+        //     $res .= '</table>';
+
+        //     $res .= '</li>';
+        //     $tabIndex++;
+        // }
+        // $res .= '</table>'.$modal.'</div>';
+        // $res .= '</ul>';
+
+        // $res .= '</div>';
 
         return $res;
     }
