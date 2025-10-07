@@ -976,6 +976,12 @@ $(function () {
     $(document).on("submit", "#create-filter-form", function (e) {
         e.preventDefault();
         const current_account = $(this).attr("account");
+        // const edit_filter_modal = new Hm_Modal({
+        // //   title: "Create Email Filter",
+        // //   modalId: "editFilterModal",
+        //     size: "xl",
+        //     modalId: "myEditFilterModal",
+        // });
         const edit_filter_modal = new Hm_Filter_Modal(current_account);
         const $form = $(this);
         const $btn = $form.find("#create_filter").prop("disabled", true);
