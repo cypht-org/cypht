@@ -426,7 +426,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 . $this->trans('Filter similar messages')
                 . '</a>'
                 . '<div class="dropdown-menu move_to_location p-3">'
-                . '<form class="filter-form" style="min-width:260px;">'
+                . '<form id="create-filter-form" style="min-width:260px;">'
 
                 // From (enabled, checked by default)
                 . '<div class="form-check mb-1">'
@@ -464,7 +464,7 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
                 . '</label>'
                 . '</div>'
 
-                . '<button type="submit" class="btn btn-primary btn-sm">'
+                . '<button type="submit" id="create_filter" class="btn btn-primary btn-sm">'
                 . $this->trans('Create filter')
                 . '</button>'
                 . '</form>'
