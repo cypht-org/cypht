@@ -275,3 +275,23 @@ var check_cc_exist_in_contacts_list = function() {
     return "";
 };
 
+var initContactTabs = function() {
+    $('.category-tab').on('click', function(e) {
+        e.preventDefault();
+        
+        var targetId = $(this).data('target');
+        
+        $('.category-tab').removeClass('active');
+        
+        $(this).addClass('active');
+        
+        $('.tab-content-section').removeClass('active');
+        
+        $('#' + targetId).addClass('active');
+    });
+};
+
+$(document).ready(function() {
+    initContactTabs();
+});
+
