@@ -436,6 +436,46 @@ Hm_Modal.prototype = {
     }
 };
 
+class Hm_Filter_Modal extends Hm_Modal {
+    constructor(current_account) {
+    super({
+      size: "xl",
+      modalId: "myEditFilterModal",
+    });
+    const modalContent = document.querySelector("#edit_filter_modal");
+    if (modalContent) {
+      this.setContent(modalContent.innerHTML);
+      modalContent.remove();
+    } else {
+        this.setContent("<p>Could not load filter editor</p>");
+    }
+      // add a button
+      this.addFooterBtn(
+        "Save",
+        "btn-primary ms-auto",
+        async function () {
+          let result = save_filter(current_account);
+          if (result) {
+            this.hide();
+          }
+        }
+      );
+
+      // add another button
+      this.addFooterBtn(
+        "Convert to code",
+        "btn-warning",
+        async function () {
+          let result = save_filter(current_account, true);
+          if (result) {
+            this.hide();
+          }
+        }
+      );
+  }
+}
+
+
 class Hm_Alert {
     constructor() {
         this.container = document.querySelector('.sys_messages');

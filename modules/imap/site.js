@@ -961,6 +961,46 @@ var imap_move_copy = function(e, action, context) {
     return false;
 };
 
+
+
+$(function () {
+    $(document).on("submit", "#create-filter-form", function (e) {
+        e.preventDefault();
+        const current_account = $(this).attr("account");
+        const edit_filter_modal = new Hm_Filter_Modal(current_account);
+        const $form = $(this);
+        const $btn = $form.find("#create_filter").prop("disabled", true);
+        const data = {};
+
+        // collect checked conditions
+        if ($form.find("#use_from").is(":checked"))
+            data["from"] = $form.find('input[name="from"]').val();
+        if ($form.find("#use_to").is(":checked"))
+            data["to"] = $form.find('input[name="to"]').val();
+        if ($form.find("#use_subject").is(":checked"))
+            data["subject"] = $form.find('input[name="subject"]').val();
+        if ($form.find("#use_reply").is(":checked"))
+            data["reply-to"] = $form.find('input[name="reply-to"]').val();
+
+        if ($.isEmptyObject(data)) {
+            Hm_Notices.show("Please check at least one condition to create a filter.", "danger");
+            $btn.prop("disabled", false);
+            return;
+        }
+
+        function encodeParams(obj) {
+            return Object.entries(obj)
+            .map(([k, v]) => encodeURIComponent(k) + "=" + encodeURIComponent(v))
+            .join("&");
+        }
+
+
+        const params = encodeParams(data);
+        edit_filter_modal.open();
+
+    });
+});
+
 var imap_perform_move_copy = function(dest_id, context, action = null) {
     if (!action) {
         action = $('.move_to_type').val();

@@ -19,7 +19,9 @@ add_handler('ajax_imap_debug', 'sieve_connect', true, 'imap', 'imap_connect', 'a
 
 // sieve filter
 add_output('sieve_filters', 'sievefilters_settings_start', true, 'sievefilters', 'version_upgrade_checker', 'after');
+add_output('message', 'sievefilters_settings_start', true, 'sievefilters', 'content_section_start', 'after');
 add_output('ajax_hm_folders', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
+add_output('message', 'sievefilters_settings_link', true, 'sievefilters', 'settings_menu_end', 'before');
 setup_base_ajax_page('ajax_account_sieve_filters', 'core');
 add_handler('ajax_account_sieve_filters', 'settings_load_imap', true, 'sievefilters', 'load_user_data', 'after');
 add_handler('ajax_account_sieve_filters', 'load_account_sieve_filters', true, 'sievefilters', 'settings_load_imap', 'after');
