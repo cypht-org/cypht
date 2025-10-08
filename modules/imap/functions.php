@@ -800,7 +800,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     }
                 }
                 if ($sent) {
-                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, false, true);
+                    $msgs = $mailbox->search($folder, $search_type, $terms, null, null, true, true);
                 }
                 else {
                     $msgs = $mailbox->search($folder, $search_type, $terms);
@@ -814,7 +814,7 @@ function merge_imap_search_results($ids, $search_type, $session, $hm_cache, $fol
                     rsort($msgs);
                     $msgs = array_slice($msgs, 0, $limit);
                 }
-                foreach ($mailbox->get_message_list($folder, $msgs) as $msg) {
+                foreach ($mailbox->get_message_list($folder, $msgs, !$sent) as $msg) {
                     if (array_key_exists('content-type', $msg) && mb_stristr($msg['content-type'], 'multipart/mixed')) {
                         $msg['flags'] .= ' \Attachment';
                     }
