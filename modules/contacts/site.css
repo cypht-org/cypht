@@ -246,12 +246,15 @@
 
 .category-tabs-container {
   display: flex;
-  justify-content: flex-start;
-  padding-left: 0;
-  padding-right: 0;
-  padding-top: .75rem;
-  padding-bottom: .75rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
   width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
 }
 
 .category-tabs {
@@ -262,6 +265,28 @@
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   width: auto;
+  flex: 1;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.action-btn-add {
+  display: flex;
+  align-items: center;
+  padding: 0.625rem 1.25rem;
+  font-weight: 600;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.action-btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .category-tab {
@@ -797,5 +822,314 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Modal styles */
+.custom-modal .modal-content {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.custom-modal-header {
+  background: white;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.custom-modal-header .modal-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.modal-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.custom-modal-header .btn-close {
+  opacity: 0.5;
+}
+
+.custom-modal-header .btn-close:hover {
+  opacity: 1;
+}
+
+.custom-modal-body {
+  padding: 1.5rem;
+  background: white;
+}
+
+.contact-method-toggle {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.method-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: white;
+  border: none;
+  border-right: 1px solid #e5e7eb;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.method-btn:last-child {
+  border-right: none;
+}
+
+.method-btn:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.method-btn.active {
+  background: #111827;
+  color: white;
+}
+
+.method-btn svg {
+  flex-shrink: 0;
+}
+
+.contact-manual-form {
+  margin-top: 1rem;
+}
+
+.custom-input {
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  transition: border-color 0.2s ease;
+}
+
+.custom-input:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.05);
+  outline: none;
+}
+
+.custom-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.375rem;
+  font-size: 0.8125rem;
+}
+
+.csv-import-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.csv-info-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 1rem;
+  display: flex;
+  gap: 0.875rem;
+}
+
+.csv-info-icon {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+.csv-info-title {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.csv-info-text {
+  color: #6b7280;
+  margin-bottom: 0.625rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.csv-download-link {
+  color: #111827;
+  font-weight: 500;
+  text-decoration: underline;
+  font-size: 0.8125rem;
+  transition: opacity 0.2s ease;
+}
+
+.csv-download-link:hover {
+  opacity: 0.7;
+}
+
+.csv-upload-area {
+  background: white;
+  border-radius: 6px;
+  padding: 0;
+}
+
+.csv-file-input {
+  display: none;
+}
+
+.csv-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  border: 2px dashed #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafa;
+}
+
+.csv-upload-label:hover {
+  border-color: #111827;
+  background: white;
+}
+
+.csv-upload-icon {
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+  transition: color 0.2s ease;
+}
+
+.csv-upload-label:hover .csv-upload-icon {
+  color: #111827;
+}
+
+.csv-upload-text {
+  font-size: 0.875rem;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+.csv-upload-text strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.csv-upload-hint {
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.custom-modal-footer {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.custom-btn-secondary {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.custom-btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.custom-btn-primary {
+  padding: 0.5rem 1rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  border-radius: 6px;
+  background: #111827;
+  border: 1px solid #111827;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.custom-btn-primary:hover {
+  background: #1f2937;
+  border-color: #1f2937;
+}
+
+/* LDAP Modal Styling */
+.modal-dialog-centered .modal-content {
+  border-radius: 16px;
+}
+
+.modal-header h5 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Responsive adjustments for modals */
+@media (max-width: 768px) {
+  .custom-modal-body {
+    padding: 1.5rem;
+  }
+
+  .contact-method-toggle {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .method-btn {
+    padding: 0.875rem;
+  }
+
+  .contact-manual-form {
+    padding: 1.5rem;
+  }
+
+  .csv-upload-label {
+    padding: 2rem 1rem;
+  }
+
+  .custom-modal-footer {
+    flex-direction: column;
+  }
+
+  .custom-modal-footer button {
+    width: 100%;
   }
 }
