@@ -219,13 +219,7 @@ function get_module_assignments($settings) {
                 $js .= file_get_contents($js_module);
             }
         }
-
-        // load pcss3t.cs only if one of: ['contacts','local_contacts','ldap_contacts','gmail_contacts'] is enabled
-        if(count(array_intersect(['contacts','local_contacts','ldap_contacts','gmail_contacts'], $mods)) > 0){
-            if (is_readable(sprintf("third_party/contact-group.css", 'third_party'))) {
-                $css .= file_get_contents(sprintf("third_party/contact-group.css", 'third_party'));
-            }
-        }
+        
         $css .= file_get_contents(sprintf("third_party/nprogress.css", 'third_party'));
     }
     return array($js, $css, $filters, $assets);
