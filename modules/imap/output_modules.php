@@ -388,6 +388,10 @@ class Hm_Output_filter_message_headers extends Hm_Output_Module {
             if (!$this->get('is_archive_folder')) {
                 $txt .= '<a class="archive_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="archive_message" href="#">'.$this->trans('Archive').'</a>';
             }
+
+            if ($this->get('is_trash_folder')) {
+                $txt .= '<a class="restore_link hlink text-decoration-none btn btn-sm btn-outline-secondary" id="restore_message" href="#">'.$this->trans('Restore').'</a>';
+            }
             
             if($this->get('tags')){
                 $txt .= tags_dropdown($this, $headers);
