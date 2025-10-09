@@ -1093,6 +1093,11 @@ if (!class_exists('Hm_IMAP')) {
                                 $cset = trim(mb_strtolower(str_replace(array('"', "'"), '', $matches[1])));
                             }
                         }
+
+                        if ($exclude_auto_bcc && trim($x_auto_bcc) === 'cypht') {
+                            continue;
+                        }
+
                         $headers[(string) $uid] = array('uid' => $uid, 'flags' => $flags, 'internal_date' => $internal_date, 'size' => $size,
                                          'date' => $date, 'from' => $from, 'to' => $to, 'subject' => $subject, 'content-type' => $content_type,
                                          'timestamp' => time(), 'charset' => $cset, 'x-priority' => $x_priority, 'google_msg_id' => $google_msg_id,
@@ -1109,14 +1114,6 @@ if (!class_exists('Hm_IMAP')) {
                         }
 
 
-                    }
-                }
-            }
-
-            if ($exclude_auto_bcc) {
-                foreach ($headers as $k => $v) {
-                    if ($v['x_auto_bcc']) {
-                        unset($headers[$k]);
                     }
                 }
             }
