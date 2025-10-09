@@ -383,7 +383,7 @@ function save_user_settings($handler, $form, $logout) {
             Hm_Msgs::add('Could not save settings: ' . $e->getMessage(), 'warning');
         }
     }
-    
+
 }}
 
 /**
@@ -486,6 +486,9 @@ function get_tls_stream_type() {
         $method |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
         $method |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
     }
+    if (defined('STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT')) {
+        $method |= STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT;
+    }
     return $method;
 }}
 
@@ -550,7 +553,7 @@ function in_server_list($list, $id, $user) {
 /**
  * Perform a check on last added server
  * It gets deleted if already configured
- * 
+ *
  * @param string $list class to process on check
  * @param string $user username to check for
  * @return bool
