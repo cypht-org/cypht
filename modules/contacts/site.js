@@ -291,7 +291,158 @@ var initContactTabs = function() {
     });
 };
 
+var initLocalContactModal = function() {
+    $('#manual-entry-btn').on('click', function() {
+        $(this).addClass('active');
+        $('#csv-import-btn').removeClass('active');
+        $('.contact-manual-form').show();
+        $('.csv-import-section').hide();
+        $('#submit-local-contact-btn').text('Add Contact');
+    });
+
+    $('#csv-import-btn').on('click', function() {
+        $(this).addClass('active');
+        $('#manual-entry-btn').removeClass('active');
+        $('.contact-manual-form').hide();
+        $('.csv-import-section').show();
+        $('#submit-local-contact-btn').text('Import Contacts');
+    });
+
+    $('#submit-local-contact-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        if ($('#manual-entry-btn').hasClass('active')) {
+            var name = $('#contact_name').val();
+            var email = $('#contact_email').val();
+            var phone = $('#contact_phone').val();
+            var category = $('#contact_category').val();
+            
+            if (!name || !email) {
+                //TODO: Use better error display
+                alert('Please fill in the required fields (Name and Email)');
+                return;
+            }
+            Hm_Ajax.request(
+                [
+                    {'name': 'hm_ajax_hook', 'value': 'ajax_add_contact'},
+                    {'name': 'contact_name', 'value': name},
+                    {'name': 'contact_email', 'value': email},
+                    {'name': 'contact_phone', 'value': phone},
+                    {'name': 'contact_category', 'value': category},
+                    {'name': 'contact_source', 'value': 'local:local'}
+                ],
+                function(res) {
+                    if (res.contact_added) {
+                        const modalElement = document.getElementById('localContactModal');
+                        const modal = bootstrap.Modal.getInstance(modalElement);
+                        if (modal) {
+                            modal.hide();
+                        }
+                        window.location.reload();
+                    }
+                }
+            );
+        } else {
+            var fileInput = $('#contact_csv')[0];
+            if (!fileInput.files.length) {
+                alert('Please select a CSV file');
+                return;
+            }
+            //TODO: Implement CSV import functionality
+            console.log('CSV import not implemented yet');
+        }
+    });
+
+    $('#localContactModal').on('hidden.bs.modal', function() {
+        $('#manual-contact-form')[0].reset();
+        $('#manual-entry-btn').addClass('active');
+        $('#csv-import-btn').removeClass('active');
+        $('.contact-manual-form').show();
+        $('.csv-import-section').hide();
+        $('#submit-local-contact-btn').text('Add Contact');
+    });
+};
+
+var initLdapContactModal = function() {
+    $('#submit-ldap-contact-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        var firstName = $('#ldap_first_name').val();
+        var lastName = $('#ldap_last_name').val();
+        var email = $('#ldap_mail').val();
+        
+        if (!firstName || !lastName || !email) {
+            //TODO: Use better error display
+            alert('Please fill in the required fields (First Name, Last Name, and Email)');
+            return;
+        }
+        //TODO: implement: validation for other fields as needed and ajax_add_ldap_contact
+        var formData = [
+            {'name': 'hm_ajax_hook', 'value': 'ajax_add_ldap_contact'},
+            {'name': 'contact_source', 'value': 'ldap'},
+            {'name': 'ldap_source', 'value': $('#ldap_source').val()},
+            {'name': 'ldap_first_name', 'value': firstName},
+            {'name': 'ldap_last_name', 'value': lastName},
+            {'name': 'ldap_mail', 'value': email},
+            {'name': 'ldap_displayname', 'value': $('#ldap_displayname').val()},
+            {'name': 'ldap_uidattr', 'value': $('#ldap_uidattr').val()},
+            {'name': 'ldap_uid', 'value': $('#ldap_uid').val()},
+            {'name': 'ldap_locality', 'value': $('#ldap_locality').val()},
+            {'name': 'ldap_state', 'value': $('#ldap_state').val()},
+            {'name': 'ldap_street', 'value': $('#ldap_street').val()},
+            {'name': 'ldap_postalcode', 'value': $('#ldap_postalcode').val()},
+            {'name': 'ldap_title', 'value': $('#ldap_title').val()},
+            {'name': 'ldap_phone', 'value': $('#ldap_phone').val()},
+            {'name': 'ldap_fax', 'value': $('#ldap_fax').val()},
+            {'name': 'ldap_mobile', 'value': $('#ldap_mobile').val()},
+            {'name': 'ldap_room', 'value': $('#ldap_room').val()},
+            {'name': 'ldap_car', 'value': $('#ldap_car').val()},
+            {'name': 'ldap_org', 'value': $('#ldap_org').val()},
+            {'name': 'ldap_org_unit', 'value': $('#ldap_org_unit').val()},
+            {'name': 'ldap_org_dpt', 'value': $('#ldap_org_dpt').val()},
+            {'name': 'ldap_emp_num', 'value': $('#ldap_emp_num').val()},
+            {'name': 'ldap_emp_type', 'value': $('#ldap_emp_type').val()},
+            {'name': 'ldap_lang', 'value': $('#ldap_lang').val()},
+            {'name': 'ldap_uri', 'value': $('#ldap_uri').val()}
+        ];
+        
+        Hm_Ajax.request(
+            formData,
+            function(res) {
+                if (res.contact_added) {
+                    const modalElement = document.getElementById('ldapContactModal');
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    if (modal) {
+                        modal.hide();
+                    }
+                    window.location.reload();
+                } else {
+                    if (res.error_message) {
+                        //TODO: Use better error display
+                        alert(res.error_message);
+                    }
+                }
+            }
+        );
+    });
+
+    $('#ldapContactModal').on('hidden.bs.modal', function() {
+        $('#ldap-contact-form')[0].reset();
+    });
+
+    $('#ldap_uidattr').on('change', function() {
+        if ($(this).val() === 'uid') {
+            $('#ldap_uid_field_wrapper').removeClass('d-none');
+        } else {
+            $('#ldap_uid_field_wrapper').addClass('d-none');
+        }
+    });
+};
+
+//TODO: Move JS related to local contacts to /modules/local_contacts/ and ldap contacts to /modules/ldap_contacts/
 $(document).ready(function() {
     initContactTabs();
+    initLocalContactModal();
+    initLdapContactModal();
 });
 

@@ -228,86 +228,19 @@ class Hm_Output_contacts_content_start extends Hm_Output_Module {
         foreach ($contact_source_list as $value) {
             $actions .= '<div class="list_src"><a href="?page=export_contact&amp;contact_source='.$this->html_safe($value).'">'.$this->html_safe($this->html_safe($value).' Contacts').'</a></div>';
         }
-        $res = '<div class="app-container">';
+        $res = '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
+            '<i class="bi bi-download" width="16" height="16" onclick="listControlsMenu()"></i></a></div></div>'.
+            '<div class="list_actions">'.$actions.'</div>';
+
+        $res .= '<div class="app-container">';
         $res .= '<div class="container-fluid py-5">';
-        // $res .= '<div class="row mb-4">';
-        // $res .= '<div class="col-12">';
-        // $res .= '<div class="text-center">';
-        // $res .= '<h1 class="app-title mb-3">Gestion des Contacts</h1>;';
-        // $res .= '<p class="app-subtitle">Organisez vos contacts par catégorie</p>';
-        // $res .= '</div>';
-        // $res .= '</div>';
-        // $res .= '</div>';
+        
         // category tabs starts here
         $res .= '<div class="row mb-4">';
-        $res .= '<div class="col-12 px-0">';
-        // start Tabs
-        // $res .= '<div class="category-tabs-container">';
-        // $res .= '<div class="category-tabs">';
-
-        // $res .= '<button class="category-tab active">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= 'Categorie 1 icon';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Categorie 1';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Categorie 1 description';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '2';
-        // $res .= '</div>';
-        // $res .= '/<button>';
-
-        // $res .= '<button class="category-tab">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= 'Categorie 2 icon';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Categorie 2';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Categorie 2 description';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '4';
-        // $res .= '</div>';
-        // $res .= '/<button>';
-
-        // $res .= '<button class="category-tab">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= 'Categorie 3 icon';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Categorie 3';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Categorie 3 description';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '6';
-        // $res .= '</div>';
-        // $res .= '/<button>';
-
-        // $res .= '</div>';
-        // $res .= '</div>';
+        $res .= '<div class="col-12 px-2">';
 
         return $res;
         // end tabs
-
-        // $res .= '</div>';
-        // $res .= '</div>';
-
-        // return '<div class="contacts_content p-0"><div class="content_title d-flex gap-2 justify-content-between px-3 align-items-center"><div class="d-flex gap-2 align-items-center">'.$this->trans('Contacts'). '</div><div class="list_controls source_link d-flex gap-2 align-items-center"><a href="#" title="' . $this->trans('Export Contacts') . '" class="refresh_list">' .
-        //     '<i class="bi bi-download" width="16" height="16" onclick="listControlsMenu()"></i></a></div></div>'.
-        //     '<div class="list_actions">'.$actions.'</div>';
     }
 }
 
@@ -493,58 +426,21 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
         $res = '<div class="category-tabs-container">';
         $res .= '<div class="category-tabs">';
         $res .= $tabsHtml;
-        // $res .= '<button class="category-tab tab-collected active">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= '<i class="bi bi-people-fill"></i>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Collected Sender';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Contacts collectés automatiquement';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '2';
-        // $res .= '</div>';
-        // $res .= '</button>';
-
-        // $res .= '<button class="category-tab tab-trusted">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= '<i class="bi bi-person-check-fill"></i>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Trusted Sender';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Expéditeurs de confiance';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '4';
-        // $res .= '</div>';
-        // $res .= '</button>';
-
-        // $res .= '<button class="category-tab tab-trusted-senders">';
-        // $res .= '<div class="tab-icon">';
-        // $res .= '<i class="bi bi-person-badge-fill"></i>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-content">';
-        // $res .= '<h3 class="tab-title">';
-        // $res .= 'Trusted Senders';
-        // $res .= '</h3>';
-        // $res .= '<p class="tab-description">';
-        // $res .= 'Expéditeurs hautement fiables';
-        // $res .= '</p>';
-        // $res .= '</div>';
-        // $res .= '<div class="tab-badge">';
-        // $res .= '6';
-        // $res .= '</div>';
-        // $res .= '</button>';
 
         $res .= '</div>';
+
+        $res .= '<div class="action-buttons">';
+
+        $res .= '<button class="btn btn-primary action-btn-add" data-bs-toggle="modal" data-bs-target="#ldapContactModal"><i class="bi bi-person-plus-fill"></i>';
+        $res .= 'Add LDAP';
+        $res .= '</button>';
+
+        $res .= '<button class="btn btn-success action-btn-add" data-bs-toggle="modal" data-bs-target="#localContactModal"><i class="bi bi-person-plus"></i>';
+        $res .= 'Add Local';
+        $res .= '</button>';
+
+        $res .= '</div>';
+
         $res .= '</div>';
 
         $res .= '<div class="row p-3">';
@@ -679,125 +575,374 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 
         $res .= '</div>';
         $res .= '</div>';
-        // $res = '<div class="px-3 mt-3"><table class="contact_list table">';
-        // $modal = '';
-        // if ($imported_contact) {
-        //     $res .=
-        //     '<tr class="contact_import_detail"><td colspan="7"><a href="#" class="show_import_detail text-danger" data-bs-toggle="modal" data-bs-target="#importDetailModal">'.$this->trans('More info about import operation').'</a></td></tr>';
-        //     $modal .=  get_import_detail_modal_content($this, $imported_contact);
-        // }
 
-        // $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
+        return $res;
+    }
+}
 
-
-        // $contacts = $this->get('contact_store');
-        // $editable = $this->get('contact_edit', array());
-
-        // $res = '<div class="contact-group contact-group-effect-scale contact-group-theme-1">';
-        // $tabIndex = 1;
-        // $contactGroups = [];
-        // if ($contacts) {
-        //     foreach ($contacts->paginate_grouped('group', $current_page, $per_page) as $key => $contact) {
-        //         if (!array_key_exists($key, $contactGroups)) {
-        //             $contactGroups[$key] = [];
-        //         }
-        //         $contactGroups[$key][] = $contact;
-        //     }
-        // }
+/**
+ * @subpackage contacts/output
+ * TODO: Remove this class after moving the modal forms to their respective modules
+ */
+class Hm_Output_contact_forms extends Hm_Output_Module {
+    protected function output() {
+        $res = '';
+        // TODO: Move local modal form to /modules/local_contacts/
+        $res .= $this->buildLocalContactModal();
+        // TODO: Move ldap modal form to /modules/ldap_contacts/
+        $res .= $this->buildLdapContactModal();
         
-        // foreach ($contactGroups as $group => $groupContacts) {
-        //     $res .= '<input type="radio" name="contact-group" ' . ($tabIndex === 1 ? 'checked ' : '') . 'id="tab' . $tabIndex . '" class="' . ($tabIndex === 1 ? 'tab-content-first' : 'tab-content-' . $tabIndex) . '">';
-        //     $res .= '<label for="tab' . $tabIndex . '">' . $this->html_safe($group) . '</label>';
+        return $res;
+    }
+    
+    private function buildLocalContactModal() {
+        $res = '<div class="modal fade" id="localContactModal" tabindex="-1" aria-labelledby="localContactModalLabel" aria-hidden="true">';
+        $res .= '<div class="modal-dialog modal-dialog-centered modal-lg">';
+        $res .= '<div class="modal-content custom-modal-content">';
+        
+        $res .= '<div class="modal-header custom-modal-header">';
+        $res .= '<h5 class="modal-title d-flex align-items-center" id="localContactModalLabel">';
+        $res .= '<div class="modal-icon-wrapper me-2">';
+        $res .= '<i class="bi bi-person-plus" style="font-size: 24px;"></i>';
+        $res .= '</div>';
+        $res .= $this->trans('Add Local Contact');
+        $res .= '</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'; 
+        $res .= '</div>';
 
-        //     $tabIndex++;
-        // }
-        // $tabIndex = 1;
-        // $res .= '<ul>';
+        $res .= '<div class="modal-body custom-modal-body">';
+        
+        // Toggle buttons for Manual vs CSV
+        $res .= '<div class="contact-method-toggle">';
+        $res .= '<button type="button" class="method-btn active" id="manual-entry-btn">';
+        $res .= '<i class="bi bi-person-plus" style="width: 18px; height: 18px;"></i>';
+        $res .= '<span>' . $this->trans('Manual Entry') . '</span>';
+        $res .= '</button>';
+        $res .= '<button type="button" class="method-btn" id="csv-import-btn">';
+        $res .= '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        $res .= '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>';
+        $res .= '<polyline points="14 2 14 8 20 8"/>';
+        $res .= '<line x1="12" y1="18" x2="12" y2="12"/>';
+        $res .= '<line x1="9" y1="15" x2="15" y2="15"/>';
+        $res .= '</svg>';
+        $res .= '<span>' . $this->trans('Import CSV') . '</span>';
+        $res .= '</button>';
+        $res .= '</div>';
 
-        // foreach ($contactGroups as $group => $groupContacts) {
+        // Manual Entry Form (visible by default)
+        $res .= '<form class="contact-manual-form" id="manual-contact-form">';
+        $res .= '<div class="row">';
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="contact_name" class="form-label">';
+        $res .= $this->trans('Display Name') . ' <span class="text-danger">*</span>';
+        $res .= '</label>';
+        $res .= '<input type="text" class="form-control custom-input" id="contact_name" name="contact_name" placeholder="John Doe" required>';
+        $res .= '</div>';
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="contact_email" class="form-label">';
+        $res .= $this->trans('Email Address') . ' <span class="text-danger">*</span>';
+        $res .= '</label>';
+        $res .= '<input type="email" class="form-control custom-input" id="contact_email" name="contact_email" placeholder="john.doe@example.com" required>';
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="contact_phone" class="form-label">';
+        $res .= $this->trans('Phone Number');
+        $res .= '</label>';
+        $res .= '<input type="tel" class="form-control custom-input" id="contact_phone" name="contact_phone" placeholder="+1 234 567 8900">';
+        $res .= '</div>';
+        $res .= '<div class="mb-3">';
+        $res .= '<label for="contact_category" class="form-label">';
+        $res .= $this->trans('Category');
+        $res .= '</label>';
+        $res .= '<select class="form-select custom-input" id="contact_category" name="contact_category">';
+        $res .= '<option value="Collected Recipients">' . $this->trans('Collected Recipients') . '</option>';
+        $res .= '<option value="Trusted Senders">' . $this->trans('Trusted Senders') . '</option>';
+        $res .= '<option value="Personal Addresses">' . $this->trans('Personal Addresses') . '</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        $res .= '</form>';
 
-        //     $res .= '<li class="tab-content '.($tabIndex === 1 ? 'tab-content-first' : 'tab-content-'.$tabIndex).' typography">';
-        //     $res .= '<table class="contact_list">';
-        //     $res .= '<tr><td colspan="7" class="contact_list_title"><div class="server_title">'.$this->trans('Contacts').'</div></td></tr>';
-        //     foreach ($groupContacts as $contact) {
-        //         foreach ($contact as $c) {
-        //             $name = $c->value('display_name');
-        //             if (!trim($name)) {
-        //                 $name = $c->value('fn');
-        //             }
+        // CSV Import Section (hidden by default)
+        $res .= '<div class="csv-import-section" style="display: none;">';
+        $res .= '<div class="csv-info-card">';
+        $res .= '<div class="csv-info-icon">';
+        $res .= '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        $res .= '<circle cx="12" cy="12" r="10"/>';
+        $res .= '<line x1="12" y1="16" x2="12" y2="12"/>';
+        $res .= '<line x1="12" y1="8" x2="12.01" y2="8"/>';
+        $res .= '</svg>';
+        $res .= '</div>';
+        $res .= '<div>';
+        $res .= '<h6 class="csv-info-title">' . $this->trans('CSV Format Requirements') . '</h6>';
+        $res .= '<p class="csv-info-text">';
+        $res .= $this->trans('Your CSV file must include headers') . ': <strong>display_name</strong>, <strong>email_address</strong>, <strong>phone_number</strong>';
+        $res .= '</p>';
+        $res .= '<a href="/sample-contact.csv" class="csv-download-link" download>';
+        $res .= $this->trans('Download sample CSV file');
+        $res .= '</a>';
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '<div class="csv-upload-area">';
+        $res .= '<input type="file" id="contact_csv" name="contact_csv" accept=".csv" class="csv-file-input">';
+        $res .= '<label for="contact_csv" class="csv-upload-label">';
+        $res .= '<div class="csv-upload-icon">';
+        $res .= '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        $res .= '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>';
+        $res .= '<polyline points="17 8 12 3 7 8"/>';
+        $res .= '<line x1="12" y1="3" x2="12" y2="15"/>';
+        $res .= '</svg>';
+        $res .= '</div>';
+        $res .= '<p class="csv-upload-text">';
+        $res .= '<strong>' . $this->trans('Click to upload') . '</strong> ' . $this->trans('or drag and drop');
+        $res .= '</p>';
+        $res .= '<p class="csv-upload-hint">' . $this->trans('CSV files only') . '</p>';
+        $res .= '</label>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
 
-        //             $res .= '<tr class="contact_row_'.$this->html_safe($c->value('id')).'">';
-        //             $res .= '<td><a data-id="contact_'.$this->html_safe($c->value('id')).'_detail" '.
-        //                 '" class="show_contact" title="'.$this->trans('Details').'">'.
-        //                 '<i class="bi bi-person-fill"></i> '.
-        //                 '</d><td>'.$this->html_safe($c->value('type')).'<td><span class="contact_src">'.
-        //                 ($c->value('source') == 'local' ? '' : $this->html_safe($c->value('source'))).'</span>'.
-        //                 '</td><td class="contact_name_fld" data-title="' . $this->html_safe($name) . '">' . $this->html_safe($name) . '</td>' .
-        //                 '<td><div class="contact_fld">'.$this->html_safe($c->value('email_address')).'</div></td>'.
-        //                 '<td class="contact_fld"><a href="tel:'.$this->html_safe($c->value('phone_number')).'">'.
-        //                 $this->html_safe($c->value('phone_number')).'</a></td>'.
-        //                 '<td class="text-end" style="width : 100px">';
-        //             if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-        //                 $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
-                        
-        //                 if (class_exists('Hm_LDAP_Contact')) {
-        //                     $delete_attrs .= Hm_LDAP_Contact::generateDeleteAttributes($c, [$this, 'html_safe']);
-        //                 }
-                        
-        //                 $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
-        //                     $this->html_safe($c->value('source')).'&amp;contact_type='.
-        //                     $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
-                        
-        //                 if (class_exists('Hm_LDAP_Contact')) {
-        //                     $edit_url = Hm_LDAP_Contact::addDNToUrl($c, $edit_url);
-        //                 }
-                        
-        //                 $res .= '<a href="'.$edit_url.'" class="edit_contact cursor-pointer" title="'.$this->trans('Edit').'"><i class="bi bi-gear ms-2"></i></a>';
-        //             }
+        $res .= '<div class="modal-footer custom-modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary custom-btn-secondary" data-bs-dismiss="modal">';
+        $res .= $this->trans('Cancel');
+        $res .= '</button>';
+        $res .= '<button type="submit" class="btn btn-primary custom-btn-primary" id="submit-local-contact-btn">';
+        $res .= $this->trans('Add Contact');
+        $res .= '</button>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        return $res;
+    }
+    
+    private function buildLdapContactModal() {
+        $res = '<div class="modal fade" id="ldapContactModal" tabindex="-1" aria-labelledby="ldapContactModalLabel" aria-hidden="true">';
+        $res .= '<div class="modal-dialog modal-dialog-centered modal-xl">';
+        $res .= '<div class="modal-content custom-modal-content">';
+        
+        $res .= '<div class="modal-header custom-modal-header">';
+        $res .= '<h5 class="modal-title d-flex align-items-center" id="ldapContactModalLabel">';
+        $res .= '<div class="modal-icon-wrapper me-2">';
+        $res .= '<i class="bi bi-person-plus-fill" style="font-size: 24px;"></i>';
+        $res .= '</div>';
+        $res .= $this->trans('Add LDAP Contact');
+        $res .= '</h5>';
+        $res .= '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'; 
+        $res .= '</div>';
 
-        //             $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
-        //                 '&amp;contact_source='.$this->html_safe($c->value('source')).
-        //                 '&amp;contact_type='.$this->html_safe($c->value('type'));
-                    
-        //             if (class_exists('Hm_LDAP_Contact')) {
-        //                 $send_to_url = Hm_LDAP_Contact::addDNToUrl($c, $send_to_url);
-        //             }
-                    
-        //             $res .= '<a href="'.$send_to_url.'" class="send_to_contact cursor-pointer" title="'.$this->trans('Send To').'">'.
-        //                 '<i class="bi bi-file-earmark-text ms-2"></i></a>';
-                    
-        //             if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-        //                 $res .= '<a '.$delete_attrs.' class="delete_contact cursor-pointer ms-3" title="'.$this->trans('Delete').'"><i class="bi bi-trash3 text-danger"></i></a>';
-        //             }
+        $res .= '<div class="modal-body custom-modal-body">';
+        
+        $res .= '<form class="ldap-contact-form" id="ldap-contact-form">';
+        $res .= '<input type="hidden" name="contact_source" value="ldap">';
+        
+        $res .= '<div class="form-section mb-4">';
+        $res .= '<h6 class="form-section-title">' . $this->trans('Basic Information') . '</h6>';
+        $res .= '<div class="row">';
+        
+        // Source
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_source" class="form-label">' . $this->trans('Source') . '</label>';
+        $res .= '<select id="ldap_source" name="ldap_source" class="form-select custom-input">';
+        $res .= '<option value="Personal">Personal</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        
+        // UID Attribute
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_uidattr" class="form-label">' . $this->trans('UID Attribute') . '</label>';
+        $res .= '<select id="ldap_uidattr" name="ldap_uidattr" class="form-select custom-input">';
+        $res .= '<option value="cn">cn</option>';
+        $res .= '<option value="uid">uid</option>';
+        $res .= '</select>';
+        $res .= '</div>';
+        
+        // First Name
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_first_name" class="form-label">' . $this->trans('First Name') . ' <span class="text-danger">*</span></label>';
+        $res .= '<input required placeholder="' . $this->trans('First Name') . '" id="ldap_first_name" type="text" name="ldap_first_name" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Last Name
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_last_name" class="form-label">' . $this->trans('Last Name') . ' <span class="text-danger">*</span></label>';
+        $res .= '<input required placeholder="' . $this->trans('Last Name') . '" id="ldap_last_name" type="text" name="ldap_last_name" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Email
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_mail" class="form-label">' . $this->trans('E-mail Address') . ' <span class="text-danger">*</span></label>';
+        $res .= '<input required placeholder="' . $this->trans('E-mail Address') . '" id="ldap_mail" type="email" name="ldap_mail" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Display Name
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_displayname" class="form-label">' . $this->trans('Display Name') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Display Name') . '" id="ldap_displayname" type="text" name="ldap_displayname" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Contact Information Section
+        $res .= '<div class="form-section mb-4">';
+        $res .= '<h6 class="form-section-title">' . $this->trans('Contact Information') . '</h6>';
+        $res .= '<div class="row">';
+        
+        // Phone
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_phone" class="form-label">' . $this->trans('Telephone Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Telephone Number') . '" id="ldap_phone" type="text" name="ldap_phone" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Mobile
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_mobile" class="form-label">' . $this->trans('Mobile Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Mobile Number') . '" id="ldap_mobile" type="text" name="ldap_mobile" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Fax
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_fax" class="form-label">' . $this->trans('Fax Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Fax Number') . '" id="ldap_fax" type="text" name="ldap_fax" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Website
+        $res .= '<div class="col-md-12 mb-3">';
+        $res .= '<label for="ldap_uri" class="form-label">' . $this->trans('Website') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Website') . '" id="ldap_uri" type="text" name="ldap_uri" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Address Information Section
+        $res .= '<div class="form-section mb-4">';
+        $res .= '<h6 class="form-section-title">' . $this->trans('Address Information') . '</h6>';
+        $res .= '<div class="row">';
+        
+        // Street
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_street" class="form-label">' . $this->trans('Street') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Street') . '" id="ldap_street" type="text" name="ldap_street" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Locality
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_locality" class="form-label">' . $this->trans('Locality') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Locality') . '" id="ldap_locality" type="text" name="ldap_locality" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // State
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_state" class="form-label">' . $this->trans('State') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('State') . '" id="ldap_state" type="text" name="ldap_state" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Postal Code
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_postalcode" class="form-label">' . $this->trans('Postal Code') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Postal Code') . '" id="ldap_postalcode" type="text" name="ldap_postalcode" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Organization Information Section
+        $res .= '<div class="form-section mb-4">';
+        $res .= '<h6 class="form-section-title">' . $this->trans('Organization Information') . '</h6>';
+        $res .= '<div class="row">';
+        
+        // Organization
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_org" class="form-label">' . $this->trans('Organization') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Organization') . '" id="ldap_org" type="text" name="ldap_org" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Organization Unit
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_org_unit" class="form-label">' . $this->trans('Organization Unit') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Organization Unit') . '" id="ldap_org_unit" type="text" name="ldap_org_unit" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Title
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_title" class="form-label">' . $this->trans('Title') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Title') . '" id="ldap_title" type="text" name="ldap_title" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Department Number
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_org_dpt" class="form-label">' . $this->trans('Department Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Department Number') . '" id="ldap_org_dpt" type="text" name="ldap_org_dpt" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Room Number
+        $res .= '<div class="col-md-4 mb-3">';
+        $res .= '<label for="ldap_room" class="form-label">' . $this->trans('Room Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Room Number') . '" id="ldap_room" type="text" name="ldap_room" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Employee Number
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_emp_num" class="form-label">' . $this->trans('Employee Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Employee Number') . '" id="ldap_emp_num" type="text" name="ldap_emp_num" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Employment Type
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_emp_type" class="form-label">' . $this->trans('Employment Type') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Employment Type') . '" id="ldap_emp_type" type="text" name="ldap_emp_type" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        // Additional Information Section
+        $res .= '<div class="form-section mb-4">';
+        $res .= '<h6 class="form-section-title">' . $this->trans('Additional Information') . '</h6>';
+        $res .= '<div class="row">';
+        
+        // Language
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_lang" class="form-label">' . $this->trans('Language') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Language') . '" id="ldap_lang" type="text" name="ldap_lang" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // License Plate Number
+        $res .= '<div class="col-md-6 mb-3">';
+        $res .= '<label for="ldap_car" class="form-label">' . $this->trans('License Plate Number') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('License Plate Number') . '" id="ldap_car" type="text" name="ldap_car" value="" class="form-control custom-input">';
+        $res .= '</div>';
+        
+        // Username (hidden field)
+        $res .= '<div class="col-md-12 mb-3 d-none" id="ldap_uid_field_wrapper">';
+        $res .= '<label for="ldap_uid" class="form-label">' . $this->trans('Username') . '</label>';
+        $res .= '<input placeholder="' . $this->trans('Username') . '" id="ldap_uid" type="text" name="ldap_uid" value="" class="form-control custom-input" autocomplete="username">';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        
+        $res .= '</form>';
+        $res .= '</div>';
 
-        //             $res .= '</td></tr>';
-        //             $res .= '<tr><td id="contact_'.$this->html_safe($c->value('id')).'_detail" class="contact_detail_row" colspan="6">';
-        //             $res .= build_contact_detail($this, $c, $c->value('id')).'</td>';
-        //             $res .= '</td></tr>';
-        //         }
-        //     }
-        //     $res .= '<tr><td class="contact_pages" colspan="7">';
-        //     $contactsPerPage = $per_page;
-        //     $totalContacts = count($contact);
-        //     $totalPages = ceil($totalContacts / $contactsPerPage);
-        //     $currentPage = $current_page;
-        //     if ($currentPage > 1) {
-        //         $res .= '<a href="?page=contacts&contact_page='.($currentPage - 1).'">Previous</a>';
-        //     }
-        //     if ($currentPage <= $totalPages) {
-        //         $res .= ' <a href="?page=contacts&contact_page='.($currentPage + 1).'">Next</a>';
-        //     }
-        //     $res .= '</td></tr>';
-        //     $res .= '</table>';
-
-        //     $res .= '</li>';
-        //     $tabIndex++;
-        // }
-        // $res .= '</table>'.$modal.'</div>';
-        // $res .= '</ul>';
-
-        // $res .= '</div>';
-
+        $res .= '<div class="modal-footer custom-modal-footer">';
+        $res .= '<button type="button" class="btn btn-secondary custom-btn-secondary" data-bs-dismiss="modal">';
+        $res .= $this->trans('Cancel');
+        $res .= '</button>';
+        $res .= '<button type="submit" class="btn btn-primary custom-btn-primary" id="submit-ldap-contact-btn">';
+        $res .= $this->trans('Add LDAP Contact');
+        $res .= '</button>';
+        $res .= '</div>';
+        
+        $res .= '</div>';
+        $res .= '</div>';
+        $res .= '</div>';
+        
         return $res;
     }
 }
