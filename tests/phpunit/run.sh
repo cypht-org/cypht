@@ -10,6 +10,10 @@ DB="${DB:-sqlite}"
 
 echo "SETTING UP DB $DB"
 
+COVERAGE_REQUIREMENT=78
+
+echo "Coverage requirement is ${COVERAGE_REQUIREMENT}%"
+
 export DB_DRIVER=$DB
 export DB_NAME=cypht_test
 
@@ -43,3 +47,4 @@ else
 fi
 
 phpunit --bootstrap vendor/autoload.php --configuration ${SCRIPT_DIR}/phpunit.xml --testdox $@
+vendor/bin/coverage-check ${SCRIPT_DIR}/clover.xml ${COVERAGE_REQUIREMENT}
