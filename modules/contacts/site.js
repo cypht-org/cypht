@@ -439,10 +439,32 @@ var initLdapContactModal = function() {
     });
 };
 
+var initPagination = function() {
+    $(document).on('click', '.pagination-btn:not([disabled]), .pagination-number', function(e) {
+        e.preventDefault();
+        var page = $(this).data('page');
+        var currentPage = parseInt(getUrlParameter('contact_page')) || 1;
+        
+        if (page && page !== currentPage) {
+            var currentUrl = new URL(window.location);
+            currentUrl.searchParams.set('contact_page', page);
+            window.location.href = currentUrl.toString();
+        }
+    });
+};
+
+var getUrlParameter = function(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
 //TODO: Move JS related to local contacts to /modules/local_contacts/ and ldap contacts to /modules/ldap_contacts/
 $(document).ready(function() {
     initContactTabs();
     initLocalContactModal();
     initLdapContactModal();
+    initPagination();
 });
 

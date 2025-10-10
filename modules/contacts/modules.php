@@ -351,11 +351,18 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
             return '<div class="no_contact_sources">'.$this->trans('No contact backends are enabled!').
                 '<br />'.$this->trans('At least one backend must be enabled in the config/app.php file to use contacts.').'</div>';
         }
-        $per_page = 25;
+        $per_page = 15;
         $current_page = $this->get('contact_page', 1);
 
         $contacts = $this->get('contact_store');
         $editable = $this->get('contact_edit', array());
+
+        // Get total contact count for pagination
+        $total_contacts = 0;
+        if ($contacts) {
+            $total_contacts = $contacts->count();
+        }
+        $total_pages = ceil($total_contacts / $per_page);
 
         $tabIndex = 1;
         $contactGroups = [];
@@ -486,87 +493,144 @@ class Hm_Output_contacts_list extends Hm_Output_Module {
 
                 foreach ($contactsToShow as $contact) {
                     foreach ($contact as $c) {
-                    $name = $c->value('display_name');
-                    if (!trim($name)) {
-                        $name = $c->value('fn');
-                    }
-                    if (!trim($name)) {
-                        $name = $c->value('email_address');
-                    }
-                    
-                    $initials = get_initials($name);
-                    $avatarColor = get_avatar_color($c->value('id'));
+                        $name = $c->value('display_name');
+                        if (!trim($name)) {
+                            $name = $c->value('fn');
+                        }
+                        if (!trim($name)) {
+                            $name = $c->value('email_address');
+                        }
+                        
+                        $initials = get_initials($name);
+                        $avatarColor = get_avatar_color($c->value('id'));
 
-                    $res .= '<tr class="contact-row">';
-                    
-                    $res .= '<td>';
-                    $res .= '<div class="contact-info">';
-                    $res .= '<div class="contact-avatar-small" style="background: ' . $avatarColor . '">';
-                    $res .= '<span>' . $this->html_safe($initials) . '</span>';
-                    $res .= '</div>';
-                    $res .= '<span class="contact-name-text">' . $this->html_safe($name) . '</span>';
-                    $res .= '</div>';
-                    $res .= '</td>';
+                        $res .= '<tr class="contact-row">';
+                        
+                        $res .= '<td>';
+                        $res .= '<div class="contact-info">';
+                        $res .= '<div class="contact-avatar-small" style="background: ' . $avatarColor . '">';
+                        $res .= '<span>' . $this->html_safe($initials) . '</span>';
+                        $res .= '</div>';
+                        $res .= '<span class="contact-name-text">' . $this->html_safe($name) . '</span>';
+                        $res .= '</div>';
+                        $res .= '</td>';
 
-                    $res .= '<td>';
-                    $res .= '<div class="contact-source-cell">';
-                    $res .= '<i class="bi bi-database-fill"></i>';
-                    $res .= '<span>' . $this->html_safe($c->value('source')) . '</span>';
-                    $res .= '</div>';
-                    $res .= '</td>';
+                        $res .= '<td>';
+                        $res .= '<div class="contact-source-cell">';
+                        $res .= '<i class="bi bi-database-fill"></i>';
+                        $res .= '<span>' . $this->html_safe($c->value('source')) . '</span>';
+                        $res .= '</div>';
+                        $res .= '</td>';
 
-                    $res .= '<td>';
-                    $res .= '<div class="contact-email-cell">';
-                    $res .= '<i class="bi bi-envelope-fill"></i>';
-                    $res .= '<span>' . $this->html_safe($c->value('email_address')) . '</span>';
-                    $res .= '</div>';
-                    $res .= '</td>';
+                        $res .= '<td>';
+                        $res .= '<div class="contact-email-cell">';
+                        $res .= '<i class="bi bi-envelope-fill"></i>';
+                        $res .= '<span>' . $this->html_safe($c->value('email_address')) . '</span>';
+                        $res .= '</div>';
+                        $res .= '</td>';
 
-                    $res .= '<td>';
-                    $res .= '<div class="contact-phone-cell">';
-                    $res .= '<i class="bi bi-telephone-fill"></i>';
-                    $res .= '<span>' . $this->html_safe($c->value('phone_number')) . '</span>';
-                    $res .= '</div>';
-                    $res .= '</td>';
+                        $res .= '<td>';
+                        $res .= '<div class="contact-phone-cell">';
+                        $res .= '<i class="bi bi-telephone-fill"></i>';
+                        $res .= '<span>' . $this->html_safe($c->value('phone_number')) . '</span>';
+                        $res .= '</div>';
+                        $res .= '</td>';
 
-                    $res .= '<td>';
-                    $res .= '<div class="contact-actions">';
-                    
-                    if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
-                            $this->html_safe($c->value('source')).'&amp;contact_type='.
-                            $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
-                        $res .= '<a href="'.$edit_url.'" class="action-btn action-btn-edit" title="Modifier">';
-                        $res .= '<i class="bi bi-pencil-fill"></i>';
+                        $res .= '<td>';
+                        $res .= '<div class="contact-actions">';
+                        
+                        if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+                            $edit_url = '?page=contacts&amp;contact_id='.$this->html_safe($c->value('id')).'&amp;contact_source='.
+                                $this->html_safe($c->value('source')).'&amp;contact_type='.
+                                $this->html_safe($c->value('type')).'&amp;contact_page='.$current_page;
+                            $res .= '<a href="'.$edit_url.'" class="action-btn action-btn-edit" title="Modifier">';
+                            $res .= '<i class="bi bi-pencil-fill"></i>';
+                            $res .= '</a>';
+                        }
+
+                        $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
+                            '&amp;contact_source='.$this->html_safe($c->value('source')).
+                            '&amp;contact_type='.$this->html_safe($c->value('type'));
+                        $res .= '<a href="'.$send_to_url.'" class="action-btn action-btn-more" title="Envoyer à">';
+                        $res .= '<i class="bi bi-envelope-fill"></i>';
                         $res .= '</a>';
+                        
+                        if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
+                            $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
+                            $res .= '<a '.$delete_attrs.' class="action-btn action-btn-delete delete_contact" title="Supprimer">';
+                            $res .= '<i class="bi bi-trash-fill"></i>';
+                            $res .= '</a>';
+                        }
+                        
+                        $res .= '</div>';
+                        $res .= '</td>';
+                        $res .= '</tr>';
                     }
-
-                    $send_to_url = '?page=compose&amp;contact_id='.$this->html_safe($c->value('id')).
-                        '&amp;contact_source='.$this->html_safe($c->value('source')).
-                        '&amp;contact_type='.$this->html_safe($c->value('type'));
-                    $res .= '<a href="'.$send_to_url.'" class="action-btn action-btn-more" title="Envoyer à">';
-                    $res .= '<i class="bi bi-envelope-fill"></i>';
-                    $res .= '</a>';
-                    
-                    if (in_array($c->value('type').':'.$c->value('source'), $editable, true)) {
-                        $delete_attrs = 'data-id="'.$this->html_safe($c->value('id')).'" data-type="'.$this->html_safe($c->value('type')).'" data-source="'.$this->html_safe($c->value('source')).'"';
-                        $res .= '<a '.$delete_attrs.' class="action-btn action-btn-delete delete_contact" title="Supprimer">';
-                        $res .= '<i class="bi bi-trash-fill"></i>';
-                        $res .= '</a>';
-                    }
-                    
-                    $res .= '</div>';
-                    $res .= '</td>';
-                    $res .= '</tr>';
                 }
-            }
 
                 $res .= '</tbody>';
                 $res .= '</table>';
                 $res .= '</div>';
+                
+                if ($total_contacts > 0 && $total_pages > 1) {
+                    $start_item = ($current_page - 1) * $per_page + 1;
+                    $end_item = min($start_item + $per_page - 1, $total_contacts);
+                    
+                    $res .= '<div class="pagination-container mt-3">';
+                    $res .= '<div class="pagination-info">';
+                    $res .= sprintf($this->trans('Showing %d-%d of %d contacts'), $start_item, $end_item, $total_contacts);
+                    $res .= '</div>';
+                    
+                    $res .= '<div class="pagination-controls">';
+                    
+                    $prev_disabled = $current_page <= 1 ? ' disabled=""' : '';
+                    $prev_page = max(1, $current_page - 1);
+                    $res .= '<button class="pagination-btn"' . $prev_disabled . ' data-page="' . $prev_page . '">';
+                    $res .= '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-left">';
+                    $res .= '<path d="m15 18-6-6 6-6"></path>';
+                    $res .= '</svg>';
+                    $res .= '</button>';
+                    
+                    $res .= '<div class="pagination-numbers">';
+                    
+                    $start_page = max(1, $current_page - 2);
+                    $end_page = min($total_pages, $current_page + 2);
+                    
+                    if ($start_page > 1) {
+                        $res .= '<button class="pagination-number" data-page="1">1</button>';
+                        if ($start_page > 2) {
+                            $res .= '<span class="pagination-ellipsis">...</span>';
+                        }
+                    }
+                    
+                    for ($i = $start_page; $i <= $end_page; $i++) {
+                        $active_class = $i == $current_page ? ' active' : '';
+                        $res .= '<button class="pagination-number' . $active_class . '" data-page="' . $i . '">' . $i . '</button>';
+                    }
+                    
+                    if ($end_page < $total_pages) {
+                        if ($end_page < $total_pages - 1) {
+                            $res .= '<span class="pagination-ellipsis">...</span>';
+                        }
+                        $res .= '<button class="pagination-number" data-page="' . $total_pages . '">' . $total_pages . '</button>';
+                    }
+                    
+                    $res .= '</div>';
+                    
+                    $next_disabled = $current_page >= $total_pages ? ' disabled=""' : '';
+                    $next_page = min($total_pages, $current_page + 1);
+                    $res .= '<button class="pagination-btn"' . $next_disabled . ' data-page="' . $next_page . '">';
+                    $res .= '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-right">';
+                    $res .= '<path d="m9 18 6-6-6-6"></path>';
+                    $res .= '</svg>';
+                    $res .= '</button>';
+                    
+                    $res .= '</div>';
+                    $res .= '</div>';
+                }
             } else {
                 $res .= '<div class="empty-state">';
-                $res .= '<p>Aucun contact dans cette catégorie</p>';
+                $res .= '<p>No contacts in this category</p>';
                 $res .= '</div>';
             }
 
