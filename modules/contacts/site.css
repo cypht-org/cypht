@@ -538,10 +538,14 @@
 }
 
 .contact-table tbody td {
-  padding: 1.25rem;
+  padding: .7rem 1.25rem;
   vertical-align: middle;
   color: #334155;
   font-size: 0.9375rem;
+}
+
+.contact-table tbody tr:last-child {
+  border-bottom: 1px solid transparent;
 }
 
 .contact-info {
@@ -553,7 +557,8 @@
 .contact-avatar-small {
   width: 42px;
   height: 42px;
-  border-radius: var(--bs-border-radius-sm);
+  border-radius: 50px;
+  /* border-radius: var(--bs-border-radius-sm); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1214,3 +1219,100 @@
 /* .ldap-contact-form .form-section:last-child {
   margin-bottom: 0;
 } */
+
+/* Pagination styles */
+.pagination-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 0;
+  margin-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination-info {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pagination-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.pagination-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pagination-number:hover:not(.active) {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.pagination-number.active {
+  background: #111827;
+  color: white;
+  border-color: #111827;
+}
+
+@media (max-width: 768px) {
+  .pagination-container {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .pagination-info {
+    font-size: 0.8125rem;
+  }
+
+  .pagination-controls {
+    width: 100%;
+    justify-content: center;
+  }
+}
